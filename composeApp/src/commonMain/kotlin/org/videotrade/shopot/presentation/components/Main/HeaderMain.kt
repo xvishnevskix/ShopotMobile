@@ -1,0 +1,105 @@
+package org.videotrade.shopot.presentation.components.Main
+
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.painterResource
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.add_main
+import shopot.composeapp.generated.resources.logo_main
+import shopot.composeapp.generated.resources.search_main
+import shopot.composeapp.generated.resources.settings_main
+
+@Composable
+fun HeaderMain(drawerState: DrawerState) {
+    val interactionSource =
+        remember { MutableInteractionSource() }  // Создаем источник взаимодействия
+
+    val scope = rememberCoroutineScope()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+
+        ) {
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+
+
+            Image(
+                modifier = Modifier.size(50.dp).clickable {
+                    scope.launch {
+                        drawerState.open()
+
+                    }
+
+                },
+                painter = painterResource(Res.drawable.logo_main),
+                contentDescription = null,
+
+                )
+
+            Text(
+                "Шёпот",
+                modifier = Modifier.padding(start = 14.dp),
+
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+
+            )
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+
+            Image(
+                modifier = Modifier.size(22.dp).padding(end = 4.dp).clickable(
+                    interactionSource = interactionSource, // Используем источник взаимодействия
+                    indication = null, // Указываем null, чтобы убрать анимацию при клике
+                    onClick = { }
+                ),
+
+                painter = painterResource(Res.drawable.search_main),
+                contentDescription = null,
+
+                )
+            Image(
+                modifier = Modifier.size(30.dp).padding(end = 4.dp),
+                painter = painterResource(Res.drawable.add_main),
+                contentDescription = null,
+
+                )
+            Image(
+                modifier = Modifier.size(25.dp),
+                painter = painterResource(Res.drawable.settings_main),
+                contentDescription = null,
+
+                )
+        }
+
+    }
+
+
+}
