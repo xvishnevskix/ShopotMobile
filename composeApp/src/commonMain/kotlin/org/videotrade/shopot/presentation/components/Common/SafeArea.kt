@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SafeArea(content: @Composable () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize().padding(20.dp)) {
+    Box(modifier = Modifier.fillMaxSize().safeContentPadding()) {
         content()
     }
 

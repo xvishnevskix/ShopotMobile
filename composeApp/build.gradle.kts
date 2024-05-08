@@ -65,9 +65,13 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.stately.common)
+            implementation(libs.webrtc.kmp)
             
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.websockets)
+            
+            
+            
         }
 
         commonTest.dependencies {

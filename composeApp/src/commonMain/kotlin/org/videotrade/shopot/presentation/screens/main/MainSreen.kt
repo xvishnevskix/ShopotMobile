@@ -28,7 +28,7 @@ class MainScreen : Screen {
   
         
         coroutineScope.launch {
-            connectionWs()
+//            connectionWs()
             
         }
         
