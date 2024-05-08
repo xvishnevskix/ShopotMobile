@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.DoorBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,7 +51,7 @@ fun AuthHeader(text: String) {
 
         ) {
             Icon(
-                imageVector = Icons.Default.ArrowBackIosNew,
+                imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back",
                 modifier = Modifier.padding(end = 8.dp).clickable {
                     navigator.pop()

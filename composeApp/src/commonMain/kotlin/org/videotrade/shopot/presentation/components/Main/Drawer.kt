@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
-import androidx.compose.material.icons.filled.Contacts
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Icon
@@ -38,7 +38,7 @@ fun Drawer(drawerState: DrawerState, chatState:  List<UserItem>) {
 
     val items = listOf(
         DrawerItem(
-            Icons.Default.Contacts,
+            Icons.Default.Call,
 
             "Контакты"
         ) {},

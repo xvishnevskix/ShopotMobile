@@ -18,16 +18,16 @@ import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 @Composable
-fun MainContentComponent(drawerState: DrawerState, chatState:  List<UserItem>) {
-
+fun MainContentComponent(drawerState: DrawerState, chatState: List<UserItem>) {
+    
     SafeArea {
-
-
+        
+        
         Column(
-
+        
         ) {
             HeaderMain(drawerState)
-
+            
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -37,19 +37,19 @@ fun MainContentComponent(drawerState: DrawerState, chatState:  List<UserItem>) {
                     modifier = Modifier.padding(bottom = 20.dp),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
-
+                
                 )
-
+                
                 LazyColumn {
                     itemsIndexed(chatState) { index, item ->
                         UserComponentItem(item)
-
+                        
                     }
                 }
-
+                
             }
-
+            
         }
     }
-
+    
 }

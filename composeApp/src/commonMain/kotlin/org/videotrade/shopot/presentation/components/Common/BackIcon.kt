@@ -3,7 +3,7 @@ package org.videotrade.shopot.presentation.components.Common
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -13,7 +13,7 @@ import cafe.adriel.voyager.navigator.Navigator
 @Composable
 fun BackIcon(modifier: Modifier = Modifier) {
     Icon(
-        imageVector = Icons.Default.ArrowBackIosNew,
+        imageVector = Icons.Default.ArrowBack,
         contentDescription = "Back",
         modifier = modifier
     )

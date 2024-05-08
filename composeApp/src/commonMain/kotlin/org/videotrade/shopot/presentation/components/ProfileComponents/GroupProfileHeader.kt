@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.DoorBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -63,7 +61,7 @@ fun GroupProfileHeader(text: String) {
 
         ) {
         Icon(
-            imageVector = Icons.Default.ArrowBackIosNew,
+            imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
             modifier = Modifier.padding(start = 0.dp,end = 1.dp)
         )

@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import org.videotrade.shopot.api.connectionWs
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.koin.compose.koinInject
+import org.videotrade.shopot.presentation.components.Main.Drawer
 
 
 class MainScreen : Screen {
@@ -33,7 +34,7 @@ class MainScreen : Screen {
         
 
         
-//        Drawer(drawerState, chatState)
+        Drawer(drawerState, chatState)
         
         
     }

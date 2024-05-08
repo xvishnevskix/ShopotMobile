@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import Avatar
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -23,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.videotrade.shopot.domain.model.UserItem
-import org.videotrade.shopot.presentation.components.Common.Avatar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.jetbrains.compose.resources.Font
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -58,7 +58,7 @@ fun ChatHeader(chat: UserItem) {
             horizontalArrangement = Arrangement.Center
         ) {
 
-            Avatar()
+//            Avatar()
 
             Text(
                 "${chat.firstName} ${chat.lastName}",
