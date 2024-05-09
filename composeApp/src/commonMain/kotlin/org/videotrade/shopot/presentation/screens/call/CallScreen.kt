@@ -17,6 +17,7 @@ import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import com.shepeliev.webrtckmp.videoTracks
+import org.videotrade.shopot.presentation.components.Call.Video
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class CallScreen : Screen {

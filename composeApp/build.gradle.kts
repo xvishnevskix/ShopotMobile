@@ -10,11 +10,24 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.buildConfig)
     alias(libs.plugins.kotlinx.serialization)
+    kotlin("native.cocoapods")
+    
 }
 
 kotlin {
     
-
+    cocoapods {
+        version = "1.0"
+        summary = "Compose app"
+        homepage = "not published"
+        ios.deploymentTarget = "13.0"
+        
+        pod("WebRTC-SDK") {
+            version = libs.versions.webrtc.ios.sdk.get()
+            moduleName = "WebRTC"
+            packageName = "WebRTC"
+        }
+    }
         
         
         
@@ -80,6 +93,8 @@ kotlin {
             
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.websockets)
+            
+//            implementation(project(":webrtc-kmp"))
             
             
             
@@ -157,25 +172,26 @@ buildConfig {
 }
 
 
-//fun KotlinNativeTarget.configureWebRtcCinterops() {
-//    val webRtcFrameworkPath = file("$buildDir/cocoapods/synthetic/IOS/Pods/WebRTC-SDK")
-//        .resolveArchPath(konanTarget, "WebRTC")
-//    compilations.getByName("main") {
-//        cinterops.getByName("WebRTC") {
-//            compilerOpts("-framework", "WebRTC", "-F$webRtcFrameworkPath")
-//        }
-//    }
-//
-//    binaries {
-//        getTest("DEBUG").apply {
-//            linkerOpts(
-//                "-framework",
-//                "WebRTC",
-//                "-F$webRtcFrameworkPath",
-//                "-rpath",
-//                "$webRtcFrameworkPath",
-//                "-ObjC"
-//            )
-//        }
-//    }
-//}
+
+fun KotlinNativeTarget.configureWebRtcCinterops() {
+    val webRtcFrameworkPath = file("$buildDir/cocoapods/synthetic/IOS/Pods/WebRTC-SDK")
+        .resolveArchPath(konanTarget, "WebRTC")
+    compilations.getByName("main") {
+        cinterops.getByName("WebRTC") {
+            compilerOpts("-framework", "WebRTC", "-F$webRtcFrameworkPath")
+        }
+    }
+    
+    binaries {
+        getTest("DEBUG").apply {
+            linkerOpts(
+                "-framework",
+                "WebRTC",
+                "-F$webRtcFrameworkPath",
+                "-rpath",
+                "$webRtcFrameworkPath",
+                "-ObjC"
+            )
+        }
+    }
+}
