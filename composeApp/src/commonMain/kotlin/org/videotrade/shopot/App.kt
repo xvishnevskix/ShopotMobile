@@ -117,7 +117,6 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.videotrade.shopot.presentation.screens.main.MainScreen
-import org.videotrade.shopot.theme.AppTheme
 
 import org.koin.compose.KoinContext
 import org.videotrade.shopot.domain.model.UserItem
@@ -125,7 +124,7 @@ import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 
 @Composable
-internal fun App() = AppTheme {
+internal fun App()  {
     
     KoinContext {
         Surface(

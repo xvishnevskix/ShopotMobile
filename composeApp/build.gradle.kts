@@ -2,6 +2,7 @@ import org.jetbrains.compose.ExperimentalComposeLibrary
 import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -12,7 +13,12 @@ plugins {
 }
 
 kotlin {
-    androidTarget {
+    
+
+        
+        
+        
+        androidTarget {
         compilations.all {
             kotlinOptions {
                 jvmTarget = "${JavaVersion.VERSION_1_8}"
@@ -29,6 +35,7 @@ kotlin {
             }
         }
     }
+    
 
     listOf(
         iosX64(),
@@ -42,6 +49,9 @@ kotlin {
     }
 
     sourceSets {
+        
+        
+        
         all {
             languageSettings {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
@@ -66,6 +76,7 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.stately.common)
             implementation(libs.webrtc.kmp)
+            implementation(libs.kermit) //Add latest version
             
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.websockets)
@@ -91,7 +102,11 @@ kotlin {
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
-
+        
+  
+        val iosMain by getting
+        val iosSimulatorArm64Main by getting
+        iosSimulatorArm64Main.dependsOn(iosMain)
     }
 }
 
@@ -140,3 +155,27 @@ buildConfig {
     // BuildConfig configuration here.
     // https://github.com/gmazzo/gradle-buildconfig-plugin#usage-in-kts
 }
+
+
+//fun KotlinNativeTarget.configureWebRtcCinterops() {
+//    val webRtcFrameworkPath = file("$buildDir/cocoapods/synthetic/IOS/Pods/WebRTC-SDK")
+//        .resolveArchPath(konanTarget, "WebRTC")
+//    compilations.getByName("main") {
+//        cinterops.getByName("WebRTC") {
+//            compilerOpts("-framework", "WebRTC", "-F$webRtcFrameworkPath")
+//        }
+//    }
+//
+//    binaries {
+//        getTest("DEBUG").apply {
+//            linkerOpts(
+//                "-framework",
+//                "WebRTC",
+//                "-F$webRtcFrameworkPath",
+//                "-rpath",
+//                "$webRtcFrameworkPath",
+//                "-ObjC"
+//            )
+//        }
+//    }
+//}
