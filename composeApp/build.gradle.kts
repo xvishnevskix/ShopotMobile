@@ -3,6 +3,8 @@ import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
+import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
     alias(libs.plugins.multiplatform)
@@ -28,10 +30,9 @@ kotlin {
             packageName = "WebRTC"
         }
     }
-        
-        
-        
-        androidTarget {
+    
+    
+    androidTarget {
         compilations.all {
             kotlinOptions {
                 jvmTarget = "${JavaVersion.VERSION_1_8}"
@@ -49,17 +50,18 @@ kotlin {
         }
     }
     
-
+    
     listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach {
-        it.binaries.framework {
+        iosX64 { configureWebRtcCinterops() },
+        iosArm64 { configureWebRtcCinterops() },
+        iosSimulatorArm64 { configureWebRtcCinterops() }
+    ).forEach { iosTarget ->
+        iosTarget.binaries.framework {
             baseName = "ComposeApp"
             isStatic = true
         }
     }
+
 
     sourceSets {
         
@@ -193,5 +195,27 @@ fun KotlinNativeTarget.configureWebRtcCinterops() {
                 "-ObjC"
             )
         }
+    }
+}
+
+
+fun File.resolveArchPath(target: KonanTarget, framework: String): File? {
+    val archPaths = resolve("$framework.xcframework")
+        .listFiles { _, name -> target.matches(name) }
+        ?: return null
+    
+    check(archPaths.size == 1) { "Resolving framework '$framework' arch path failed: $archPaths" }
+    
+    return archPaths.first()
+}
+
+private fun KonanTarget.matches(dir: String): Boolean {
+    return when (this) {
+        KonanTarget.IOS_SIMULATOR_ARM64,
+        KonanTarget.IOS_X64 -> dir.startsWith("ios") && dir.endsWith("simulator")
+        
+        KonanTarget.IOS_ARM64 -> dir.startsWith("ios-arm64") && !dir.contains("x86")
+        
+        else -> error("Unsupported target $name")
     }
 }
