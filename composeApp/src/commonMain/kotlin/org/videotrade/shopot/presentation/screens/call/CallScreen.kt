@@ -100,6 +100,7 @@ class CallScreen(private val userId: String = "82c208513187dc01") : Screen {
         
         DisposableEffect(Unit) {
             val job = scope.launch {
+                
                 val peerConnection = PeerConnection()
                 
                 setPeerConnections(peerConnection)
@@ -280,86 +281,71 @@ suspend fun handleWebRTCWebSocket(
                     for (frame in incoming) {
                         if (frame is Frame.Text) {
                             val text = frame.readText()
-                            Logger.d { "Received frame: $text" }
-                            
                             val jsonElement = Json.parseToJsonElement(text)
                             val type = jsonElement.jsonObject["type"]?.jsonPrimitive?.content
                             val rtcMessage = jsonElement.jsonObject["rtcMessage"]?.jsonObject
-                         
-                            
-                            
-                            try {
-                         
-                            
-                            } catch (e: Error) {
-                                
-                                Logger.d { "ErrorError1111 ${e.message}" }
-                                
-                                
-                            }
                             
                             
                             
                             
                             when (type) {
                                 "newCall" -> {
-
-
-//
+                                    
                                     if (rtcMessage != null) {
-                                        val messageTypeString = rtcMessage.get("type")?.jsonPrimitive?.content
                                         val sdp =
-                                            rtcMessage.get("sdp")?.jsonPrimitive?.content ?: return@launch
+                                            rtcMessage.get("sdp")?.jsonPrimitive?.content
+                                                ?: return@launch
                                         
                                         
                                         val callerId =
                                             jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-
-
+                                        
+                                        
                                         otherUserId.value = callerId
-
-//                                        val offer = deserializeSessionDescription(rtcMessage)
-                                        
-                                        val messageType = messageTypeString?.let {
-                                            try {
-                                                SessionDescriptionType.valueOf(it.uppercase())
-                                            } catch (e: IllegalArgumentException) {
-                                                null // или обработать исключение, если тип не распознан
-                                            }
-                                        }
-                                        
-                                        if (messageType == null ) return@launch
                                         
                                         
-                                        val  offer = SessionDescription(messageType,sdp )
+                                        val offer =
+                                            SessionDescription(SessionDescriptionType.Offer, sdp)
                                         
                                         
                                         if (peerConnections != null) {
-
-
+                                            
+                                            
                                             peerConnections.setRemoteDescription(offer)
-
-
+                                            
+                                            
                                             inCommingCall.value = true
                                         }
-
+                                        
                                     }
                                 }
                                 
                                 "callAnswered" -> {
 
-//                                    if (rtcMessage == null || peerConnections == null) return@launch
-//
-//
-//                                    val answer = deserializeSessionDescription(rtcMessage)
-//
-//                                    peerConnections.setRemoteDescription(answer)
+                                    if (rtcMessage == null || peerConnections == null) return@launch
+                                    
+                                    
+                                    val sdp =
+                                        rtcMessage.get("sdp")?.jsonPrimitive?.content
+                                            ?: return@launch
+                                    
+                                    
+                                    val answer =
+                                        SessionDescription(SessionDescriptionType.Answer, sdp)
+                                    
+                                    
+                                    Logger.d("rtcMessage31313 $answer")
+                                    
+                                    peerConnections.setRemoteDescription(answer)
                                 }
                                 
                                 "ICEcandidate" -> {
                                     
                                     
                                     if (rtcMessage == null || peerConnections == null) return@launch
+                                    
+                                    
+                                    Logger.d("ICEcandidate313131 $rtcMessage")
                                     
                                     
                                     val jsonElement = Json.parseToJsonElement(rtcMessage.toString())
@@ -373,7 +359,6 @@ suspend fun handleWebRTCWebSocket(
                                     
                                     
                                     
-                                    println("ICEcandidate $rtcMessage $peerConnections")
 
 //                                    val dto = Json.decodeFromString(SessionDescriptionDTO.serializer(), )
                                     
@@ -381,7 +366,7 @@ suspend fun handleWebRTCWebSocket(
                                     if (candidate == null || id == null || label == null) return@launch
                                     
                                     println(
-                                        "iceCandidate222 ${
+                                        "iceCandidate222 $callerId ${
                                             IceCandidate(
                                                 candidate = candidate,
                                                 sdpMid = id,
@@ -460,8 +445,9 @@ data class WebRTCMessage(
     val type: String,
     val calleeId: String? = null,
     val callerId: String? = null,
-    val rtcMessage: SessionDescriptionDTO,
+    val rtcMessage: SessionDescriptionDTO? = null,
     val sender: String? = null,
+    val  iceMessage: rtcMessageDTO? = null
     
     )
 

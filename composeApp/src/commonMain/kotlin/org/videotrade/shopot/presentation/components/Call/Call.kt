@@ -43,34 +43,34 @@ suspend fun Call(
         .onEach { candidate ->
             Logger.d { "onIceCandidate22: ${candidate.candidate}" }
             
-//            val rtcMessage = Json.encodeToString(
-//                rtcMessageDTO.serializer(), rtcMessageDTO(
-//                    label = candidate.sdpMLineIndex,
-//                    id = candidate.sdpMid,
-//                    candidate = candidate.candidate,
-//                )
-//            )
+            val rtcMessage = Json.encodeToString(
+                rtcMessageDTO.serializer(), rtcMessageDTO(
+                    label = candidate.sdpMLineIndex,
+                    id = candidate.sdpMid,
+                    candidate = candidate.candidate,
+                )
+            )
             
-//
-//            val iceCandidateMessage = WebRTCMessage(
-//                type = "ICEcandidate",
-//                calleeId = otherUserId.value,
-//                rtcMessage = rtcMessageDTO(
-//                    label = candidate.sdpMLineIndex,
-//                    id = candidate.sdpMid,
-//                    candidate = candidate.candidate,
-//                ),
-//            )
-//
-//            val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
-//
-//
-//            try {
-//                webSocketSession.value?.send(Frame.Text(jsonMessage))
-//                println("Message sent successfully")
-//            } catch (e: Exception) {
-//                println("Failed to send message: ${e.message}")
-//            }
+
+            val iceCandidateMessage = WebRTCMessage(
+                type = "ICEcandidate",
+                calleeId = otherUserId.value,
+                iceMessage = rtcMessageDTO(
+                    label = candidate.sdpMLineIndex,
+                    id = candidate.sdpMid,
+                    candidate = candidate.candidate,
+                ),
+            )
+
+            val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
+
+
+            try {
+                webSocketSession.value?.send(Frame.Text(jsonMessage))
+                println("Message sent successfully")
+            } catch (e: Exception) {
+                println("Failed to send message: ${e.message}")
+            }
             
             peerConnection.addIceCandidate(candidate)
             
@@ -81,28 +81,28 @@ suspend fun Call(
     // Следим за изменениями состояния сигнализации
     peerConnection.onSignalingStateChange
         .onEach { signalingState ->
-            Logger.d { "onSignalingStateChange: $signalingState" }
+            Logger.d { "peer2   onSignalingStateChange: $signalingState" }
         }
         .launchIn(this)
     
     // Следим за изменениями состояния соединения ICE
     peerConnection.onIceConnectionStateChange
         .onEach { state ->
-            Logger.d { "onIceConnectionStateChange: $state" }
+            Logger.d { " peer2 onIceConnectionStateChange: $state" }
         }
         .launchIn(this)
     
     // Следим за изменениями общего состояния соединения
     peerConnection.onConnectionStateChange
         .onEach { state ->
-            Logger.d { "onConnectionStateChange: $state" }
+            Logger.d { "peer2 onConnectionStateChange: $state" }
         }
         .launchIn(this)
     
     // Обработка треков, получаемых от удалённого пира
     peerConnection.onTrack
         .onEach { event ->
-            Logger.d { "onTrack: ${event.track}" }
+            Logger.d { "onTrack:  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
             if (event.track?.kind == MediaStreamTrackKind.Video) {
                 setRemoteVideoTrack(event.track as VideoStreamTrack)
             }
