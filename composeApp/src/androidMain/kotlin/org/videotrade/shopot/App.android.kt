@@ -9,6 +9,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import org.koin.core.context.startKoin
 import org.videotrade.shopot.di.getSharedModules
+import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
 
 class AndroidApp : Application() {
     companion object {
@@ -17,6 +18,7 @@ class AndroidApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        DeviceIdProviderFactory.initialize(this)
         
         startKoin { modules(getSharedModules()) }
         

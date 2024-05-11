@@ -95,7 +95,10 @@ kotlin {
             
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.websockets)
-            
+            implementation(libs.ktor.client.serialization)
+            implementation(libs.kotlinx.serialization.json.v132)
+
+
 //            implementation(project(":webrtc-kmp"))
             
             
