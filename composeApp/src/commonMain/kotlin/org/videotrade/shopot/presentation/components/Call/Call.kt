@@ -1,6 +1,5 @@
 import androidx.compose.runtime.MutableState
 import co.touchlab.kermit.Logger
-import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.MediaStreamTrackKind
 import com.shepeliev.webrtckmp.PeerConnection
@@ -32,26 +31,20 @@ suspend fun Call(
     
     ): Nothing = coroutineScope {
     localStream.tracks.forEach { track ->
-        peerConnection.addTrack(track)
+        
+        Logger.d { "track22:${callerId.value} ${otherUserId.value} $track" }
+        
+        peerConnection.addTrack(track, localStream)
     }
-    
+
 //    val pсIceCandidates = mutableListOf<IceCandidate>()
     
     
     // Обработка кандидатов ICE
     peerConnection.onIceCandidate
         .onEach { candidate ->
-            Logger.d { "onIceCandidate22: ${candidate.candidate}" }
+//            Logger.d { "PC1 onIceCandidate22:${callerId.value} ${otherUserId.value}" }
             
-            val rtcMessage = Json.encodeToString(
-                rtcMessageDTO.serializer(), rtcMessageDTO(
-                    label = candidate.sdpMLineIndex,
-                    id = candidate.sdpMid,
-                    candidate = candidate.candidate,
-                )
-            )
-            
-
             val iceCandidateMessage = WebRTCMessage(
                 type = "ICEcandidate",
                 calleeId = otherUserId.value,
@@ -61,10 +54,10 @@ suspend fun Call(
                     candidate = candidate.candidate,
                 ),
             )
-
+            
             val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
-
-
+            
+            
             try {
                 webSocketSession.value?.send(Frame.Text(jsonMessage))
                 println("Message sent successfully")
@@ -81,28 +74,35 @@ suspend fun Call(
     // Следим за изменениями состояния сигнализации
     peerConnection.onSignalingStateChange
         .onEach { signalingState ->
-            Logger.d { "peer2   onSignalingStateChange: $signalingState" }
+            Logger.d { "PC1 onSignalingStateChange: $signalingState" }
+            
+            if (signalingState == SignalingState.HaveRemoteOffer) {
+                Logger.d { " peer2 signalingState: $signalingState" }
+                
+            }
         }
         .launchIn(this)
     
     // Следим за изменениями состояния соединения ICE
     peerConnection.onIceConnectionStateChange
         .onEach { state ->
-            Logger.d { " peer2 onIceConnectionStateChange: $state" }
+            Logger.d { "PC1 onIceConnectionStateChange: $state" }
+            
+            
         }
         .launchIn(this)
     
     // Следим за изменениями общего состояния соединения
     peerConnection.onConnectionStateChange
         .onEach { state ->
-            Logger.d { "peer2 onConnectionStateChange: $state" }
+            Logger.d { "PC1 onConnectionStateChange: $state" }
         }
         .launchIn(this)
     
     // Обработка треков, получаемых от удалённого пира
     peerConnection.onTrack
         .onEach { event ->
-            Logger.d { "onTrack:  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
+            Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
             if (event.track?.kind == MediaStreamTrackKind.Video) {
                 setRemoteVideoTrack(event.track as VideoStreamTrack)
             }

@@ -21,10 +21,12 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
+import com.shepeliev.webrtckmp.IceServer
 import com.shepeliev.webrtckmp.MediaDevices
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.RtcConfiguration
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
 import com.shepeliev.webrtckmp.VideoStreamTrack
@@ -101,7 +103,29 @@ class CallScreen(private val userId: String = "82c208513187dc01") : Screen {
         DisposableEffect(Unit) {
             val job = scope.launch {
                 
-                val peerConnection = PeerConnection()
+                val iceServers = listOf(
+                    "stun:stun.l.google.com:19302",
+                    "stun:stun1.l.google.com:19302",
+                    "stun:stun2.l.google.com:19302",
+                )
+                
+                val turnServers = listOf(
+                    "turn:89.221.60.156:3478",
+                )
+                // Создание конфигурации для PeerConnection
+                val rtcConfiguration = RtcConfiguration(
+                    iceServers = listOf(
+                        IceServer(iceServers),
+                        IceServer(
+                            urls = turnServers,// URL TURN сервера
+                            username = "andrew", // Имя пользователя
+                            password = "kapustin" // Пароль
+                        )
+                    )
+                )
+                
+                // Создание PeerConnection с данной конфигурацией
+                val peerConnection = PeerConnection(rtcConfiguration)
                 
                 setPeerConnections(peerConnection)
                 
@@ -286,8 +310,6 @@ suspend fun handleWebRTCWebSocket(
                             val rtcMessage = jsonElement.jsonObject["rtcMessage"]?.jsonObject
                             
                             
-                            
-                            
                             when (type) {
                                 "newCall" -> {
                                     
@@ -321,7 +343,7 @@ suspend fun handleWebRTCWebSocket(
                                 }
                                 
                                 "callAnswered" -> {
-
+                                    
                                     if (rtcMessage == null || peerConnections == null) return@launch
                                     
                                     
@@ -356,9 +378,7 @@ suspend fun handleWebRTCWebSocket(
                                         jsonElement.jsonObject["id"]?.jsonPrimitive?.content
                                     val candidate =
                                         jsonElement.jsonObject["candidate"]?.jsonPrimitive?.content
-                                    
-                                    
-                                    
+
 
 //                                    val dto = Json.decodeFromString(SessionDescriptionDTO.serializer(), )
                                     
@@ -447,9 +467,9 @@ data class WebRTCMessage(
     val callerId: String? = null,
     val rtcMessage: SessionDescriptionDTO? = null,
     val sender: String? = null,
-    val  iceMessage: rtcMessageDTO? = null
-    
-    )
+    val iceMessage: rtcMessageDTO? = null
+
+)
 
 @Serializable
 data class rtcMessageDTO(

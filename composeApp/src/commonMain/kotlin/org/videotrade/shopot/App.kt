@@ -118,15 +118,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
+import org.koin.compose.KoinContext
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
-import org.koin.compose.KoinContext
-import org.videotrade.shopot.domain.model.UserItem
-import org.videotrade.shopot.presentation.screens.call.CallScreen
-import org.videotrade.shopot.presentation.screens.chat.ChatScreen
-
 @Composable
-internal fun App()  {
+internal fun App() {
     
     KoinContext {
         Surface(
@@ -136,10 +132,10 @@ internal fun App()  {
 //                ChatScreen(
 //                UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "")
 //                )
-                CallScreen(
-
-                )
-//MainScreen()
+//                CallScreen(
+//
+//                )
+                MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
