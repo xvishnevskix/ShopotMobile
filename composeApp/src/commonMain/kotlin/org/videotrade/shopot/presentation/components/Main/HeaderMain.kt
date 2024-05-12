@@ -15,11 +15,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import shopot.composeapp.generated.resources.Montserrat_Medium
+import shopot.composeapp.generated.resources.Montserrat_Regular
+import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.add_main
 import shopot.composeapp.generated.resources.logo_main
@@ -61,10 +70,14 @@ fun HeaderMain(drawerState: DrawerState) {
 
             Text(
                 "Шёпот",
-                modifier = Modifier.padding(start = 14.dp),
+                modifier = Modifier.padding(start = 7.dp),
 
+                textAlign = TextAlign.Center,
                 fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                color = Color(0xFF000000)
 
             )
         }
@@ -75,7 +88,7 @@ fun HeaderMain(drawerState: DrawerState) {
         ) {
 
             Image(
-                modifier = Modifier.size(22.dp).padding(end = 4.dp).clickable(
+                modifier = Modifier.padding(end = 15.dp).size(22.dp).clickable(
                     interactionSource = interactionSource, // Используем источник взаимодействия
                     indication = null, // Указываем null, чтобы убрать анимацию при клике
                     onClick = { }
@@ -86,7 +99,7 @@ fun HeaderMain(drawerState: DrawerState) {
 
                 )
             Image(
-                modifier = Modifier.size(30.dp).padding(end = 4.dp),
+                modifier = Modifier.padding(end = 15.dp).size(30.dp),
                 painter = painterResource(Res.drawable.add_main),
                 contentDescription = null,
 

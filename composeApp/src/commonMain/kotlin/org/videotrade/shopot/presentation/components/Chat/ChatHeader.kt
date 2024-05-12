@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.Icon
@@ -28,6 +29,7 @@ import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.jetbrains.compose.resources.Font
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.randomUser
 
 @Composable
 fun ChatHeader(chat: UserItem) {
@@ -58,15 +60,18 @@ fun ChatHeader(chat: UserItem) {
             horizontalArrangement = Arrangement.Center
         ) {
 
-//            Avatar()
+            Avatar(
+                drawableRes = Res.drawable.randomUser,
+                size = 40.dp
+            )
 
             Text(
                 "${chat.firstName} ${chat.lastName}",
-                fontSize = 20.sp,
+                fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                 lineHeight = 20.sp,
-                modifier = Modifier.padding(start = 5.dp),
+                modifier = Modifier.padding(start = 16.dp),
             )
         }
 
@@ -74,8 +79,8 @@ fun ChatHeader(chat: UserItem) {
         Box {
             Icon(
                 imageVector = Icons.Default.Call,
-                contentDescription = "Back",
-                modifier = Modifier.padding(end = 8.dp).clickable {
+                contentDescription = "Call",
+                modifier = Modifier.padding(end = 8.dp).size(20.dp).clickable {
                     navigator.pop()
                 }
             )

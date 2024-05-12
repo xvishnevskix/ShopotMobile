@@ -1,6 +1,4 @@
 package org.videotrade.shopot
-
-
 //
 //import androidx.compose.animation.core.*
 //import androidx.compose.foundation.Image
@@ -118,24 +116,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import org.koin.compose.KoinContext
 import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.theme.AppTheme
+
+import org.koin.compose.KoinContext
+import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 
 @Composable
-internal fun App() {
+internal fun App() = AppTheme {
     
     KoinContext {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
             Navigator(
-//                ChatScreen(
-//                UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "")
-//                )
+////                ChatScreen(
+////                UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "")
+////                )
 //                CallScreen(
 //
 //                )
-                MainScreen()
+MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
