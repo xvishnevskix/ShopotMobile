@@ -7,7 +7,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.launch
-import org.videotrade.shopot.api.connectionWs
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.components.Main.Drawer
@@ -26,12 +25,8 @@ class MainScreen : Screen {
         
         val coroutineScope = rememberCoroutineScope()
         
-        
-        coroutineScope.launch {
-//            connectionWs()
-        
-        }
-        
+        viewModel.getProfile()
+     
         
         
         Drawer(drawerState, chatState)

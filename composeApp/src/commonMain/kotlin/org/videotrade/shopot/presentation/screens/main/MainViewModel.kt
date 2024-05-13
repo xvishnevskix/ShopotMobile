@@ -10,27 +10,43 @@ import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.domain.usecase.UsersUseCase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.usecase.ProfileUseCase
 
 class MainViewModel : ViewModel(), KoinComponent {
-    private val useCase: UsersUseCase by inject()
+    private val userUseCase: UsersUseCase by inject()
+    private val profileUseCase: ProfileUseCase by inject()
     
     private val _chats = MutableStateFlow<List<UserItem>>(listOf())
     
     val chats: StateFlow<List<UserItem>> = _chats.asStateFlow()
     
+    
+    
+    private val profile = MutableStateFlow<ProfileDTO?>( null)
+    
+    
     init {
         loadUsers()
     }
     
+    
+    
+    
+     fun getProfile() {
+        viewModelScope.launch {
+            profileUseCase.getProfile()
+        }
+    }
     private fun loadUsers() {
         viewModelScope.launch {
-            _chats.value = useCase.getUsers()
+            _chats.value = userUseCase.getUsers()
         }
     }
     
     fun deleteUserItem(user: UserItem) {
         viewModelScope.launch {
-            useCase.delUser(user)
+            userUseCase.delUser(user)
             // После удаления обновить список
             _chats.update { currentUsers ->
                 currentUsers.filter { it.id != user.id }
@@ -41,7 +57,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     fun addUserItem(user: UserItem) {
         viewModelScope.launch {
-            useCase.addUser(user)
+            userUseCase.addUser(user)
             // Обновляем список чатов, добавляя новый элемент, если его ещё нет в списке
             val updatedUsers =
                 _chats.value.toMutableList()  // Создаем изменяемую копию текущего списка

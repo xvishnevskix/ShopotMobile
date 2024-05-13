@@ -1,5 +1,6 @@
 package org.videotrade.shopot.data
 
+import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -21,29 +22,30 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
-
 import org.videotrade.shopot.api.getValueInStorage
 
 class origin {
-    private val client = HttpClient()
-
-    suspend fun get(
-        url: String
-    ): HttpResponse? {
-
+    val client =
+        HttpClient() // Инициализация HTTP клиента, возможно вам стоит инициализировать его вне этой функции, чтобы использовать пул соединений
+    
+    suspend inline fun <reified T> get(url: String): T? {
+        
         try {
             val token = getValueInStorage("token")
-
-            val response: HttpResponse =
-                client.get("${EnvironmentConfig.serverUrl}$url") {
-                    contentType(ContentType.Application.Json)
-                    header(HttpHeaders.Authorization, "Bearer $token")
-                }
-
+            
+            Logger.d("response31331 ${token}")
+            
+            
+            
+            val response: HttpResponse = client.get("${EnvironmentConfig.serverUrl}$url") {
+                contentType(ContentType.Application.Json)
+                header(HttpHeaders.Authorization, "Bearer $token")
+            }
+            
             if (response.status.isSuccess()) {
-
-                return response
-
+                
+                val responseData: T = Json.decodeFromString(response.bodyAsText())
+                return responseData
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
@@ -52,30 +54,29 @@ class origin {
         } finally {
             client.close()
         }
-
         return null
     }
-
-
+    
+    
     suspend fun post(
         url: String,
-        data : JsonObject
+        data: JsonObject
     ): HttpResponse? {
-
+        
         try {
             val token = getValueInStorage("token")
-
+            
             val response: HttpResponse =
                 client.get("${EnvironmentConfig.serverUrl}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
                 }
-
+            
             if (response.status.isSuccess()) {
-
+                
                 return response
-
+                
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
@@ -84,67 +85,68 @@ class origin {
         } finally {
             client.close()
         }
-
+        
         return null
     }
-
-
+    
+    
     suspend fun reloadTokens(
-
+    
     ): HttpResponse? {
         val client = HttpClient()
-
+        
         try {
-
-
+            
+            
             val refreshToken = getValueInStorage("refreshToken")
-
+            
             println("refreshToken $refreshToken")
-
+            
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("refreshToken", refreshToken)
-
+                    
                 }
             )
-
+            
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.serverUrl}auth/refresh-token") {
                     contentType(ContentType.Application.Json)
                     setBody(jsonContent)
                 }
-
-
-
+            
+            
+            
+            
             if (response.status.isSuccess()) {
-
+                
                 val jsonString = response.bodyAsText()
                 val jsonElement = Json.parseToJsonElement(jsonString)
                 val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-
-
+                
+                
                 val token = messageObject?.get("token")?.jsonPrimitive?.content
-
+                
                 token?.let {
                     addValueInStorage(
                         "token",
                         token
                     )
                 }
-
-
+                
+                
                 return response
-
-
+                
+                
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
         } catch (e: Exception) {
-            println("Error111: $e")
+            println("Error222: $e")
         } finally {
             client.close()
         }
-
+        
         return null
     }
 }

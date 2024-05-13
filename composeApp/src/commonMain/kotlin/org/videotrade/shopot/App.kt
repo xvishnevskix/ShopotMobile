@@ -123,6 +123,7 @@ import org.koin.compose.KoinContext
 import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 
 @Composable
 internal fun App() = AppTheme {
@@ -138,7 +139,9 @@ internal fun App() = AppTheme {
 //                CallScreen(
 //
 //                )
-MainScreen()
+
+                MainScreen()
+//                        IntroScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
