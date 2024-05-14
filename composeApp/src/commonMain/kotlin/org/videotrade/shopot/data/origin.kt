@@ -33,7 +33,6 @@ class origin {
         try {
             val token = getValueInStorage("token")
             
-            Logger.d("response31331 ${token}")
             
             
             
@@ -45,12 +44,14 @@ class origin {
             if (response.status.isSuccess()) {
                 
                 val responseData: T = Json.decodeFromString(response.bodyAsText())
+                
+                
                 return responseData
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
         } catch (e: Exception) {
-            println("Error: $e")
+            println("Error22231: $e")
         } finally {
             client.close()
         }
