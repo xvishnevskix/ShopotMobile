@@ -13,6 +13,7 @@ import org.videotrade.shopot.domain.repository.WsRepository
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.UsersUseCase
+import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
@@ -21,11 +22,16 @@ private val domainModule = module {
     factory { ChatUseCase() }
     factory { UsersUseCase() }
     factory { ProfileUseCase() }
+    factory { WsUseCase() }
     
 }
 
 
 private val presentationModule = module {
+    single<WsRepository> {
+        WsRepositoryImpl()
+    }
+    
     single<UsersRepository> {
         UsersRepositoryImpl()
     }

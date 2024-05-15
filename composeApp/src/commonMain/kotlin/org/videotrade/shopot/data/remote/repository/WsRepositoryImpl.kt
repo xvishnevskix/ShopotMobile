@@ -11,11 +11,17 @@ class WsRepositoryImpl : WsRepository {
     private val isConnected = mutableStateOf(false)
     
     
-    override suspend fun connectionWs() {
+    override suspend fun connectionWs(userId: String) {
         handleWebRTCWebSocket(
             webSocketSession,
-            isConnected
+            isConnected,
+            userId
         )
+    }
+    
+    override suspend fun getWsSession(): DefaultClientWebSocketSession? {
+        
+        return webSocketSession.value
     }
     
     

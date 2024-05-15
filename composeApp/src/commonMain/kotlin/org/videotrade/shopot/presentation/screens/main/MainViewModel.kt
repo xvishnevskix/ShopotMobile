@@ -13,24 +13,54 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.UsersUseCase
+import org.videotrade.shopot.domain.usecase.WsUseCase
 
 class MainViewModel : ViewModel(), KoinComponent {
     private val userUseCase: UsersUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
+    private val WsUseCase: WsUseCase by inject()
     
     private val _chats = MutableStateFlow<List<UserItem>>(listOf())
     
     val chats: StateFlow<List<UserItem>> = _chats.asStateFlow()
     
     
-     val profile = MutableStateFlow<ProfileDTO?>(null)
+    val profile = MutableStateFlow<ProfileDTO?>(null)
     
     
     init {
-        loadUsers()
-        
-        getProfile()
-        
+        viewModelScope.launch {
+            getProfile()
+            
+            
+            
+            profile.collect { updatedProfile ->
+                
+                
+                
+                updatedProfile?.let {
+                    connectionWs(it.id)
+                    
+                    loadUsers()
+                    
+                }
+            }
+        }
+    }
+    
+    
+    fun connectionWs(userId: String) {
+        viewModelScope.launch {
+            WsUseCase.connectionWs(userId)
+        }
+    }
+    
+    fun getWsSession() {
+        viewModelScope.launch {
+            val ws = WsUseCase.getWsSession() ?: return@launch
+            
+            
+        }
     }
     
     
@@ -40,7 +70,9 @@ class MainViewModel : ViewModel(), KoinComponent {
             
             
             
-                profile.value = profileCase.message
+            profile.value = profileCase.message
+            
+            
         }
     }
     
