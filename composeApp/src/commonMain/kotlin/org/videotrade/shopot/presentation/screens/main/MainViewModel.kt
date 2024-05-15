@@ -30,21 +30,21 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     init {
         viewModelScope.launch {
-            getProfile()
+            downloadProfile()
+            
+            connectionWs("ebe19811-b218-475c-965b-f8c03464ed4f")
             
             
-            
-            profile.collect { updatedProfile ->
-                
-                
-                
-                updatedProfile?.let {
-                    connectionWs(it.id)
-                    
-                    loadUsers()
-                    
-                }
-            }
+//            profile.collect { updatedProfile ->
+//
+//
+//
+//                updatedProfile?.let {
+//
+//                    loadUsers()
+//
+//                }
+//            }
         }
     }
     
@@ -66,8 +66,19 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     fun getProfile() {
         viewModelScope.launch {
-            val profileCase = profileUseCase.getProfile() ?: return@launch
+            val profileCase = profileUseCase.downloadProfile() ?: return@launch
             
+            
+            profile.value = profileCase.message
+            
+            
+        }
+    }
+    
+    
+    fun downloadProfile() {
+        viewModelScope.launch {
+            val profileCase = profileUseCase.downloadProfile() ?: return@launch
             
             
             profile.value = profileCase.message

@@ -7,11 +7,11 @@ class ChatRepositoryImpl : ChatRepository {
 
     private var messages =
         mutableListOf(
-            MessageItem("1", "Privet",true, "", "Антон", "Иванов", "", ""),
-            MessageItem("1", "Privet",true, "", "Антон", "Иванов", "", ""),
-            MessageItem("1", "Privet",true, "", "Антон", "Иванов", "", ""),
-            MessageItem("1", "Privet",true, "", "Антон", "Иванов", "", ""),
-            MessageItem("2", "Poka",true, "", "Мансур", "Дандаев", "", "")
+            MessageItem("1", "Privet1",true, "", "Антон", "Иванов", "", "", "1"),
+            MessageItem("1", "Privet",true, "", "Антон", "Иванов", "", "", "2"),
+            MessageItem("1", "Privet",true, "", "Антон", "Иванов", "", "", "1"),
+            MessageItem("1", "Privet",true, "", "Антон", "Иванов", "", "", "1"),
+            MessageItem("2", "Poka",true, "", "Мансур", "Дандаев", "", "", "1")
         )
 
 

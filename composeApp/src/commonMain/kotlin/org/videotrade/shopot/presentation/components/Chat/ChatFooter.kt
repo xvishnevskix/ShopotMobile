@@ -88,7 +88,7 @@ fun ChatFooter(viewModel: ChatViewModel) {
             contentDescription = "Send",
             modifier = Modifier.padding(end = 8.dp).clickable {
                 viewModel.addMessage(
-                    MessageItem("2", text, true, "", "Мансур", "Дандаев", "", "")
+                    MessageItem("2", text, true, "", "Мансур", "Дандаев", "", "", "2")
                 
                 )
             }

@@ -10,4 +10,7 @@ data class MessageItem(
     var lastName: String,
     var phone: String,
     var notificationToken: String,
+    var userId: String,
+    
+    
 )

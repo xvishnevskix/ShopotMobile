@@ -1,12 +1,14 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -28,58 +30,58 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.double_message_check
 
-
 @Composable
 fun Chat(
+    chat: UserItem,
     viewModel: ChatViewModel, modifier: Modifier
 ) {
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
-    
+    val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     val listState = rememberLazyListState()
-
-//    LaunchedEffect(messagesState.size) {
-//        if (messagesState.isNotEmpty()) {
-//            listState.animateScrollToItem(messagesState.lastIndex)
-//        }
-//    }
+    
+    Logger.d("profile.id ${profile?.id}")
     
     LazyColumn(
         state = listState,
         reverseLayout = true, // Makes items start from the bottom
-        modifier = modifier
+        modifier = Modifier
+            .fillMaxHeight()
+            .navigationBarsPadding()  // Обеспечивает отступы от навигационной панели
     ) {
         itemsIndexed(messagesState) { index, message ->
-            MessageBox(message)
+            if (profile != null) {
+                MessageBox(profile.id, message)
+                
+//                Text("dadadada")
+            }
         }
     }
-    
-    
 }
 
 @Composable
-fun MessageBox(message: MessageItem) {
+fun MessageBox(profileId: String, message: MessageItem) {
     Column {
         Box(
-//        contentAlignment = if (true) Alignment.CenterStart else Alignment.CenterEnd,
-            contentAlignment = if (message.id == "1") Alignment.CenterEnd else Alignment.CenterStart,
+            contentAlignment = if (profileId == message.userId) Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
-                .padding(start = 2.dp ,end = 2.dp)
+                .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
-                .padding(vertical = 4.dp,)
+                .padding(vertical = 4.dp)
         ) {
-
-            if (message.id == "1") {
+            if (profileId == message.userId) {
                 Surface(
-                    modifier = Modifier
-                        .wrapContentSize(),
+                    modifier = Modifier.wrapContentSize(),
                     shape = RoundedCornerShape(
                         topStart = 20.dp,
                         topEnd = 20.dp,
@@ -92,7 +94,12 @@ fun MessageBox(message: MessageItem) {
                     Text(
                         text = message.text,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
+                        modifier = Modifier.padding(
+                            start = 25.dp,
+                            end = 25.dp,
+                            top = 13.dp,
+                            bottom = 12.dp
+                        ),
                         textAlign = TextAlign.Start,
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -100,12 +107,10 @@ fun MessageBox(message: MessageItem) {
                         lineHeight = 20.sp,
                         color = Color(0xFFFFFFFF),
                     )
-
                 }
             } else {
                 Surface(
-                    modifier = Modifier
-                        .wrapContentSize(),
+                    modifier = Modifier.wrapContentSize(),
                     shape = RoundedCornerShape(
                         topStart = 20.dp,
                         topEnd = 20.dp,
@@ -118,7 +123,12 @@ fun MessageBox(message: MessageItem) {
                     Text(
                         text = message.text,
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
+                        modifier = Modifier.padding(
+                            start = 25.dp,
+                            end = 25.dp,
+                            top = 13.dp,
+                            bottom = 12.dp
+                        ),
                         textAlign = TextAlign.Start,
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -126,27 +136,23 @@ fun MessageBox(message: MessageItem) {
                         lineHeight = 20.sp,
                         color = Color(0xFF29303C),
                     )
-
                 }
             }
         }
-
+        
         Row(
-            horizontalArrangement = if (message.id == "1") Arrangement.End else Arrangement.Start,
+            horizontalArrangement = if (profileId == message.userId) Arrangement.End else Arrangement.Start,
             modifier = Modifier
-                .padding(start = 2.dp ,end = 2.dp)
+                .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
         ) {
             Image(
-                modifier = Modifier.padding(top = 2.dp, end = 4.dp).size(14.dp),
+                modifier = Modifier
+                    .padding(top = 2.dp, end = 4.dp)
+                    .size(14.dp),
                 painter = painterResource(Res.drawable.double_message_check),
                 contentDescription = null,
             )
-//                Image(
-//                    modifier = Modifier.size(14.dp),
-//                    painter = painterResource(Res.drawable.single_message_check),
-//                    contentDescription = null,
-//                )
             Text(
                 text = "11:17",
                 style = MaterialTheme.typography.bodyLarge,
@@ -161,5 +167,3 @@ fun MessageBox(message: MessageItem) {
         }
     }
 }
-
-

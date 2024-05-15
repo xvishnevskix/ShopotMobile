@@ -11,4 +11,5 @@ data class UserItem(
     var unread: Int,
     var notificationToken: String,
     var lastMessage: String,
+    var chatId: String,
 )

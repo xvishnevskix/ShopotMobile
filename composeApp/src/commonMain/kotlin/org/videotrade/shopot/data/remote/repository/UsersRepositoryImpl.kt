@@ -6,8 +6,8 @@ class UsersRepositoryImpl : UsersRepository {
 
     private var users =
         mutableListOf(
-            UserItem("1", true, "", "Антон", "Иванов", "", 2, "10", ""),
-            UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "")
+            UserItem("1", true, "", "Антон", "Иванов", "", 2, "10", "",""),
+            UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","")
         )
 
 

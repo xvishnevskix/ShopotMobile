@@ -1,12 +1,14 @@
 package org.videotrade.shopot.domain.repository
 
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.UserProfile
 
 
 interface ProfileRepository {
     
     
-    suspend fun getProfile() : UserProfile?
+    suspend fun downloadProfile() : UserProfile?
+     fun getProfile() : ProfileDTO?
     
     
 }
