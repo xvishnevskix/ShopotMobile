@@ -140,7 +140,7 @@ internal fun App() = AppTheme {
 //                CallScreen(
 //
 //                )
-LoginScreen()
+MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

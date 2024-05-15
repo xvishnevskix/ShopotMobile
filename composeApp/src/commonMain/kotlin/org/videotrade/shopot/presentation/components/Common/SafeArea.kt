@@ -7,13 +7,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun SafeArea(content: @Composable () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize().safeContentPadding()) {
+fun SafeArea(isBlurred: Boolean = false, content: @Composable () -> Unit) {
+    val blurRadius = if (isBlurred) 10.dp else 0.dp
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .blur(blurRadius)
+            .safeContentPadding()
+    ) {
         content()
     }
-
 }
