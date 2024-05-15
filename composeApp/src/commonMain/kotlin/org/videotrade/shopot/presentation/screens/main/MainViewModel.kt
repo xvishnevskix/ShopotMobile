@@ -1,17 +1,18 @@
 package org.videotrade.shopot.presentation.screens.main
 
+import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.videotrade.shopot.domain.model.UserItem
-import org.videotrade.shopot.domain.usecase.UsersUseCase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.domain.usecase.UsersUseCase
 
 class MainViewModel : ViewModel(), KoinComponent {
     private val userUseCase: UsersUseCase by inject()
@@ -22,22 +23,27 @@ class MainViewModel : ViewModel(), KoinComponent {
     val chats: StateFlow<List<UserItem>> = _chats.asStateFlow()
     
     
-    
-    private val profile = MutableStateFlow<ProfileDTO?>( null)
+     val profile = MutableStateFlow<ProfileDTO?>(null)
     
     
     init {
         loadUsers()
+        
+        getProfile()
+        
     }
     
     
-    
-    
-     fun getProfile() {
+    fun getProfile() {
         viewModelScope.launch {
-            profileUseCase.getProfile()
+            val profileCase = profileUseCase.getProfile() ?: return@launch
+            
+            
+            
+                profile.value = profileCase.message
         }
     }
+    
     private fun loadUsers() {
         viewModelScope.launch {
             _chats.value = userUseCase.getUsers()

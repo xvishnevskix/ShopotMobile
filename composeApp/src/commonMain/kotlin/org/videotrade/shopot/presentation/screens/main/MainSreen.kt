@@ -19,17 +19,15 @@ class MainScreen : Screen {
     override fun Content() {
         
         val viewModel: MainViewModel = koinInject()
-        val chatState = viewModel.chats.collectAsState(initial = listOf()).value
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         
         
         val coroutineScope = rememberCoroutineScope()
         
-        viewModel.getProfile()
      
         
         
-        Drawer(drawerState, chatState)
+        Drawer(drawerState, viewModel)
         
         
     }

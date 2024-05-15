@@ -140,8 +140,8 @@ internal fun App() = AppTheme {
 //
 //                )
 
-                MainScreen()
-//                        IntroScreen()
+//                MainScreen()
+                        IntroScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

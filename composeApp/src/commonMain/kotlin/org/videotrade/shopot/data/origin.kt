@@ -34,14 +34,16 @@ class origin {
             val token = getValueInStorage("token")
             
             
-            
-            
             val response: HttpResponse = client.get("${EnvironmentConfig.serverUrl}$url") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
             
+            
+            
             if (response.status.isSuccess()) {
+                
+                
                 
                 val responseData: T = Json.decodeFromString(response.bodyAsText())
                 

@@ -32,7 +32,6 @@ suspend fun Call(
     ): Nothing = coroutineScope {
     localStream.tracks.forEach { track ->
         
-        Logger.d { "track22:${callerId.value} ${otherUserId.value} $track" }
         
         peerConnection.addTrack(track, localStream)
     }

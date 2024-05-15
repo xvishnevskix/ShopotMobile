@@ -63,20 +63,20 @@ class LoginCallScreen(private val phone: String) : Screen {
 
         coroutineScope.launch {
 
-            val response = sendRequestToBackend(phone.drop(1), null, "auth/2fa")
-
-            if (response != null) {
-
-                val jsonString = response.bodyAsText()
-                val jsonElement = Json.parseToJsonElement(jsonString)
-                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-
-
-
-
-                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-
-            }
+//            val response = sendRequestToBackend(phone.drop(1), null, "auth/2fa")
+//
+//            if (response != null) {
+//
+//                val jsonString = response.bodyAsText()
+//                val jsonElement = Json.parseToJsonElement(jsonString)
+//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+//
+//
+//
+//
+//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+//
+//            }
 
         }
 
@@ -136,13 +136,13 @@ class LoginCallScreen(private val phone: String) : Screen {
                             coroutineScope.launch {
 
 
-                                if (
-                                    responseState.value != otpText && !isSuccessOtp.value
-
-                                ) {
-
-                                    return@launch
-                                }
+//                                if (
+//                                    responseState.value != otpText && !isSuccessOtp.value
+//
+//                                ) {
+//
+//                                    return@launch
+//                                }
 
                                 val response = sendRequestToBackend(phone, null, "auth/login")
 
