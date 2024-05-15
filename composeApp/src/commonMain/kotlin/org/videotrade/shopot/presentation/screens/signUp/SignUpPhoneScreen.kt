@@ -15,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -31,7 +32,7 @@ import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFProText_Semibold
 
-class SignUpPhoneScreen(private val phone: MutableState<String>) : Screen {
+class SignUpPhoneScreen(private val phone: MutableState<TextFieldValue>) : Screen {
 
 
     @Composable
@@ -72,7 +73,7 @@ class SignUpPhoneScreen(private val phone: MutableState<String>) : Screen {
                         CustomButton(
                             "Отправить код",
                             {
-                                navigator.push(SignUpCallScreen(phone.value))
+                                navigator.push(SignUpCallScreen(phone.value.text))
                             })
                     }
                 }

@@ -25,8 +25,10 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -41,9 +43,10 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
+
 @Composable
 fun PhoneInput(
-    textState: MutableState<String>
+    textState: MutableState<TextFieldValue>
 ) {
 
     var countryCode by remember { mutableStateOf("+7") }
@@ -79,23 +82,27 @@ fun PhoneInput(
             countries = countries,
             onCountrySelected = { selectedCode ->
                 countryCode = selectedCode
-                textState.value = selectedCode
+                textState.value = TextFieldValue(text = selectedCode, selection = TextRange(selectedCode.length))
             }
         )
+
         Spacer(modifier = Modifier.height(16.dp))
+
         BasicTextField(
             value = textState.value,
-            onValueChange = { newText ->
-                val filteredText = newText.filter { char -> char.isDigit() || char == '+' }
-                if (filteredText.startsWith(countryCode) && filteredText.length <= phoneNumberLength) {
-                    textState.value = filteredText
-                } else if (!filteredText.startsWith(countryCode)) {
-                    textState.value = countryCode + filteredText.drop(countryCode.length)
+            onValueChange = { newTextValue ->
+                val newText = newTextValue.text.filter { char -> char.isDigit() || char == '+' }
+                val cursorPosition = newText.length
+                if (newText.startsWith(countryCode) && newText.length <= phoneNumberLength) {
+                    textState.value = TextFieldValue(text = newText, selection = TextRange(cursorPosition))
+                } else if (!newText.startsWith(countryCode)) {
+                    val adjustedText = countryCode + newText.drop(countryCode.length)
                         .take(phoneNumberLength - countryCode.length)
+                    textState.value = TextFieldValue(text = adjustedText, selection = TextRange(adjustedText.length))
                 }
-
             },
-
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             textStyle = TextStyle(
                 textAlign = TextAlign.Start,
                 fontSize = 15.sp,
@@ -104,8 +111,6 @@ fun PhoneInput(
                 lineHeight = 20.sp,
                 color = Color(0xFF000000)
             ),
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier
                 .shadow(3.dp, RoundedCornerShape(12.dp))
                 .clip(RoundedCornerShape(12.dp))
@@ -162,10 +167,12 @@ fun CountryPicker(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                     modifier = Modifier
+
                         .fillMaxWidth()
                         .background(Color.White)
                         .padding(5.dp),
                     offset = DpOffset(x = 0.dp, y = 210.dp),
+
 
                     ) {
                     countries.forEach { country ->

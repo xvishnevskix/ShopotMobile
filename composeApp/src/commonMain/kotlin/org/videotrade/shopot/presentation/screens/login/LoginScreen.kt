@@ -54,7 +54,13 @@ class LoginScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
 
 
-        val textState = remember { mutableStateOf("+7") }
+        val textState =
+            remember {
+                mutableStateOf(
+                    TextFieldValue(text = "+7", selection = TextRange(3) //для правильной позиции курсора
+                    )
+                )
+            }
 
 
         SafeArea {
@@ -105,7 +111,7 @@ class LoginScreen : Screen {
                     CustomButton(
                         "Войти",
                         {
-                            navigator.push(LoginCallScreen(textState.value))
+                            navigator.push(LoginCallScreen(textState.value.text))
 
                         })
 
@@ -113,7 +119,8 @@ class LoginScreen : Screen {
 
                     Row(
                         modifier = Modifier.padding(10.dp).fillMaxWidth()
-                            .clickable { navigator.push(SignUpPhoneScreen(textState)) },
+                            .clickable { navigator.push(SignUpPhoneScreen(textState)) }
+                        ,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
