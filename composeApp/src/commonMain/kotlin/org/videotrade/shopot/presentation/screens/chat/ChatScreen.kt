@@ -1,28 +1,16 @@
 package org.videotrade.shopot.presentation.screens.chat
 
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.components.Chat.Chat
@@ -32,8 +20,6 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.components.Chat.BlurredMessageOverlay
-import org.videotrade.shopot.presentation.components.Chat.MessageBlurBox
-import org.videotrade.shopot.presentation.components.Chat.MessageBox
 
 class ChatScreen(private val chat: UserItem) : Screen {
 
@@ -43,6 +29,7 @@ class ChatScreen(private val chat: UserItem) : Screen {
 
         var selectedMessage by remember { mutableStateOf<MessageItem?>(null) }
         var selectedMessageY by remember { mutableStateOf(0) }
+        var hiddenMessageId by remember { mutableStateOf<String?>(null) }
 
         Box(modifier = Modifier.fillMaxSize()) {
             SafeArea(isBlurred = selectedMessage != null) {
@@ -60,8 +47,10 @@ class ChatScreen(private val chat: UserItem) : Screen {
                                 .padding(innerPadding),
                             onMessageClick = { message, y ->
                                 selectedMessage = message
-                                selectedMessageY = y + 145
-                            }
+                                selectedMessageY = y + 150
+                                hiddenMessageId = message.id
+                            },
+                            hiddenMessageId = hiddenMessageId
                         )
                     }
                 }
@@ -70,7 +59,10 @@ class ChatScreen(private val chat: UserItem) : Screen {
             BlurredMessageOverlay(
                 selectedMessage = selectedMessage,
                 selectedMessageY = selectedMessageY,
-                onDismiss = { selectedMessage = null }
+                onDismiss = {
+                    selectedMessage = null
+                    hiddenMessageId = null
+                }
             )
         }
     }
