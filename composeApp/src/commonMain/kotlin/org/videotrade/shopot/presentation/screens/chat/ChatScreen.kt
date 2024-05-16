@@ -31,6 +31,7 @@ import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.presentation.components.Chat.BlurredMessageOverlay
 import org.videotrade.shopot.presentation.components.Chat.MessageBlurBox
 import org.videotrade.shopot.presentation.components.Chat.MessageBox
 
@@ -59,44 +60,18 @@ class ChatScreen(private val chat: UserItem) : Screen {
                                 .padding(innerPadding),
                             onMessageClick = { message, y ->
                                 selectedMessage = message
-                                selectedMessageY = y + 150
+                                selectedMessageY = y + 145
                             }
                         )
                     }
                 }
             }
 
-            selectedMessage?.let { message ->
-                var visible by remember { mutableStateOf(false) }
-                LaunchedEffect(Unit) {
-                    visible = true
-                }
-
-                val alpha by animateFloatAsState(
-                    targetValue = if (visible) 0.5f else 0f,
-                    animationSpec = tween(durationMillis = 200)
-                )
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = alpha))
-                        .clickable { selectedMessage = null },
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .offset(y = with(LocalDensity.current) { selectedMessageY.toDp() })
-                            .padding(16.dp)
-                    ) {
-                        Surface(
-                            shape = RoundedCornerShape(16.dp),
-                            color = Color.Transparent
-                        ) {
-                            MessageBlurBox(message = message, onClick = {}, visible = visible)
-                        }
-                    }
-                }
-            }
+            BlurredMessageOverlay(
+                selectedMessage = selectedMessage,
+                selectedMessageY = selectedMessageY,
+                onDismiss = { selectedMessage = null }
+            )
         }
     }
 }

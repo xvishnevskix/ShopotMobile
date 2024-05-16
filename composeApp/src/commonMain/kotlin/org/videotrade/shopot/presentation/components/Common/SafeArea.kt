@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SafeArea(isBlurred: Boolean = false, content: @Composable () -> Unit) {
-    val blurRadius = if (isBlurred) 10.dp else 0.dp
+    val blurRadius = if (isBlurred) 20.dp else 0.dp
     Box(
         modifier = Modifier
             .fillMaxSize()

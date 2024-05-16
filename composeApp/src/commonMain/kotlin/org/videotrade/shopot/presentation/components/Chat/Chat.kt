@@ -7,6 +7,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
@@ -34,6 +35,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -47,6 +49,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -339,6 +342,45 @@ fun MessageBox(message: MessageItem, onClick: () -> Unit, onPositioned: (LayoutC
 }
 
 @Composable
+fun BlurredMessageOverlay(
+    selectedMessage: MessageItem?,
+    selectedMessageY: Int,
+    onDismiss: () -> Unit
+) {
+    selectedMessage?.let { message ->
+        var visible by remember { mutableStateOf(false) }
+        LaunchedEffect(Unit) {
+            visible = true
+        }
+
+        val alpha by animateFloatAsState(
+            targetValue = if (visible) 0.6f else 0f,
+            animationSpec = tween(durationMillis = 200)
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = alpha))
+                .clickable { onDismiss() },
+        ) {
+            Box(
+                modifier = Modifier
+                    .offset(y = with(LocalDensity.current) { selectedMessageY.toDp() })
+                    .padding(16.dp)
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.Transparent
+                ) {
+                    MessageBlurBox(message = message, onClick = {}, visible = visible)
+                }
+            }
+        }
+    }
+}
+
+@Composable
 fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) {
     val transition = updateTransition(targetState = visible, label = "MessageBlurBoxTransition")
     val orientation: Dp = if (message.id == "1") 100.dp else -75.dp
@@ -368,7 +410,7 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                contentAlignment = Alignment.CenterEnd,
+                contentAlignment = if (message.id == "1") Alignment.CenterEnd else Alignment.CenterStart,
                 modifier = Modifier
                     .padding(start = 2.dp, end = 2.dp)
                     .fillMaxWidth()
@@ -420,14 +462,14 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
                 }
             }
             Row(
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = if (message.id == "1") Arrangement.End else Arrangement.Start,
                 modifier = Modifier
                     .padding(start = 2.dp, end = 2.dp)
                     .fillMaxWidth()
             ) {
                 Image(
                     modifier = Modifier
-                        .padding(start = 70.dp, top = 2.dp, end = 4.dp)
+                        .padding(start = if (message.id == "1") 70.dp else 0.dp, top = 2.dp, end = 4.dp)
                         .size(14.dp),
                     painter = painterResource(Res.drawable.double_message_check),
                     contentDescription = null,
