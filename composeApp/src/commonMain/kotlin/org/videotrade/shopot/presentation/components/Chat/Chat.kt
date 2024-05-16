@@ -37,10 +37,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -222,7 +228,7 @@ import shopot.composeapp.generated.resources.pencil_in_circle
     )
 @Composable
 fun Chat(
-    viewModel: ChatViewModel, modifier: Modifier, onMessageClick: (MessageItem) -> Unit
+    viewModel: ChatViewModel, modifier: Modifier, onMessageClick: (MessageItem, Int) -> Unit
 ) {
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
@@ -234,22 +240,31 @@ fun Chat(
             modifier = modifier
         ) {
             itemsIndexed(messagesState) { index, message ->
-                MessageBox(message = message, onClick = { onMessageClick(message) })
+                var messageY by remember { mutableStateOf(0) }
+                MessageBox(
+                    message = message,
+                    onClick = { onMessageClick(message, messageY) },
+                    onPositioned = { coordinates ->
+                        messageY = coordinates.positionInParent().y.toInt()
+                    }
+                )
+
+
             }
         }
     }
 }
-@Composable
-fun MessageBox(message: MessageItem, onClick: () -> Unit) {
-    Column(
 
+@Composable
+fun MessageBox(message: MessageItem, onClick: () -> Unit, onPositioned: (LayoutCoordinates) -> Unit) {
+    Column(
+        modifier = Modifier.onGloballyPositioned(onPositioned)
     ) {
         Box(
             contentAlignment = if (message.id == "1") Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
-
                 .padding(vertical = 4.dp)
                 .clickable(onClick = onClick)
         ) {
@@ -331,7 +346,7 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
         transitionSpec = { tween(durationMillis = 300, easing = FastOutSlowInEasing) },
         label = "FirstColumnOffsetX"
     ) { state ->
-        if (state) 0.dp else  {orientation}
+        if (state) 0.dp else orientation
     }
 
     val secondColumnOffsetY by transition.animateDp(
