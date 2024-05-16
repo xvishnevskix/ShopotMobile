@@ -231,7 +231,7 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize() ) {
         LazyColumn(
             state = listState,
             reverseLayout = true,

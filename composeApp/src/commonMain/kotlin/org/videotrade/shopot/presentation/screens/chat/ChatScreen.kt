@@ -78,8 +78,7 @@ class ChatScreen(
                                 
                                 profile,
                                 
-                                Modifier
-                                    .weight(1f)
+                                Modifier.fillMaxSize()
                                     .padding(innerPadding),
                                 onMessageClick = { message, y ->
                                     selectedMessage = message
