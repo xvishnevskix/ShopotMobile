@@ -1,9 +1,8 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
 import com.android.build.api.dsl.ManagedVirtualDevice
+import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
@@ -61,10 +60,9 @@ kotlin {
             isStatic = true
         }
     }
-
-
+    
+    
     sourceSets {
-        
         
         
         all {
@@ -91,39 +89,34 @@ kotlin {
             implementation(libs.koin.compose)
             implementation(libs.stately.common)
             implementation(libs.webrtc.kmp)
-            implementation(libs.kermit) //Add latest version
-            
+            implementation(libs.kermit)
             implementation(libs.ktor.client.cio)
             implementation(libs.ktor.client.websockets)
             implementation(libs.ktor.client.serialization)
             implementation(libs.kotlinx.serialization.json.v132)
-
-
-//            implementation(project(":webrtc-kmp"))
-            
             
             
         }
-
+        
         commonTest.dependencies {
             implementation(kotlin("test"))
             @OptIn(ExperimentalComposeLibrary::class)
             implementation(compose.uiTest)
             implementation(libs.kotlinx.coroutines.test)
         }
-
+        
         androidMain.dependencies {
             implementation(compose.uiTooling)
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
         }
-
+        
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
         
-  
+        
         val iosMain by getting
         val iosSimulatorArm64Main by getting
         iosSimulatorArm64Main.dependsOn(iosMain)
@@ -133,15 +126,15 @@ kotlin {
 android {
     namespace = "org.videotrade.shopot"
     compileSdk = 34
-
+    
     defaultConfig {
         minSdk = 24
         targetSdk = 34
-
+        
         applicationId = "org.videotrade.shopot.androidApp"
         versionCode = 1
         versionName = "1.0.0"
-
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     sourceSets["main"].apply {
