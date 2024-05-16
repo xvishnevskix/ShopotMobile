@@ -9,6 +9,9 @@ import org.videotrade.shopot.domain.repository.ChatRepository
 class ChatRepositoryImpl : ChatRepository {
     private val _messages = MutableStateFlow<List<MessageItem>>(
         listOf(
+            MessageItem("1", "cf9b66e2-9e18-4342-bbc0-c5144a593f71" , "" , "" ,"" ,1 , listOf(1) ,false ,"" ,),
+            MessageItem("2", "cf9b66e2-9e18-4342-bbc0-c5144a593f71" , "" , "" ,"" ,1 , listOf(1) ,false ,"" ,),
+         
         )
     )
     

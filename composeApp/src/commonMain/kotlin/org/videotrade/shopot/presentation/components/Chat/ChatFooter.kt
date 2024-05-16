@@ -37,7 +37,6 @@ fun ChatFooter(viewModel: ChatViewModel) {
     
     Box(
         modifier = Modifier
-            .statusBarsPadding()
             .imePadding()  // Обеспечивает, что клавиатура не будет перекрывать этот элемент
     ) {
     

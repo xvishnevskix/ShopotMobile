@@ -30,7 +30,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,6 +56,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -101,14 +101,14 @@ import shopot.composeapp.generated.resources.edit_pencil
 //    Column {
 //        Box(
 ////        contentAlignment = if (true) Alignment.CenterStart else Alignment.CenterEnd,
-//            contentAlignment = if (message.fromUser == "1") Alignment.CenterEnd else Alignment.CenterStart,
+//            contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
 //            modifier = Modifier
 //                .padding(start = 2.dp ,end = 2.dp)
 //                .fillMaxWidth()
 //                .padding(vertical = 4.dp,)
 //        ) {
 //
-//            if (message.fromUser == "1") {
+//            if (message.fromUser == profile.id) {
 //                Surface(
 //                    modifier = Modifier
 //                        .wrapContentSize(),
@@ -164,7 +164,7 @@ import shopot.composeapp.generated.resources.edit_pencil
 //        }
 //
 //        Row(
-//            horizontalArrangement = if (message.fromUser == "1") Arrangement.End else Arrangement.Start,
+//            horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
 //            modifier = Modifier
 //                .padding(start = 2.dp ,end = 2.dp)
 //                .fillMaxWidth()
@@ -194,41 +194,43 @@ import shopot.composeapp.generated.resources.edit_pencil
 //    }
 //}
 
-    data class EditOption(
-        val text: String,
-        val imagePath: DrawableResource
+data class EditOption(
+    val text: String,
+    val imagePath: DrawableResource
+)
+
+
+val editOptions = listOf(
+    EditOption(
+        text = "Переслать",
+        imagePath = Res.drawable.edit_pencil
+    ),
+    EditOption(
+        text = "Изменить",
+        imagePath = Res.drawable.edit_pencil
+    ),
+    EditOption(
+        text = "Удалить",
+        imagePath = Res.drawable.edit_pencil
+    ),
+    EditOption(
+        text = "Копировать",
+        imagePath = Res.drawable.edit_pencil
+    ),
+    
     )
 
-
-    val editOptions = listOf(
-        EditOption(
-            text = "Переслать",
-            imagePath = Res.drawable.edit_pencil
-        ),
-        EditOption(
-            text = "Изменить",
-            imagePath = Res.drawable.edit_pencil
-        ),
-        EditOption(
-            text = "Удалить",
-            imagePath = Res.drawable.edit_pencil
-        ),
-        EditOption(
-            text = "Копировать",
-            imagePath = Res.drawable.edit_pencil
-        ),
-
-    )
 @Composable
 fun Chat(
     viewModel: ChatViewModel,
+    profile: ProfileDTO,
     modifier: Modifier,
     onMessageClick: (MessageItem, Int) -> Unit,
     hiddenMessageId: String?
 ) {
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
-
+    
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             state = listState,
@@ -240,6 +242,7 @@ fun Chat(
                 val isVisible = message.id != hiddenMessageId
                 MessageBox(
                     message = message,
+                    profile = profile,
                     onClick = { onMessageClick(message, messageY) },
                     onPositioned = { coordinates ->
                         messageY = coordinates.positionInParent().y.toInt()
@@ -250,9 +253,11 @@ fun Chat(
         }
     }
 }
+
 @Composable
 fun MessageBox(
     message: MessageItem,
+    profile: ProfileDTO,
     onClick: () -> Unit,
     onPositioned: (LayoutCoordinates) -> Unit,
     isVisible: Boolean
@@ -263,14 +268,14 @@ fun MessageBox(
             .alpha(if (isVisible) 1f else 0f) // Manage visibility with alpha
     ) {
         Box(
-            contentAlignment = if (message.fromUser == "1") Alignment.CenterEnd else Alignment.CenterStart,
+            contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .clickable(onClick = onClick)
         ) {
-            if (message.fromUser == "1") {
+            if (message.fromUser == profile.id) {
                 Surface(
                     modifier = Modifier.wrapContentSize(),
                     shape = RoundedCornerShape(
@@ -288,7 +293,12 @@ fun MessageBox(
                             color = Color.White,
                             fontSize = 16.sp
                         ),
-                        modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
+                        modifier = Modifier.padding(
+                            start = 25.dp,
+                            end = 25.dp,
+                            top = 13.dp,
+                            bottom = 12.dp
+                        ),
                     )
                 }
             } else {
@@ -309,14 +319,19 @@ fun MessageBox(
                             color = Color.Black,
                             fontSize = 16.sp
                         ),
-                        modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
+                        modifier = Modifier.padding(
+                            start = 25.dp,
+                            end = 25.dp,
+                            top = 13.dp,
+                            bottom = 12.dp
+                        ),
                     )
                 }
             }
         }
-
+        
         Row(
-            horizontalArrangement = if (message.fromUser == "1") Arrangement.End else Arrangement.Start,
+            horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
             modifier = Modifier
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
@@ -342,6 +357,7 @@ fun MessageBox(
 
 @Composable
 fun BlurredMessageOverlay(
+    profile: ProfileDTO,
     selectedMessage: MessageItem?,
     selectedMessageY: Int,
     onDismiss: () -> Unit
@@ -351,12 +367,12 @@ fun BlurredMessageOverlay(
         LaunchedEffect(Unit) {
             visible = true
         }
-
+        
         val alpha by animateFloatAsState(
             targetValue = if (visible) 0.5f else 0f,
             animationSpec = tween(durationMillis = 200)
         )
-
+        
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -372,7 +388,7 @@ fun BlurredMessageOverlay(
                     shape = RoundedCornerShape(16.dp),
                     color = Color.Transparent
                 ) {
-                    MessageBlurBox(message = message, onClick = {}, visible = visible)
+                    MessageBlurBox(message = message, profile = profile, onClick = {}, visible = visible)
                 }
             }
         }
@@ -380,23 +396,28 @@ fun BlurredMessageOverlay(
 }
 
 @Composable
-fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) {
+fun MessageBlurBox(
+    message: MessageItem,
+    profile: ProfileDTO,
+    onClick: () -> Unit,
+    visible: Boolean
+) {
     val transition = updateTransition(targetState = visible, label = "MessageBlurBoxTransition")
-    val orientation: Dp = if (message.fromUser == "1") 100.dp else -75.dp
+    val orientation: Dp = if (message.fromUser == profile.id) 100.dp else -75.dp
     val firstColumnOffsetX by transition.animateDp(
         transitionSpec = { tween(durationMillis = 300, easing = FastOutSlowInEasing) },
         label = "FirstColumnOffsetX"
     ) { state ->
         if (state) 0.dp else orientation
     }
-
+    
     val secondColumnOffsetY by transition.animateDp(
         transitionSpec = { tween(durationMillis = 300, easing = FastOutSlowInEasing) },
         label = "SecondColumnOffsetY"
     ) { state ->
         if (state) 0.dp else 200.dp
     }
-
+    
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -409,14 +430,14 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                contentAlignment = if (message.fromUser == "1") Alignment.CenterEnd else Alignment.CenterStart,
+                contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
                 modifier = Modifier
                     .padding(start = 2.dp, end = 2.dp)
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .clickable(onClick = onClick)
             ) {
-                if (message.fromUser == "1") {
+                if (message.fromUser == profile.id) {
                     Surface(
                         modifier = Modifier.wrapContentSize(),
                         shape = RoundedCornerShape(
@@ -434,7 +455,12 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
                                 color = Color.White,
                                 fontSize = 16.sp
                             ),
-                            modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
+                            modifier = Modifier.padding(
+                                start = 25.dp,
+                                end = 25.dp,
+                                top = 13.dp,
+                                bottom = 12.dp
+                            ),
                         )
                     }
                 } else {
@@ -455,27 +481,36 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
                                 color = Color.Black,
                                 fontSize = 16.sp
                             ),
-                            modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
+                            modifier = Modifier.padding(
+                                start = 25.dp,
+                                end = 25.dp,
+                                top = 13.dp,
+                                bottom = 12.dp
+                            ),
                         )
                     }
                 }
             }
             Row(
-                horizontalArrangement = if (message.fromUser == "1") Arrangement.End else Arrangement.Start,
+                horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
                 modifier = Modifier
                     .padding(start = 2.dp, end = 2.dp)
                     .fillMaxWidth()
             ) {
                 Image(
                     modifier = Modifier
-                        .padding(start = if (message.fromUser == "1") 70.dp else 0.dp, top = 2.dp, end = 4.dp)
+                        .padding(
+                            start = if (message.fromUser == profile.id) 70.dp else 0.dp,
+                            top = 2.dp,
+                            end = 4.dp
+                        )
                         .size(14.dp),
                     painter = painterResource(Res.drawable.double_message_check),
                     contentDescription = null,
                 )
             }
         }
-
+        
         Column(
             modifier = Modifier
                 .offset(y = secondColumnOffsetY)
