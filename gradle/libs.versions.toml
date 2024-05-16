@@ -1,5 +1,4 @@
 [versions]
-
 kermit = "2.0.3"
 kotlin = "1.9.23"
 compose = "1.6.1"
@@ -20,7 +19,7 @@ koinCompose = "1.1.0"
 statelyCommon = "2.0.5"
 webrtcKmp = "0.114.4"
 webrtc-ios-sdk = "114.5735.09"
-
+animationCoreAndroid = "1.6.7"
 [libraries]
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -29,7 +28,6 @@ androidx-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref =
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlinx-serialization-json-v132 = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
 ktor-client-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
@@ -52,6 +50,7 @@ koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koinCompose" }
 stately-common = { module = "co.touchlab:stately-common", version.ref = "statelyCommon" }
 webrtc-kmp = { module = "com.shepeliev:webrtc-kmp", version.ref = "webrtcKmp" }
+androidx-animation-core-android = { group = "androidx.compose.animation", name = "animation-core-android", version.ref = "animationCoreAndroid" }
 
 [plugins]
 

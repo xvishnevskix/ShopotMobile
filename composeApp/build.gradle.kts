@@ -170,6 +170,9 @@ android {
         kotlinCompilerExtensionVersion = "1.5.11"
     }
 }
+dependencies {
+    implementation(libs.androidx.animation.core.android)
+}
 
 buildConfig {
     // BuildConfig configuration here.

@@ -54,13 +54,13 @@ fun Otp(otpFields: SnapshotStateList<String>) {
             otpFields.forEachIndexed { index, _ ->
                 OutlinedTextField(
                     value = otpFields[index],
-                    placeholder = {
-                        Text(
-                            "—", // Стиль плейсхолдера соответствующий вашему дизайну
-                            fontSize = 18.sp,
-                            color = Color.Gray
-                        )
-                    },
+//                    placeholder = {
+//                        Text(
+//                            "—", // Стиль плейсхолдера соответствующий вашему дизайну
+//                            fontSize = 18.sp,
+//                            color = Color.Gray
+//                        )
+//                    },
                     onValueChange = {
                         if (it.length <= 1) {
                             otpFields[index] = it

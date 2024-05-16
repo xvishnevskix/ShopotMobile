@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import shopot.composeapp.generated.resources.Montserrat_Regular
+import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 
@@ -31,13 +32,14 @@ fun CustomButton(
     onClick: () -> Unit,
     width: Dp = 325.dp, // default width
     height: Dp = 48.dp,
+
 ) {
     Button(
         onClick = onClick,
         // Use ButtonDefaults.buttonColors if you need to customize the colors further
         colors = ButtonDefaults.buttonColors(Color(0xFFb2A293C)),
         shape = RoundedCornerShape(24), // This gives us the rounded corners
-        modifier = Modifier.width(width) // set the width
+        modifier = Modifier.padding().width(width) // set the width
             .height(height)
             .shadow(
                 elevation = 15.dp, // радиус размытия
@@ -52,12 +54,11 @@ fun CustomButton(
         ) {
         Text(
             text = text,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
             textAlign = TextAlign.Center,
-            fontSize = 16.sp,
+            fontSize = 13.sp,
             lineHeight = 15.sp,
             color = Color(255, 255, 255),
-            fontWeight = FontWeight.W600
         )
     }
 }

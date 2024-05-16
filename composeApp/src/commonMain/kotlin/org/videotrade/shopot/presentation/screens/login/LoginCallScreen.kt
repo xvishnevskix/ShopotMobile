@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.login
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -44,9 +45,10 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.jetbrains.compose.resources.Font
+import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
-import shopot.composeapp.generated.resources.SFProText_Regular
+import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.SFProText_Semibold
 
 class LoginCallScreen(private val phone: String) : Screen {
 
@@ -90,7 +92,7 @@ class LoginCallScreen(private val phone: String) : Screen {
 
 
         SafeArea {
-            AuthHeader("Вход")
+            AuthHeader("Вход", 0.55F)
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -102,10 +104,9 @@ class LoginCallScreen(private val phone: String) : Screen {
 
                     Text(
                         "Введите последние 4 цифры входящего звонка",
-                        modifier = Modifier.padding(bottom = 5.dp),
-                        fontFamily = FontFamily(Font(Res.font.SFProText_Regular)),
+                        modifier = Modifier.padding(bottom = 10.dp),
+                        fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
                         fontSize = 20.sp,
-                        fontWeight = FontWeight.W600,
                         textAlign = TextAlign.Center,
                         letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
                         lineHeight = 24.sp,
@@ -114,11 +115,10 @@ class LoginCallScreen(private val phone: String) : Screen {
                     Text(
                         "На ваш номер $phone поступит звонок. Введите последние 4 цифры +X XXX XXX 12 34 ",
                         textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                         lineHeight = 24.sp,
                         modifier = Modifier.padding(bottom = 5.dp),
-                        fontWeight = FontWeight.W400,
                         color = Color(151, 151, 151)
                     )
 
@@ -186,6 +186,17 @@ class LoginCallScreen(private val phone: String) : Screen {
 
 
                         })
+
+                    Text(
+                        "Отправить код по SMS",
+                        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                        textAlign = TextAlign.Center,
+                        fontSize = 15.sp,
+                        lineHeight = 15.sp,
+                        color = Color(0xFF000000),
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.padding(top = 20.dp).clickable { navigator.push(LoginSMSScreen(phone)) }
+                    )
                 }
 
 
