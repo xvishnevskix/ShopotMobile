@@ -71,6 +71,10 @@ class ChatScreen(
                         bottomBar = {
                             ChatFooter(viewModel)
                         }
+                        ,
+                        
+                        modifier = Modifier
+                            .fillMaxSize()
                     ) { innerPadding ->
                         if (profile != null) {
                             Chat(

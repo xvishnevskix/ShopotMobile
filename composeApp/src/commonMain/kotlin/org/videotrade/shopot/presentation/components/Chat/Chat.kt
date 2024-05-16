@@ -8,6 +8,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
@@ -231,7 +233,6 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     
-    Box(modifier = modifier.fillMaxSize() ) {
         LazyColumn(
             state = listState,
             reverseLayout = true,
@@ -252,7 +253,6 @@ fun Chat(
             }
         }
     }
-}
 
 @Composable
 fun MessageBox(
@@ -273,7 +273,11 @@ fun MessageBox(
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
-                .clickable(onClick = onClick)
+                .pointerInput(Unit) {
+                    detectTapGestures(
+                        onLongPress = { onClick() }
+                    )
+                }
         ) {
             if (message.fromUser == profile.id) {
                 Surface(
