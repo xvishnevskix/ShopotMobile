@@ -15,6 +15,7 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.UsersUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
 
@@ -44,6 +45,9 @@ private val presentationModule = module {
     }
     
     single { MainViewModel() }
+    single { IntroViewModel() }
+    
+    
     
     single<ChatRepository> {
         ChatRepositoryImpl()

@@ -30,76 +30,85 @@ import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatFooter(viewModel: ChatViewModel) {
     
     var text by remember { mutableStateOf("") }
     
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth().height(58.dp).clip(RoundedCornerShape(20.dp)).background(
-            Color(0xFFF3F4F6)
-        ).padding(horizontal = 15.dp)
+    Box(
+        modifier = Modifier
+            .statusBarsPadding()
+            .imePadding()  // Обеспечивает, что клавиатура не будет перекрывать этот элемент
     ) {
-        Box(
-            modifier = Modifier
-                .padding(end = 20.dp)
-                .size(37.dp)
-                .background(color = Color(0xFF2A293C), shape = CircleShape),
-            contentAlignment = Alignment.Center
+    
+    
+    Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth().height(58.dp).clip(RoundedCornerShape(20.dp))
+                .background(
+                    Color(0xFFF3F4F6)
+                ).padding(horizontal = 15.dp)
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add",
-                tint = Color.White,
-                modifier = Modifier.size(16.dp)
-            )
-        }
-        BasicTextField(
-            value = text,
-            onValueChange = { text = it },
-            modifier = Modifier.weight(1f), // Здесь можно добавить модификаторы, если это необходимо
-            textStyle = TextStyle(color = Color.Black, fontSize = 16.sp), // Простой чёрный текст
-            cursorBrush = SolidColor(Color.Black), // Чёрный цвет курсора
-            visualTransformation = VisualTransformation.None, // Без визуальных преобразований
-            decorationBox = { innerTextField ->
-                Box {
-                    if (text.isEmpty()) {
-                        Text(
-                            "Написать...",
-                            textAlign = TextAlign.Center,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF979797),
-                        )
-                    // Подсказка
-                    }
-                    innerTextField() // Основное текстовое поле
-                }
-            }
-        )
-        
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.Send,
-            contentDescription = "Send",
-            modifier = Modifier.padding(end = 8.dp).clickable {
-                viewModel.addMessage(
-                    MessageItem("2", text, true, "", "Мансур", "Дандаев", "", "", "2")
-                
+            Box(
+                modifier = Modifier
+                    .padding(end = 20.dp)
+                    .size(37.dp)
+                    .background(color = Color(0xFF2A293C), shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Add",
+                    tint = Color.White,
+                    modifier = Modifier.size(16.dp)
                 )
             }
-        )
+            BasicTextField(
+                value = text,
+                onValueChange = { text = it },
+                modifier = Modifier.weight(1f), // Здесь можно добавить модификаторы, если это необходимо
+                textStyle = TextStyle(
+                    color = Color.Black,
+                    fontSize = 16.sp
+                ), // Простой чёрный текст
+                cursorBrush = SolidColor(Color.Black), // Чёрный цвет курсора
+                visualTransformation = VisualTransformation.None, // Без визуальных преобразований
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (text.isEmpty()) {
+                            Text(
+                                "Написать...",
+                                textAlign = TextAlign.Center,
+                                fontSize = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                color = Color(0xFF979797),
+                            )
+                            // Подсказка
+                        }
+                        innerTextField() // Основное текстовое поле
+                    }
+                }
+            )
+            
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Send,
+                contentDescription = "Send",
+                modifier = Modifier.padding(end = 8.dp).clickable {
+                    viewModel.addMessage(
+                        MessageItem("1", "" ,"" ,"" ,"" ,0 , listOf() ,false ,"")
+                    
+                    )
+                }
+            )
+            
+            
+        }
         
-        
-       
     }
-       
-    }
-    
+}
     
     
 

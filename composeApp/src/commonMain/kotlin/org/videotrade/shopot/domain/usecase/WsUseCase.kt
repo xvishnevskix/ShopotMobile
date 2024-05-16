@@ -8,7 +8,7 @@ import org.videotrade.shopot.domain.repository.WsRepository
 class WsUseCase : KoinComponent {
     private val repository: WsRepository by inject()
 
-    suspend fun connectionWs(userId: String) {
+    suspend fun connectionWs(userId: String){
         return repository.connectionWs(userId)
     }
     

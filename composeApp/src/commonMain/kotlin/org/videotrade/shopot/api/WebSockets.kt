@@ -12,13 +12,17 @@ import io.ktor.websocket.readText
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.usecase.ChatUseCase
 
 suspend fun handleWebRTCWebSocket(
     webSocketSession: MutableState<DefaultClientWebSocketSession?>,
     isConnected: MutableState<Boolean>,
-    userId: String
+    userId: String,
+    chatUseCase: ChatUseCase
 
 ) {
     
@@ -59,8 +63,25 @@ suspend fun handleWebRTCWebSocket(
                             
                             when (action) {
                                 "getMessages" -> {
+                                    try {
+                                        
+                                        val messagesJson =
+                                            jsonElement.jsonObject["messages"]?.jsonArray
+                                        println("messages31312222 $messagesJson")
+                                        
+                                        if (messagesJson != null) {
+                                            val messages: List<MessageItem> =
+                                                Json.decodeFromString(messagesJson.toString())
+                                            println("messages31312222 $messages")
+                                            
+                                            chatUseCase.initMessages(messages) // Инициализация сообщений
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
                                     
-                                    Logger.d { "getMessages $jsonElement" }
                                 }
                                 
                                 "newCall" -> {

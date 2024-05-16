@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -44,7 +45,7 @@ import shopot.composeapp.generated.resources.double_message_check
 @Composable
 fun Chat(
     chat: UserItem,
-    viewModel: ChatViewModel, modifier: Modifier
+    viewModel: ChatViewModel,
 ) {
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
@@ -56,14 +57,13 @@ fun Chat(
         state = listState,
         reverseLayout = true, // Makes items start from the bottom
         modifier = Modifier
-            .fillMaxHeight()
-            .navigationBarsPadding()  // Обеспечивает отступы от навигационной панели
+            .fillMaxSize()
+//            .navigationBarsPadding()
     ) {
         itemsIndexed(messagesState) { index, message ->
             if (profile != null) {
                 MessageBox(profile.id, message)
                 
-//                Text("dadadada")
             }
         }
     }
@@ -73,13 +73,12 @@ fun Chat(
 fun MessageBox(profileId: String, message: MessageItem) {
     Column {
         Box(
-            contentAlignment = if (profileId == message.userId) Alignment.CenterEnd else Alignment.CenterStart,
+            contentAlignment = if (profileId == message.fromUser) Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
-                .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
         ) {
-            if (profileId == message.userId) {
+            if (profileId == message.fromUser) {
                 Surface(
                     modifier = Modifier.wrapContentSize(),
                     shape = RoundedCornerShape(
@@ -92,7 +91,7 @@ fun MessageBox(profileId: String, message: MessageItem) {
                     color = Color(0xFF2A293C)
                 ) {
                     Text(
-                        text = message.text,
+                        text = message.content,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(
                             start = 25.dp,
@@ -121,7 +120,7 @@ fun MessageBox(profileId: String, message: MessageItem) {
                     color = Color(0xFFF3F4F6)
                 ) {
                     Text(
-                        text = message.text,
+                        text = message.content,
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(
                             start = 25.dp,
@@ -141,7 +140,7 @@ fun MessageBox(profileId: String, message: MessageItem) {
         }
         
         Row(
-            horizontalArrangement = if (profileId == message.userId) Arrangement.End else Arrangement.Start,
+            horizontalArrangement = if (profileId == message.fromUser) Arrangement.End else Arrangement.Start,
             modifier = Modifier
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()

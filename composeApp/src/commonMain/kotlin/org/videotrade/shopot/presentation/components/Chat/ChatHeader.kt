@@ -46,7 +46,7 @@ fun ChatHeader(chat: UserItem) {
 
 
     Row(
-        modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(top = 8.dp),
+        modifier = Modifier.fillMaxWidth().statusBarsPadding(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
 
