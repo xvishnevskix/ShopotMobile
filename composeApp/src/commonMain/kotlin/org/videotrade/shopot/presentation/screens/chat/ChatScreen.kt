@@ -6,12 +6,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import kotlinx.coroutines.delay
 import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.components.Chat.Chat
 import org.videotrade.shopot.presentation.components.Chat.ChatFooter
@@ -26,7 +28,17 @@ class ChatScreen(private val chat: UserItem) : Screen {
     @Composable
     override fun Content() {
         val viewModel: ChatViewModel = koinInject()
-
+        
+        
+        LaunchedEffect(key1 = viewModel) {
+            viewModel.wsConnect()
+            
+            
+            delay(2000)
+            viewModel.getMessagesBack(chat.chatId)
+        }
+        
+        
         var selectedMessage by remember { mutableStateOf<MessageItem?>(null) }
         var selectedMessageY by remember { mutableStateOf(0) }
         var hiddenMessageId by remember { mutableStateOf<String?>(null) }

@@ -101,14 +101,14 @@ import shopot.composeapp.generated.resources.edit_pencil
 //    Column {
 //        Box(
 ////        contentAlignment = if (true) Alignment.CenterStart else Alignment.CenterEnd,
-//            contentAlignment = if (message.id == "1") Alignment.CenterEnd else Alignment.CenterStart,
+//            contentAlignment = if (message.fromUser == "1") Alignment.CenterEnd else Alignment.CenterStart,
 //            modifier = Modifier
 //                .padding(start = 2.dp ,end = 2.dp)
 //                .fillMaxWidth()
 //                .padding(vertical = 4.dp,)
 //        ) {
 //
-//            if (message.id == "1") {
+//            if (message.fromUser == "1") {
 //                Surface(
 //                    modifier = Modifier
 //                        .wrapContentSize(),
@@ -122,7 +122,7 @@ import shopot.composeapp.generated.resources.edit_pencil
 //                    color = Color(0xFF2A293C)
 //                ) {
 //                    Text(
-//                        text = message.text,
+//                        text = message.content,
 //                        style = MaterialTheme.typography.bodyLarge,
 //                        modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
 //                        textAlign = TextAlign.Start,
@@ -148,7 +148,7 @@ import shopot.composeapp.generated.resources.edit_pencil
 //                    color = Color(0xFFF3F4F6)
 //                ) {
 //                    Text(
-//                        text = message.text,
+//                        text = message.content,
 //                        style = MaterialTheme.typography.bodyLarge,
 //                        modifier = Modifier.padding(start = 25.dp, end = 25.dp, top = 13.dp, bottom = 12.dp),
 //                        textAlign = TextAlign.Start,
@@ -164,7 +164,7 @@ import shopot.composeapp.generated.resources.edit_pencil
 //        }
 //
 //        Row(
-//            horizontalArrangement = if (message.id == "1") Arrangement.End else Arrangement.Start,
+//            horizontalArrangement = if (message.fromUser == "1") Arrangement.End else Arrangement.Start,
 //            modifier = Modifier
 //                .padding(start = 2.dp ,end = 2.dp)
 //                .fillMaxWidth()
@@ -263,14 +263,14 @@ fun MessageBox(
             .alpha(if (isVisible) 1f else 0f) // Manage visibility with alpha
     ) {
         Box(
-            contentAlignment = if (message.id == "1") Alignment.CenterEnd else Alignment.CenterStart,
+            contentAlignment = if (message.fromUser == "1") Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .clickable(onClick = onClick)
         ) {
-            if (message.id == "1") {
+            if (message.fromUser == "1") {
                 Surface(
                     modifier = Modifier.wrapContentSize(),
                     shape = RoundedCornerShape(
@@ -283,7 +283,7 @@ fun MessageBox(
                     color = Color(0xFF2A293C)
                 ) {
                     Text(
-                        text = message.text,
+                        text = message.content,
                         style = TextStyle(
                             color = Color.White,
                             fontSize = 16.sp
@@ -304,7 +304,7 @@ fun MessageBox(
                     color = Color(0xFFF3F4F6)
                 ) {
                     Text(
-                        text = message.text,
+                        text = message.content,
                         style = TextStyle(
                             color = Color.Black,
                             fontSize = 16.sp
@@ -316,7 +316,7 @@ fun MessageBox(
         }
 
         Row(
-            horizontalArrangement = if (message.id == "1") Arrangement.End else Arrangement.Start,
+            horizontalArrangement = if (message.fromUser == "1") Arrangement.End else Arrangement.Start,
             modifier = Modifier
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
@@ -382,7 +382,7 @@ fun BlurredMessageOverlay(
 @Composable
 fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) {
     val transition = updateTransition(targetState = visible, label = "MessageBlurBoxTransition")
-    val orientation: Dp = if (message.id == "1") 100.dp else -75.dp
+    val orientation: Dp = if (message.fromUser == "1") 100.dp else -75.dp
     val firstColumnOffsetX by transition.animateDp(
         transitionSpec = { tween(durationMillis = 300, easing = FastOutSlowInEasing) },
         label = "FirstColumnOffsetX"
@@ -409,14 +409,14 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
-                contentAlignment = if (message.id == "1") Alignment.CenterEnd else Alignment.CenterStart,
+                contentAlignment = if (message.fromUser == "1") Alignment.CenterEnd else Alignment.CenterStart,
                 modifier = Modifier
                     .padding(start = 2.dp, end = 2.dp)
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .clickable(onClick = onClick)
             ) {
-                if (message.id == "1") {
+                if (message.fromUser == "1") {
                     Surface(
                         modifier = Modifier.wrapContentSize(),
                         shape = RoundedCornerShape(
@@ -429,7 +429,7 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
                         color = Color(0xFF2A293C)
                     ) {
                         Text(
-                            text = message.text,
+                            text = message.content,
                             style = TextStyle(
                                 color = Color.White,
                                 fontSize = 16.sp
@@ -450,7 +450,7 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
                         color = Color(0xFFF3F4F6)
                     ) {
                         Text(
-                            text = message.text,
+                            text = message.content,
                             style = TextStyle(
                                 color = Color.Black,
                                 fontSize = 16.sp
@@ -461,14 +461,14 @@ fun MessageBlurBox(message: MessageItem, onClick: () -> Unit, visible: Boolean) 
                 }
             }
             Row(
-                horizontalArrangement = if (message.id == "1") Arrangement.End else Arrangement.Start,
+                horizontalArrangement = if (message.fromUser == "1") Arrangement.End else Arrangement.Start,
                 modifier = Modifier
                     .padding(start = 2.dp, end = 2.dp)
                     .fillMaxWidth()
             ) {
                 Image(
                     modifier = Modifier
-                        .padding(start = if (message.id == "1") 70.dp else 0.dp, top = 2.dp, end = 4.dp)
+                        .padding(start = if (message.fromUser == "1") 70.dp else 0.dp, top = 2.dp, end = 4.dp)
                         .size(14.dp),
                     painter = painterResource(Res.drawable.double_message_check),
                     contentDescription = null,
