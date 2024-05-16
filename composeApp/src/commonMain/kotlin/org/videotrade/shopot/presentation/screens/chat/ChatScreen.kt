@@ -1,5 +1,7 @@
 package org.videotrade.shopot.presentation.screens.chat
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -10,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,6 +29,7 @@ import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.presentation.components.Chat.MessageBlurBox
 import org.videotrade.shopot.presentation.components.Chat.MessageBox
 
 class ChatScreen(private val chat: UserItem) : Screen {
@@ -56,25 +60,35 @@ class ChatScreen(private val chat: UserItem) : Screen {
                 }
             }
 
+            // заблюренное сообщение
+
             selectedMessage?.let { message ->
+                var visible by remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    visible = true
+                }
+
+                val alpha by animateFloatAsState(
+                    targetValue = if (visible) 0.5f else 0f,
+                    animationSpec = tween(durationMillis = 200)
+                )
+
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.5f))
-                        .clickable { selectedMessage = null } // Закрываем при клике на затемненный фон
-                    ,
+                        .background(Color.Black.copy(alpha = alpha))
+                        .clickable {  selectedMessage = null },
                 ) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.CenterStart)
                             .padding(16.dp)
                     ) {
-                        // Показываем выбранное сообщение без размытия
                         Surface(
                             shape = RoundedCornerShape(16.dp),
                             color = Color.Transparent
                         ) {
-                            MessageBox(message = message, onClick = { /* Ничего не делаем */ })
+                            MessageBlurBox(message = message, onClick = {}, visible = visible)
                         }
                     }
                 }

@@ -2,7 +2,7 @@ package org.videotrade.shopot.domain.model
 
 
 data class MessageItem(
-    val id: String,
+    var id: String,
     val text: String,
     val isPersonal: Boolean,
     var icon: String,
