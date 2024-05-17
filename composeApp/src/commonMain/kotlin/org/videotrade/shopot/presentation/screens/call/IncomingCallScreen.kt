@@ -4,14 +4,11 @@ import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
 
 
-class CallScreen() : Screen {
+class IncomingCallScreen() : Screen {
     
     
     @Composable
     override fun Content() {
-    
-    
-    
     
     
     }

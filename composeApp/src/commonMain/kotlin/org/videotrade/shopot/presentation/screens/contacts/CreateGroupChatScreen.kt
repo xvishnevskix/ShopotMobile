@@ -1,17 +1,14 @@
-package org.videotrade.shopot.presentation.screens.call
+package org.videotrade.shopot.presentation.screens.contacts
 
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.screen.Screen
 
 
-class CallScreen() : Screen {
+class CreateGroupChatScreen() : Screen {
     
     
     @Composable
     override fun Content() {
-    
-    
-    
     
     
     }
