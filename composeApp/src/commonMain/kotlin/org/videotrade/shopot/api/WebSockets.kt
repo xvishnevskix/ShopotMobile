@@ -105,52 +105,52 @@ suspend fun handleWebRTCWebSocket(
                     
                 }
                 
-                @Serializable
-                data class sendMessage(
-                    var action: String,
-                    var content: String,
-                    var fromUser: String,
-                    var chatId: String,
-                )
+//                @Serializable
+//                data class sendMessage(
+//                    var action: String,
+//                    var content: String,
+//                    var fromUser: String,
+//                    var chatId: String,
+//                )
+//
+//                val jsonMessageMess =
+//                    Json.encodeToString(
+//                        sendMessage.serializer(), sendMessage(
+//                            "sendMessage",
+//                            "Privet",
+//                            "10f609c6-df91-4cbc-afc7-30c175cc1111",
+//                            "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
+//                        )
+//                    )
+//
+//
+//                send(Frame.Text(jsonMessageMess))
+//
                 
-                val jsonMessageMess =
-                    Json.encodeToString(
-                        sendMessage.serializer(), sendMessage(
-                            "sendMessage",
-                            "Privet",
-                            "10f609c6-df91-4cbc-afc7-30c175cc1111",
-                            "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
-                        )
-                    )
-                
-                
-                send(Frame.Text(jsonMessageMess))
-                
-                
-                @Serializable
-                data class getMessages(
-                    var action: String,
-                    var chatId: String,
-                )
-                
-                
-                val jsonMessage =
-                    Json.encodeToString(
-                        getMessages.serializer(), getMessages(
-                            "getMessages", chatId = "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
-                        )
-                    )
-                
-                try {
-                    
-                    
-                    send(Frame.Text(jsonMessage))
-                    println("Message sent successfully")
-                } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
-                }
-                
-                
+//                @Serializable
+//                data class getMessages(
+//                    var action: String,
+//                    var chatId: String,
+//                )
+//
+//
+//                val jsonMessage =
+//                    Json.encodeToString(
+//                        getMessages.serializer(), getMessages(
+//                            "getMessages", chatId = "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
+//                        )
+//                    )
+//
+//                try {
+//
+//
+//                    send(Frame.Text(jsonMessage))
+//                    println("Message sent successfully")
+//                } catch (e: Exception) {
+//                    println("Failed to send message: ${e.message}")
+//                }
+//
+//
                 callOutputRoutine.join()
             }
         } catch (e: Exception) {

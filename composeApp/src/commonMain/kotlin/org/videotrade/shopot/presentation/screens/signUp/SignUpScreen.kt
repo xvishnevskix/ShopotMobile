@@ -1,28 +1,19 @@
-package org.videotrade.shopot.presentation.screens.login
+package org.videotrade.shopot.presentation.screens.signUp
 
 import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -43,18 +33,38 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.videotrade.shopot.presentation.components.Common.CustomButton
-import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.components.Auth.AuthHeader
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.presentation.components.Auth.PhoneInput
+import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.presentation.components.Auth.AuthHeader
+import org.videotrade.shopot.presentation.components.Common.CustomButton
+import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.SFProText_Semibold
 import shopot.composeapp.generated.resources.pencil_in_circle
 import shopot.composeapp.generated.resources.person
 
@@ -64,22 +74,22 @@ data class SignUpTextState(
     var nickname: String = ""
 )
 
-class SignUpScreen() : Screen {
-
-
+class SignUpScreen(private val phone: String) : Screen {
+    
+    
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val responseState = remember { mutableStateOf<String?>(null) }
         val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
         val coroutineScope = rememberCoroutineScope()
-
+        
         val textState = remember { mutableStateOf(SignUpTextState()) }
-
+        
         SafeArea {
-
+            
             AuthHeader("Создать аккаунт", 0.75F)
-
+            
             Box(
                 modifier = Modifier.padding(top = 70.dp).fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
@@ -93,13 +103,13 @@ class SignUpScreen() : Screen {
                             modifier = Modifier.size(28.dp).align(Alignment.BottomEnd)
                         )
                     }
-
+                    
                     Column(
                         modifier = Modifier.fillMaxWidth(1F),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-
+                        
+                        
                         Column(
                             modifier = Modifier.padding(top = 35.dp),
                         ) {
@@ -152,10 +162,10 @@ class SignUpScreen() : Screen {
                                     .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
                             )
                         }
-
-
-
-
+                        
+                        
+                        
+                        
                         Column(
                             modifier = Modifier.padding(top = 7.dp),
                         ) {
@@ -208,10 +218,10 @@ class SignUpScreen() : Screen {
                                     .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
                             )
                         }
-
-
-
-
+                        
+                        
+                        
+                        
                         Column(
                             modifier = Modifier.padding(top = 7.dp, bottom = 10.dp),
                         ) {
@@ -264,18 +274,82 @@ class SignUpScreen() : Screen {
                                     .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
                             )
                         }
-
+                        
                     }
-
+                    
                     Box(
                         modifier = Modifier.padding(top = 20.dp)
                     ) {
                         CustomButton(
                             "Создать аккаунт",
-                            {
-
-
-                            })
+                            { scope ->
+                                scope.launch {
+                                    val jsonContent = Json.encodeToString(
+                                        buildJsonObject {
+                                            put("first_name", textState.value.firstName)
+                                            put("phone", phone)
+                                            put("login", textState.value.nickname)
+                                        }
+                                    )
+                                    
+                                    val client = HttpClient()
+                                    try {
+                                        val getToken = getValueInStorage("token")
+                                        val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}auth/new-register") {
+                                            contentType(ContentType.Application.Json)
+                                            header(HttpHeaders.Authorization, "Bearer $getToken")
+                                            setBody(jsonContent)
+                                        }
+                                        
+                                        println("response313131 $response")
+                                        
+                                        if (response.status.isSuccess()) {
+                                            
+                                            
+                                            val jsonString = response.bodyAsText()
+                                            val jsonElement = Json.parseToJsonElement(jsonString)
+                                            val messageObject =
+                                                jsonElement.jsonObject["message"]?.jsonObject
+                                            
+                                            
+                                            val token = messageObject?.get("token")?.jsonPrimitive?.content
+                                            val refreshToken =
+                                                messageObject?.get("refreshToken")?.jsonPrimitive?.content
+                                            
+                                            
+                                            println("response313131 $token")
+                                            println("response313131 $refreshToken")
+                                            
+                                            
+                                            token?.let {
+                                                addValueInStorage(
+                                                    "token",
+                                                    token
+                                                )
+                                            }
+                                            refreshToken?.let {
+                                                addValueInStorage(
+                                                    "refreshToken",
+                                                    refreshToken
+                                                )
+                                            }
+                                            
+                                            
+                                            navigator.push(MainScreen())
+                                            
+                                            
+                                        } else {
+                                            println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                                        }
+                                    } catch (e: Exception) {
+                                        println("Error: $e")
+                                    } finally {
+                                        client.close()
+                                    }
+                                }
+                            }
+                        )
+                        
                     }
                 }
             }

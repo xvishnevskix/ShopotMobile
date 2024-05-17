@@ -1,4 +1,4 @@
-package org.videotrade.shopot.presentation.screens.login
+package org.videotrade.shopot.presentation.screens.auth
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +31,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.SFProText_Semibold
 
-class LoginSMSScreen(private val phone: String) : Screen {
+class AuthSMSScreen(private val phone: String) : Screen {
 
 
     @Composable

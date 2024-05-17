@@ -61,10 +61,10 @@ class origin {
     }
     
     
-    suspend fun post(
+    suspend  inline fun <reified T> post(
         url: String,
-        data: JsonObject
-    ): HttpResponse? {
+        data: String
+    ): T? {
         
         try {
             val token = getValueInStorage("token")
@@ -78,8 +78,12 @@ class origin {
             
             if (response.status.isSuccess()) {
                 
-                return response
                 
+                
+                val responseData: T = Json.decodeFromString(response.bodyAsText())
+                
+                
+                return responseData
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }

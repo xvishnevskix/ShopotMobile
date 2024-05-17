@@ -7,23 +7,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
-import org.koin.compose.koinInject
-import org.koin.core.component.get
 import org.videotrade.shopot.data.origin
-import org.videotrade.shopot.domain.model.UserItem
-import org.videotrade.shopot.domain.usecase.WsUseCase
-import org.videotrade.shopot.presentation.screens.chat.ChatScreen
-import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
-import org.videotrade.shopot.presentation.screens.login.LoginScreen
+import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.logo
@@ -34,12 +25,7 @@ class IntroScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel: IntroViewModel = koinInject()
         
-        
-
-       
-
         
         Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             Image(
@@ -67,7 +53,7 @@ class IntroScreen : Screen {
             }
             
             
-            navigator.push(LoginScreen())
+            navigator.push(SignInScreen())
             
             
         }

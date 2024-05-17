@@ -12,7 +12,7 @@ data class MessageItem(
     var replaces: Int,
     var created:  List<Int>?,
     var isDeleted: Boolean,
-    var chatId: String?,
+    var chatId: String,
     
     
     )

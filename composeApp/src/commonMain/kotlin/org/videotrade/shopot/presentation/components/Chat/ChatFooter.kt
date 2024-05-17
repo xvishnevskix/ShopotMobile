@@ -2,15 +2,27 @@ package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,12 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
-fun ChatFooter(viewModel: ChatViewModel) {
+fun ChatFooter(chat: UserItem, viewModel: ChatViewModel) {
     
     var text by remember { mutableStateOf("") }
     
@@ -39,9 +52,9 @@ fun ChatFooter(viewModel: ChatViewModel) {
         modifier = Modifier
             .imePadding().padding(vertical = 15.dp)
     ) {
-    
-    
-    Row(
+        
+        
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth().height(58.dp).clip(RoundedCornerShape(20.dp))
@@ -97,9 +110,11 @@ fun ChatFooter(viewModel: ChatViewModel) {
                 contentDescription = "Send",
                 modifier = Modifier.padding(end = 8.dp).clickable {
                     viewModel.addMessage(
-                        MessageItem("1", "" ,"" ,"" ,"" ,0 , listOf() ,false ,"")
+                        MessageItem("10", "10f609c6-df91-4cbc-afc7-30c175cc1111", text, "", "", 0, listOf(), false,  chat.chatId)
                     
                     )
+                    
+                    text = ""
                 }
             )
             

@@ -45,7 +45,10 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -198,26 +201,43 @@ import shopot.composeapp.generated.resources.edit_pencil
 
 data class EditOption(
     val text: String,
-    val imagePath: DrawableResource
-)
+    val imagePath: DrawableResource,
+    val onClick: (viewModule: ChatViewModel, message: MessageItem, clipboardManager: ClipboardManager) -> Unit,
+    
+    )
 
 
 val editOptions = listOf(
-    EditOption(
-        text = "Переслать",
-        imagePath = Res.drawable.edit_pencil
-    ),
-    EditOption(
-        text = "Изменить",
-        imagePath = Res.drawable.edit_pencil
-    ),
+//    EditOption(
+//        text = "Переслать",
+//        imagePath = Res.drawable.edit_pencil,
+//        onClick = {
+//
+//
+//        }
+//    ),
+//    EditOption(
+//        text = "Изменить",
+//        imagePath = Res.drawable.edit_pencil,
+//        onClick = {}
+//    ),
     EditOption(
         text = "Удалить",
-        imagePath = Res.drawable.edit_pencil
+        imagePath = Res.drawable.edit_pencil,
+        onClick = { viewModule, message, _ ->
+            viewModule.deleteMessage(message)
+        }
     ),
     EditOption(
         text = "Копировать",
-        imagePath = Res.drawable.edit_pencil
+        imagePath = Res.drawable.edit_pencil,
+        onClick = { _, message, clipboardManager ->
+            
+            
+            clipboardManager.setText(AnnotatedString(message.content))
+            
+            
+        }
     ),
     
     )
@@ -233,26 +253,27 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     
-        LazyColumn(
-            state = listState,
-            reverseLayout = true,
-            modifier = modifier
-        ) {
-            itemsIndexed(messagesState) { index, message ->
-                var messageY by remember { mutableStateOf(0) }
-                val isVisible = message.id != hiddenMessageId
-                MessageBox(
-                    message = message,
-                    profile = profile,
-                    onClick = { onMessageClick(message, messageY) },
-                    onPositioned = { coordinates ->
-                        messageY = coordinates.positionInParent().y.toInt()
-                    },
-                    isVisible = isVisible
-                )
-            }
+    LazyColumn(
+        state = listState,
+        reverseLayout = true,
+        modifier = modifier
+    ) {
+        itemsIndexed(messagesState) { index, message ->
+            
+            var messageY by remember { mutableStateOf(0) }
+            val isVisible = message.id != hiddenMessageId
+            MessageBox(
+                message = message,
+                profile = profile,
+                onClick = { onMessageClick(message, messageY) },
+                onPositioned = { coordinates ->
+                    messageY = coordinates.positionInParent().y.toInt()
+                },
+                isVisible = isVisible
+            )
         }
     }
+}
 
 @Composable
 fun MessageBox(
@@ -362,6 +383,7 @@ fun MessageBox(
 @Composable
 fun BlurredMessageOverlay(
     profile: ProfileDTO,
+    viewModel: ChatViewModel,
     selectedMessage: MessageItem?,
     selectedMessageY: Int,
     onDismiss: () -> Unit
@@ -392,7 +414,13 @@ fun BlurredMessageOverlay(
                     shape = RoundedCornerShape(16.dp),
                     color = Color.Transparent
                 ) {
-                    MessageBlurBox(message = message, profile = profile, onClick = {}, visible = visible)
+                    MessageBlurBox(
+                        message = message,
+                        profile = profile,
+                        viewModel = viewModel,
+                        onClick = {},
+                        visible = visible
+                    )
                 }
             }
         }
@@ -403,9 +431,12 @@ fun BlurredMessageOverlay(
 fun MessageBlurBox(
     message: MessageItem,
     profile: ProfileDTO,
+    viewModel: ChatViewModel,
     onClick: () -> Unit,
     visible: Boolean
 ) {
+    val clipboardManager = LocalClipboardManager.current
+    
     val transition = updateTransition(targetState = visible, label = "MessageBlurBoxTransition")
     val orientation: Dp = if (message.fromUser == profile.id) 100.dp else -75.dp
     val firstColumnOffsetX by transition.animateDp(
@@ -529,7 +560,11 @@ fun MessageBlurBox(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth().clickable {
+                            
+                            
+                            editOption.onClick(viewModel, message, clipboardManager)
+                        }
                 ) {
                     Text(
                         text = editOption.text,

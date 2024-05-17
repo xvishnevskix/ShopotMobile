@@ -1,4 +1,4 @@
-package org.videotrade.shopot.presentation.screens.login
+package org.videotrade.shopot.presentation.screens.signUp
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +29,7 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
+import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFProText_Semibold
 
@@ -73,7 +74,7 @@ class SignUpPhoneScreen(private val phone: MutableState<TextFieldValue>) : Scree
                         CustomButton(
                             "Отправить код",
                             {
-                                navigator.push(SignUpCallScreen(phone.value.text))
+                                navigator.push(AuthCallScreen(phone.value.text, "SignUp"))
                             })
                     }
                 }

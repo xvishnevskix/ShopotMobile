@@ -33,12 +33,13 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-
-import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
 import shopot.composeapp.generated.resources.LoginLogo
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -46,31 +47,32 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 
 
-class LoginScreen : Screen {
-
-
+class SignInScreen : Screen {
+    
+    
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-
-
+        
+        
         val textState =
             remember {
                 mutableStateOf(
-                    TextFieldValue(text = "+7", selection = TextRange(3) //для правильной позиции курсора
+                    TextFieldValue(
+                        text = "+7", selection = TextRange(3) //для правильной позиции курсора
                     )
                 )
             }
-
-
+        
+        
         SafeArea {
-
+            
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-
-
+                
+                
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(
                         modifier = Modifier
@@ -79,7 +81,7 @@ class LoginScreen : Screen {
                         contentDescription = null,
                         contentScale = ContentScale.Crop
                     )
-
+                    
                     Text(
                         "Добро пожаловать!",
                         fontSize = 28.sp,
@@ -99,28 +101,33 @@ class LoginScreen : Screen {
                         fontWeight = FontWeight.W400,
                         color = Color(151, 151, 151)
                     )
-
-
-
-
+                    
+                    
+                    
+                    
                     Box(modifier = Modifier.padding(top = 25.dp, bottom = 25.dp)) {
                         PhoneInput(textState)
                     }
-
-
+                    
+                    
                     CustomButton(
                         "Войти",
                         {
-                            navigator.push(LoginCallScreen(textState.value.text))
-
+                            navigator.push(
+                                AuthCallScreen(
+                                    textState.value.text,
+                                    
+                                    "SignIn"
+                                )
+                            )
+                            
                         })
-
+                    
                     Spacer(modifier = Modifier.height(154.dp))
-
+                    
                     Row(
                         modifier = Modifier.padding(10.dp).fillMaxWidth()
-                            .clickable { navigator.push(SignUpPhoneScreen(textState)) }
-                        ,
+                            .clickable { navigator.push(SignUpPhoneScreen(textState)) },
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
@@ -140,17 +147,19 @@ class LoginScreen : Screen {
                             color = Color(0xFF000000),
                             textDecoration = TextDecoration.Underline
                         )
-
+                        
                     }
-
+                    
                 }
-
-
+                
+                
             }
-
+            
         }
-
+        
     }
-
-
+    
+    
 }
+
+

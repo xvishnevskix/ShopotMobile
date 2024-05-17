@@ -133,15 +133,15 @@ internal fun App() = AppTheme {
             modifier = Modifier.fillMaxSize()
         ) {
             Navigator(
-                ChatScreen(
-                UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
-                )
+//                ChatScreen(
+//                UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
+//                )
 //                CallScreen(
 //
 //                )
 
 //                MainScreen()
-//                        IntroScreen()
+                        IntroScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

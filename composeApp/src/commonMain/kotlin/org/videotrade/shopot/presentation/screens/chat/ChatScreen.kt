@@ -27,7 +27,7 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class ChatScreen(
     private val chat: UserItem = UserItem(
-        "1",
+        "cf9b66e2-9e18-4342-bbc0-c5144a593f71",
         false,
         "",
         "",
@@ -36,7 +36,7 @@ class ChatScreen(
         0,
         "",
         "",
-        "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b",
+        "89da6ae1-cec8-4a48-89de-46c5b7c174a2",
     )
 ) : Screen {
     
@@ -69,7 +69,7 @@ class ChatScreen(
                         
                         },
                         bottomBar = {
-                            ChatFooter(viewModel)
+                            ChatFooter(chat,viewModel)
                         }
                         ,
                         
@@ -85,6 +85,7 @@ class ChatScreen(
                                 Modifier.fillMaxSize()
                                     .padding(innerPadding),
                                 onMessageClick = { message, y ->
+                                    
                                     selectedMessage = message
                                     selectedMessageY = y + 150
                                     hiddenMessageId = message.id
@@ -99,6 +100,7 @@ class ChatScreen(
             if (profile != null) {
                 BlurredMessageOverlay(
                     profile,
+                    viewModel,
                     selectedMessage = selectedMessage,
                     selectedMessageY = selectedMessageY,
                     onDismiss = {

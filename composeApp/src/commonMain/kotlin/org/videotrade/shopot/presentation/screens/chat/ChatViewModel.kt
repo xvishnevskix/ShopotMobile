@@ -21,7 +21,7 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 class ChatViewModel : ViewModel(), KoinComponent {
     private val chatUseCase: ChatUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
-    private  val wsUseCase: WsUseCase by inject()
+    private val wsUseCase: WsUseCase by inject()
     
     private val _messages = MutableStateFlow<List<MessageItem>>(listOf())
     
@@ -62,7 +62,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     fun getMessagesBack(chatId: String) {
         viewModelScope.launch {
-
             
             
             try {
@@ -98,6 +97,35 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun addMessage(message: MessageItem) {
         viewModelScope.launch {
             chatUseCase.addMessage(message)
+            
+            try {
+                
+                
+                @Serializable
+                data class sendMessegesDTO(
+                    val action: String,
+                    val content: String,
+                    val fromUser: String,
+                    val chatId: String
+                )
+                
+                
+                val getMesseges = sendMessegesDTO(
+                    "sendMessage",
+                    message.content,
+                    message.fromUser,
+                    message.chatId
+                )
+                
+                
+                val jsonMessage = Json.encodeToString(sendMessegesDTO.serializer(), getMesseges)
+                
+                
+                ws.value?.send(Frame.Text(jsonMessage))
+                
+            } catch (e: Exception) {
+                println("Failed to send message: ${e.message}")
+            }
         }
     }
     

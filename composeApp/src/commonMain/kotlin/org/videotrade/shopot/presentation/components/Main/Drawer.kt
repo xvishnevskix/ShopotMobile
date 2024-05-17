@@ -34,7 +34,7 @@ import co.touchlab.kermit.Logger
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.presentation.screens.login.LoginScreen
+import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -173,6 +173,6 @@ fun leaveApp(navigator: Navigator) {
     delValueInStorage("token")
     delValueInStorage("refreshToken")
     
-    navigator.push(LoginScreen())
+    navigator.push(SignInScreen())
     
 }
