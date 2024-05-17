@@ -121,7 +121,8 @@ import org.videotrade.shopot.theme.AppTheme
 
 import org.koin.compose.KoinContext
 import org.videotrade.shopot.domain.model.UserItem
-import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.components.Main.CallScreen
+import org.videotrade.shopot.presentation.components.Main.IncomingCallScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
@@ -143,7 +144,8 @@ internal fun App() = AppTheme {
 
 //                MainScreen()
 //                        IntroScreen()
-                        CallScreen()
+                       //CallScreen()
+                            IncomingCallScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
