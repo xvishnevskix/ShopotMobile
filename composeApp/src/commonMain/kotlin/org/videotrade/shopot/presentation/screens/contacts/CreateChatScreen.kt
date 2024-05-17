@@ -61,17 +61,16 @@ class CreateChatScreen() : Screen {
 
 
                 ){
-                    Button(
-                        onClick = {},
-                        modifier = Modifier,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(255, 255, 255))
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp),
 
-                    )
+                        )
                     {
                         Image(painter = painterResource(Res.drawable.arrowleft ),
                             contentDescription ="image",
                             contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp).clickable{}
 
                         ) }
                     Text(text = "Создать чат",
@@ -80,12 +79,11 @@ class CreateChatScreen() : Screen {
                         fontFamily= FontFamily.SansSerif
 
                     )
-                    Button(
-                        onClick = {},
-                        modifier = Modifier,
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(255, 255, 255))
+                    Box(
+                        modifier = Modifier
+                            .clickable{},
 
-                    )
+                        )
                     { Image(painter = painterResource(Res.drawable.search_main),
                         contentDescription ="image",
                         contentScale = ContentScale.Crop,
