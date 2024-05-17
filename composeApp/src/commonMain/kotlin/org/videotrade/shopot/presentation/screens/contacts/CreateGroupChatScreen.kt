@@ -20,6 +20,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -97,7 +99,6 @@ class CreateGroupChatScreen() : Screen {
                         modifier = Modifier.size(24.dp)
 
                     ) }
-
                 }
 
                 LazyColumn(modifier = Modifier
@@ -121,7 +122,7 @@ class CreateGroupChatScreen() : Screen {
                         usersInfo
 
                     ){_,item->
-                        UserItem(item = item)
+                        UserItemCrGroup(item = item)
 
                     }
                     item { NextBtn() }
@@ -166,7 +167,7 @@ fun CreateGroupInput() {
                 .width(260.dp)
                 .padding(bottom = 15.dp, start = 25.dp)
                 .background(Color(255, 255, 255)),
-            label = { Text("Введите имя группы") },
+            label = { Text("Введите имя человека") },
             value = message.value,
             singleLine = true,
             textStyle = TextStyle(fontSize = 20.sp),
