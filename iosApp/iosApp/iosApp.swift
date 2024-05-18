@@ -8,6 +8,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     override  init (){
         
         KoinHelperKt.doInitKoin()
+        
+      
     }
     
     func application(
