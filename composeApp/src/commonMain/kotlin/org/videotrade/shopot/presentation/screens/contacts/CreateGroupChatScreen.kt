@@ -54,6 +54,10 @@ class CreateGroupChatScreen() : Screen {
         
         val viewModel: ContactsViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
+        
+        
+        viewModel.fetchContacts()
+        
         Box(
             modifier = Modifier
                 //background
