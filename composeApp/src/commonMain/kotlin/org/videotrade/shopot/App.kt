@@ -148,7 +148,7 @@ internal fun App() = AppTheme {
                        //CallScreen()
                            // IncomingCallScreen()
 //                CreateChatScreen()
-                CreateGroupChatScreen()
+                MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

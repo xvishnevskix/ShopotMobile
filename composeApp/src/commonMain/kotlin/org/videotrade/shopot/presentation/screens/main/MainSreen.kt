@@ -20,9 +20,9 @@ class MainScreen : Screen {
         
         val viewModel: MainViewModel = koinInject()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+//        val coroutineScope = rememberCoroutineScope()
         
         
-        val coroutineScope = rememberCoroutineScope()
         
      
         

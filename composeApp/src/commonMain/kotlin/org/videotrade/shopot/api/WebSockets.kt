@@ -15,6 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 
@@ -38,12 +39,12 @@ suspend fun handleWebRTCWebSocket(
         try {
             httpClient.webSocket(
                 method = HttpMethod.Get,
-                host = "192.168.31.223",
+                host = webSocketsUrl,
                 port = 5050,
                 path = "/chat",
                 request = {
-//                    url.parameters.append("user_id", userId)
-                    url.parameters.append("chatId", "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
+                    url.parameters.append("user_id", userId)
+//                    url.parameters.append("chatId", "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
                 }
             ) {
                 webSocketSession.value = this

@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 // В androidMain
 object EnvironmentConfig {
     const val serverUrl: String = "http://192.168.31.223:3001/api/"
-    const val webSocketsUrl: String = "ws://192.168.31.223:5050"
+    const val webSocketsUrl: String = "192.168.31.223"
     
     @Serializable
     data class Customer(

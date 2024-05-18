@@ -17,7 +17,6 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
     override suspend fun connectionWs(userId: String) {
         val chatUseCase: ChatUseCase by inject()
         
-        println("chatUseCase $chatUseCase")
         
         handleWebRTCWebSocket(
             webSocketSession,

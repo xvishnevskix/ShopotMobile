@@ -30,9 +30,9 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     init {
         viewModelScope.launch {
-            downloadProfile()
+//            downloadProfile()
             
-            connectionWs("ebe19811-b218-475c-965b-f8c03464ed4f")
+//            profile.value?.let { connectionWs(it.id) }
             
             
 //            profile.collect { updatedProfile ->
