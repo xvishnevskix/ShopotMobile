@@ -9,7 +9,7 @@ import kotlin.coroutines.suspendCoroutine
 
 actual class ContactsProvider {
     @OptIn(ExperimentalForeignApi::class)
-    actual suspend fun getContacts(): List<Contact> = withContext(Dispatchers.Default) {
+    actual suspend fun getContacts(): List<ContactDTO> = withContext(Dispatchers.Default) {
         
         val store = CNContactStore()
         val keysToFetch = listOf(
@@ -20,7 +20,7 @@ actual class ContactsProvider {
         
         val request = CNContactFetchRequest(keysToFetch = keysToFetch)
         
-        val contacts = mutableListOf<Contact>()
+        val contacts = mutableListOf<ContactDTO>()
         suspendCoroutine<Unit> { continuation ->
             try {
                 store.enumerateContactsWithFetchRequest(request, error = null) { contact, _ ->
@@ -32,8 +32,8 @@ actual class ContactsProvider {
                         phoneNumber?.stringValue
                     } ?: emptyList()
                     
-                    phoneNumbers?.forEach { phoneNumber ->
-                        contacts.add(Contact(name, phoneNumber))
+                    phoneNumbers?.forEach { phone ->
+                        contacts.add(ContactDTO(name, phone))
                     }
                 }
                 continuation.resume(Unit)

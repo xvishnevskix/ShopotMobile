@@ -32,12 +32,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.domain.model.ContactDTO
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 @Composable
-fun UserItemCrGroup(item: UserItemInfo) {
+fun UserItemCrGroup(item: ContactDTO) {
 
+    
+    
+    
     Box(
         modifier = Modifier
             .background(Color(255, 255, 255))
@@ -74,7 +78,7 @@ fun UserItemCrGroup(item: UserItemInfo) {
                     fontFamily = FontFamily.SansSerif
                 )
                 Text(
-                    text = "${item.number}",
+                    text = "${item.phone}",
                     fontSize = 16.sp,
                     fontFamily = FontFamily.SansSerif,
                     color = Color(127, 127, 127)

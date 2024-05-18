@@ -5,10 +5,11 @@ import android.provider.Settings
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.videotrade.shopot.domain.model.ContactDTO
 
 actual class ContactsProvider (private val context: Context) {
-    actual suspend fun getContacts(): List<Contact> = withContext(Dispatchers.IO) {
-        val contacts = mutableListOf<Contact>()
+    actual suspend fun getContacts(): List<ContactDTO> = withContext(Dispatchers.IO) {
+        val contacts = mutableListOf<ContactDTO>()
         val cursor = context.contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             null,
@@ -25,8 +26,8 @@ actual class ContactsProvider (private val context: Context) {
             while (it.moveToNext()) {
                 
                 val name = it.getString(nameIndex)
-                val phoneNumber = it.getString(numberIndex)
-                contacts.add(Contact(name, phoneNumber))
+                val phone = it.getString(numberIndex)
+                contacts.add(ContactDTO(name, phone))
             }
         }
         
