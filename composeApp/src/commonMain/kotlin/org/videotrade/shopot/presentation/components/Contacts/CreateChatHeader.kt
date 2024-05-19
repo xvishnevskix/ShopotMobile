@@ -42,6 +42,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import shopot.composeapp.generated.resources.Montserrat_Bold
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -49,13 +50,14 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFProText_Regular
 import shopot.composeapp.generated.resources.check_mark
 import shopot.composeapp.generated.resources.dot_menu
+import shopot.composeapp.generated.resources.search_icon
 
 @Composable
-fun GroupEditHeader(text: String) {
+fun CreateChatHeader(text: String) {
     val navigator = LocalNavigator.currentOrThrow
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 23.dp).background(Color(0xFFF3F4F6)),
+        modifier = Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 23.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
 
@@ -63,7 +65,9 @@ fun GroupEditHeader(text: String) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
-            modifier = Modifier.padding(start = 0.dp,end = 1.dp)
+            modifier = Modifier.padding(start = 0.dp,end = 1.dp).clickable {
+                navigator.pop()
+            }
         )
         Text(
             text = text,
@@ -75,9 +79,9 @@ fun GroupEditHeader(text: String) {
             modifier = Modifier.padding(end = 10.dp)
         )
         Image(
-            painter = painterResource(Res.drawable.check_mark),
+            painter = painterResource(Res.drawable.search_icon),
             contentDescription = "Avatar",
-            modifier = Modifier.size(width = 16.dp, height = 12.dp),
+            modifier = Modifier.size(width = 15.dp, height = 15.dp),
             contentScale = ContentScale.FillBounds
         )
     }

@@ -26,13 +26,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
+import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.arrowleft
+import shopot.composeapp.generated.resources.create_group
 import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.search_main
 
@@ -40,104 +48,44 @@ import shopot.composeapp.generated.resources.search_main
 class CreateChatScreen() : Screen {
     @Composable
     override fun Content() {
-        
+
         val viewModel: ContactsViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
-        
-        
-        viewModel.fetchContacts()
-        
-        
-        Box(
-            modifier = Modifier
-                //background
-                .fillMaxSize()
-                .background(Color(255, 255, 255))
-        ) {
-            Column {
-                Box(modifier = Modifier.height(40.dp).fillMaxWidth())
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(Color(255, 255, 255))
-                        .height(70.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround
-                
-                
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp),
-                        
-                        )
-                    {
-                        Image(painter = painterResource(Res.drawable.arrowleft),
-                            contentDescription = "image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(24.dp).clickable {}
-                        
-                        )
-                    }
-                    Text(
-                        text = "Создать чат",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
-                        fontFamily = FontFamily.SansSerif
-                    
-                    )
-                    Box(
-                        modifier = Modifier
-                            .clickable {},
-                        
-                        )
-                    {
-                        Image(
-                            painter = painterResource(Res.drawable.search_main),
-                            contentDescription = "image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.size(24.dp)
-                        
-                        )
-                    }
-                    
-                }
-                
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color = Color(255, 255, 255))
-                ) {
-                    item {
-                        makeA_group()
-                    }
 
-//                    var usersInfo = arrayListOf(
-//                        UserItemInfo("Василий", "+7 (000) 000-00-00"),
-//                        UserItemInfo("Андрей", "+7 (000) 000-00-00"),
-//                        UserItemInfo("Алексей", "+7 (000) 000-00-00"),
-//
-//                        )
-//                    usersInfo.add(UserItemInfo("Павел", "+7 (000) 000-00-00"))
-                    itemsIndexed(
-                        contacts
-                    
-                    ) { _, item ->
-                        UserItem(item = item)
-                        
+
+        viewModel.fetchContacts()
+
+
+        SafeArea {
+            Box(
+                modifier = Modifier
+                    //background
+                    .fillMaxSize()
+                    .background(Color(255, 255, 255))
+            ) {
+                Column {
+                    CreateChatHeader("Создать чат")
+                    LazyColumn(
+                        modifier = Modifier
+
+                            .fillMaxSize()
+                            .background(color = Color(255, 255, 255))
+                    ) {
+                        item {
+                            makeA_group()
+                        }
+                        itemsIndexed(
+                            contacts
+
+                        ) { _, item ->
+                            UserItem(item = item)
+
+                        }
                     }
-                    
                 }
-                
-                
             }
-            
         }
-        
-        
     }
-    
-    
 }
 
 
@@ -147,44 +95,47 @@ private fun makeA_group() {
         modifier = Modifier
             .background(Color(255, 255, 255))
             .fillMaxSize()
-            .height(80.dp)
-            .padding(top = 10.dp)
-            .border(0.5.dp, color = Color(127, 127, 127))
+            .padding(top = 10.dp, bottom = 42.dp)
             .clickable { }
-    
+
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
-                .padding(start = 25.dp)
-                .height(64.dp),
+                .fillMaxWidth()
+                .padding()
         ) {
-            
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.create_group),
+                    contentDescription = "back icon",
+                    modifier = Modifier.size(56.dp)
+                )
+
+                Text(
+                    text = "Создать группу",
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                    textAlign = TextAlign.Center,
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+
+                )
+            }
             Image(
-                painter = painterResource(Res.drawable.person),
-                contentDescription = "image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.size(68.dp)
-                    .clip(RoundedCornerShape(100.dp))
+                painter = painterResource(Res.drawable.arrowleft),
+                contentDescription = "create group arrow",
+                modifier = Modifier.size(18.dp)
             )
-            
-            
-            Text(
-                text = "Создать группу",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                fontFamily = FontFamily.SansSerif,
-                modifier = Modifier
-                    .padding(start = 26.dp)
-            
-            )
-            
-            
+
         }
-        
-        
     }
-    
 }
 
 
