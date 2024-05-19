@@ -125,7 +125,8 @@ import org.videotrade.shopot.presentation.components.Main.CallScreen
 import org.videotrade.shopot.presentation.components.Main.IncomingCallScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
-import org.videotrade.shopot.presentation.screens.contacts.CreateGroupChatScreen
+import org.videotrade.shopot.presentation.screens.contacts.CreateGroupChatFirstScreen
+import org.videotrade.shopot.presentation.screens.contacts.CreateGroupChatSecondScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 
 @Composable
@@ -148,7 +149,8 @@ internal fun App() = AppTheme {
                        //CallScreen()
                            // IncomingCallScreen()
 //                CreateChatScreen()
-                CreateGroupChatScreen()
+                CreateGroupChatFirstScreen()
+//                CreateGroupChatSecondScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

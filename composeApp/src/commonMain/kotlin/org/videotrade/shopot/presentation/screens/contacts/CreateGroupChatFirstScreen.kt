@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,10 +18,17 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +48,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
@@ -53,7 +62,7 @@ import shopot.composeapp.generated.resources.randomUser
 import shopot.composeapp.generated.resources.search_main
 
 
-class CreateChatScreen() : Screen {
+class CreateGroupChatFirstScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -68,28 +77,51 @@ class CreateChatScreen() : Screen {
             Box(
                 modifier = Modifier
                     //background
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .background(Color(255, 255, 255))
             ) {
-                Column {
-                    CreateChatHeader("Создать чат")
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        //background
+                        .fillMaxSize()
+                ) {
+                    CreateChatHeader("Создать группу")
                     LazyColumn(
                         modifier = Modifier
 
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.8F)
                             .background(color = Color(255, 255, 255))
                     ) {
-                        item {
-                            makeA_group()
-                        }
+
                         itemsIndexed(
                             contacts
 
                         ) { _, item ->
                             UserItem(item = item)
+                            UserItem(item = item)
+                            UserItem(item = item)
+                            UserItem(item = item)
 
                         }
                     }
+
+
+
+                    Box(
+                        modifier = Modifier.padding(top = 85.dp)
+                    ) {
+                        CustomButton(
+                            "Далее",
+                            {
+                                navigator.push(
+                                    CreateGroupChatSecondScreen()
+                                )
+
+                            })
+                    }
+
                 }
             }
         }
@@ -97,61 +129,12 @@ class CreateChatScreen() : Screen {
 }
 
 
-@Composable
-private fun makeA_group() {
-    val navigator = LocalNavigator.currentOrThrow
-    Box(
-        modifier = Modifier
-            .background(Color(255, 255, 255))
-            .fillMaxSize()
-            .padding(top = 10.dp, bottom = 42.dp)
-            .clickable {
-                navigator.push(CreateGroupChatFirstScreen())
-            }
-
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.create_group),
-                    contentDescription = "back icon",
-                    modifier = Modifier.size(56.dp)
-                )
-
-                Text(
-                    text = "Создать группу",
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                    textAlign = TextAlign.Center,
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-
-                )
-            }
-            Image(
-                painter = painterResource(Res.drawable.arrowleft),
-                contentDescription = "create group arrow",
-                modifier = Modifier.size(18.dp)
-            )
-
-        }
-    }
-}
-
 
 @Composable
 private fun UserItem(item: ContactDTO) {
+
+    val isChecked = remember { mutableStateOf(false) }
+
 
     Box(
         modifier = Modifier
@@ -203,16 +186,44 @@ private fun UserItem(item: ContactDTO) {
 
 
                 }
-                Image(
-                    painter = painterResource(Res.drawable.arrowleft),
-                    contentDescription = "create group arrow",
-                    modifier = Modifier.size(18.dp)
+                CustomCheckbox(
+                    checked = isChecked.value,
+                    onCheckedChange = { isChecked.value = it },
+                    backgroundColor = Color(0xFF2A293C),
+                    checkmarkColor = Color.White
                 )
             }
             Divider(
                 color = Color(0xFFD9D9D9).copy(alpha = 0.43f),
                 thickness = 1.dp,
                 modifier = Modifier.padding(top = 22.dp)
+            )
+        }
+    }
+}
+
+
+@Composable
+fun CustomCheckbox(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    backgroundColor: Color = Color(0xFF2A293C),
+    checkmarkColor: Color = Color.White
+) {
+    Box(
+        modifier = Modifier
+            .size(24.dp)
+            .clip(RoundedCornerShape(6.dp))
+            .background(backgroundColor)
+            .clickable { onCheckedChange(!checked) },
+        contentAlignment = Alignment.Center
+    ) {
+        if (checked) {
+            Icon(
+                imageVector = Icons.Default.Check,
+                contentDescription = null,
+                tint = checkmarkColor,
+                modifier = Modifier.size(16.dp)
             )
         }
     }

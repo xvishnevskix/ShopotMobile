@@ -45,7 +45,7 @@ import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.search_main
 
 
-class CreateGroupChatScreen() : Screen {
+class CreateGroupChatSecondScreen() : Screen {
     
     
     @Composable

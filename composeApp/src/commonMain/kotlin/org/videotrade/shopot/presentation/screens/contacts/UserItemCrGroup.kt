@@ -104,6 +104,4 @@ fun UserItemCrGroup(item: ContactDTO) {
         }
 
     }
-
-
 }
