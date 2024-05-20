@@ -66,9 +66,18 @@ class CreateGroupSecondScreen() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
         val selectedContacts = viewModel.selectedContacts
+        val isSearching = remember { mutableStateOf(false) }
+        val searchQuery = remember { mutableStateOf("") }
 
-
-
+        val filteredContacts = if (searchQuery.value.isEmpty()) {
+            selectedContacts
+        } else {
+            selectedContacts.filter {
+                it.name.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
+                    searchQuery.value
+                )
+            }
+        }
 
         SafeArea {
             Box(
@@ -80,7 +89,11 @@ class CreateGroupSecondScreen() : Screen {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    CreateChatHeader("Создать чат")
+                    CreateChatHeader(
+                        "Создать группу",
+                        isSearching = isSearching,
+                        searchQuery = searchQuery,
+                    )
                     LazyColumn(
                         modifier = Modifier
 
@@ -93,7 +106,7 @@ class CreateGroupSecondScreen() : Screen {
                            CreateGroupInput()
                             participantCountText(selectedContacts.size.toString())
                         }
-                        itemsIndexed(selectedContacts) { _, item ->
+                        itemsIndexed(filteredContacts) { _, item ->
                             UserItem(item = item)
                         }
                     }

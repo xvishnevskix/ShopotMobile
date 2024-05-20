@@ -50,10 +50,20 @@ class CreateGroupFirstScreen() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
-
+        val isSearching = remember { mutableStateOf(false) }
+        val searchQuery = remember { mutableStateOf("") }
 
         viewModel.fetchContacts()
 
+        val filteredContacts = if (searchQuery.value.isEmpty()) {
+            contacts
+        } else {
+            contacts.filter {
+                it.name.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
+                    searchQuery.value
+                )
+            }
+        }
 
         SafeArea {
             Box(
@@ -68,7 +78,11 @@ class CreateGroupFirstScreen() : Screen {
                         //background
                         .fillMaxSize()
                 ) {
-                    CreateChatHeader("Создать группу")
+                    CreateChatHeader(
+                        "Создать группу",
+                        isSearching = isSearching,
+                        searchQuery = searchQuery,
+                    )
                     LazyColumn(
                         modifier = Modifier
 
@@ -79,7 +93,7 @@ class CreateGroupFirstScreen() : Screen {
 
                         itemsIndexed(
 
-                            contacts
+                            filteredContacts
 
                         ) { _, item ->
                             UserItem(item = item, sharedViewModel = viewModel)
@@ -120,7 +134,14 @@ private fun UserItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
             .padding(top = 22.dp)
             .background(Color(255, 255, 255))
             .fillMaxWidth()
-            .clickable { }
+            .clickable {
+                isChecked.value = !isChecked.value
+                if (isChecked.value) {
+                    sharedViewModel.addContact(item)
+                } else {
+                    sharedViewModel.removeContact(item)
+                }
+            }
     ) {
         Column {
             Row(

@@ -21,6 +21,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,42 +54,49 @@ import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.randomUser
 import shopot.composeapp.generated.resources.search_main
 
-
 class CreateChatScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
-
+        val isSearching = remember { mutableStateOf(false) }
+        val searchQuery = remember { mutableStateOf("") }
 
         viewModel.fetchContacts()
 
+        val filteredContacts = if (searchQuery.value.isEmpty()) {
+            contacts
+        } else {
+            contacts.filter {
+                it.name.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
+                    searchQuery.value
+                )
+            }
+        }
 
         SafeArea {
             Box(
                 modifier = Modifier
-                    //background
                     .fillMaxSize()
                     .background(Color(255, 255, 255))
             ) {
                 Column {
-                    CreateChatHeader("Создать чат")
+                    CreateChatHeader(
+                        text = "Создать чат",
+                        isSearching = isSearching,
+                        searchQuery = searchQuery,
+                    )
                     LazyColumn(
                         modifier = Modifier
-
                             .fillMaxSize()
                             .background(color = Color(255, 255, 255))
                     ) {
                         item {
                             makeA_group()
                         }
-                        itemsIndexed(
-                            contacts
-
-                        ) { _, item ->
+                        itemsIndexed(filteredContacts) { _, item ->
                             UserItem(item = item)
-
                         }
                     }
                 }
