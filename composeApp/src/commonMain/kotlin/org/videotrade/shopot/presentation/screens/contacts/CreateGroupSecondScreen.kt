@@ -58,6 +58,7 @@ import shopot.composeapp.generated.resources.create_group
 import shopot.composeapp.generated.resources.edit_group_name
 import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.randomUser
+import kotlin.math.abs
 
 
 class CreateGroupSecondScreen() : Screen {
@@ -104,7 +105,7 @@ class CreateGroupSecondScreen() : Screen {
                     ) {
                         item {
                            CreateGroupInput()
-                            participantCountText(selectedContacts.size.toString())
+                            ParticipantCountText(selectedContacts.size)
                         }
                         itemsIndexed(filteredContacts) { _, item ->
                             UserItem(item = item)
@@ -133,8 +134,6 @@ class CreateGroupSecondScreen() : Screen {
 
 @Composable
 private fun UserItem(item: ContactDTO) {
-
-    val isChecked = remember { mutableStateOf(false) }
 
 
     Box(
@@ -184,8 +183,6 @@ private fun UserItem(item: ContactDTO) {
                         )
 
                     }
-
-
                 }
 
             }
@@ -255,42 +252,28 @@ fun CreateGroupInput() {
     }
 }
 
-
 @Composable
-fun participantCountText(counter: String) {
-    
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(Color(255, 255, 255))
-            .height(70.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    
-    ) {
-        if (counter.toInt() < 5) {
-            Text(
-                text = "$counter участника",
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                textAlign = TextAlign.Center,
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-                color = Color(0xFF000000)
-            )
-        } else {
-            Text(
-                text = "$counter участников",
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                textAlign = TextAlign.Center,
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-                color = Color(0xFF000000)
-            )
-        }
-    }
-    
+fun ParticipantCountText(count: Int) {
+    Text(
+        text = getParticipantCountText(count),
+        fontSize = 16.sp,
+        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+        color = Color(0xFF000000)
+    )
 }
 
+fun getParticipantCountText(count: Int): String {
+    val forms = arrayOf("участник", "участника", "участников")
+    return "$count ${getPluralForm(count, forms)}"
+}
 
+fun getPluralForm(number: Int, forms: Array<String>): String {
+    val n = abs(number) % 100
+    val n1 = n % 10
+    return when {
+        n in 11..19 -> forms[2]
+        n1 == 1 -> forms[0]
+        n1 in 2..4 -> forms[1]
+        else -> forms[2]
+    }
+}
