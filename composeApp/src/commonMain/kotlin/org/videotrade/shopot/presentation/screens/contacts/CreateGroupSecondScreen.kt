@@ -258,7 +258,8 @@ fun ParticipantCountText(count: Int) {
         text = getParticipantCountText(count),
         fontSize = 16.sp,
         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-        color = Color(0xFF000000)
+        color = Color(0xFF000000),
+        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
     )
 }
 
