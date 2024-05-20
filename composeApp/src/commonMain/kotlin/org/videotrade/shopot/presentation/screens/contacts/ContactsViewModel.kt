@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.contacts
 
 
+import androidx.compose.runtime.mutableStateListOf
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,5 +23,20 @@ class ContactsViewModel() : ViewModel(),
             
             
         }
+    }
+}
+
+
+class SharedViewModel : ViewModel() {
+    val selectedContacts = mutableStateListOf<ContactDTO>()
+
+    fun addContact(contact: ContactDTO) {
+        if (!selectedContacts.contains(contact)) {
+            selectedContacts.add(contact)
+        }
+    }
+
+    fun removeContact(contact: ContactDTO) {
+        selectedContacts.remove(contact)
     }
 }

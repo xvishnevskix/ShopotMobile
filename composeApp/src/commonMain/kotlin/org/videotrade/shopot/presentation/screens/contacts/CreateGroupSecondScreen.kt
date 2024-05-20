@@ -3,7 +3,6 @@ package org.videotrade.shopot.presentation.screens.contacts
 import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,16 +14,15 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -49,28 +47,27 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
+import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
-import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.create_group
+import shopot.composeapp.generated.resources.edit_group_name
 import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.randomUser
-import shopot.composeapp.generated.resources.search_main
 
 
-class CreateGroupChatFirstScreen() : Screen {
+class CreateGroupSecondScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel: ContactsViewModel = koinInject()
-        val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
+        val sharedViewModel: SharedViewModel = koinInject()
+        val selectedContacts = sharedViewModel.selectedContacts
 
 
-        viewModel.fetchContacts()
 
 
         SafeArea {
@@ -82,32 +79,24 @@ class CreateGroupChatFirstScreen() : Screen {
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        //background
-                        .fillMaxSize()
                 ) {
-                    CreateChatHeader("Создать группу")
+                    CreateChatHeader("Создать чат")
                     LazyColumn(
                         modifier = Modifier
 
                             .fillMaxWidth()
                             .fillMaxHeight(0.8F)
-                            .background(color = Color(255, 255, 255))
+                            .background(color = Color(255, 255, 255)),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
-                        itemsIndexed(
-                            contacts
-
-                        ) { _, item ->
+                        item {
+                           CreateGroupInput()
+                            participantCountText(selectedContacts.size.toString())
+                        }
+                        itemsIndexed(selectedContacts) { _, item ->
                             UserItem(item = item)
-                            UserItem(item = item)
-                            UserItem(item = item)
-                            UserItem(item = item)
-
                         }
                     }
-
-
 
                     Box(
                         modifier = Modifier.padding(top = 85.dp)
@@ -116,12 +105,11 @@ class CreateGroupChatFirstScreen() : Screen {
                             "Далее",
                             {
                                 navigator.push(
-                                    CreateGroupChatSecondScreen()
+                                    MainScreen()
                                 )
 
                             })
                     }
-
                 }
             }
         }
@@ -186,12 +174,7 @@ private fun UserItem(item: ContactDTO) {
 
 
                 }
-                CustomCheckbox(
-                    checked = isChecked.value,
-                    onCheckedChange = { isChecked.value = it },
-                    backgroundColor = Color(0xFF2A293C),
-                    checkmarkColor = Color.White
-                )
+
             }
             Divider(
                 color = Color(0xFFD9D9D9).copy(alpha = 0.43f),
@@ -203,28 +186,98 @@ private fun UserItem(item: ContactDTO) {
 }
 
 
+
+
 @Composable
-fun CustomCheckbox(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    backgroundColor: Color = Color(0xFF2A293C),
-    checkmarkColor: Color = Color.White
-) {
-    Box(
+fun CreateGroupInput() {
+    
+    val message = remember { mutableStateOf("") }
+    Row(
         modifier = Modifier
-            .size(24.dp)
-            .clip(RoundedCornerShape(6.dp))
-            .background(backgroundColor)
-            .clickable { onCheckedChange(!checked) },
-        contentAlignment = Alignment.Center
+            .padding(start = 9.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        if (checked) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                contentDescription = null,
-                tint = checkmarkColor,
-                modifier = Modifier.size(16.dp)
+        Box(
+            modifier = Modifier.background(Color(0xFF2A293C), shape = CircleShape).size(56.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(Res.drawable.edit_group_name),
+                contentDescription = "create group",
+                modifier = Modifier.padding(start = 6.dp).size(22.dp)
+            )
+        }
+        
+        TextField(
+            modifier = Modifier
+                .width(232.dp)
+                .padding(bottom = 15.dp, start = 25.dp)
+                .background(Color(255, 255, 255)),
+
+            label = { Text("Введите имя группы") },
+            value = message.value,
+            singleLine = true,
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                color = Color(0xFF979797),
+            ),
+            onValueChange = { newText -> message.value = newText },
+            colors = TextFieldDefaults.colors(
+                disabledLabelColor = Color(0xff979797),
+                focusedLabelColor = Color.Transparent,
+                focusedContainerColor = Color(255, 255, 255),
+                disabledContainerColor = Color(255, 255, 255),
+                unfocusedContainerColor = Color(255, 255, 255),
+                focusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.9f),
+                unfocusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.43f),
+                disabledIndicatorColor = Color(0xffc5c7c6)
+            ),
+            
+            )
+    }
+}
+
+
+@Composable
+fun participantCountText(counter: String) {
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(255, 255, 255))
+            .height(70.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    
+    ) {
+        if (counter.toInt() < 5) {
+            Text(
+                text = "$counter участника",
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                color = Color(0xFF000000)
+            )
+        } else {
+            Text(
+                text = "$counter участников",
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                color = Color(0xFF000000)
             )
         }
     }
+    
 }
+
+
