@@ -64,8 +64,8 @@ class CreateGroupSecondScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val sharedViewModel: SharedViewModel = koinInject()
-        val selectedContacts = sharedViewModel.selectedContacts
+        val viewModel: ContactsViewModel = koinInject()
+        val selectedContacts = viewModel.selectedContacts
 
 
 
@@ -224,7 +224,7 @@ fun CreateGroupInput() {
                 textAlign = TextAlign.Center,
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                 lineHeight = 20.sp,
-                color = Color(0xFF979797),
+                color = Color(0xFF000000),
             ),
             onValueChange = { newText -> message.value = newText },
             colors = TextFieldDefaults.colors(

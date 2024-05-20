@@ -13,6 +13,7 @@ import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 class ContactsViewModel() : ViewModel(),
     KoinComponent {
     private val _contacts = MutableStateFlow<List<ContactDTO>>(emptyList())
+     val selectedContacts = mutableStateListOf<ContactDTO>()
     val contacts: StateFlow<List<ContactDTO>> get() = _contacts
     
     fun fetchContacts() {
@@ -24,11 +25,6 @@ class ContactsViewModel() : ViewModel(),
             
         }
     }
-}
-
-
-class SharedViewModel : ViewModel() {
-    val selectedContacts = mutableStateListOf<ContactDTO>()
 
     fun addContact(contact: ContactDTO) {
         if (!selectedContacts.contains(contact)) {

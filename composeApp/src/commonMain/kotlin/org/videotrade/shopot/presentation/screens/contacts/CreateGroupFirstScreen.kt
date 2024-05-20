@@ -49,7 +49,6 @@ class CreateGroupFirstScreen() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
-        val sharedViewModel: SharedViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
 
 
@@ -83,7 +82,7 @@ class CreateGroupFirstScreen() : Screen {
                             contacts
 
                         ) { _, item ->
-                            UserItem(item = item, sharedViewModel = sharedViewModel)
+                            UserItem(item = item, sharedViewModel = viewModel)
 
 
                         }
@@ -113,7 +112,7 @@ class CreateGroupFirstScreen() : Screen {
 
 
 @Composable
-private fun UserItem(item: ContactDTO, sharedViewModel: SharedViewModel) {
+private fun UserItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
     val isChecked = remember { mutableStateOf(false) }
 
     Box(
