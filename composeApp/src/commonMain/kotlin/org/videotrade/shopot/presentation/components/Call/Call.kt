@@ -17,8 +17,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.Json
-import org.videotrade.shopot.presentation.screens.call.WebRTCMessage
-import org.videotrade.shopot.presentation.screens.call.rtcMessageDTO
+import org.videotrade.shopot.presentation.components.Main.WebRTCMessage
+import org.videotrade.shopot.presentation.components.Main.rtcMessageDTO
+
 
 suspend fun Call(
     webSocketSession: MutableState<DefaultClientWebSocketSession?>,

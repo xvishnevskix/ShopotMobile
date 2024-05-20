@@ -116,17 +116,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import org.videotrade.shopot.presentation.screens.main.MainScreen
-import org.videotrade.shopot.theme.AppTheme
-
 import org.koin.compose.KoinContext
 import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.components.Main.CallScreen
-import org.videotrade.shopot.presentation.components.Main.IncomingCallScreen
-import org.videotrade.shopot.presentation.screens.chat.ChatScreen
-import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
-import org.videotrade.shopot.presentation.screens.contacts.CreateGroupChatScreen
-import org.videotrade.shopot.presentation.screens.intro.IntroScreen
+import org.videotrade.shopot.theme.AppTheme
 
 @Composable
 internal fun App() = AppTheme {
@@ -139,16 +132,28 @@ internal fun App() = AppTheme {
 //                ChatScreen(
 //                UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
 //                )
-//                CallScreen(
-//
-//                )
+                CallScreen(
+                    UserItem(
+                        "2",
+                        true,
+                        "",
+                        "Мансур",
+                        "Дандаев",
+                        "",
+                        2,
+                        "10",
+                        "",
+                        "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
+                    )
+                
+                )
 
 //                MainScreen()
 //                        IntroScreen()
-                       //CallScreen()
-                           // IncomingCallScreen()
+                //CallScreen()
+                // IncomingCallScreen()
 //                CreateChatScreen()
-                MainScreen()
+//                MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
