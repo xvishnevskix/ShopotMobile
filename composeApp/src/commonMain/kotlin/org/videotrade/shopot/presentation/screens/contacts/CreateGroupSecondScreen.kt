@@ -3,22 +3,26 @@ package org.videotrade.shopot.presentation.screens.contacts
 import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -42,33 +46,34 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.presentation.components.Common.CustomButton
+import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
-import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.create_group
+import shopot.composeapp.generated.resources.edit_group_name
 import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.randomUser
-import shopot.composeapp.generated.resources.search_main
+import kotlin.math.abs
 
-class CreateChatScreen() : Screen {
+
+class CreateGroupSecondScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
-        val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
+        val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
 
-        viewModel.fetchContacts()
-
         val filteredContacts = if (searchQuery.value.isEmpty()) {
-            contacts
+            selectedContacts
         } else {
-            contacts.filter {
+            selectedContacts.filter {
                 it.name.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
                     searchQuery.value
                 )
@@ -78,26 +83,46 @@ class CreateChatScreen() : Screen {
         SafeArea {
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    //background
+                    .fillMaxWidth()
                     .background(Color(255, 255, 255))
             ) {
-                Column {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
                     CreateChatHeader(
-                        text = "Создать чат",
+                        "Создать группу",
                         isSearching = isSearching,
                         searchQuery = searchQuery,
                     )
                     LazyColumn(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .background(color = Color(255, 255, 255))
+
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.8F)
+                            .background(color = Color(255, 255, 255)),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
-                            makeA_group()
+                           CreateGroupInput()
+                            ParticipantCountText(selectedContacts.size)
                         }
                         itemsIndexed(filteredContacts) { _, item ->
                             UserItem(item = item)
                         }
+                    }
+
+                    Box(
+                        modifier = Modifier.padding(top = 85.dp)
+                    ) {
+                        CustomButton(
+                            "Далее",
+                            {
+                                navigator.push(
+                                    MainScreen()
+                                )
+
+                            })
                     }
                 }
             }
@@ -106,61 +131,10 @@ class CreateChatScreen() : Screen {
 }
 
 
-@Composable
-private fun makeA_group() {
-    val navigator = LocalNavigator.currentOrThrow
-    Box(
-        modifier = Modifier
-            .background(Color(255, 255, 255))
-            .fillMaxSize()
-            .padding(top = 10.dp, bottom = 42.dp)
-            .clickable {
-                navigator.push(CreateGroupFirstScreen())
-            }
-
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Image(
-                    painter = painterResource(Res.drawable.create_group),
-                    contentDescription = "create group",
-                    modifier = Modifier.size(56.dp)
-                )
-
-                Text(
-                    text = "Создать группу",
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                    textAlign = TextAlign.Center,
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-
-                )
-            }
-            Image(
-                painter = painterResource(Res.drawable.arrowleft),
-                contentDescription = "create group arrow",
-                modifier = Modifier.size(18.dp)
-            )
-
-        }
-    }
-}
-
 
 @Composable
 private fun UserItem(item: ContactDTO) {
+
 
     Box(
         modifier = Modifier
@@ -209,14 +183,8 @@ private fun UserItem(item: ContactDTO) {
                         )
 
                     }
-
-
                 }
-                Image(
-                    painter = painterResource(Res.drawable.arrowleft),
-                    contentDescription = "create group arrow",
-                    modifier = Modifier.size(18.dp)
-                )
+
             }
             Divider(
                 color = Color(0xFFD9D9D9).copy(alpha = 0.43f),
@@ -224,5 +192,89 @@ private fun UserItem(item: ContactDTO) {
                 modifier = Modifier.padding(top = 22.dp)
             )
         }
+    }
+}
+
+
+
+
+@Composable
+fun CreateGroupInput() {
+    
+    val message = remember { mutableStateOf("") }
+    Row(
+        modifier = Modifier
+            .padding(start = 9.dp).fillMaxWidth(),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier.background(Color(0xFF2A293C), shape = CircleShape).size(56.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(Res.drawable.edit_group_name),
+                contentDescription = "create group",
+                modifier = Modifier.padding(start = 6.dp).size(22.dp)
+            )
+        }
+        
+        TextField(
+            modifier = Modifier
+                .width(232.dp)
+                .padding(bottom = 15.dp, start = 25.dp)
+                .background(Color(255, 255, 255)),
+
+            label = { Text("Введите имя группы") },
+            value = message.value,
+            singleLine = true,
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                color = Color(0xFF000000),
+            ),
+            onValueChange = { newText -> message.value = newText },
+            colors = TextFieldDefaults.colors(
+                disabledLabelColor = Color(0xff979797),
+                focusedLabelColor = Color.Transparent,
+                focusedContainerColor = Color(255, 255, 255),
+                disabledContainerColor = Color(255, 255, 255),
+                unfocusedContainerColor = Color(255, 255, 255),
+                focusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.9f),
+                unfocusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.43f),
+                disabledIndicatorColor = Color(0xffc5c7c6)
+            ),
+            
+            )
+    }
+}
+
+@Composable
+fun ParticipantCountText(count: Int) {
+    Text(
+        text = getParticipantCountText(count),
+        fontSize = 16.sp,
+        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+        color = Color(0xFF000000),
+        modifier = Modifier.padding(top = 10.dp, bottom = 10.dp)
+    )
+}
+
+fun getParticipantCountText(count: Int): String {
+    val forms = arrayOf("участник", "участника", "участников")
+    return "$count ${getPluralForm(count, forms)}"
+}
+
+fun getPluralForm(number: Int, forms: Array<String>): String {
+    val n = abs(number) % 100
+    val n1 = n % 10
+    return when {
+        n in 11..19 -> forms[2]
+        n1 == 1 -> forms[0]
+        n1 in 2..4 -> forms[1]
+        else -> forms[2]
     }
 }

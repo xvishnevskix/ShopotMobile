@@ -68,8 +68,7 @@ fun GroupEditHeader(text: String) {
         Text(
             text = text,
             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W600,
+            fontSize = 17.sp,
             textAlign = TextAlign.Center,
             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
             lineHeight = 20.sp,
