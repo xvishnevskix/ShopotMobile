@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "913545962230",
+    "project_id": "shopot-7429b",
+    "storage_bucket": "shopot-7429b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:913545962230:android:a2d0c2c21f9cc0121482d7",
+        "android_client_info": {
+          "package_name": "org.videotrade.shopot.androidApp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDYIlMAeuXRzkL9oGu1vvMNpFCSY8qWJ8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
