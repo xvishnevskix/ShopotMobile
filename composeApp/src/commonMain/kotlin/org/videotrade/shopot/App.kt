@@ -119,6 +119,7 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.KoinContext
 import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.components.Main.CallScreen
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.theme.AppTheme
 
@@ -150,11 +151,11 @@ internal fun App() = AppTheme {
 //                )
 
 //                MainScreen()
-//                        IntroScreen()
+                        IntroScreen()
                 //CallScreen()
                 // IncomingCallScreen()
 //                CreateChatScreen()
-                MainScreen()
+//                MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

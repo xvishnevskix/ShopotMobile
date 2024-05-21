@@ -24,16 +24,35 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import io.ktor.client.HttpClient
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFProText_Semibold
 
-class SignUpPhoneScreen(private val phone: MutableState<TextFieldValue>) : Screen {
+class SignUpPhoneScreen : Screen {
 
 
     @Composable
@@ -43,6 +62,7 @@ class SignUpPhoneScreen(private val phone: MutableState<TextFieldValue>) : Scree
         val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
         val coroutineScope = rememberCoroutineScope()
 
+        val phone = remember { mutableStateOf(value = TextFieldValue()) }
 
 
         SafeArea {
@@ -74,8 +94,54 @@ class SignUpPhoneScreen(private val phone: MutableState<TextFieldValue>) : Scree
                         CustomButton(
                             "Отправить код",
                             {
-                                navigator.push(AuthCallScreen(phone.value.text, "SignUp"))
-                            })
+
+                                it.launch {
+                                    try {
+                                        val client = HttpClient()
+
+                                        val jsonContent = Json.encodeToString(
+                                            buildJsonObject {
+                                                put("phoneNumber", phone.value.text.drop(1))
+                                            }
+                                        )
+                                        val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}auth/sign-up") {
+                                            contentType(ContentType.Application.Json)
+                                            setBody(jsonContent)
+                                        }
+                                        println("responseresponse ${response}")
+
+                                        if (response.status.isSuccess()) {
+                                            val jsonString = response.bodyAsText()
+                                            val jsonElement = Json.parseToJsonElement(jsonString).jsonObject
+
+                                            println("accessToken ${jsonElement}")
+
+                                            val accessToken = jsonElement["accessToken"]?.jsonPrimitive?.content
+                                            val refreshToken = jsonElement["refreshToken"]?.jsonPrimitive?.content
+
+                                            accessToken?.let {
+                                                addValueInStorage("accessToken", accessToken)
+                                            }
+                                            refreshToken?.let {
+                                                addValueInStorage("refreshToken", refreshToken)
+                                            }
+
+                                            navigator.push(
+                                                AuthCallScreen(
+                                                    phone.value.text,
+                                                    "SignUp"
+                                                )
+                                            )
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
+                                    }
+                                }
+
+
+                            }
+
+                        )
                     }
                 }
             }

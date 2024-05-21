@@ -147,13 +147,13 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 
                                 println("dsdada ${responseState.value }, ${otpText}}")
                                 
-                                if (
-                                    responseState.value != otpText && !isSuccessOtp.value
-                                
-                                ) {
-                                    
-                                    return@launch
-                                }
+//                                if (
+//                                    responseState.value != otpText && !isSuccessOtp.value
+//
+//                                ) {
+//
+//                                    return@launch
+//                                }
                                 
                                 when (authCase) {
                                     

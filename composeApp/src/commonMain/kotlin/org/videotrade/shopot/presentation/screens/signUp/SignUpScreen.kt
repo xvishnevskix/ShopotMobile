@@ -286,16 +286,23 @@ class SignUpScreen(private val phone: String) : Screen {
                                 scope.launch {
                                     val jsonContent = Json.encodeToString(
                                         buildJsonObject {
-                                            put("first_name", textState.value.firstName)
-                                            put("phone", phone)
+                                            put("firstName", textState.value.firstName)
+                                            put("lastName", textState.value.firstName)
+                                            put("email","admin.admin@gmail.com")
+                                            put("description", textState.value.firstName)
                                             put("login", textState.value.nickname)
+                                            put("status", "active")
                                         }
                                     )
-                                    
+
+
+
+
+
                                     val client = HttpClient()
                                     try {
-                                        val getToken = getValueInStorage("token")
-                                        val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}auth/new-register") {
+                                        val getToken = getValueInStorage("accessToken")
+                                        val response: HttpResponse = client.post("http://192.168.31.144:3000/users") {
                                             contentType(ContentType.Application.Json)
                                             header(HttpHeaders.Authorization, "Bearer $getToken")
                                             setBody(jsonContent)
