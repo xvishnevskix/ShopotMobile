@@ -170,7 +170,7 @@ data class DrawerItem(
 
 fun leaveApp(navigator: Navigator) {
     
-    delValueInStorage("token")
+    delValueInStorage("accessToken")
     delValueInStorage("refreshToken")
     
     navigator.push(SignInScreen())

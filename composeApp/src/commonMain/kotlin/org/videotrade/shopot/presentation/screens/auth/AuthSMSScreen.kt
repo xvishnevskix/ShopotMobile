@@ -134,7 +134,7 @@ class AuthSMSScreen(private val phone: String) : Screen {
 //                                        jsonElement.jsonObject["message"]?.jsonObject
 //
 //
-//                                    val token = messageObject?.get("token")?.jsonPrimitive?.content
+//                                    val token = messageObject?.get("accessToken")?.jsonPrimitive?.content
 //                                    val refreshToken =
 //                                        messageObject?.get("refreshToken")?.jsonPrimitive?.content
 //
@@ -143,7 +143,7 @@ class AuthSMSScreen(private val phone: String) : Screen {
 //
 //                                    token?.let {
 //                                        addValueInStorage(
-//                                            "token",
+//                                            "accessToken",
 //                                            token
 //                                        )
 //                                    }

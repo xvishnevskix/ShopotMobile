@@ -30,21 +30,21 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     init {
         viewModelScope.launch {
-//            downloadProfile()
+            downloadProfile()
             
-//            profile.value?.let { connectionWs(it.id) }
+            profile.value?.let { connectionWs(it.id) }
             
             
-//            profile.collect { updatedProfile ->
-//
-//
-//
-//                updatedProfile?.let {
-//
-//                    loadUsers()
-//
-//                }
-//            }
+            profile.collect { updatedProfile ->
+
+
+
+                updatedProfile?.let {
+
+                    loadUsers()
+
+                }
+            }
         }
     }
     

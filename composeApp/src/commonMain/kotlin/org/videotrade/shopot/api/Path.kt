@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 // В androidMain
 object EnvironmentConfig {
-    const val serverUrl: String = "http://192.168.31.144:3000/api/"
+    const val serverUrl: String = "http://192.168.31.223:3000/api/"
     const val webSocketsUrl: String = "192.168.31.223"
     
     @Serializable

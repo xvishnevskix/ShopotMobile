@@ -63,10 +63,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val responseState = remember { mutableStateOf<String?>("1111") }
         val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
         val coroutineScope = rememberCoroutineScope()
-        
-        
-        
-        
+
+
 //        coroutineScope.launch {
 //
 //            val response = sendRequestToBackend(phone.drop(1), null, "auth/2fa")
@@ -145,8 +143,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             coroutineScope.launch {
                                 
                                 
-                                println("dsdada ${responseState.value }, ${otpText}}")
-                                
+                                println("dsdada ${responseState.value}, ${otpText}}")
+
 //                                if (
 //                                    responseState.value != otpText && !isSuccessOtp.value
 //
@@ -199,7 +197,7 @@ suspend fun sendRequestToBackend(
     try {
         val jsonContent = Json.encodeToString(
             buildJsonObject {
-                put("phone", phone)
+                put("phoneNumber", phone.drop(1))
                 
                 notificationToken?.let { put("notificationToken", it) }
             }
@@ -239,21 +237,18 @@ suspend fun sendLogin(phone: String, navigator: Navigator) {
     if (response != null) {
         
         val jsonString = response.bodyAsText()
-        val jsonElement = Json.parseToJsonElement(jsonString)
-        val messageObject =
-            jsonElement.jsonObject["message"]?.jsonObject
+        val jsonElement = Json.parseToJsonElement(jsonString).jsonObject
         
         
-        val token = messageObject?.get("token")?.jsonPrimitive?.content
+        val token = jsonElement.get("accessToken")?.jsonPrimitive?.content
         val refreshToken =
-            messageObject?.get("refreshToken")?.jsonPrimitive?.content
-        
+            jsonElement.get("refreshToken")?.jsonPrimitive?.content
         
         
         
         token?.let {
             addValueInStorage(
-                "token",
+                "accessToken",
                 token
             )
         }

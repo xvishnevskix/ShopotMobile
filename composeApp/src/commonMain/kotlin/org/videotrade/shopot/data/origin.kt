@@ -31,7 +31,7 @@ class origin {
     suspend inline fun <reified T> get(url: String): T? {
         
         try {
-            val token = getValueInStorage("token")
+            val token = getValueInStorage("accessToken")
             
             
             val response: HttpResponse = client.get("${EnvironmentConfig.serverUrl}$url") {
@@ -39,6 +39,7 @@ class origin {
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
             
+            println("response $response")
             
             
             if (response.status.isSuccess()) {
@@ -67,7 +68,7 @@ class origin {
     ): T? {
         
         try {
-            val token = getValueInStorage("token")
+            val token = getValueInStorage("accessToken")
             
             val response: HttpResponse =
                 client.get("${EnvironmentConfig.serverUrl}$url") {
@@ -75,6 +76,7 @@ class origin {
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
                 }
+            
             
             if (response.status.isSuccess()) {
                 
@@ -132,11 +134,11 @@ class origin {
                 val messageObject = jsonElement.jsonObject["message"]?.jsonObject
                 
                 
-                val token = messageObject?.get("token")?.jsonPrimitive?.content
+                val token = messageObject?.get("accessToken")?.jsonPrimitive?.content
                 
                 token?.let {
                     addValueInStorage(
-                        "token",
+                        "accessToken",
                         token
                     )
                 }

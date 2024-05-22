@@ -302,7 +302,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                     val client = HttpClient()
                                     try {
                                         val getToken = getValueInStorage("accessToken")
-                                        val response: HttpResponse = client.post("http://192.168.31.144:3000/users") {
+                                        val response: HttpResponse = client.post("http://192.168.31.223:3000/users") {
                                             contentType(ContentType.Application.Json)
                                             header(HttpHeaders.Authorization, "Bearer $getToken")
                                             setBody(jsonContent)
@@ -319,7 +319,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 jsonElement.jsonObject["message"]?.jsonObject
                                             
                                             
-                                            val token = messageObject?.get("token")?.jsonPrimitive?.content
+                                            val token = messageObject?.get("accessToken")?.jsonPrimitive?.content
                                             val refreshToken =
                                                 messageObject?.get("refreshToken")?.jsonPrimitive?.content
                                             
@@ -330,7 +330,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                             
                                             token?.let {
                                                 addValueInStorage(
-                                                    "token",
+                                                    "accessToken",
                                                     token
                                                 )
                                             }
