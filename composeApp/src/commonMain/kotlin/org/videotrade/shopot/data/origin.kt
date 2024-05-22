@@ -39,11 +39,11 @@ class origin {
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
             
-            println("response $response")
             
             
             if (response.status.isSuccess()) {
                 
+                println("response3131 ${response.bodyAsText()}")
                 
                 
                 val responseData: T = Json.decodeFromString(response.bodyAsText())

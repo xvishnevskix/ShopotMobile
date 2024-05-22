@@ -46,13 +46,11 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     
     
-    val chatState = viewModel.chats.collectAsState(initial = listOf()).value
     
     val profileState = viewModel.profile.collectAsState(
         initial = ProfileDTO(
-            first_name = "Unknow",
-            last_name = "Unknow",
-            phone = "+7 900 000 00 00"
+            firstName = "Unknow",
+            lastName = "Unknow",
         )
     ).value
     
@@ -98,7 +96,7 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
                 
                 Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp)) {
                     Text(
-                        "${profileState?.first_name} ${profileState?.last_name}",
+                        "${profileState?.firstName} ${profileState?.lastName}",
                         textAlign = TextAlign.Center,
                         fontSize = 18.sp,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -151,7 +149,7 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
         }
     },
         content = {
-            MainContentComponent(drawerState, chatState)
+            MainContentComponent(drawerState, viewModel)
             
             
         })

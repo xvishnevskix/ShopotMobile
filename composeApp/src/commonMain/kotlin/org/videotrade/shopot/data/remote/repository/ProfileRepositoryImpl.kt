@@ -11,16 +11,16 @@ class ProfileRepositoryImpl : ProfileRepository {
     private val profile = mutableStateOf<ProfileDTO?>(ProfileDTO("1"))
     
     
-    override suspend fun downloadProfile(): UserProfile? {
+    override suspend fun downloadProfile(): ProfileDTO? {
         
         val init = origin()
         
         
-        val profileRes = init.get<UserProfile>("user/profile") ?: return null
+        val profileRes = init.get<ProfileDTO>("user/profile") ?: return null
         
+        println("profileRes $profileRes")
         
-        
-        profile.value = profileRes.message
+        profile.value = profileRes
         
         
         return profileRes

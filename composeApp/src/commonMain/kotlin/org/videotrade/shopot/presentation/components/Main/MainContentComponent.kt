@@ -14,6 +14,8 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +32,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Main.UserComponentItem
 import org.videotrade.shopot.domain.model.UserItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -37,7 +40,16 @@ import shopot.composeapp.generated.resources.double_message_check
 import shopot.composeapp.generated.resources.smart_encryption
 
 @Composable
-fun MainContentComponent(drawerState: DrawerState, chatState: List<UserItem>) {
+fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
+    
+    
+    val chatState = viewModel.chats.collectAsState(initial = listOf()).value
+    
+//    LaunchedEffect(viewModel._wsSession.value) {
+//
+//        println("dasdadada ${viewModel._wsSession.value}")
+//    }
+//
 
     SafeArea {
 

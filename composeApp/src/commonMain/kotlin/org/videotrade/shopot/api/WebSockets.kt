@@ -9,6 +9,7 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -20,7 +21,7 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 
 suspend fun handleWebRTCWebSocket(
-    webSocketSession: MutableState<DefaultClientWebSocketSession?>,
+    webSocketSession: MutableStateFlow<DefaultClientWebSocketSession?>,
     isConnected: MutableState<Boolean>,
     userId: String,
     chatUseCase: ChatUseCase
@@ -41,12 +42,11 @@ suspend fun handleWebRTCWebSocket(
                 method = HttpMethod.Get,
                 host = webSocketsUrl,
                 port = 5050,
-                path = "/chat",
-                request = {
-                    url.parameters.append("user_id", userId)
-//                    url.parameters.append("chatId", "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
-                }
+                path = "/chat?userId=$userId",
+              
             ) {
+                
+                
                 webSocketSession.value = this
                 isConnected.value = true
                 
@@ -65,10 +65,10 @@ suspend fun handleWebRTCWebSocket(
                             when (action) {
                                 "getMessages" -> {
                                     try {
+                                        println("getMessages")
                                         
                                         val messagesJson =
                                             jsonElement.jsonObject["messages"]?.jsonArray
-                                        println("messages31312222 $messagesJson")
                                         
                                         if (messagesJson != null) {
                                             val messages: List<MessageItem> =

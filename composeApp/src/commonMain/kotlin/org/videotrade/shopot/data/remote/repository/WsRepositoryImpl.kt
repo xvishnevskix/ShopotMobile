@@ -2,6 +2,8 @@ package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.api.handleWebRTCWebSocket
@@ -10,8 +12,10 @@ import org.videotrade.shopot.domain.usecase.ChatUseCase
 
 class WsRepositoryImpl : WsRepository, KoinComponent {
     
-    private val webSocketSession = mutableStateOf<DefaultClientWebSocketSession?>(null)
     private val isConnected = mutableStateOf(false)
+    
+    private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
+    override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
     
     
     override suspend fun connectionWs(userId: String) {
@@ -19,18 +23,18 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
         
         
         handleWebRTCWebSocket(
-            webSocketSession,
+            _wsSession,
             isConnected,
             userId,
             chatUseCase
         )
         
-    
+        
     }
     
     override suspend fun getWsSession(): DefaultClientWebSocketSession? {
         
-        return webSocketSession.value
+        return wsSession.value
     }
     
     

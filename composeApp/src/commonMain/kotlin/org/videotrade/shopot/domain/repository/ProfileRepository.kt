@@ -7,8 +7,8 @@ import org.videotrade.shopot.domain.model.UserProfile
 interface ProfileRepository {
     
     
-    suspend fun downloadProfile() : UserProfile?
-     fun getProfile() : ProfileDTO?
+    suspend fun downloadProfile() : ProfileDTO?
+    fun getProfile() : ProfileDTO?
     
     
 }
