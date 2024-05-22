@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Main.UserComponentItem
-import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold

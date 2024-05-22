@@ -7,31 +7,52 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ContactDTO
-import org.videotrade.shopot.multiplatform.ContactsProviderFactory
+import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.domain.usecase.ProfileUseCase
 
 class ContactsViewModel() : ViewModel(),
     KoinComponent {
+    val selectedContacts = mutableStateListOf<ContactDTO>()
+    
+    
+    private val ContactsUseCase: ContactsUseCase by inject()
+    private val ProfileUseCase: ProfileUseCase by inject()
+    
+    
     private val _contacts = MutableStateFlow<List<ContactDTO>>(emptyList())
-     val selectedContacts = mutableStateListOf<ContactDTO>()
+    
     val contacts: StateFlow<List<ContactDTO>> get() = _contacts
     
     fun fetchContacts() {
         viewModelScope.launch {
             
             
-            _contacts.value = ContactsProviderFactory.create().getContacts()
+            val contactsSort = ContactsUseCase.fetchContacts()
             
-            
+            _contacts.value = contactsSort
         }
     }
-
+    fun createChat(contact: ContactDTO) {
+        viewModelScope.launch {
+            val profile = ProfileUseCase.getProfile()
+            
+            if (profile != null) {
+                ContactsUseCase.createChat(profile.id, contact)
+            }
+        
+        }
+        
+    }
+    
+    
     fun addContact(contact: ContactDTO) {
         if (!selectedContacts.contains(contact)) {
             selectedContacts.add(contact)
         }
     }
-
+    
     fun removeContact(contact: ContactDTO) {
         selectedContacts.remove(contact)
     }

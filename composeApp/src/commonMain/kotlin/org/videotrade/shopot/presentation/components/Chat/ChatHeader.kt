@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
-import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.components.Main.CallScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -35,7 +35,7 @@ import shopot.composeapp.generated.resources.Res
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatHeader(chat: UserItem) {
+fun ChatHeader(chat: ChatItem) {
     val interactionSource =
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
@@ -70,7 +70,8 @@ fun ChatHeader(chat: UserItem) {
             )
             
             Text(
-                "${chat.firstName} ${chat.lastName}",
+//                "${chat.firstName} ${chat.lastName}",
+                "AAA",
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),

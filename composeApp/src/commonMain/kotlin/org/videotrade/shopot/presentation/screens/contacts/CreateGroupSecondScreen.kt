@@ -74,7 +74,7 @@ class CreateGroupSecondScreen() : Screen {
             selectedContacts
         } else {
             selectedContacts.filter {
-                it.name.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
+                it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
                     searchQuery.value
                 )
             }
@@ -108,7 +108,7 @@ class CreateGroupSecondScreen() : Screen {
                             ParticipantCountText(selectedContacts.size)
                         }
                         itemsIndexed(filteredContacts) { _, item ->
-                            UserItem(item = item)
+                            ChatItem(item = item)
                         }
                     }
 
@@ -133,7 +133,7 @@ class CreateGroupSecondScreen() : Screen {
 
 
 @Composable
-private fun UserItem(item: ContactDTO) {
+private fun ChatItem(item: ContactDTO) {
 
 
     Box(
@@ -163,7 +163,7 @@ private fun UserItem(item: ContactDTO) {
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         Text(
-                            text = "${item.name}",
+                            text = "${item.firstName} ${item.lastName}",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             textAlign = TextAlign.Center,

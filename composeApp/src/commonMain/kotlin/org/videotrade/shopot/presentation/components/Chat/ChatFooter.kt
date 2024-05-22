@@ -38,13 +38,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.MessageItem
-import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
-fun ChatFooter(chat: UserItem, viewModel: ChatViewModel) {
+fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     
     var text by remember { mutableStateOf("") }
     
@@ -110,7 +110,7 @@ fun ChatFooter(chat: UserItem, viewModel: ChatViewModel) {
                 contentDescription = "Send",
                 modifier = Modifier.padding(end = 8.dp).clickable {
                     viewModel.addMessage(
-                        MessageItem("10", "10f609c6-df91-4cbc-afc7-30c175cc1111", text, "", "", 0, listOf(), false,  chat.chatId)
+                        MessageItem("10", "10f609c6-df91-4cbc-afc7-30c175cc1111", text, "", "", 0, listOf(), false,  chat.id)
                     
                     )
                     

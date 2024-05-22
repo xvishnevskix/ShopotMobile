@@ -23,9 +23,12 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -41,6 +44,7 @@ fun HeaderMain(drawerState: DrawerState) {
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
 
     val scope = rememberCoroutineScope()
+    val navigator = LocalNavigator.currentOrThrow
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -99,7 +103,9 @@ fun HeaderMain(drawerState: DrawerState) {
 
                 )
             Image(
-                modifier = Modifier.padding(end = 15.dp).size(30.dp),
+                modifier = Modifier.padding(end = 15.dp).size(30.dp).clickable {
+                    navigator.push(CreateChatScreen())
+                },
                 painter = painterResource(Res.drawable.add_main),
                 contentDescription = null,
 

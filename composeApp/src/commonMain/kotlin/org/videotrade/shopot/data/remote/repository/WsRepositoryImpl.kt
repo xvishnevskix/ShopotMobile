@@ -9,6 +9,7 @@ import org.koin.core.component.inject
 import org.videotrade.shopot.api.handleWebRTCWebSocket
 import org.videotrade.shopot.domain.repository.WsRepository
 import org.videotrade.shopot.domain.usecase.ChatUseCase
+import org.videotrade.shopot.domain.usecase.ChatsUseCase
 
 class WsRepositoryImpl : WsRepository, KoinComponent {
     
@@ -20,13 +21,15 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
     
     override suspend fun connectionWs(userId: String) {
         val chatUseCase: ChatUseCase by inject()
+        val ChatsUseCase: ChatsUseCase by inject()
         
         
         handleWebRTCWebSocket(
             _wsSession,
             isConnected,
             userId,
-            chatUseCase
+            chatUseCase,
+            ChatsUseCase
         )
         
         

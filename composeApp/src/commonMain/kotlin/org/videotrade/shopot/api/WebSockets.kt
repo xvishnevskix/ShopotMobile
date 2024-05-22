@@ -11,20 +11,21 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
-import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
+import org.videotrade.shopot.domain.usecase.ChatsUseCase
 
 suspend fun handleWebRTCWebSocket(
     webSocketSession: MutableStateFlow<DefaultClientWebSocketSession?>,
     isConnected: MutableState<Boolean>,
     userId: String,
-    chatUseCase: ChatUseCase
+    chatUseCase: ChatUseCase,
+    ChatsUseCase: ChatsUseCase
 
 ) {
     
@@ -43,8 +44,8 @@ suspend fun handleWebRTCWebSocket(
                 host = webSocketsUrl,
                 port = 5050,
                 path = "/chat?userId=$userId",
-              
-            ) {
+                
+                ) {
                 
                 
                 webSocketSession.value = this
@@ -63,19 +64,39 @@ suspend fun handleWebRTCWebSocket(
                             
                             
                             when (action) {
-                                "getMessages" -> {
+                                "getUserChats" -> {
                                     try {
-                                        println("getMessages")
                                         
                                         val messagesJson =
-                                            jsonElement.jsonObject["messages"]?.jsonArray
+                                            jsonElement.jsonObject["data"]?.jsonArray
                                         
+                                        
+                                        val chats = mutableListOf<ChatItem>()
                                         if (messagesJson != null) {
-                                            val messages: List<MessageItem> =
-                                                Json.decodeFromString(messagesJson.toString())
-                                            println("messages31312222 $messages")
                                             
-                                            chatUseCase.initMessages(messages) // Инициализация сообщений
+                                            for (chatItem in messagesJson) {
+                                                
+                                                
+                                                
+                                                val chatJson =
+                                                    chatItem.jsonObject["chat"]?.jsonObject
+                                                
+                                                println("messages31312222 $chatJson")
+                                                
+                                                
+                                                val chat: ChatItem =
+                                                    Json.decodeFromString(chatJson.toString())
+                                                
+                                                println("messages31312222 $chat")
+                                                
+                                                
+                                                chats.add(chat)
+                                                
+                                            }
+                                            
+                                            println("chats $chats")
+
+                                       ChatsUseCase.addChats(chats)// Инициализация сообщений
                                         }
                                         
                                     } catch (e: Exception) {
@@ -105,7 +126,7 @@ suspend fun handleWebRTCWebSocket(
                     
                     
                 }
-                
+
 //                @Serializable
 //                data class sendMessage(
 //                    var action: String,
@@ -127,7 +148,7 @@ suspend fun handleWebRTCWebSocket(
 //
 //                send(Frame.Text(jsonMessageMess))
 //
-                
+
 //                @Serializable
 //                data class getMessages(
 //                    var action: String,

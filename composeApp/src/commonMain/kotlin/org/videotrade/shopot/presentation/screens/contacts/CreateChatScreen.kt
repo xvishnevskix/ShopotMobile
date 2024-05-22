@@ -69,7 +69,7 @@ class CreateChatScreen() : Screen {
             contacts
         } else {
             contacts.filter {
-                it.name.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
+                it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
                     searchQuery.value
                 )
             }
@@ -96,7 +96,7 @@ class CreateChatScreen() : Screen {
                             makeA_group()
                         }
                         itemsIndexed(filteredContacts) { _, item ->
-                            UserItem(item = item)
+                            ChatItem(viewModel, item = item)
                         }
                     }
                 }
@@ -160,14 +160,17 @@ private fun makeA_group() {
 
 
 @Composable
-private fun UserItem(item: ContactDTO) {
+private fun ChatItem(viewModel: ContactsViewModel,item: ContactDTO) {
 
     Box(
         modifier = Modifier
             .padding(top = 22.dp)
             .background(Color(255, 255, 255))
             .fillMaxWidth()
-            .clickable {  }
+            .clickable {
+                
+                viewModel.createChat(item)
+            }
 
     ) {
         Column(
@@ -189,7 +192,7 @@ private fun UserItem(item: ContactDTO) {
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         Text(
-                            text = "${item.name}",
+                            text = "${item.firstName} ${item.lastName}",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             textAlign = TextAlign.Center,

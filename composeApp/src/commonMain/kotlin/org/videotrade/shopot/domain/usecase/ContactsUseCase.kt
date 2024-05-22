@@ -1,0 +1,22 @@
+package org.videotrade.shopot.domain.usecase
+
+import kotlinx.coroutines.flow.StateFlow
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.repository.ChatRepository
+import org.videotrade.shopot.domain.repository.ContactsRepository
+
+class ContactsUseCase : KoinComponent {
+    private val repository: ContactsRepository by inject()
+    
+    suspend fun fetchContacts(): List<ContactDTO> {
+        return repository.fetchContacts()
+    }
+    suspend fun createChat(profileId: String , contact: ContactDTO) {
+        return repository.createChat(profileId , contact)
+    }
+    
+    
+}

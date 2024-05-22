@@ -117,10 +117,12 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.KoinContext
-import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Main.CallScreen
+import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -132,10 +134,10 @@ internal fun App() = AppTheme {
         ) {
             Navigator(
 //                ChatScreen(
-//                UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
+//                ChatItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
 //                )
 //                CallScreen(
-//                    UserItem(
+//                    ChatItem(
 //                        "2",
 //                        true,
 //                        "",
@@ -152,6 +154,7 @@ internal fun App() = AppTheme {
 
 //                MainScreen()
                         IntroScreen()
+//                                SignUpScreen("+79388899885")
                 //CallScreen()
                 // IncomingCallScreen()
 //                CreateChatScreen()

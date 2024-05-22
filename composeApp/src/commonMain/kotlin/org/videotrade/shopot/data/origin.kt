@@ -71,12 +71,14 @@ class origin {
             val token = getValueInStorage("accessToken")
             
             val response: HttpResponse =
-                client.get("${EnvironmentConfig.serverUrl}$url") {
+                client.post("${EnvironmentConfig.serverUrl}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
                 }
             
+            
+            println("response.bodyAsText() ${response.bodyAsText()}")
             
             if (response.status.isSuccess()) {
                 

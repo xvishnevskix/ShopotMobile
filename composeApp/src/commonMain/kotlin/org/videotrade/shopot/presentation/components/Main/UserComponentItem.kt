@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
-import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.jetbrains.compose.resources.painterResource
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -39,7 +39,7 @@ import shopot.composeapp.generated.resources.randomUser
 import shopot.composeapp.generated.resources.single_message_check
 
 @Composable
-fun UserComponentItem(chat: UserItem) {
+fun UserComponentItem(chat: ChatItem) {
     val navigator = LocalNavigator.currentOrThrow
 
 
@@ -63,7 +63,8 @@ fun UserComponentItem(chat: UserItem) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "${chat.firstName} ${chat.lastName}",
+//                    "${chat.firstName} ${chat.lastName}",
+                    "AAAA",
 
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,

@@ -18,7 +18,7 @@ import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Chat.BlurredMessageOverlay
 import org.videotrade.shopot.presentation.components.Chat.Chat
 import org.videotrade.shopot.presentation.components.Chat.ChatFooter
@@ -26,18 +26,7 @@ import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class ChatScreen(
-    private val chat: UserItem = UserItem(
-        "cf9b66e2-9e18-4342-bbc0-c5144a593f71",
-        false,
-        "",
-        "",
-        "",
-        "",
-        0,
-        "",
-        "",
-        "89da6ae1-cec8-4a48-89de-46c5b7c174a2",
-    )
+    private val chat: ChatItem
 ) : Screen {
     
     @Composable
@@ -51,7 +40,7 @@ class ChatScreen(
             
             
             delay(2000)
-            viewModel.getMessagesBack(chat.chatId)
+            viewModel.getMessagesBack(chat.id)
         }
         
         

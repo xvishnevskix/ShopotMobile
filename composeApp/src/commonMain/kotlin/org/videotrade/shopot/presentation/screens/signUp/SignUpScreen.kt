@@ -55,6 +55,7 @@ import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
@@ -302,7 +303,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                     val client = HttpClient()
                                     try {
                                         val getToken = getValueInStorage("accessToken")
-                                        val response: HttpResponse = client.post("http://192.168.31.223:3000/users") {
+                                        val response: HttpResponse = client.post("${serverUrl}user") {
                                             contentType(ContentType.Application.Json)
                                             header(HttpHeaders.Authorization, "Bearer $getToken")
                                             setBody(jsonContent)

@@ -1,32 +1,41 @@
 package org.videotrade.shopot.data.remote.repository
-import org.videotrade.shopot.domain.model.UserItem
-import org.videotrade.shopot.domain.repository.UsersRepository
 
-class UsersRepositoryImpl : UsersRepository {
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.repository.ChatsRepository
 
-    private var users =
-        mutableListOf(
-            UserItem("1", true, "", "Антон", "Иванов", "", 2, "10", "",""),
-            UserItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","")
+class ChatsRepositoryImpl : ChatsRepository {
+    
+    
+    private val _chats = MutableStateFlow<List<ChatItem>>(
+        listOf(
+        
         )
-
-
-    override fun getUsers(): List<UserItem> {
-
-        return users.toList()
-
+    )
+    override val chats: StateFlow<List<ChatItem>> get() = _chats
+    
+    
+    override fun getChats(): List<ChatItem> {
+        
+        return chats.value
+        
     }
-
-
-    override fun delUser(user: UserItem) {
-        users = users.filter { it.id != user.id }.toMutableList()
+    
+    
+    override fun delChat(chat: ChatItem) {
+//        _chats= _users.value.filter { it.id != user.id }
     }
-
-
-
-    override fun addUser(user: UserItem) {
-
-         users.add(user)
+    
+    
+    override fun addChat(chat: ChatItem) {
+        
+//        users.add(user)
     }
-
+    
+    override fun addChats(chatsInit: MutableList<ChatItem>) {
+        _chats.value = chatsInit
+        
+    }
+    
 }

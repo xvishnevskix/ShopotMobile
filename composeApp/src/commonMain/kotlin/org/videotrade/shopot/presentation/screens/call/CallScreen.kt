@@ -32,13 +32,13 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.domain.model.UserItem
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Call.Video
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
-class CallScreen(private val chat: UserItem) : Screen {
+class CallScreen(private val chat: ChatItem) : Screen {
     
     @Composable
     override fun Content() {

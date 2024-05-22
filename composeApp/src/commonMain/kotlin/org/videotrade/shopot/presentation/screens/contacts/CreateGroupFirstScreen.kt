@@ -59,7 +59,7 @@ class CreateGroupFirstScreen() : Screen {
             contacts
         } else {
             contacts.filter {
-                it.name.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
+                it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
                     searchQuery.value
                 )
             }
@@ -96,7 +96,7 @@ class CreateGroupFirstScreen() : Screen {
                             filteredContacts
 
                         ) { _, item ->
-                            UserItem(item = item, sharedViewModel = viewModel)
+                            ChatItem(item = item, sharedViewModel = viewModel)
 
 
                         }
@@ -126,7 +126,7 @@ class CreateGroupFirstScreen() : Screen {
 
 
 @Composable
-private fun UserItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
+private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
     val isChecked = remember { mutableStateOf(false) }
 
     Box(
@@ -153,7 +153,7 @@ private fun UserItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                     Avatar(Res.drawable.randomUser, 80.dp)
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
-                            text = item.name,
+                            text = item.firstName,
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             textAlign = TextAlign.Center,

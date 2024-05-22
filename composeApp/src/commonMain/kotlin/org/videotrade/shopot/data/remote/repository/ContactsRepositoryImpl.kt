@@ -1,0 +1,109 @@
+package org.videotrade.shopot.data.remote.repository
+
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.domain.repository.ContactsRepository
+import org.videotrade.shopot.multiplatform.ContactsProviderFactory
+
+class ContactsRepositoryImpl : ContactsRepository {
+    private val _contacts = MutableStateFlow<List<ContactDTO>>(
+        listOf(
+        
+        )
+    )
+    override val contacts: StateFlow<List<ContactDTO>> get() = _contacts
+    
+    
+    override suspend fun fetchContacts(): List<ContactDTO> {
+        
+        @Serializable
+        data class ContactsgetAll(
+            val userDetails: ContactDTO,
+            val phone: String
+        )
+        
+        val newContacts = mutableListOf<ContactDTO>()
+        
+        val contactsNative = ContactsProviderFactory.create().getContacts()
+        val contactsGet = origin().get<List<ContactsgetAll>>("user/getAll")
+        
+        // Функция для нормализации номера телефона
+        fun normalizePhoneNumber(phone: String): String {
+            return phone.replace(Regex("[^0-9]"), "")
+        }
+        
+        // Преобразование контактов из backend в словарь по нормализованному номеру телефона для быстрого поиска
+        val backendContactsMap = contactsGet?.associateBy {
+            normalizePhoneNumber(it.phone)
+        }
+        
+        // Сравнение контактов по нормализованному номеру телефона
+        for (contact in contactsNative) {
+            val normalizedPhone = normalizePhoneNumber(contact.phone)
+            
+            println("normalizedPhone $normalizedPhone")
+            
+            val backendContact = backendContactsMap?.get(normalizedPhone)
+            if (backendContact != null) {
+                val (userDetails, _) = backendContact
+                newContacts.add(
+                    ContactDTO(
+                        userDetails.id,
+                        userDetails.login,
+                        userDetails.email,
+                        contact.firstName,
+                        contact.lastName,
+                        userDetails.description,
+                        contact.phone,
+                        userDetails.status,
+                    )
+                )
+            }
+        }
+        
+        
+        println("contactst $contactsGet $contactsNative")
+        println("newContacts $newContacts")
+        
+        _contacts.value = newContacts
+        
+        return newContacts
+    }
+    
+    override suspend fun createChat(profileId: String, contact: ContactDTO) {
+        
+        
+        val jsonContent = Json.encodeToString(
+            buildJsonObject {
+                put("firstUserId", profileId)
+                put("secondUserId", contact.id)
+                
+            }
+        )
+        
+        println("jsonContent $jsonContent")
+        
+        @Serializable
+        data class PersonalChat(
+            val id: String,
+            val createdAt: String,
+            val firstUserId: String,
+            val secondUserId: String
+        )
+        
+        val contactsGet = origin().post<PersonalChat>("personal-chat", jsonContent)
+        
+        
+        println("contactsGet $contactsGet")
+        
+    }
+    
+    
+}
