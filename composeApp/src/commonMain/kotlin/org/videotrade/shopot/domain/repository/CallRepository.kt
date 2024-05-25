@@ -19,5 +19,15 @@ interface CallRepository {
     suspend fun reconnectPeerConnection()
     suspend fun getWsSession(): DefaultClientWebSocketSession?
     suspend fun getPeerConnection(): PeerConnection
-     fun getOtherUserId(): Int
+    
+    
+    fun getCallerId(): String
+    
+     fun getOtherUserId(): String
+    
+    
+     fun updateOtherUserId(userId: String)
+     
+    
+    
 }

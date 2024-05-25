@@ -48,8 +48,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val isConnected = mutableStateOf(false)
     
     
-    private fun generateRandomNumber(): Int {
-        return Random.nextInt(1, 11) // верхняя граница исключена, поэтому указываем 11
+    private fun generateRandomNumber(): String {
+        return Random.nextInt(1, 41).toString() // верхняя граница исключена, поэтому указываем 11
     }
     
     
@@ -82,8 +82,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     host = "videotradedev.ru",
                     port = 3006,
                     path = "/ws",
+                    
+//                    host = "192.168.31.223",
+//                    port = 3001,
+//                    path = "/message",
                     request = {
-                        url.parameters.append("callerId", userId)
+                        url.parameters.append("callerId", callerId.value)
                     }
                 ) {
                     _wsSession.value = this
@@ -103,10 +107,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         println("sadada")
                                         
-                                        rtcMessage?.let { it ->
+                                        rtcMessage?.let {
                                             val sdp = it["sdp"]?.jsonPrimitive?.content ?: return@launch
                                             val callerId = jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-                                            callerId?.let { otherUserId.value = it.toInt() }
+                                            callerId?.let { otherUserId.value = it }
                                             
                                             val offer = SessionDescription(
                                                 SessionDescriptionType.Offer,
@@ -169,7 +173,19 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         return peerConnection.value
     }
     
-    override  fun getOtherUserId(): Int {
+    override  fun getOtherUserId(): String {
         return otherUserId.value
     }
+    
+    
+    override  fun getCallerId(): String {
+        return callerId.value
+    }
+    
+    
+    override fun updateOtherUserId(userId: String){
+        
+         otherUserId.value = userId
+    }
+
 }

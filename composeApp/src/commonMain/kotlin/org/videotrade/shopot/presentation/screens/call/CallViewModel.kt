@@ -82,15 +82,29 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
+    
+    fun updateOtherUserId(userId: String) {
+        viewModelScope.launch {
+            callUseCase.updateOtherUserId(userId)
+        }
+    }
+    
+    
 //    private fun getPeerConnection() {
 //        viewModelScope.launch {
 //            _peerConnection.value = callUseCase.getPeerConnection()
 //        }
 //    }
     
-     fun getOtherUserId(): Int {
+     fun getOtherUserId(): String {
         return callUseCase.getOtherUserId()
     }
+    
+    fun getCallerId(): String {
+        return callUseCase.getCallerId()
+    }
+    
+    
     
     suspend fun Call(
         webSocketSession: StateFlow<DefaultClientWebSocketSession?>,
@@ -105,11 +119,11 @@ class CallViewModel() : ViewModel(), KoinComponent {
         // Обработка кандидатов ICE
         peerConnection.onIceCandidate
             .onEach { candidate ->
-                Logger.d { "PC22:${getOtherUserId()}" }
+                Logger.d { "PC2213131:${getOtherUserId()}" }
                 
                 val iceCandidateMessage = WebRTCMessage(
                     type = "ICEcandidate",
-                    calleeId = getOtherUserId().toString(),
+                    calleeId = getOtherUserId(),
                     iceMessage = rtcMessageDTO(
                         label = candidate.sdpMLineIndex,
                         id = candidate.sdpMid,

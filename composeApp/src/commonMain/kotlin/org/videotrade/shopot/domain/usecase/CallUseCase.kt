@@ -29,7 +29,16 @@ class CallUseCase : KoinComponent {
         return repository.getPeerConnection()
     }
     
-     fun getOtherUserId(): Int {
+     fun getOtherUserId(): String {
         return repository.getOtherUserId()
+    }
+    fun getCallerId(): String {
+        return repository.getCallerId()
+    }
+    
+    
+    
+     fun updateOtherUserId(userId: String) {
+        return repository.updateOtherUserId(userId)
     }
 }
