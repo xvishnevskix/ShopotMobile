@@ -19,6 +19,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.component.KoinComponent
 import org.videotrade.shopot.domain.repository.CallRepository
+import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
     
@@ -45,8 +46,15 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     )
     
     private val isConnected = mutableStateOf(false)
-    private val otherUserId = mutableStateOf("82c208513187dc01")
-    private val callerId = mutableStateOf<String?>(null)
+    
+    
+    private fun generateRandomNumber(): Int {
+        return Random.nextInt(1, 11) // верхняя граница исключена, поэтому указываем 11
+    }
+    
+    
+    private val otherUserId = mutableStateOf("")
+    private val callerId = mutableStateOf(generateRandomNumber())
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
@@ -71,7 +79,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             try {
                 httpClient.webSocket(
                     method = HttpMethod.Get,
-                    host = "192.168.31.223",
+                    host = "videotradedev.ru",
                     port = 3006,
                     path = "/ws",
                     request = {
@@ -80,6 +88,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 ) {
                     _wsSession.value = this
                     isConnected.value = true
+                    
                     
                     val callOutputRoutine = launch {
                         for (frame in incoming) {
@@ -91,10 +100,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 
                                 when (type) {
                                     "newCall" -> {
-                                        rtcMessage?.let {
+                                        
+                                        println("sadada")
+                                        
+                                        rtcMessage?.let { it ->
                                             val sdp = it["sdp"]?.jsonPrimitive?.content ?: return@launch
                                             val callerId = jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-                                            callerId?.let { otherUserId.value = it }
+                                            callerId?.let { otherUserId.value = it.toInt() }
                                             
                                             val offer = SessionDescription(
                                                 SessionDescriptionType.Offer,
@@ -157,7 +169,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         return peerConnection.value
     }
     
-    override suspend fun getOtherUserId(): String {
+    override  fun getOtherUserId(): Int {
         return otherUserId.value
     }
 }

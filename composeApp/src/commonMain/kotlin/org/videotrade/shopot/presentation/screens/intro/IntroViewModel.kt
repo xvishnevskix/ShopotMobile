@@ -17,7 +17,6 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
@@ -31,21 +30,20 @@ class IntroViewModel : ViewModel(), KoinComponent {
     private val ContactsUseCase: ContactsUseCase by inject()
     
     
-//    private val userUseCase: ChatsUseCase by inject()
-//    private val profileUseCase: ProfileUseCase by inject()
-//    private val WsUseCase: WsUseCase by inject()
-//
-//
-//    val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-//    val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
-//
-//
-//    val profile = MutableStateFlow<ProfileDTO?>(null)
-//
-//
+    private val profileUseCase: ProfileUseCase by inject()
+    private val WsUseCase: WsUseCase by inject()
+    
+    
+    val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
+    val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
+    
+    
+    val profile = MutableStateFlow<ProfileDTO?>(null)
+    
+    
 //    init {
 //        viewModelScope.launch {
-//            println("dadsadada2")
+//            println("dadsadada1")
 //
 //            downloadProfile()
 //
@@ -65,7 +63,28 @@ class IntroViewModel : ViewModel(), KoinComponent {
 //        }
 //    }
     
-    
+    private fun chatsInit(navigator: Navigator) {
+        
+        viewModelScope.launch {
+            println("dadsadada1")
+            
+            downloadProfile()
+            
+            profile.collect { updatedProfile ->
+                
+                profile.value?.id?.let {
+                    println("dadsadada2")
+                    observeWsConnection(it, navigator)
+                    
+                    connectionWs(it)
+                    
+                    
+                }
+                
+                
+            }
+        }
+    }
     
     
     fun fetchContacts(navigator: Navigator) {
@@ -73,11 +92,12 @@ class IntroViewModel : ViewModel(), KoinComponent {
             
             
             val contacts = ContactsUseCase.fetchContacts()
+            println("response3131 $contacts")
             
             
             if (contacts != null) {
                 
-                navigator.push(MainScreen())
+                chatsInit(navigator)
                 
             } else {
                 navigator.push(SignInScreen())
@@ -106,7 +126,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    private fun observeWsConnection(userId: String) {
+    private fun observeWsConnection(userId: String, navigator: Navigator) {
         WsUseCase.wsSession
             .onEach { wsSessionNew ->
                 
@@ -127,6 +147,9 @@ class IntroViewModel : ViewModel(), KoinComponent {
                         println("jsonContent $jsonContent")
                         
                         wsSessionNew.send(Frame.Text(jsonContent))
+                        
+                        
+                        navigator.push(MainScreen())
                         
                         println("Message sent successfully")
                     } catch (e: Exception) {

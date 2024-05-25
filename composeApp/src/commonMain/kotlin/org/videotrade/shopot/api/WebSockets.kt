@@ -68,6 +68,7 @@ suspend fun handleWebRTCWebSocket(
                             when (action) {
                                 "getUserChats" -> {
                                     try {
+                                        
                                         val dataJson = jsonElement.jsonObject["data"]?.jsonArray
                                         
                                         val chats = mutableListOf<ChatItem>()
@@ -171,6 +172,9 @@ suspend fun handleWebRTCWebSocket(
                                             
                                             
                                             chatUseCase.addMessage(message)// Инициализация сообщений
+                                            
+                                            chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
+                                            
                                         }
                                         
                                     } catch (e: Exception) {

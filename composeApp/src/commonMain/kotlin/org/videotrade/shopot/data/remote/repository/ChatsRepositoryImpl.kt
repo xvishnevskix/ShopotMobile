@@ -2,7 +2,9 @@ package org.videotrade.shopot.data.remote.repository
 
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatsRepository
 
 class ChatsRepositoryImpl : ChatsRepository {
@@ -23,9 +25,23 @@ class ChatsRepositoryImpl : ChatsRepository {
     }
     
     
+    override fun updateLastMessageChat(messageItem: MessageItem) {
+        _chats.update { currentChats ->
+            currentChats.map { chatItem ->
+                if (chatItem.chatId == messageItem.chatId) {
+                    chatItem.copy(lastMessage = messageItem.content)
+                } else {
+                    chatItem
+                }
+            }
+        }
+    }
+    
+    
     override fun delChat(chat: ChatItem) {
 //        _chats= _users.value.filter { it.id != user.id }
     }
+    
     
     
     override fun addChat(chat: ChatItem) {

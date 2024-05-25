@@ -72,6 +72,10 @@ class CallScreen(private val chat: ChatItem) : Screen {
         val localVideoTrack = localStream?.videoTracks?.firstOrNull()
         
         Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            
+            Text("${viewModel.getOtherUserId()}")
+            
+            
             localVideoTrack?.let { Video(track = it, modifier = Modifier.weight(1f)) }
                 ?: Box(modifier = Modifier.weight(1f))
             
@@ -89,7 +93,9 @@ class CallScreen(private val chat: ChatItem) : Screen {
                         )
                         peerConnections.setLocalDescription(answer)
                         if (viewModel.wsSession.value != null) {
-                            answerCall(viewModel.wsSession.value, answer, viewModel.getOtherUserId())
+                            answerCall(viewModel.wsSession.value, answer,
+                                viewModel.getOtherUserId().toString()
+                            )
                         }
                     }
                 }, content = {
@@ -107,7 +113,9 @@ class CallScreen(private val chat: ChatItem) : Screen {
                     )
                     peerConnections.setLocalDescription(offer)
                     if (viewModel.wsSession.value != null) {
-                        makeCall(viewModel.wsSession.value, offer, viewModel.getOtherUserId())
+                        makeCall(viewModel.wsSession.value, offer,
+                            viewModel.getOtherUserId().toString()
+                        )
                     }
                 }
             })

@@ -48,6 +48,7 @@ class IntroScreen : Screen {
             if (response != null && response.status == HttpStatusCode.OK) {
                 
                 
+                
                 viewModel.fetchContacts(navigator)
                 return@LaunchedEffect
                 

@@ -5,6 +5,7 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.repository.ChatsRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.MessageItem
 
 class ChatsUseCase : KoinComponent {
     private val repository: ChatsRepository by inject()
@@ -20,8 +21,10 @@ class ChatsUseCase : KoinComponent {
     }
     
     
-
-
+    
+    fun updateLastMessageChat(messageItem: MessageItem) {
+        return repository.updateLastMessageChat(messageItem)
+    }
     fun delChat(user: ChatItem) {
         return repository.delChat(user)
     }

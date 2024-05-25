@@ -88,7 +88,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
 //        }
 //    }
     
-    suspend fun getOtherUserId(): String {
+     fun getOtherUserId(): Int {
         return callUseCase.getOtherUserId()
     }
     
@@ -109,7 +109,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                 
                 val iceCandidateMessage = WebRTCMessage(
                     type = "ICEcandidate",
-                    calleeId = getOtherUserId(),
+                    calleeId = getOtherUserId().toString(),
                     iceMessage = rtcMessageDTO(
                         label = candidate.sdpMLineIndex,
                         id = candidate.sdpMid,

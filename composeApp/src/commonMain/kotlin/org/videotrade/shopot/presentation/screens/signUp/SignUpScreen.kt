@@ -54,6 +54,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
@@ -61,6 +62,7 @@ import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
@@ -81,9 +83,7 @@ class SignUpScreen(private val phone: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val responseState = remember { mutableStateOf<String?>(null) }
-        val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
-        val coroutineScope = rememberCoroutineScope()
+        val viewModel: IntroViewModel = koinInject()
         
         val textState = remember { mutableStateOf(SignUpTextState()) }
         
@@ -343,7 +343,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                             }
                                             
                                             
-                                            navigator.push(MainScreen())
+                                            viewModel.fetchContacts(navigator)
                                             
                                             
                                         } else {

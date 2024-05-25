@@ -41,12 +41,14 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import shopot.composeapp.generated.resources.Montserrat_Medium
@@ -63,6 +65,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val responseState = remember { mutableStateOf<String?>("1111") }
         val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
         val coroutineScope = rememberCoroutineScope()
+        val viewModel: IntroViewModel = koinInject()
 
 
 //        coroutineScope.launch {
@@ -155,7 +158,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 
                                 when (authCase) {
                                     
-                                    "SignIn" -> sendLogin(phone, navigator)
+                                    "SignIn" -> sendLogin(phone, navigator,viewModel)
                                     "SignUp" -> sendSignUp(phone, navigator)
                                 }
                             }
@@ -228,7 +231,7 @@ suspend fun sendRequestToBackend(
 }
 
 
-suspend fun sendLogin(phone: String, navigator: Navigator) {
+suspend fun sendLogin(phone: String, navigator: Navigator,viewModel: IntroViewModel) {
     
     
     val response = sendRequestToBackend(phone, null, "auth/login")
@@ -260,7 +263,8 @@ suspend fun sendLogin(phone: String, navigator: Navigator) {
         }
         
         
-        navigator.push(MainScreen())
+        
+        viewModel.fetchContacts(navigator)
         
         
     }

@@ -29,7 +29,7 @@ class CallUseCase : KoinComponent {
         return repository.getPeerConnection()
     }
     
-    suspend fun getOtherUserId(): String {
+     fun getOtherUserId(): Int {
         return repository.getOtherUserId()
     }
 }
