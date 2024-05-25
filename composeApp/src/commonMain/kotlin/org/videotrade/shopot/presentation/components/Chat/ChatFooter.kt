@@ -109,8 +109,14 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send",
                 modifier = Modifier.padding(end = 8.dp).clickable {
-                    viewModel.addMessage(
-                        MessageItem("10", "10f609c6-df91-4cbc-afc7-30c175cc1111", text, "", "", 0, listOf(), false,  chat.id)
+                    viewModel.sendMessage(
+                        MessageItem(
+                        
+                        content = text ,
+                           fromUser = viewModel.profile.value.id,
+                          chatId = chat.id ,
+                          
+                        )
                     
                     )
                     

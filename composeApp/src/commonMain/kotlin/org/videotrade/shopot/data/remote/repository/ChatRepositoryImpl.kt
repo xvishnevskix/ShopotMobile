@@ -1,35 +1,102 @@
 package org.videotrade.shopot.data.remote.repository
 
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatRepository
+import org.videotrade.shopot.domain.usecase.WsUseCase
 
-class ChatRepositoryImpl : ChatRepository {
+class ChatRepositoryImpl : ChatRepository, KoinComponent {
     private val _messages = MutableStateFlow<List<MessageItem>>(
-        listOf(
-            MessageItem("1", "cf9b66e2-9e18-4342-bbc0-c5144a593f71" , "" , "" ,"" ,1 , listOf(1) ,false ,"" ,),
-            MessageItem("2", "cf9b66e2-9e18-4342-bbc0-c5144a593f71" , "" , "" ,"" ,1 , listOf(1) ,false ,"" ,),
-         
-        )
+        emptyList()
     )
+    val wsUseCase: WsUseCase by inject()
     
     
     override fun initMessages(messages: List<MessageItem>) {
-        _messages.value = messages
+        
+        _messages.value = messages.reversed()
     }
     
-    override fun addMessage(message: MessageItem) {
+    
+    override suspend fun sendMessage(message: MessageItem) {
+        try {
+            
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "sendMessage")
+                    put("content", message.content)
+                    put("fromUser", message.fromUser)
+                    put("chatId", message.chatId)
+                }
+            )
+            
+            
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+            
+        } catch (e: Exception) {
+            println("Failed to send message: ${e.message}")
+        }
+    }
+    
+    
+    
+    
+    override suspend fun addMessage(message: MessageItem) {
         _messages.value = listOf(message) + _messages.value
     }
     
     
-    // Теперь это Flow
     override fun getMessages(): StateFlow<List<MessageItem>> = _messages.asStateFlow()
     
     
-    override fun delMessage(message: MessageItem) {
+    override suspend fun getMessagesBack(chatId: String) {
+        
+        try {
+            
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "getMessages")
+                    put("chatId", chatId)
+                }
+            )
+            
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+            
+        } catch (e: Exception) {
+            println("Failed to send message: ${e.message}")
+        }
+        
+    }
+    
+    
+    override suspend fun delMessage(message: MessageItem) {
         _messages.value = _messages.value.filter { it.id != message.id }
+        
+        try {
+            
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "removeMessage")
+                    put("messageId", message.id)
+                }
+            )
+            
+            
+            println("jsonContent $jsonContent")
+            
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+            
+        } catch (e: Exception) {
+            println("Failed to send message: ${e.message}")
+        }
     }
 }

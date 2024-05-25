@@ -10,6 +10,7 @@ import org.videotrade.shopot.api.handleWebRTCWebSocket
 import org.videotrade.shopot.domain.repository.WsRepository
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
+import org.videotrade.shopot.domain.usecase.ContactsUseCase
 
 class WsRepositoryImpl : WsRepository, KoinComponent {
     
@@ -21,7 +22,8 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
     
     override suspend fun connectionWs(userId: String) {
         val chatUseCase: ChatUseCase by inject()
-        val ChatsUseCase: ChatsUseCase by inject()
+        val chatsUseCase: ChatsUseCase by inject()
+        val contactsUseCase: ContactsUseCase by inject()
         
         
         handleWebRTCWebSocket(
@@ -29,7 +31,8 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
             isConnected,
             userId,
             chatUseCase,
-            ChatsUseCase
+            chatsUseCase,
+            contactsUseCase
         )
         
         

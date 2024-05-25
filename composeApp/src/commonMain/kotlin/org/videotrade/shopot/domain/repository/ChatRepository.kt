@@ -8,8 +8,15 @@ interface ChatRepository {
     fun initMessages(messages: List<MessageItem>)
     fun getMessages(): StateFlow<List<MessageItem>>
     
-    fun delMessage(message: MessageItem)
-    fun addMessage(message: MessageItem)
+    
+    suspend  fun getMessagesBack(chatId: String)
+    
+    suspend  fun delMessage(message: MessageItem)
+    suspend  fun  addMessage(message: MessageItem)
+    suspend  fun  sendMessage(message: MessageItem)
+    
+    
+    
     
     
 }

@@ -11,11 +11,12 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.logo
 
@@ -25,6 +26,7 @@ class IntroScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val viewModel: IntroViewModel = koinInject()
         
         
         Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
@@ -41,12 +43,12 @@ class IntroScreen : Screen {
         LaunchedEffect(key1 = Unit) {
             
             
-            val origin = origin()
-            
-            val response = origin.reloadTokens()
+            val response = origin().reloadTokens()
             
             if (response != null && response.status == HttpStatusCode.OK) {
-                navigator.push(MainScreen())
+                
+                
+                viewModel.fetchContacts(navigator)
                 return@LaunchedEffect
                 
                 

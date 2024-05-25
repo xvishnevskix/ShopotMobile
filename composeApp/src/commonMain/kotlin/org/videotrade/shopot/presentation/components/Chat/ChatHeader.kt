@@ -70,8 +70,7 @@ fun ChatHeader(chat: ChatItem) {
             )
             
             Text(
-//                "${chat.firstName} ${chat.lastName}",
-                "AAA",
+                "${chat.firstName} ${chat.lastName}",
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),

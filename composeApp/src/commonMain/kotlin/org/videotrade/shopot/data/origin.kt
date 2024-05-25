@@ -1,6 +1,5 @@
 package org.videotrade.shopot.data
 
-import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -11,11 +10,11 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -28,11 +27,14 @@ class origin {
     val client =
         HttpClient() // Инициализация HTTP клиента, возможно вам стоит инициализировать его вне этой функции, чтобы использовать пул соединений
     
+    
     suspend inline fun <reified T> get(url: String): T? {
         
         try {
             val token = getValueInStorage("accessToken")
             
+            
+            println("token $token")
             
             val response: HttpResponse = client.get("${EnvironmentConfig.serverUrl}$url") {
                 contentType(ContentType.Application.Json)
@@ -40,10 +42,15 @@ class origin {
             }
             
             
+            if (
+                response.status == HttpStatusCode(401, "Unauthorized")
+            ) {
+                return null
+                
+            }
+            
             
             if (response.status.isSuccess()) {
-                
-                println("response3131 ${response.bodyAsText()}")
                 
                 
                 val responseData: T = Json.decodeFromString(response.bodyAsText())
@@ -51,6 +58,8 @@ class origin {
                 
                 return responseData
             } else {
+                
+                
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
         } catch (e: Exception) {
@@ -62,7 +71,7 @@ class origin {
     }
     
     
-    suspend  inline fun <reified T> post(
+    suspend inline fun <reified T> post(
         url: String,
         data: String
     ): T? {
@@ -81,7 +90,6 @@ class origin {
             println("response.bodyAsText() ${response.bodyAsText()}")
             
             if (response.status.isSuccess()) {
-                
                 
                 
                 val responseData: T = Json.decodeFromString(response.bodyAsText())

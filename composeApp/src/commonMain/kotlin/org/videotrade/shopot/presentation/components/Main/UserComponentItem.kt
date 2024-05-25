@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -28,21 +27,20 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
-import org.jetbrains.compose.resources.painterResource
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.double_message_check
 import shopot.composeapp.generated.resources.randomUser
-import shopot.composeapp.generated.resources.single_message_check
 
 @Composable
 fun UserComponentItem(chat: ChatItem) {
     val navigator = LocalNavigator.currentOrThrow
-
-
+    
+    
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
             navigator.push(ChatScreen(chat))
@@ -52,32 +50,29 @@ fun UserComponentItem(chat: ChatItem) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-
+            
             Avatar(
                 drawableRes = Res.drawable.randomUser,
                 size = 60.dp
             )
-
+            
             Column(
                 modifier = Modifier.padding(start = 10.dp),
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-//                    "${chat.firstName} ${chat.lastName}",
-                    "AAAA",
-
+                    "${chat.firstName} ${chat.lastName}",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                     lineHeight = 20.sp,
                     color = Color(0xFF000000)
-
+                
                 )
-
+                
                 Text(
-//                    chat.lastMessage,
-                    "Не получится, прошу прощения.",
+                    chat.lastMessage,
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -85,11 +80,11 @@ fun UserComponentItem(chat: ChatItem) {
                     lineHeight = 20.sp,
                     color = Color(0xFF979797),
                     modifier = Modifier.padding(top = 5.dp)
-
+                
                 )
             }
         }
-
+        
         Row {
             Column(
                 modifier = Modifier.padding(top = 12.dp, end = 5.dp)
@@ -98,7 +93,7 @@ fun UserComponentItem(chat: ChatItem) {
                     modifier = Modifier.size(14.dp),
                     painter = painterResource(Res.drawable.double_message_check),
                     contentDescription = null,
-                    )
+                )
 //                Image(
 //                    modifier = Modifier.size(14.dp),
 //                    painter = painterResource(Res.drawable.single_message_check),
@@ -117,8 +112,8 @@ fun UserComponentItem(chat: ChatItem) {
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                     lineHeight = 20.sp,
                     color = Color(0xFF979797),
-
-                )
+                    
+                    )
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
@@ -135,15 +130,15 @@ fun UserComponentItem(chat: ChatItem) {
                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                         lineHeight = 20.sp,
                         color = Color(0xFFFFFFFF),
-
-                    )
-
+                        
+                        )
+                    
                 }
             }
-
+            
         }
-
-
+        
+        
     }
-
+    
 }

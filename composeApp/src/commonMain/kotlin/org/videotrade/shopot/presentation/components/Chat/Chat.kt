@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -256,7 +257,8 @@ fun Chat(
     LazyColumn(
         state = listState,
         reverseLayout = true,
-        modifier = modifier
+        modifier = modifier,
+        
     ) {
         itemsIndexed(messagesState) { index, message ->
             
@@ -369,7 +371,7 @@ fun MessageBox(
                 contentDescription = null,
             )
             Text(
-                text = "11:17",
+                text = formatTimestamp(message.created),
                 style = TextStyle(
                     color = Color.Gray,
                     fontSize = 16.sp

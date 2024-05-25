@@ -3,13 +3,10 @@ package org.videotrade.shopot.presentation.screens.chat
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.MessageItem
@@ -27,14 +24,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
     
-    val profile = MutableStateFlow<ProfileDTO?>(null)
+    val profile = MutableStateFlow(ProfileDTO())
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     
     
     init {
         
         
-        profile.value = profileUseCase.getProfile()
+        profile.value = profileUseCase.getProfile()!!
         
         
         viewModelScope.launch {
@@ -62,70 +59,13 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     fun getMessagesBack(chatId: String) {
         viewModelScope.launch {
-            
-            
-            try {
-                
-                val _ws = wsUseCase.getWsSession() ?: return@launch
-                
-                
-                @Serializable
-                data class getMessegesDTO(
-                    val action: String,
-                    val chatId: String? = null,
-                )
-//
-                val getMesseges = getMessegesDTO(
-                    "getMessages",
-                    chatId,
-                )
-                
-                
-                val jsonMessage = Json.encodeToString(getMessegesDTO.serializer(), getMesseges)
-                
-                
-                
-                ws.value = _ws
-                _ws.send(Frame.Text(jsonMessage))
-                
-            } catch (e: Exception) {
-                println("Failed to send message: ${e.message}")
-            }
+            chatUseCase.getMessagesBack(chatId)
         }
     }
     
-    fun addMessage(message: MessageItem) {
+    fun sendMessage(message: MessageItem) {
         viewModelScope.launch {
-            chatUseCase.addMessage(message)
-            
-            try {
-                
-                
-                @Serializable
-                data class sendMessegesDTO(
-                    val action: String,
-                    val content: String,
-                    val fromUser: String,
-                    val chatId: String
-                )
-                
-                
-                val getMesseges = sendMessegesDTO(
-                    "sendMessage",
-                    message.content,
-                    message.fromUser,
-                    message.chatId
-                )
-                
-                
-                val jsonMessage = Json.encodeToString(sendMessegesDTO.serializer(), getMesseges)
-                
-                
-                ws.value?.send(Frame.Text(jsonMessage))
-                
-            } catch (e: Exception) {
-                println("Failed to send message: ${e.message}")
-            }
+            chatUseCase.sendMessage(message)
         }
     }
     

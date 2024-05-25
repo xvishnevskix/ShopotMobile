@@ -14,16 +14,28 @@ class ChatUseCase : KoinComponent {
     }
     
     
+    
+    suspend fun getMessagesBack(chatId: String){
+        return repository.getMessagesBack(chatId)
+    }
+    
+    
     fun initMessages(messages: List<MessageItem>) {
         return repository.initMessages(messages)
     }
     
-    fun delMessage(message: MessageItem) {
+    suspend  fun delMessage(message: MessageItem) {
         return repository.delMessage(message)
     }
     
-    fun addMessage(message: MessageItem) {
+    suspend fun addMessage(message: MessageItem) {
         return repository.addMessage(message)
     }
+    
+    
+    suspend fun sendMessage(message: MessageItem) {
+        return repository.sendMessage(message)
+    }
+    
     
 }

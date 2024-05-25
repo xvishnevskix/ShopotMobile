@@ -31,7 +31,9 @@ class ContactsViewModel() : ViewModel(),
             
             val contactsSort = ContactsUseCase.fetchContacts()
             
-            _contacts.value = contactsSort
+            if (contactsSort != null) {
+                _contacts.value = contactsSort
+            }
         }
     }
     fun createChat(contact: ContactDTO) {

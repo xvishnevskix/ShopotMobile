@@ -17,16 +17,18 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
+import org.videotrade.shopot.domain.usecase.ContactsUseCase
 
 suspend fun handleWebRTCWebSocket(
     webSocketSession: MutableStateFlow<DefaultClientWebSocketSession?>,
     isConnected: MutableState<Boolean>,
     userId: String,
     chatUseCase: ChatUseCase,
-    ChatsUseCase: ChatsUseCase
-
+    chatsUseCase: ChatsUseCase,
+    contactsUseCase: ContactsUseCase
 ) {
     
     
@@ -66,37 +68,81 @@ suspend fun handleWebRTCWebSocket(
                             when (action) {
                                 "getUserChats" -> {
                                     try {
-                                        
-                                        val messagesJson =
-                                            jsonElement.jsonObject["data"]?.jsonArray
-                                        
+                                        val dataJson = jsonElement.jsonObject["data"]?.jsonArray
                                         
                                         val chats = mutableListOf<ChatItem>()
-                                        if (messagesJson != null) {
+                                        if (dataJson != null) {
                                             
-                                            for (chatItem in messagesJson) {
-                                                
-                                                
-                                                
-                                                val chatJson =
-                                                    chatItem.jsonObject["chat"]?.jsonObject
-                                                
-                                                println("messages31312222 $chatJson")
-                                                
-                                                
+                                            
+                                            fun normalizePhoneNumber(phone: String): String {
+                                                return phone.replace(Regex("[^0-9]"), "")
+                                            }
+                                            
+                                            val contactsMap = contactsUseCase.contacts.value.associateBy {
+                                                normalizePhoneNumber(it.phone)
+                                            }
+                                            
+                                            for (chatItem in dataJson) {
                                                 val chat: ChatItem =
-                                                    Json.decodeFromString(chatJson.toString())
+                                                    Json.decodeFromString(chatItem.toString())
+
+                                                val normalizedChatPhone = normalizePhoneNumber(chat.phone)
                                                 
-                                                println("messages31312222 $chat")
-                                                
-                                                
-                                                chats.add(chat)
+                                                val contact = contactsMap[normalizedChatPhone]
+
+                                                if (contact != null) {
+                                                    val sortChat = chat.copy(
+                                                        firstName = contact.firstName,
+                                                        lastName = contact.lastName
+                                                    )
+                                                    println("sortChat $sortChat")
+                                                    chats.add(sortChat)
+                                                } else {
+                                                    chats.add(chat)
+                                                    
+                                                }
                                                 
                                             }
                                             
                                             println("chats $chats")
-
-                                       ChatsUseCase.addChats(chats)// Инициализация сообщений
+                                            
+                                            chatsUseCase.addChats(chats) // Инициализация сообщений
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                }
+                                
+                                "getMessages" -> {
+                                    try {
+                                        
+                                        println("jsonElement $jsonElement ")
+                                        
+                                        val dataJson =
+                                            jsonElement.jsonObject["data"]?.jsonArray
+                                        
+                                        
+                                        val messages = mutableListOf<MessageItem>()
+                                        
+                                        if (dataJson != null) {
+                                            
+                                            for (messageItem in dataJson) {
+                                                
+                                                
+                                                val message: MessageItem =
+                                                    Json.decodeFromString(messageItem.toString())
+                                                
+                                                
+                                                
+                                                messages.add(message)
+                                                
+                                            }
+                                            
+                                            
+                                            
+                                            chatUseCase.initMessages(messages)// Инициализация сообщений
                                         }
                                         
                                     } catch (e: Exception) {
@@ -106,19 +152,98 @@ suspend fun handleWebRTCWebSocket(
                                     
                                 }
                                 
-                                "newCall" -> {
-                                
-                                
+                                "messageSent" -> {
+                                    try {
+                                        
+                                        
+                                        println("jsonElement $jsonElement ")
+                                        
+                                        val messageJson =
+                                            jsonElement.jsonObject["message"]?.jsonObject
+                                        
+                                        
+                                        
+                                        if (messageJson != null) {
+                                            
+                                            
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
+                                            
+                                            
+                                            chatUseCase.addMessage(message)// Инициализация сообщений
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
                                 }
                                 
-                                "callAnswered" -> {
-                                
-                                
+                                "messageDeleted" -> {
+                                    try {
+                                        
+                                        
+                                        println("messagePoka $jsonElement")
+                                        
+                                        val dataJson =
+                                            jsonElement.jsonObject["data"]?.jsonObject
+                                        
+                                        
+                                        
+                                        if (dataJson != null) {
+                                            
+                                            val messageJson =
+                                                jsonElement.jsonObject["data"]?.jsonObject
+                                            
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
+                                            
+                                            
+                                            println("messagePoka $message")
+                                            
+                                            
+                                            chatUseCase.addMessage(message)// Инициализация сообщений
+                                            
+                                            chatsUseCase
+                                            
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                    
                                 }
                                 
-                                "ICEcandidate" -> {
-                                
-                                
+                                "messageRemoved" -> {
+                                    try {
+                                        
+                                        
+                                        println("messagePoka $jsonElement")
+                                        
+                                        val messageJson =
+                                            jsonElement.jsonObject["message"]?.jsonObject
+                                        
+                                        
+                                        
+                                        if (messageJson != null) {
+                                            
+                                            
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
+                                            
+                                            
+                                            chatUseCase.delMessage(message)// Инициализация сообщений
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                    
                                 }
                             }
                         }

@@ -32,16 +32,14 @@ class ChatScreen(
     @Composable
     override fun Content() {
         val viewModel: ChatViewModel = koinInject()
-        val profile = viewModel.profile.collectAsState(initial = ProfileDTO("1")).value
+        val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
         
         
         LaunchedEffect(key1 = viewModel) {
-            viewModel.wsConnect()
-            
-            
-            delay(2000)
             viewModel.getMessagesBack(chat.id)
+
         }
+        
         
         
         var selectedMessage by remember { mutableStateOf<MessageItem?>(null) }
