@@ -81,14 +81,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     method = HttpMethod.Get,
                     host = "videotradedev.ru",
                     port = 3006,
-                    path = "/ws",
+                    path = "/ws?callerId=${callerId.value}",
+                    
+                    
                     
 //                    host = "192.168.31.223",
 //                    port = 3001,
 //                    path = "/message",
-                    request = {
-                        url.parameters.append("callerId", callerId.value)
-                    }
+                
                 ) {
                     _wsSession.value = this
                     isConnected.value = true
