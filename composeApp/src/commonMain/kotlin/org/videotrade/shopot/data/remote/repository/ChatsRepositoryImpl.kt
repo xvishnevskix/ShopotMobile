@@ -3,6 +3,7 @@ package org.videotrade.shopot.data.remote.repository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.LocalDateTime
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatsRepository
@@ -29,12 +30,14 @@ class ChatsRepositoryImpl : ChatsRepository {
         _chats.update { currentChats ->
             currentChats.map { chatItem ->
                 if (chatItem.chatId == messageItem.chatId) {
-                    chatItem.copy(lastMessage = messageItem.content)
+                    chatItem.copy(lastMessage = messageItem)
                 } else {
                     chatItem
                 }
             }
         }
+        
+        sortChatsByLastMessageCreated()
     }
     
     
@@ -52,6 +55,15 @@ class ChatsRepositoryImpl : ChatsRepository {
     override fun addChats(chatsInit: MutableList<ChatItem>) {
         _chats.value = chatsInit
         
+    }
+    
+
+    
+
+    fun sortChatsByLastMessageCreated() {
+//        _chats.value = _chats.value.sortedWith(compareByDescending { chatItem ->
+//            chatItem.lastMessage?.created?.toLocalDateTimeOrNull() ?: EARLY_DATE
+//        })
     }
     
 }

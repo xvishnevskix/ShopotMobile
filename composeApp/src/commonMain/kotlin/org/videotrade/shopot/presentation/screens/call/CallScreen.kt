@@ -136,7 +136,7 @@ class CallScreen(private val chat: ChatItem) : Screen {
                         if (viewModel.wsSession.value != null) {
                             answerCall(
                                 viewModel.wsSession.value, answer,
-                                viewModel.getOtherUserId().toString()
+                                viewModel.getOtherUserId()
                             )
                         }
                     }

@@ -28,6 +28,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -71,18 +72,25 @@ fun UserComponentItem(chat: ChatItem) {
                 
                 )
                 
-                Text(
-                    chat.lastMessage,
-                    textAlign = TextAlign.Center,
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    color = Color(0xFF979797),
-                    modifier = Modifier.padding(top = 5.dp)
                 
-                )
-            }
+                val messageContent = chat.lastMessage?.content ?: "Начните переписку"
+                
+                
+                    Text(
+                        messageContent,
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        lineHeight = 20.sp,
+                        color = Color(0xFF979797),
+                        modifier = Modifier.padding(top = 5.dp)
+                    
+                    )
+                    
+               
+                }
+            
         }
         
         Row {
@@ -104,16 +112,19 @@ fun UserComponentItem(chat: ChatItem) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(top = 9.dp)
             ) {
-//                Text(
-//                    "12:40",
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 14.sp,
-//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                    lineHeight = 20.sp,
-//                    color = Color(0xFF979797),
-//
-//                    )
+                chat.lastMessage?.let {
+                    
+                    Text(
+                        formatTimestamp(it.created),
+                        textAlign = TextAlign.Center,
+                        fontSize = 14.sp,
+                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        lineHeight = 20.sp,
+                        color = Color(0xFF979797),
+                        
+                        )
+                }
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))

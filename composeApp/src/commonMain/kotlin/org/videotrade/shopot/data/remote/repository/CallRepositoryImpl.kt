@@ -105,7 +105,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 when (type) {
                                     "newCall" -> {
                                         
-                                        println("sadada")
+                                        println("newCall")
                                         
                                         rtcMessage?.let {
                                             val sdp = it["sdp"]?.jsonPrimitive?.content ?: return@launch

@@ -69,6 +69,8 @@ suspend fun handleWebRTCWebSocket(
                                 "getUserChats" -> {
                                     try {
                                         
+                                        
+                                        
                                         val dataJson = jsonElement.jsonObject["data"]?.jsonArray
                                         
                                         val chats = mutableListOf<ChatItem>()
@@ -82,6 +84,9 @@ suspend fun handleWebRTCWebSocket(
                                             val contactsMap = contactsUseCase.contacts.value.associateBy {
                                                 normalizePhoneNumber(it.phone)
                                             }
+                                            
+                                            
+                                            println("sortChat $jsonElement $contactsMap")
                                             
                                             for (chatItem in dataJson) {
                                                 val chat: ChatItem =
@@ -119,7 +124,6 @@ suspend fun handleWebRTCWebSocket(
                                 "getMessages" -> {
                                     try {
                                         
-                                        println("jsonElement $jsonElement ")
                                         
                                         val dataJson =
                                             jsonElement.jsonObject["data"]?.jsonArray
@@ -167,8 +171,12 @@ suspend fun handleWebRTCWebSocket(
                                         if (messageJson != null) {
                                             
                                             
+                                            println("tttt ${messageJson}")
+                                            
+                                            
                                             val message: MessageItem =
                                                 Json.decodeFromString(messageJson.toString())
+                                            
                                             
                                             
                                             chatUseCase.addMessage(message)// Инициализация сообщений

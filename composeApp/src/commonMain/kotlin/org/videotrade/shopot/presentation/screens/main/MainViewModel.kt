@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ChatItem
@@ -31,7 +32,6 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     
     val profile = MutableStateFlow<ProfileDTO?>(null)
-
     
     
     init {
@@ -48,15 +48,42 @@ class MainViewModel : ViewModel(), KoinComponent {
             }
         }
     }
+
+//    private fun observeUsers() {
+//        userUseCase.chats.onEach { newUsers ->
+//            _chats.value = newUsers
+//
+//        }.launchIn(viewModelScope)
+//
+//    }
+    
+    
+    private fun List<Int>.toLocalDateTimeOrNull(): LocalDateTime? {
+        return if (this.size >= 6) {
+            LocalDateTime(
+                this[0],
+                this[1],
+                this[2],
+                this[3],
+                this[4],
+                this[5],
+                this.getOrNull(6) ?: 0
+            )
+        } else {
+            null
+        }
+    }
+    
+    private val EARLY_DATE = LocalDateTime(1970, 1, 1, 0, 0, 0)
     
     private fun observeUsers() {
         userUseCase.chats.onEach { newUsers ->
-            _chats.value = newUsers
-            
+            _chats.value = newUsers.sortedByDescending { chat ->
+                chat.lastMessage?.created?.toLocalDateTimeOrNull() ?: EARLY_DATE
+            }
         }.launchIn(viewModelScope)
-        
     }
-
+    
     
     fun connectionWs(userId: String) {
         viewModelScope.launch {
@@ -96,5 +123,5 @@ class MainViewModel : ViewModel(), KoinComponent {
             _chats.value = userUseCase.chats.value
         }
     }
-
+    
 }

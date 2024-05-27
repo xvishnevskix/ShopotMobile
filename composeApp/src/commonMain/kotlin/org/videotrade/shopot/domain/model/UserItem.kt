@@ -12,7 +12,7 @@ data class ChatItem(
     var phone: String,
     var unread: Int,
     var notificationToken: String,
-    var lastMessage: String,
+    var lastMessage: MessageItem?,
     var chatId: String,
 )
 
@@ -21,7 +21,7 @@ data class ChatItem(
 //@Serializable
 //data class ChatItem(
 //    val id: String,
-//    val firstUserId: String,
+//    val firstUserId: String,,...
 //    val secondUserId: String,
 //    val createdAt: Long,
 //

@@ -1,5 +1,8 @@
 package org.videotrade.shopot.presentation.components.Main
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,17 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
@@ -29,36 +29,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.presentation.components.Main.UserComponentItem
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.double_message_check
 import shopot.composeapp.generated.resources.smart_encryption
 
 @Composable
 fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
-    
-    
     val chatState = viewModel.chats.collectAsState(initial = listOf()).value
     
-//    LaunchedEffect(viewModel._wsSession.value) {
-//
-//        println("dasdadada ${viewModel._wsSession.value}")
-//    }
-//
-
     SafeArea {
-
-
-        Column(
-
-        ) {
+        Column {
             HeaderMain(drawerState)
-
+            
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -73,15 +58,18 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                     lineHeight = 20.sp,
                     color = Color(0xFF000000)
                 )
-
-
+                
                 LazyColumn {
                     items(chatState) { item ->
-                        // Разметка для всех элементов списка
-                        UserComponentItem(item)
+                        AnimatedVisibility(
+                            visible = true,
+                            enter = fadeIn(),
+                            exit = fadeOut()
+                        ) {
+                            UserComponentItem(item)
+                        }
                     }
                     item {
-                        // Разметка для дополнительного элемента в конце списка
                         Column(
                             modifier = Modifier.padding(top = 40.dp, bottom = 10.dp).fillMaxWidth(),
                             horizontalAlignment = Alignment.CenterHorizontally,
@@ -90,7 +78,6 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                             Row(
                                 horizontalArrangement = Arrangement.Center,
                                 verticalAlignment = Alignment.CenterVertically,
-
                             ) {
                                 Image(
                                     modifier = Modifier.size(27.dp),
@@ -98,9 +85,7 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                                     contentDescription = null,
                                 )
                             }
-                            Row(
-
-                            ) {
+                            Row {
                                 Text(
                                     "Все чаты зашифрованы  ",
                                     textAlign = TextAlign.Center,
@@ -124,10 +109,7 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                         }
                     }
                 }
-
             }
-
         }
     }
-
 }
