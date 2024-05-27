@@ -43,6 +43,7 @@ import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Call.Video
+import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -83,20 +84,21 @@ class CallScreen(private val chat: ChatItem) : Screen {
         
         val localVideoTrack = localStream?.videoTracks?.firstOrNull()
         
-        Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            
-            Text(viewModel.getCallerId())
-            
-            
-            BasicTextField(
-                value = text,
-                onValueChange = { text = it },
-                textStyle = TextStyle(
-                    color = Color.Black,
-                    fontSize = 16.sp
-                ), // Простой чёрный текст
-                cursorBrush = SolidColor(Color.Black), // Чёрный цвет курсора
-                visualTransformation = VisualTransformation.None, // Без визуальных преобразований
+   SafeArea {
+       Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+           
+           Text(viewModel.getCallerId())
+           
+           
+           BasicTextField(
+               value = text,
+               onValueChange = { text = it },
+               textStyle = TextStyle(
+                   color = Color.Black,
+                   fontSize = 16.sp
+               ), // Простой чёрный текст
+               cursorBrush = SolidColor(Color.Black), // Чёрный цвет курсора
+               visualTransformation = VisualTransformation.None, // Без визуальных преобразований
 //                decorationBox = { innerTextField ->
 //                    Box {
 //                        if (text.isEmpty()) {
@@ -114,57 +116,58 @@ class CallScreen(private val chat: ChatItem) : Screen {
 //                        innerTextField() // Основное текстовое поле
 //                    }
 //                }
-            )
-            
-            
-            localVideoTrack?.let { Video(track = it, modifier = Modifier.weight(1f)) }
-                ?: Box(modifier = Modifier.weight(1f))
-            
-            remoteVideoTrack?.let { Video(track = it, modifier = Modifier.weight(1f)) }
-                ?: Box(modifier = Modifier.weight(1f))
-            
-            if (inCommingCall) {
-                Button(onClick = {
-                    scope.launch {
-                        val answer = peerConnections.createAnswer(
-                            options = OfferAnswerOptions(
-                                offerToReceiveVideo = true,
-                                offerToReceiveAudio = true
-                            )
-                        )
-                        peerConnections.setLocalDescription(answer)
-                        if (viewModel.wsSession.value != null) {
-                            answerCall(
-                                viewModel.wsSession.value, answer,
-                                viewModel.getOtherUserId()
-                            )
-                        }
-                    }
-                }, content = {
-                    Text("inCommingCall")
-                }, modifier = Modifier.weight(0.4f))
-            }
-            
-            CallButton({
-                scope.launch {
-                    viewModel.updateOtherUserId(text)
-                    
-                    val offer = peerConnections.createOffer(
-                        OfferAnswerOptions(
-                            offerToReceiveVideo = true,
-                            offerToReceiveAudio = true
-                        )
-                    )
-                    peerConnections.setLocalDescription(offer)
-                    if (viewModel.wsSession.value != null) {
-                        makeCall(
-                            viewModel.wsSession.value, offer,
-                            text
-                        )
-                    }
-                }
-            })
-        }
+           )
+           
+           
+           localVideoTrack?.let { Video(track = it, modifier = Modifier.weight(1f)) }
+               ?: Box(modifier = Modifier.weight(1f))
+           
+           remoteVideoTrack?.let { Video(track = it, modifier = Modifier.weight(1f)) }
+               ?: Box(modifier = Modifier.weight(1f))
+           
+           if (inCommingCall) {
+               Button(onClick = {
+                   scope.launch {
+                       val answer = peerConnections.createAnswer(
+                           options = OfferAnswerOptions(
+                               offerToReceiveVideo = true,
+                               offerToReceiveAudio = true
+                           )
+                       )
+                       peerConnections.setLocalDescription(answer)
+                       if (viewModel.wsSession.value != null) {
+                           answerCall(
+                               viewModel.wsSession.value, answer,
+                               viewModel.getOtherUserId()
+                           )
+                       }
+                   }
+               }, content = {
+                   Text("inCommingCall")
+               }, modifier = Modifier.weight(0.4f))
+           }
+           
+           CallButton({
+               scope.launch {
+                   viewModel.updateOtherUserId(text)
+                   
+                   val offer = peerConnections.createOffer(
+                       OfferAnswerOptions(
+                           offerToReceiveVideo = true,
+                           offerToReceiveAudio = true
+                       )
+                   )
+                   peerConnections.setLocalDescription(offer)
+                   if (viewModel.wsSession.value != null) {
+                       makeCall(
+                           viewModel.wsSession.value, offer,
+                           text
+                       )
+                   }
+               }
+           })
+       }
+   }
     }
 }
 

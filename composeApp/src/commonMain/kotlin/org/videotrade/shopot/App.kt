@@ -136,23 +136,23 @@ internal fun App() = AppTheme {
 //                ChatScreen(
 //                ChatItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
 //                )
-//                CallScreen(
-//                    ChatItem(
-//                        "2",
-//                        true,
-//                        "",
-//                        "Мансур",
-//                        "Дандаев",
-//                        "",
-//                        2,
-//                        "10",
-//                        "",
-//                        "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
-//                    )
-//                )
+                CallScreen(
+                    ChatItem(
+                        "2",
+                        true,
+                        "",
+                        "Мансур",
+                        "Дандаев",
+                        "",
+                        2,
+                        "10",
+                        null,
+                        "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
+                    )
+                )
 
 //                MainScreen()
-                        IntroScreen()
+//                        IntroScreen()
 //                                SignUpScreen("+79388899885")
                 //CallScreen()
                 // IncomingCallScreen()

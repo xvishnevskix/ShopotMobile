@@ -61,13 +61,15 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                 
                 LazyColumn {
                     items(chatState) { item ->
-                        AnimatedVisibility(
-                            visible = true,
-                            enter = fadeIn(),
-                            exit = fadeOut()
-                        ) {
-                            UserComponentItem(item)
-                        }
+//                        AnimatedVisibility(
+//                            visible = true,
+//                            enter = fadeIn(),
+//                            exit = fadeOut()
+//                        ) {
+//                        }
+//
+                        UserComponentItem(item)
+                        
                     }
                     item {
                         Column(
