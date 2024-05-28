@@ -109,14 +109,14 @@ class IncomingCallScreen(private val userId: String) : Screen {
 //                        .padding(horizontal = 50.dp)
 //                ) {
 //                    rejectBtn { /* Handle reject */ }
-//                    aceptBtn {
+                    aceptBtn {
                     navigator.push(
                         CallScreen(
                             userId,
                             "IncomingCall"
                         )
                     )
-//                    }
+                    }
 //                }
             }
         }

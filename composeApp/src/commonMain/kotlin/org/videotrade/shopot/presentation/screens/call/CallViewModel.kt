@@ -1,6 +1,5 @@
 package org.videotrade.shopot.presentation.screens.call
 
-import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.MediaStreamTrackKind
@@ -28,7 +27,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
@@ -54,7 +52,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
-
     
     private fun observeWsConnection() {
         callUseCase.wsSession
@@ -219,36 +216,35 @@ class CallViewModel() : ViewModel(), KoinComponent {
             if (wsSession.value != null) {
                 
                 try {
-                
-                println("111111111 ${peerConnection.value}")
-                val answer = peerConnection.value.createAnswer(
-                    options = OfferAnswerOptions(
-                        offerToReceiveVideo = true,
-                        offerToReceiveAudio = true
+                    
+                    val otherUserId = getOtherUserId()
+                    
+                    
+                    val answer = peerConnection.value.createAnswer(
+                        options = OfferAnswerOptions(
+                            offerToReceiveVideo = true,
+                            offerToReceiveAudio = true
+                        )
                     )
-                )
-                println("222222222")
-                
-                peerConnection.value.setLocalDescription(answer)
-                
-                println("3333333")
-                
-                if (wsSession.value?.outgoing?.isClosedForSend == true) {
-                    return@launch
-                }
-                println("4444444")
-                
-                val answerCallMessage = WebRTCMessage(
-                    type = "answerCall",
-                    callerId = getOtherUserId(),
-                    rtcMessage = SessionDescriptionDTO(answer.type, answer.sdp)
-                )
-                println("55555555")
-                
-                println("answerCallMessage $answerCallMessage")
-                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
-                
-                
+                    
+                    peerConnection.value.setLocalDescription(answer)
+                    
+                    
+                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                        return@launch
+                    }
+                    
+                    val answerCallMessage = WebRTCMessage(
+                        type = "answerCall",
+                        callerId = otherUserId,
+                        rtcMessage = SessionDescriptionDTO(answer.type, answer.sdp)
+                    )
+                    
+                    println("answerCallMessage $answerCallMessage")
+                    val jsonMessage =
+                        Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
+                    
+                    
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     println("Message sent successfully")
                 } catch (e: Exception) {

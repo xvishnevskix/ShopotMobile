@@ -27,6 +27,7 @@ import org.koin.core.component.KoinComponent
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
 import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
@@ -105,7 +106,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 
                                 when (type) {
                                     "newCall" -> {
-                                        
                                         rtcMessage?.let {
                                             val sdp =
                                                 it["sdp"]?.jsonPrimitive?.content ?: return@launch
@@ -116,15 +116,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 SessionDescriptionType.Offer,
                                                 sdp
                                             )
-//                                            _peerConnection.value.setRemoteDescription(offer)
+                                            _peerConnection.value.setRemoteDescription(offer)
                                             
                                             callerId?.let { userId ->
                                                 
-                                                println("newCall $navigator")
                                                 
                                                 otherUserId.value = userId
                                                 
-                                                navigator.push(CallScreen(userId, "IncomingCall"))
+                                                navigator.push(IncomingCallScreen(userId))
                                             }
                                             
                                             
@@ -139,7 +138,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 SessionDescriptionType.Answer,
                                                 sdp
                                             )
-                                            Logger.d("rtcMessage31313 $answer")
                                             _peerConnection.value.setRemoteDescription(answer)
                                         }
                                     }
