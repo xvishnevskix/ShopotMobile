@@ -154,97 +154,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
             
         }
     }
-
-
-//    suspend fun initWebrtc(
-//        webSocketSession: StateFlow<DefaultClientWebSocketSession?>,
-//        peerConnection: PeerConnection,
-//        localStream: MediaStream,
-//        setRemoteVideoTrack: (VideoStreamTrack?) -> Unit,
-//        hasExecutedTwo: MutableState<Boolean>,
-//    ): Nothing = coroutineScope {
-//
-//        localStream.tracks.forEach { track ->
-//            peerConnection.addTrack(track, localStream)
-//        }
-//
-//
-//
-//
-//        // Обработка кандидатов ICE
-//        peerConnection.onIceCandidate
-//            .onEach { candidate ->
-//                Logger.d { "PC2213131" }
-//
-//                val iceCandidateMessage = WebRTCMessage(
-//                    type = "ICEcandidate",
-//                    calleeId = getOtherUserId(),
-//                    iceMessage = rtcMessageDTO(
-//                        label = candidate.sdpMLineIndex,
-//                        id = candidate.sdpMid,
-//                        candidate = candidate.candidate,
-//                    ),
-//                )
-//
-//
-//                val jsonMessage =
-//                    Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
-//
-//                try {
-//
-//                    Logger.d { "PC2213131:${jsonMessage}" }
-//
-//                    webSocketSession.value?.send(Frame.Text(jsonMessage))
-//                    println("Message sent successfully")
-//                } catch (e: Exception) {
-//                    println("Failed to send message: ${e.message}")
-//                }
-//
-//                peerConnection.addIceCandidate(candidate)
-//            }
-//            .launchIn(this)
-//
-//        // Следим за изменениями состояния сигнализации
-//        peerConnection.onSignalingStateChange
-//            .onEach { signalingState ->
-//                Logger.d { "peerState111 onSignalingStateChange: $signalingState" }
-//
-//                if (signalingState == SignalingState.HaveRemoteOffer) {
-//                    Logger.d { " peer2 signalingState: $signalingState" }
-//                }
-//            }
-//            .launchIn(this)
-//
-//        // Следим за изменениями состояния соединения ICE
-//        peerConnection.onIceConnectionStateChange
-//            .onEach { state ->
-//                Logger.d { "peerState111 onIceConnectionStateChange: $state" }
-//            }
-//            .launchIn(this)
-//
-//        // Следим за изменениями общего состояния соединения
-//        peerConnection.onConnectionStateChange
-//            .onEach { state ->
-//                Logger.d { "peerState111 onConnectionStateChange: $state" }
-//            }
-//            .launchIn(this)
-//
-//
-//        // Обработка треков, получаемых от удалённого пира
-//        peerConnection.onTrack
-//            .onEach { event ->
-//                Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
-//                if (event.track?.kind == MediaStreamTrackKind.Video) {
-//                    setRemoteVideoTrack(event.track as VideoStreamTrack)
-//                }
-//            }
-//            .launchIn(this)
-//
-//        hasExecutedTwo.value = true
-//
-//        awaitCancellation()  // Поддерживаем корутину активной
-//    }
-    
     
     @OptIn(DelicateCoroutinesApi::class)
     fun makeCall(userId: String) {
@@ -252,7 +161,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
             if (wsSession.value != null) {
                 val offer = peerConnection.value.createOffer(
                     OfferAnswerOptions(
-                        offerToReceiveVideo = true,
+//                        offerToReceiveVideo = true,
                         offerToReceiveAudio = true
                     )
                 )
@@ -298,7 +207,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                     
                     val answer = peerConnection.value.createAnswer(
                         options = OfferAnswerOptions(
-                            offerToReceiveVideo = true,
+//                            offerToReceiveVideo = true,
                             offerToReceiveAudio = true
                         )
                     )

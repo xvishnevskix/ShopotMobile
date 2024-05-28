@@ -31,9 +31,9 @@ class CallScreen(
         val viewModel: CallViewModel = koinInject()
         val wsSession by viewModel.wsSession.collectAsState()
         val localStream by viewModel.localStream.collectAsState()
-        val remoteVideoTrack by viewModel.remoteVideoTrack.collectAsState()
-        
-        val localVideoTrack = localStream?.videoTracks?.firstOrNull()
+//        val remoteVideoTrack by viewModel.remoteVideoTrack.collectAsState()
+//
+//        val localVideoTrack = localStream?.videoTracks?.firstOrNull()
         
         val hasExecuted = remember { mutableStateOf(false) }
         
@@ -66,11 +66,11 @@ class CallScreen(
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 
                 
-                localVideoTrack?.let { Video(track = it, modifier = Modifier.weight(0.4f)) }
-                    ?: Box(modifier = Modifier.weight(0.5f))
-                
-                remoteVideoTrack?.let { Video(track = it, modifier = Modifier.weight(0.4f)) }
-                    ?: Box(modifier = Modifier.weight(0.5f))
+//                localVideoTrack?.let { Video(track = it, modifier = Modifier.weight(0.4f)) }
+//                    ?: Box(modifier = Modifier.weight(0.5f))
+//
+//                remoteVideoTrack?.let { Video(track = it, modifier = Modifier.weight(0.4f)) }
+//                    ?: Box(modifier = Modifier.weight(0.5f))
                 
                 
             }
