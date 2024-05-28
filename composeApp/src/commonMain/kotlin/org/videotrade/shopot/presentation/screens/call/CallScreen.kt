@@ -26,30 +26,22 @@ class CallScreen(
     
     @Composable
     override fun Content() {
-
-
+        
+        
         val viewModel: CallViewModel = koinInject()
         val wsSession by viewModel.wsSession.collectAsState()
         val localStream by viewModel.localStream.collectAsState()
         val remoteVideoTrack by viewModel.remoteVideoTrack.collectAsState()
         
+        val localVideoTrack = localStream?.videoTracks?.firstOrNull()
+        
         val hasExecuted = remember { mutableStateOf(false) }
-
-
-
-
-
-
-
-
         
         
         LaunchedEffect(wsSession) {
             
             
             if (!hasExecuted.value && wsSession != null) {
-                
-                
                 when (callCase) {
                     "Call" -> {
                         viewModel.initWebrtc()
@@ -65,12 +57,11 @@ class CallScreen(
                 hasExecuted.value = true
             }
         }
-
-
-//        }
         
         
-        val localVideoTrack = localStream?.videoTracks?.firstOrNull()
+        
+        
+        
         SafeArea {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 
