@@ -77,6 +77,9 @@ class CallScreen(
             
             
             
+            println("pspspsp ${viewModel.wsSession} /// ${viewModel.peerConnection.value} /// $localStream //// $setRemoteVideoTrack")
+            
+            
             viewModel.initWebrtc(
                 viewModel.wsSession,
                 viewModel.peerConnection.value,
