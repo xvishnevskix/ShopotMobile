@@ -107,7 +107,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
         // Обработка кандидатов ICE
         peerConnection.onIceCandidate
             .onEach { candidate ->
-                Logger.d { "PC2213131:${getOtherUserId()}" }
                 
                 val iceCandidateMessage = WebRTCMessage(
                     type = "ICEcandidate",
@@ -124,6 +123,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
                     Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
                 
                 try {
+                    
+                    Logger.d { "PC2213131:${jsonMessage}" }
+                    
                     webSocketSession.value?.send(Frame.Text(jsonMessage))
                     println("Message sent successfully")
                 } catch (e: Exception) {

@@ -144,7 +144,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     
                                     "ICEcandidate" -> {
                                         rtcMessage?.let {
-                                            Logger.d("ICEcandidate313131 $rtcMessage")
+                                            Logger.d("ICEcandidate111111 $rtcMessage")
                                             val jsonElement =
                                                 Json.parseToJsonElement(rtcMessage.toString())
                                             val label =

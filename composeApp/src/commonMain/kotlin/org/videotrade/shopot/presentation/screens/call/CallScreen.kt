@@ -44,6 +44,29 @@ class CallScreen(
         
         
         
+        LaunchedEffect(localStream == null) {
+            val stream = MediaDevices.getUserMedia(audio = true, video = true)
+            setLocalStream(stream)
+        }
+        
+        LaunchedEffect(localStream) {
+            if (localStream == null) return@LaunchedEffect
+            
+            
+            
+            println("pspspsp ${viewModel.wsSession} /// ${viewModel.peerConnection.value} /// $localStream //// $setRemoteVideoTrack")
+            
+            
+            viewModel.initWebrtc(
+                viewModel.wsSession,
+                viewModel.peerConnection.value,
+                localStream,
+                setRemoteVideoTrack,
+            )
+        }
+        
+        
+        
         LaunchedEffect(wsSession) {
             
             
@@ -67,27 +90,7 @@ class CallScreen(
 
 //        }
         
-        LaunchedEffect(localStream == null) {
-            val stream = MediaDevices.getUserMedia(audio = true, video = true)
-            setLocalStream(stream)
-        }
-        
-        LaunchedEffect(localStream) {
-            if (localStream == null) return@LaunchedEffect
-            
-            
-            
-            println("pspspsp ${viewModel.wsSession} /// ${viewModel.peerConnection.value} /// $localStream //// $setRemoteVideoTrack")
-            
-            
-            viewModel.initWebrtc(
-                viewModel.wsSession,
-                viewModel.peerConnection.value,
-                localStream,
-                setRemoteVideoTrack,
-            )
-        }
-
+   
         val localVideoTrack = localStream?.videoTracks?.firstOrNull()
 //
         SafeArea {
