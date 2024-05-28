@@ -1,9 +1,11 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import androidx.compose.runtime.collectAsState
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -43,12 +45,32 @@ class CallViewModel() : ViewModel(), KoinComponent {
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = _remoteVideoTrack
     
     
+    private val _callState = MutableStateFlow(PeerConnectionState.New)
+    val callState: StateFlow<PeerConnectionState> get() = _callState
+    
+    
     init {
         viewModelScope.launch {
+            
+            observeCallState()
             observeWsConnection()
             observeIsConnectedWebrtc()
             observeStreems()
         }
+    }
+    
+    
+    private fun observeCallState() {
+        
+        callUseCase.callState
+            .onEach { callStateNew ->
+                
+                _callState.value = callStateNew
+                
+                println("callStateNew $callStateNew")
+                
+            }
+            .launchIn(viewModelScope)
     }
     
     

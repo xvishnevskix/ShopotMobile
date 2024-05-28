@@ -21,7 +21,7 @@ import shopot.composeapp.generated.resources.rejectCall
 import shopot.composeapp.generated.resources.svgviewer_png_output
 
 @Composable
-fun rejectBtn(onClick: () -> Unit) {
+fun rejectBtn(onClick: () -> Unit, text: String= "Отменить") {
     Column {
         Button(
             onClick = onClick,
@@ -38,7 +38,7 @@ fun rejectBtn(onClick: () -> Unit) {
         }
         Text(
             modifier = Modifier.padding(top = 25.dp),
-            text = "Отменить",
+            text = text,
             fontSize = 16.sp,
             color = Color(255, 255, 255)
         )

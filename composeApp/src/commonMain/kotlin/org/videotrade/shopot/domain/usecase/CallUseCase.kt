@@ -3,6 +3,7 @@ package org.videotrade.shopot.domain.usecase
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +19,8 @@ class CallUseCase : KoinComponent {
     val isConnectedWebrtc: StateFlow<Boolean> get() = repository.isConnectedWebrtc
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
+    val callState: StateFlow<PeerConnectionState> get() = repository.callState
+    
     
     
     suspend fun connectionWs(userId: String, navigator: Navigator) {

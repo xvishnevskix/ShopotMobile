@@ -3,6 +3,7 @@ package org.videotrade.shopot.domain.repository
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
@@ -21,6 +22,8 @@ interface CallRepository {
     val localStream: StateFlow<MediaStream?>
     
     val remoteVideoTrack: StateFlow<VideoStreamTrack?>
+    
+    val callState: StateFlow<PeerConnectionState>
     
     
     

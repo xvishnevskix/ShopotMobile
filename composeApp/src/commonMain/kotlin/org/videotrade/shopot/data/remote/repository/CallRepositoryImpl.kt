@@ -9,6 +9,7 @@ import com.shepeliev.webrtckmp.MediaDevices
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.MediaStreamTrackKind
 import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.RtcConfiguration
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
@@ -96,6 +97,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _isConnectedWebrtc = MutableStateFlow(false)
     
     override val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
+    
+    
+    private val _callState = MutableStateFlow(PeerConnectionState.New)
+    
+    override val callState: StateFlow<PeerConnectionState> get() = _callState
     
     
     override suspend fun reconnectPeerConnection() {
@@ -284,6 +290,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         peerConnection.value.onConnectionStateChange
             .onEach { state ->
                 Logger.d { "peerState111 onConnectionStateChange: $state" }
+                
+                
+                _callState.value = state
+                
             }
             .launchIn(this)
         
