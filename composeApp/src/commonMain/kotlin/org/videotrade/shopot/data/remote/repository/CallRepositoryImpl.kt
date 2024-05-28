@@ -5,10 +5,20 @@ import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.IceServer
+import com.shepeliev.webrtckmp.MediaDevices
+import com.shepeliev.webrtckmp.MediaStream
+import com.shepeliev.webrtckmp.MediaStreamTrackKind
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.RtcConfiguration
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
+import com.shepeliev.webrtckmp.SignalingState
+import com.shepeliev.webrtckmp.VideoStreamTrack
+import com.shepeliev.webrtckmp.onConnectionStateChange
+import com.shepeliev.webrtckmp.onIceCandidate
+import com.shepeliev.webrtckmp.onIceConnectionStateChange
+import com.shepeliev.webrtckmp.onSignalingStateChange
+import com.shepeliev.webrtckmp.onTrack
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
@@ -16,8 +26,12 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.int
@@ -25,8 +39,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.component.KoinComponent
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.domain.model.WebRTCMessage
+import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
-import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
 import kotlin.random.Random
 
@@ -74,9 +89,29 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _inCommingCall = MutableStateFlow(false)
     override val inCommingCall: StateFlow<Boolean> get() = _inCommingCall
     
+    private val offer = MutableStateFlow<SessionDescription?>(null)
+    
+    override val localStream = MutableStateFlow<MediaStream?>(null)
+    
+    override val remoteVideoTrack = MutableStateFlow<VideoStreamTrack?>(null)
+    
+    
+    private val _isConnectedWebrtc = MutableStateFlow(false)
+    
+    override val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
+    
+    
     override suspend fun reconnectPeerConnection() {
         // Переподключение PeerConnection
         _peerConnection.value = PeerConnection(rtcConfiguration)
+    }
+    
+    override suspend fun setOffer() {
+        
+        Logger.d { "onTrack:1111" }
+        
+        offer.value?.let { _peerConnection.value.setRemoteDescription(it) }
+        
     }
     
     override suspend fun connectionWs(userId: String, navigator: Navigator) {
@@ -112,18 +147,23 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             val callerId =
                                                 jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
                                             
-                                            val offer = SessionDescription(
+                                            offer.value = SessionDescription(
                                                 SessionDescriptionType.Offer,
                                                 sdp
                                             )
-                                            _peerConnection.value.setRemoteDescription(offer)
+                                            
+                                            
                                             
                                             callerId?.let { userId ->
                                                 
                                                 
                                                 otherUserId.value = userId
                                                 
+                                                _inCommingCall.value = true
+                                                
+                                                
                                                 navigator.push(IncomingCallScreen(userId))
+                                                
                                             }
                                             
                                             
@@ -176,6 +216,95 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 println("Ошибка соединения: $e")
             }
         }
+    }
+    
+    
+    override suspend fun initWebrtc(): Nothing = coroutineScope {
+        val stream = MediaDevices.getUserMedia(audio = true, video = true)
+        
+        localStream.value = stream
+        
+        
+        
+        stream.tracks.forEach { track ->
+            peerConnection.value.addTrack(track, localStream.value!!)
+        }
+        
+        
+        
+        _isConnectedWebrtc.value = true
+        // Обработка кандидатов ICE
+        peerConnection.value.onIceCandidate
+            .onEach { candidate ->
+                Logger.d { "PC2213131" }
+                
+                val iceCandidateMessage = WebRTCMessage(
+                    type = "ICEcandidate",
+                    calleeId = otherUserId.value,
+                    iceMessage = rtcMessageDTO(
+                        label = candidate.sdpMLineIndex,
+                        id = candidate.sdpMid,
+                        candidate = candidate.candidate,
+                    ),
+                )
+                
+                
+                val jsonMessage =
+                    Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
+                
+                try {
+                    
+                    Logger.d { "PC2213131:${jsonMessage}" }
+                    
+                    wsSession.value?.send(Frame.Text(jsonMessage))
+                    println("Message sent successfully")
+                } catch (e: Exception) {
+                    println("Failed to send message: ${e.message}")
+                }
+                
+                peerConnection.value.addIceCandidate(candidate)
+            }
+            .launchIn(this)
+        
+        // Следим за изменениями состояния сигнализации
+        peerConnection.value.onSignalingStateChange
+            .onEach { signalingState ->
+                Logger.d { "peerState111 onSignalingStateChange: $signalingState" }
+                
+                if (signalingState == SignalingState.HaveRemoteOffer) {
+                    Logger.d { " peer2 signalingState: $signalingState" }
+                }
+            }
+            .launchIn(this)
+        
+        // Следим за изменениями состояния соединения ICE
+        peerConnection.value.onIceConnectionStateChange
+            .onEach { state ->
+                Logger.d { "peerState111 onIceConnectionStateChange: $state" }
+            }
+            .launchIn(this)
+        
+        // Следим за изменениями общего состояния соединения
+        peerConnection.value.onConnectionStateChange
+            .onEach { state ->
+                Logger.d { "peerState111 onConnectionStateChange: $state" }
+            }
+            .launchIn(this)
+        
+        
+        // Обработка треков, получаемых от удалённого пира
+        peerConnection.value.onTrack
+            .onEach { event ->
+                Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
+                if (event.track?.kind == MediaStreamTrackKind.Video) {
+                    remoteVideoTrack.value = event.track as VideoStreamTrack
+                }
+            }
+            .launchIn(this)
+        
+        
+        
+        awaitCancellation()  // Поддерживаем корутину активной
     }
     
     override suspend fun getWsSession(): DefaultClientWebSocketSession? {

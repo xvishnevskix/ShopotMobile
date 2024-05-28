@@ -1,43 +1,14 @@
 package org.videotrade.shopot.presentation.screens.call
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
-import org.videotrade.shopot.presentation.components.Call.rejectBtn
-import org.videotrade.shopot.presentation.screens.call.CallScreen
-import org.videotrade.shopot.presentation.screens.call.CallViewModel
-import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.maksimus
 
 
 class IncomingCallScreen(private val userId: String) : Screen {
@@ -46,6 +17,23 @@ class IncomingCallScreen(private val userId: String) : Screen {
     override fun Content() {
 //        val photo: DrawableResource = Res.drawable.maksimus
         val navigator = LocalNavigator.currentOrThrow
+        
+        val viewModel: CallViewModel = koinInject()
+        val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
+        
+        LaunchedEffect(isConnectedWebrtc) {
+            
+            println("isConnectedWebrtc $isConnectedWebrtc")
+            if (isConnectedWebrtc)
+                navigator.push(
+                    CallScreen(
+                        userId,
+                        "IncomingCall"
+                    
+                    )
+                )
+        }
+
 //        val name = remember { "Максим Аркаев" }
 //
 //        Box(modifier = Modifier.fillMaxSize()) {
@@ -109,14 +97,12 @@ class IncomingCallScreen(private val userId: String) : Screen {
 //                        .padding(horizontal = 50.dp)
 //                ) {
 //                    rejectBtn { /* Handle reject */ }
-                    aceptBtn {
-                    navigator.push(
-                        CallScreen(
-                            userId,
-                            "IncomingCall"
-                        )
-                    )
-                    }
-//                }
-            }
+        aceptBtn {
+            
+            viewModel.initWebrtc()
+            
+            
         }
+//                }
+    }
+}

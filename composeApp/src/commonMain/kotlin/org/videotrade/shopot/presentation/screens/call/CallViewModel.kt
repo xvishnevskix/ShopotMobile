@@ -2,22 +2,13 @@ package org.videotrade.shopot.presentation.screens.call
 
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.MediaStream
-import com.shepeliev.webrtckmp.MediaStreamTrackKind
 import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnection
-import com.shepeliev.webrtckmp.SignalingState
 import com.shepeliev.webrtckmp.VideoStreamTrack
-import com.shepeliev.webrtckmp.onConnectionStateChange
-import com.shepeliev.webrtckmp.onIceCandidate
-import com.shepeliev.webrtckmp.onIceConnectionStateChange
-import com.shepeliev.webrtckmp.onSignalingStateChange
-import com.shepeliev.webrtckmp.onTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +20,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
-import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 
 class CallViewModel() : ViewModel(), KoinComponent {
@@ -45,13 +35,77 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val peerConnection: StateFlow<PeerConnection> get() = callUseCase.peerConnection
     
+    private val _isConnectedWebrtc = MutableStateFlow(false)
+    val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
+    
+    
+    private val _localStream = MutableStateFlow<MediaStream?>(null)
+    val localStream: StateFlow<MediaStream?> get() = _localStream
+    
+    
+    private val _remoteVideoTrack = MutableStateFlow<VideoStreamTrack?>(null)
+    val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = _remoteVideoTrack
+    
+    
+    
     
     init {
         viewModelScope.launch {
+   
             observeWsConnection()
+            observeIsConnectedWebrtc()
+            observeIncoming()
+            observeStreems()
         }
     }
     
+    
+    private fun observeStreems() {
+        callUseCase.localStream
+            .onEach { localStreamNew ->
+                
+                _localStream.value = localStreamNew
+                
+                println("_localStream $_localStream")
+                
+            }
+            .launchIn(viewModelScope)
+        
+        callUseCase.remoteVideoTrack
+            .onEach { remoteVideoTrackNew ->
+                
+                _remoteVideoTrack.value = remoteVideoTrackNew
+                
+                println("remoteVideoTrackNew $remoteVideoTrackNew")
+                
+            }
+            .launchIn(viewModelScope)
+    }
+    
+    private fun observeIsConnectedWebrtc() {
+        callUseCase.isConnectedWebrtc
+            .onEach { isConnectedWebrtcNew ->
+                
+                _isConnectedWebrtc.value = isConnectedWebrtcNew
+                
+                println("isConnectedWebrtcNew $isConnectedWebrtcNew")
+                
+            }
+            .launchIn(viewModelScope)
+    }
+    
+    
+    private fun observeIncoming() {
+        callUseCase.inCommingCall
+            .onEach { inCommingCallNew ->
+                
+                _inCommingCall.value = inCommingCallNew
+                
+                println("wsSessionNew1111 $inCommingCallNew")
+                
+            }
+            .launchIn(viewModelScope)
+    }
     
     private fun observeWsConnection() {
         callUseCase.wsSession
@@ -94,85 +148,102 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-    suspend fun initWebrtc(
-        webSocketSession: StateFlow<DefaultClientWebSocketSession?>,
-        peerConnection: PeerConnection,
-        localStream: MediaStream,
-        setRemoteVideoTrack: (VideoStreamTrack?) -> Unit,
-    ): Nothing = coroutineScope {
-        localStream.tracks.forEach { track ->
-            peerConnection.addTrack(track, localStream)
+    fun initWebrtc() {
+        viewModelScope.launch {
+            callUseCase.initWebrtc()
+            
         }
-        
-        // Обработка кандидатов ICE
-        peerConnection.onIceCandidate
-            .onEach { candidate ->
-                
-                val iceCandidateMessage = WebRTCMessage(
-                    type = "ICEcandidate",
-                    calleeId = getOtherUserId(),
-                    iceMessage = rtcMessageDTO(
-                        label = candidate.sdpMLineIndex,
-                        id = candidate.sdpMid,
-                        candidate = candidate.candidate,
-                    ),
-                )
-                
-                
-                val jsonMessage =
-                    Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
-                
-                try {
-                    
-                    Logger.d { "PC2213131:${jsonMessage}" }
-                    
-                    webSocketSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully")
-                } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
-                }
-                
-                peerConnection.addIceCandidate(candidate)
-            }
-            .launchIn(this)
-        
-        // Следим за изменениями состояния сигнализации
-        peerConnection.onSignalingStateChange
-            .onEach { signalingState ->
-                Logger.d { "PC1 onSignalingStateChange: $signalingState" }
-                
-                if (signalingState == SignalingState.HaveRemoteOffer) {
-                    Logger.d { " peer2 signalingState: $signalingState" }
-                }
-            }
-            .launchIn(this)
-        
-        // Следим за изменениями состояния соединения ICE
-        peerConnection.onIceConnectionStateChange
-            .onEach { state ->
-                Logger.d { "PC1 onIceConnectionStateChange: $state" }
-            }
-            .launchIn(this)
-        
-        // Следим за изменениями общего состояния соединения
-        peerConnection.onConnectionStateChange
-            .onEach { state ->
-                Logger.d { "PC1 onConnectionStateChange: $state" }
-            }
-            .launchIn(this)
-        
-        // Обработка треков, получаемых от удалённого пира
-        peerConnection.onTrack
-            .onEach { event ->
-                Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
-                if (event.track?.kind == MediaStreamTrackKind.Video) {
-                    setRemoteVideoTrack(event.track as VideoStreamTrack)
-                }
-            }
-            .launchIn(this)
-        
-        awaitCancellation()  // Поддерживаем корутину активной
     }
+
+
+//    suspend fun initWebrtc(
+//        webSocketSession: StateFlow<DefaultClientWebSocketSession?>,
+//        peerConnection: PeerConnection,
+//        localStream: MediaStream,
+//        setRemoteVideoTrack: (VideoStreamTrack?) -> Unit,
+//        hasExecutedTwo: MutableState<Boolean>,
+//    ): Nothing = coroutineScope {
+//
+//        localStream.tracks.forEach { track ->
+//            peerConnection.addTrack(track, localStream)
+//        }
+//
+//
+//
+//
+//        // Обработка кандидатов ICE
+//        peerConnection.onIceCandidate
+//            .onEach { candidate ->
+//                Logger.d { "PC2213131" }
+//
+//                val iceCandidateMessage = WebRTCMessage(
+//                    type = "ICEcandidate",
+//                    calleeId = getOtherUserId(),
+//                    iceMessage = rtcMessageDTO(
+//                        label = candidate.sdpMLineIndex,
+//                        id = candidate.sdpMid,
+//                        candidate = candidate.candidate,
+//                    ),
+//                )
+//
+//
+//                val jsonMessage =
+//                    Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
+//
+//                try {
+//
+//                    Logger.d { "PC2213131:${jsonMessage}" }
+//
+//                    webSocketSession.value?.send(Frame.Text(jsonMessage))
+//                    println("Message sent successfully")
+//                } catch (e: Exception) {
+//                    println("Failed to send message: ${e.message}")
+//                }
+//
+//                peerConnection.addIceCandidate(candidate)
+//            }
+//            .launchIn(this)
+//
+//        // Следим за изменениями состояния сигнализации
+//        peerConnection.onSignalingStateChange
+//            .onEach { signalingState ->
+//                Logger.d { "peerState111 onSignalingStateChange: $signalingState" }
+//
+//                if (signalingState == SignalingState.HaveRemoteOffer) {
+//                    Logger.d { " peer2 signalingState: $signalingState" }
+//                }
+//            }
+//            .launchIn(this)
+//
+//        // Следим за изменениями состояния соединения ICE
+//        peerConnection.onIceConnectionStateChange
+//            .onEach { state ->
+//                Logger.d { "peerState111 onIceConnectionStateChange: $state" }
+//            }
+//            .launchIn(this)
+//
+//        // Следим за изменениями общего состояния соединения
+//        peerConnection.onConnectionStateChange
+//            .onEach { state ->
+//                Logger.d { "peerState111 onConnectionStateChange: $state" }
+//            }
+//            .launchIn(this)
+//
+//
+//        // Обработка треков, получаемых от удалённого пира
+//        peerConnection.onTrack
+//            .onEach { event ->
+//                Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
+//                if (event.track?.kind == MediaStreamTrackKind.Video) {
+//                    setRemoteVideoTrack(event.track as VideoStreamTrack)
+//                }
+//            }
+//            .launchIn(this)
+//
+//        hasExecutedTwo.value = true
+//
+//        awaitCancellation()  // Поддерживаем корутину активной
+//    }
     
     
     @OptIn(DelicateCoroutinesApi::class)
@@ -219,6 +290,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
                 
                 try {
                     
+                    callUseCase.setOffer()
+                    
+                    
                     val otherUserId = getOtherUserId()
                     
                     
@@ -242,7 +316,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
                         rtcMessage = SessionDescriptionDTO(answer.type, answer.sdp)
                     )
                     
-                    println("answerCallMessage $answerCallMessage")
+                    Logger.d {
+                        "answerCallMessage $answerCallMessage"
+                    }
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
                     
