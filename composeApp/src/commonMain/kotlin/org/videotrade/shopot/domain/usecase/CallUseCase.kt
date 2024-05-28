@@ -12,8 +12,6 @@ import org.videotrade.shopot.domain.repository.CallRepository
 
 class CallUseCase : KoinComponent {
     private val repository: CallRepository by inject()
-    
-    val inCommingCall: StateFlow<Boolean> get() = repository.inCommingCall
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = repository.wsSession
     
     val peerConnection: StateFlow<PeerConnection> get() = repository.peerConnection
@@ -58,4 +56,9 @@ class CallUseCase : KoinComponent {
     suspend fun initWebrtc(): Nothing {
         repository.initWebrtc()
     }
+    
+     fun rejectCall() {
+        repository.rejectCall()
+    }
+    
 }

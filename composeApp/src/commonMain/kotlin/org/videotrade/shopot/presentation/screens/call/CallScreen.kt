@@ -12,6 +12,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.shepeliev.webrtckmp.videoTracks
 import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.components.Call.Video
@@ -34,6 +36,7 @@ class CallScreen(
 //        val remoteVideoTrack by viewModel.remoteVideoTrack.collectAsState()
 //
 //        val localVideoTrack = localStream?.videoTracks?.firstOrNull()
+        val navigator = LocalNavigator.currentOrThrow
         
         val hasExecuted = remember { mutableStateOf(false) }
         
@@ -45,7 +48,6 @@ class CallScreen(
                 when (callCase) {
                     "Call" -> {
                         viewModel.initWebrtc()
-                        
                         viewModel.updateOtherUserId(userId)
                         viewModel.makeCall(userId)
                     }

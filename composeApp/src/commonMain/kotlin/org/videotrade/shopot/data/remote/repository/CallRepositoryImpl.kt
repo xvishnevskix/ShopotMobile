@@ -86,9 +86,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _peerConnection = MutableStateFlow(PeerConnection(rtcConfiguration))
     override val peerConnection: StateFlow<PeerConnection> get() = _peerConnection
     
-    private val _inCommingCall = MutableStateFlow(false)
-    override val inCommingCall: StateFlow<Boolean> get() = _inCommingCall
-    
     private val offer = MutableStateFlow<SessionDescription?>(null)
     
     override val localStream = MutableStateFlow<MediaStream?>(null)
@@ -159,7 +156,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 
                                                 otherUserId.value = userId
                                                 
-                                                _inCommingCall.value = true
                                                 
                                                 
                                                 navigator.push(IncomingCallScreen(userId))
@@ -329,5 +325,21 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         otherUserId.value = userId
     }
+    
+    override fun rejectCall() {
+        // Закрываем PeerConnection
+        _peerConnection.value.close()
+        // Освобождаем все треки в локальных стримах
+        localStream.value?.let { stream ->
+            stream.tracks.forEach { track ->
+                track.stop()
+            }
+        }
+
+        localStream.value = null
+        remoteVideoTrack.value = null
+        _isConnectedWebrtc.value = false
+    }
+
     
 }

@@ -29,10 +29,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
     
     
-    private val _inCommingCall = MutableStateFlow(false)
-    val inCommingCall: StateFlow<Boolean> get() = _inCommingCall
-    
-    
     val peerConnection: StateFlow<PeerConnection> get() = callUseCase.peerConnection
     
     private val _isConnectedWebrtc = MutableStateFlow(false)
@@ -47,14 +43,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = _remoteVideoTrack
     
     
-    
-    
     init {
         viewModelScope.launch {
-   
             observeWsConnection()
             observeIsConnectedWebrtc()
-            observeIncoming()
             observeStreems()
         }
     }
@@ -95,18 +87,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-    private fun observeIncoming() {
-        callUseCase.inCommingCall
-            .onEach { inCommingCallNew ->
-                
-                _inCommingCall.value = inCommingCallNew
-                
-                println("wsSessionNew1111 $inCommingCallNew")
-                
-            }
-            .launchIn(viewModelScope)
-    }
-    
     private fun observeWsConnection() {
         callUseCase.wsSession
             .onEach { wsSessionNew ->
@@ -131,15 +111,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
             callUseCase.updateOtherUserId(userId)
         }
     }
-
-
-//    private fun getPeerConnection() {
-//        viewModelScope.launch {
-//            _peerConnection.value = callUseCase.getPeerConnection()
-//        }
-//    }
     
-    fun getOtherUserId(): String {
+    
+    private fun getOtherUserId(): String {
         return callUseCase.getOtherUserId()
     }
     
@@ -241,4 +215,11 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
         
     }
+    
+    fun rejectCall() {
+        viewModelScope.launch {
+            callUseCase.rejectCall()
+        }
+    }
+    
 }

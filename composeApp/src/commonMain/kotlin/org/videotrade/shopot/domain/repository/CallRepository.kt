@@ -12,9 +12,6 @@ interface CallRepository {
     
     val wsSession: StateFlow<DefaultClientWebSocketSession?>
     
-    
-    val inCommingCall: StateFlow<Boolean>
-    
     val peerConnection: StateFlow<PeerConnection>
     
     
@@ -44,6 +41,9 @@ interface CallRepository {
     
     fun updateOtherUserId(userId: String)
     suspend fun initWebrtc(): Nothing
+    
+    
+    fun rejectCall()
     
     
     
