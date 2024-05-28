@@ -29,7 +29,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Common.BackIcon
-import org.videotrade.shopot.presentation.components.Main.CallScreen
+import org.videotrade.shopot.presentation.screens.call.CallScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -39,7 +39,6 @@ fun ChatHeader(chat: ChatItem) {
     val interactionSource =
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
-    
     
     
     Row(
@@ -85,7 +84,11 @@ fun ChatHeader(chat: ChatItem) {
                 imageVector = Icons.Default.Call,
                 contentDescription = "Call",
                 modifier = Modifier.padding(end = 8.dp).size(20.dp).clickable {
-                    navigator.push(CallScreen(chat))
+                    
+                    
+                    println("userID : ${chat.userId}")
+                    
+                    navigator.push(CallScreen(chat.userId, "Call"))
                 }
             )
         }

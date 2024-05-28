@@ -48,9 +48,9 @@
 //import kotlinx.serialization.json.jsonPrimitive
 //import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
 //import org.videotrade.shopot.presentation.components.Call.Video
-//import org.videotrade.shopot.presentation.components.Main.answerCall
+//import org.videotrade.shopot.presentation.screens.call.answerCall
 //import org.videotrade.shopot.presentation.components.Main.hangup
-//import org.videotrade.shopot.presentation.components.Main.makeCall
+//import org.videotrade.shopot.presentation.screens.call.makeCall
 //
 //
 //fun showDeviceId(): String? {

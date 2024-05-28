@@ -1,10 +1,22 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
-import com.shepeliev.webrtckmp.*
+import com.shepeliev.webrtckmp.MediaStream
+import com.shepeliev.webrtckmp.MediaStreamTrackKind
+import com.shepeliev.webrtckmp.OfferAnswerOptions
+import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.SignalingState
+import com.shepeliev.webrtckmp.VideoStreamTrack
+import com.shepeliev.webrtckmp.onConnectionStateChange
+import com.shepeliev.webrtckmp.onIceCandidate
+import com.shepeliev.webrtckmp.onIceConnectionStateChange
+import com.shepeliev.webrtckmp.onSignalingStateChange
+import com.shepeliev.webrtckmp.onTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,19 +28,18 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.SessionDescriptionDTO
+import org.videotrade.shopot.domain.model.WebRTCMessage
+import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
-import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
-import org.videotrade.shopot.presentation.components.Main.WebRTCMessage
-import org.videotrade.shopot.presentation.components.Main.rtcMessageDTO
 
 class CallViewModel() : ViewModel(), KoinComponent {
     private val callUseCase: CallUseCase by inject()
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
-
     
-//    val peerConnection = MutableStateFlow<PeerConnection?>(null)
     
     private val _inCommingCall = MutableStateFlow(false)
     val inCommingCall: StateFlow<Boolean> get() = _inCommingCall
@@ -36,49 +47,30 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val peerConnection: StateFlow<PeerConnection> get() = callUseCase.peerConnection
     
-    private fun showDeviceId(): String? {
-        val deviceIdProvider = DeviceIdProviderFactory.create()
-        return deviceIdProvider.getDeviceId()
-    }
     
     init {
         viewModelScope.launch {
-            observeInCommingCall()
             observeWsConnection()
-            
-            showDeviceId()?.let {
-                println("Device ID: $it")
-                callUseCase.connectionWs(it)
-            }
-            
         }
     }
     
-    private fun observeInCommingCall() {
-        callUseCase.inCommingCall
-            .onEach { isIncoming ->
-                _inCommingCall.value = isIncoming
-                if (isIncoming) {
-                    Logger.d { "Incoming call detected" }
-                    // Handle incoming call
-                }
-            }
-            .launchIn(viewModelScope)
-    }
+
     
     private fun observeWsConnection() {
         callUseCase.wsSession
             .onEach { wsSessionNew ->
                 
-                println("wsSessionNew $wsSessionNew")
                 _wsSession.value = wsSessionNew
+                
+                println("wsSessionNew1111 $wsSessionNew")
+                
             }
             .launchIn(viewModelScope)
     }
     
     fun getWsSession() {
         viewModelScope.launch {
-           println("dsadada ${callUseCase.getWsSession()}")
+            println("dsadada ${callUseCase.getWsSession()}")
         }
     }
     
@@ -88,15 +80,15 @@ class CallViewModel() : ViewModel(), KoinComponent {
             callUseCase.updateOtherUserId(userId)
         }
     }
-    
-    
+
+
 //    private fun getPeerConnection() {
 //        viewModelScope.launch {
 //            _peerConnection.value = callUseCase.getPeerConnection()
 //        }
 //    }
     
-     fun getOtherUserId(): String {
+    fun getOtherUserId(): String {
         return callUseCase.getOtherUserId()
     }
     
@@ -105,8 +97,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-    
-    suspend fun Call(
+    suspend fun initWebrtc(
         webSocketSession: StateFlow<DefaultClientWebSocketSession?>,
         peerConnection: PeerConnection,
         localStream: MediaStream,
@@ -131,7 +122,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
                     ),
                 )
                 
-                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
+                
+                val jsonMessage =
+                    Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
                 
                 try {
                     webSocketSession.value?.send(Frame.Text(jsonMessage))
@@ -180,5 +173,89 @@ class CallViewModel() : ViewModel(), KoinComponent {
             .launchIn(this)
         
         awaitCancellation()  // Поддерживаем корутину активной
+    }
+    
+    
+    @OptIn(DelicateCoroutinesApi::class)
+    fun makeCall(userId: String) {
+        viewModelScope.launch {
+            if (wsSession.value != null) {
+                val offer = peerConnection.value.createOffer(
+                    OfferAnswerOptions(
+                        offerToReceiveVideo = true,
+                        offerToReceiveAudio = true
+                    )
+                )
+                peerConnection.value.setLocalDescription(offer)
+                
+                
+                if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                    return@launch
+                }
+                
+                val newCallMessage = WebRTCMessage(
+                    type = "call",
+                    calleeId = userId,
+                    rtcMessage = SessionDescriptionDTO(offer.type, offer.sdp)
+                )
+                
+                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
+                
+                try {
+                    wsSession.value?.send(Frame.Text(jsonMessage))
+                    println("Message sent successfully")
+                } catch (e: Exception) {
+                    println("Failed to send message: ${e.message}")
+                }
+            }
+        }
+        
+    }
+    
+    
+    @OptIn(DelicateCoroutinesApi::class)
+    fun answerCall() {
+        viewModelScope.launch {
+            if (wsSession.value != null) {
+                
+                try {
+                
+                println("111111111 ${peerConnection.value}")
+                val answer = peerConnection.value.createAnswer(
+                    options = OfferAnswerOptions(
+                        offerToReceiveVideo = true,
+                        offerToReceiveAudio = true
+                    )
+                )
+                println("222222222")
+                
+                peerConnection.value.setLocalDescription(answer)
+                
+                println("3333333")
+                
+                if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                    return@launch
+                }
+                println("4444444")
+                
+                val answerCallMessage = WebRTCMessage(
+                    type = "answerCall",
+                    callerId = getOtherUserId(),
+                    rtcMessage = SessionDescriptionDTO(answer.type, answer.sdp)
+                )
+                println("55555555")
+                
+                println("answerCallMessage $answerCallMessage")
+                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
+                
+                
+                    wsSession.value?.send(Frame.Text(jsonMessage))
+                    println("Message sent successfully")
+                } catch (e: Exception) {
+                    println("Failed to send message: ${e.message}")
+                }
+            }
+        }
+        
     }
 }

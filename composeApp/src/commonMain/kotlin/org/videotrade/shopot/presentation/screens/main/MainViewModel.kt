@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.main
 
+import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
@@ -21,6 +23,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     private val userUseCase: ChatsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val WsUseCase: WsUseCase by inject()
+    private val CallUseCase: CallUseCase by inject()
     
     
     val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
@@ -34,8 +37,12 @@ class MainViewModel : ViewModel(), KoinComponent {
     val profile = MutableStateFlow<ProfileDTO?>(null)
     
     
+    val navigator = MutableStateFlow<Navigator?>(null)
+    
+    
     init {
         viewModelScope.launch {
+            
             
             getProfile()
             
@@ -43,8 +50,18 @@ class MainViewModel : ViewModel(), KoinComponent {
             
             observeUsers()
             profile.collect {
-                if (it !== null)
-                    getWsSession()
+                
+                getWsSession()
+                
+                if (it !== null){
+                    
+                    
+                    println("userID : ${it.id}")
+                    
+                    navigator.value?.let { navigator -> CallUseCase.connectionWs(it.id, navigator) }
+                    
+                }
+                
             }
         }
     }
@@ -85,12 +102,18 @@ class MainViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun connectionWs(userId: String) {
-        viewModelScope.launch {
-            WsUseCase.connectionWs(userId)
-        }
+    fun getNavigator(navigatorGet: Navigator) {
+        
+        navigator.value = navigatorGet
     }
     
+    
+//    fun connectionWs(userId: String) {
+//        viewModelScope.launch {
+//            WsUseCase.connectionWs(userId)
+//        }
+//    }
+//
     private fun getWsSession() {
         viewModelScope.launch {
             

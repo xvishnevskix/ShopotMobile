@@ -1,5 +1,6 @@
 package org.videotrade.shopot.domain.usecase
 
+import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.PeerConnection
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
@@ -17,8 +18,9 @@ class CallUseCase : KoinComponent {
     
     
     
-    suspend fun connectionWs(userId: String) {
-        return repository.connectionWs(userId)
+    suspend fun connectionWs(userId: String,navigator: Navigator) {
+        
+        return repository.connectionWs(userId, navigator)
     }
     
     suspend fun getWsSession(): DefaultClientWebSocketSession? {

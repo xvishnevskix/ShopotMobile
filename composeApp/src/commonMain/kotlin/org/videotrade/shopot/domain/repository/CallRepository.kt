@@ -1,5 +1,6 @@
 package org.videotrade.shopot.domain.repository
 
+import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.PeerConnection
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +16,7 @@ interface CallRepository {
     val peerConnection: StateFlow<PeerConnection>
     
     
-    suspend fun connectionWs(userId: String)
+    suspend fun connectionWs(userId: String,navigator: Navigator)
     suspend fun reconnectPeerConnection()
     suspend fun getWsSession(): DefaultClientWebSocketSession?
     suspend fun getPeerConnection(): PeerConnection

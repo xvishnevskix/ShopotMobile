@@ -69,7 +69,7 @@ suspend fun handleWebRTCWebSocket(
                                 "getUserChats" -> {
                                     try {
                                         
-                                        
+                                        println("getUserChatsgetUserChats")
                                         
                                         val dataJson = jsonElement.jsonObject["data"]?.jsonArray
                                         
@@ -86,11 +86,14 @@ suspend fun handleWebRTCWebSocket(
                                             }
                                             
                                             
-                                            println("sortChat $jsonElement $contactsMap")
+                                            println("sortChat $dataJson")
                                             
                                             for (chatItem in dataJson) {
                                                 val chat: ChatItem =
                                                     Json.decodeFromString(chatItem.toString())
+                                                
+                                                
+                                                
 
                                                 val normalizedChatPhone = normalizePhoneNumber(chat.phone)
                                                 

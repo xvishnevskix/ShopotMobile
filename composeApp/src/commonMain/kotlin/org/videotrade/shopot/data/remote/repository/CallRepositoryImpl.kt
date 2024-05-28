@@ -1,8 +1,14 @@
 package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
+import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
-import com.shepeliev.webrtckmp.*
+import com.shepeliev.webrtckmp.IceCandidate
+import com.shepeliev.webrtckmp.IceServer
+import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.RtcConfiguration
+import com.shepeliev.webrtckmp.SessionDescription
+import com.shepeliev.webrtckmp.SessionDescriptionType
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
@@ -18,7 +24,9 @@ import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.component.KoinComponent
+import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.domain.repository.CallRepository
+import org.videotrade.shopot.presentation.screens.call.CallScreen
 import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
@@ -70,7 +78,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _peerConnection.value = PeerConnection(rtcConfiguration)
     }
     
-    override suspend fun connectionWs(userId: String) {
+    override suspend fun connectionWs(userId: String, navigator: Navigator) {
         val httpClient = HttpClient {
             install(WebSockets)
         }
@@ -79,16 +87,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             try {
                 httpClient.webSocket(
                     method = HttpMethod.Get,
-                    host = "videotradedev.ru",
+                    host = webSocketsUrl,
                     port = 3006,
-                    path = "/ws?callerId=${callerId.value}",
-                    
-                    
-                    
-//                    host = "192.168.31.223",
-//                    port = 3001,
-//                    path = "/message",
-                
+                    path = "/ws?callerId=${userId}",
                 ) {
                     _wsSession.value = this
                     isConnected.value = true
@@ -105,25 +106,35 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 when (type) {
                                     "newCall" -> {
                                         
-                                        println("newCall")
-                                        
                                         rtcMessage?.let {
-                                            val sdp = it["sdp"]?.jsonPrimitive?.content ?: return@launch
-                                            val callerId = jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-                                            callerId?.let { otherUserId.value = it }
+                                            val sdp =
+                                                it["sdp"]?.jsonPrimitive?.content ?: return@launch
+                                            val callerId =
+                                                jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
                                             
                                             val offer = SessionDescription(
                                                 SessionDescriptionType.Offer,
                                                 sdp
                                             )
-                                            _peerConnection.value.setRemoteDescription(offer)
-                                            _inCommingCall.value = true
+//                                            _peerConnection.value.setRemoteDescription(offer)
+                                            
+                                            callerId?.let { userId ->
+                                                
+                                                println("newCall $navigator")
+                                                
+                                                otherUserId.value = userId
+                                                
+                                                navigator.push(CallScreen(userId, "IncomingCall"))
+                                            }
+                                            
+                                            
                                         }
                                     }
                                     
                                     "callAnswered" -> {
                                         rtcMessage?.let {
-                                            val sdp = it["sdp"]?.jsonPrimitive?.content ?: return@launch
+                                            val sdp =
+                                                it["sdp"]?.jsonPrimitive?.content ?: return@launch
                                             val answer = SessionDescription(
                                                 SessionDescriptionType.Answer,
                                                 sdp
@@ -136,10 +147,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     "ICEcandidate" -> {
                                         rtcMessage?.let {
                                             Logger.d("ICEcandidate313131 $rtcMessage")
-                                            val jsonElement = Json.parseToJsonElement(rtcMessage.toString())
-                                            val label = jsonElement.jsonObject["label"]?.jsonPrimitive?.int
-                                            val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
-                                            val candidate = jsonElement.jsonObject["candidate"]?.jsonPrimitive?.content
+                                            val jsonElement =
+                                                Json.parseToJsonElement(rtcMessage.toString())
+                                            val label =
+                                                jsonElement.jsonObject["label"]?.jsonPrimitive?.int
+                                            val id =
+                                                jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                                            val candidate =
+                                                jsonElement.jsonObject["candidate"]?.jsonPrimitive?.content
                                             
                                             if (candidate != null && id != null && label != null) {
                                                 val iceCandidate = IceCandidate(
@@ -173,19 +188,19 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         return peerConnection.value
     }
     
-    override  fun getOtherUserId(): String {
+    override fun getOtherUserId(): String {
         return otherUserId.value
     }
     
     
-    override  fun getCallerId(): String {
+    override fun getCallerId(): String {
         return callerId.value
     }
     
     
-    override fun updateOtherUserId(userId: String){
+    override fun updateOtherUserId(userId: String) {
         
-         otherUserId.value = userId
+        otherUserId.value = userId
     }
-
+    
 }

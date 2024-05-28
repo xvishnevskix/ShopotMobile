@@ -6,6 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.koin.compose.koinInject
@@ -21,8 +23,9 @@ class MainScreen : Screen {
         val viewModel: MainViewModel = koinInject()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 //        val coroutineScope = rememberCoroutineScope()
+        val navigator = LocalNavigator.currentOrThrow
         
-        
+        viewModel.getNavigator(navigator)
         
      
         
