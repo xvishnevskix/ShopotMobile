@@ -48,14 +48,32 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     }
     
     
-    
-    
     override suspend fun addMessage(message: MessageItem) {
         _messages.value = listOf(message) + _messages.value
     }
     
     
     override fun getMessages(): StateFlow<List<MessageItem>> = _messages.asStateFlow()
+    
+    
+    override suspend fun readMessage(messageId: String, userId: String) {
+        
+        try {
+            
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "readMessage")
+                    put("messageId", messageId)
+                    put("readerId", userId)
+                }
+            )
+            
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+            
+        } catch (e: Exception) {
+            println("Failed to send message: ${e.message}")
+        }
+    }
     
     
     override suspend fun getMessagesBack(chatId: String) {

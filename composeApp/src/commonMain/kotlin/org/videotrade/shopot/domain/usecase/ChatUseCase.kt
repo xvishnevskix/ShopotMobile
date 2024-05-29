@@ -14,6 +14,10 @@ class ChatUseCase : KoinComponent {
     }
     
     
+    suspend  fun readMessage(messageId: String, userId: String) {
+        return repository.readMessage(messageId,userId)
+    }
+    
     
     suspend fun getMessagesBack(chatId: String){
         return repository.getMessagesBack(chatId)

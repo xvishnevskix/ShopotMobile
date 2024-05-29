@@ -59,7 +59,6 @@ class IncomingCallScreen(private val userId: String) : Screen {
                     CallScreen(
                         userId,
                         "IncomingCall"
-                    
                     )
                 )
         }

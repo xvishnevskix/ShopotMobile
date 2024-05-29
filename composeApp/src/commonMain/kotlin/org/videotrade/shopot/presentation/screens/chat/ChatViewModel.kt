@@ -46,14 +46,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun wsConnect() {
-        
+    fun readMessage(messageId: String) {
         viewModelScope.launch {
-            
-            wsUseCase.connectionWs("cf9b66e2-9e18-4342-bbc0-c5144a593f71")
-            
+            chatUseCase.readMessage(messageId, profile.value.id)
         }
-        
     }
     
     

@@ -8,7 +8,6 @@ import platform.Contacts.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import org.videotrade.shopot.domain.model.ContactDTO // Импортируйте ContactDTO из общего модуля
-import org.videotrade.shopot.
 
 actual class ContactsProvider {
     @OptIn(ExperimentalForeignApi::class)

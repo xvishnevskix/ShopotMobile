@@ -32,6 +32,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
     
     
+    
     val peerConnection: StateFlow<PeerConnection> get() = callUseCase.peerConnection
     
     private val _isConnectedWebrtc = MutableStateFlow(false)
@@ -57,12 +58,19 @@ class CallViewModel() : ViewModel(), KoinComponent {
     init {
         viewModelScope.launch {
             
+            println("callStateNew22 ${callUseCase.peerConnection}")
+            
+            
             observeCallStates()
             observeWsConnection()
             observeIsConnectedWebrtc()
-            observeStreems()
+//            observeStreems()
         }
     }
+    
+    
+    
+    
     
     
     private fun observeCallStates() {
@@ -70,6 +78,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.iseState
             .onEach { iseStateNew ->
                 
+         
                 _iceState.value = iseStateNew
                 
                 println("iseStateNew $iseStateNew")
@@ -159,10 +168,15 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
+    
+    fun reconnectPeerConnection() {
+        viewModelScope.launch {
+            callUseCase.reconnectPeerConnection()
+        }
+    }
     fun initWebrtc() {
         viewModelScope.launch {
             callUseCase.initWebrtc()
-            
         }
     }
     
@@ -255,8 +269,20 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun rejectCall() {
         viewModelScope.launch {
+            
+            _callState.value =  PeerConnectionState.New
+            _iceState.value =  IceConnectionState.New
             callUseCase.rejectCall()
         }
     }
+    
+    fun rejectCallAnswer() {
+        viewModelScope.launch {
+            callUseCase.rejectCallAnswer()
+        }
+    }
+    
+    
+    
     
 }

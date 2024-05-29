@@ -1,6 +1,8 @@
 package org.videotrade.shopot.presentation.screens.main
 
 import cafe.adriel.voyager.navigator.Navigator
+import com.shepeliev.webrtckmp.PeerConnection
+import com.shepeliev.webrtckmp.PeerConnectionState
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,9 +24,8 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 class MainViewModel : ViewModel(), KoinComponent {
     private val userUseCase: ChatsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
-    private val WsUseCase: WsUseCase by inject()
-    private val CallUseCase: CallUseCase by inject()
-    
+    private val wsUseCase: WsUseCase by inject()
+    private val callUseCase: CallUseCase by inject()
     
     val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
@@ -40,10 +41,18 @@ class MainViewModel : ViewModel(), KoinComponent {
     val navigator = MutableStateFlow<Navigator?>(null)
     
     
+    private val _peerConnection = MutableStateFlow<PeerConnection?>(null)
+    
+    val peerConnection  get() = _peerConnection.asStateFlow()
+    
+    
     init {
         viewModelScope.launch {
             
+     
             
+            
+    
             getProfile()
             
             loadUsers()
@@ -53,16 +62,19 @@ class MainViewModel : ViewModel(), KoinComponent {
                 
                 getWsSession()
                 
-                if (it !== null){
+                if (it !== null) {
                     
                     
                     println("userID : ${it.id}")
                     
-                    navigator.value?.let { navigator -> CallUseCase.connectionWs(it.id, navigator) }
+                    navigator.value?.let { navigator -> callUseCase.connectionWs(it.id, navigator) }
                     
                 }
                 
             }
+            
+            
+     
         }
     }
 
@@ -108,16 +120,16 @@ class MainViewModel : ViewModel(), KoinComponent {
     }
     
     
-//    fun connectionWs(userId: String) {
-//        viewModelScope.launch {
-//            WsUseCase.connectionWs(userId)
-//        }
-//    }
-//
+        fun getPeerConnection() {
+        viewModelScope.launch {
+            _peerConnection.value =  callUseCase.getPeerConnection()
+        }
+    }
+
     private fun getWsSession() {
         viewModelScope.launch {
             
-            _wsSession.value = WsUseCase.getWsSession() ?: return@launch
+            _wsSession.value = wsUseCase.getWsSession() ?: return@launch
             
         }
     }

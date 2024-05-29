@@ -24,6 +24,9 @@ class CallUseCase : KoinComponent {
     val iseState: StateFlow<IceConnectionState> get() = repository.iseState
     
     
+    suspend fun reconnectPeerConnection() {
+        return repository.reconnectPeerConnection()
+    }
     
     suspend fun connectionWs(userId: String, navigator: Navigator) {
         
@@ -62,8 +65,14 @@ class CallUseCase : KoinComponent {
         repository.initWebrtc()
     }
     
-     fun rejectCall() {
+    fun rejectCall() {
         repository.rejectCall()
     }
+    
+    fun rejectCallAnswer() {
+        repository.rejectCallAnswer()
+    }
+    
+    
     
 }

@@ -84,75 +84,75 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
     
     
     
-    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
-        ModalDrawerSheet {
-            
-            Row(modifier = Modifier.padding(top = 40.dp, start = 30.dp, bottom = 60.dp)) {
-                Avatar(
-                    drawableRes = Res.drawable.randomUser,
-                    size = 80.dp
-                )
-                
-                
-                Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp)) {
-                    Text(
-                        "${profileState?.firstName} ${profileState?.lastName}",
-                        textAlign = TextAlign.Center,
-                        fontSize = 18.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF000000)
-                    
-                    )
-                    
-                    Text(
-                        text = "${profileState?.phone}",
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797)
-                    
-                    )
-                }
-                
-            }
-            
-            items.forEach {
-                NavigationDrawerItem(
-                    label = {
-                        Text(
-                            it.title,
-                            textAlign = TextAlign.Center,
-                            fontSize = 18.sp,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF000000)
-                        )
-                    },
-                    selected = false,
-                    icon = {
-                        Icon(
-                            imageVector = it.icon,
-                            contentDescription = it.title
-                        )
-                    },
-                    onClick = it.onClick,
-                    modifier = Modifier.padding(start = 15.dp)
-                
-                
-                )
-            }
-        }
-    },
-        content = {
+//    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
+//        ModalDrawerSheet {
+//
+//            Row(modifier = Modifier.padding(top = 40.dp, start = 30.dp, bottom = 60.dp)) {
+//                Avatar(
+//                    drawableRes = Res.drawable.randomUser,
+//                    size = 80.dp
+//                )
+//
+//
+//                Column(modifier = Modifier.padding(start = 16.dp, top = 16.dp)) {
+//                    Text(
+//                        "${profileState?.firstName} ${profileState?.lastName}",
+//                        textAlign = TextAlign.Center,
+//                        fontSize = 18.sp,
+//                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                        lineHeight = 20.sp,
+//                        color = Color(0xFF000000)
+//
+//                    )
+//
+//                    Text(
+//                        text = "${profileState?.phone}",
+//                        textAlign = TextAlign.Center,
+//                        fontSize = 14.sp,
+//                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                        lineHeight = 20.sp,
+//                        color = Color(0xFF979797)
+//
+//                    )
+//                }
+//
+//            }
+//
+//            items.forEach {
+//                NavigationDrawerItem(
+//                    label = {
+//                        Text(
+//                            it.title,
+//                            textAlign = TextAlign.Center,
+//                            fontSize = 18.sp,
+//                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+//                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                            lineHeight = 20.sp,
+//                            color = Color(0xFF000000)
+//                        )
+//                    },
+//                    selected = false,
+//                    icon = {
+//                        Icon(
+//                            imageVector = it.icon,
+//                            contentDescription = it.title
+//                        )
+//                    },
+//                    onClick = it.onClick,
+//                    modifier = Modifier.padding(start = 15.dp)
+//
+//
+//                )
+//            }
+//        }
+//    },
+//        content = {
             MainContentComponent(drawerState, viewModel)
             
             
-        })
+//        })
 }
 
 

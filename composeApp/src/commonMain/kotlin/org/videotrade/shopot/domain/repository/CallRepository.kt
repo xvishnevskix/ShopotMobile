@@ -14,7 +14,7 @@ interface CallRepository {
     
     val wsSession: StateFlow<DefaultClientWebSocketSession?>
     
-    val peerConnection: StateFlow<PeerConnection>
+    val peerConnection: StateFlow<PeerConnection?>
     
     
     val isConnectedWebrtc: StateFlow<Boolean>
@@ -50,6 +50,7 @@ interface CallRepository {
     
     
     fun rejectCall()
+    fun rejectCallAnswer()
     
     
     

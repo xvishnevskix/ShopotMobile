@@ -65,6 +65,7 @@ class ChatScreen(
                     ) { innerPadding ->
                         if (profile != null) {
                             Chat(
+                                chat,
                                 viewModel,
                                 
                                 profile,

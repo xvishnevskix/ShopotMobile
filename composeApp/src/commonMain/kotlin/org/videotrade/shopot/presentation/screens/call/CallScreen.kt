@@ -32,20 +32,14 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.shepeliev.webrtckmp.IceConnectionState
-import com.shepeliev.webrtckmp.PeerConnectionState
-import com.shepeliev.webrtckmp.videoTracks
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.presentation.components.Call.Video
-import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
-import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.maksimus
 import shopot.composeapp.generated.resources.person
 
 class CallScreen(
@@ -65,10 +59,10 @@ class CallScreen(
         val iceState by viewModel.iceState.collectAsState()
         
         
-        
         val navigator = LocalNavigator.currentOrThrow
         
         val hasExecuted = remember { mutableStateOf(false) }
+        val isRejected = remember { mutableStateOf(false) }
         
         
         LaunchedEffect(wsSession) {
@@ -95,106 +89,112 @@ class CallScreen(
         LaunchedEffect(iceState) {
             
             
-            if(IceConnectionState.Closed == iceState ||  IceConnectionState.Disconnected == iceState) {
+            if (IceConnectionState.Closed == iceState || IceConnectionState.Disconnected == iceState) {
                 
+                if (!isRejected.value) {
+                    println("sdadaa")
+                    viewModel.rejectCallAnswer()
+                }
+                isRejected.value = true
                 navigator.push(MainScreen())
             }
-
+            
         }
         
         
-            var Photo: DrawableResource
-            Photo = Res.drawable.person
+        var Photo: DrawableResource
+        Photo = Res.drawable.person
+        
+        Image(
+            painter = painterResource(Photo),
+            contentDescription = "image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(7.dp)
+        )
+        
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
             
-            Image(
-                painter = painterResource(Photo),
-                contentDescription = "image",
-                contentScale = ContentScale.Crop,
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .blur(7.dp)
+                    .fillMaxWidth()
+                    .height(100.dp)
+                //.background(Color(0, 0, 0)),
             )
-            
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(100.dp)
-                    //.background(Color(0, 0, 0)),
-                )
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .width(200.dp)
-                        .height(200.dp)
-                        .background(
-                            color = Color(255, 255, 255),
-                            shape = RoundedCornerShape(100.dp)
-                        )
-                        .clip(CircleShape)
-                ) {
-                    Image(
-                        painter = painterResource(Photo),
-                        contentDescription = "image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .width(190.dp)
-                            .height(190.dp)
-                            .clip(RoundedCornerShape(100.dp))
+                    .align(Alignment.CenterHorizontally)
+                    .width(200.dp)
+                    .height(200.dp)
+                    .background(
+                        color = Color(255, 255, 255),
+                        shape = RoundedCornerShape(100.dp)
                     )
-                    
-                }
-                
-                Text(
-                    text = callState.toString(),
+                    .clip(CircleShape)
+            ) {
+                Image(
+                    painter = painterResource(Photo),
+                    contentDescription = "image",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .padding(top = 25.dp)
-                        .align(Alignment.CenterHorizontally),
-                    fontSize = 16.sp,
-                    color = Color(255, 255, 255)
-                
+                        .align(Alignment.Center)
+                        .width(190.dp)
+                        .height(190.dp)
+                        .clip(RoundedCornerShape(100.dp))
                 )
                 
-                var name: String
-                name = "Максим Аркаев"
-                Text(
-                    modifier = Modifier
-                        .padding(top = 12.5.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = "$name",
-                    fontSize = 24.sp,
-                    color = Color(255, 255, 255)
-                
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(330.dp)
-                    //.background(Color(0, 0, 0)),
-                )
-                
-                
-                
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    speakerBtn { }
-                    rejectBtn( {
-                        viewModel.rejectCall()
-//                        navigator.push(MainScreen())
-                    }, "Завершить")
-                    microfonBtn{}
-                }
             }
             
+            Text(
+                text = callState.toString(),
+                modifier = Modifier
+                    .padding(top = 25.dp)
+                    .align(Alignment.CenterHorizontally),
+                fontSize = 16.sp,
+                color = Color(255, 255, 255)
+            
+            )
+            
+            var name: String
+            name = "Максим Аркаев"
+            Text(
+                modifier = Modifier
+                    .padding(top = 12.5.dp)
+                    .align(Alignment.CenterHorizontally),
+                text = "$name",
+                fontSize = 24.sp,
+                color = Color(255, 255, 255)
+            
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(330.dp)
+                //.background(Color(0, 0, 0)),
+            )
+            
+            
+            
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceAround,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                speakerBtn { }
+                rejectBtn({
+                    viewModel.rejectCall()
+                    isRejected.value = true
+//                    navigator.push(MainScreen())
+                }, "Завершить")
+                microfonBtn {}
+            }
         }
+        
+    }
 }
 
 

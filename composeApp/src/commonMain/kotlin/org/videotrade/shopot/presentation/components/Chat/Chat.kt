@@ -61,6 +61,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.formatTimestamp
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -68,6 +69,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.double_message_check
 import shopot.composeapp.generated.resources.edit_pencil
+import shopot.composeapp.generated.resources.single_message_check
 
 
 //@Composable
@@ -245,6 +247,7 @@ val editOptions = listOf(
 
 @Composable
 fun Chat(
+    chat: ChatItem,
     viewModel: ChatViewModel,
     profile: ProfileDTO,
     modifier: Modifier,
@@ -259,12 +262,14 @@ fun Chat(
         reverseLayout = true,
         modifier = modifier,
         
-    ) {
+        ) {
         itemsIndexed(messagesState) { index, message ->
             
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
             MessageBox(
+                chat = chat,
+                viewModel = viewModel,
                 message = message,
                 profile = profile,
                 onClick = { onMessageClick(message, messageY) },
@@ -279,12 +284,44 @@ fun Chat(
 
 @Composable
 fun MessageBox(
+    chat: ChatItem,
+    viewModel: ChatViewModel,
     message: MessageItem,
     profile: ProfileDTO,
     onClick: () -> Unit,
     onPositioned: (LayoutCoordinates) -> Unit,
     isVisible: Boolean
 ) {
+    
+    
+    val isReadByMe = remember { mutableStateOf(false) }
+    val isSendRead = remember { mutableStateOf(false) }
+    
+    LaunchedEffect(key1 = isReadByMe) {
+        
+        
+        if (!isSendRead.value) {
+            if (message.fromUser == profile.id) {
+                if (message.anotherRead) {
+                    isReadByMe.value = true
+                }
+                
+            } else {
+                
+                if (!message.iread) {
+                    viewModel.readMessage(message.id)
+                }
+            }
+            
+            isSendRead.value = true
+            
+        }
+        
+        
+    }
+    
+    
+    
     Column(
         modifier = Modifier
             .onGloballyPositioned(onPositioned)
@@ -363,13 +400,29 @@ fun MessageBox(
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
         ) {
-            Image(
-                modifier = Modifier
-                    .padding(top = 2.dp, end = 4.dp)
-                    .size(14.dp),
-                painter = painterResource(Res.drawable.double_message_check),
-                contentDescription = null,
-            )
+            
+            
+            if (message.fromUser == profile.id)
+                if (isReadByMe.value) {
+                    Image(
+                        modifier = Modifier
+                            .padding(top = 2.dp, end = 4.dp)
+                            .size(14.dp),
+                        painter = painterResource(Res.drawable.double_message_check),
+                        contentDescription = null,
+                    )
+                    
+                } else {
+                    
+                    Image(
+                        modifier = Modifier
+                            .padding(top = 2.dp, end = 4.dp)
+                            .size(14.dp),
+                        painter = painterResource(Res.drawable.single_message_check),
+                        contentDescription = null,
+                    )
+                }
+            
             Text(
                 text = formatTimestamp(message.created),
                 style = TextStyle(

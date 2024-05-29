@@ -37,8 +37,8 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -111,11 +111,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 modifier = Modifier.padding(end = 8.dp).clickable {
                     viewModel.sendMessage(
                         MessageItem(
-                        
-                        content = text ,
-                           fromUser = viewModel.profile.value.id,
-                          chatId = chat.id ,
-                          anotherRead = false
+                            content = text,
+                            fromUser = viewModel.profile.value.id,
+                            chatId = chat.id,
+                            anotherRead = false,
+                            iread = false
                         )
                     
                     )
