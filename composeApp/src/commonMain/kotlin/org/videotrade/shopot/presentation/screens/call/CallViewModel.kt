@@ -1,16 +1,12 @@
 package org.videotrade.shopot.presentation.screens.call
 
-import androidx.compose.runtime.collectAsState
-import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
-import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.websocket.Frame
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,11 +14,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.domain.model.SessionDescriptionDTO
-import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.usecase.CallUseCase
 
 class CallViewModel() : ViewModel(), KoinComponent {
@@ -30,10 +23,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
-    
-    
-    
-    val peerConnection: StateFlow<PeerConnection> get() = callUseCase.peerConnection
     
     private val _isConnectedWebrtc = MutableStateFlow(false)
     val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
@@ -69,16 +58,12 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-    
-    
-    
-    
     private fun observeCallStates() {
         
         callUseCase.iseState
             .onEach { iseStateNew ->
                 
-         
+                
                 _iceState.value = iseStateNew
                 
                 println("iseStateNew $iseStateNew")
@@ -168,12 +153,12 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-    
     fun reconnectPeerConnection() {
         viewModelScope.launch {
             callUseCase.reconnectPeerConnection()
         }
     }
+    
     fun initWebrtc() {
         viewModelScope.launch {
             callUseCase.initWebrtc()
@@ -181,97 +166,21 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     @OptIn(DelicateCoroutinesApi::class)
-    fun makeCall(userId: String) {
-        viewModelScope.launch {
-            if (wsSession.value != null) {
-                val offer = peerConnection.value.createOffer(
-                    OfferAnswerOptions(
-//                        offerToReceiveVideo = true,
-                        offerToReceiveAudio = true
-                    )
-                )
-                peerConnection.value.setLocalDescription(offer)
-                
-                
-                if (wsSession.value?.outgoing?.isClosedForSend == true) {
-                    return@launch
-                }
-                
-                val newCallMessage = WebRTCMessage(
-                    type = "call",
-                    calleeId = userId,
-                    rtcMessage = SessionDescriptionDTO(offer.type, offer.sdp)
-                )
-                
-                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-                
-                try {
-                    wsSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully")
-                } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
-                }
-            }
-        }
-        
+    suspend fun makeCall(userId: String) {
+        callUseCase.makeCall(userId)
     }
-    
     
     @OptIn(DelicateCoroutinesApi::class)
-    fun answerCall() {
-        viewModelScope.launch {
-            if (wsSession.value != null) {
-                
-                try {
-                    
-                    callUseCase.setOffer()
-                    
-                    
-                    val otherUserId = getOtherUserId()
-                    
-                    
-                    val answer = peerConnection.value.createAnswer(
-                        options = OfferAnswerOptions(
-//                            offerToReceiveVideo = true,
-                            offerToReceiveAudio = true
-                        )
-                    )
-                    
-                    peerConnection.value.setLocalDescription(answer)
-                    
-                    
-                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
-                        return@launch
-                    }
-                    
-                    val answerCallMessage = WebRTCMessage(
-                        type = "answerCall",
-                        callerId = otherUserId,
-                        rtcMessage = SessionDescriptionDTO(answer.type, answer.sdp)
-                    )
-                    
-                    Logger.d {
-                        "answerCallMessage $answerCallMessage"
-                    }
-                    val jsonMessage =
-                        Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
-                    
-                    
-                    wsSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully")
-                } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
-                }
-            }
-        }
-        
+    suspend fun answerCall() {
+        callUseCase.answerCall()
     }
+    
     
     fun rejectCall() {
         viewModelScope.launch {
             
-            _callState.value =  PeerConnectionState.New
-            _iceState.value =  IceConnectionState.New
+            _callState.value = PeerConnectionState.New
+            _iceState.value = IceConnectionState.New
             callUseCase.rejectCall()
         }
     }
@@ -281,8 +190,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
             callUseCase.rejectCallAnswer()
         }
     }
-    
-    
     
     
 }

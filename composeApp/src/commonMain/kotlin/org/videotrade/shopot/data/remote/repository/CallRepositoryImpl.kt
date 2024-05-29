@@ -9,6 +9,7 @@ import com.shepeliev.webrtckmp.IceServer
 import com.shepeliev.webrtckmp.MediaDevices
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.MediaStreamTrackKind
+import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.RtcConfiguration
@@ -28,6 +29,7 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,6 +43,7 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.component.KoinComponent
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
@@ -85,8 +88,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
     
-    private val _peerConnection = MutableStateFlow<PeerConnection?>(null)
-    override val peerConnection: StateFlow<PeerConnection?> get() = _peerConnection
+    private val _peerConnection =
+        MutableStateFlow<PeerConnection>(PeerConnection(rtcConfiguration))
+    override val peerConnection: StateFlow<PeerConnection> get() = _peerConnection
     
     private val offer = MutableStateFlow<SessionDescription?>(null)
     
@@ -116,10 +120,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     override suspend fun setOffer() {
-        
-        Logger.d { "onTrack:1111" }
-        
-        offer.value?.let { _peerConnection.value.setRemoteDescription(it) }
+        offer.value?.let { _peerConnection.value?.setRemoteDescription(it) }
         
     }
     
@@ -186,7 +187,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 SessionDescriptionType.Answer,
                                                 sdp
                                             )
-                                            _peerConnection.value.setRemoteDescription(answer)
+                                            _peerConnection.value?.setRemoteDescription(answer)
                                         }
                                     }
                                     
@@ -208,7 +209,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                     sdpMid = id,
                                                     sdpMLineIndex = label
                                                 )
-                                                _peerConnection.value.addIceCandidate(iceCandidate)
+                                                _peerConnection.value?.addIceCandidate(iceCandidate)
                                             }
                                         }
                                     }
@@ -229,103 +230,105 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override suspend fun initWebrtc(): Nothing = coroutineScope {
         
-        
-        val peerConnection
-        
-        
-        _peerConnection.value = PeerConnection(rtcConfiguration)
-        
-        
-        
-        val stream = MediaDevices.getUserMedia(audio = true, video = true)
-        
-        localStream.value = stream
-        
-        
-        
-        stream.tracks.forEach { track ->
-            peerConnection.value?.addTrack(track, localStream.value!!)
-        }
-        
-        
-        
-        _isConnectedWebrtc.value = true
-        // Обработка кандидатов ICE
-        peerConnection.value.onIceCandidate
-            .onEach { candidate ->
-                Logger.d { "PC2213131" }
-                
-                val iceCandidateMessage = WebRTCMessage(
-                    type = "ICEcandidate",
-                    calleeId = otherUserId.value,
-                    iceMessage = rtcMessageDTO(
-                        label = candidate.sdpMLineIndex,
-                        id = candidate.sdpMid,
-                        candidate = candidate.candidate,
-                    ),
-                )
-                
-                
-                val jsonMessage =
-                    Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
-                
-                try {
+            
+            
+            println("signalingStateClose")
+            
+//            val peerConnection.value = PeerConnection(rtcConfiguration)
+            
+            
+            
+            
+//            _peerConnection.value = PeerConnection(rtcConfiguration)
+            
+            
+            val stream = MediaDevices.getUserMedia(audio = true, video = true)
+            
+            localStream.value = stream
+            
+            
+            
+            stream.tracks.forEach { track ->
+                peerConnection.value.addTrack(track, localStream.value!!)
+            }
+            
+            
+            
+            _isConnectedWebrtc.value = true
+            // Обработка кандидатов ICE
+            peerConnection.value.onIceCandidate
+                .onEach { candidate ->
+                    Logger.d { "PC2213131" }
                     
-                    Logger.d { "PC2213131:${jsonMessage}" }
+                    val iceCandidateMessage = WebRTCMessage(
+                        type = "ICEcandidate",
+                        calleeId = otherUserId.value,
+                        iceMessage = rtcMessageDTO(
+                            label = candidate.sdpMLineIndex,
+                            id = candidate.sdpMid,
+                            candidate = candidate.candidate,
+                        ),
+                    )
                     
-                    wsSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully")
-                } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
+                    
+                    val jsonMessage =
+                        Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
+                    
+                    try {
+                        
+                        Logger.d { "PC2213131:${jsonMessage}" }
+                        
+                        wsSession.value?.send(Frame.Text(jsonMessage))
+                        println("Message sent successfully")
+                    } catch (e: Exception) {
+                        println("Failed to send message: ${e.message}")
+                    }
+                    
+                    peerConnection.value?.addIceCandidate(candidate)
                 }
-                
-                peerConnection.value.addIceCandidate(candidate)
-            }
-            .launchIn(this)
-        
-        // Следим за изменениями состояния сигнализации
-        peerConnection.value.onSignalingStateChange
-            .onEach { signalingState ->
-                Logger.d { "peerState111 onSignalingStateChange: $signalingState" }
-                
-                if (signalingState == SignalingState.HaveRemoteOffer) {
-                    Logger.d { " peer2 signalingState: $signalingState" }
+                .launchIn(this)
+            
+            // Следим за изменениями состояния сигнализации
+            peerConnection.value.onSignalingStateChange
+                .onEach { signalingState ->
+                    Logger.d { "peerState111 onSignalingStateChange: $signalingState" }
+                    
+                    if (signalingState == SignalingState.HaveRemoteOffer) {
+                        Logger.d { " peer2 signalingState: $signalingState" }
+                    }
                 }
-            }
-            .launchIn(this)
-        
-        // Следим за изменениями состояния соединения ICE
-        peerConnection.value.onIceConnectionStateChange
-            .onEach { state ->
-                
-                _iceState.value = state
-                Logger.d { "peerState111 onIceConnectionStateChange: $state" }
-            }
-            .launchIn(this)
-        
-        // Следим за изменениями общего состояния соединения
-        peerConnection.value.onConnectionStateChange
-            .onEach { state ->
-                Logger.d { "peerState111 onConnectionStateChange: $state" }
-                
-                
-                _callState.value = state
-                
-            }
-            .launchIn(this)
-        
-        
-        // Обработка треков, получаемых от удалённого пира
-        peerConnection.value.onTrack
-            .onEach { event ->
-                Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
-                if (event.track?.kind == MediaStreamTrackKind.Video) {
-                    remoteVideoTrack.value = event.track as VideoStreamTrack
+                .launchIn(this)
+            
+            // Следим за изменениями состояния соединения ICE
+            peerConnection.value.onIceConnectionStateChange
+                .onEach { state ->
+                    
+                    _iceState.value = state
+                    Logger.d { "peerState111 onIceConnectionStateChange: $state" }
                 }
-            }
-            .launchIn(this)
-        
-        
+                .launchIn(this)
+            
+            // Следим за изменениями общего состояния соединения
+            peerConnection.value.onConnectionStateChange
+                .onEach { state ->
+                    Logger.d { "peerState111 onConnectionStateChange: $state" }
+                    
+                    
+                    _callState.value = state
+                    
+                }
+                .launchIn(this)
+            
+            
+            // Обработка треков, получаемых от удалённого пира
+            peerConnection.value.onTrack
+                .onEach { event ->
+                    Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
+                    if (event.track?.kind == MediaStreamTrackKind.Video) {
+                        remoteVideoTrack.value = event.track as VideoStreamTrack
+                    }
+                }
+                .launchIn(this)
         
         awaitCancellation()  // Поддерживаем корутину активной
     }
@@ -334,7 +337,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         return wsSession.value
     }
     
-    override suspend fun getPeerConnection(): PeerConnection {
+    override suspend fun getPeerConnection(): PeerConnection? {
         return peerConnection.value
     }
     
@@ -352,7 +355,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         otherUserId.value = userId
     }
-    
+
 //    override fun rejectCall() {
 //        try {
 //
@@ -425,13 +428,109 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //    }
 //
     
+    
+    @OptIn(DelicateCoroutinesApi::class)
+    suspend override fun makeCall(userId: String) {
+        coroutineScope {
+            if (wsSession.value != null) {
+                val offer = peerConnection.value?.createOffer(
+                    OfferAnswerOptions(
+//                        offerToReceiveVideo = true,
+                        offerToReceiveAudio = true
+                    )
+                )
+                if (offer != null) {
+                    peerConnection.value?.setLocalDescription(offer)
+                }
+                
+                
+                if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                    return@coroutineScope
+                }
+                
+                val newCallMessage = WebRTCMessage(
+                    type = "call",
+                    calleeId = userId,
+                    rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
+                )
+                
+                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
+                
+                try {
+                    wsSession.value?.send(Frame.Text(jsonMessage))
+                    println("Message sent successfully")
+                } catch (e: Exception) {
+                    println("Failed to send message: ${e.message}")
+                }
+            }
+        }
+        
+    }
+    
+    
+    @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun answerCall() {
+        coroutineScope {
+            if (wsSession.value != null) {
+                
+                try {
+                    
+                    setOffer()
+                    
+                    
+                    val otherUserId = otherUserId.value
+                    
+                    
+                    val answer = peerConnection.value?.createAnswer(
+                        options = OfferAnswerOptions(
+                            //                            offerToReceiveVideo = true,
+                            offerToReceiveAudio = true
+                        )
+                    )
+                    
+                    if (answer != null) {
+                        peerConnection.value?.setLocalDescription(answer)
+                    }
+                    
+                    
+                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                        return@coroutineScope
+                    }
+                    
+                    val answerCallMessage = WebRTCMessage(
+                        type = "answerCall",
+                        callerId = otherUserId,
+                        rtcMessage = answer?.let { SessionDescriptionDTO(it.type, answer.sdp) }
+                    )
+                    
+                    Logger.d {
+                        "answerCallMessage $answerCallMessage"
+                    }
+                    val jsonMessage =
+                        Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
+                    
+                    
+                    wsSession.value?.send(Frame.Text(jsonMessage))
+                    println("Message sent successfully")
+                } catch (e: Exception) {
+                    println("Failed to send message: ${e.message}")
+                }
+            }
+        }
+        
+    }
+    
+    
     override fun rejectCall() {
         try {
             println("asaassaasrejectCall ${peerConnection.value}")
             
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value
-            if (currentPeerConnection.signalingState != SignalingState.Closed) {
+            
+            
+            
+            if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
                 localStream.value?.let { stream ->
                     stream.tracks.forEach { track ->
@@ -470,7 +569,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         try {
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value
-            if (currentPeerConnection.signalingState != SignalingState.Closed) {
+            if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
                 localStream.value?.let { stream ->
                     stream.tracks.forEach { track ->

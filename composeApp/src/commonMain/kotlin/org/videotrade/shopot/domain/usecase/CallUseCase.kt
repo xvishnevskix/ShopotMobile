@@ -16,7 +16,7 @@ class CallUseCase : KoinComponent {
     private val repository: CallRepository by inject()
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = repository.wsSession
     
-    val peerConnection: StateFlow<PeerConnection> get() = repository.peerConnection
+    val peerConnection: StateFlow<PeerConnection?> get() = repository.peerConnection
     val isConnectedWebrtc: StateFlow<Boolean> get() = repository.isConnectedWebrtc
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
@@ -43,7 +43,7 @@ class CallUseCase : KoinComponent {
         return repository.getWsSession()
     }
     
-    suspend fun getPeerConnection(): PeerConnection {
+    suspend fun getPeerConnection(): PeerConnection? {
         return repository.getPeerConnection()
     }
     
@@ -65,6 +65,16 @@ class CallUseCase : KoinComponent {
         repository.initWebrtc()
     }
     
+    
+    suspend fun makeCall(userId: String) {
+        repository.makeCall(userId)
+    }
+    
+    suspend fun answerCall() {
+        repository.answerCall()
+    }
+    
+    
     fun rejectCall() {
         repository.rejectCall()
     }
@@ -72,7 +82,6 @@ class CallUseCase : KoinComponent {
     fun rejectCallAnswer() {
         repository.rejectCallAnswer()
     }
-    
     
     
 }

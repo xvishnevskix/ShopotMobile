@@ -29,15 +29,13 @@ interface CallRepository {
     val iseState: StateFlow<IceConnectionState>
     
     
-    
-    
     suspend fun connectionWs(userId: String, navigator: Navigator)
     suspend fun reconnectPeerConnection()
     suspend fun setOffer()
     
     
     suspend fun getWsSession(): DefaultClientWebSocketSession?
-    suspend fun getPeerConnection(): PeerConnection
+    suspend fun getPeerConnection(): PeerConnection?
     
     
     fun getCallerId(): String
@@ -49,10 +47,11 @@ interface CallRepository {
     suspend fun initWebrtc(): Nothing
     
     
+    suspend fun makeCall(userId: String)
+    suspend fun answerCall()
+    
     fun rejectCall()
     fun rejectCallAnswer()
-    
-    
     
     
 }
