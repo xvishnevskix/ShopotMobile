@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.screens.call
 
 import androidx.compose.runtime.collectAsState
 import co.touchlab.kermit.Logger
+import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnection
@@ -49,10 +50,14 @@ class CallViewModel() : ViewModel(), KoinComponent {
     val callState: StateFlow<PeerConnectionState> get() = _callState
     
     
+    private val _iceState = MutableStateFlow(IceConnectionState.New)
+    val iceState: StateFlow<IceConnectionState> get() = _iceState
+    
+    
     init {
         viewModelScope.launch {
             
-            observeCallState()
+            observeCallStates()
             observeWsConnection()
             observeIsConnectedWebrtc()
             observeStreems()
@@ -60,7 +65,17 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-    private fun observeCallState() {
+    private fun observeCallStates() {
+        
+        callUseCase.iseState
+            .onEach { iseStateNew ->
+                
+                _iceState.value = iseStateNew
+                
+                println("iseStateNew $iseStateNew")
+                
+            }
+            .launchIn(viewModelScope)
         
         callUseCase.callState
             .onEach { callStateNew ->

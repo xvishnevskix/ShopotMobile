@@ -1,6 +1,7 @@
 package org.videotrade.shopot.domain.usecase
 
 import cafe.adriel.voyager.navigator.Navigator
+import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.PeerConnectionState
@@ -20,6 +21,7 @@ class CallUseCase : KoinComponent {
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
     val callState: StateFlow<PeerConnectionState> get() = repository.callState
+    val iseState: StateFlow<IceConnectionState> get() = repository.iseState
     
     
     

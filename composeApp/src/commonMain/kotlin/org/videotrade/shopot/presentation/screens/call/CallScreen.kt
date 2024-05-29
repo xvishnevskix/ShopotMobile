@@ -31,13 +31,17 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.shepeliev.webrtckmp.IceConnectionState
+import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.videoTracks
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.components.Call.Video
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
+import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
+import org.videotrade.shopot.presentation.components.Call.speakerBtn
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
@@ -58,6 +62,10 @@ class CallScreen(
         val viewModel: CallViewModel = koinInject()
         val wsSession by viewModel.wsSession.collectAsState()
         val callState by viewModel.callState.collectAsState()
+        val iceState by viewModel.iceState.collectAsState()
+        
+        
+        
         val navigator = LocalNavigator.currentOrThrow
         
         val hasExecuted = remember { mutableStateOf(false) }
@@ -84,10 +92,17 @@ class CallScreen(
         
         
         
-        LaunchedEffect(callState) {}
+        LaunchedEffect(iceState) {
+            
+            
+            if(IceConnectionState.Closed == iceState ||  IceConnectionState.Disconnected == iceState) {
+                
+                navigator.push(MainScreen())
+            }
+
+        }
         
         
-        SafeArea {
             var Photo: DrawableResource
             Photo = Res.drawable.person
             
@@ -166,22 +181,20 @@ class CallScreen(
                 
                 
                 Row(
-                    
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier.fillMaxSize()
                 ) {
+                    speakerBtn { }
                     rejectBtn( {
                         viewModel.rejectCall()
-                        navigator.push(MainScreen())
+//                        navigator.push(MainScreen())
                     }, "Завершить")
-                    aceptBtn {  }
-                    
+                    microfonBtn{}
                 }
             }
             
         }
-    }
 }
 
 

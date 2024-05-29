@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
+import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.IceServer
 import com.shepeliev.webrtckmp.MediaDevices
 import com.shepeliev.webrtckmp.MediaStream
@@ -102,6 +103,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _callState = MutableStateFlow(PeerConnectionState.New)
     
     override val callState: StateFlow<PeerConnectionState> get() = _callState
+    
+    
+    private val _iceState = MutableStateFlow(IceConnectionState.New)
+    
+    override val iseState: StateFlow<IceConnectionState> get() = _iceState
     
     
     override suspend fun reconnectPeerConnection() {
@@ -282,6 +288,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         // Следим за изменениями состояния соединения ICE
         peerConnection.value.onIceConnectionStateChange
             .onEach { state ->
+                
+                _iceState.value = state
                 Logger.d { "peerState111 onIceConnectionStateChange: $state" }
             }
             .launchIn(this)
