@@ -50,8 +50,8 @@ interface CallRepository {
     suspend fun makeCall(userId: String)
     suspend fun answerCall()
     
-    fun rejectCall()
-    fun rejectCallAnswer()
+   suspend fun rejectCall(navigator: Navigator, userId: String): Boolean
+//    fun rejectCallAnswer()
     
     
 }

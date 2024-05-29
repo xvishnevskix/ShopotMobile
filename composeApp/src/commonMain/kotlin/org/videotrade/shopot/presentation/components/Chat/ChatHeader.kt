@@ -30,12 +30,13 @@ import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatHeader(chat: ChatItem) {
+fun ChatHeader(chat: ChatItem, viewModel:ChatViewModel) {
     val interactionSource =
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
@@ -55,7 +56,11 @@ fun ChatHeader(chat: ChatItem) {
             
             
             BackIcon(Modifier.padding(end = 8.dp).clickable {
+                
+                viewModel.clearMessages()
                 navigator.pop()
+                
+                
             })
         }
         

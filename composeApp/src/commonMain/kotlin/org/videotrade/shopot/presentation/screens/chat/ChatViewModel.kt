@@ -71,6 +71,12 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.delMessage(message)
         }
     }
+    
+    fun clearMessages() {
+        viewModelScope.launch {
+            chatUseCase.clearMessages()
+        }
+    }
 }
 
 

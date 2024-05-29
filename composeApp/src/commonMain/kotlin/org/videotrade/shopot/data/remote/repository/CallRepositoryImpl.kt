@@ -37,10 +37,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.int
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
@@ -48,6 +51,7 @@ import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
@@ -89,8 +93,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
     
     private val _peerConnection =
-        MutableStateFlow<PeerConnection>(PeerConnection(rtcConfiguration))
-    override val peerConnection: StateFlow<PeerConnection> get() = _peerConnection
+        MutableStateFlow<PeerConnection?>(PeerConnection(rtcConfiguration))
+    override val peerConnection: StateFlow<PeerConnection?> get() = _peerConnection
     
     private val offer = MutableStateFlow<SessionDescription?>(null)
     
@@ -144,6 +148,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     val callOutputRoutine = launch {
                         for (frame in incoming) {
                             if (frame is Frame.Text) {
+                                
+                                println("frame11 $frame")
                                 val text = frame.readText()
                                 val jsonElement = Json.parseToJsonElement(text)
                                 val type = jsonElement.jsonObject["type"]?.jsonPrimitive?.content
@@ -213,6 +219,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             }
                                         }
                                     }
+                                    
+                                    "rejectCall" -> {
+                                        rejectCallAnswer(navigator)
+                                    }
                                 }
                             }
                         }
@@ -230,17 +240,18 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override suspend fun initWebrtc(): Nothing = coroutineScope {
         
-            
-            
-            println("signalingStateClose")
-            
+        
+        println("signalingStateClose")
+
 //            val peerConnection.value = PeerConnection(rtcConfiguration)
-            
-            
-            
-            
+
+
 //            _peerConnection.value = PeerConnection(rtcConfiguration)
-            
+        
+        
+        println("peerConnection.value ${peerConnection.value}")
+        
+        if (peerConnection.value !== null) {
             
             val stream = MediaDevices.getUserMedia(audio = true, video = true)
             
@@ -249,14 +260,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             
             stream.tracks.forEach { track ->
-                peerConnection.value.addTrack(track, localStream.value!!)
+                peerConnection.value!!.addTrack(track, localStream.value!!)
             }
             
             
             
             _isConnectedWebrtc.value = true
             // Обработка кандидатов ICE
-            peerConnection.value.onIceCandidate
+            peerConnection.value!!.onIceCandidate
                 .onEach { candidate ->
                     Logger.d { "PC2213131" }
                     
@@ -289,7 +300,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .launchIn(this)
             
             // Следим за изменениями состояния сигнализации
-            peerConnection.value.onSignalingStateChange
+            peerConnection.value!!.onSignalingStateChange
                 .onEach { signalingState ->
                     Logger.d { "peerState111 onSignalingStateChange: $signalingState" }
                     
@@ -300,7 +311,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .launchIn(this)
             
             // Следим за изменениями состояния соединения ICE
-            peerConnection.value.onIceConnectionStateChange
+            peerConnection.value!!.onIceConnectionStateChange
                 .onEach { state ->
                     
                     _iceState.value = state
@@ -309,7 +320,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .launchIn(this)
             
             // Следим за изменениями общего состояния соединения
-            peerConnection.value.onConnectionStateChange
+            peerConnection.value!!.onConnectionStateChange
                 .onEach { state ->
                     Logger.d { "peerState111 onConnectionStateChange: $state" }
                     
@@ -321,7 +332,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             
             // Обработка треков, получаемых от удалённого пира
-            peerConnection.value.onTrack
+            peerConnection.value!!.onTrack
                 .onEach { event ->
                     Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
                     if (event.track?.kind == MediaStreamTrackKind.Video) {
@@ -329,8 +340,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     }
                 }
                 .launchIn(this)
-        
+        }
         awaitCancellation()  // Поддерживаем корутину активной
+        
     }
     
     override suspend fun getWsSession(): DefaultClientWebSocketSession? {
@@ -355,78 +367,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         otherUserId.value = userId
     }
-
-//    override fun rejectCall() {
-//        try {
-//
-//            println("asaassaasrejectCall ${peerConnection.value}")
-//
-////            peerConnection.value.getTransceivers().forEach { peerConnection.value.removeTrack(it.sender) }
-//
-//
-//            // Останавливаем все треки локального потока
-//            localStream.value?.let { stream ->
-//                stream.tracks.forEach { track ->
-//                    track.stop()
-//                }
-//            }
-//
-//            _peerConnection.value.getTransceivers().forEach { _peerConnection.value.removeTrack(it.sender) }
-//
-//
-//            _peerConnection.value.close()
-//
-////            _peerConnection.value = PeerConnection(rtcConfiguration)
-//
-//
-//            // Очищаем локальный и удаленный потоки
-//            localStream.value = null
-//            remoteVideoTrack.value = null
-//            _isConnectedWebrtc.value = false
-//            offer.value = null
-//            otherUserId.value = ""
-//            callerId.value = ""
-//            _iceState.value = IceConnectionState.New
-//            _callState.value = PeerConnectionState.New
-//
-//
-//        } catch (e: Exception) {
-//            Logger.e(e) { "Failed to reject call and clean up resources. $e" }
-//        }
-//    }
-//
-//
-//    override fun rejectCallAnswer() {
-//        try {
-//            // Останавливаем все треки локального потока
-//            localStream.value?.let { stream ->
-//                stream.tracks.forEach { track ->
-//                    track.stop()
-//                }
-//            }
-//
-//
-//            _peerConnection.value.getTransceivers().forEach { _peerConnection.value.removeTrack(it.sender) }
-//
-////            _peerConnection.value = PeerConnection(rtcConfiguration)
-//
-//            // Очищаем локальный и удаленный потоки
-//            localStream.value = null
-//            remoteVideoTrack.value = null
-//            _isConnectedWebrtc.value = false
-//            offer.value = null
-//            otherUserId.value = ""
-//            callerId.value = ""
-//            _iceState.value = IceConnectionState.New
-//            _callState.value = PeerConnectionState.New
-////
-//
-//
-//        } catch (e: Exception) {
-//            Logger.e(e) { "Failed to reject call and clean up resources. $e" }
-//        }
-//    }
-//
     
     
     @OptIn(DelicateCoroutinesApi::class)
@@ -521,22 +461,55 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    override fun rejectCall() {
+    override suspend fun rejectCall(navigator: Navigator,userId: String): Boolean {
         try {
-            println("asaassaasrejectCall ${peerConnection.value}")
             
+            println("rejectCall1")
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("type", "rejectCall")
+                    put("userId", userId)
+                }
+            )
+            println("rejectCall12")
+            
+            rejectCallAnswer(navigator)
+            
+            
+            wsSession.value?.send(Frame.Text(jsonContent))
+            println("rejectCall13")
+            
+            
+            println("rejectCall134")
+            
+            return true
+            
+        } catch (e: Exception) {
+            println(e)
+            
+            navigator.push(MainScreen())
+            return false
+            
+        }
+    }
+    
+     fun rejectCallAnswer(navigator: Navigator) {
+        try {
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value
-            
-            
+            println("rejectCallAnswer1")
             
             if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
+                println("rejectCallAnswer2")
+                
                 localStream.value?.let { stream ->
                     stream.tracks.forEach { track ->
                         track.stop()
                     }
                 }
+                
+                println("rejectCallAnswer3")
                 
                 // Удаляем все треки
                 currentPeerConnection.getTransceivers().forEach {
@@ -549,7 +522,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 Logger.w { "PeerConnection already closed" }
             }
             
+            println("rejectCallAnswer4")
+            
             // Очищаем локальный и удаленный потоки
+            _peerConnection.value = null
             localStream.value = null
             remoteVideoTrack.value = null
             _isConnectedWebrtc.value = false
@@ -559,44 +535,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _iceState.value = IceConnectionState.New
             _callState.value = PeerConnectionState.New
             
-            Logger.d { "Call rejected and resources cleaned up successfully." }
-        } catch (e: Exception) {
-            Logger.e(e) { "Failed to reject call and clean up resources. $e" }
-        }
-    }
-    
-    override fun rejectCallAnswer() {
-        try {
-            // Проверяем, инициализирован ли peerConnection
-            val currentPeerConnection = _peerConnection.value
-            if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
-                // Останавливаем все треки локального потока
-                localStream.value?.let { stream ->
-                    stream.tracks.forEach { track ->
-                        track.stop()
-                    }
-                }
-                
-                // Удаляем все треки
-                currentPeerConnection.getTransceivers().forEach {
-                    currentPeerConnection.removeTrack(it.sender)
-                }
-                
-                // Закрываем PeerConnection
-//                currentPeerConnection.close()
-            } else {
-                Logger.w { "PeerConnection already closed" }
-            }
+            println("rejectCallAnswer5")
             
-            // Очищаем локальный и удаленный потоки
-            localStream.value = null
-            remoteVideoTrack.value = null
-            _isConnectedWebrtc.value = false
-            offer.value = null
-            otherUserId.value = ""
-            callerId.value = ""
-            _iceState.value = IceConnectionState.New
-            _callState.value = PeerConnectionState.New
+            _peerConnection.value = PeerConnection(rtcConfiguration)
+            
+            
+            navigator.push(MainScreen())
             
             Logger.d { "Call answer rejected and resources cleaned up successfully." }
         } catch (e: Exception) {

@@ -26,11 +26,15 @@ class MainScreen : Screen {
         
         
         
-//        LaunchedEffect(viewModel.peerConnection.value) {
+//        LaunchedEffect(viewModel.callWsSession.value) {
 //
-//            val op = viewModel.getPeerConnection()
 //
-//            println("op3131 ${viewModel.peerConnection.value}")
+//            viewModel.callWsSession.collect {
+//                println("op3131 ${it}")
+//
+//            }
+//
+//
 //        }
 //
         Drawer(drawerState, viewModel)

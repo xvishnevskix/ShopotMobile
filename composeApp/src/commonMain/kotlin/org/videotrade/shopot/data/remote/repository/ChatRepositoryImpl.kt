@@ -117,4 +117,11 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
             println("Failed to send message: ${e.message}")
         }
     }
+    
+    override fun clearMessages() {
+        _messages.value = emptyList()
+      
+    }
+    
+    
 }

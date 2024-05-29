@@ -31,43 +31,39 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.shepeliev.webrtckmp.IceConnectionState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 class CallScreen(
-//    private val chat: ChatItem,
     private val userId: String,
     private val callCase: String,
-    
-    ) : Screen {
+) : Screen {
     
     @Composable
     override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        
+        // Use a remember key to manage ViewModel lifecycle
+//        val viewModelState = remember { mutableStateOf(CallViewModel()) }
+//        val viewModel = viewModelState.value
         
         
         val viewModel: CallViewModel = koinInject()
+        
         val wsSession by viewModel.wsSession.collectAsState()
         val callState by viewModel.callState.collectAsState()
         val iceState by viewModel.iceState.collectAsState()
         
-        
-        val navigator = LocalNavigator.currentOrThrow
-        
         val hasExecuted = remember { mutableStateOf(false) }
         val isRejected = remember { mutableStateOf(false) }
         
-        
         LaunchedEffect(wsSession) {
-            
-            
             if (!hasExecuted.value && wsSession != null) {
                 when (callCase) {
                     "Call" -> {
@@ -77,33 +73,35 @@ class CallScreen(
                     }
                     
                     "IncomingCall" -> viewModel.answerCall()
-                    
                 }
-                
                 hasExecuted.value = true
             }
         }
         
+        println("sdadaa $iceState")
+
+//        LaunchedEffect(iceState) {
+//            if (IceConnectionState.Closed == iceState || IceConnectionState.Disconnected == iceState) {
+//                if (!isRejected.value) {
+//                    val op = viewModel.rejectCallAnswer()
+//                    if (op) {
+//                        viewModel._iceState.value = IceConnectionState.New
+//                        navigator.push(MainScreen())
+//                    }
+//                }
+//                isRejected.value = true
+//            }
+//        }
+
+//        DisposableEffect(Unit) {
+//            onDispose {
+//                // Dispose ViewModel when the screen is removed from composition
+//                viewModel.stopObserving()
+//                viewModelState.value = CallViewModel() // Recreate ViewModel
+//            }
+//        }
         
-        
-        LaunchedEffect(iceState) {
-            
-            
-            if (IceConnectionState.Closed == iceState || IceConnectionState.Disconnected == iceState) {
-                
-                if (!isRejected.value) {
-                    println("sdadaa")
-                    viewModel.rejectCallAnswer()
-                }
-                isRejected.value = true
-                navigator.push(MainScreen())
-            }
-            
-        }
-        
-        
-        var Photo: DrawableResource
-        Photo = Res.drawable.person
+        var Photo: DrawableResource = Res.drawable.person
         
         Image(
             painter = painterResource(Photo),
@@ -118,12 +116,10 @@ class CallScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-            
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp)
-                //.background(Color(0, 0, 0)),
             )
             Box(
                 modifier = Modifier
@@ -146,7 +142,6 @@ class CallScreen(
                         .height(190.dp)
                         .clip(RoundedCornerShape(100.dp))
                 )
-                
             }
             
             Text(
@@ -156,28 +151,22 @@ class CallScreen(
                     .align(Alignment.CenterHorizontally),
                 fontSize = 16.sp,
                 color = Color(255, 255, 255)
-            
             )
             
-            var name: String
-            name = "Максим Аркаев"
+            var name: String = "Максим Аркаев"
             Text(
                 modifier = Modifier
                     .padding(top = 12.5.dp)
                     .align(Alignment.CenterHorizontally),
-                text = "$name",
+                text = name,
                 fontSize = 24.sp,
                 color = Color(255, 255, 255)
-            
             )
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(330.dp)
-                //.background(Color(0, 0, 0)),
             )
-            
-            
             
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -186,17 +175,14 @@ class CallScreen(
             ) {
                 speakerBtn { }
                 rejectBtn({
-                    viewModel.rejectCall()
-                    isRejected.value = true
-//                    navigator.push(MainScreen())
+                    
+                    println("rejectBtn")
+                    viewModel.rejectCall(navigator, userId)
+                    
+                    
                 }, "Завершить")
                 microfonBtn {}
             }
         }
-        
     }
 }
-
-
-
-

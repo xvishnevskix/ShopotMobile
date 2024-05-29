@@ -297,7 +297,9 @@ fun MessageBox(
     val isReadByMe = remember { mutableStateOf(false) }
     val isSendRead = remember { mutableStateOf(false) }
     
-    LaunchedEffect(key1 = isReadByMe) {
+    
+    LaunchedEffect(viewModel.messages.value) {
+        println("message.anotherRead ${message.content}  ${message.anotherRead}")
         
         
         if (!isSendRead.value) {

@@ -52,7 +52,7 @@ class ChatScreen(
                     
                     Scaffold(
                         topBar = {
-                            ChatHeader(chat)
+                            ChatHeader(chat,viewModel)
                         
                         },
                         bottomBar = {

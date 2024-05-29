@@ -32,6 +32,11 @@ class ChatUseCase : KoinComponent {
         return repository.delMessage(message)
     }
     
+      fun clearMessages() {
+        return repository.clearMessages()
+    }
+    
+    
     suspend fun addMessage(message: MessageItem) {
         return repository.addMessage(message)
     }

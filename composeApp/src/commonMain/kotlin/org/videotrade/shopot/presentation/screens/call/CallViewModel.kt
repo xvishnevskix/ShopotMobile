@@ -1,8 +1,8 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
-import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
@@ -17,6 +17,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.usecase.CallUseCase
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class CallViewModel() : ViewModel(), KoinComponent {
     private val callUseCase: CallUseCase by inject()
@@ -27,80 +28,70 @@ class CallViewModel() : ViewModel(), KoinComponent {
     private val _isConnectedWebrtc = MutableStateFlow(false)
     val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
     
-    
     private val _localStream = MutableStateFlow<MediaStream?>(null)
     val localStream: StateFlow<MediaStream?> get() = _localStream
-    
     
     private val _remoteVideoTrack = MutableStateFlow<VideoStreamTrack?>(null)
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = _remoteVideoTrack
     
-    
     private val _callState = MutableStateFlow(PeerConnectionState.New)
     val callState: StateFlow<PeerConnectionState> get() = _callState
     
-    
-    private val _iceState = MutableStateFlow(IceConnectionState.New)
+    val _iceState = MutableStateFlow<IceConnectionState>(IceConnectionState.New)
     val iceState: StateFlow<IceConnectionState> get() = _iceState
     
+    // Флаг для управления наблюдением
+    private var isObserving = MutableStateFlow(true)
     
     init {
+        startObserving()
+    }
+    
+    private fun startObserving() {
         viewModelScope.launch {
-            
-            println("callStateNew22 ${callUseCase.peerConnection}")
-            
-            
             observeCallStates()
             observeWsConnection()
             observeIsConnectedWebrtc()
-//            observeStreems()
+            observeStreams()
         }
     }
     
-    
     private fun observeCallStates() {
-        
         callUseCase.iseState
             .onEach { iseStateNew ->
-                
-                
-                _iceState.value = iseStateNew
-                
-                println("iseStateNew $iseStateNew")
-                
+                if (isObserving.value) {
+                    _iceState.value = iseStateNew
+                    println("iseStateNew $iseStateNew")
+                }
             }
             .launchIn(viewModelScope)
         
         callUseCase.callState
             .onEach { callStateNew ->
-                
-                _callState.value = callStateNew
-                
-                println("callStateNew $callStateNew")
-                
+                if (isObserving.value) {
+                    _callState.value = callStateNew
+                    println("callStateNew $callStateNew")
+                }
             }
             .launchIn(viewModelScope)
     }
     
-    
-    private fun observeStreems() {
+    private fun observeStreams() {
         callUseCase.localStream
             .onEach { localStreamNew ->
-                
-                _localStream.value = localStreamNew
-                
-                println("_localStream $_localStream")
-                
+                if (isObserving.value) {
+                    _localStream.value = localStreamNew
+                    println("_localStream $_localStream")
+                }
             }
             .launchIn(viewModelScope)
         
         callUseCase.remoteVideoTrack
             .onEach { remoteVideoTrackNew ->
-                
-                _remoteVideoTrack.value = remoteVideoTrackNew
-                
-                println("remoteVideoTrackNew $remoteVideoTrackNew")
-                
+                if (isObserving.value) {
+                    _remoteVideoTrack.value = remoteVideoTrackNew
+                    println("remoteVideoTrackNew $remoteVideoTrackNew")
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -108,24 +99,21 @@ class CallViewModel() : ViewModel(), KoinComponent {
     private fun observeIsConnectedWebrtc() {
         callUseCase.isConnectedWebrtc
             .onEach { isConnectedWebrtcNew ->
-                
-                _isConnectedWebrtc.value = isConnectedWebrtcNew
-                
-                println("isConnectedWebrtcNew $isConnectedWebrtcNew")
-                
+                if (isObserving.value) {
+                    _isConnectedWebrtc.value = isConnectedWebrtcNew
+                    println("isConnectedWebrtcNew $isConnectedWebrtcNew")
+                }
             }
             .launchIn(viewModelScope)
     }
     
-    
     private fun observeWsConnection() {
         callUseCase.wsSession
             .onEach { wsSessionNew ->
-                
-                _wsSession.value = wsSessionNew
-                
-                println("wsSessionNew1111 $wsSessionNew")
-                
+                if (isObserving.value) {
+                    _wsSession.value = wsSessionNew
+                    println("wsSessionNew1111 $wsSessionNew")
+                }
             }
             .launchIn(viewModelScope)
     }
@@ -136,13 +124,11 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
-    
     fun updateOtherUserId(userId: String) {
         viewModelScope.launch {
             callUseCase.updateOtherUserId(userId)
         }
     }
-    
     
     private fun getOtherUserId(): String {
         return callUseCase.getOtherUserId()
@@ -152,7 +138,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
         return callUseCase.getCallerId()
     }
     
-    
     fun reconnectPeerConnection() {
         viewModelScope.launch {
             callUseCase.reconnectPeerConnection()
@@ -161,6 +146,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun initWebrtc() {
         viewModelScope.launch {
+            startObservingAgain()
             callUseCase.initWebrtc()
         }
     }
@@ -175,21 +161,34 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.answerCall()
     }
     
-    
-    fun rejectCall() {
+    fun rejectCall(navigator: Navigator, userId: String) {
         viewModelScope.launch {
+            val isRejectCall = callUseCase.rejectCall(navigator,userId)
             
-            _callState.value = PeerConnectionState.New
-            _iceState.value = IceConnectionState.New
-            callUseCase.rejectCall()
+            if (isRejectCall) {
+                navigator.push(MainScreen())
+            }
         }
+        
+        
     }
     
-    fun rejectCallAnswer() {
-        viewModelScope.launch {
-            callUseCase.rejectCallAnswer()
-        }
+    fun rejectCallAnswer(): Boolean {
+        _callState.value = PeerConnectionState.New
+        _iceState.value = IceConnectionState.New
+        callUseCase.rejectCallAnswer()
+        
+        return true
     }
     
+    // Новая функция для остановки наблюдения
+    fun stopObserving() {
+        isObserving.value = false
+    }
     
+    // Новая функция для запуска наблюдения
+    fun startObservingAgain() {
+        isObserving.value = true
+        startObserving()
+    }
 }

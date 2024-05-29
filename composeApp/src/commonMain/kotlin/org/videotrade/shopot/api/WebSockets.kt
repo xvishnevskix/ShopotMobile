@@ -261,6 +261,38 @@ suspend fun handleWebRTCWebSocket(
                                     
                                     
                                 }
+                                
+                                
+                                
+                                "messageReadNotification" -> {
+                                    try {
+                                        
+                                        
+                                    
+                                        val messageJson =
+                                            jsonElement.jsonObject["message"]?.jsonObject
+                                        
+                                        println("messageReadNotification1 $messageJson")
+                                        
+                                        if (messageJson != null) {
+                                            
+                                            
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
+                                            
+                                            
+                                            println("messageReadNotification $message")
+                                            
+//                                            chatUseCase.delMessage(message)// Инициализация сообщений
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                    
+                                }
                             }
                         }
                     }

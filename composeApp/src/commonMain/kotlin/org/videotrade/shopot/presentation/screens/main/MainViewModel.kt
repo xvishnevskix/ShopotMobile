@@ -1,10 +1,9 @@
 package org.videotrade.shopot.presentation.screens.main
 
 import cafe.adriel.voyager.navigator.Navigator
-import com.shepeliev.webrtckmp.PeerConnection
-import com.shepeliev.webrtckmp.PeerConnectionState
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,6 +29,9 @@ class MainViewModel : ViewModel(), KoinComponent {
     val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
     
+//    val callWsSession: Flow<DefaultClientWebSocketSession?> get() = callUseCase.wsSession
+    
+    
     private val _chats = MutableStateFlow<List<ChatItem>>(emptyList())
     
     val chats: StateFlow<List<ChatItem>> = _chats.asStateFlow()
@@ -41,18 +43,10 @@ class MainViewModel : ViewModel(), KoinComponent {
     val navigator = MutableStateFlow<Navigator?>(null)
     
     
-    private val _peerConnection = MutableStateFlow<PeerConnection?>(null)
-    
-    val peerConnection  get() = _peerConnection.asStateFlow()
-    
-    
     init {
         viewModelScope.launch {
             
-     
             
-            
-    
             getProfile()
             
             loadUsers()
@@ -74,7 +68,6 @@ class MainViewModel : ViewModel(), KoinComponent {
             }
             
             
-     
         }
     }
 
@@ -118,14 +111,14 @@ class MainViewModel : ViewModel(), KoinComponent {
         
         navigator.value = navigatorGet
     }
-    
-    
-        fun getPeerConnection() {
-        viewModelScope.launch {
-            _peerConnection.value =  callUseCase.getPeerConnection()
-        }
-    }
 
+
+//        fun getPeerConnection() {
+//        viewModelScope.launch {
+//            _peerConnection.value =  callUseCase.getPeerConnection()
+//        }
+//    }
+    
     private fun getWsSession() {
         viewModelScope.launch {
             

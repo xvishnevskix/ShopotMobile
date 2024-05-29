@@ -15,6 +15,10 @@ interface ChatRepository {
     suspend fun getMessagesBack(chatId: String)
     
     suspend fun delMessage(message: MessageItem)
+     fun clearMessages()
+    
+    
+    
     suspend fun addMessage(message: MessageItem)
     suspend fun sendMessage(message: MessageItem)
     
