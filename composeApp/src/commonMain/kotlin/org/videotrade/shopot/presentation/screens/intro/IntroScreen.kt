@@ -16,6 +16,7 @@ import io.ktor.http.HttpStatusCode
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.logo
@@ -41,6 +42,13 @@ class IntroScreen : Screen {
         
         
         LaunchedEffect(key1 = Unit) {
+            
+            
+            
+//            val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
+            
+            
+//            println("contactsNative $contactsNative")
             
             
             val response = origin().reloadTokens()

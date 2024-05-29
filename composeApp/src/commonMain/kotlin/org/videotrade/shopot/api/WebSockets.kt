@@ -69,7 +69,7 @@ suspend fun handleWebRTCWebSocket(
                                 "getUserChats" -> {
                                     try {
                                         
-                                        println("getUserChatsgetUserChats")
+                                        println("getUserChatsgetUserChats $jsonElement")
                                         
                                         val dataJson = jsonElement.jsonObject["data"]?.jsonArray
                                         
@@ -126,6 +126,7 @@ suspend fun handleWebRTCWebSocket(
                                 
                                 "getMessages" -> {
                                     try {
+                                        println("jsonElement111 $jsonElement")
                                         
                                         
                                         val dataJson =

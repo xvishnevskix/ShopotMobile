@@ -14,4 +14,7 @@ data class MessageItem(
     var isDeleted: Boolean = false,
     var chatId: String,
     var uploadStack: String? = "",
+    var anotherRead: Boolean
+    
+    
 )
