@@ -17,10 +17,12 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.usecase.CallUseCase
+import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class CallViewModel() : ViewModel(), KoinComponent {
     private val callUseCase: CallUseCase by inject()
+    private val profileUseCase: ProfileUseCase by inject()
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
@@ -151,9 +153,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
-    @OptIn(DelicateCoroutinesApi::class)
-    suspend fun makeCall(userId: String) {
-        callUseCase.makeCall(userId)
+    suspend fun makeCall(calleeId: String) {
+        profileUseCase.getProfile()?.let { callUseCase.makeCall( it.id , calleeId) }
     }
     
     @OptIn(DelicateCoroutinesApi::class)

@@ -40,6 +40,9 @@ import shopot.composeapp.generated.resources.smart_encryption
 fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
     val chatState = viewModel.chats.collectAsState(initial = listOf()).value
     
+    
+    
+    
     SafeArea {
         Column {
             HeaderMain(drawerState)

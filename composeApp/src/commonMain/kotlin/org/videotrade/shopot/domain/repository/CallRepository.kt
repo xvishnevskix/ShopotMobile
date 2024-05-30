@@ -47,7 +47,7 @@ interface CallRepository {
     suspend fun initWebrtc(): Nothing
     
     
-    suspend fun makeCall(userId: String)
+    suspend fun makeCall(userId: String, calleeId: String)
     suspend fun answerCall()
     
    suspend fun rejectCall(navigator: Navigator, userId: String): Boolean

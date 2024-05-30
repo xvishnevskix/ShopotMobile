@@ -158,6 +158,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 when (type) {
                                     "newCall" -> {
                                         rtcMessage?.let {
+                                            
+                                            println("jsonElement1112 $jsonElement")
                                             val sdp =
                                                 it["sdp"]?.jsonPrimitive?.content ?: return@launch
                                             val callerId =
@@ -370,7 +372,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     @OptIn(DelicateCoroutinesApi::class)
-    suspend override fun makeCall(userId: String) {
+    suspend override fun makeCall(userId: String, calleeId: String) {
         coroutineScope {
             if (wsSession.value != null) {
                 val offer = peerConnection.value?.createOffer(
@@ -388,13 +390,24 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     return@coroutineScope
                 }
                 
-                val newCallMessage = WebRTCMessage(
-                    type = "call",
-                    calleeId = userId,
-                    rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
+//                val newCallMessage = WebRTCMessage(
+//                    type = "call",
+//                    calleeId = calleeId,
+//                    userId = userId,
+//                    rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
+//                )
+                
+                val jsonMessage = Json.encodeToString(
+                    buildJsonObject {
+                        put("type", "call")
+                        put("calleeId", calleeId)
+                        put("userId", userId)
+                        put("rtcMessage", offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }.toString())
+                    }
                 )
                 
-                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
+                
+//                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
                 
                 try {
                     wsSession.value?.send(Frame.Text(jsonMessage))
@@ -461,7 +474,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    override suspend fun rejectCall(navigator: Navigator,userId: String): Boolean {
+    override suspend fun rejectCall(navigator: Navigator, userId: String): Boolean {
         try {
             
             println("rejectCall1")
@@ -493,7 +506,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         }
     }
     
-     fun rejectCallAnswer(navigator: Navigator) {
+    fun rejectCallAnswer(navigator: Navigator) {
         try {
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value

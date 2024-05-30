@@ -66,8 +66,8 @@ class CallUseCase : KoinComponent {
     }
     
     
-    suspend fun makeCall(userId: String) {
-        repository.makeCall(userId)
+    suspend fun makeCall(userId: String, calleeId: String){
+        repository.makeCall(userId, calleeId)
     }
     
     suspend fun answerCall() {
