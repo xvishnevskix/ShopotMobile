@@ -277,13 +277,14 @@ suspend fun handleWebRTCWebSocket(
                                         if (messageJson != null) {
                                             
                                             
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
+                                            val messageId =
+                                                messageJson["messageId"]?.jsonPrimitive?.content
                                             
                                             
-                                            println("messageReadNotification $message")
                                             
-//                                            chatUseCase.delMessage(message)// Инициализация сообщений
+                                            if (messageId != null) {
+                                                chatUseCase.readMessage(messageId)
+                                            }
                                         }
                                         
                                     } catch (e: Exception) {

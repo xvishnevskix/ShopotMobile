@@ -302,7 +302,7 @@ fun MessageBox(
         println("message.anotherRead ${message.content}  ${message.anotherRead}")
         
         
-        if (!isSendRead.value) {
+//        if (!isSendRead.value) {
             if (message.fromUser == profile.id) {
                 if (message.anotherRead) {
                     isReadByMe.value = true
@@ -311,13 +311,13 @@ fun MessageBox(
             } else {
                 
                 if (!message.iread) {
-                    viewModel.readMessage(message.id)
+                    viewModel.sendReadMessage(message.id)
                 }
             }
             
-            isSendRead.value = true
-            
-        }
+//            isSendRead.value = true
+//
+//        }
         
         
     }
@@ -405,7 +405,7 @@ fun MessageBox(
             
             
             if (message.fromUser == profile.id)
-                if (isReadByMe.value) {
+                if (message.anotherRead) {
                     Image(
                         modifier = Modifier
                             .padding(top = 2.dp, end = 4.dp)

@@ -46,9 +46,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun readMessage(messageId: String) {
+    fun sendReadMessage(messageId: String) {
         viewModelScope.launch {
-            chatUseCase.readMessage(messageId, profile.value.id)
+            chatUseCase.sendReadMessage(messageId, profile.value.id)
         }
     }
     

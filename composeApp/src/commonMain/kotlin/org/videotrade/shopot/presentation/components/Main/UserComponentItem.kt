@@ -35,6 +35,7 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.randomUser
 
 @Composable
@@ -53,7 +54,7 @@ fun UserComponentItem(chat: ChatItem) {
         ) {
             
             Avatar(
-                drawableRes = Res.drawable.randomUser,
+                drawableRes = Res.drawable.person,
                 size = 60.dp
             )
             

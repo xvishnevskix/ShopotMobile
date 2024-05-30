@@ -4,6 +4,7 @@ import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -56,7 +57,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     override fun getMessages(): StateFlow<List<MessageItem>> = _messages.asStateFlow()
     
     
-    override suspend fun readMessage(messageId: String, userId: String) {
+    override suspend fun sendReadMessage(messageId: String, userId: String) {
         
         try {
             
@@ -73,6 +74,23 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }
+    }
+    
+    
+    override fun readMessage(messageId: String) {
+        _messages.update { currentChat ->
+            currentChat.map { messageItem ->
+                
+                if (messageItem.id == messageId) {
+                    println("messageId!!!!!! ${messageItem.id} $messageId")
+                    
+                    messageItem.copy(anotherRead = true)
+                } else {
+                    messageItem
+                }
+            }
+        }
+        
     }
     
     
@@ -120,7 +138,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     
     override fun clearMessages() {
         _messages.value = emptyList()
-      
+        
     }
     
     
