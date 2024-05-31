@@ -100,7 +100,11 @@ class origin {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
         } catch (e: Exception) {
+            
             println("Error: $e")
+            
+            return null
+            
         } finally {
             client.close()
         }

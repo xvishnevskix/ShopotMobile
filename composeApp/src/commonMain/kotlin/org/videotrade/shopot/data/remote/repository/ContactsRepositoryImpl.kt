@@ -1,18 +1,23 @@
 package org.videotrade.shopot.data.remote.repository
 
+import cafe.adriel.voyager.navigator.Navigator
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.domain.repository.ContactsRepository
+import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 
-class ContactsRepositoryImpl : ContactsRepository {
+class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     private val _contacts = MutableStateFlow<List<ContactDTO>>(
         listOf(
         
@@ -87,31 +92,49 @@ class ContactsRepositoryImpl : ContactsRepository {
         
     }
     
-    override suspend fun createChat(profileId: String, contact: ContactDTO) {
+    override suspend fun createChat(profileId: String, contact: ContactDTO, navigator: Navigator) {
+        val wsUseCase: WsUseCase by inject()
+
+
+//        val jsonContent = Json.encodeToString(
+//            buildJsonObject {
+//                put("firstUserId", profileId)
+//                put("secondUserId", contact.id)
+//
+//            }
+//        )
+//
+//        println("jsonContent $jsonContent")
+//
+//        @Serializable
+//        data class PersonalChat(
+//            val id: String,
+//            val createdAt: String,
+//            val firstUserId: String,
+//            val secondUserId: String
+//        )
+//
+//        val contactsGet = origin().post<PersonalChat>("personal-chat", jsonContent)
         
         
-        val jsonContent = Json.encodeToString(
-            buildJsonObject {
-                put("firstUserId", profileId)
-                put("secondUserId", contact.id)
-                
-            }
-        )
+        try {
+            val jsonContentSocket = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "createChat")
+                    put("firstUserId", profileId)
+                    put("secondUserId", contact.id)
+                }
+            )
+            
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContentSocket))
+            
+            
+            navigator.push(MainScreen())
+        } catch (e: Exception) {
+            
+            println("error createChat")
+        }
         
-        println("jsonContent $jsonContent")
-        
-        @Serializable
-        data class PersonalChat(
-            val id: String,
-            val createdAt: String,
-            val firstUserId: String,
-            val secondUserId: String
-        )
-        
-        val contactsGet = origin().post<PersonalChat>("personal-chat", jsonContent)
-        
-        
-        println("contactsGet $contactsGet")
         
     }
     

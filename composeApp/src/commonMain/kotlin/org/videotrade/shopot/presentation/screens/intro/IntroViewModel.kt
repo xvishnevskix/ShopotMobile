@@ -17,8 +17,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
@@ -39,8 +39,8 @@ class IntroViewModel : ViewModel(), KoinComponent {
     
     
     val profile = MutableStateFlow<ProfileDTO?>(null)
-    
-    
+
+
 //    init {
 //        viewModelScope.launch {
 //            println("dadsadada1")
@@ -68,7 +68,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             println("dadsadada1")
             
-            downloadProfile()
+            downloadProfile(navigator)
             
             profile.collect { updatedProfile ->
                 
@@ -76,7 +76,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
                     println("dadsadada2")
                     observeWsConnection(it, navigator)
                     
-                    connectionWs(it)
+                    connectionWs(it, navigator)
                     
                     
                 }
@@ -108,18 +108,27 @@ class IntroViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun connectionWs(userId: String) {
+    fun connectionWs(userId: String, navigator: Navigator) {
         viewModelScope.launch {
-            WsUseCase.connectionWs(userId)
+            WsUseCase.connectionWs(userId, navigator)
         }
     }
     
     
-    fun downloadProfile() {
+    private fun downloadProfile(navigator: Navigator) {
         viewModelScope.launch {
-            val profileCase = profileUseCase.downloadProfile() ?: return@launch
+            val profileCase = profileUseCase.downloadProfile()
             
             
+            
+            if (profileCase == null) {
+                
+                delValueInStorage("accessToken")
+                delValueInStorage("refreshToken")
+                
+                return@launch
+                
+            }
             profile.value = profileCase
             
             

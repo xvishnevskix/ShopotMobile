@@ -16,7 +16,7 @@ interface ChatsRepository {
     fun updateLastMessageChat(messageItem: MessageItem)
     fun delChat(chat: ChatItem)
     fun addChat(chat: ChatItem)
-    fun addChats(chat: MutableList<ChatItem>)
+    fun addChats(chatsInit: MutableList<ChatItem>)
     
 
 }

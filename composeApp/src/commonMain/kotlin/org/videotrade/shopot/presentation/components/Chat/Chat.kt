@@ -61,7 +61,6 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.formatTimestamp
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -247,7 +246,6 @@ val editOptions = listOf(
 
 @Composable
 fun Chat(
-    chat: ChatItem,
     viewModel: ChatViewModel,
     profile: ProfileDTO,
     modifier: Modifier,
@@ -261,14 +259,12 @@ fun Chat(
         state = listState,
         reverseLayout = true,
         modifier = modifier,
-        
-        ) {
-        itemsIndexed(messagesState) { index, message ->
+    ) {
+        itemsIndexed(messagesState) { _, message ->
             
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
             MessageBox(
-                chat = chat,
                 viewModel = viewModel,
                 message = message,
                 profile = profile,
@@ -284,7 +280,6 @@ fun Chat(
 
 @Composable
 fun MessageBox(
-    chat: ChatItem,
     viewModel: ChatViewModel,
     message: MessageItem,
     profile: ProfileDTO,
@@ -299,25 +294,17 @@ fun MessageBox(
     
     
     LaunchedEffect(viewModel.messages.value) {
-        println("message.anotherRead ${message.content}  ${message.anotherRead}")
-        
-        
-//        if (!isSendRead.value) {
-            if (message.fromUser == profile.id) {
-                if (message.anotherRead) {
-                    isReadByMe.value = true
-                }
-                
-            } else {
-                
-                if (!message.iread) {
-                    viewModel.sendReadMessage(message.id)
-                }
+        if (message.fromUser == profile.id) {
+            if (message.anotherRead) {
+                isReadByMe.value = true
             }
             
-//            isSendRead.value = true
-//
-//        }
+        } else {
+            
+            if (!message.iread) {
+                viewModel.sendReadMessage(message.id)
+            }
+        }
         
         
     }

@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import kotlinx.coroutines.delay
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -63,24 +62,22 @@ class ChatScreen(
                         modifier = Modifier
                             .fillMaxSize()
                     ) { innerPadding ->
-                        if (profile != null) {
-                            Chat(
-                                chat,
-                                viewModel,
+                        Chat(
+                            viewModel,
+                            profile,
+                            
+                            Modifier.fillMaxSize()
+                                .padding(innerPadding),
+                            
+                            onMessageClick = {
+                                             message, y ->
                                 
-                                profile,
-                                
-                                Modifier.fillMaxSize()
-                                    .padding(innerPadding),
-                                onMessageClick = { message, y ->
-                                    
-                                    selectedMessage = message
-                                    selectedMessageY = y + 150
-                                    hiddenMessageId = message.id
-                                },
-                                hiddenMessageId = hiddenMessageId
-                            )
-                        }
+                                selectedMessage = message
+                                selectedMessageY = y + 150
+                                hiddenMessageId = message.id
+                            },
+                            hiddenMessageId = hiddenMessageId
+                        )
                     }
                 }
             }

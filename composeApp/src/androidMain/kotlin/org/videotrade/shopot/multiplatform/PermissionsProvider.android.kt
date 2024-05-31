@@ -3,7 +3,6 @@ package org.videotrade.shopot.multiplatform
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -18,12 +17,14 @@ actual class PermissionsProvider(private val activity: Activity) {
     companion object {
         const val REQUEST_CODE_CAMERA = 1
         const val REQUEST_CODE_CONTACTS = 2
+        const val REQUEST_CODE_MICROPHONE = 3
     }
     
     actual suspend fun getPermission(permissionName: String): Boolean {
         return when (permissionName) {
             "camera" -> requestCameraPermission()
             "contacts" -> requestContactsPermission()
+            "microphone" -> requestMicrophonePermission()
             else -> {
                 println("Неизвестное разрешение: $permissionName")
                 false
@@ -78,8 +79,33 @@ actual class PermissionsProvider(private val activity: Activity) {
             }
         }
     }
+    
+    private suspend fun requestMicrophonePermission(): Boolean {
+        return withContext(Dispatchers.Main) {
+            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+                suspendCancellableCoroutine<Boolean> { continuation ->
+                    (activity as AppActivity).registerActivityResultCallback { requestCode, grantResults ->
+                        if (requestCode == REQUEST_CODE_MICROPHONE) {
+                            val granted = grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED
+                            continuation.resume(granted)
+                        }
+                    }
+                    ActivityCompat.requestPermissions(
+                        activity,
+                        arrayOf(Manifest.permission.RECORD_AUDIO),
+                        REQUEST_CODE_MICROPHONE
+                    )
+                }
+            } else {
+                println("Разрешение на использование микрофона уже предоставлено")
+                true
+            }
+        }
+    }
 }
 
+@SuppressLint("StaticFieldLeak")
 actual object PermissionsProviderFactory {
     private lateinit var activity: Activity
     

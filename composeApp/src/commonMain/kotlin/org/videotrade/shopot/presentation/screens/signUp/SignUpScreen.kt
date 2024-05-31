@@ -16,7 +16,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,15 +33,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
 import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.launch
@@ -55,10 +50,8 @@ import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
-import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -285,75 +278,59 @@ class SignUpScreen(private val phone: String) : Screen {
                             "Создать аккаунт",
                             { scope ->
                                 scope.launch {
-                                    val jsonContent = Json.encodeToString(
-                                        buildJsonObject {
-                                            put("firstName", textState.value.firstName)
-                                            put("lastName", textState.value.firstName)
-                                            put("email","admin.admin@gmail.com")
-                                            put("description", textState.value.firstName)
-                                            put("login", textState.value.nickname)
-                                            put("status", "active")
-                                        }
-                                    )
-
-
-
-
-
+                                    
                                     val client = HttpClient()
+                                    
                                     try {
-                                        val getToken = getValueInStorage("accessToken")
-                                        val response: HttpResponse = client.post("${serverUrl}user") {
-                                            contentType(ContentType.Application.Json)
-                                            header(HttpHeaders.Authorization, "Bearer $getToken")
-                                            setBody(jsonContent)
-                                        }
+                                        val jsonContent = Json.encodeToString(
+                                            buildJsonObject {
+                                                put("phoneNumber", phone.drop(1))
+                                                put("firstName", textState.value.firstName)
+                                                put("lastName", textState.value.firstName)
+                                                put("email", "admin.admin@gmail.com")
+                                                put("description", textState.value.firstName)
+                                                put("login", textState.value.nickname)
+                                                put("status", "active")
+                                            }
+                                        )
                                         
-                                        println("response313131 $response")
+                                        println("jsonContent $jsonContent")
+                                        
+                                        val response: HttpResponse =
+                                            client.post("${serverUrl}auth/sign-up") {
+                                                contentType(ContentType.Application.Json)
+                                                setBody(jsonContent)
+                                            }
+                                        println("responseresponse ${response}")
                                         
                                         if (response.status.isSuccess()) {
-                                            
-                                            
                                             val jsonString = response.bodyAsText()
-                                            val jsonElement = Json.parseToJsonElement(jsonString)
-                                            val messageObject =
-                                                jsonElement.jsonObject["message"]?.jsonObject
+                                            val jsonElement =
+                                                Json.parseToJsonElement(jsonString).jsonObject
                                             
+                                            println("accessToken ${jsonElement}")
                                             
-                                            val token = messageObject?.get("accessToken")?.jsonPrimitive?.content
+                                            val accessToken =
+                                                jsonElement["accessToken"]?.jsonPrimitive?.content
                                             val refreshToken =
-                                                messageObject?.get("refreshToken")?.jsonPrimitive?.content
+                                                jsonElement["refreshToken"]?.jsonPrimitive?.content
                                             
-                                            
-                                            println("response313131 $token")
-                                            println("response313131 $refreshToken")
-                                            
-                                            
-                                            token?.let {
-                                                addValueInStorage(
-                                                    "accessToken",
-                                                    token
-                                                )
+                                            accessToken?.let {
+                                                addValueInStorage("accessToken", accessToken)
                                             }
                                             refreshToken?.let {
-                                                addValueInStorage(
-                                                    "refreshToken",
-                                                    refreshToken
-                                                )
+                                                addValueInStorage("refreshToken", refreshToken)
                                             }
                                             
-                                            
-                                            viewModel.fetchContacts(navigator)
-                                            
-                                            
-                                        } else {
-                                            println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                                            navigator.push(MainScreen())
                                         }
                                     } catch (e: Exception) {
-                                        println("Error: $e")
+                                        e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
                                     } finally {
                                         client.close()
                                     }
+                                    
+                                    
                                 }
                             }
                         )

@@ -1,6 +1,7 @@
 package org.videotrade.shopot.api
 
 import androidx.compose.runtime.MutableState
+import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -21,8 +22,10 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 suspend fun handleWebRTCWebSocket(
+    navigator: Navigator,
     webSocketSession: MutableStateFlow<DefaultClientWebSocketSession?>,
     isConnected: MutableState<Boolean>,
     userId: String,
@@ -81,9 +84,10 @@ suspend fun handleWebRTCWebSocket(
                                                 return phone.replace(Regex("[^0-9]"), "")
                                             }
                                             
-                                            val contactsMap = contactsUseCase.contacts.value.associateBy {
-                                                normalizePhoneNumber(it.phone)
-                                            }
+                                            val contactsMap =
+                                                contactsUseCase.contacts.value.associateBy {
+                                                    normalizePhoneNumber(it.phone)
+                                                }
                                             
                                             
                                             println("sortChat $dataJson")
@@ -93,12 +97,11 @@ suspend fun handleWebRTCWebSocket(
                                                     Json.decodeFromString(chatItem.toString())
                                                 
                                                 
-                                                
-
-                                                val normalizedChatPhone = normalizePhoneNumber(chat.phone)
+                                                val normalizedChatPhone =
+                                                    normalizePhoneNumber(chat.phone)
                                                 
                                                 val contact = contactsMap[normalizedChatPhone]
-
+                                                
                                                 if (contact != null) {
                                                     val sortChat = chat.copy(
                                                         firstName = contact.firstName,
@@ -221,7 +224,6 @@ suspend fun handleWebRTCWebSocket(
                                             
                                             chatUseCase.addMessage(message)// Инициализация сообщений
                                             
-                                            chatsUseCase
                                             
                                         }
                                         
@@ -263,12 +265,10 @@ suspend fun handleWebRTCWebSocket(
                                 }
                                 
                                 
-                                
                                 "messageReadNotification" -> {
                                     try {
                                         
                                         
-                                    
                                         val messageJson =
                                             jsonElement.jsonObject["message"]?.jsonObject
                                         
@@ -294,6 +294,37 @@ suspend fun handleWebRTCWebSocket(
                                     
                                     
                                 }
+                                
+                                "createChat" -> {
+                                    
+                                    try {
+                                        
+                                        
+                                        val dataJson =
+                                            jsonElement.jsonObject["data"]?.jsonObject
+                                        
+                                        
+                                        if (dataJson != null) {
+                                            
+                                            
+                                            val chat =
+                                                Json.decodeFromString<ChatItem>(dataJson.toString())
+                                            
+                                            println("createChat1 $chat")
+                                            
+                                            
+                                            chatsUseCase.addChat(chat)
+                                            
+//                                            navigator.push(MainScreen())
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                }
+                                
                             }
                         }
                     }

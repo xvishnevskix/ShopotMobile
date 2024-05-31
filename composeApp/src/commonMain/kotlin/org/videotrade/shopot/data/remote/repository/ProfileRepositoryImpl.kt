@@ -3,12 +3,11 @@ package org.videotrade.shopot.data.remote.repository
 import androidx.compose.runtime.mutableStateOf
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.domain.model.UserProfile
 import org.videotrade.shopot.domain.repository.ProfileRepository
 
 class ProfileRepositoryImpl : ProfileRepository {
     
-    private val profile = mutableStateOf<ProfileDTO?>(ProfileDTO("1"))
+    private val profile = mutableStateOf<ProfileDTO?>(null)
     
     
     override suspend fun downloadProfile(): ProfileDTO? {

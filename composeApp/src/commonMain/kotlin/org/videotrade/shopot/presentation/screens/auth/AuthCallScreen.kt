@@ -1,12 +1,12 @@
 package org.videotrade.shopot.presentation.screens.auth
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -49,9 +48,7 @@ import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
-import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.SFProText_Semibold
@@ -63,14 +60,15 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val responseState = remember { mutableStateOf<String?>("1111") }
-        val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
+        val isSuccessOtp = remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
-
-
-//        coroutineScope.launch {
+        
+        
+//        LaunchedEffect(key1 = viewModel) {
 //
-//            val response = sendRequestToBackend(phone.drop(1), null, "auth/2fa")
+//
+//            val response = sendRequestToBackend(phone, null, "2fa")
 //
 //            if (response != null) {
 //
@@ -86,7 +84,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //            }
 //
 //        }
-        
+//
         
         val isError = remember { mutableStateOf(false) }
         
@@ -146,8 +144,6 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             coroutineScope.launch {
                                 
                                 
-                                println("dsdada ${responseState.value}, ${otpText}}")
-
 //                                if (
 //                                    responseState.value != otpText && !isSuccessOtp.value
 //
@@ -158,25 +154,25 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 
                                 when (authCase) {
                                     
-                                    "SignIn" -> sendLogin(phone, navigator,viewModel)
+                                    "SignIn" -> sendLogin(phone, navigator, viewModel)
                                     "SignUp" -> sendSignUp(phone, navigator)
                                 }
                             }
                             
                             
                         })
-                    
-                    Text(
-                        "Отправить код по SMS",
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                        textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
-                        lineHeight = 15.sp,
-                        color = Color(0xFF000000),
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.padding(top = 20.dp)
-                            .clickable { navigator.push(AuthSMSScreen(phone)) }
-                    )
+
+//                    Text(
+//                        "Отправить код по SMS",
+//                        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+//                        textAlign = TextAlign.Center,
+//                        fontSize = 15.sp,
+//                        lineHeight = 15.sp,
+//                        color = Color(0xFF000000),
+//                        textDecoration = TextDecoration.Underline,
+//                        modifier = Modifier.padding(top = 20.dp)
+//                            .clickable { navigator.push(AuthSMSScreen(phone)) }
+//                    )
                 }
                 
                 
@@ -197,6 +193,7 @@ suspend fun sendRequestToBackend(
 ): HttpResponse? {
     val client = HttpClient()
     
+    
     try {
         val jsonContent = Json.encodeToString(
             buildJsonObject {
@@ -205,6 +202,10 @@ suspend fun sendRequestToBackend(
                 notificationToken?.let { put("notificationToken", it) }
             }
         )
+        
+        
+        println("url $url ${jsonContent}")
+        
         
         val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
             contentType(ContentType.Application.Json)
@@ -231,7 +232,7 @@ suspend fun sendRequestToBackend(
 }
 
 
-suspend fun sendLogin(phone: String, navigator: Navigator,viewModel: IntroViewModel) {
+suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewModel) {
     
     
     val response = sendRequestToBackend(phone, null, "auth/login")
@@ -243,9 +244,9 @@ suspend fun sendLogin(phone: String, navigator: Navigator,viewModel: IntroViewMo
         val jsonElement = Json.parseToJsonElement(jsonString).jsonObject
         
         
-        val token = jsonElement.get("accessToken")?.jsonPrimitive?.content
+        val token = jsonElement["accessToken"]?.jsonPrimitive?.content
         val refreshToken =
-            jsonElement.get("refreshToken")?.jsonPrimitive?.content
+            jsonElement["refreshToken"]?.jsonPrimitive?.content
         
         
         

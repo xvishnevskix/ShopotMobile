@@ -44,9 +44,11 @@ class IntroScreen : Screen {
             
             
             val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
+            val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
+            val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
             
             
-            if (!contactsNative) return@LaunchedEffect
+            if (!contactsNative || !cameraNative || !microPhoneNative) return@LaunchedEffect
             
             
             val response = origin().reloadTokens()

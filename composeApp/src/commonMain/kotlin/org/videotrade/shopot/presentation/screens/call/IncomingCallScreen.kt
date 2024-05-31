@@ -34,15 +34,15 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.maksimus
 import shopot.composeapp.generated.resources.person
 
 
-class IncomingCallScreen(private val userId: String) : Screen {
+class IncomingCallScreen(private val userId: String, private val user: ProfileDTO) : Screen {
     
     @Composable
     override fun Content() {
@@ -58,12 +58,13 @@ class IncomingCallScreen(private val userId: String) : Screen {
                 navigator.push(
                     CallScreen(
                         userId,
-                        "IncomingCall"
+                        "IncomingCall",
+                        user
                     )
                 )
         }
         
-        val name = remember { "Максим Аркаев" }
+        val name = remember { "${user.firstName} ${user.lastName}" }
         
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -116,6 +117,14 @@ class IncomingCallScreen(private val userId: String) : Screen {
                     color = Color.White
                 )
                 
+                
+                Text(
+                    modifier = Modifier.padding(top = 12.5.dp),
+                    text = "+${user.phone}",
+                    fontSize = 24.sp,
+                    color = Color.White
+                )
+                
                 Spacer(modifier = Modifier.height(30.dp))
                 
                 Row(
@@ -125,7 +134,12 @@ class IncomingCallScreen(private val userId: String) : Screen {
                         .fillMaxWidth()
                         .padding(horizontal = 50.dp)
                 ) {
-                    rejectBtn ({ navigator.push(MainScreen()) })
+                    rejectBtn({
+                        
+                        viewModel.rejectCall(navigator, userId)
+                        
+                        navigator.push(MainScreen())
+                    })
                     aceptBtn {
                         
                         viewModel.initWebrtc()

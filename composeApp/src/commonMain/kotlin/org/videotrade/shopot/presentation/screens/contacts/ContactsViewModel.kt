@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.screens.contacts
 
 
 import androidx.compose.runtime.mutableStateListOf
+import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,14 +37,15 @@ class ContactsViewModel() : ViewModel(),
             }
         }
     }
-    fun createChat(contact: ContactDTO) {
+    
+    fun createChat(contact: ContactDTO, navigator: Navigator) {
         viewModelScope.launch {
             val profile = ProfileUseCase.getProfile()
             
             if (profile != null) {
-                ContactsUseCase.createChat(profile.id, contact)
+                ContactsUseCase.createChat(profile.id, contact, navigator)
             }
-        
+            
         }
         
     }

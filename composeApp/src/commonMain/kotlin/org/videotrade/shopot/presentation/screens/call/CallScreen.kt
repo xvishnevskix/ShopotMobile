@@ -20,6 +20,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -31,9 +32,12 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.shepeliev.webrtckmp.PeerConnectionState
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
@@ -43,25 +47,26 @@ import shopot.composeapp.generated.resources.person
 class CallScreen(
     private val userId: String,
     private val callCase: String,
+    private val user: ProfileDTO,
 ) : Screen {
     
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         
-        // Use a remember key to manage ViewModel lifecycle
-//        val viewModelState = remember { mutableStateOf(CallViewModel()) }
-//        val viewModel = viewModelState.value
         
+        var secondsElapsed by remember { mutableStateOf(0) }
+        var isRunning by remember { mutableStateOf(false) }
         
         val viewModel: CallViewModel = koinInject()
         
         val wsSession by viewModel.wsSession.collectAsState()
-        val callState by viewModel.callState.collectAsState()
-        val iceState by viewModel.iceState.collectAsState()
+        val callStateView by viewModel.callState.collectAsState()
+        
         
         val hasExecuted = remember { mutableStateOf(false) }
-        val isRejected = remember { mutableStateOf(false) }
+        
+        val callState = remember { mutableStateOf("") }
         
         LaunchedEffect(wsSession) {
             if (!hasExecuted.value && wsSession != null) {
@@ -78,28 +83,33 @@ class CallScreen(
             }
         }
         
-        println("sdadaa $iceState")
-
-//        LaunchedEffect(iceState) {
-//            if (IceConnectionState.Closed == iceState || IceConnectionState.Disconnected == iceState) {
-//                if (!isRejected.value) {
-//                    val op = viewModel.rejectCallAnswer()
-//                    if (op) {
-//                        viewModel._iceState.value = IceConnectionState.New
-//                        navigator.push(MainScreen())
-//                    }
-//                }
-//                isRejected.value = true
-//            }
-//        }
-
-//        DisposableEffect(Unit) {
-//            onDispose {
-//                // Dispose ViewModel when the screen is removed from composition
-//                viewModel.stopObserving()
-//                viewModelState.value = CallViewModel() // Recreate ViewModel
-//            }
-//        }
+        
+        LaunchedEffect(isRunning) {
+            while (isRunning) {
+                delay(1000L)
+                secondsElapsed++
+            }
+        }
+        
+        LaunchedEffect(callStateView) {
+            when (callStateView) {
+                PeerConnectionState.New -> callState.value = "Идет вызов..."
+                PeerConnectionState.Connecting -> callState.value =
+                    "Идет процесс установления соединения."
+                
+                PeerConnectionState.Connected -> {
+                    callState.value = "Соединение установлено."
+                    delay(500)
+                    isRunning = true
+                }
+                
+                PeerConnectionState.Disconnected -> callState.value = "Соединение было разорвано."
+                PeerConnectionState.Failed -> callState.value =
+                    "Произошла ошибка при установлении соединения."
+                
+                PeerConnectionState.Closed -> callState.value = "Соединение было закрыто."
+            }
+        }
         
         var Photo: DrawableResource = Res.drawable.person
         
@@ -144,8 +154,22 @@ class CallScreen(
                 )
             }
             
+            
+            
+            
             Text(
-                text = callState.toString(),
+                text = if (isRunning) {
+                    val hours = secondsElapsed / 3600
+                    val minutes = (secondsElapsed % 3600) / 60
+                    val seconds = secondsElapsed % 60
+                    if (hours > 0) {
+                        "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+                    } else {
+                        "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+                    }
+                } else {
+                    callState.value
+                },
                 modifier = Modifier
                     .padding(top = 25.dp)
                     .align(Alignment.CenterHorizontally),
@@ -153,15 +177,25 @@ class CallScreen(
                 color = Color(255, 255, 255)
             )
             
-            var name: String = "Максим Аркаев"
+            
             Text(
                 modifier = Modifier
                     .padding(top = 12.5.dp)
                     .align(Alignment.CenterHorizontally),
-                text = name,
+                text = "${user.firstName} ${user.firstName}",
                 fontSize = 24.sp,
                 color = Color(255, 255, 255)
             )
+            
+            Text(
+                modifier = Modifier
+                    .padding(top = 12.5.dp)
+                    .align(Alignment.CenterHorizontally),
+                text = "+${user.phone}",
+                fontSize = 20.sp,
+                color = Color(255, 255, 255)
+            )
+            
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

@@ -46,6 +46,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
@@ -87,6 +88,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     private val otherUserId = mutableStateOf("")
+    
+    
+    private val isCall = mutableStateOf(false)
+    
+    
     private val callerId = mutableStateOf(generateRandomNumber())
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
@@ -149,41 +155,67 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         for (frame in incoming) {
                             if (frame is Frame.Text) {
                                 
-                                println("frame11 $frame")
                                 val text = frame.readText()
+                                
+                                
                                 val jsonElement = Json.parseToJsonElement(text)
+                                
+                                println("jsonElement1112 $jsonElement")
+                                
+                                
                                 val type = jsonElement.jsonObject["type"]?.jsonPrimitive?.content
+                                
+                                println("jsonElement1112 $type")
+                                
+                                
                                 val rtcMessage = jsonElement.jsonObject["rtcMessage"]?.jsonObject
+                                
+                                
                                 
                                 when (type) {
                                     "newCall" -> {
-                                        rtcMessage?.let {
+                                        try {
                                             
-                                            println("jsonElement1112 $jsonElement")
-                                            val sdp =
-                                                it["sdp"]?.jsonPrimitive?.content ?: return@launch
-                                            val callerId =
-                                                jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-                                            
-                                            offer.value = SessionDescription(
-                                                SessionDescriptionType.Offer,
-                                                sdp
-                                            )
-                                            
-                                            
-                                            
-                                            callerId?.let { userId ->
+                                            rtcMessage?.let {
                                                 
                                                 
-                                                otherUserId.value = userId
+                                                val userJson =
+                                                    jsonElement.jsonObject["user"]?.jsonObject
+                                                
+                                                
+                                                val user =
+                                                    Json.decodeFromString<ProfileDTO>(userJson.toString())
+                                                
+                                                
+                                                val sdp =
+                                                    it["sdp"]?.jsonPrimitive?.content
+                                                        ?: return@launch
+                                                val callerId =
+                                                    jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
+                                                
+                                                offer.value = SessionDescription(
+                                                    SessionDescriptionType.Offer,
+                                                    sdp
+                                                )
                                                 
                                                 
                                                 
-                                                navigator.push(IncomingCallScreen(userId))
+                                                callerId?.let { userId ->
+                                                    
+                                                    
+                                                    otherUserId.value = userId
+                                                    
+                                                    
+                                                    
+                                                    navigator.push(IncomingCallScreen(userId, user))
+                                                    
+                                                }
+                                                
                                                 
                                             }
+                                        } catch (e: Exception) {
                                             
-                                            
+                                            println("Error newCall: $e")
                                         }
                                     }
                                     
@@ -223,7 +255,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
-                                        rejectCallAnswer(navigator)
+                                        if (isCall.value)
+                                            rejectCallAnswer(navigator)
+                                        
+                                        if (!isConnectedWebrtc.value)
+                                            navigator.push(MainScreen())
+                                        
+                                        
                                     }
                                 }
                             }
@@ -242,7 +280,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override suspend fun initWebrtc(): Nothing = coroutineScope {
         
-        
+        isCall.value = true
         println("signalingStateClose")
 
 //            val peerConnection.value = PeerConnection(rtcConfiguration)
@@ -375,43 +413,38 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     suspend override fun makeCall(userId: String, calleeId: String) {
         coroutineScope {
             if (wsSession.value != null) {
-                val offer = peerConnection.value?.createOffer(
-                    OfferAnswerOptions(
-//                        offerToReceiveVideo = true,
-                        offerToReceiveAudio = true
-                    )
-                )
-                if (offer != null) {
-                    peerConnection.value?.setLocalDescription(offer)
-                }
-                
-                
-                if (wsSession.value?.outgoing?.isClosedForSend == true) {
-                    return@coroutineScope
-                }
-                
-//                val newCallMessage = WebRTCMessage(
-//                    type = "call",
-//                    calleeId = calleeId,
-//                    userId = userId,
-//                    rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
-//                )
-                
-                val jsonMessage = Json.encodeToString(
-                    buildJsonObject {
-                        put("type", "call")
-                        put("calleeId", calleeId)
-                        put("userId", userId)
-                        put("rtcMessage", offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }.toString())
-                    }
-                )
-                
-                
-//                val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-                
                 try {
+                    
+                    val offer = peerConnection.value?.createOffer(
+                        OfferAnswerOptions(
+//                        offerToReceiveVideo = true,
+                            offerToReceiveAudio = true
+                        )
+                    )
+                    if (offer != null) {
+                        peerConnection.value?.setLocalDescription(offer)
+                    }
+                    
+                    
+                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                        return@coroutineScope
+                    }
+                    
+                    val newCallMessage = WebRTCMessage(
+                        type = "call",
+                        calleeId = calleeId,
+                        userId = userId,
+                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
+                    )
+                    
+                    
+                    val jsonMessage =
+                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
+                    
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     println("Message sent successfully")
+                    
+                    
                 } catch (e: Exception) {
                     println("Failed to send message: ${e.message}")
                 }
@@ -477,14 +510,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override suspend fun rejectCall(navigator: Navigator, userId: String): Boolean {
         try {
             
-            println("rejectCall1")
+            
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("type", "rejectCall")
                     put("userId", userId)
                 }
             )
-            println("rejectCall12")
+            
             
             rejectCallAnswer(navigator)
             
@@ -538,6 +571,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             println("rejectCallAnswer4")
             
             // Очищаем локальный и удаленный потоки
+            isCall.value = false
             _peerConnection.value = null
             localStream.value = null
             remoteVideoTrack.value = null

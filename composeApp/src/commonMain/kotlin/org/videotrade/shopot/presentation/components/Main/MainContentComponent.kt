@@ -1,8 +1,5 @@
 package org.videotrade.shopot.presentation.components.Main
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -63,55 +60,83 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                 )
                 
                 LazyColumn {
+                    
                     items(chatState) { item ->
-//                        AnimatedVisibility(
-//                            visible = true,
-//                            enter = fadeIn(),
-//                            exit = fadeOut()
-//                        ) {
-//                        }
-//
+                        
                         UserComponentItem(item)
                         
                     }
-                    item {
-                        Column(
-                            modifier = Modifier.padding(top = 40.dp, bottom = 10.dp).fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Row(
-                                horizontalArrangement = Arrangement.Center,
-                                verticalAlignment = Alignment.CenterVertically,
+                    if (chatState.isNotEmpty()) {
+                        
+                        item {
+                            Column(
+                                modifier = Modifier.padding(top = 40.dp, bottom = 10.dp)
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
                             ) {
-                                Image(
-                                    modifier = Modifier.size(27.dp),
-                                    painter = painterResource(Res.drawable.smart_encryption),
-                                    contentDescription = null,
-                                )
-                            }
-                            Row {
-                                Text(
-                                    "Все чаты зашифрованы  ",
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 10.sp,
-                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                    lineHeight = 20.sp,
-                                    color = Color(0xFF000000),
-                                )
-                                Text(
-                                    "ассиметричным и постквантовым шифрованием",
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 10.sp,
-                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                    lineHeight = 20.sp,
-                                    color = Color(0xFF219653),
-                                    textDecoration = TextDecoration.Underline,
-                                )
+                                
+                                Row(
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Image(
+                                        modifier = Modifier.size(27.dp),
+                                        painter = painterResource(Res.drawable.smart_encryption),
+                                        contentDescription = null,
+                                    )
+                                }
+                                
+                                
+                                Row {
+                                    Text(
+                                        "Все чаты зашифрованы  ",
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 10.sp,
+                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                        lineHeight = 20.sp,
+                                        color = Color(0xFF000000),
+                                    )
+                                    Text(
+                                        "ассиметричным и постквантовым шифрованием",
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 10.sp,
+                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                        lineHeight = 20.sp,
+                                        color = Color(0xFF219653),
+                                        textDecoration = TextDecoration.Underline,
+                                    )
+                                }
                             }
                         }
+                    } else {
+                        item {
+                            Column(
+                                modifier = Modifier.padding(top = 40.dp, bottom = 10.dp)
+                                    .fillMaxWidth(),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.Center
+                            ) {
+                                
+                                
+                                Row {
+                                    Text(
+                                        "Создайте новый чат",
+                                        modifier = Modifier.padding(bottom = 15.dp),
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 18.sp,
+                                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                        lineHeight = 20.sp,
+                                        color = Color(0xFF000000)
+                                    )
+                                    
+                                }
+                            }
+                        }
+                        
                     }
                 }
             }

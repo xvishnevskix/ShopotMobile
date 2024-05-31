@@ -3,7 +3,6 @@ package org.videotrade.shopot.presentation.screens.contacts
 import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,12 +10,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,11 +22,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -44,15 +38,12 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
-import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.create_group
-import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.randomUser
-import shopot.composeapp.generated.resources.search_main
 
 class CreateChatScreen() : Screen {
     @Composable
@@ -62,9 +53,9 @@ class CreateChatScreen() : Screen {
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
-
+        
         viewModel.fetchContacts()
-
+        
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             contacts
         } else {
@@ -74,7 +65,7 @@ class CreateChatScreen() : Screen {
                 )
             }
         }
-
+        
         SafeArea {
             Box(
                 modifier = Modifier
@@ -93,7 +84,7 @@ class CreateChatScreen() : Screen {
                             .background(color = Color(255, 255, 255))
                     ) {
                         item {
-                            makeA_group()
+                            makeA_group(contacts)
                         }
                         itemsIndexed(filteredContacts) { _, item ->
                             ChatItem(viewModel, item = item)
@@ -107,7 +98,7 @@ class CreateChatScreen() : Screen {
 
 
 @Composable
-private fun makeA_group() {
+private fun makeA_group(contacts: List<ContactDTO>) {
     val navigator = LocalNavigator.currentOrThrow
     Box(
         modifier = Modifier
@@ -115,9 +106,10 @@ private fun makeA_group() {
             .fillMaxSize()
             .padding(top = 10.dp, bottom = 42.dp)
             .clickable {
-                navigator.push(CreateGroupFirstScreen())
+                if (contacts.isNotEmpty())
+                    navigator.push(CreateGroupFirstScreen())
             }
-
+    
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -135,7 +127,7 @@ private fun makeA_group() {
                     contentDescription = "create group",
                     modifier = Modifier.size(56.dp)
                 )
-
+                
                 Text(
                     text = "Создать группу",
                     fontSize = 20.sp,
@@ -145,7 +137,7 @@ private fun makeA_group() {
                     lineHeight = 20.sp,
                     modifier = Modifier
                         .padding(start = 20.dp)
-
+                
                 )
             }
             Image(
@@ -153,15 +145,16 @@ private fun makeA_group() {
                 contentDescription = "create group arrow",
                 modifier = Modifier.size(18.dp)
             )
-
+            
         }
     }
 }
 
 
 @Composable
-private fun ChatItem(viewModel: ContactsViewModel,item: ContactDTO) {
-
+private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
+    val navigator = LocalNavigator.currentOrThrow
+    
     Box(
         modifier = Modifier
             .padding(top = 22.dp)
@@ -169,9 +162,9 @@ private fun ChatItem(viewModel: ContactsViewModel,item: ContactDTO) {
             .fillMaxWidth()
             .clickable {
                 
-                viewModel.createChat(item)
+                viewModel.createChat(item, navigator)
             }
-
+    
     ) {
         Column(
         ) {
@@ -210,10 +203,10 @@ private fun ChatItem(viewModel: ContactsViewModel,item: ContactDTO) {
                             color = Color(0xFF979797),
                             modifier = Modifier.padding(top = 13.dp)
                         )
-
+                        
                     }
-
-
+                    
+                    
                 }
                 Image(
                     painter = painterResource(Res.drawable.arrowleft),

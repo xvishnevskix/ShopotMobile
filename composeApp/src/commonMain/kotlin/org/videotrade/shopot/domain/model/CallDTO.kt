@@ -8,6 +8,7 @@ data class WebRTCMessage(
     val type: String,
     val calleeId: String? = null,
     val callerId: String? = null,
+    val userId: String? = null,
     val rtcMessage: SessionDescriptionDTO? = null,
     val sender: String? = null,
     val iceMessage: rtcMessageDTO? = null

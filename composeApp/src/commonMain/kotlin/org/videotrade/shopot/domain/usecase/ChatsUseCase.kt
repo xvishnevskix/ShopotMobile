@@ -33,8 +33,8 @@ class ChatsUseCase : KoinComponent {
         return repository.addChat(user)
     }
     
-    fun addChats(users: MutableList<ChatItem>) {
-        return repository.addChats(users)
+    fun addChats(chatsInit: MutableList<ChatItem>) {
+        return repository.addChats(chatsInit)
     }
 
 }
