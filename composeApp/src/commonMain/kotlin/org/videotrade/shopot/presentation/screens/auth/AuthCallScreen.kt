@@ -65,26 +65,26 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val viewModel: IntroViewModel = koinInject()
         
         
-//        LaunchedEffect(key1 = viewModel) {
-//
-//
-//            val response = sendRequestToBackend(phone, null, "2fa")
-//
-//            if (response != null) {
-//
-//                val jsonString = response.bodyAsText()
-//                val jsonElement = Json.parseToJsonElement(jsonString)
-//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//
-//
-//
-//
-//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//
-//            }
-//
-//        }
-//
+        LaunchedEffect(key1 = viewModel) {
+            
+            
+            val response = sendRequestToBackend(phone, null, "2fa")
+            
+            if (response != null) {
+                
+                val jsonString = response.bodyAsText()
+                val jsonElement = Json.parseToJsonElement(jsonString)
+                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                
+                
+                
+                
+                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+                
+            }
+            
+        }
+        
         
         val isError = remember { mutableStateOf(false) }
         
@@ -144,13 +144,13 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             coroutineScope.launch {
                                 
                                 
-//                                if (
-//                                    responseState.value != otpText && !isSuccessOtp.value
-//
-//                                ) {
-//
-//                                    return@launch
-//                                }
+                                if (
+                                    responseState.value != otpText && !isSuccessOtp.value
+                                
+                                ) {
+                                    
+                                    return@launch
+                                }
                                 
                                 when (authCase) {
                                     
