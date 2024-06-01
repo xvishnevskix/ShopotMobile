@@ -10,7 +10,7 @@ import org.koin.core.context.startKoin
 import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
-import org.videotrade.shopot.multiplatform.MediaProviderFactory
+//import org.videotrade.shopot.multiplatform.MediaProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProvider
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import javax.annotation.Nullable
@@ -50,7 +50,7 @@ class AppActivity : ComponentActivity() {
     }
     
     private fun initializeProviders() {
-        MediaProviderFactory.initialize(this)
+//        MediaProviderFactory.initialize(this)
         PermissionsProviderFactory.initialize(this)
         permissionsProvider = PermissionsProviderFactory.create()
     }

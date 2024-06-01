@@ -1,15 +1,27 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-
     <key>NSContactsUsageDescription</key>
     <string>Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.</string>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
-
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Мы хотим получить доступ к вашей фотогалерее</string>
-
+    <key>NSCameraUsageDescription</key>
+    <string>Приложению требуется доступ к камере для съемки фотографий.</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Приложению требуется доступ к микрофону для записи аудио.</string>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSExceptionDomains</key>
+        <dict>
+            <key>videotradedev.ru</key> <!-- Удален префикс https:// -->
+            <dict>
+                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                <true/>
+                <key>NSIncludesSubdomains</key>
+                <true/>
+            </dict>
+        </dict>
+    </dict>
 </dict>
 </plist>

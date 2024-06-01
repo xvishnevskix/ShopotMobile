@@ -25,6 +25,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -32,6 +34,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import io.ktor.util.Platform
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -65,26 +68,26 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val viewModel: IntroViewModel = koinInject()
         
         
-        LaunchedEffect(key1 = viewModel) {
-            
-            
-            val response = sendRequestToBackend(phone, null, "2fa")
-            
-            if (response != null) {
-                
-                val jsonString = response.bodyAsText()
-                val jsonElement = Json.parseToJsonElement(jsonString)
-                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-                
-                
-                
-                
-                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-                
-            }
-            
-        }
-        
+//        LaunchedEffect(key1 = viewModel) {
+//
+//
+//            val response = sendRequestToBackend(phone, null, "2fa")
+//
+//            if (response != null) {
+//
+//                val jsonString = response.bodyAsText()
+//                val jsonElement = Json.parseToJsonElement(jsonString)
+//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+//
+//
+//
+//
+//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+//
+//            }
+//
+//        }
+//
         
         val isError = remember { mutableStateOf(false) }
         
@@ -144,13 +147,13 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             coroutineScope.launch {
                                 
                                 
-                                if (
-                                    responseState.value != otpText && !isSuccessOtp.value
-                                
-                                ) {
-                                    
-                                    return@launch
-                                }
+//                                if (
+//                                    responseState.value != otpText && !isSuccessOtp.value
+//
+//                                ) {
+//
+//                                    return@launch
+//                                }
                                 
                                 when (authCase) {
                                     
@@ -191,7 +194,9 @@ suspend fun sendRequestToBackend(
     notificationToken: String?,
     url: String
 ): HttpResponse? {
-    val client = HttpClient()
+    val client = HttpClient() { // или другой движок в зависимости от платформы
+    
+    }
     
     
     try {
@@ -238,6 +243,8 @@ suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewM
     val response = sendRequestToBackend(phone, null, "auth/login")
     
     
+    println("sadada")
+    
     if (response != null) {
         
         val jsonString = response.bodyAsText()
@@ -279,3 +286,7 @@ fun sendSignUp(phone: String, navigator: Navigator) {
     
     
 }
+
+
+
+

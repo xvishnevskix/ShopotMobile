@@ -1,11 +1,15 @@
 package org.videotrade.shopot.multiplatform
 
+import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.videotrade.shopot.domain.model.ContactDTO
 import platform.Contacts.*
-import platform.Foundation.*
+import platform.Foundation.NSError
+import platform.Foundation.NSString
+import platform.Foundation.NSLog
 
 actual class ContactsProvider {
     @OptIn(ExperimentalForeignApi::class)
@@ -15,21 +19,27 @@ actual class ContactsProvider {
             CNContactGivenNameKey,
             CNContactFamilyNameKey,
             CNContactPhoneNumbersKey
-        ) as List<*>
+        )
         
         val fetchRequest = CNContactFetchRequest(keysToFetch = keysToFetch)
         val contacts = mutableListOf<ContactDTO>()
+        var fetchError: CPointer<ObjCObjectVar<NSError?>>?? = null
         
-        contactStore.enumerateContactsWithFetchRequest(fetchRequest, error = null) { contact, _ ->
-            if(contact !== null){
-            val firstName = contact.givenName
-            val lastName = contact.familyName
-            val phoneNumbers = contact.phoneNumbers
-            phoneNumbers.forEach { labeledValue ->
-                val phoneNumber = (labeledValue.value() as? CNPhoneNumber)?.stringValue ?: ""
+        contactStore.enumerateContactsWithFetchRequest(fetchRequest, error = fetchError) { contact, stop ->
+            val firstName = contact?.givenName ?: ""
+            val lastName = contact?.familyName ?: ""
+            val phoneNumbers = contact?.phoneNumbers
+            
+            phoneNumbers?.forEach { labeledValue ->
+                val labeledValueObj = labeledValue as? CNLabeledValue
+                
+                val phoneNumber = (labeledValueObj?.value as? CNPhoneNumber)?.stringValue ?: ""
                 contacts.add(ContactDTO(firstName = firstName, lastName = lastName, phone = phoneNumber))
             }
-                }
+        }
+        
+        if (fetchError != null) {
+            NSLog("Failed to fetch contacts: %@", fetchError)
         }
         
         contacts
@@ -41,3 +51,6 @@ actual object ContactsProviderFactory {
         return ContactsProvider()
     }
 }
+
+
+
