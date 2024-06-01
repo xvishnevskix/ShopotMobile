@@ -1,9 +1,7 @@
 package org.videotrade.shopot
 
 import android.app.Application
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -12,8 +10,11 @@ import org.koin.core.context.startKoin
 import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
+import org.videotrade.shopot.multiplatform.MediaProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProvider
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import javax.annotation.Nullable
+
 
 class AndroidApp : Application() {
     companion object {
@@ -22,12 +23,14 @@ class AndroidApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
-        DeviceIdProviderFactory.initialize(this)
-        ContactsProviderFactory.initialize(this)
-        
+        initializeFactories(this)
         startKoin { modules(getSharedModules()) }
-        
         INSTANCE = this
+    }
+    
+    private fun initializeFactories(context: Context) {
+        DeviceIdProviderFactory.initialize(context)
+        ContactsProviderFactory.initialize(context)
     }
 }
 
@@ -35,11 +38,19 @@ class AppActivity : ComponentActivity() {
     private lateinit var permissionsProvider: PermissionsProvider
     private var permissionResultCallback: ((Int, IntArray) -> Unit)? = null
     
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(@Nullable savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent { App() }
         
+        initializeProviders()
+        
+        setContent {
+            App()
+        }
+    }
+    
+    private fun initializeProviders() {
+        MediaProviderFactory.initialize(this)
         PermissionsProviderFactory.initialize(this)
         permissionsProvider = PermissionsProviderFactory.create()
     }
@@ -48,22 +59,15 @@ class AppActivity : ComponentActivity() {
         permissionResultCallback = callback
     }
     
+    @Deprecated("Deprecated in Java")
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        super.onRequestPermissionsResult(requestCode, permissions as Array<String>, grantResults)
         permissionResultCallback?.invoke(requestCode, grantResults)
     }
 }
 
-//internal actual fun openUrl(url: String?) {
-//    val uri = url?.let { Uri.parse(it) } ?: return
-//    val intent = Intent().apply {
-//        action = Intent.ACTION_VIEW
-//        data = uri
-//        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//    }
-//    AndroidApp.INSTANCE.startActivity(intent)
-//}
+

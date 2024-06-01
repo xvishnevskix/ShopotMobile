@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.Lint
+import com.android.build.api.dsl.LintOptions
 import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
@@ -14,6 +16,8 @@ plugins {
     kotlin("native.cocoapods")
     
 }
+
+
 
 kotlin {
     
@@ -47,6 +51,8 @@ kotlin {
                 implementation(libs.androidx.junit4)
             }
         }
+        
+    
     }
     
     
@@ -119,9 +125,9 @@ kotlin {
         }
         
         
-        val iosMain by getting
-        val iosSimulatorArm64Main by getting
-        iosSimulatorArm64Main.dependsOn(iosMain)
+//        val iosMain by getting
+//        val iosSimulatorArm64Main by getting
+//        iosSimulatorArm64Main.dependsOn(iosMain)
     }
 }
 
@@ -164,6 +170,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.11"
     }
+    
+
+    
+    
 }
 dependencies {
     implementation(libs.androidx.animation.core.android)

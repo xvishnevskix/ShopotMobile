@@ -43,6 +43,8 @@ fun UserComponentItem(chat: ChatItem) {
     val navigator = LocalNavigator.currentOrThrow
     
     
+    println("${chat.firstName} ${chat.lastName}")
+    
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
             navigator.push(ChatScreen(chat))

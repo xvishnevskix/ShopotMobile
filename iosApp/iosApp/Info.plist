@@ -7,5 +7,9 @@
     <string>Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.</string>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Мы хотим получить доступ к вашей фотогалерее</string>
+
 </dict>
 </plist>

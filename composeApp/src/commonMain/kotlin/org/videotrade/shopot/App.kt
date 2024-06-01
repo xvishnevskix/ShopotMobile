@@ -117,6 +117,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.KoinContext
+import org.videotrade.shopot.presentation.screens.common.TestScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.theme.AppTheme
 
@@ -147,12 +148,13 @@ internal fun App() = AppTheme {
 //                )
 
 //                MainScreen()
-                        IntroScreen()
+//                        IntroScreen()
 //                                SignUpScreen("+79388899885")
                 //CallScreen()
                 // IncomingCallScreen()
 //                CreateChatScreen()
 //                MainScreen()
+                TestScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
