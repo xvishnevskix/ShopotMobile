@@ -149,7 +149,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                     color = Color(0xFF000000)
                                 ),
                                 singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                                 modifier = Modifier
                                     .shadow(1.dp, RoundedCornerShape(12.dp))
                                     .clip(RoundedCornerShape(12.dp))
@@ -205,7 +205,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                     color = Color(0xFF000000)
                                 ),
                                 singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                                 modifier = Modifier
                                     .shadow(1.dp, RoundedCornerShape(12.dp))
                                     .clip(RoundedCornerShape(12.dp))
@@ -261,7 +261,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                     color = Color(0xFF000000)
                                 ),
                                 singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                                 modifier = Modifier
                                     .shadow(1.dp, RoundedCornerShape(12.dp))
                                     .clip(RoundedCornerShape(12.dp))
