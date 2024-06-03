@@ -46,6 +46,7 @@ import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.CustomButton
@@ -194,7 +195,7 @@ suspend fun sendRequestToBackend(
     notificationToken: String?,
     url: String
 ): HttpResponse? {
-    val client = HttpClient() { // или другой движок в зависимости от платформы
+    val client = HttpClient(getHttpClientEngine()) { // или другой движок в зависимости от платформы
     
     }
     

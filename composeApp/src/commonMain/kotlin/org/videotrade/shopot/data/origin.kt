@@ -23,10 +23,11 @@ import kotlinx.serialization.json.put
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.multiplatform.getHttpClientEngine
 
 class origin {
     val client =
-        HttpClient() // Инициализация HTTP клиента, возможно вам стоит инициализировать его вне этой функции, чтобы использовать пул соединений
+        HttpClient(getHttpClientEngine()) // Инициализация HTTP клиента, возможно вам стоит инициализировать его вне этой функции, чтобы использовать пул соединений
     
     
     suspend inline fun <reified T> get(url: String): T? {
@@ -117,7 +118,7 @@ class origin {
     suspend fun reloadTokens(
     
     ): HttpResponse? {
-        val client = HttpClient()
+        val client = HttpClient(getHttpClientEngine())
         
         try {
             

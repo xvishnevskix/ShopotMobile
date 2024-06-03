@@ -52,6 +52,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -279,7 +280,7 @@ class SignUpScreen(private val phone: String) : Screen {
                             { scope ->
                                 scope.launch {
                                     
-                                    val client = HttpClient()
+                                    val client = HttpClient(getHttpClientEngine())
                                     
                                     try {
                                         val jsonContent = Json.encodeToString(

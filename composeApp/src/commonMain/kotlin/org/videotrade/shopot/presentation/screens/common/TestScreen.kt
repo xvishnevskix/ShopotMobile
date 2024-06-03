@@ -1,90 +1,35 @@
-//package org.videotrade.shopot.presentation.screens.common
-//
-//import androidx.compose.foundation.Image
-//import androidx.compose.foundation.layout.Row
-//import androidx.compose.foundation.layout.fillMaxSize
-//import androidx.compose.foundation.layout.size
-//import androidx.compose.material3.Button
-//import androidx.compose.material3.Text
-//import androidx.compose.runtime.*
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.graphics.ImageBitmap
-//import androidx.compose.ui.unit.dp
-//import cafe.adriel.voyager.core.screen.Screen
-//import kotlinx.coroutines.launch
-//import org.videotrade.shopot.multiplatform.ContactsProviderFactory
-//import org.videotrade.shopot.multiplatform.MediaProviderFactory
-//import org.videotrade.shopot.multiplatform.loadImage
-//
-//class TestScreen : Screen {
-//    @Composable
-//    override fun Content() {
-//        MediaPickerSample()
-//    }
-//}
-//
-//@Composable
-//fun MediaPickerSample() {
-//    val coroutineScope = rememberCoroutineScope()
-//    var imageUri: String? by remember { mutableStateOf(null) }
-//
-//
-//
-//    Row {
-//        imageUri?.let {
-//            val imageBitmap = loadImage(it)
-//            imageBitmap?.let { bitmap ->
-//                Image(bitmap = bitmap, contentDescription = null)
-//            }
-//        }
-//
-//        Button(
-//            onClick = {
-//                try {
-////                    val mediaProvider = MediaProviderFactory.create()
-//
-//                    coroutineScope.launch {
-//
-//
-//
-////                        val mediaUri = mediaProvider.getMedia()
-////                        println("mediaUri $mediaUri")
-////                        imageUri = mediaUri
-//                    }
-//                } catch (e: Exception) {
-//                    println("Error: $e")
-//                }
-//            },
-//            modifier = Modifier.size(200.dp)
-//
-//        ) {
-//            Text(text = "Выбрать фото")
-//        }
-//    }
-//}
+
+
 package org.videotrade.shopot.presentation.screens.common
 
-//import org.videotrade.shopot.multiplatform.MediaProviderFactory
-//import org.videotrade.shopot.multiplatform.loadImage
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import com.preat.peekaboo.image.picker.SelectionMode
-import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
-import com.preat.peekaboo.image.picker.toImageBitmap
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.HttpClientEngineConfig
+import io.ktor.client.engine.HttpClientEngineFactory
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class TestScreen : Screen {
@@ -97,46 +42,89 @@ class TestScreen : Screen {
 @Composable
 fun MediaPickerSample() {
     val scope = rememberCoroutineScope()
-    val byteArray = remember { mutableStateOf<ByteArray?>(null) }
-    var images by remember { mutableStateOf<ImageBitmap?>(null) }
-    
-    
-    val singleImagePicker = rememberImagePickerLauncher(
-        selectionMode = SelectionMode.Single,
-        scope = scope,
-        onResult = { byteArrays ->
-            byteArrays.firstOrNull()?.let {
-                // Process the selected images' ByteArrays.
-                println(it)
-                images = it.toImageBitmap()
-                
-                byteArray.value = it
-            }
-        }
-    )
     
     
     SafeArea {
         Row {
-            images?.let {
-                Image(
-                    modifier = Modifier
-                        .size(220.dp),
-                    bitmap = it,
-                    
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-            }
+            
             Button(
                 onClick = {
-                    singleImagePicker.launch()
+                    
+                    scope.launch {
+                        reloadTokens()
+                    }
                 }
             ) {
-                Text("Pick Single Image")
+                Text("Pick Single")
             }
         }
         
     }
     
 }
+
+
+suspend fun reloadTokens(
+
+): HttpResponse? {
+    val client = HttpClient(getHttpClientEngine())
+    
+    try {
+        
+        
+        val refreshToken = getValueInStorage("refreshToken")
+        
+        println("refreshToken $refreshToken")
+        
+        val jsonContent = Json.encodeToString(
+            buildJsonObject {
+                put("refreshToken", refreshToken)
+                
+            }
+        )
+        
+        val response: HttpResponse =
+            client.post("${EnvironmentConfig.serverUrl}auth/refresh-token") {
+                contentType(ContentType.Application.Json)
+                setBody(jsonContent)
+            }
+        
+        
+        
+        
+        if (response.status.isSuccess()) {
+            
+            val jsonString = response.bodyAsText()
+            val jsonElement = Json.parseToJsonElement(jsonString)
+            val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+            
+            
+            val token = messageObject?.get("accessToken")?.jsonPrimitive?.content
+            
+            token?.let {
+                addValueInStorage(
+                    "accessToken",
+                    token
+                )
+            }
+            
+            
+            return response
+            
+            
+        } else {
+            println("Failed to retrieve data: ${response.status.description} ${response.request}")
+        }
+    } catch (e: Exception) {
+        println("Error222: $e")
+    } finally {
+        client.close()
+    }
+    
+    return null
+}
+
+
+
+
+
