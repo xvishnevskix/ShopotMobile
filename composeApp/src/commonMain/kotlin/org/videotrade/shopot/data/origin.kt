@@ -1,7 +1,8 @@
 package org.videotrade.shopot.data
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -10,10 +11,13 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.http.headers
 import io.ktor.http.isSuccess
+import io.ktor.util.InternalAPI
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -42,6 +46,9 @@ class origin {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
+            
+            
+            println("bodyAsTextbodyAsText ${response.bodyAsText()}")
             
             
             if (
@@ -115,6 +122,7 @@ class origin {
     }
     
     
+    @OptIn(InternalAPI::class)
     suspend fun reloadTokens(
     
     ): HttpResponse? {
@@ -125,7 +133,6 @@ class origin {
             
             val refreshToken = getValueInStorage("refreshToken")
             
-            println("refreshToken $refreshToken")
             
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
@@ -134,12 +141,15 @@ class origin {
                 }
             )
             
+            println("response11 ")
+            
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.serverUrl}auth/refresh-token") {
                     contentType(ContentType.Application.Json)
                     setBody(jsonContent)
                 }
             
+            println("response11 ${response.content}")
             
             
             
@@ -174,4 +184,53 @@ class origin {
         
         return null
     }
+    
+    
+    suspend fun sendFile(
+        url: String,
+        fileBytes: ByteArray, fileName: String
+    ): HttpResponse? {
+        val client =
+            HttpClient(getHttpClientEngine())
+        try {
+            val token = getValueInStorage("accessToken")
+            
+            
+            val response: HttpResponse = client.submitFormWithBinaryData(
+                url = "${EnvironmentConfig.serverUrl}$url",
+                formData = formData {
+                    append("file", fileBytes, Headers.build {
+                        append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"$fileName\"")
+                    })
+                }
+            ) {
+                header(HttpHeaders.Authorization, "Bearer $token")
+            }
+                
+                
+                
+                
+                println("response.bodyAsText() ${response.bodyAsText()}")
+            
+            if (response.status.isSuccess()) {
+            
+            
+            } else {
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+            }
+        } catch (e: Exception) {
+            
+            println("Error111: $e")
+            
+            return null
+            
+        } finally {
+            client.close()
+        }
+        
+        return null
+        
+        
+    }
+    
 }

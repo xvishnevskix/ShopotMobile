@@ -1,6 +1,8 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,19 +26,23 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.smart_encryption
 
 @Composable
 fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
     val chatState = viewModel.chats.collectAsState(initial = listOf()).value
-    
+    val navigator = LocalNavigator.currentOrThrow
     
     
     
@@ -50,7 +56,7 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
             ) {
                 Text(
                     "Чаты",
-                    modifier = Modifier.padding(bottom = 15.dp),
+                    modifier = Modifier.padding(bottom = 15.dp, top = 5.dp),
                     textAlign = TextAlign.Center,
                     fontSize = 20.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -59,7 +65,10 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                     color = Color(0xFF000000)
                 )
                 
-                LazyColumn {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                ) {
                     
                     items(chatState) { item ->
                         
@@ -114,8 +123,10 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                     } else {
                         item {
                             Column(
-                                modifier = Modifier.padding(top = 40.dp, bottom = 10.dp)
-                                    .fillMaxWidth(),
+                                modifier = Modifier.padding(bottom = 10.dp)
+                                    .fillMaxSize().clickable {
+                                        navigator.push(CreateChatScreen())
+                                    }.size(600.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 verticalArrangement = Arrangement.Center
                             ) {
@@ -124,13 +135,13 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                                 Row {
                                     Text(
                                         "Создайте новый чат",
-                                        modifier = Modifier.padding(bottom = 15.dp),
+                                        modifier = Modifier,
                                         textAlign = TextAlign.Center,
-                                        fontSize = 18.sp,
-                                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                                        fontSize = 20.sp,
+                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
                                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                         lineHeight = 20.sp,
-                                        color = Color(0xFF000000)
+                                        color = Color(0xFF979797)
                                     )
                                     
                                 }

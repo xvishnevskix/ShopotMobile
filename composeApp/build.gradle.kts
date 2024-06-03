@@ -100,13 +100,11 @@ kotlin {
             implementation(libs.ktor.client.websockets)
             implementation(libs.ktor.client.serialization)
             implementation(libs.ktor.client.core)
-            implementation(libs.ktor.client.core.v200)
-//            implementation(libs.ktor.client.darwin.v200) // для iOS
             implementation(libs.kotlinx.serialization.json.v132)
             implementation(libs.kotlinx.datetime)
             implementation(libs.peekaboo.ui)
             implementation(libs.peekaboo.image.picker)
-            
+            implementation(libs.sonner)
             
         }
         

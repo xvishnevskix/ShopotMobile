@@ -16,6 +16,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.common.ToasterViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.logo
@@ -27,17 +29,9 @@ class IntroScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
+        val toasterViewModel: ToasterViewModel = koinInject()
         
         
-        Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
-            Image(
-                modifier = Modifier
-                    .fillMaxSize(),
-                painter = painterResource(Res.drawable.logo),
-                contentDescription = null,
-                
-                )
-        }
         
         
         LaunchedEffect(key1 = Unit) {
@@ -47,8 +41,17 @@ class IntroScreen : Screen {
             val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
             val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
             
+            toasterViewModel.toaster.show("Hello world!")
             
-            if (!contactsNative || !cameraNative || !microPhoneNative) return@LaunchedEffect
+//            println("adasdadada $contactsNative $cameraNative $microPhoneNative")
+//            if (!contactsNative || !cameraNative || !microPhoneNative) {
+//
+//                return@LaunchedEffect
+//            }
+            
+            
+            
+            println("adasdadada")
             
             
             val response = origin().reloadTokens()
@@ -68,6 +71,19 @@ class IntroScreen : Screen {
             
         }
         
+        
+        
+        Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
+            SafeArea {
+                Image(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    painter = painterResource(Res.drawable.logo),
+                    contentDescription = null,
+                    
+                    )
+            }
+        }
         
     }
     

@@ -40,6 +40,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import io.ktor.util.InternalAPI
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -74,6 +75,7 @@ data class SignUpTextState(
 class SignUpScreen(private val phone: String) : Screen {
     
     
+    @OptIn(InternalAPI::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -302,7 +304,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 contentType(ContentType.Application.Json)
                                                 setBody(jsonContent)
                                             }
-                                        println("responseresponse ${response}")
+                                        println("responseresponse ${response.content}")
                                         
                                         if (response.status.isSuccess()) {
                                             val jsonString = response.bodyAsText()
