@@ -63,7 +63,7 @@ class IntroScreen : Screen {
             }
             
             
-            navigator.push(SignInScreen())
+            navigator.replace(SignInScreen())
             
             
         }
