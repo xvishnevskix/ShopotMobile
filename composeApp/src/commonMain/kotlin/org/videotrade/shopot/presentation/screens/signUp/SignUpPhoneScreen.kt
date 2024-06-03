@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -41,8 +42,14 @@ class SignUpPhoneScreen : Screen {
         val responseState = remember { mutableStateOf<String?>(null) }
         val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
         val coroutineScope = rememberCoroutineScope()
-        
-        val phone = remember { mutableStateOf(value = TextFieldValue()) }
+
+        val phone =  remember {
+            mutableStateOf(
+                TextFieldValue(
+                    text = "+7", selection = TextRange(3) //для правильной позиции курсора
+                )
+            )
+        }
         
         
         SafeArea {
