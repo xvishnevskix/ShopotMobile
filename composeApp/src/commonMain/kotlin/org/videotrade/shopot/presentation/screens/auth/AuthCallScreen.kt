@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -111,43 +112,44 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             ) {
                 
                 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                     
                     
-                    Text(
-                        "Введите последние 4 цифры входящего звонка",
-                        modifier = Modifier.padding(bottom = 10.dp),
-                        fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
-                        letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
-                        lineHeight = 24.sp,
-                        
+                    item {
+                        Text(
+                            "Введите последние 4 цифры входящего звонка",
+                            modifier = Modifier.padding(bottom = 10.dp),
+                            fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
+                            lineHeight = 24.sp,
+
+                            )
+                        Text(
+                            "На ваш номер $phone поступит звонок. Введите последние 4 цифры +X XXX XXX 12 34 ",
+                            textAlign = TextAlign.Center,
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                            lineHeight = 24.sp,
+                            modifier = Modifier.padding(bottom = 5.dp),
+                            color = Color(151, 151, 151)
                         )
-                    Text(
-                        "На ваш номер $phone поступит звонок. Введите последние 4 цифры +X XXX XXX 12 34 ",
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        lineHeight = 24.sp,
-                        modifier = Modifier.padding(bottom = 5.dp),
-                        color = Color(151, 151, 151)
-                    )
-                    
-                    
-                    
-                    Otp(otpFields)
-                    
-                    
-                    CustomButton(
-                        "Подтвердить",
-                        {
-                            val otpText = otpFields.joinToString("")
-                            
-                            
-                            coroutineScope.launch {
-                                
-                                
+
+
+
+                        Otp(otpFields)
+
+
+                        CustomButton(
+                            "Подтвердить",
+                            {
+                                val otpText = otpFields.joinToString("")
+
+
+                                coroutineScope.launch {
+
+
 //                                if (
 //                                    responseState.value != otpText && !isSuccessOtp.value
 //
@@ -155,16 +157,16 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //
 //                                    return@launch
 //                                }
-                                
-                                when (authCase) {
-                                    
-                                    "SignIn" -> sendLogin(phone, navigator, viewModel)
-                                    "SignUp" -> sendSignUp(phone, navigator)
+
+                                    when (authCase) {
+
+                                        "SignIn" -> sendLogin(phone, navigator, viewModel)
+                                        "SignUp" -> sendSignUp(phone, navigator)
+                                    }
                                 }
-                            }
-                            
-                            
-                        })
+
+
+                            })
 
 //                    Text(
 //                        "Отправить код по SMS",
@@ -177,7 +179,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //                        modifier = Modifier.padding(top = 20.dp)
 //                            .clickable { navigator.push(AuthSMSScreen(phone)) }
 //                    )
-                }
+                    }
+                    }
                 
                 
             }

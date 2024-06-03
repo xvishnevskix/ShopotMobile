@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -73,81 +74,83 @@ class SignInScreen : Screen {
             ) {
                 
                 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Image(
-                        modifier = Modifier
-                            .size(220.dp),
-                        painter = painterResource(Res.drawable.LoginLogo),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
-                    
-                    Text(
-                        "Добро пожаловать!",
-                        fontSize = 28.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        modifier = Modifier.padding(bottom = 5.dp),
-                    )
-                    Text(
-                        "Для того, чтобы продолжить \nавторизуйтесь",
-                        textAlign = TextAlign.Center,
-                        fontSize = 18.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 24.sp,
-                        modifier = Modifier.padding(bottom = 5.dp),
-                        fontWeight = FontWeight.W400,
-                        color = Color(151, 151, 151)
-                    )
-                    
-                    
-                    
-                    
-                    Box(modifier = Modifier.padding(top = 25.dp, bottom = 25.dp)) {
-                        PhoneInput(textState)
-                    }
-                    
-                    
-                    CustomButton(
-                        "Войти",
-                        {
-                            navigator.push(
-                                AuthCallScreen(
-                                    textState.value.text,
-                                    
-                                    "SignIn"
+                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+                    item {
+                        Image(
+                            modifier = Modifier
+                                .size(220.dp),
+                            painter = painterResource(Res.drawable.LoginLogo),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+
+                        Text(
+                            "Добро пожаловать!",
+                            fontSize = 28.sp,
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                            lineHeight = 20.sp,
+                            modifier = Modifier.padding(bottom = 5.dp),
+                        )
+                        Text(
+                            "Для того, чтобы продолжить \nавторизуйтесь",
+                            textAlign = TextAlign.Center,
+                            fontSize = 18.sp,
+                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                            lineHeight = 24.sp,
+                            modifier = Modifier.padding(bottom = 5.dp),
+                            fontWeight = FontWeight.W400,
+                            color = Color(151, 151, 151)
+                        )
+
+
+
+
+                        Box(modifier = Modifier.padding(top = 25.dp, bottom = 25.dp)) {
+                            PhoneInput(textState)
+                        }
+
+
+                        CustomButton(
+                            "Войти",
+                            {
+                                navigator.push(
+                                    AuthCallScreen(
+                                        textState.value.text,
+
+                                        "SignIn"
+                                    )
                                 )
+
+                            })
+
+                        Spacer(modifier = Modifier.height(154.dp))
+
+                        Row(
+                            modifier = Modifier.padding(10.dp).fillMaxWidth()
+                                .clickable { navigator.push(SignUpPhoneScreen()) },
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                "У вас еще нет акканута?",
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                lineHeight = 15.sp,
+                                color = Color(0xFF979797),
                             )
-                            
-                        })
-                    
-                    Spacer(modifier = Modifier.height(154.dp))
-                    
-                    Row(
-                        modifier = Modifier.padding(10.dp).fillMaxWidth()
-                            .clickable { navigator.push(SignUpPhoneScreen()) },
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            "У вас еще нет акканута?",
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp,
-                            lineHeight = 15.sp,
-                            color = Color(0xFF979797),
-                        )
-                        Text(
-                            " Зарегистрироваться",
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp,
-                            lineHeight = 15.sp,
-                            color = Color(0xFF000000),
-                            textDecoration = TextDecoration.Underline
-                        )
-                        
+                            Text(
+                                " Зарегистрироваться",
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                lineHeight = 15.sp,
+                                color = Color(0xFF000000),
+                                textDecoration = TextDecoration.Underline
+                            )
+
+                        }
                     }
                     
                 }

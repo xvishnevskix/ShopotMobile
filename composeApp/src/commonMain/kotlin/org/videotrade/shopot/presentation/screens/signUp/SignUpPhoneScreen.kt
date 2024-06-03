@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -60,40 +61,42 @@ class SignUpPhoneScreen : Screen {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        "Введите номер телефона",
-                        modifier = Modifier.padding(bottom = 5.dp),
-                        fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
-                        letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
-                        lineHeight = 24.sp,
-                    )
-                    
-                    Spacer(modifier = Modifier.height(80.dp))
-                    
-                    PhoneInput(phone)
-                    
-                    Box(
-                        modifier = Modifier.padding(top = 20.dp)
-                    ) {
-                        CustomButton(
-                            "Отправить код",
-                            {
-                                
-                                
-                                navigator.push(
-                                    AuthCallScreen(
-                                        phone.value.text,
-                                        "SignUp"
-                                    )
-                                )
-                                
-                                
-                            }
-                        
+                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+                    item {
+                        Text(
+                            "Введите номер телефона",
+                            modifier = Modifier.padding(bottom = 5.dp),
+                            fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
+                            lineHeight = 24.sp,
                         )
+
+                        Spacer(modifier = Modifier.height(80.dp))
+
+                        PhoneInput(phone)
+
+                        Box(
+                            modifier = Modifier.padding(top = 20.dp)
+                        ) {
+                            CustomButton(
+                                "Отправить код",
+                                {
+
+
+                                    navigator.push(
+                                        AuthCallScreen(
+                                            phone.value.text,
+                                            "SignUp"
+                                        )
+                                    )
+
+
+                                }
+
+                            )
+                        }
                     }
                 }
             }

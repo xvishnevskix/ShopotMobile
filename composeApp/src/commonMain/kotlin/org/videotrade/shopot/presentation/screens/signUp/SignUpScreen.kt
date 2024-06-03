@@ -5,10 +5,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -73,274 +75,190 @@ data class SignUpTextState(
 )
 
 class SignUpScreen(private val phone: String) : Screen {
-    
-    
+
     @OptIn(InternalAPI::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
-        
+
         val textState = remember { mutableStateOf(SignUpTextState()) }
-        
+
         SafeArea {
-            
             AuthHeader("Создать аккаунт", 0.75F)
-            
+
             Box(
-                modifier = Modifier.padding(top = 70.dp).fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Box() {
-                        Avatar(Res.drawable.person, 140.dp)
-                        Image(
-                            painter = painterResource(Res.drawable.pencil_in_circle),
-                            contentDescription = "Редактировать",
-                            modifier = Modifier.size(28.dp).align(Alignment.BottomEnd)
-                        )
-                    }
-                    
-                    Column(
-                        modifier = Modifier.fillMaxWidth(1F),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        
-                        
-                        Column(
-                            modifier = Modifier.padding(top = 35.dp),
-                        ) {
-                            Text(
-                                "Имя",
-                                textAlign = TextAlign.Center,
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 15.sp,
-                                modifier = Modifier.padding(
-                                    top = 5.dp,
-                                    bottom = 8.dp,
-                                    start = 4.dp
-                                ),
-                                color = Color(0xFF000000)
+                LazyColumn(
+                    modifier = Modifier.padding(top = 70.dp).fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    contentPadding = PaddingValues(bottom = 20.dp)
+                ) {
+                    item {
+                        Box() {
+                            Avatar(Res.drawable.person, 140.dp)
+                            Image(
+                                painter = painterResource(Res.drawable.pencil_in_circle),
+                                contentDescription = "Редактировать",
+                                modifier = Modifier.size(28.dp).align(Alignment.BottomEnd)
                             )
-                            BasicTextField(
+                        }
+                    }
+
+                    item {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            TextFieldWithTitle(
+                                title = "Имя",
                                 value = textState.value.firstName,
-                                onValueChange = {
-                                    textState.value = textState.value.copy(firstName = it)
-                                },
-                                decorationBox = { innerTextField ->
-                                    if (textState.value.firstName.isEmpty()) {
-                                        Text(
-                                            text = "Имя", style = TextStyle(
-                                                color = Color(0xFFC7C7C7),
-                                                fontSize = 12.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                                lineHeight = 15.sp,
-                                            )
-                                        )
-                                    }
-                                    innerTextField()
-                                },
-                                textStyle = TextStyle(
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 15.sp,
-                                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    lineHeight = 20.sp,
-                                    color = Color(0xFF000000)
-                                ),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                                modifier = Modifier
-                                    .shadow(1.dp, RoundedCornerShape(12.dp))
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .fillMaxWidth(0.9f).background(Color(0xFFFFFFFF))
-                                    .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
+                                onValueChange = { textState.value = textState.value.copy(firstName = it) },
+                                placeholder = "Имя"
                             )
-                        }
-                        
-                        
-                        
-                        
-                        Column(
-                            modifier = Modifier.padding(top = 7.dp),
-                        ) {
-                            Text(
-                                "Фамилия",
-                                textAlign = TextAlign.Center,
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 15.sp,
-                                modifier = Modifier.padding(
-                                    top = 5.dp,
-                                    bottom = 8.dp,
-                                    start = 4.dp
-                                ),
-                                color = Color(0xFF000000)
-                            )
-                            BasicTextField(
+
+                            TextFieldWithTitle(
+                                title = "Фамилия",
                                 value = textState.value.lastName,
-                                onValueChange = {
-                                    textState.value = textState.value.copy(lastName = it)
-                                },
-                                decorationBox = { innerTextField ->
-                                    if (textState.value.lastName.isEmpty()) {
-                                        Text(
-                                            text = "Фамилия", style = TextStyle(
-                                                color = Color(0xFFC7C7C7),
-                                                fontSize = 12.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                                lineHeight = 15.sp,
-                                            )
-                                        )
-                                    }
-                                    innerTextField()
-                                },
-                                textStyle = TextStyle(
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 15.sp,
-                                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    lineHeight = 20.sp,
-                                    color = Color(0xFF000000)
-                                ),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                                modifier = Modifier
-                                    .shadow(1.dp, RoundedCornerShape(12.dp))
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .fillMaxWidth(0.9f).background(Color(0xFFFFFFFF))
-                                    .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
+                                onValueChange = { textState.value = textState.value.copy(lastName = it) },
+                                placeholder = "Фамилия"
                             )
-                        }
-                        
-                        
-                        
-                        
-                        Column(
-                            modifier = Modifier.padding(top = 7.dp, bottom = 10.dp),
-                        ) {
-                            Text(
-                                "Придумайте ник",
-                                textAlign = TextAlign.Center,
-                                fontSize = 14.sp,
-                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 15.sp,
-                                modifier = Modifier.padding(
-                                    top = 5.dp,
-                                    bottom = 8.dp,
-                                    start = 4.dp
-                                ),
-                                color = Color(0xFF000000)
-                            )
-                            BasicTextField(
+
+                            TextFieldWithTitle(
+                                title = "Придумайте ник",
                                 value = textState.value.nickname,
-                                onValueChange = {
-                                    textState.value = textState.value.copy(nickname = it)
-                                },
-                                decorationBox = { innerTextField ->
-                                    if (textState.value.nickname.isEmpty()) {
-                                        Text(
-                                            text = "Придумайте ник", style = TextStyle(
-                                                color = Color(0xFFC7C7C7),
-                                                fontSize = 12.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                                lineHeight = 15.sp,
-                                            )
-                                        )
-                                    }
-                                    innerTextField()
-                                },
-                                textStyle = TextStyle(
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 15.sp,
-                                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    lineHeight = 20.sp,
-                                    color = Color(0xFF000000)
-                                ),
-                                singleLine = true,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                                modifier = Modifier
-                                    .shadow(1.dp, RoundedCornerShape(12.dp))
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .fillMaxWidth(0.9f).background(Color(0xFFFFFFFF))
-                                    .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
+                                onValueChange = { textState.value = textState.value.copy(nickname = it) },
+                                placeholder = "Придумайте ник"
                             )
                         }
-                        
                     }
-                    
-                    Box(
-                        modifier = Modifier.padding(top = 20.dp)
-                    ) {
-                        CustomButton(
-                            "Создать аккаунт",
-                            { scope ->
-                                scope.launch {
-                                    
-                                    val client = HttpClient(getHttpClientEngine())
-                                    
-                                    try {
-                                        val jsonContent = Json.encodeToString(
-                                            buildJsonObject {
-                                                put("phoneNumber", phone.drop(1))
-                                                put("firstName", textState.value.firstName)
-                                                put("lastName", textState.value.firstName)
-                                                put("email", "admin.admin@gmail.com")
-                                                put("description", textState.value.firstName)
-                                                put("login", textState.value.nickname)
-                                                put("status", "active")
+
+                    item {
+                        Box(
+                            modifier = Modifier.padding(top = 20.dp)
+                        ) {
+                            CustomButton(
+                                "Создать аккаунт",
+                                { scope ->
+                                    scope.launch {
+                                        val client = HttpClient(getHttpClientEngine())
+
+                                        try {
+                                            val jsonContent = Json.encodeToString(
+                                                buildJsonObject {
+                                                    put("phoneNumber", phone.drop(1))
+                                                    put("firstName", textState.value.firstName)
+                                                    put("lastName", textState.value.firstName)
+                                                    put("email", "admin.admin@gmail.com")
+                                                    put("description", textState.value.firstName)
+                                                    put("login", textState.value.nickname)
+                                                    put("status", "active")
+                                                }
+                                            )
+
+                                            println("jsonContent $jsonContent")
+
+                                            val response: HttpResponse =
+                                                client.post("${serverUrl}auth/sign-up") {
+                                                    contentType(ContentType.Application.Json)
+                                                    setBody(jsonContent)
+                                                }
+                                            println("responseresponse ${response.content}")
+
+                                            if (response.status.isSuccess()) {
+                                                val jsonString = response.bodyAsText()
+                                                val jsonElement =
+                                                    Json.parseToJsonElement(jsonString).jsonObject
+
+                                                println("accessToken ${jsonElement}")
+
+                                                val accessToken =
+                                                    jsonElement["accessToken"]?.jsonPrimitive?.content
+                                                val refreshToken =
+                                                    jsonElement["refreshToken"]?.jsonPrimitive?.content
+
+                                                accessToken?.let {
+                                                    addValueInStorage("accessToken", accessToken)
+                                                }
+                                                refreshToken?.let {
+                                                    addValueInStorage("refreshToken", refreshToken)
+                                                }
+
+                                                navigator.push(MainScreen())
                                             }
-                                        )
-                                        
-                                        println("jsonContent $jsonContent")
-                                        
-                                        val response: HttpResponse =
-                                            client.post("${serverUrl}auth/sign-up") {
-                                                contentType(ContentType.Application.Json)
-                                                setBody(jsonContent)
-                                            }
-                                        println("responseresponse ${response.content}")
-                                        
-                                        if (response.status.isSuccess()) {
-                                            val jsonString = response.bodyAsText()
-                                            val jsonElement =
-                                                Json.parseToJsonElement(jsonString).jsonObject
-                                            
-                                            println("accessToken ${jsonElement}")
-                                            
-                                            val accessToken =
-                                                jsonElement["accessToken"]?.jsonPrimitive?.content
-                                            val refreshToken =
-                                                jsonElement["refreshToken"]?.jsonPrimitive?.content
-                                            
-                                            accessToken?.let {
-                                                addValueInStorage("accessToken", accessToken)
-                                            }
-                                            refreshToken?.let {
-                                                addValueInStorage("refreshToken", refreshToken)
-                                            }
-                                            
-                                            navigator.push(MainScreen())
+                                        } catch (e: Exception) {
+                                            e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
+                                        } finally {
+                                            client.close()
                                         }
-                                    } catch (e: Exception) {
-                                        e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
-                                    } finally {
-                                        client.close()
                                     }
-                                    
-                                    
                                 }
-                            }
-                        )
-                        
+                            )
+                        }
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    fun TextFieldWithTitle(
+        title: String,
+        value: String,
+        onValueChange: (String) -> Unit,
+        placeholder: String
+    ) {
+        Column(
+            modifier = Modifier.padding(top = 7.dp),
+        ) {
+            Text(
+                title,
+                textAlign = TextAlign.Center,
+                fontSize = 14.sp,
+                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 15.sp,
+                modifier = Modifier.padding(
+                    top = 5.dp,
+                    bottom = 8.dp,
+                    start = 4.dp
+                ),
+                color = Color(0xFF000000)
+            )
+            BasicTextField(
+                value = value,
+                onValueChange = onValueChange,
+                decorationBox = { innerTextField ->
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder, style = TextStyle(
+                                color = Color(0xFFC7C7C7),
+                                fontSize = 12.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                lineHeight = 15.sp,
+                            )
+                        )
+                    }
+                    innerTextField()
+                },
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Start,
+                    fontSize = 15.sp,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                    color = Color(0xFF000000)
+                ),
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                modifier = Modifier
+                    .shadow(1.dp, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
+                    .fillMaxWidth(0.9f).background(Color(0xFFFFFFFF))
+                    .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
+            )
         }
     }
 }
