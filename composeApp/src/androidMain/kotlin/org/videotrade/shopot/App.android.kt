@@ -50,24 +50,22 @@ class AppActivity : ComponentActivity() {
     }
     
     private fun initializeProviders() {
-//        MediaProviderFactory.initialize(this)
         PermissionsProviderFactory.initialize(this)
-        permissionsProvider = PermissionsProviderFactory.create()
+//        permissionsProvider = PermissionsProviderFactory.create()
     }
     
     fun registerActivityResultCallback(callback: (Int, IntArray) -> Unit) {
         permissionResultCallback = callback
     }
     
-    @Deprecated("Deprecated in Java")
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions as Array<String>, grantResults)
-        permissionResultCallback?.invoke(requestCode, grantResults)
-    }
+//    override fun onRequestPermissionsResult(
+//        requestCode: Int,
+//        permissions: Array<out String>,
+//        grantResults: IntArray
+//    ) {
+//        super.onRequestPermissionsResult(requestCode, permissions as Array<String>, grantResults)
+//        permissionResultCallback?.invoke(requestCode, grantResults)
+//    }
 }
 
 

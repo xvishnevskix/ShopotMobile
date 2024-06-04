@@ -119,6 +119,7 @@ import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.KoinContext
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
+import org.videotrade.shopot.presentation.screens.test.TestScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -149,7 +150,7 @@ internal fun App() = AppTheme {
 
 //                MainScreen()
                         IntroScreen()
-//                SignUpScreen("+79388899880")
+//                SignUpScreen("+79899236226")
                 //CallScreen()
                 // IncomingCallScreen()
 //                CreateChatScreen()

@@ -1,8 +1,7 @@
-import com.android.build.api.dsl.Lint
-import com.android.build.api.dsl.LintOptions
 import com.android.build.api.dsl.ManagedVirtualDevice
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.konan.target.KonanTarget
@@ -10,6 +9,7 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 plugins {
     alias(libs.plugins.multiplatform)
     alias(libs.plugins.compose)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.android.application)
     alias(libs.plugins.buildConfig)
     alias(libs.plugins.kotlinx.serialization)
@@ -37,9 +37,11 @@ kotlin {
     
     androidTarget {
         compilations.all {
-            kotlinOptions {
-                jvmTarget = "${JavaVersion.VERSION_1_8}"
-                freeCompilerArgs += "-Xjdk-release=${JavaVersion.VERSION_1_8}"
+            compileTaskProvider {
+                compilerOptions {
+                    jvmTarget.set(JvmTarget.JVM_1_8)
+                    freeCompilerArgs.add("-Xjdk-release=${JavaVersion.VERSION_1_8}")
+                }
             }
         }
         //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
@@ -52,7 +54,7 @@ kotlin {
             }
         }
         
-    
+        
     }
     
     
@@ -69,13 +71,13 @@ kotlin {
     
     
     sourceSets {
-        
-        
-        all {
-            languageSettings {
-                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
-            }
-        }
+
+
+//        all {
+//            languageSettings {
+//                optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
+//            }
+//        }
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
@@ -105,6 +107,7 @@ kotlin {
             implementation(libs.peekaboo.ui)
             implementation(libs.peekaboo.image.picker)
             implementation(libs.sonner)
+            api(libs.image.loader.v181)
             
         }
         
@@ -127,8 +130,8 @@ kotlin {
             
             
         }
-        
-        
+
+
 //        val iosMain by getting
 //        val iosSimulatorArm64Main by getting
 //        iosSimulatorArm64Main.dependsOn(iosMain)
@@ -174,8 +177,6 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.11"
     }
-    
-
     
     
 }

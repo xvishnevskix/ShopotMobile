@@ -21,8 +21,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.image.picker.toImageBitmap
+import com.seiko.imageloader.rememberImagePainter
 import kotlinx.coroutines.launch
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class TestScreen : Screen {
@@ -35,53 +37,14 @@ class TestScreen : Screen {
 @Composable
 fun MediaPickerSample() {
     val scope = rememberCoroutineScope()
-    val byteArray = remember { mutableStateOf<ByteArray?>(null) }
-    var images by remember { mutableStateOf<ImageBitmap?>(null) }
-    
-    
-    val singleImagePicker = rememberImagePickerLauncher(
-        selectionMode = SelectionMode.Single,
-        scope = scope,
-        onResult = { byteArrays ->
-            byteArrays.firstOrNull()?.let {
-                // Process the selected images' ByteArrays.
 
-
-                scope.launch {
-                    origin().sendFile("file/upload", it, "image/jpeg")
-                }
-
-                println(it)
-                images = it.toImageBitmap()
-
-                byteArray.value = it
-            }
-        }
-    )
-    
-    
     
     SafeArea {
         Row {
-            images?.let {
-                Image(
-                    modifier = Modifier
-                        .size(220.dp),
-                    bitmap = it,
-                    
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
-            }
-            Button(
-                onClick = {
-                    singleImagePicker.launch()
-                    
-                    
-                }
-            ) {
-                Text("Pick Single Image")
-            }
+            Image(
+                painter = rememberImagePainter("https://static.gettyimages.com/display-sets/creative-landing/images/GettyImages-1448734171.jpg"),
+                contentDescription = "image",
+            )
         }
         
     }
