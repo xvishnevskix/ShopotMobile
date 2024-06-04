@@ -66,7 +66,7 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                 )
                 
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+//                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.Center,
                 ) {
                     
