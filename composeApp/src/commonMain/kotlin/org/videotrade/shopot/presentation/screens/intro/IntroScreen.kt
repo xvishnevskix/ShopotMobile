@@ -41,7 +41,7 @@ class IntroScreen : Screen {
             val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
             val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
             
-            toasterViewModel.toaster.show("Hello world!")
+//            toasterViewModel.toaster.show("Hello world!")
             
 //            println("adasdadada $contactsNative $cameraNative $microPhoneNative")
 //            if (!contactsNative || !cameraNative || !microPhoneNative) {

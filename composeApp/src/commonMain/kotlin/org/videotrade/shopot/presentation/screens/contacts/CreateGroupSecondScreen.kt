@@ -9,31 +9,24 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -47,16 +40,13 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
-import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.create_group
 import shopot.composeapp.generated.resources.edit_group_name
-import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.randomUser
 import kotlin.math.abs
 
@@ -69,17 +59,25 @@ class CreateGroupSecondScreen() : Screen {
         val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
-
+        
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             selectedContacts
         } else {
             selectedContacts.filter {
-                it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
-                    searchQuery.value
-                )
+                
+                if (it.firstName !== null) {
+                    it.firstName.contains(
+                        searchQuery.value,
+                        ignoreCase = true
+                    ) || it.phone.contains(
+                        searchQuery.value
+                    )
+                } else {
+                    false
+                }
             }
         }
-
+        
         SafeArea {
             Box(
                 modifier = Modifier
@@ -97,21 +95,21 @@ class CreateGroupSecondScreen() : Screen {
                     )
                     LazyColumn(
                         modifier = Modifier
-
+                            
                             .fillMaxWidth()
                             .fillMaxHeight(0.8F)
                             .background(color = Color(255, 255, 255)),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
-                           CreateGroupInput()
+                            CreateGroupInput()
                             ParticipantCountText(selectedContacts.size)
                         }
                         itemsIndexed(filteredContacts) { _, item ->
                             ChatItem(item = item)
                         }
                     }
-
+                    
                     Box(
                         modifier = Modifier.padding(top = 85.dp)
                     ) {
@@ -121,7 +119,7 @@ class CreateGroupSecondScreen() : Screen {
                                 navigator.push(
                                     MainScreen()
                                 )
-
+                                
                             })
                     }
                 }
@@ -131,18 +129,17 @@ class CreateGroupSecondScreen() : Screen {
 }
 
 
-
 @Composable
 private fun ChatItem(item: ContactDTO) {
-
-
+    
+    
     Box(
         modifier = Modifier
             .padding(top = 22.dp)
             .background(Color(255, 255, 255))
             .fillMaxWidth()
-            .clickable {  }
-
+            .clickable { }
+    
     ) {
         Column(
         ) {
@@ -181,10 +178,10 @@ private fun ChatItem(item: ContactDTO) {
                             color = Color(0xFF979797),
                             modifier = Modifier.padding(top = 13.dp)
                         )
-
+                        
                     }
                 }
-
+                
             }
             Divider(
                 color = Color(0xFFD9D9D9).copy(alpha = 0.43f),
@@ -194,8 +191,6 @@ private fun ChatItem(item: ContactDTO) {
         }
     }
 }
-
-
 
 
 @Composable
@@ -224,7 +219,7 @@ fun CreateGroupInput() {
                 .width(232.dp)
                 .padding(bottom = 15.dp, start = 25.dp)
                 .background(Color(255, 255, 255)),
-
+            
             label = { Text("Введите имя группы") },
             value = message.value,
             singleLine = true,

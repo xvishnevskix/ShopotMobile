@@ -4,12 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ContactDTO(
-    val id: String = "",
-    val login: String = "",
-    val email: String = "",
-    val firstName: String = "",
-    val lastName: String = "",
-    val description: String = "",
+    val id: String? = "",
+    val login: String? = "",
+    val email: String? = "",
+    val firstName: String? = "",
+    val lastName: String? = "",
+    val description: String? = "",
     val phone: String = "",
-    val status: String = ""
+    val status: String? = ""
 )

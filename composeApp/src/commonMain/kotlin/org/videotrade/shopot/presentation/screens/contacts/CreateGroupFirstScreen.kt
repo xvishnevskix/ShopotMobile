@@ -59,9 +59,20 @@ class CreateGroupFirstScreen() : Screen {
             contacts
         } else {
             contacts.filter {
-                it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
-                    searchQuery.value
-                )
+                
+                if (it.firstName !== null) {
+                    it.firstName.contains(
+                        searchQuery.value,
+                        ignoreCase = true
+                    ) || it.phone.contains(
+                        searchQuery.value
+                    )
+                } else {
+                    
+                    false
+                }
+                
+                
             }
         }
 
@@ -153,7 +164,7 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                     Avatar(Res.drawable.randomUser, 80.dp)
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
-                            text = item.firstName,
+                            text = "${item.firstName}",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             textAlign = TextAlign.Center,

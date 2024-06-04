@@ -1,8 +1,8 @@
 package org.videotrade.shopot.data
 
 import io.ktor.client.HttpClient
+import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import io.ktor.client.request.forms.submitFormWithBinaryData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -15,7 +15,6 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.http.headers
 import io.ktor.http.isSuccess
 import io.ktor.util.InternalAPI
 import kotlinx.serialization.encodeToString
@@ -27,6 +26,7 @@ import kotlinx.serialization.json.put
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.domain.model.FileDTO
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 
 class origin {
@@ -188,35 +188,41 @@ class origin {
     
     suspend fun sendFile(
         url: String,
-        fileBytes: ByteArray, fileName: String
-    ): HttpResponse? {
+        fileBytes: ByteArray,
+        contentType: String
+    ): FileDTO? {
         val client =
             HttpClient(getHttpClientEngine())
         try {
             val token = getValueInStorage("accessToken")
             
             
-            val response: HttpResponse = client.submitFormWithBinaryData(
-                url = "${EnvironmentConfig.serverUrl}$url",
-                formData = formData {
-                    append("file", fileBytes, Headers.build {
-                        append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"$fileName\"")
-                    })
-                }
-            ) {
+            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                setBody(MultiPartFormDataContent(
+                    formData {
+                        append("file", fileBytes, Headers.build {
+                            append(HttpHeaders.ContentType, contentType)
+                            append(HttpHeaders.ContentDisposition, "filename=\"jpg\"")
+                        })
+                    }
+                ))
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
-                
-                
-                
-                
-                println("response.bodyAsText() ${response.bodyAsText()}")
+            
+            
+            
+            println("response.bodyAsText() ${response.bodyAsText()}")
             
             if (response.status.isSuccess()) {
-            
-            
+                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
+                
+                
+                return responseData
+                
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                return null
+                
             }
         } catch (e: Exception) {
             
@@ -227,9 +233,6 @@ class origin {
         } finally {
             client.close()
         }
-        
-        return null
-        
         
     }
     

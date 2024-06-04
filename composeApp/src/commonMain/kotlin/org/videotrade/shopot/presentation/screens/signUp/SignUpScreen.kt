@@ -3,6 +3,7 @@ package org.videotrade.shopot.presentation.screens.signUp
 import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -16,13 +17,17 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -34,6 +39,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import com.preat.peekaboo.image.picker.toImageBitmap
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -55,6 +63,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.CustomButton
@@ -75,18 +84,35 @@ data class SignUpTextState(
 )
 
 class SignUpScreen(private val phone: String) : Screen {
-
+    
     @OptIn(InternalAPI::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
-
+        
+        val scope = rememberCoroutineScope()
         val textState = remember { mutableStateOf(SignUpTextState()) }
-
+        val byteArray = remember { mutableStateOf<ByteArray?>(null) }
+        var images by remember { mutableStateOf<ImageBitmap?>(null) }
+        
+        val singleImagePicker = rememberImagePickerLauncher(
+            selectionMode = SelectionMode.Single,
+            scope = scope,
+            onResult = { byteArrays ->
+                byteArrays.firstOrNull()?.let {
+                    
+                    images = it.toImageBitmap()
+                    
+                    byteArray.value = it
+                }
+            }
+        )
+        
+        
         SafeArea {
             AuthHeader("Создать аккаунт", 0.75F)
-
+            
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
@@ -97,16 +123,29 @@ class SignUpScreen(private val phone: String) : Screen {
                     contentPadding = PaddingValues(bottom = 20.dp)
                 ) {
                     item {
-                        Box() {
-                            Avatar(Res.drawable.person, 140.dp)
-                            Image(
-                                painter = painterResource(Res.drawable.pencil_in_circle),
-                                contentDescription = "Редактировать",
-                                modifier = Modifier.size(28.dp).align(Alignment.BottomEnd)
-                            )
+                        Box(modifier = Modifier.clickable {
+                            singleImagePicker.launch()
+                            
+                        }) {
+                            
+                            
+                            if (images !== null) {
+                                Avatar(bitmap = images, size = 140.dp)
+                                
+                                
+                            } else {
+                                Avatar(Res.drawable.person, 140.dp)
+                                Image(
+                                    painter = painterResource(Res.drawable.pencil_in_circle),
+                                    contentDescription = "Редактировать",
+                                    modifier = Modifier.size(28.dp).align(Alignment.BottomEnd)
+                                )
+                            }
+                            
+                            
                         }
                     }
-
+                    
                     item {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
@@ -115,26 +154,32 @@ class SignUpScreen(private val phone: String) : Screen {
                             TextFieldWithTitle(
                                 title = "Имя",
                                 value = textState.value.firstName,
-                                onValueChange = { textState.value = textState.value.copy(firstName = it) },
+                                onValueChange = {
+                                    textState.value = textState.value.copy(firstName = it)
+                                },
                                 placeholder = "Имя"
                             )
-
+                            
                             TextFieldWithTitle(
                                 title = "Фамилия",
                                 value = textState.value.lastName,
-                                onValueChange = { textState.value = textState.value.copy(lastName = it) },
+                                onValueChange = {
+                                    textState.value = textState.value.copy(lastName = it)
+                                },
                                 placeholder = "Фамилия"
                             )
-
+                            
                             TextFieldWithTitle(
                                 title = "Придумайте ник",
                                 value = textState.value.nickname,
-                                onValueChange = { textState.value = textState.value.copy(nickname = it) },
+                                onValueChange = {
+                                    textState.value = textState.value.copy(nickname = it)
+                                },
                                 placeholder = "Придумайте ник"
                             )
                         }
                     }
-
+                    
                     item {
                         Box(
                             modifier = Modifier.padding(top = 20.dp)
@@ -144,8 +189,18 @@ class SignUpScreen(private val phone: String) : Screen {
                                 { scope ->
                                     scope.launch {
                                         val client = HttpClient(getHttpClientEngine())
-
+                                        
                                         try {
+                                            
+                                            val icon = byteArray.value?.let {
+                                                origin().sendFile(
+                                                    "file/upload",
+                                                    it, "image/jpeg"
+                                                )
+                                                
+                                            }
+                                            println("icon $icon")
+                                            
                                             val jsonContent = Json.encodeToString(
                                                 buildJsonObject {
                                                     put("phoneNumber", phone.drop(1))
@@ -155,37 +210,38 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     put("description", textState.value.firstName)
                                                     put("login", textState.value.nickname)
                                                     put("status", "active")
+                                                    put("icon", icon?.id)
                                                 }
                                             )
-
+                                            
                                             println("jsonContent $jsonContent")
-
+                                            
                                             val response: HttpResponse =
                                                 client.post("${serverUrl}auth/sign-up") {
                                                     contentType(ContentType.Application.Json)
                                                     setBody(jsonContent)
                                                 }
                                             println("responseresponse ${response.content}")
-
+                                            
                                             if (response.status.isSuccess()) {
                                                 val jsonString = response.bodyAsText()
                                                 val jsonElement =
                                                     Json.parseToJsonElement(jsonString).jsonObject
-
+                                                
                                                 println("accessToken ${jsonElement}")
-
+                                                
                                                 val accessToken =
                                                     jsonElement["accessToken"]?.jsonPrimitive?.content
                                                 val refreshToken =
                                                     jsonElement["refreshToken"]?.jsonPrimitive?.content
-
+                                                
                                                 accessToken?.let {
                                                     addValueInStorage("accessToken", accessToken)
                                                 }
                                                 refreshToken?.let {
                                                     addValueInStorage("refreshToken", refreshToken)
                                                 }
-
+                                                
                                                 navigator.push(MainScreen())
                                             }
                                         } catch (e: Exception) {
@@ -202,7 +258,7 @@ class SignUpScreen(private val phone: String) : Screen {
             }
         }
     }
-
+    
     @Composable
     fun TextFieldWithTitle(
         title: String,

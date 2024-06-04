@@ -60,9 +60,20 @@ class CreateChatScreen() : Screen {
             contacts
         } else {
             contacts.filter {
-                it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(
-                    searchQuery.value
-                )
+                
+                if (it.firstName !== null) {
+                    it.firstName.contains(
+                        searchQuery.value,
+                        ignoreCase = true
+                    ) || it.phone.contains(
+                        searchQuery.value
+                    )
+                } else {
+                    
+                    false
+                }
+                
+                
             }
         }
         

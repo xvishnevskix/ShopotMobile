@@ -104,8 +104,8 @@ suspend fun handleWebRTCWebSocket(
                                                 
                                                 if (contact != null) {
                                                     val sortChat = chat.copy(
-                                                        firstName = contact.firstName,
-                                                        lastName = contact.lastName
+                                                        firstName = "${contact.firstName}",
+                                                        lastName = "${contact.lastName}"
                                                     )
                                                     println("sortChat $sortChat")
                                                     chats.add(sortChat)

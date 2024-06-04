@@ -48,7 +48,7 @@ fun MediaPickerSample() {
 
 
                 scope.launch {
-                    origin().sendFile("file/upload", it, "image")
+                    origin().sendFile("file/upload", it, "image/jpeg")
                 }
 
                 println(it)
