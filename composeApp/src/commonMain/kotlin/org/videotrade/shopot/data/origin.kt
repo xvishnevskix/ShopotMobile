@@ -211,7 +211,7 @@ class origin {
             
             
             
-            println("response.bodyAsText() ${response.bodyAsText()}")
+            println("response.Send ${response.status} ${response.bodyAsText()}")
             
             if (response.status.isSuccess()) {
                 val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())

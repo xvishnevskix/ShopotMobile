@@ -74,7 +74,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     chatId = chatId,
                     anotherRead = false,
                     iread = false,
-//                    attachments = attachments
+                    attachments = attachments
                 )
             )
         }
@@ -94,8 +94,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 "file/upload",
                 file, "image/jpeg"
             )
-            
-            
+
+
             if (fileId !== null)
                 sendMessage(
                     content,

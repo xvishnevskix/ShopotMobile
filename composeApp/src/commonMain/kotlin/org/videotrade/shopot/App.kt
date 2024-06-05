@@ -149,13 +149,13 @@ internal fun App() = AppTheme {
 //                )
 
 //                MainScreen()
-//                        IntroScreen()
+                        IntroScreen()
 //                SignUpScreen("+79899236221")
                 //CallScreen()
                 // IncomingCallScreen()
 //                CreateChatScreen()
 //                MainScreen()
-                TestScreen()
+//                TestScreen()
 //                SignInScreen()
             ) { navigator ->
                 SlideTransition(navigator)

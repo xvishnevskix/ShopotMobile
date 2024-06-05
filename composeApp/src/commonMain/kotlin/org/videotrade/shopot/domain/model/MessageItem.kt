@@ -15,7 +15,7 @@ data class MessageItem(
     var chatId: String,
     var anotherRead: Boolean,
     var iread: Boolean,
-//    var attachments: List<String>,
+    var attachments: List<String>?,
 
     
     
