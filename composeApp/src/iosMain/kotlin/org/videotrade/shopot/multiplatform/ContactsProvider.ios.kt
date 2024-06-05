@@ -34,7 +34,7 @@ actual class ContactsProvider {
                 val labeledValueObj = labeledValue as? CNLabeledValue
                 
                 val phoneNumber = (labeledValueObj?.value as? CNPhoneNumber)?.stringValue ?: ""
-                contacts.add(ContactDTO(firstName = firstName, lastName = lastName, phone = phoneNumber))
+                contacts.add(ContactDTO(firstName = firstName, lastName = lastName, phone = phoneNumber, icon = null))
             }
         }
         
