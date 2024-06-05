@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,18 +37,43 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.ChatItem
-import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
+    val scope = rememberCoroutineScope()
     
     var text by remember { mutableStateOf("") }
     
+    val singleImagePicker = rememberImagePickerLauncher(
+        selectionMode = SelectionMode.Single,
+        scope = scope,
+        onResult = { byteArrays ->
+            byteArrays.firstOrNull()?.let {
+                
+                
+                scope.launch {
+                    viewModel.sendAttachments(
+                        content = text,
+                        fromUser = viewModel.profile.value.id,
+                        chatId = chat.id,
+                        it
+                    )
+                    
+                    
+                }
+                
+                
+            }
+        }
+    )
     Box(
         modifier = Modifier
             .imePadding().padding(vertical = 15.dp)
@@ -73,7 +99,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add",
                     tint = Color.White,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp).clickable {
+                        singleImagePicker.launch()
+                        
+                    }
                 )
             }
             BasicTextField(
@@ -110,14 +139,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 contentDescription = "Send",
                 modifier = Modifier.padding(end = 8.dp).clickable {
                     viewModel.sendMessage(
-                        MessageItem(
-                            content = text,
-                            fromUser = viewModel.profile.value.id,
-                            chatId = chat.id,
-                            anotherRead = false,
-                            iread = false
-                        )
-                    
+                        content = text,
+                        fromUser = viewModel.profile.value.id,
+                        chatId = chat.id,
+                     
+                        attachments = emptyList()
                     )
                     
                     text = ""

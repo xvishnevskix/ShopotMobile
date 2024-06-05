@@ -155,7 +155,7 @@ private fun ChatItem(item: ContactDTO) {
                     modifier = Modifier
                         .padding()
                 ) {
-                    Avatar(Res.drawable.randomUser, 80.dp)
+                    Avatar(icon = item.icon, 80.dp)
                     Column(
                         modifier = Modifier.padding(start = 16.dp)
                     ) {

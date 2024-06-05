@@ -134,7 +134,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 
                                 
                             } else {
-                                Avatar(Res.drawable.person, 140.dp)
+                                Avatar(icon = null, 140.dp)
                                 Image(
                                     painter = painterResource(Res.drawable.pencil_in_circle),
                                     contentDescription = "Редактировать",
@@ -199,7 +199,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 )
                                                 
                                             }
-                                            println("icon $icon")
+                                            println("icon3131 ${ icon?.id}")
                                             
                                             val jsonContent = Json.encodeToString(
                                                 buildJsonObject {

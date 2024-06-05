@@ -161,7 +161,7 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                 modifier = Modifier.padding().fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding()) {
-                    Avatar(Res.drawable.randomUser, 80.dp)
+                    Avatar(item.icon, 80.dp)
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
                             text = "${item.firstName}",

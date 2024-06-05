@@ -10,20 +10,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.EnvironmentConfig
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 @Composable
 fun CustomImage(
-    imageUri: String? = null,
+    icon: String? = null,
     size: Dp = 40.dp,
     modifier: Modifier = Modifier.size(size),
     contentScale: ContentScale = ContentScale.Crop,
 ) {
-    val imagePainter = if (imageUri == null) {
+    val imagePainter = if (icon == null) {
         painterResource(Res.drawable.person)
     } else {
-        rememberImagePainter(imageUri)
+//        rememberImagePainter("${EnvironmentConfig.serverUrl}file/$icon")
+        rememberImagePainter("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE5fPhctwNLodS9VmAniEw_UiLWHgKs0fs1w&s")
     }
     
     

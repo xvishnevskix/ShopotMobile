@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class ChatItem(
     val id: String,
     val personal: Boolean,
-    var icon: String,
+    var icon: String?,
     var firstName: String,
     var lastName: String,
     var phone: String,

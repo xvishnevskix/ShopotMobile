@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.api.handleWebRTCWebSocket
+import org.videotrade.shopot.api.handleConnectWebSocket
 import org.videotrade.shopot.domain.repository.WsRepository
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
@@ -27,7 +27,7 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
         val contactsUseCase: ContactsUseCase by inject()
         
         
-        handleWebRTCWebSocket(
+        handleConnectWebSocket(
             navigator,
             _wsSession,
             isConnected,

@@ -24,7 +24,7 @@ import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
-suspend fun handleWebRTCWebSocket(
+suspend fun handleConnectWebSocket(
     navigator: Navigator,
     webSocketSession: MutableStateFlow<DefaultClientWebSocketSession?>,
     isConnected: MutableState<Boolean>,

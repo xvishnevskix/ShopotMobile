@@ -4,17 +4,31 @@ import Avatar
 import GroupLongButton
 import GroupShortButton
 import GroupUserCard
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,26 +42,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.presentation.components.ProfileComponents.GroupProfileHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.person
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.launch
-import org.videotrade.shopot.presentation.components.ProfileComponents.GroupProfileHeader
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.add_user
@@ -59,7 +58,7 @@ import shopot.composeapp.generated.resources.video_icon
 
 
 class GroupProfileScreen : Screen {
-
+    
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
@@ -69,14 +68,14 @@ class GroupProfileScreen : Screen {
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
         }
-
-
-
+        
+        
+        
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopStart
         ) {
-
+            
             Column {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -88,7 +87,7 @@ class GroupProfileScreen : Screen {
                 ) {
                     GroupProfileHeader("Изменить")
                     Avatar(
-                        drawableRes = Res.drawable.person,
+                        icon = null,
                         size = 116.dp
                     )
                     Text(
@@ -110,7 +109,7 @@ class GroupProfileScreen : Screen {
                         lineHeight = 20.sp,
                         color = Color(0xFF979797)
                     )
-
+                    
                     Row(
                         modifier = Modifier
                             .padding(start = 5.dp, end = 5.dp)
@@ -161,20 +160,20 @@ class GroupProfileScreen : Screen {
                             text = "Изменить"
                         )
                     }
-
-
+                    
+                    
                 }
-
-
+                
+                
                 Scaffold(
-
+                
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(top = it.calculateTopPadding()),
                         horizontalAlignment = Alignment.CenterHorizontally
-
+                    
                     ) {
                         TabRow(
                             selectedTabIndex = selectedTabIndex.value,
@@ -186,10 +185,10 @@ class GroupProfileScreen : Screen {
                                         .clip(RoundedCornerShape(8.dp)),
                                     height = 3.dp,
                                     color = Color(0xFF29303C),
-
+                                    
                                     )
                             }
-
+                        
                         ) {
                             Tabs.entries.forEachIndexed { index, currentTab ->
                                 Tab(
@@ -202,7 +201,7 @@ class GroupProfileScreen : Screen {
                                             pagerState.animateScrollToPage(currentTab.ordinal)
                                         }
                                     },
-
+                                    
                                     text = {
                                         Text(
                                             modifier = Modifier.wrapContentWidth(),
@@ -218,7 +217,7 @@ class GroupProfileScreen : Screen {
                                 )
                             }
                         }
-
+                        
                         HorizontalPager(
                             state = pagerState,
                             modifier = Modifier
@@ -228,11 +227,11 @@ class GroupProfileScreen : Screen {
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-
+                                
                                 contentAlignment = Alignment.TopCenter,
                             ) {
 //                                Text( text = Tabs.entries[selectedTabIndex.value].text)
-
+                                
                                 if (Tabs.entries[selectedTabIndex.value].text == "Участники") {
                                     LazyColumn(
                                         verticalArrangement = Arrangement.Top,
@@ -295,6 +294,6 @@ enum class Tabs(
         title = "Ссылки",
         text = "Здесь будут ваши ссылки"
     ),
-
-
+    
+    
 }

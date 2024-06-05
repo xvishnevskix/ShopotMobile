@@ -8,23 +8,25 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 @Composable
 fun Avatar(
-    drawableRes: DrawableResource? = null,
+    icon: String? = null,
     size: Dp = 40.dp,
     modifier: Modifier = Modifier.size(size),
     contentScale: ContentScale = ContentScale.Crop,
     bitmap: ImageBitmap? = null
 ) {
-    val imagePainter = if (drawableRes == null) {
-        painterResource(Res.drawable.person)  // Ресурс по умолчанию
+    val imagePainter = if (icon == null) {
+        painterResource(Res.drawable.person)
     } else {
-        painterResource(drawableRes)  // Переданный ресурс
+        rememberImagePainter("${serverUrl}file/id/$icon")
     }
     
     Surface(
@@ -33,7 +35,6 @@ fun Avatar(
     ) {
         
         if (bitmap !== null) {
-            
             Image(
                 bitmap = bitmap,
                 contentDescription = "Avatar",
@@ -42,6 +43,7 @@ fun Avatar(
             )
             return@Surface
         }
+        
         Image(
             painter = imagePainter,
             contentDescription = "Avatar",

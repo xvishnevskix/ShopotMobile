@@ -12,13 +12,9 @@ data class ProfileDTO(
     val description: String? = "",
     val status: String? = "",
     val phone: String = "",
+    val icon: String? = "",
 )
 
-@Serializable
-data class UserProfile(
-    
-    val userDetails: ProfileDTO,
-    
-    )
+
 
 

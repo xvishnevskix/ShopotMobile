@@ -191,7 +191,7 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                     modifier = Modifier
                         .padding()
                 ) {
-                    Avatar(Res.drawable.randomUser, 80.dp)
+                    Avatar(item.icon, 80.dp)
                     Column(
                         modifier = Modifier.padding(start = 16.dp)
                     ) {

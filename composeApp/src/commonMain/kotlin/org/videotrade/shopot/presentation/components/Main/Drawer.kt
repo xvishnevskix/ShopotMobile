@@ -88,7 +88,7 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
                 
                 Row(modifier = Modifier.padding(top = 40.dp, start = 30.dp, bottom = 60.dp)) {
                     Avatar(
-                        drawableRes = Res.drawable.person,
+                       icon = profileState?.icon,
                         size = 80.dp
                     )
                     

@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatUseCase
@@ -59,9 +60,49 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun sendMessage(message: MessageItem) {
+    fun sendMessage(
+        content: String? = null,
+        fromUser: String,
+        chatId: String,
+        attachments: List<String>? = null
+    ) {
         viewModelScope.launch {
-            chatUseCase.sendMessage(message)
+            chatUseCase.sendMessage(
+                MessageItem(
+                    content = content,
+                    fromUser = fromUser,
+                    chatId = chatId,
+                    anotherRead = false,
+                    iread = false,
+//                    attachments = attachments
+                )
+            )
+        }
+    }
+    
+    
+    fun sendAttachments(
+        content: String?,
+        fromUser: String,
+        chatId: String,
+        file: ByteArray
+    ) {
+        viewModelScope.launch {
+            
+            
+            val fileId = origin().sendFile(
+                "file/upload",
+                file, "image/jpeg"
+            )
+            
+            
+            if (fileId !== null)
+                sendMessage(
+                    content,
+                    fromUser,
+                    chatId,
+                    listOf(fileId.id)
+                )
         }
     }
     

@@ -85,7 +85,7 @@ class ProfileScreen : Screen {
                ) {
                    ProfileHeader("Информация")
                    Avatar(
-                       drawableRes = Res.drawable.person,
+                       icon = null,
                        size = 186.dp
                    )
                    Text(

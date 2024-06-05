@@ -43,7 +43,7 @@ fun UserComponentItem(chat: ChatItem) {
     val navigator = LocalNavigator.currentOrThrow
     
     
-    println("${chat.firstName} ${chat.lastName}")
+    println("dasdafafa  ${chat.icon} ${chat.lastName}")
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
@@ -56,7 +56,7 @@ fun UserComponentItem(chat: ChatItem) {
         ) {
             
             Avatar(
-                drawableRes = Res.drawable.person,
+              icon = chat.icon,
                 size = 60.dp
             )
             

@@ -150,7 +150,7 @@ internal fun App() = AppTheme {
 
 //                MainScreen()
                         IntroScreen()
-//                SignUpScreen("+79899236226")
+//                SignUpScreen("+79899236221")
                 //CallScreen()
                 // IncomingCallScreen()
 //                CreateChatScreen()

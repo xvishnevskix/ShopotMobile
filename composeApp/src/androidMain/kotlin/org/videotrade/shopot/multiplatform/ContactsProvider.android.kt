@@ -58,7 +58,7 @@ actual class ContactsProvider(private val context: Context) {
                     }
                 }
                 
-                contacts.add(ContactDTO(firstName = firstName ?: "", lastName = lastName ?: "", phone =  phone))
+                contacts.add(ContactDTO(firstName = firstName ?: "", lastName = lastName ?: "", phone =  phone, icon = null))
             }
         }
         

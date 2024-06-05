@@ -236,7 +236,7 @@ val editOptions = listOf(
         onClick = { _, message, clipboardManager ->
             
             
-            clipboardManager.setText(AnnotatedString(message.content))
+            message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
             
             
         }
@@ -290,7 +290,6 @@ fun MessageBox(
     
     
     val isReadByMe = remember { mutableStateOf(false) }
-    val isSendRead = remember { mutableStateOf(false) }
     
     
     LaunchedEffect(viewModel.messages.value) {
@@ -330,58 +329,18 @@ fun MessageBox(
                     )
                 }
         ) {
-            if (message.fromUser == profile.id) {
-                Surface(
-                    modifier = Modifier.wrapContentSize(),
-                    shape = RoundedCornerShape(
-                        topStart = 20.dp,
-                        topEnd = 20.dp,
-                        bottomEnd = 0.dp,
-                        bottomStart = 20.dp
-                    ),
-                    shadowElevation = 4.dp,
-                    color = Color(0xFF2A293C)
-                ) {
-                    Text(
-                        text = message.content,
-                        style = TextStyle(
-                            color = Color.White,
-                            fontSize = 16.sp
-                        ),
-                        modifier = Modifier.padding(
-                            start = 25.dp,
-                            end = 25.dp,
-                            top = 13.dp,
-                            bottom = 12.dp
-                        ),
-                    )
-                }
-            } else {
-                Surface(
-                    modifier = Modifier.wrapContentSize(),
-                    shape = RoundedCornerShape(
-                        topStart = 20.dp,
-                        topEnd = 20.dp,
-                        bottomEnd = 20.dp,
-                        bottomStart = 0.dp
-                    ),
-                    shadowElevation = 4.dp,
-                    color = Color(0xFFF3F4F6)
-                ) {
-                    Text(
-                        text = message.content,
-                        style = TextStyle(
-                            color = Color.Black,
-                            fontSize = 16.sp
-                        ),
-                        modifier = Modifier.padding(
-                            start = 25.dp,
-                            end = 25.dp,
-                            top = 13.dp,
-                            bottom = 12.dp
-                        ),
-                    )
-                }
+            Surface(
+                modifier = Modifier.wrapContentSize(),
+                shape = RoundedCornerShape(
+                    topStart = 20.dp,
+                    topEnd = 20.dp,
+                    bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
+                    bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                ),
+                shadowElevation = 4.dp,
+                color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
+            ) {
+                MessageFormat(message, profile)
             }
         }
         
@@ -530,19 +489,21 @@ fun MessageBlurBox(
                         shadowElevation = 4.dp,
                         color = Color(0xFF2A293C)
                     ) {
-                        Text(
-                            text = message.content,
-                            style = TextStyle(
-                                color = Color.White,
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.padding(
-                                start = 25.dp,
-                                end = 25.dp,
-                                top = 13.dp,
-                                bottom = 12.dp
-                            ),
-                        )
+                        message.content?.let {
+                            Text(
+                                text = it,
+                                style = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 16.sp
+                                ),
+                                modifier = Modifier.padding(
+                                    start = 25.dp,
+                                    end = 25.dp,
+                                    top = 13.dp,
+                                    bottom = 12.dp
+                                ),
+                            )
+                        }
                     }
                 } else {
                     Surface(
@@ -556,19 +517,21 @@ fun MessageBlurBox(
                         shadowElevation = 4.dp,
                         color = Color(0xFFF3F4F6)
                     ) {
-                        Text(
-                            text = message.content,
-                            style = TextStyle(
-                                color = Color.Black,
-                                fontSize = 16.sp
-                            ),
-                            modifier = Modifier.padding(
-                                start = 25.dp,
-                                end = 25.dp,
-                                top = 13.dp,
-                                bottom = 12.dp
-                            ),
-                        )
+                        message.content?.let {
+                            Text(
+                                text = it,
+                                style = TextStyle(
+                                    color = Color.Black,
+                                    fontSize = 16.sp
+                                ),
+                                modifier = Modifier.padding(
+                                    start = 25.dp,
+                                    end = 25.dp,
+                                    top = 13.dp,
+                                    bottom = 12.dp
+                                ),
+                            )
+                        }
                     }
                 }
             }
@@ -635,4 +598,20 @@ fun MessageBlurBox(
             }
         }
     }
+}
+
+
+@Composable
+fun MessageFormat(message: MessageItem, profile: ProfileDTO) {
+//    if (message.content !== "") {
+//        MessageText(message, profile)
+//        return
+//    }
+//
+//
+    
+    MessageImage(message, profile)
+
+    
+    
 }

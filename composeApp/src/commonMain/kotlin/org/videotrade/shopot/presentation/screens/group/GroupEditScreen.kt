@@ -51,7 +51,6 @@ import shopot.composeapp.generated.resources.add_photo
 
 class GroupEditScreen : Screen {
 
-    @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -83,7 +82,7 @@ class GroupEditScreen : Screen {
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Avatar(drawableRes = Res.drawable.person, size = 70.dp)
+                        Avatar(icon = null, size = 70.dp)
                         BasicTextField(
                             value = textState.value,
                             onValueChange = { newText -> textState.value = newText },

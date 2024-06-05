@@ -71,6 +71,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
         ) {
             
             Avatar(
+                icon = chat.icon,
                 size = 40.dp
             )
             

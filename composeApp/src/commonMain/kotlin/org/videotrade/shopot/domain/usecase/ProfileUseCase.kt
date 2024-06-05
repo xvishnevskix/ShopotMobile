@@ -3,7 +3,6 @@ package org.videotrade.shopot.domain.usecase
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.domain.model.UserProfile
 import org.videotrade.shopot.domain.repository.ProfileRepository
 
 class ProfileUseCase : KoinComponent {

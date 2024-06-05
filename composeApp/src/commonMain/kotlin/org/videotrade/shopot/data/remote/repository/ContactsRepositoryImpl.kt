@@ -69,6 +69,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
                             backendContact.description,
                             normalizedPhone,
                             backendContact.status,
+                            icon = backendContact.icon,
                         )
                     )
                 }

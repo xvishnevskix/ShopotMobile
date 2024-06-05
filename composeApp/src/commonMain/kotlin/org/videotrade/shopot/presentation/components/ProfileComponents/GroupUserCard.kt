@@ -59,7 +59,7 @@ fun GroupUserCard(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Top
             ) {
-                Avatar(drawableRes = Res.drawable.person)
+                Avatar(icon = "")
                 Column(
                     modifier = Modifier.padding(start = 15.dp)
                 ) {
