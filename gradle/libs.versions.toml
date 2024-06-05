@@ -1,13 +1,14 @@
 [versions]
-imageLoader = "1.8.1"
 kermit = "2.0.3"
-kotlin = "2.0.0"
+kotlin = "1.9.23"
 compose = "1.6.10"
 agp = "8.2.2"
 androidx-activityCompose = "1.9.0"
 androidx-uiTest = "1.6.7"
 kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.3"
+ktorClientCore = "2.3.11"
+ktorClientDarwin = "2.3.11"
 peekabooUi = "0.5.2"
 sonner = "0.3.6"
 voyager = "1.0.0"
@@ -24,15 +25,20 @@ statelyCommon = "2.0.6"
 webrtcKmp = "0.114.4"
 webrtc-ios-sdk = "114.5735.09"
 animationCoreAndroid = "1.6.7"
+imageLoader = "1.8.1"
+
 [libraries]
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-uiTest" }
 androidx-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-uiTest" }
-image-loader-v181 = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json-v132 = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
+image-loader-v181 = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
+
+ktor-client-core-v200 = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
+ktor-client-darwin-v200 = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientDarwin" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekabooUi" }
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekabooUi" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
@@ -62,7 +68,6 @@ androidx-animation-core-android = { group = "androidx.compose.animation", name =
 
 [plugins]
 
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 android-application = { id = "com.android.application", version.ref = "agp" }

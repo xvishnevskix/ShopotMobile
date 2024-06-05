@@ -75,7 +75,11 @@ fun UserComponentItem(chat: ChatItem) {
                 
                 
                 Text(
-                    "${chat.lastMessage?.let { MessageContent(message = it) }}",
+                    if (chat.lastMessage !== null) {
+                        MessageContent(message = chat.lastMessage!!)
+                    } else {
+                        "Начните переписку"
+                    },
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),

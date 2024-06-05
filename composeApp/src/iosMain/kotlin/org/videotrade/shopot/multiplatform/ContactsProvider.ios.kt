@@ -23,7 +23,7 @@ actual class ContactsProvider {
         
         val fetchRequest = CNContactFetchRequest(keysToFetch = keysToFetch)
         val contacts = mutableListOf<ContactDTO>()
-        var fetchError: CPointer<ObjCObjectVar<NSError?>>?? = null
+        val fetchError: CPointer<ObjCObjectVar<NSError?>>? = null
         
         contactStore.enumerateContactsWithFetchRequest(fetchRequest, error = fetchError) { contact, stop ->
             val firstName = contact?.givenName ?: ""

@@ -92,7 +92,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             
             val fileId = origin().sendFile(
                 "file/upload",
-                file, "image/jpeg"
+                file, "image"
             )
 
 

@@ -221,6 +221,7 @@ suspend fun sendRequestToBackend(
             setBody(jsonContent)
         }
         
+        println("url ${response.bodyAsText()} ${jsonContent}")
         
         
         if (response.status.isSuccess()) {
