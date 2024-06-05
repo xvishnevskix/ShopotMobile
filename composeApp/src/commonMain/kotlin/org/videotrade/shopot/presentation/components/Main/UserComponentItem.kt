@@ -1,7 +1,6 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import Avatar
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,16 +25,13 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.double_message_check
-import shopot.composeapp.generated.resources.person
-import shopot.composeapp.generated.resources.randomUser
 
 @Composable
 fun UserComponentItem(chat: ChatItem) {
@@ -56,7 +51,7 @@ fun UserComponentItem(chat: ChatItem) {
         ) {
             
             Avatar(
-              icon = chat.icon,
+                icon = chat.icon,
                 size = 60.dp
             )
             
@@ -79,20 +74,20 @@ fun UserComponentItem(chat: ChatItem) {
                 val messageContent = chat.lastMessage?.content ?: "Начните переписку"
                 
                 
-                    Text(
-                        messageContent,
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797),
-                        modifier = Modifier.padding(top = 5.dp)
-                    
-                    )
-                    
-               
-                }
+                Text(
+                    "${chat.lastMessage?.let { MessageContent(message = it) }}",
+                    textAlign = TextAlign.Center,
+                    fontSize = 14.sp,
+                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                    color = Color(0xFF979797),
+                    modifier = Modifier.padding(top = 5.dp)
+                
+                )
+                
+                
+            }
             
         }
         
@@ -153,6 +148,17 @@ fun UserComponentItem(chat: ChatItem) {
         }
         
         
+    }
+    
+}
+
+
+@Composable
+fun MessageContent(message: MessageItem): String {
+    return if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        message.content ?: "Начните переписку"
+    } else {
+        "Фото"
     }
     
 }

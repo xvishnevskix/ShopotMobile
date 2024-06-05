@@ -34,7 +34,6 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             val contactsNative = ContactsProviderFactory.create().getContacts()
             val contactsGet = origin().get<List<ContactDTO>>("user/getAll") ?: return null
-//            println("contactst $contactsGet $contactsNative")
             
             
             // Функция для нормализации номера телефона
@@ -48,12 +47,14 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             }
             
             
+            println("contactst11231 $backendContactsMap ")
+            
             // Сравнение контактов по нормализованному номеру телефона
             for (contact in contactsNative) {
                 val normalizedPhone = normalizePhoneNumber(contact.phone)
                 
                 
-                val backendContact = backendContactsMap.get(normalizedPhone)
+                val backendContact = backendContactsMap[normalizedPhone]
                 
                 
                 println("normalizedPhone $normalizedPhone $backendContactsMap")

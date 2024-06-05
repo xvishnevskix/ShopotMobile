@@ -43,11 +43,11 @@ class IntroScreen : Screen {
             
             
 //            println("adasdadada $contactsNative $cameraNative $microPhoneNative")
-            if (!contactsNative || !cameraNative || !microPhoneNative) {
-            toasterViewModel.toaster.show("Hello world!")
-
-                return@LaunchedEffect
-            }
+//            if (!contactsNative || !cameraNative || !microPhoneNative) {
+//            toasterViewModel.toaster.show("Hello world!")
+//
+//                return@LaunchedEffect
+//            }
             
             
             

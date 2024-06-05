@@ -254,8 +254,8 @@ fun Chat(
 ) {
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
-
-
+    
+    
     println("messagesState $messagesState")
     LazyColumn(
         state = listState,
@@ -605,15 +605,10 @@ fun MessageBlurBox(
 
 @Composable
 fun MessageFormat(message: MessageItem, profile: ProfileDTO) {
-//    if (message.content !== "") {
-//        MessageText(message, profile)
-//        return
-//    }
-//
-//
-    
-    MessageImage(message, profile)
-
-    
+    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        MessageText(message, profile)
+    } else {
+        MessageImage(message, profile)
+    }
     
 }

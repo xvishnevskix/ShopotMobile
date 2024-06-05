@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -37,10 +38,13 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
                     put("content", message.content)
                     put("fromUser", message.fromUser)
                     put("chatId", message.chatId)
+                    put(
+                        "attachments",
+                        Json.encodeToJsonElement(message.attachments)
+                    )
                 }
             )
-            
-            
+            println("jsonContent $jsonContent")
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
             
         } catch (e: Exception) {

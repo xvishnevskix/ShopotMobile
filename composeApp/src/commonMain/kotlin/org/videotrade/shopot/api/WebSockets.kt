@@ -168,7 +168,6 @@ suspend fun handleConnectWebSocket(
                                     try {
                                         
                                         
-                                        println("jsonElement $jsonElement ")
                                         
                                         val messageJson =
                                             jsonElement.jsonObject["message"]?.jsonObject

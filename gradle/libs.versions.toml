@@ -8,12 +8,10 @@ androidx-activityCompose = "1.9.0"
 androidx-uiTest = "1.6.7"
 kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.3"
-ktorClientCore = "2.3.11"
-ktorClientDarwin = "2.3.11"
 peekabooUi = "0.5.2"
 sonner = "0.3.6"
 voyager = "1.0.0"
-composeImageLoader = "1.7.8"
+composeImageLoader = "1.8.1"
 buildConfig = "4.1.1"
 kotlinx-coroutines = "1.8.1"
 moko-mvvm = "0.16.1"
@@ -35,9 +33,6 @@ image-loader-v181 = { module = "io.github.qdsfdhvh:image-loader", version.ref = 
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json-v132 = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-
-ktor-client-core-v200 = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
-ktor-client-darwin-v200 = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientDarwin" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekabooUi" }
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekabooUi" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }

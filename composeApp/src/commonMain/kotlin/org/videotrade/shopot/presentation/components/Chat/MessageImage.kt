@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
+import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 
@@ -18,7 +19,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 fun MessageImage(message: MessageItem, profile: ProfileDTO) {
     
     val imagePainter =
-        rememberImagePainter("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE5fPhctwNLodS9VmAniEw_UiLWHgKs0fs1w&s")
+        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${message.attachments?.get(0)}")
     
     
     
