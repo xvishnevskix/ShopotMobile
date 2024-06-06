@@ -9,6 +9,8 @@ interface ContactsRepository {
     val contacts: StateFlow<List<ContactDTO>>
     
     suspend fun fetchContacts(): List<ContactDTO>?
+     fun getContacts(): List<ContactDTO>
+    
     
     suspend fun createChat(profileId: String , contact: ContactDTO, navigator: Navigator)
     

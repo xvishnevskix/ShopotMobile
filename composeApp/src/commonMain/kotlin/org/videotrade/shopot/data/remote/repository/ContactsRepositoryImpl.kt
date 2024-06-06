@@ -94,6 +94,13 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         
     }
     
+    override  fun getContacts(): List<ContactDTO> {
+        
+        return contacts.value
+    }
+    
+    
+    
     override suspend fun createChat(profileId: String, contact: ContactDTO, navigator: Navigator) {
         val wsUseCase: WsUseCase by inject()
 

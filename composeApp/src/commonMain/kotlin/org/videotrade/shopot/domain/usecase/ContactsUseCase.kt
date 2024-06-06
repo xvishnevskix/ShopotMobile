@@ -18,6 +18,10 @@ class ContactsUseCase : KoinComponent {
         return repository.fetchContacts()
     }
     
+     fun getContacts(): List<ContactDTO> {
+        return repository.getContacts()
+    }
+    
     suspend fun createChat(profileId: String, contact: ContactDTO, navigator: Navigator) {
         return repository.createChat(profileId, contact, navigator)
     }

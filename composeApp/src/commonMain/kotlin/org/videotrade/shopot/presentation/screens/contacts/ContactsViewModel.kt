@@ -38,6 +38,23 @@ class ContactsViewModel() : ViewModel(),
         }
     }
     
+    
+    fun getContacts() {
+        viewModelScope.launch {
+            
+            
+            val contactsSort = ContactsUseCase.getContacts()
+            
+            if (contactsSort.isEmpty()) {
+                fetchContacts()
+            } else {
+                
+                _contacts.value = contactsSort
+                
+            }
+        }
+    }
+    
     fun createChat(contact: ContactDTO, navigator: Navigator) {
         viewModelScope.launch {
             val profile = ProfileUseCase.getProfile()
