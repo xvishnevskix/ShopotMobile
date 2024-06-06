@@ -75,7 +75,6 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
         
         ) {
             viewModel.leaveApp(navigator)
-            
         }
     )
     

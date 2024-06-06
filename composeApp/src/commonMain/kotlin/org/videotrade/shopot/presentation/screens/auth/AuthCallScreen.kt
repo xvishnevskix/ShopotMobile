@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -90,6 +91,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //        }
 //
         
+        LaunchedEffect(Unit) {
+            
+            
+            println("adsdada ${viewModel.getKoin()}")
+            
+            
+        }
+        
         val isError = remember { mutableStateOf(false) }
         
         
@@ -99,6 +108,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         
         DisposableEffect(Unit) {
             onDispose {
+                
                 viewModel.clearWsConnection()
             }
         }

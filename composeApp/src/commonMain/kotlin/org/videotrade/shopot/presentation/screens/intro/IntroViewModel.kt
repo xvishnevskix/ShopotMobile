@@ -5,7 +5,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -140,7 +139,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
         wsUseCase.wsSession
             .onEach { wsSessionNew ->
                 
-                if (_wsSession.value == null && wsSessionNew != null  ) {
+                if (wsSessionNew != null) {
                     println("wsSessionIntro $wsSessionNew")
                     _wsSession.value = wsSessionNew
                     
@@ -175,10 +174,10 @@ class IntroViewModel : ViewModel(), KoinComponent {
     
     fun clearWsConnection() {
         // Очищаем сессию WebSocket
-      viewModelScope.launch {
-          wsUseCase.clearData()
-          _wsSession.value = null
-      }
+        viewModelScope.launch {
+            wsUseCase.clearData()
+            _wsSession.value = null
+        }
     }
     
     

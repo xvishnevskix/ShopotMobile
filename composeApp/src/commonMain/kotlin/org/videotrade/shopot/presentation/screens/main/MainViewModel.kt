@@ -3,7 +3,6 @@ package org.videotrade.shopot.presentation.screens.main
 import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,16 +18,18 @@ import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.presentation.screens.login.SignInScreen
 
 class MainViewModel : ViewModel(), KoinComponent {
     private val userUseCase: ChatsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val callUseCase: CallUseCase by inject()
+    private val chatsUseCase: ChatsUseCase by inject()
     
     val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
-    
+
 //    val callWsSession: Flow<DefaultClientWebSocketSession?> get() = callUseCase.wsSession
     
     
@@ -152,4 +153,19 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    
+    fun leaveApp(navigator: Navigator) {
+        viewModelScope.launch {
+            userUseCase.clearData()
+            profileUseCase.clearData()
+            wsUseCase.clearData()
+            callUseCase.clearData()
+            chatsUseCase.clearData()
+            
+            
+            
+            navigator.replace(SignInScreen())
+            
+        }
+    }
 }
