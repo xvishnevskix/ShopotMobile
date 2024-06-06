@@ -33,56 +33,48 @@ class IntroViewModel : ViewModel(), KoinComponent {
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     
-    
-    val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-    val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
+//
+//    val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
+//    val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
     
     
     val profile = MutableStateFlow<ProfileDTO?>(null)
-
-
-//    init {
-//        viewModelScope.launch {
-//            println("dadsadada1")
-//
-//            downloadProfile()
-//
-//            profile.collect { updatedProfile ->
-//
-//                profile.value?.id?.let {
-//                    println("dadsadada2")
-//                    observeWsConnection(it)
-//
-//                    connectionWs(it)
-//
-//
-//                }
-//
-//
-//            }
-//        }
-//    }
     
-    private fun chatsInit(navigator: Navigator) {
-        
+    private var isObserving = MutableStateFlow(true)
+    
+    val navigator = MutableStateFlow<Navigator?>(null)
+    
+    
+    init {
         viewModelScope.launch {
-            println("dadsadada1")
-            
-            downloadProfile(navigator)
-            
-            profile.collect { updatedProfile ->
+            profile.collect { _ ->
+                
+                
                 
                 profile.value?.id?.let {
-                    println("dadsadada2")
-                    observeWsConnection(it, navigator)
                     
-                    connectionWs(it, navigator)
+                    if (navigator.value !== null) {
+                        
+                        println("navigator.value31311 $it")
+                        
+                        observeWsConnection(it, navigator.value!!)
+                        connectionWs(it, navigator.value!!)
+                    }
                     
                     
                 }
                 
                 
             }
+        }
+    }
+    
+    private fun chatsInit(navigator: Navigator) {
+        
+        viewModelScope.launch {
+            
+            downloadProfile(navigator)
+            
         }
     }
     
@@ -108,7 +100,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun connectionWs(userId: String, navigator: Navigator) {
+    private fun connectionWs(userId: String, navigator: Navigator) {
         viewModelScope.launch {
             wsUseCase.connectionWs(userId, navigator)
         }
@@ -136,51 +128,54 @@ class IntroViewModel : ViewModel(), KoinComponent {
     }
     
     private fun observeWsConnection(userId: String, navigator: Navigator) {
+        println("wsSessionIntrowsUseCase.wsSession ${wsUseCase.wsSession.value}")
         wsUseCase.wsSession
             .onEach { wsSessionNew ->
-                
-                if (wsSessionNew != null) {
-                    println("wsSessionIntro $wsSessionNew")
-                    _wsSession.value = wsSessionNew
+                if ( profile.value?.id !== null && isObserving.value) {
                     
-                    
-                    val jsonContent = Json.encodeToString(
-                        buildJsonObject {
-                            put("action", "getUserChats")
-                            put("userId", userId)
+                    if (wsSessionNew != null) {
+                        println("wsSessionIntro $wsSessionNew")
+                        
+                        stopObserving()
+                        
+                        val jsonContent = Json.encodeToString(
+                            buildJsonObject {
+                                put("action", "getUserChats")
+                                put("userId", profile.value?.id)
+                            }
+                        )
+                        
+                        try {
+                            
+                            println("jsonContent $jsonContent")
+                            
+                            wsSessionNew.send(Frame.Text(jsonContent))
+                            
+                            navigator.replace(MainScreen())
+                            
+                            println("Message sent successfully")
+                        } catch (e: Exception) {
+                            println("Failed to send message: ${e.message}")
                         }
-                    )
-                    
-                    try {
                         
-                        println("jsonContent $jsonContent")
                         
-                        wsSessionNew.send(Frame.Text(jsonContent))
-                        
-                        navigator.replace(MainScreen())
-                        
-                        println("Message sent successfully")
-                    } catch (e: Exception) {
-                        println("Failed to send message: ${e.message}")
                     }
-                    
-                    
                 }
                 
             }
             .launchIn(viewModelScope)
+        
+        
     }
     
     
-    fun clearWsConnection() {
-        // Очищаем сессию WebSocket
-        viewModelScope.launch {
-            wsUseCase.clearData()
-            _wsSession.value = null
-        }
+    fun stopObserving() {
+        isObserving.value = false
     }
     
-    
+    fun startObserving() {
+        isObserving.value = true
+    }
 }
 
 

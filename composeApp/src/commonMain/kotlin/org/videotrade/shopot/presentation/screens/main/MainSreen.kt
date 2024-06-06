@@ -3,6 +3,7 @@ package org.videotrade.shopot.presentation.screens.main
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -16,7 +17,17 @@ class MainScreen : Screen {
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
         val navigator = LocalNavigator.currentOrThrow
         
-        viewModel.getNavigator(navigator)
+        
+        LaunchedEffect(Unit) {
+            viewModel.getNavigator(navigator)
+            
+            viewModel.getProfile()
+            viewModel.loadUsers()
+            
+            
+            
+            
+        }
         
         Drawer(drawerState, viewModel)
     }

@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 data class MessageItem(
     val id: String = "",
     val fromUser: String = "",
-    val content: String? ,
+    val content: String?,
     val forwardMessage: String? = "",
     var answerMessage: String? = "",
     var replaces: Int? = null,
@@ -15,5 +15,22 @@ data class MessageItem(
     var chatId: String,
     var anotherRead: Boolean,
     var iread: Boolean,
-    var attachments: List<String>?,
+    var attachments: List<Attachment>?,
 )
+
+
+@Serializable
+data class Attachment(
+    val id: String = "",
+    val messageId: String = "",
+    val userId: String,
+    val fileId: String = "",
+    var type: String = "",
+    var name: String = "",
+    
+    )
+
+
+
+
+

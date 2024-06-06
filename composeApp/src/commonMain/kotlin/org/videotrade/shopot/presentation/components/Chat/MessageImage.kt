@@ -19,7 +19,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 fun MessageImage(message: MessageItem, profile: ProfileDTO) {
     
     val imagePainter =
-        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${message.attachments?.get(0)}")
+        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${message.attachments?.get(0)?.fileId}")
     
     
     

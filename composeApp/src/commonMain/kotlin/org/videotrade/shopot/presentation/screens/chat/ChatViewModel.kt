@@ -32,9 +32,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     init {
         
         
-        profile.value = profileUseCase.getProfile()!!
-        
-        
         viewModelScope.launch {
             
             
@@ -74,8 +71,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     chatId = chatId,
                     anotherRead = false,
                     iread = false,
-                    attachments = attachments
-                )
+                    attachments = null
+                ),
+                attachments
             )
         }
     }
@@ -94,8 +92,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 "file/upload",
                 file, "image"
             )
-
-
+            
+            
             if (fileId !== null)
                 sendMessage(
                     content,
@@ -118,6 +116,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.clearMessages()
         }
     }
+    
+    fun getProfile() {
+        viewModelScope.launch {
+            profile.value = profileUseCase.getProfile()!!
+        }
+    }
+    
+    
 }
 
 

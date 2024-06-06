@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
@@ -21,7 +22,6 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 
 class MainViewModel : ViewModel(), KoinComponent {
-    private val userUseCase: ChatsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val callUseCase: CallUseCase by inject()
@@ -48,9 +48,6 @@ class MainViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             
             
-            getProfile()
-            
-            loadUsers()
             
             observeUsers()
             profile.collect {
@@ -100,7 +97,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     private val EARLY_DATE = LocalDateTime(1970, 1, 1, 0, 0, 0)
     
     private fun observeUsers() {
-        userUseCase.chats.onEach { newUsers ->
+        chatsUseCase.chats.onEach { newUsers ->
             _chats.value = newUsers.sortedByDescending { chat ->
                 chat.lastMessage?.created?.toLocalDateTimeOrNull() ?: EARLY_DATE
             }
@@ -129,7 +126,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     }
     
     
-    private fun getProfile() {
+    fun getProfile() {
         viewModelScope.launch {
             profile.value = profileUseCase.getProfile() ?: return@launch
         }
@@ -147,21 +144,28 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    private fun loadUsers() {
+     fun loadUsers() {
         viewModelScope.launch {
-            _chats.value = userUseCase.chats.value
+            
+            println("prrrr ${chatsUseCase.chats.value}")
+            _chats.value = chatsUseCase.chats.value
         }
     }
     
     
     fun leaveApp(navigator: Navigator) {
         viewModelScope.launch {
-            userUseCase.clearData()
+            
+            _chats.value = emptyList()
+            _wsSession.value = null
+            
             profileUseCase.clearData()
             wsUseCase.clearData()
             callUseCase.clearData()
             chatsUseCase.clearData()
             
+            delValueInStorage("accessToken")
+            delValueInStorage("refreshToken")
             
             
             navigator.replace(SignInScreen())

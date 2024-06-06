@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +32,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -51,7 +49,6 @@ import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
-import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -67,7 +64,15 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val isSuccessOtp = remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
-//        val viewModel: MainViewModel = koinInject()
+
+
+        
+        
+        LaunchedEffect(key1 = Unit) {
+            
+            viewModel.navigator.value = navigator
+            
+        }
 
 
 //        LaunchedEffect(key1 = viewModel) {
@@ -91,13 +96,6 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //        }
 //
         
-        LaunchedEffect(Unit) {
-            
-            
-            println("adsdada ${viewModel.getKoin()}")
-            
-            
-        }
         
         val isError = remember { mutableStateOf(false) }
         
@@ -106,12 +104,6 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         
         
         
-        DisposableEffect(Unit) {
-            onDispose {
-                
-                viewModel.clearWsConnection()
-            }
-        }
         
         
         
@@ -293,8 +285,10 @@ suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewM
 
 
 //        navigator.push(MainScreen())
-            viewModel.fetchContacts(navigator)
-            
+        
+        viewModel.startObserving()
+        viewModel.fetchContacts(navigator)
+        
         
     }
 }

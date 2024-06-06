@@ -36,6 +36,7 @@ class IntroScreen : Screen {
         
         LaunchedEffect(key1 = Unit) {
             
+            viewModel.navigator.value = navigator
             
             val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
             val cameraNative = PermissionsProviderFactory.create().getPermission("camera")

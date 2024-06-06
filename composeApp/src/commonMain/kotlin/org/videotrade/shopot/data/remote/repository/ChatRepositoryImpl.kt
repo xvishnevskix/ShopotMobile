@@ -29,7 +29,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     }
     
     
-    override suspend fun sendMessage(message: MessageItem) {
+    override suspend fun sendMessage(message: MessageItem, attachments: List<String>?) {
         try {
             
             val jsonContent = Json.encodeToString(
@@ -40,7 +40,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
                     put("chatId", message.chatId)
                     put(
                         "attachments",
-                        Json.encodeToJsonElement(message.attachments)
+                        Json.encodeToJsonElement(attachments)
                     )
                 }
             )

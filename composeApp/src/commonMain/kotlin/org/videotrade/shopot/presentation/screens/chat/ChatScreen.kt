@@ -35,6 +35,8 @@ class ChatScreen(
         
         
         LaunchedEffect(key1 = viewModel) {
+            
+            viewModel.getProfile()
             viewModel.getMessagesBack(chat.id)
 
         }
