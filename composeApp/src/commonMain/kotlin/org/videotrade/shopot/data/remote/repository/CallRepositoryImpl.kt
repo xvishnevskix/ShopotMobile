@@ -595,5 +595,18 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         }
     }
     
+    override fun clearData() {
+        _peerConnection.value?.close()
+        _peerConnection.value = null
+        localStream.value = null
+        remoteVideoTrack.value = null
+        _isConnectedWebrtc.value = false
+        offer.value = null
+        otherUserId.value = ""
+        callerId.value = ""
+        _iceState.value = IceConnectionState.New
+        _callState.value = PeerConnectionState.New
+        _wsSession.value = null
+    }
     
 }

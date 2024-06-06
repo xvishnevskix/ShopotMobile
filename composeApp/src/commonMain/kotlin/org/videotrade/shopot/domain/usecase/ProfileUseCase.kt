@@ -17,4 +17,8 @@ class ProfileUseCase : KoinComponent {
      fun getProfile(): ProfileDTO? {
         return repository.getProfile()
     }
+    
+    fun clearData() {
+        repository.clearData()
+    }
 }

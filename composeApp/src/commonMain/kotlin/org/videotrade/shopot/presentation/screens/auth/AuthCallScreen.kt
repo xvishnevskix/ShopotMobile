@@ -1,13 +1,12 @@
 package org.videotrade.shopot.presentation.screens.auth
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,8 +25,6 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.HttpClientEngine
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
@@ -35,7 +32,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import io.ktor.util.Platform
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -53,6 +50,7 @@ import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -68,8 +66,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val isSuccessOtp = remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
-        
-        
+//        val viewModel: MainViewModel = koinInject()
+
+
 //        LaunchedEffect(key1 = viewModel) {
 //
 //
@@ -98,6 +97,13 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         
         
         
+        DisposableEffect(Unit) {
+            onDispose {
+                viewModel.clearWsConnection()
+            }
+        }
+        
+        
         
         SafeArea {
             
@@ -124,7 +130,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             textAlign = TextAlign.Center,
                             letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
                             lineHeight = 24.sp,
-
+                            
                             )
                         Text(
                             "На ваш номер $phone поступит звонок. Введите последние 4 цифры +X XXX XXX 12 34 ",
@@ -135,18 +141,18 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             modifier = Modifier.padding(bottom = 5.dp),
                             color = Color(151, 151, 151)
                         )
-
-
-
+                        
+                        
+                        
                         Otp(otpFields)
-
-
+                        
+                        
                         CustomButton(
                             "Подтвердить",
                             {
                                 val otpText = otpFields.joinToString("")
-
-
+                                
+                                
                                 coroutineScope.launch {
 
 
@@ -157,15 +163,15 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //
 //                                    return@launch
 //                                }
-
+                                    
                                     when (authCase) {
-
+                                        
                                         "SignIn" -> sendLogin(phone, navigator, viewModel)
                                         "SignUp" -> sendSignUp(phone, navigator)
                                     }
                                 }
-
-
+                                
+                                
                             })
 
 //                    Text(
@@ -180,7 +186,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //                            .clickable { navigator.push(AuthSMSScreen(phone)) }
 //                    )
                     }
-                    }
+                }
                 
                 
             }
@@ -274,11 +280,11 @@ suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewM
                 refreshToken
             )
         }
-        
-        
-        
-        viewModel.fetchContacts(navigator)
-        
+
+
+//        navigator.push(MainScreen())
+            viewModel.fetchContacts(navigator)
+            
         
     }
 }

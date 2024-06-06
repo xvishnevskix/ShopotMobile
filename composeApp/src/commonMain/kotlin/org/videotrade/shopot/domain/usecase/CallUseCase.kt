@@ -83,5 +83,7 @@ class CallUseCase : KoinComponent {
 //        repository.rejectCallAnswer()
     }
     
-    
+    fun clearData() {
+        repository.clearData()
+    }
 }

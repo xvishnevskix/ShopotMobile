@@ -53,5 +53,5 @@ interface CallRepository {
    suspend fun rejectCall(navigator: Navigator, userId: String): Boolean
 //    fun rejectCallAnswer()
     
-    
+    fun clearData()
 }

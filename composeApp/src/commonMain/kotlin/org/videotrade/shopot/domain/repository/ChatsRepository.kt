@@ -18,5 +18,5 @@ interface ChatsRepository {
     fun addChat(chat: ChatItem)
     fun addChats(chatsInit: MutableList<ChatItem>)
     
-
+    fun clearData()
 }

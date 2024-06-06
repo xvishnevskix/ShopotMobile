@@ -20,5 +20,5 @@ interface ChatRepository {
     suspend fun addMessage(message: MessageItem)
     suspend fun sendMessage(message: MessageItem)
     
-    
+    fun clearData()
 }

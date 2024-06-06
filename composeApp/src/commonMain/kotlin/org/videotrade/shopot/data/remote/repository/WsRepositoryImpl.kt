@@ -3,6 +3,7 @@ package org.videotrade.shopot.data.remote.repository
 import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.navigator.Navigator
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.websocket.close
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
@@ -46,5 +47,9 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
         return wsSession.value
     }
     
-    
+    override suspend fun clearData() {
+        _wsSession.value?.close()
+        _wsSession.value = null
+        isConnected.value = false
+    }
 }

@@ -140,5 +140,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         
     }
     
-    
+    override fun clearData() {
+        _contacts.value = emptyList()
+    }
 }

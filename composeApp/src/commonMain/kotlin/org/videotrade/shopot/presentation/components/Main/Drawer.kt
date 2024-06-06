@@ -74,7 +74,7 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
             "Выход"
         
         ) {
-            leaveApp(navigator)
+            viewModel.leaveApp(navigator)
             
         }
     )
@@ -169,11 +169,3 @@ data class DrawerItem(
 )
 
 
-fun leaveApp(navigator: Navigator) {
-    
-    delValueInStorage("accessToken")
-    delValueInStorage("refreshToken")
-    
-    navigator.push(SignInScreen())
-    
-}

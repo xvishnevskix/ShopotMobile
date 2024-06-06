@@ -36,7 +36,6 @@ class ChatsRepositoryImpl : ChatsRepository {
             }
         }
         
-        sortChatsByLastMessageCreated()
     }
     
     
@@ -56,10 +55,8 @@ class ChatsRepositoryImpl : ChatsRepository {
     }
     
     
-    fun sortChatsByLastMessageCreated() {
-//        _chats.value = _chats.value.sortedWith(compareByDescending { chatItem ->
-//            chatItem.lastMessage?.created?.toLocalDateTimeOrNull() ?: EARLY_DATE
-//        })
+
+    override fun clearData() {
+        _chats.value = emptyList()
     }
-    
 }

@@ -36,5 +36,7 @@ class ChatsUseCase : KoinComponent {
     fun addChats(chatsInit: MutableList<ChatItem>) {
         return repository.addChats(chatsInit)
     }
-
+    fun clearData() {
+        repository.clearData()
+    }
 }

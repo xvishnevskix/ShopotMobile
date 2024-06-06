@@ -22,5 +22,7 @@ class ContactsUseCase : KoinComponent {
         return repository.createChat(profileId, contact, navigator)
     }
     
-    
+    fun clearData() {
+        repository.clearData()
+    }
 }

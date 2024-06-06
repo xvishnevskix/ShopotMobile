@@ -51,5 +51,7 @@ class ChatUseCase : KoinComponent {
         return repository.sendMessage(message)
     }
     
-    
+    fun clearData() {
+        repository.clearData()
+    }
 }

@@ -15,5 +15,5 @@ interface WsRepository {
     suspend fun getWsSession(): DefaultClientWebSocketSession?
     
     
-
+    suspend fun clearData()
 }

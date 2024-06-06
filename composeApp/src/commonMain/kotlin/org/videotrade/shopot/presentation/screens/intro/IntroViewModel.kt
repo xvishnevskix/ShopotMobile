@@ -5,6 +5,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,7 +32,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
     
     
     private val profileUseCase: ProfileUseCase by inject()
-    private val WsUseCase: WsUseCase by inject()
+    private val wsUseCase: WsUseCase by inject()
     
     
     val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
@@ -110,7 +111,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
     
     fun connectionWs(userId: String, navigator: Navigator) {
         viewModelScope.launch {
-            WsUseCase.connectionWs(userId, navigator)
+            wsUseCase.connectionWs(userId, navigator)
         }
     }
     
@@ -136,11 +137,11 @@ class IntroViewModel : ViewModel(), KoinComponent {
     }
     
     private fun observeWsConnection(userId: String, navigator: Navigator) {
-        WsUseCase.wsSession
+        wsUseCase.wsSession
             .onEach { wsSessionNew ->
                 
-                if (wsSessionNew != null) {
-                    println("wsSessionNew $wsSessionNew")
+                if (_wsSession.value == null && wsSessionNew != null  ) {
+                    println("wsSessionIntro $wsSessionNew")
                     _wsSession.value = wsSessionNew
                     
                     
@@ -157,8 +158,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
                         
                         wsSessionNew.send(Frame.Text(jsonContent))
                         
-                        
-                        navigator.push(MainScreen())
+                        navigator.replace(MainScreen())
                         
                         println("Message sent successfully")
                     } catch (e: Exception) {
@@ -171,6 +171,16 @@ class IntroViewModel : ViewModel(), KoinComponent {
             }
             .launchIn(viewModelScope)
     }
+    
+    
+    fun clearWsConnection() {
+        // Очищаем сессию WebSocket
+      viewModelScope.launch {
+          wsUseCase.clearData()
+          _wsSession.value = null
+      }
+    }
+    
     
 }
 

@@ -145,5 +145,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         
     }
     
-    
+    override fun clearData() {
+        _messages.value = emptyList()
+    }
 }

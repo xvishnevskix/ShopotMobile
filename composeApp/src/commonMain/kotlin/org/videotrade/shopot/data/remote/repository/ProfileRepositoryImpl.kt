@@ -33,5 +33,7 @@ class ProfileRepositoryImpl : ProfileRepository {
         
     }
     
-    
+    override fun clearData() {
+        profile.value = null
+    }
 }
