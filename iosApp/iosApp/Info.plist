@@ -14,7 +14,7 @@
     <dict>
         <key>NSExceptionDomains</key>
         <dict>
-            <key>videotradedev.ru</key> <!-- Удален префикс https:// -->
+            <key>videotradedev.ru</key>
             <dict>
                 <key>NSExceptionAllowsInsecureHTTPLoads</key>
                 <true/>
@@ -23,5 +23,9 @@
             </dict>
         </dict>
     </dict>
+    <key>FirebaseAppDelegateProxyEnabled</key>
+    <false/>
+    <key>aps-environment</key>
+    <string>development</string> <!-- Или "production", если вы готовите релиз -->
 </dict>
 </plist>

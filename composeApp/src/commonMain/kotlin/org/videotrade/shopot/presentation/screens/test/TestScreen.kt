@@ -44,20 +44,19 @@ class TestScreen : Screen {
 
 
 
-//        Button({
-//
-//            coroutineScope.launch {
+        Button({
+
+            coroutineScope.launch {
 //                var token = NotifierManager.getPushNotifier().getToken()
 //                println("onNewToken: $token ") // При необходимости обновить пользовательский токен на сервере
-//
-//
-//            }
-//
-//
-//        }, content = {
-//
-//            Text("ASDDSAD")
-//        })
+
+            }
+
+
+        }, content = {
+
+            Text("ASDDSAD")
+        })
 
 //        ZoomableImage()
     }
