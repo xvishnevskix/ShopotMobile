@@ -14,7 +14,7 @@ plugins {
     alias(libs.plugins.buildConfig)
     alias(libs.plugins.kotlinx.serialization)
     kotlin("native.cocoapods")
-    
+    id("com.google.gms.google-services")
 }
 
 
@@ -62,6 +62,7 @@ kotlin {
         iosSimulatorArm64 { configureWebRtcCinterops() }
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
+            export("io.github.mirzemehdi:kmpnotifier:1.0.0")
             baseName = "ComposeApp"
             isStatic = true
         }
@@ -106,7 +107,9 @@ kotlin {
             implementation(libs.peekaboo.image.picker)
             implementation(libs.sonner)
             api(libs.image.loader.v181)
-            
+            api(libs.kmpnotifier) // in iOS export this library
+            implementation(libs.firebase.common)
+
         }
         
         commonTest.dependencies {
@@ -121,6 +124,8 @@ kotlin {
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
+            implementation(project.dependencies.platform("com.google.firebase:firebase-bom:30.0.1"))
+
         }
         
         iosMain.dependencies {

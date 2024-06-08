@@ -6,6 +6,12 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.initialize
+import com.mmk.kmpnotifier.notification.NotifierManager
+import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
+import com.mmk.kmpnotifier.permission.PermissionUtil
 import org.koin.core.context.startKoin
 import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
@@ -37,11 +43,13 @@ class AndroidApp : Application() {
 class AppActivity : ComponentActivity() {
     private lateinit var permissionsProvider: PermissionsProvider
     private var permissionResultCallback: ((Int, IntArray) -> Unit)? = null
-    
+
     override fun onCreate(@Nullable savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Firebase.initialize(this) // This line
+
         enableEdgeToEdge()
-        
         initializeProviders()
         
         setContent {
@@ -51,21 +59,21 @@ class AppActivity : ComponentActivity() {
     
     private fun initializeProviders() {
         PermissionsProviderFactory.initialize(this)
-//        permissionsProvider = PermissionsProviderFactory.create()
+
+
+
+        NotifierManager.initialize(
+            configuration = NotificationPlatformConfiguration.Android(
+                notificationIconResId = dev.icerock.moko.mvvm.compose.R.drawable.notification_bg,
+            )
+        )
+
     }
     
     fun registerActivityResultCallback(callback: (Int, IntArray) -> Unit) {
         permissionResultCallback = callback
     }
-    
-//    override fun onRequestPermissionsResult(
-//        requestCode: Int,
-//        permissions: Array<out String>,
-//        grantResults: IntArray
-//    ) {
-//        super.onRequestPermissionsResult(requestCode, permissions as Array<String>, grantResults)
-//        permissionResultCallback?.invoke(requestCode, grantResults)
-//    }
+
 }
 
 

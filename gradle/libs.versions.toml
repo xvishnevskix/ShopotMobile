@@ -1,5 +1,6 @@
 [versions]
 kermit = "2.0.3"
+kmpnotifier = "1.0.0"
 kotlin = "1.9.23"
 compose = "1.6.10"
 agp = "8.2.2"
@@ -26,13 +27,17 @@ webrtcKmp = "0.114.4"
 webrtc-ios-sdk = "114.5735.09"
 animationCoreAndroid = "1.6.7"
 imageLoader = "1.8.1"
+gms = "4.4.0"
+firebaseCommon = "1.10.0"
 
 [libraries]
+firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-uiTest" }
 androidx-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-uiTest" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+kmpnotifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "kmpnotifier" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json-v132 = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 image-loader-v181 = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
@@ -73,3 +78,4 @@ compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 android-application = { id = "com.android.application", version.ref = "agp" }
 buildConfig = { id = "com.github.gmazzo.buildconfig", version.ref = "buildConfig" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+google-gms = { id = "com.google.gms.google-services", version.ref = "gms" }
