@@ -76,6 +76,7 @@ class CreateChatScreen() : Screen {
                 
             }
         }
+
         
         SafeArea {
             Box(

@@ -72,10 +72,14 @@ fun UserComponentItem(chat: ChatItem) {
                 
                 
                 val messageContent = chat.lastMessage?.content ?: "Начните переписку"
-                
-                
+
+
                 Text(
-                    "${chat.lastMessage?.let { MessageContent(message = it) }}",
+                    text = chat.lastMessage?.let {
+                        MessageContent(message = it)
+                    }?.takeIf { it.isNotEmpty() }?.let {
+                        if (it.length > 35) "${it.take(32)}..." else it
+                    } ?: "",
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -83,7 +87,6 @@ fun UserComponentItem(chat: ChatItem) {
                     lineHeight = 20.sp,
                     color = Color(0xFF979797),
                     modifier = Modifier.padding(top = 5.dp)
-                
                 )
                 
                 

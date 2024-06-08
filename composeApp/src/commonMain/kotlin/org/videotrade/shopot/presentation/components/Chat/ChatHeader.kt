@@ -56,7 +56,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
         ) {
             
             
-            BackIcon(Modifier.padding(end = 8.dp).clickable {
+            BackIcon(Modifier.padding(start = 23.dp,end = 8.dp).clickable {
                 
                 viewModel.clearMessages()
                 navigator.pop()
@@ -90,7 +90,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
             Icon(
                 imageVector = Icons.Default.Call,
                 contentDescription = "Call",
-                modifier = Modifier.padding(end = 8.dp).size(20.dp).clickable {
+                modifier = Modifier.padding(end = 23.dp).size(20.dp).clickable {
                     
                     
                     println("userID : ${chat.userId}")

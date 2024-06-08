@@ -83,7 +83,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().height(58.dp).clip(RoundedCornerShape(20.dp))
+            modifier = Modifier
+                .padding(horizontal = 15.dp)
+                .fillMaxWidth().height(58.dp).clip(RoundedCornerShape(20.dp))
                 .background(
                     Color(0xFFF3F4F6)
                 ).padding(horizontal = 15.dp)
@@ -99,7 +101,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add",
                     tint = Color.White,
-                    modifier = Modifier.size(16.dp).clickable {
+                    modifier = Modifier.size(20.dp).clickable {
                         singleImagePicker.launch()
                         
                     }
@@ -108,7 +110,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             BasicTextField(
                 value = text,
                 onValueChange = { text = it },
-                modifier = Modifier.weight(1f), // Здесь можно добавить модификаторы, если это необходимо
+                modifier = Modifier.weight(1f).padding(3.dp), // Здесь можно добавить модификаторы, если это необходимо
                 textStyle = TextStyle(
                     color = Color.Black,
                     fontSize = 16.sp
