@@ -295,8 +295,8 @@ fun MessageBox(
     
     
     LaunchedEffect(viewModel.messages.value) {
-        
-        
+
+        println("viewModel.messages.value ${message.anotherRead} ${message.content} ${message}")
         if (message.fromUser == profile.id) {
             if (message.anotherRead) {
                 isReadByMe.value = true

@@ -24,6 +24,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val _messages = MutableStateFlow<List<MessageItem>>(listOf())
     
     val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
+
+    val messagesA: StateFlow<List<MessageItem>> = chatUseCase.getMessages()
+
     
     val profile = MutableStateFlow(ProfileDTO())
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
@@ -36,6 +39,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
             
             
             chatUseCase.getMessages().collect {
+
+                println("it313123131 $it")
                 _messages.value = it
             }
             

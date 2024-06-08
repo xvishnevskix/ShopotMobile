@@ -52,7 +52,8 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             // Сравнение контактов по нормализованному номеру телефона
             for (contact in contactsNative) {
                 val normalizedPhone = normalizePhoneNumber(contact.phone)
-                
+
+
                 
                 val backendContact = backendContactsMap[normalizedPhone]
                 

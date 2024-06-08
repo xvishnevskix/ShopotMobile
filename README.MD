@@ -17,6 +17,6 @@ Run android simulator UI tests: `./gradlew :composeApp:pixel5Check`
 ### iOS
 To run the application on iPhone device/simulator:
  - Open `iosApp/iosApp.xcproject` in Xcode and run standard configuration
- - Or use [Kotlin Multiplatform Mobile plugin](https://plugins.jetbrains.com/plugin/14936-kotlin-multiplatform-mobile) for Android Studio
+ - Or use [Kotlin Multiplatform Mobile plugin](https://plugins.jetbrPains.com/plugin/14936-kotlin-multiplatform-mobile) for Android Studio
 Run iOS simulator UI tests: `./gradlew :composeApp:iosSimulatorArm64Test`
 

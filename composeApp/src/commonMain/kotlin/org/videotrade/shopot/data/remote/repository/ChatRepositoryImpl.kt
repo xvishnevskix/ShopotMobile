@@ -82,9 +82,12 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     
     
     override fun readMessage(messageId: String) {
+
+        println("messageId!!!!!!  $messageId")
+
         _messages.update { currentChat ->
             currentChat.map { messageItem ->
-                
+
                 if (messageItem.id == messageId) {
                     println("messageId!!!!!! ${messageItem.id} $messageId")
                     

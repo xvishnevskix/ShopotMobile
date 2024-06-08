@@ -24,60 +24,67 @@ import shopot.composeapp.generated.resources.logo
 
 
 class IntroScreen : Screen {
-    
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
         val toasterViewModel: ToasterViewModel = koinInject()
-        
-        
-        
-        
+
+
+
+
         LaunchedEffect(key1 = Unit) {
-            
+
             viewModel.navigator.value = navigator
-            
+
+            println("Первый")
+
             val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
 //            val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
 //            val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
-            
-            
+
+            println("второй")
+
 //            println("adasdadada $contactsNative $cameraNative $microPhoneNative")
 //            if (!contactsNative || !cameraNative || !microPhoneNative) {
 //            toasterViewModel.toaster.show("Hello world!")
 //
 //                return@LaunchedEffect
 //            }
-            
-            
-            
+
+            if (!contactsNative) {
+                toasterViewModel.toaster.show("Добавьте все разрешения")
+
+                return@LaunchedEffect
+            }
+
             println("adasdadada")
-            
-            
+
+
             val response = origin().reloadTokens()
-            
-            
+
+
             println("adasdadada $response")
-            
-            
+
+
             if (response != null && response.status == HttpStatusCode.OK) {
-                
-                
+
+
                 viewModel.fetchContacts(navigator)
                 return@LaunchedEffect
-                
-                
+
+
             }
-            
-            
+
+
             navigator.replace(SignInScreen())
-            
-            
+
+
         }
-        
-        
-        
+
+
+
         Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             SafeArea {
                 Image(
@@ -85,12 +92,12 @@ class IntroScreen : Screen {
                         .fillMaxSize(),
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
-                    
+
                     )
             }
         }
-        
+
     }
-    
-    
+
+
 }

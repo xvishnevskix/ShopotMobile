@@ -274,11 +274,10 @@ suspend fun handleConnectWebSocket(
                                         println("messageReadNotification1 $messageJson")
                                         
                                         if (messageJson != null) {
-                                            
-                                            
+
+
                                             val messageId =
-                                                messageJson["messageId"]?.jsonPrimitive?.content
-                                            
+                                                messageJson["id"]?.jsonPrimitive?.content
                                             
                                             
                                             if (messageId != null) {
