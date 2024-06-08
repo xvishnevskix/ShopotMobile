@@ -60,14 +60,18 @@ fun UserComponentItem(chat: ChatItem) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "${chat.firstName} ${chat.lastName}",
+                    text = listOfNotNull(chat.firstName, chat.lastName)
+                        .joinToString(" ")
+                        .takeIf { it.isNotBlank() }
+                        ?.let {
+                            if (it.length > 35) "${it.take(32)}..." else it
+                        } ?: "",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                     lineHeight = 20.sp,
                     color = Color(0xFF000000)
-                
                 )
                 
                 
@@ -163,5 +167,4 @@ fun MessageContent(message: MessageItem): String {
     } else {
         "Фото"
     }
-    
 }

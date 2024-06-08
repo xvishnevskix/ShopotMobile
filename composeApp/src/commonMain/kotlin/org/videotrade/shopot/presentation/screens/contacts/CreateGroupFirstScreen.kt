@@ -164,7 +164,12 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                     Avatar(item.icon, 80.dp)
                     Column(modifier = Modifier.padding(start = 16.dp)) {
                         Text(
-                            text = "${item.firstName}",
+                            text = listOfNotNull(item.firstName, item.lastName)
+                                .joinToString(" ")
+                                .takeIf { it.isNotBlank() }
+                                ?.let {
+                                    if (it.length > 32) "${it.take(29)}..." else it
+                                } ?: "",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             textAlign = TextAlign.Center,
