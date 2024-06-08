@@ -242,7 +242,8 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     addValueInStorage("refreshToken", refreshToken)
                                                 }
                                                 
-                                                navigator.push(MainScreen())
+                                                viewModel.startObserving()
+                                                viewModel.fetchContacts(navigator)
                                             }
                                         } catch (e: Exception) {
                                             e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes

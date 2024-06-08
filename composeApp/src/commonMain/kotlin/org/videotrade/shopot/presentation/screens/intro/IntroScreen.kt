@@ -39,8 +39,8 @@ class IntroScreen : Screen {
             viewModel.navigator.value = navigator
             
             val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
-            val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
-            val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
+//            val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
+//            val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
             
             
 //            println("adasdadada $contactsNative $cameraNative $microPhoneNative")
