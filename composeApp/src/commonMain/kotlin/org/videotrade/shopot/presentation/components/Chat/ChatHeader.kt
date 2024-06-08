@@ -76,7 +76,12 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
             )
             
             Text(
-                "${chat.firstName} ${chat.lastName}",
+                text = listOfNotNull(chat.firstName, chat.lastName)
+                    .joinToString(" ")
+                    .takeIf { it.isNotBlank() }
+                    ?.let {
+                        if (it.length > 30) "${it.take(27)}..." else it
+                    } ?: "",
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
