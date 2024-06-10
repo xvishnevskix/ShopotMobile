@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.mmk.kmpnotifier.notification.NotifierManager
 import io.ktor.http.HttpStatusCode
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -35,16 +36,18 @@ class IntroScreen : Screen {
 
 
         LaunchedEffect(key1 = Unit) {
+            try {
 
-            viewModel.navigator.value = navigator
 
-            println("Первый")
+                viewModel.navigator.value = navigator
 
-            val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
+                println("Первый")
+
+                val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
 //            val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
 //            val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
 
-            println("второй")
+                println("второй")
 
 //            println("adasdadada $contactsNative $cameraNative $microPhoneNative")
 //            if (!contactsNative || !cameraNative || !microPhoneNative) {
@@ -53,33 +56,41 @@ class IntroScreen : Screen {
 //                return@LaunchedEffect
 //            }
 
-            if (!contactsNative) {
-                toasterViewModel.toaster.show("Добавьте все разрешения")
+                if (!contactsNative) {
+                    toasterViewModel.toaster.show("Добавьте все разрешения")
 
-                return@LaunchedEffect
-            }
+                    return@LaunchedEffect
+                }
 
-            println("adasdadada")
-
-
-            val response = origin().reloadTokens()
+                println("adasdadada")
 
 
-            println("adasdadada $response")
+                val response = origin().reloadTokens()
 
 
-            if (response != null && response.status == HttpStatusCode.OK) {
+                println("adasdadada $response")
+
+
+                if (response != null && response.status == HttpStatusCode.OK) {
+
+
+                    viewModel.updateNotificationToken()
 
 
                 viewModel.fetchContacts(navigator)
-                return@LaunchedEffect
+                    return@LaunchedEffect
 
+
+                }
+
+
+                navigator.replace(SignInScreen())
+
+            } catch (e: Exception) {
+
+                navigator.replace(SignInScreen())
 
             }
-
-
-            navigator.replace(SignInScreen())
-
 
         }
 

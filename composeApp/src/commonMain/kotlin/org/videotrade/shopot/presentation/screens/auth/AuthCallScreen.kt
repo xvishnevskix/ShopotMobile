@@ -284,6 +284,8 @@ suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewM
         }
 
 
+
+        viewModel.updateNotificationToken()
 //        navigator.push(MainScreen())
         
         viewModel.startObserving()

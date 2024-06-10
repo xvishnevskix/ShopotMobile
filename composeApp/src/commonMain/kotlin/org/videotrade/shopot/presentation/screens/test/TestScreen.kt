@@ -27,28 +27,42 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 
 import org.videotrade.shopot.presentation.components.Common.ZoomableImage
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 
 class TestScreen : Screen {
     @Composable
     override fun Content() {
         val coroutineScope = rememberCoroutineScope()
-
-
-
-
-
-
+        val viewModel: IntroViewModel = koinInject()
 
 
         Button({
 
             coroutineScope.launch {
-//                var token = NotifierManager.getPushNotifier().getToken()
-//                println("onNewToken: $token ") // При необходимости обновить пользовательский токен на сервере
+                var token = NotifierManager.getPushNotifier().getToken()
+                println("onNewToken: $token ") // При необходимости обновить пользовательский токен на сервере
+
+
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("title", "Test Notification")
+                        put("body", "This is a test message from Postman.")
+                        put("token", token)
+
+                    }
+                )
+
+                val op = origin().post<Any>("notification/notify", jsonContent)
+
+
+                println("op3131 $op")
 
             }
 

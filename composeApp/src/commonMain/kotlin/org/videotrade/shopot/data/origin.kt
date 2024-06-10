@@ -6,6 +6,7 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
@@ -118,6 +119,48 @@ class origin {
             client.close()
         }
         
+        return null
+    }
+
+
+    suspend inline fun <reified T> put(
+        url: String,
+        data: String
+    ): T? {
+
+        try {
+            val token = getValueInStorage("accessToken")
+
+            val response: HttpResponse =
+                client.put("${EnvironmentConfig.serverUrl}$url") {
+                    contentType(ContentType.Application.Json)
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    setBody(data)
+                }
+
+
+            println("response.bodyAsText() ${response.bodyAsText()}")
+
+            if (response.status.isSuccess()) {
+
+
+                val responseData: T = Json.decodeFromString(response.bodyAsText())
+
+
+                return responseData
+            } else {
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+            }
+        } catch (e: Exception) {
+
+            println("Error: $e")
+
+            return null
+
+        } finally {
+            client.close()
+        }
+
         return null
     }
     

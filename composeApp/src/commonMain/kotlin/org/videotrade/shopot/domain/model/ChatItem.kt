@@ -11,7 +11,7 @@ data class ChatItem(
     var lastName: String,
     var phone: String,
     var unread: Int,
-    var notificationToken: String,
+    var notificationToken: String?,
     var lastMessage: MessageItem?,
     var chatId: String,
     var userId: String,

@@ -107,6 +107,10 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                             )
                         )
                     )
+
+
+                    viewModel.sendNotify("Звонок", "от ${chat.firstName} ${chat.lastName}", chat.notificationToken)
+
                 }
             )
         }

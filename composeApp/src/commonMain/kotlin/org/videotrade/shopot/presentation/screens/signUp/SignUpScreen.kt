@@ -241,7 +241,10 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 refreshToken?.let {
                                                     addValueInStorage("refreshToken", refreshToken)
                                                 }
-                                                
+
+
+                                                viewModel.updateNotificationToken()
+
                                                 viewModel.startObserving()
                                                 viewModel.fetchContacts(navigator)
                                             }

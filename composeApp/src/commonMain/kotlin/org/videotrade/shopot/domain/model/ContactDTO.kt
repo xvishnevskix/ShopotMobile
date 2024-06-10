@@ -12,5 +12,8 @@ data class ContactDTO(
     val description: String? = "",
     val phone: String = "",
     val status: String? = "",
-    val icon: String?
+    val icon: String?,
+    val notificationToken: String? = null
+
+
 )

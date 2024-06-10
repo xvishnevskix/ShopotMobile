@@ -13,6 +13,7 @@ data class ProfileDTO(
     val status: String? = "",
     val phone: String = "",
     val icon: String? = "",
+    val notificationToken: String? = null,
 )
 
 
