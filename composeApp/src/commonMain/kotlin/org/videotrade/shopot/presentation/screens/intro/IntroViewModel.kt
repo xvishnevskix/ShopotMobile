@@ -90,8 +90,10 @@ class IntroViewModel : ViewModel(), KoinComponent {
                 }
             )
 
+            
+            println("jsonContent321323 $jsonContent")
 
-            origin().put<Any>("user/profile/edit", jsonContent)
+            origin().put("user/profile/edit", jsonContent)
         }
     }
 

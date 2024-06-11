@@ -123,10 +123,10 @@ class origin {
     }
 
 
-    suspend inline fun <reified T> put(
+    suspend inline fun put(
         url: String,
         data: String
-    ): T? {
+    ) {
 
         try {
             val token = getValueInStorage("accessToken")
@@ -144,10 +144,10 @@ class origin {
             if (response.status.isSuccess()) {
 
 
-                val responseData: T = Json.decodeFromString(response.bodyAsText())
-
-
-                return responseData
+//                val responseData = Json.decodeFromString(response.bodyAsText())
+//
+//
+//                return responseData
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
@@ -155,13 +155,11 @@ class origin {
 
             println("Error: $e")
 
-            return null
 
         } finally {
             client.close()
         }
 
-        return null
     }
     
     
