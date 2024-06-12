@@ -93,43 +93,43 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 attachments
             )
 
-//            sendNotify("Новое сообщение", content, notificationToken)
+            sendNotify("Новое сообщение", content, notificationToken)
             
             
-            val httpClient = HttpClient {
-                install(WebSockets)
-                
-            }
-            
-            println("aaaaaa3123131 ${userId} $fromUser")
-            
-            
-            var profileId = getValueInStorage("profileId")
-            
-            try {
-                httpClient.webSocket(
-                    method = HttpMethod.Get,
-                    host = "192.168.31.223",
-                    port = 3001,
-                    path = "/message",
-                    request = {
-                        profileId?.let { url.parameters.append("callerId", it) }
-                    }
-                ) {
-                    
-                    val jsonContent = Json.encodeToString(
-                        buildJsonObject {
-                            put("type", "call")
-                            put("calleeId", userId)
-                            
-                        }
-                    )
-                    
-                    send(Frame.Text(jsonContent))
-                }
-            } catch (e: Exception) {
-            
-            }
+//            val httpClient = HttpClient {
+//                install(WebSockets)
+//
+//            }
+//
+//            println("aaaaaa3123131 ${userId} $fromUser")
+//
+//
+//            var profileId = getValueInStorage("profileId")
+//
+//            try {
+//                httpClient.webSocket(
+//                    method = HttpMethod.Get,
+//                    host = "192.168.31.223",
+//                    port = 3001,
+//                    path = "/message",
+//                    request = {
+//                        profileId?.let { url.parameters.append("callerId", it) }
+//                    }
+//                ) {
+//
+//                    val jsonContent = Json.encodeToString(
+//                        buildJsonObject {
+//                            put("type", "call")
+//                            put("calleeId", userId)
+//
+//                        }
+//                    )
+//
+//                    send(Frame.Text(jsonContent))
+//                }
+//            } catch (e: Exception) {
+//
+//            }
         }
     }
     

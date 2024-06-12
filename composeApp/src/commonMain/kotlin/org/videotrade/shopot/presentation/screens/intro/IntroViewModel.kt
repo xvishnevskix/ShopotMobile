@@ -146,7 +146,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
             
             
             
-            BackgroundTaskManagerFactory.create().scheduleTask()
+//            BackgroundTaskManagerFactory.create().scheduleTask()
             
             
             
