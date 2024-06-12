@@ -14,6 +14,7 @@ import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfig
 import com.mmk.kmpnotifier.permission.PermissionUtil
 import org.koin.core.context.startKoin
 import org.videotrade.shopot.di.getSharedModules
+import org.videotrade.shopot.multiplatform.BackgroundTaskManagerFactory
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
 //import org.videotrade.shopot.multiplatform.MediaProviderFactory
@@ -37,6 +38,7 @@ class AndroidApp : Application() {
     private fun initializeFactories(context: Context) {
         DeviceIdProviderFactory.initialize(context)
         ContactsProviderFactory.initialize(context)
+        BackgroundTaskManagerFactory.initialize(context)
     }
 }
 

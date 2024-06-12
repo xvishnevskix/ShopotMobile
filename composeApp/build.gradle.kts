@@ -125,6 +125,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
             implementation(project.dependencies.platform("com.google.firebase:firebase-bom:30.0.1"))
+            implementation(libs.androidx.work.runtime.ktx)
 
         }
         

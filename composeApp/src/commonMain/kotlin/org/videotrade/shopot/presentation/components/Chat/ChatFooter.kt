@@ -142,6 +142,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         content = text,
                         fromUser = viewModel.profile.value.id,
                         chatId = chat.id,
+                        userId = chat.userId,
                         notificationToken = chat.notificationToken,
                         attachments = emptyList()
                     )

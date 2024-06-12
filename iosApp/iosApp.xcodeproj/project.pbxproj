@@ -327,6 +327,11 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Приложению требуется доступ к камере для съемки фотографий.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Приложению требуется доступ к микрофону для записи аудио.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Мы хотим получить доступ к вашей фотогалерее";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to provide relevant notifications.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -362,6 +367,11 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = iosApp/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Приложению требуется доступ к камере для съемки фотографий.";
+				INFOPLIST_KEY_NSContactsUsageDescription = "Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Приложению требуется доступ к микрофону для записи аудио.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Мы хотим получить доступ к вашей фотогалерее";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to provide relevant notifications.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

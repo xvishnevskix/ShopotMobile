@@ -151,12 +151,12 @@ internal fun App() = AppTheme {
 //                )
 
 //                MainScreen()
-                        IntroScreen()
 //                SignUpScreen("+79899236221")
                 //CallScreen()
                 // IncomingCallScreen()
 //                CreateChatScreen()
 //                MainScreen()
+                IntroScreen()
 //                TestScreen()
 //                SignInScreen()
             ) { navigator ->

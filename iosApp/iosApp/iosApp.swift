@@ -4,6 +4,8 @@ import Firebase
 import FirebaseCore
 import FirebaseMessaging
 
+
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: UIWindow?
@@ -11,7 +13,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     override init() {
         FirebaseApp.configure()
         NotifierManager.shared.initialize(configuration: NotificationPlatformConfigurationIos.init(showPushNotification: true, askNotificationPermissionOnStart: true))
-        
+        BackgroundService()
+
         KoinHelperKt.doInitKoin()
     }
     

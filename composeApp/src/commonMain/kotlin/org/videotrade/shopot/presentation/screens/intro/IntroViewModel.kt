@@ -18,12 +18,14 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.BackgroundTaskManagerFactory
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
@@ -133,13 +135,21 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
 
             if (profileCase == null) {
-
                 delValueInStorage("accessToken")
                 delValueInStorage("refreshToken")
 
                 return@launch
 
             }
+            
+            addValueInStorage("profileId", profileCase.id)
+            
+            
+            
+            BackgroundTaskManagerFactory.create().scheduleTask()
+            
+            
+            
             profile.value = profileCase
 
 

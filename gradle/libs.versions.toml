@@ -29,8 +29,10 @@ animationCoreAndroid = "1.6.7"
 imageLoader = "1.8.1"
 gms = "4.4.0"
 firebaseCommon = "1.10.0"
+workRuntimeKtx = "2.9.0"
 
 [libraries]
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
