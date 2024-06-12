@@ -84,6 +84,7 @@ class CreateChatScreen() : Screen {
                 
             }
         }
+
         
         SafeArea {
             Box(
@@ -204,7 +205,12 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                         modifier = Modifier.padding(start = 16.dp)
                     ) {
                         Text(
-                            text = "${item.firstName} ${item.lastName}",
+                            text = listOfNotNull(item.firstName, item.lastName)
+                                .joinToString(" ")
+                                .takeIf { it.isNotBlank() }
+                                ?.let {
+                                    if (it.length > 35) "${it.take(32)}..." else it
+                                } ?: "",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             textAlign = TextAlign.Center,

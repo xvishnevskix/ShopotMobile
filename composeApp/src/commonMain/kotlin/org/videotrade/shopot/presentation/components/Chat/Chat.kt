@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -322,7 +324,6 @@ fun MessageBox(
         Box(
             contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
-                .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
                 .padding(vertical = 4.dp)
                 .pointerInput(Unit) {
@@ -332,7 +333,7 @@ fun MessageBox(
                 }
         ) {
             Surface(
-                modifier = Modifier.wrapContentSize(),
+                modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
                 shape = RoundedCornerShape(
                     topStart = 20.dp,
                     topEnd = 20.dp,

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -83,14 +84,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth().height(58.dp).clip(RoundedCornerShape(20.dp))
+            modifier = Modifier
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth().heightIn(max = 125.dp, min = 58.dp).clip(RoundedCornerShape(20.dp))
                 .background(
                     Color(0xFFF3F4F6)
                 ).padding(horizontal = 15.dp)
         ) {
             Box(
                 modifier = Modifier
-                    .padding(end = 20.dp)
+                    .padding(end = 15.dp)
                     .size(37.dp)
                     .background(color = Color(0xFF2A293C), shape = CircleShape),
                 contentAlignment = Alignment.Center
@@ -99,7 +102,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     imageVector = Icons.Default.Add,
                     contentDescription = "Add",
                     tint = Color.White,
-                    modifier = Modifier.size(16.dp).clickable {
+                    modifier = Modifier.size(20.dp).clickable {
                         singleImagePicker.launch()
                         
                     }
@@ -108,7 +111,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             BasicTextField(
                 value = text,
                 onValueChange = { text = it },
-                modifier = Modifier.weight(1f), // Здесь можно добавить модификаторы, если это необходимо
+                modifier = Modifier.padding(end = 8.dp, top = 5.dp, bottom = 5.dp).weight(1f).padding(3.dp), // Здесь можно добавить модификаторы, если это необходимо
                 textStyle = TextStyle(
                     color = Color.Black,
                     fontSize = 16.sp
@@ -137,7 +140,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send",
-                modifier = Modifier.padding(end = 8.dp).clickable {
+                modifier = Modifier.padding(2.dp).clickable {
                     viewModel.sendMessage(
                         content = text,
                         fromUser = viewModel.profile.value.id,

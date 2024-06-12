@@ -13,6 +13,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
@@ -48,7 +49,7 @@ class ChatScreen(
         var hiddenMessageId by remember { mutableStateOf<String?>(null) }
         
         Box(modifier = Modifier.fillMaxSize()) {
-            SafeArea(isBlurred = selectedMessage != null) {
+            SafeArea(isBlurred = selectedMessage != null, 7.dp) {
                 Column(modifier = Modifier.fillMaxSize()) {
                     
                     Scaffold(

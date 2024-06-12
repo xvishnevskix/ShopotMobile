@@ -60,26 +60,30 @@ fun UserComponentItem(chat: ChatItem) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    "${chat.firstName} ${chat.lastName}",
+                    text = listOfNotNull(chat.firstName, chat.lastName)
+                        .joinToString(" ")
+                        .takeIf { it.isNotBlank() }
+                        ?.let {
+                            if (it.length > 35) "${it.take(32)}..." else it
+                        } ?: "",
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                     lineHeight = 20.sp,
                     color = Color(0xFF000000)
-                
                 )
                 
                 
                 val messageContent = chat.lastMessage?.content ?: "Начните переписку"
-                
-                
+
+
                 Text(
-                    if (chat.lastMessage !== null) {
-                        MessageContent(message = chat.lastMessage!!)
-                    } else {
-                        "Начните переписку"
-                    },
+                    text = chat.lastMessage?.let {
+                        MessageContent(message = it)
+                    }?.takeIf { it.isNotEmpty() }?.let {
+                        if (it.length > 35) "${it.take(32)}..." else it
+                    } ?: "",
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -87,7 +91,6 @@ fun UserComponentItem(chat: ChatItem) {
                     lineHeight = 20.sp,
                     color = Color(0xFF979797),
                     modifier = Modifier.padding(top = 5.dp)
-                
                 )
                 
                 
@@ -164,5 +167,4 @@ fun MessageContent(message: MessageItem): String {
     } else {
         "Фото"
     }
-    
 }
