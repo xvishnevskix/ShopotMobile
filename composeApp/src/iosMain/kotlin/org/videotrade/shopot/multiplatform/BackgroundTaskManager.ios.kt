@@ -82,4 +82,13 @@ class BackgroundService {
 }
 
 
+actual class BackgroundTaskManager {
+    actual fun scheduleTask() {
+    }
+}
 
+actual object BackgroundTaskManagerFactory {
+    actual fun create(): BackgroundTaskManager {
+        TODO("Not yet implemented")
+    }
+}
