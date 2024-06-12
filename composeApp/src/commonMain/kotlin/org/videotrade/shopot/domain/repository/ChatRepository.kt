@@ -5,6 +5,14 @@ import org.videotrade.shopot.domain.model.MessageItem
 
 interface ChatRepository {
     
+    
+    
+    fun setCount(count: Int)
+    fun implementCount()
+    
+    
+    
+    
     fun initMessages(messages: List<MessageItem>)
     fun getMessages(): StateFlow<List<MessageItem>>
     

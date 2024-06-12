@@ -43,23 +43,24 @@ class IntroScreen : Screen {
                 println("Первый")
                 
                 val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
-//            val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
-//            val microPhoneNative = PermissionsProviderFactory.create().getPermission("microphone")
+                val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
+                val microPhoneNative =
+                    PermissionsProviderFactory.create().getPermission("microphone")
                 
                 println("второй")
-
-//            println("adasdadada $contactsNative $cameraNative $microPhoneNative")
-//            if (!contactsNative || !cameraNative || !microPhoneNative) {
-//            toasterViewModel.toaster.show("Hello world!")
-//
-//                return@LaunchedEffect
-//            }
                 
-                if (!contactsNative) {
-                    toasterViewModel.toaster.show("Добавьте все разрешения")
-                    
-                    return@LaunchedEffect
-                }
+                println("adasdadada $contactsNative $cameraNative $microPhoneNative")
+//                if (!contactsNative || !cameraNative || !microPhoneNative) {
+//                    toasterViewModel.toaster.show("Добавьте все разрешения")
+//
+//                    return@LaunchedEffect
+//                }
+
+//                if (!contactsNative) {
+//                    toasterViewModel.toaster.show("Добавьте все разрешения")
+//
+//                    return@LaunchedEffect
+//                }
                 
                 println("adasdadada")
                 

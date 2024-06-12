@@ -75,15 +75,14 @@ fun UserComponentItem(chat: ChatItem) {
                 )
                 
                 
-                val messageContent = chat.lastMessage?.content ?: "Начните переписку"
-
-
+                
+                
                 Text(
                     text = chat.lastMessage?.let {
                         MessageContent(message = it)
                     }?.takeIf { it.isNotEmpty() }?.let {
                         if (it.length > 35) "${it.take(32)}..." else it
-                    } ?: "",
+                    } ?: "Начните переписку",
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),

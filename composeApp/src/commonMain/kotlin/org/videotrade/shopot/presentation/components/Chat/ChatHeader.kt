@@ -58,7 +58,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
             
             BackIcon(Modifier.padding(start = 23.dp,end = 8.dp).clickable {
                 
+                
                 viewModel.clearMessages()
+                viewModel.setCount(0)
                 navigator.pop()
                 
                 

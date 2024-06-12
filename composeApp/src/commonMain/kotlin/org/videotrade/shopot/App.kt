@@ -118,8 +118,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.KoinContext
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
-import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
-import org.videotrade.shopot.presentation.screens.test.TestScreen
+import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -157,6 +156,8 @@ internal fun App() = AppTheme {
 //                CreateChatScreen()
 //                MainScreen()
                 IntroScreen()
+//                PermissionsScreen()
+
 //                TestScreen()
 //                SignInScreen()
             ) { navigator ->

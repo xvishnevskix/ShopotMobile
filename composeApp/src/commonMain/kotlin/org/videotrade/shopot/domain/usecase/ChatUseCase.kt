@@ -9,6 +9,19 @@ import org.videotrade.shopot.domain.repository.ChatRepository
 class ChatUseCase : KoinComponent {
     private val repository: ChatRepository by inject()
     
+    
+    fun setCount(count: Int) {
+        return repository.setCount(count)
+        
+    }
+    
+    fun implementCount() {
+        return repository.implementCount()
+        
+    }
+    
+    
+    
     fun getMessages(): StateFlow<List<MessageItem>> {
         return repository.getMessages()
     }
@@ -48,7 +61,7 @@ class ChatUseCase : KoinComponent {
     
     
     suspend fun sendMessage(message: MessageItem, attachments: List<String>?) {
-        return repository.sendMessage(message, attachments = attachments )
+        return repository.sendMessage(message, attachments = attachments)
     }
     
     fun clearData() {

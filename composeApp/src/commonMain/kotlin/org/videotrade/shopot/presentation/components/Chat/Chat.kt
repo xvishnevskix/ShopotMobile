@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,7 +36,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -59,10 +60,15 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.formatTimestamp
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -207,24 +213,9 @@ data class EditOption(
     val text: String,
     val imagePath: DrawableResource,
     val onClick: (viewModule: ChatViewModel, message: MessageItem, clipboardManager: ClipboardManager) -> Unit,
-    
-    )
-
+)
 
 val editOptions = listOf(
-//    EditOption(
-//        text = "Переслать",
-//        imagePath = Res.drawable.edit_pencil,
-//        onClick = {
-//
-//
-//        }
-//    ),
-//    EditOption(
-//        text = "Изменить",
-//        imagePath = Res.drawable.edit_pencil,
-//        onClick = {}
-//    ),
     EditOption(
         text = "Удалить",
         imagePath = Res.drawable.edit_pencil,
@@ -236,36 +227,46 @@ val editOptions = listOf(
         text = "Копировать",
         imagePath = Res.drawable.edit_pencil,
         onClick = { _, message, clipboardManager ->
-            
-            
             message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
-            
-            
         }
     ),
-    
-    )
+)
 
+@OptIn(FlowPreview::class)
 @Composable
 fun Chat(
     viewModel: ChatViewModel,
     profile: ProfileDTO,
+    chat: ChatItem,
     modifier: Modifier,
     onMessageClick: (MessageItem, Int) -> Unit,
     hiddenMessageId: String?
 ) {
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo }
+            .debounce(100) // добавляем задержку в 1 секунду
+            .distinctUntilChanged()
+            .collect { visibleItems ->
+                if (viewModel.messages.value.size > 23) {
+                    if (visibleItems.isNotEmpty() && visibleItems.last().index == viewModel.messages.value.size - 1) {
+                        coroutineScope.launch {
+                             viewModel.getMessagesBack(chat.chatId)
+                        }
+                    }
+                }
+            }
+    }
     
-    println("messagesState $messagesState")
     LazyColumn(
         state = listState,
         reverseLayout = true,
         modifier = modifier,
     ) {
         itemsIndexed(messagesState) { _, message ->
-            
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
             MessageBox(
@@ -291,30 +292,19 @@ fun MessageBox(
     onPositioned: (LayoutCoordinates) -> Unit,
     isVisible: Boolean
 ) {
-    
-    
     val isReadByMe = remember { mutableStateOf(false) }
     
-    
     LaunchedEffect(viewModel.messages.value) {
-
-        println("viewModel.messages.value ${message.anotherRead} ${message.content} ${message}")
         if (message.fromUser == profile.id) {
             if (message.anotherRead) {
                 isReadByMe.value = true
             }
-            
         } else {
-            
             if (!message.iread) {
                 viewModel.sendReadMessage(message.id)
             }
         }
-        
-        
     }
-    
-    
     
     Column(
         modifier = Modifier
@@ -353,8 +343,6 @@ fun MessageBox(
                 .padding(start = 2.dp, end = 2.dp)
                 .fillMaxWidth()
         ) {
-            
-            
             if (message.fromUser == profile.id)
                 if (message.anotherRead) {
                     Image(
@@ -364,9 +352,7 @@ fun MessageBox(
                         painter = painterResource(Res.drawable.double_message_check),
                         contentDescription = null,
                     )
-                    
                 } else {
-                    
                     Image(
                         modifier = Modifier
                             .padding(top = 2.dp, end = 4.dp)
@@ -385,6 +371,15 @@ fun MessageBox(
                 modifier = Modifier.padding(),
             )
         }
+    }
+}
+
+@Composable
+fun MessageFormat(message: MessageItem, profile: ProfileDTO) {
+    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        MessageText(message, profile)
+    } else {
+        MessageImage(message, profile)
     }
 }
 
@@ -603,13 +598,3 @@ fun MessageBlurBox(
     }
 }
 
-
-@Composable
-fun MessageFormat(message: MessageItem, profile: ProfileDTO) {
-    if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        MessageText(message, profile)
-    } else {
-        MessageImage(message, profile)
-    }
-    
-}

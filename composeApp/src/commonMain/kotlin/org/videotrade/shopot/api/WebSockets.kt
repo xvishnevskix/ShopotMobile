@@ -22,7 +22,6 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 suspend fun handleConnectWebSocket(
     navigator: Navigator,
@@ -129,12 +128,12 @@ suspend fun handleConnectWebSocket(
                                 
                                 "getMessages" -> {
                                     try {
-                                        println("jsonElement111 $jsonElement")
                                         
                                         
                                         val dataJson =
                                             jsonElement.jsonObject["data"]?.jsonArray
                                         
+                                        println("getMessages111111 ${dataJson?.size}")
                                         
                                         val messages = mutableListOf<MessageItem>()
                                         
@@ -148,12 +147,13 @@ suspend fun handleConnectWebSocket(
                                                 
                                                 
                                                 
+//                                                chatUseCase.addMessage(message)
                                                 messages.add(message)
                                                 
                                             }
                                             
                                             
-                                            
+                                            chatUseCase.implementCount()
                                             chatUseCase.initMessages(messages)// Инициализация сообщений
                                         }
                                         
@@ -166,7 +166,6 @@ suspend fun handleConnectWebSocket(
                                 
                                 "messageSent" -> {
                                     try {
-                                        
                                         
                                         
                                         val messageJson =
@@ -274,8 +273,8 @@ suspend fun handleConnectWebSocket(
                                         println("messageReadNotification1 $messageJson")
                                         
                                         if (messageJson != null) {
-
-
+                                            
+                                            
                                             val messageId =
                                                 messageJson["id"]?.jsonPrimitive?.content
                                             
@@ -312,7 +311,7 @@ suspend fun handleConnectWebSocket(
                                             
                                             
                                             chatsUseCase.addChat(chat)
-                                            
+
 //                                            navigator.push(MainScreen())
                                         }
                                         

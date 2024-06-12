@@ -42,6 +42,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     
     
+    
+    
+    
     init {
         
         
@@ -71,6 +74,20 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.getMessagesBack(chatId)
         }
     }
+    
+    fun setCount(count: Int) {
+        viewModelScope.launch {
+            chatUseCase.setCount(count)
+        }
+    }
+    
+    fun implementCount() {
+        viewModelScope.launch {
+            chatUseCase.implementCount()
+        }
+    }
+    
+    
     
     fun sendMessage(
         content: String? = null,

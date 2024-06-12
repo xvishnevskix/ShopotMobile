@@ -68,7 +68,7 @@ class ChatScreen(
                         Chat(
                             viewModel,
                             profile,
-                            
+                            chat,
                             Modifier.fillMaxSize()
                                 .padding(innerPadding),
                             

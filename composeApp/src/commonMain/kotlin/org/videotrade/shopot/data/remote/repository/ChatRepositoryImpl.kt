@@ -22,10 +22,22 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     )
     val wsUseCase: WsUseCase by inject()
     
+    private val messageCount = MutableStateFlow(0)
+    
+    
+    override fun setCount(count: Int) {
+        messageCount.value = count
+        
+    }
+    
+    
+    override fun implementCount() {
+        messageCount.value += 1
+        
+    }
     
     override fun initMessages(messages: List<MessageItem>) {
-        
-        _messages.value = messages.reversed()
+        _messages.value = _messages.value + messages
     }
     
     
@@ -82,12 +94,12 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     
     
     override fun readMessage(messageId: String) {
-
+        
         println("messageId!!!!!!  $messageId")
-
+        
         _messages.update { currentChat ->
             currentChat.map { messageItem ->
-
+                
                 if (messageItem.id == messageId) {
                     println("messageId!!!!!! ${messageItem.id} $messageId")
                     
@@ -105,15 +117,18 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         
         try {
             
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                    put("action", "getMessages")
-                    put("chatId", chatId)
-                }
-            )
             
-            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-            
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("action", "getMessages")
+                        put("chatId", chatId)
+                        put("page", messageCount.value)
+                    }
+                )
+                println("jsonContent4144141 ${jsonContent}")
+                wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+                
+                
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }

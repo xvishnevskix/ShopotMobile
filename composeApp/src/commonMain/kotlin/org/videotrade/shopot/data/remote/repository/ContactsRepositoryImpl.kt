@@ -38,6 +38,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             // Функция для нормализации номера телефона
             fun normalizePhoneNumber(phone: String): String {
+
                 return phone.replace(Regex("[^0-9]"), "")
             }
             

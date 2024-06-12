@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -111,7 +110,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             BasicTextField(
                 value = text,
                 onValueChange = { text = it },
-                modifier = Modifier.padding(end = 8.dp, top = 5.dp, bottom = 5.dp).weight(1f).padding(3.dp), // Здесь можно добавить модификаторы, если это необходимо
+                modifier = Modifier.padding(end = 8.dp, top = 5.dp, bottom = 5.dp).weight(1f)
+                    .padding(3.dp), // Здесь можно добавить модификаторы, если это необходимо
                 textStyle = TextStyle(
                     color = Color.Black,
                     fontSize = 16.sp
@@ -141,14 +141,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send",
                 modifier = Modifier.padding(2.dp).clickable {
-                    viewModel.sendMessage(
-                        content = text,
-                        fromUser = viewModel.profile.value.id,
-                        chatId = chat.id,
-                        userId = chat.userId,
-                        notificationToken = chat.notificationToken,
-                        attachments = emptyList()
-                    )
+                    
+                    if (text.isNotBlank())
+                        viewModel.sendMessage(
+                            content = text,
+                            fromUser = viewModel.profile.value.id,
+                            chatId = chat.id,
+                            userId = chat.userId,
+                            notificationToken = chat.notificationToken,
+                            attachments = emptyList()
+                        )
                     
                     text = ""
                 }
