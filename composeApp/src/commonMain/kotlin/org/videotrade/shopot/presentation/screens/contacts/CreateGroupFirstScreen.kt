@@ -37,6 +37,7 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.Main.BottomBar
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -76,62 +77,64 @@ class CreateGroupFirstScreen() : Screen {
             }
         }
 
-        SafeArea {
+
             Box(
                 modifier = Modifier
                     //background
                     .fillMaxWidth()
                     .background(Color(255, 255, 255))
             ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        //background
-                        .fillMaxSize()
-                ) {
-                    CreateChatHeader(
-                        "Создать группу",
-                        isSearching = isSearching,
-                        searchQuery = searchQuery,
-                    )
-                    LazyColumn(
+                SafeArea {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
-
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.8F)
-                            .background(color = Color(255, 255, 255))
+                            //background
+                            .fillMaxSize()
                     ) {
+                        CreateChatHeader(
+                            "Создать группу",
+                            isSearching = isSearching,
+                            searchQuery = searchQuery,
+                        )
+                        LazyColumn(
+                            modifier = Modifier
 
-                        itemsIndexed(
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.8F)
+                                .background(color = Color(255, 255, 255))
+                        ) {
 
-                            filteredContacts
+                            itemsIndexed(
 
-                        ) { _, item ->
-                            ChatItem(item = item, sharedViewModel = viewModel)
+                                filteredContacts
+
+                            ) { _, item ->
+                                ChatItem(item = item, sharedViewModel = viewModel)
 
 
+                            }
                         }
+
+
+
+                        Box(
+                            modifier = Modifier.padding(top = 85.dp)
+                        ) {
+                            CustomButton(
+                                "Далее",
+                                {
+                                    navigator.push(
+                                        CreateGroupSecondScreen()
+                                    )
+
+                                })
+                        }
+
                     }
-
-
-
-                    Box(
-                        modifier = Modifier.padding(top = 85.dp)
-                    ) {
-                        CustomButton(
-                            "Далее",
-                            {
-                                navigator.push(
-                                    CreateGroupSecondScreen()
-                                )
-
-                            })
-                    }
-
                 }
+                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
         }
-    }
 }
 
 

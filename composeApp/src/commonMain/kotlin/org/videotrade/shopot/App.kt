@@ -111,14 +111,18 @@ package org.videotrade.shopot
 
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.koin.compose.KoinContext
+import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
+import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -128,38 +132,9 @@ internal fun App() = AppTheme {
         Surface(
             modifier = Modifier.fillMaxSize()
         ) {
-            
-            
             Navigator(
-//                ChatScreen(
-//                ChatItem("2", true, "", "Мансур", "Дандаев", "", 2, "10", "","306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b")
-//                )
-//                CallScreen(
-//                    ChatItem(
-//                        "2",
-//                        true,
-//                        "",
-//                        "Мансур",
-//                        "Дандаев",
-//                        "",
-//                        2,
-//                        "10",
-//                        null,
-//                        "306e5bbb-e2db-4480-9f85-ca0a4b1b7a0b"
-//                    )
-//                )
-
-//                MainScreen()
-//                SignUpScreen("+79899236221")
-                //CallScreen()
-                // IncomingCallScreen()
-//                CreateChatScreen()
-//                MainScreen()
-                IntroScreen()
-//                PermissionsScreen()
-
-//                TestScreen()
-//                SignInScreen()
+//                IntroScreen()
+                MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
