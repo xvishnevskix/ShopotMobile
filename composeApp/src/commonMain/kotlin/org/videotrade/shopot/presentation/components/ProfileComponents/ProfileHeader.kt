@@ -58,7 +58,11 @@ fun ProfileHeader(text: String) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
-            modifier = Modifier.padding(start = 18.dp,end = 1.dp)
+            modifier = Modifier
+                .padding(start = 0.dp, end = 1.dp)
+                .clickable {
+                    navigator.pop()
+                }
         )
         Text(
             text = text,

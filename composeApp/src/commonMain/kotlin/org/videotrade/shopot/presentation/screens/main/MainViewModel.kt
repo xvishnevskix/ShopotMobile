@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.main
 
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -42,7 +43,10 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     
     val navigator = MutableStateFlow<Navigator?>(null)
-    
+
+    private val _currentScreen = MutableStateFlow<Screen>(MainScreen())
+
+    val currentScreen: StateFlow<Screen> = _currentScreen
     
     init {
         viewModelScope.launch {
@@ -108,6 +112,10 @@ class MainViewModel : ViewModel(), KoinComponent {
     fun getNavigator(navigatorGet: Navigator) {
         
         navigator.value = navigatorGet
+    }
+
+    fun navigateTo(screen: Screen) {
+        _currentScreen.value = screen
     }
 
 

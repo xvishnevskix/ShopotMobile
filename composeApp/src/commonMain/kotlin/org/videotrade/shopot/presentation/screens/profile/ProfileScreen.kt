@@ -38,6 +38,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Dp
 import org.jetbrains.compose.resources.DrawableResource
+import org.videotrade.shopot.presentation.components.Main.BottomBar
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.black_star
 import shopot.composeapp.generated.resources.carbon_media_library
@@ -182,7 +183,10 @@ class ProfileScreen : Screen {
 
                }
 
+
+
            }
+            BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
 
         }
 

@@ -41,6 +41,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.Main.BottomBar
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -78,13 +79,14 @@ class CreateGroupSecondScreen() : Screen {
             }
         }
         
-        SafeArea {
+
             Box(
                 modifier = Modifier
                     //background
                     .fillMaxWidth()
                     .background(Color(255, 255, 255))
             ) {
+                SafeArea {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -95,7 +97,7 @@ class CreateGroupSecondScreen() : Screen {
                     )
                     LazyColumn(
                         modifier = Modifier
-                            
+
                             .fillMaxWidth()
                             .fillMaxHeight(0.8F)
                             .background(color = Color(255, 255, 255)),
@@ -109,9 +111,9 @@ class CreateGroupSecondScreen() : Screen {
                             ChatItem(item = item)
                         }
                     }
-                    
+
                     Box(
-                        modifier = Modifier.padding(top = 85.dp)
+                        modifier = Modifier.padding(top = 5.dp)
                     ) {
                         CustomButton(
                             "Далее",
@@ -119,12 +121,13 @@ class CreateGroupSecondScreen() : Screen {
                                 navigator.push(
                                     MainScreen()
                                 )
-                                
+
                             })
                     }
                 }
+                }
+                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
-        }
     }
 }
 
