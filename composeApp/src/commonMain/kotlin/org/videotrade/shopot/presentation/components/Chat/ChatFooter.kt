@@ -60,7 +60,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 
                 
                 scope.launch {
-                    viewModel.sendAttachments(
+                
+                viewModel.sendAttachments(
                         content = text,
                         fromUser = viewModel.profile.value.id,
                         chatId = chat.id,

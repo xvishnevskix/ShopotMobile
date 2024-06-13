@@ -1,44 +1,44 @@
 package org.videotrade.shopot.presentation.screens.permissions
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Face
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
-import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.common.ToasterViewModel
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
-
 
 class PermissionsScreen : Screen {
     
@@ -46,141 +46,117 @@ class PermissionsScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val toasterViewModel: ToasterViewModel = koinInject()
-        var isCheckContacts by remember { mutableStateOf("Нажмите чтобы проверить разрешение на контакты") }
-
-
-//        LaunchedEffect(key1 = Unit) {
-//
-//
-//
-//
-//                val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
-//                val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
-//                val microPhoneNative =
-//                    PermissionsProviderFactory.create().getPermission("microphone")
-//
-//                println("второй")
-//
-//                println("adasdadada $contactsNative $cameraNative $microPhoneNative")
-//                if (!contactsNative || !cameraNative || !microPhoneNative) {
-//                    toasterViewModel.toaster.show("Добавьте все разрешения")
-//
-//                    return@LaunchedEffect
-//                }
-//
-//
-//        }
+        
+        val scope = rememberCoroutineScope()
+        
         
         val items = listOf(
-            PermissionItem(
-                Icons.Default.Face,
-                "Contacts",
-                isCheckContacts,
-                
-                ) {
-                println("sdadadada")
-                isCheckContacts = "Готово"
-            }
+            PermissionItemDTO(
+                "Контакты",
+            ),
+            PermissionItemDTO(
+                "Уведомления",
+            )
         )
         
-        
-        Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
-            SafeArea {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.Center)
+            ) {
+                Text(
+                    text = "Включите разрешения",
+                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
                 
-                Column {
-                    
-                    
-                    Column {
-                        
-                        Text(
-                            "Включите разрешения",
-                            fontSize = 28.sp,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            modifier = Modifier.padding(bottom = 5.dp),
-                        )
-                        Text(
-                            "Разрешения уведомлений и контактов позволяют вам узнавать, когда приходят сообщения, и помогают найти людей, которых вы знаете.\n" +
-                                    "Контакты шифруются, так что сервис Signal не может их видеть,",
-                            textAlign = TextAlign.Center,
-                            fontSize = 18.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 24.sp,
-                            modifier = Modifier.padding(bottom = 5.dp),
-                            fontWeight = FontWeight.W400,
-                            color = Color(151, 151, 151)
-                        )
-                        
-                        
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Разрешения уведомлений и контактов позволяют вам узнавать, когда приходят сообщения, и помогают найти людей, которых вы знаете.",
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+                    textAlign = TextAlign.Center,
+                    color = Color.Black,
+                    modifier = Modifier.align(Alignment.CenterHorizontally) // Центрирование текста
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                LazyColumn {
+                    itemsIndexed(items) { _, it ->
+                        NotificationPreview(it.title)
                     }
-                    
-                    
-                    items.forEach {
-                        
-                        PermissionItem(it.title, it.body, it.icon)
-                    }
-                    
                 }
+                Spacer(modifier = Modifier.height(102.dp))
                 
-                
+                Button(
+                    onClick = {
+                        scope.launch {
+                            val contactsNative =
+                                PermissionsProviderFactory.create().getPermission("contacts")
+                            
+                            
+                            if (contactsNative) {
+                                
+                            }
+                            
+                            
+                            val permissionsNative =
+                                PermissionsProviderFactory.create().getPermission("notifications")
+                            
+                            
+                            if (permissionsNative) {
+                                
+                            }
+                            
+                            navigator.replace(IntroScreen())
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Включите разрешения",
+                        color = Color.White
+                    )
+                }
             }
         }
-        
     }
-    
-    
 }
-
 
 @Composable
-fun PermissionItem(title: String, body: String, icon: ImageVector) {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+fun NotificationPreview(title: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(10.dp)) // Округление углов элемента
+            .background(Color(0xFF333333))
+            .padding(16.dp)
+    
     ) {
-        
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.padding(end = 20.dp)
+        Text(
+            text = title,
+            fontSize = 16.sp,
+            color = Color.White
         )
         
-        Column {
-            Text(
-                title,
-                textAlign = TextAlign.Center,
-                fontSize = 18.sp,
-                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 24.sp,
-                modifier = Modifier.padding(bottom = 5.dp),
-                fontWeight = FontWeight.W400,
-                color = Color(151, 151, 151)
-            )
-            Text(
-                body,
-                textAlign = TextAlign.Center,
-                fontSize = 18.sp,
-                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 24.sp,
-                modifier = Modifier.padding(bottom = 5.dp),
-                fontWeight = FontWeight.W400,
-                color = Color(151, 151, 151)
-            )
-        }
-        
+        Spacer(modifier = Modifier.height(8.dp))
         
     }
     
+    Spacer(modifier = Modifier.height(8.dp))
 }
 
-
-data class PermissionItem(
-    val icon: ImageVector,
+data class PermissionItemDTO(
     val title: String,
-    val body: String,
-    val onClick: () -> Unit
 )

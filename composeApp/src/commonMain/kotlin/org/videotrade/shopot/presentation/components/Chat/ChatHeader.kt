@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
@@ -26,9 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -41,7 +44,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
     val interactionSource =
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
-    
+    val scope = rememberCoroutineScope()
     
     Row(
         modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp),
@@ -56,7 +59,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
         ) {
             
             
-            BackIcon(Modifier.padding(start = 23.dp,end = 8.dp).clickable {
+            BackIcon(Modifier.padding(start = 23.dp, end = 8.dp).clickable {
                 
                 
                 viewModel.clearMessages()
@@ -99,25 +102,36 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                 contentDescription = "Call",
                 modifier = Modifier.padding(end = 23.dp).size(20.dp).clickable {
                     
-                    
-                    println("userID : ${chat.userId}")
-                    
-                    navigator.push(
-                        CallScreen(
-                            chat.userId,
-                            "Call",
-                            ProfileDTO(
-                                firstName = chat.firstName,
-                                lastName = chat.firstName,
-                                id = chat.userId,
-                                phone = chat.phone,
+                    scope.launch {
+                        val cameraPer =
+                            PermissionsProviderFactory.create().getPermission("microphone")
+                        
+                        if (!cameraPer) return@launch
+                        
+                        viewModel.sendNotify(
+                            "Звонок",
+                            "от ${chat.firstName} ${chat.lastName}",
+                            chat.notificationToken
+                        )
+                        
+                        navigator.push(
+                            CallScreen(
+                                chat.userId,
+                                "Call",
+                                ProfileDTO(
+                                    firstName = chat.firstName,
+                                    lastName = chat.firstName,
+                                    id = chat.userId,
+                                    phone = chat.phone,
+                                )
                             )
                         )
-                    )
-
-
-                    viewModel.sendNotify("Звонок", "от ${chat.firstName} ${chat.lastName}", chat.notificationToken)
-
+                        
+                        
+                    }
+                    println("userID : ${chat.userId}")
+                    
+                    
                 }
             )
         }

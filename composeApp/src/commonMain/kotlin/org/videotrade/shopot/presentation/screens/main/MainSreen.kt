@@ -15,14 +15,20 @@ class MainScreen : Screen {
     override fun Content() {
         val viewModel: MainViewModel = koinInject()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-        val navigator = LocalNavigator.currentOrThrow
+        val navigator = LocalNavigator.current
+        
+        println("LocalNavigator ${LocalNavigator.current}")
         
         
         LaunchedEffect(Unit) {
-            viewModel.getNavigator(navigator)
+            if (navigator != null) {
+                viewModel.getNavigator(navigator)
+                
+                viewModel.getProfile()
+                viewModel.loadUsers()
+            }
             
-            viewModel.getProfile()
-            viewModel.loadUsers()
+
             
             
             

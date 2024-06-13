@@ -51,6 +51,7 @@ import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
@@ -176,43 +177,55 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     "newCall" -> {
                                         try {
                                             
-                                            rtcMessage?.let {
-                                                
-                                                
-                                                val userJson =
-                                                    jsonElement.jsonObject["user"]?.jsonObject
-                                                
-                                                
-                                                val user =
-                                                    Json.decodeFromString<ProfileDTO>(userJson.toString())
-                                                
-                                                
-                                                val sdp =
-                                                    it["sdp"]?.jsonPrimitive?.content
-                                                        ?: return@launch
-                                                val callerId =
-                                                    jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-                                                
-                                                offer.value = SessionDescription(
-                                                    SessionDescriptionType.Offer,
-                                                    sdp
-                                                )
-                                                
-                                                
-                                                
-                                                callerId?.let { userId ->
+                                            val cameraPer = PermissionsProviderFactory.create()
+                                                .getPermission("microphone")
+                                            
+                                            if (cameraPer) {
+                                                rtcMessage?.let {
                                                     
                                                     
-                                                    otherUserId.value = userId
+                                                    val userJson =
+                                                        jsonElement.jsonObject["user"]?.jsonObject
+                                                    
+                                                    
+                                                    val user =
+                                                        Json.decodeFromString<ProfileDTO>(userJson.toString())
+                                                    
+                                                    
+                                                    val sdp =
+                                                        it["sdp"]?.jsonPrimitive?.content
+                                                            ?: return@launch
+                                                    val callerId =
+                                                        jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
+                                                    
+                                                    offer.value = SessionDescription(
+                                                        SessionDescriptionType.Offer,
+                                                        sdp
+                                                    )
                                                     
                                                     
                                                     
-                                                    navigator.push(IncomingCallScreen(userId, user))
+                                                    callerId?.let { userId ->
+                                                        
+                                                        
+                                                        otherUserId.value = userId
+                                                        
+                                                        
+                                                        
+                                                        navigator.push(
+                                                            IncomingCallScreen(
+                                                                userId,
+                                                                user
+                                                            )
+                                                        )
+                                                        
+                                                    }
+                                                    
                                                     
                                                 }
-                                                
-                                                
                                             }
+                                            
+                                            
                                         } catch (e: Exception) {
                                             
                                             println("Error newCall: $e")
@@ -255,12 +268,27 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
+                                        
+                                        println("rejectCall1")
                                         if (isCall.value)
                                             rejectCallAnswer(navigator)
                                         
-                                        if (!isConnectedWebrtc.value)
-                                            navigator.push(MainScreen())
+                                        println("rejectCall2 ${isConnectedWebrtc.value}")
                                         
+                                        
+                                        if (!isConnectedWebrtc.value) {
+//                                            if (navigator. !is MainScreen) {
+//                                            } else {
+//                                                println("MainScreen уже в стеке навигации")
+//                                            }
+                                            
+                                            navigator.push(MainScreen())
+                                            
+                                        }
+                                        
+                                        
+                                        
+                                        println("rejectCall3")
                                         
                                     }
                                 }

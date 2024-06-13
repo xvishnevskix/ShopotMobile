@@ -19,6 +19,7 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.ToasterViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
+import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.logo
 
@@ -40,35 +41,23 @@ class IntroScreen : Screen {
                 
                 viewModel.navigator.value = navigator
                 
-                println("Первый")
                 
-                val contactsNative = PermissionsProviderFactory.create().getPermission("contacts")
-                val cameraNative = PermissionsProviderFactory.create().getPermission("camera")
-                val microPhoneNative =
-                    PermissionsProviderFactory.create().getPermission("microphone")
+                val contactsNative = PermissionsProviderFactory.create().checkPermission("contacts")
                 
-                println("второй")
                 
-                println("adasdadada $contactsNative $cameraNative $microPhoneNative")
-//                if (!contactsNative || !cameraNative || !microPhoneNative) {
+                
+                
+                if (!contactsNative) {
 //                    toasterViewModel.toaster.show("Добавьте все разрешения")
-//
-//                    return@LaunchedEffect
-//                }
-
-//                if (!contactsNative) {
-//                    toasterViewModel.toaster.show("Добавьте все разрешения")
-//
-//                    return@LaunchedEffect
-//                }
-                
-                println("adasdadada")
+                    
+                    navigator.replace(PermissionsScreen())
+                    return@LaunchedEffect
+                }
                 
                 
                 val response = origin().reloadTokens()
                 
                 
-                println("adasdadada $response")
                 
                 
                 if (response != null && response.status == HttpStatusCode.OK) {
