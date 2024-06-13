@@ -139,15 +139,18 @@ fun CreateChatHeader(
                     }
             )
         } else {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                modifier = Modifier
-                    .padding(start = 0.dp, end = 1.dp)
-                    .clickable {
-                        navigator.pop()
-                    }
-            )
+//            Icon(
+//                imageVector = Icons.Default.ArrowBack,
+//                contentDescription = "Back",
+//                modifier = Modifier
+//                    .padding(start = 0.dp, end = 1.dp)
+//                    .clickable {
+//                        navigator.pop()
+//                    }
+//            )
+            
+            Spacer(modifier = Modifier.width(0.dp))
+            
             Text(
                 text = text,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),

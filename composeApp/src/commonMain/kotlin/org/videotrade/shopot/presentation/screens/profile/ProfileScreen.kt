@@ -60,20 +60,20 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val items = listOf(
-            ProfileSettingsItem(
-                Res.drawable.carbon_media_library,
-                22.dp,
-                "Медиа, ссылки и файлы",
-                "17"
-            ),
-            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения", "Нет"),
-            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату", ""),
-            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить", "Нет"),
-            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал", "Стандарт"),
-            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото", "Стандарт"),
-        )
-        
+//        val items = listOf(
+////            ProfileSettingsItem(
+////                Res.drawable.carbon_media_library,
+////                22.dp,
+////                "Медиа, ссылки и файлы",
+////                "17"
+////            ),
+////            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения", "Нет"),
+////            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату", ""),
+////            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить", "Нет"),
+//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал", "Стандарт"),
+////            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото", "Стандарт"),
+//        )
+//
         
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -95,7 +95,7 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                         size = 186.dp
                     )
                     Text(
-                        "Злата Свечникова",
+                        "${profile.firstName} ${profile.lastName}",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -109,7 +109,7 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                         modifier = Modifier.padding(bottom = 24.dp),
                     ) {
                         Text(
-                            "+ 7 (965) 568 - 15 - 98",
+                            profile.phone,
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -118,75 +118,79 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                             modifier = Modifier.padding(end = 18.dp),
                             color = Color(0xFF979797)
                         )
-                        Text(
-                            "@zsvechnikova",
-                            textAlign = TextAlign.Center,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            
-                            color = Color(0xFF979797)
-                        )
-                    }
-                }
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Canvas(modifier = Modifier.size(width = 46.dp, height = 33.dp)) {
-                        val path = Path().apply {
-                            moveTo(x = 0f, y = 0f)
-                            lineTo(x = size.width, y = 0f)
-                            lineTo(x = size.width / 2, y = size.height)
-                            close()
+                        profile.login?.let {
+                            Text(
+                                it,
+                                textAlign = TextAlign.Center,
+                                fontSize = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                
+                                color = Color(0xFF979797)
+                            )
                         }
-                        drawPath(path = path, color = Color(0xFFF3F4F6))
                     }
                 }
+//                Box(
+//                    modifier = Modifier.fillMaxWidth(),
+//                    contentAlignment = Alignment.Center
+//                ) {
+//                    Canvas(modifier = Modifier.size(width = 46.dp, height = 33.dp)) {
+//                        val path = Path().apply {
+//                            moveTo(x = 0f, y = 0f)
+//                            lineTo(x = size.width, y = 0f)
+//                            lineTo(x = size.width / 2, y = size.height)
+//                            close()
+//                        }
+//                        drawPath(path = path, color = Color(0xFFF3F4F6))
+//                    }
+//                }
                 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        "Дизайнер, делаю качественные проекты",
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        modifier = Modifier.padding(top = 10.dp),
-                        color = Color(0xFF000000)
-                    )
-                    Text(
-                        "Июль, 2024",
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        modifier = Modifier.padding(top = 5.dp),
-                        color = Color(0xFF979797)
-                    )
+//                    profile.description?.let {
+//                        Text(
+//                            it,
+//                            textAlign = TextAlign.Center,
+//                            fontSize = 14.sp,
+//                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+//                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                            lineHeight = 20.sp,
+//                            modifier = Modifier.padding(top = 10.dp),
+//                            color = Color(0xFF000000)
+//                        )
+//                    }
+//                    Text(
+//                        "Июль, 2024",
+//                        textAlign = TextAlign.Center,
+//                        fontSize = 16.sp,
+//                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                        lineHeight = 20.sp,
+//                        modifier = Modifier.padding(top = 5.dp),
+//                        color = Color(0xFF979797)
+//                    )
                 }
-                
-                LazyColumn(
-                    modifier = Modifier
-                        .padding(top = 6.dp, bottom = 35.dp)
-                        .fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    items(items) { item ->
-                        ProfileSettingsButton(
-                            drawableRes = item.drawableRes,
-                            size = item.size,
-                            mainText = item.mainText,
-                            boxText = item.boxText
-                        )
-                    }
-                    
-                }
+
+//                LazyColumn(
+//                    modifier = Modifier
+//                        .padding(top = 6.dp, bottom = 35.dp)
+//                        .fillMaxWidth(),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+//                ) {
+//                    items(items) { item ->
+//                        ProfileSettingsButton(
+//                            drawableRes = item.drawableRes,
+//                            size = item.size,
+//                            mainText = item.mainText,
+//                            boxText = item.boxText
+//                        )
+//                    }
+//
+//                }
                 
                 
             }

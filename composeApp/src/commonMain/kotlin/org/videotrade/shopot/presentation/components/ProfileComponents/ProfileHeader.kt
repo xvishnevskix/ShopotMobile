@@ -52,18 +52,18 @@ fun ProfileHeader(text: String) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 23.dp).background(Color(0xFFF3F4F6)),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
 
         ) {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Back",
-            modifier = Modifier
-                .padding(start = 0.dp, end = 1.dp)
-                .clickable {
-                    navigator.pop()
-                }
-        )
+//        Icon(
+//            imageVector = Icons.Default.ArrowBack,
+//            contentDescription = "Back",
+//            modifier = Modifier
+//                .padding(start = 0.dp, end = 1.dp)
+//                .clickable {
+//                    navigator.pop()
+//                }
+//        )
         Text(
             text = text,
             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -73,7 +73,7 @@ fun ProfileHeader(text: String) {
             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
             lineHeight = 24.sp,
         )
-        Spacer(modifier = Modifier.width(40.dp))
+//        Spacer(modifier = Modifier.width(40.dp))
     }
 
 }

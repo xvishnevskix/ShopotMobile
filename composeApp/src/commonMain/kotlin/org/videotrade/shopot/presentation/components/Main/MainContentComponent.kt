@@ -185,9 +185,9 @@ fun BottomBar(modifier: Modifier = Modifier) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
                 , modifier = Modifier.clickable {
-                    if (currentScreen !is ProfileScreen) {
-                        viewModel.navigateTo(ProfileScreen())
-                        navigator.push(ProfileScreen())
+                    if (viewModel.profile.value !== null && currentScreen !is ProfileScreen) {
+                        viewModel.navigateTo(ProfileScreen(viewModel.profile.value!!))
+                        navigator.push(ProfileScreen(viewModel.profile.value!!))
                     }
                 }
             ) {
