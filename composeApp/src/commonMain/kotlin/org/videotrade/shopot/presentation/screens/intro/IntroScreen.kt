@@ -43,6 +43,7 @@ class IntroScreen : Screen {
                 
                 
                 val contactsNative = PermissionsProviderFactory.create().checkPermission("contacts")
+                PermissionsProviderFactory.create().getPermission("notifications")
                 
                 
                 

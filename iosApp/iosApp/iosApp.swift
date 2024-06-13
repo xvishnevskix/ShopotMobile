@@ -13,7 +13,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     override init() {
         FirebaseApp.configure()
         NotifierManager.shared.initialize(configuration: NotificationPlatformConfigurationIos.init(showPushNotification: true, askNotificationPermissionOnStart: true))
-        BackgroundService()
+
 
         KoinHelperKt.doInitKoin()
     }

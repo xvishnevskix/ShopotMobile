@@ -205,7 +205,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 buildJsonObject {
                                                     put("phoneNumber", phone.drop(1))
                                                     put("firstName", textState.value.firstName)
-                                                    put("lastName", textState.value.firstName)
+                                                    put("lastName", textState.value.lastName)
                                                     put("email", "admin.admin@gmail.com")
                                                     put("description", textState.value.firstName)
                                                     put("login", textState.value.nickname)

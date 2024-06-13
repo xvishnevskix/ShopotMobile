@@ -123,6 +123,7 @@ import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
+import org.videotrade.shopot.presentation.screens.test.TestScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -133,8 +134,9 @@ internal fun App() = AppTheme {
             modifier = Modifier.fillMaxSize()
         ) {
             Navigator(
-                IntroScreen()
+//                IntroScreen()
 //                MainScreen()
+                TestScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
