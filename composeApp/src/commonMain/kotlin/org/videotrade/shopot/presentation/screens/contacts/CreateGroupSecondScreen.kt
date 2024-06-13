@@ -113,7 +113,7 @@ class CreateGroupSecondScreen() : Screen {
                     }
 
                     Box(
-                        modifier = Modifier.padding(top = 85.dp)
+                        modifier = Modifier.padding(top = 5.dp)
                     ) {
                         CustomButton(
                             "Далее",
