@@ -133,8 +133,8 @@ internal fun App() = AppTheme {
             modifier = Modifier.fillMaxSize()
         ) {
             Navigator(
-//                IntroScreen()
-                MainScreen()
+                IntroScreen()
+//                MainScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

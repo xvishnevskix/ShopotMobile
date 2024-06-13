@@ -43,10 +43,12 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.chat
-import shopot.composeapp.generated.resources.contacts
+import shopot.composeapp.generated.resources.chatNav
+import shopot.composeapp.generated.resources.contactsNav
+import shopot.composeapp.generated.resources.person
+import shopot.composeapp.generated.resources.profileNav
+
 import shopot.composeapp.generated.resources.smart_encryption
-import shopot.composeapp.generated.resources.user_profile
 
 @Composable
 fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
@@ -191,7 +193,7 @@ fun BottomBar(modifier: Modifier = Modifier) {
             ) {
                 Image(
                     modifier = Modifier.size(35.dp),
-                    painter = painterResource(Res.drawable.user_profile),
+                    painter = painterResource(Res.drawable.profileNav),
                     contentDescription = null,
                 )
                 Text(
@@ -215,7 +217,7 @@ fun BottomBar(modifier: Modifier = Modifier) {
             ) {
                 Image(
                     modifier = Modifier.size(35.dp),
-                    painter = painterResource(Res.drawable.chat),
+                    painter = painterResource(Res.drawable.chatNav),
                     contentDescription = null,
                 )
                 Text(
@@ -240,7 +242,7 @@ fun BottomBar(modifier: Modifier = Modifier) {
             ) {
                 Image(
                     modifier = Modifier.size(35.dp),
-                    painter = painterResource(Res.drawable.contacts),
+                    painter = painterResource(Res.drawable.contactsNav),
                     contentDescription = null,
                 )
                 Text(
