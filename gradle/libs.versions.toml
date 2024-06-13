@@ -23,6 +23,7 @@ multiplatformSettings = "1.1.1"
 koin = "3.5.3"
 koinCompose = "1.1.0"
 statelyCommon = "2.0.6"
+voyagerTabNavigator = "1.0.0"
 webrtcKmp = "0.114.4"
 webrtc-ios-sdk = "114.5735.09"
 animationCoreAndroid = "1.6.7"
@@ -33,6 +34,7 @@ workRuntimeKtx = "2.9.0"
 
 [libraries]
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+cafe-voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyagerTabNavigator" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
