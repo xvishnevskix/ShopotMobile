@@ -277,10 +277,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         
                                         if (!isConnectedWebrtc.value) {
-//                                            if (navigator. !is MainScreen) {
-//                                            } else {
-//                                                println("MainScreen уже в стеке навигации")
-//                                            }
+                                            
                                             
                                             navigator.push(MainScreen())
                                             

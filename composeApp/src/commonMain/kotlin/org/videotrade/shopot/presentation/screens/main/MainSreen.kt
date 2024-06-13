@@ -1,50 +1,36 @@
 package org.videotrade.shopot.presentation.screens.main
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.graphics.vector.ImageVector
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import org.koin.compose.koinInject
-import org.videotrade.shopot.presentation.components.Main.MainContentComponent
-import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
-import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
 import org.videotrade.shopot.presentation.components.Main.Drawer
 
 
 class MainScreen : Screen {
-
+    
     @Composable
     override fun Content() {
         val viewModel: MainViewModel = koinInject()
         val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-        val navigator = LocalNavigator.currentOrThrow
-
-
+        val navigator = LocalNavigator.current
+        
+        
+        
         LaunchedEffect(Unit) {
-            viewModel.getNavigator(navigator)
-            viewModel.getProfile()
-            viewModel.loadUsers()
+            if (navigator != null) {
+                viewModel.getNavigator(navigator)
+                
+                viewModel.getProfile()
+                viewModel.loadUsers()
+            }
         }
+        Drawer(drawerState, viewModel)
+    }
+}
 
 
 //        TabNavigator(BottomNavItem.CreateChat) { tabNavigator ->
@@ -56,12 +42,8 @@ class MainScreen : Screen {
 //        }
 
 
-
 //        MainContentComponent(drawerState, viewModel)
 
-        Drawer(drawerState, viewModel)
-    }
-}
 
 //@Composable
 //fun BottomNavBar(navigator: Navigator) {
