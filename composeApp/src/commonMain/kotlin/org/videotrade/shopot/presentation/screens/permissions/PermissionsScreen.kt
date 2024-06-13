@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
-import org.videotrade.shopot.presentation.screens.common.ToasterViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
@@ -45,7 +45,7 @@ class PermissionsScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val toasterViewModel: ToasterViewModel = koinInject()
+        val toasterViewModel: CommonViewModel = koinInject()
         
         val scope = rememberCoroutineScope()
         

@@ -16,14 +16,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import org.koin.compose.koinInject
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.Chat.BlurredMessageOverlay
 import org.videotrade.shopot.presentation.components.Chat.Chat
 import org.videotrade.shopot.presentation.components.Chat.ChatFooter
 import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+
 
 class ChatScreen(
     private val chat: ChatItem
@@ -31,6 +32,7 @@ class ChatScreen(
     
     @Composable
     override fun Content() {
+        
         val viewModel: ChatViewModel = koinInject()
         val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
         
@@ -39,9 +41,8 @@ class ChatScreen(
             
             viewModel.getProfile()
             viewModel.getMessagesBack(chat.id)
-
+            
         }
-        
         
         
         var selectedMessage by remember { mutableStateOf<MessageItem?>(null) }
@@ -54,13 +55,12 @@ class ChatScreen(
                     
                     Scaffold(
                         topBar = {
-                            ChatHeader(chat,viewModel)
-                        
+                            ChatHeader(chat, viewModel)
+                            
                         },
                         bottomBar = {
-                            ChatFooter(chat,viewModel)
-                        }
-                        ,
+                            ChatFooter(chat, viewModel)
+                        },
                         
                         modifier = Modifier
                             .fillMaxSize()
@@ -72,8 +72,7 @@ class ChatScreen(
                             Modifier.fillMaxSize()
                                 .padding(innerPadding),
                             
-                            onMessageClick = {
-                                             message, y ->
+                            onMessageClick = { message, y ->
                                 
                                 selectedMessage = message
                                 selectedMessageY = y + 150

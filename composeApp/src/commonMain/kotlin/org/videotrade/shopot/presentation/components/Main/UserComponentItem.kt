@@ -29,12 +29,14 @@ import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
-fun UserComponentItem(chat: ChatItem) {
+fun UserComponentItem(chat: ChatItem, commonViewModel: CommonViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     
     
@@ -42,6 +44,7 @@ fun UserComponentItem(chat: ChatItem) {
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
+            commonViewModel.showButtonNav.value = false
             navigator.push(ChatScreen(chat))
         },
         horizontalArrangement = Arrangement.SpaceBetween,

@@ -46,47 +46,6 @@ fun Drawer(drawerState: DrawerState, viewModel: MainViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     
     
-    val profileState = viewModel.profile.collectAsState(
-        initial = ProfileDTO(
-            firstName = "Unknow",
-            lastName = "Unknow",
-        )
-    ).value
-    
-    
-    val items = listOf(
-//        DrawerItem(
-//            Icons.Default.Call,
-//
-//            "Контакты"
-//        ) {},
-//        DrawerItem(
-//            Icons.Default.Settings,
-//
-//
-//            "Настройки"
-//
-//        ) {},
-        DrawerItem(
-            Icons.AutoMirrored.Filled.ExitToApp,
-            
-            
-            "Выход"
-        
-        ) {
-            viewModel.leaveApp(navigator)
-        }
-    )
-    
-    
-    
-    
-    
-    
-    
-    MainContentComponent(drawerState, viewModel)
-            
-            
 }
 
 

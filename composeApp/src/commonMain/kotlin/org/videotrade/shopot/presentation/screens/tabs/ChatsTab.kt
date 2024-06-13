@@ -11,6 +11,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chatNav
@@ -35,7 +36,7 @@ object ChatsTab : Tab {
     
     @Composable
     override fun Content() {
-        Navigator(screen = MainScreen()) { navigator ->
+        Navigator(screen = ChatsScreen()) { navigator ->
             SlideTransition(navigator = navigator)
         }
     }

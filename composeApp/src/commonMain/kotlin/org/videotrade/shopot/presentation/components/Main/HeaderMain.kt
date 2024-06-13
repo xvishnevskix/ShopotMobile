@@ -39,7 +39,7 @@ import shopot.composeapp.generated.resources.search_main
 import shopot.composeapp.generated.resources.settings_main
 
 @Composable
-fun HeaderMain(drawerState: DrawerState) {
+fun HeaderMain() {
     val interactionSource =
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
 
@@ -61,11 +61,8 @@ fun HeaderMain(drawerState: DrawerState) {
 
             Image(
                 modifier = Modifier.size(50.dp).clickable {
-                    scope.launch {
-                        drawerState.open()
-
-                    }
-
+                
+                
                 },
                 painter = painterResource(Res.drawable.logo_main),
                 contentDescription = null,
@@ -86,37 +83,37 @@ fun HeaderMain(drawerState: DrawerState) {
             )
         }
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-
-            Image(
-                modifier = Modifier.padding(end = 15.dp).size(22.dp).clickable(
-                    interactionSource = interactionSource, // Используем источник взаимодействия
-                    indication = null, // Указываем null, чтобы убрать анимацию при клике
-                    onClick = { }
-                ),
-
-                painter = painterResource(Res.drawable.search_main),
-                contentDescription = null,
-
-                )
-            Image(
-                modifier = Modifier.padding(end = 15.dp).size(30.dp).clickable {
-                    navigator.push(CreateChatScreen())
-                },
-                painter = painterResource(Res.drawable.add_main),
-                contentDescription = null,
-
-                )
-            Image(
-                modifier = Modifier.size(25.dp),
-                painter = painterResource(Res.drawable.settings_main),
-                contentDescription = null,
-
-                )
-        }
+//        Row(
+//            verticalAlignment = Alignment.CenterVertically,
+//            horizontalArrangement = Arrangement.Center
+//        ) {
+//
+//            Image(
+//                modifier = Modifier.padding(end = 15.dp).size(22.dp).clickable(
+//                    interactionSource = interactionSource, // Используем источник взаимодействия
+//                    indication = null, // Указываем null, чтобы убрать анимацию при клике
+//                    onClick = { }
+//                ),
+//
+//                painter = painterResource(Res.drawable.search_main),
+//                contentDescription = null,
+//
+//                )
+//            Image(
+//                modifier = Modifier.padding(end = 15.dp).size(30.dp).clickable {
+//                    navigator.push(CreateChatScreen())
+//                },
+//                painter = painterResource(Res.drawable.add_main),
+//                contentDescription = null,
+//
+//                )
+//            Image(
+//                modifier = Modifier.size(25.dp),
+//                painter = painterResource(Res.drawable.settings_main),
+//                contentDescription = null,
+//
+//                )
+//        }
 
     }
 

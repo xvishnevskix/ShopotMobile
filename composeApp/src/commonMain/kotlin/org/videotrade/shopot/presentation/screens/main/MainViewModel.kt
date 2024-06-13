@@ -45,8 +45,9 @@ class MainViewModel : ViewModel(), KoinComponent {
     val navigator = MutableStateFlow<Navigator?>(null)
 
     private val _currentScreen = MutableStateFlow<Screen>(MainScreen())
-
+    
     val currentScreen: StateFlow<Screen> = _currentScreen
+    
     
     init {
         viewModelScope.launch {

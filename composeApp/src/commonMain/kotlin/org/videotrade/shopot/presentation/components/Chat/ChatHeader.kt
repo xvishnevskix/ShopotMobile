@@ -29,12 +29,14 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -45,7 +47,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
-    
+    val commonViewModel: CommonViewModel = koinInject()
     Row(
         modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -61,9 +63,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
             
             BackIcon(Modifier.padding(start = 23.dp, end = 8.dp).clickable {
                 
-                
                 viewModel.clearMessages()
                 viewModel.setCount(0)
+                commonViewModel.showButtonNav.value = true
                 navigator.pop()
                 
                 

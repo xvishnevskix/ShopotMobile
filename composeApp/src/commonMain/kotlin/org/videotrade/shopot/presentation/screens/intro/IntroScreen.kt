@@ -17,7 +17,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.screens.common.ToasterViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
 import shopot.composeapp.generated.resources.Res
@@ -30,7 +30,7 @@ class IntroScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
-        val toasterViewModel: ToasterViewModel = koinInject()
+        val toasterViewModel: CommonViewModel = koinInject()
         
         
         

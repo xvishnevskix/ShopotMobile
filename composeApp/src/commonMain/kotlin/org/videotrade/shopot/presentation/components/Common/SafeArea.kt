@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -7,11 +8,12 @@ import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.dokar.sonner.Toaster
 import org.koin.compose.koinInject
-import org.videotrade.shopot.presentation.screens.common.ToasterViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
 @Composable
 fun SafeArea(
@@ -20,11 +22,11 @@ fun SafeArea(
     content: @Composable () -> Unit
 ) {
     val blurRadius = if (isBlurred) 20.dp else 0.dp
-    val toasterViewModel: ToasterViewModel = koinInject()
+    val toasterViewModel: CommonViewModel = koinInject()
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize().background(Color.White)
             .blur(blurRadius)
             .then(if (padding != null) Modifier.padding(padding) else Modifier.safeContentPadding())
     ) {

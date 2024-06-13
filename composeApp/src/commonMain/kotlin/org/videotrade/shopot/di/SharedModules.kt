@@ -22,7 +22,7 @@ import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
-import org.videotrade.shopot.presentation.screens.common.ToasterViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -77,8 +77,7 @@ private val presentationModule = module {
     }
     single { ContactsViewModel() }
     
-    
-    single { ToasterViewModel() }
+    single { CommonViewModel() }
     
     
 }
