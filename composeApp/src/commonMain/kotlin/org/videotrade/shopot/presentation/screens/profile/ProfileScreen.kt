@@ -35,7 +35,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.presentation.components.Main.BottomBar
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -194,7 +193,7 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                 
                 
             }
-            BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
+//            BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             
         }
         

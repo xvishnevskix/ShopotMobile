@@ -37,7 +37,6 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.components.Main.BottomBar
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -132,7 +131,7 @@ class CreateGroupFirstScreen() : Screen {
 
                     }
                 }
-                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
+//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
         }
 }

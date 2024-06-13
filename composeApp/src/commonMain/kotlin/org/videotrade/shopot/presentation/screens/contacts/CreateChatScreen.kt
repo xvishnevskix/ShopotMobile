@@ -38,7 +38,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.components.Main.BottomBar
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -114,7 +113,7 @@ class CreateChatScreen() : Screen {
                     }
                 }
                 }
-                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
+//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
 
     }

@@ -110,37 +110,107 @@ package org.videotrade.shopot
 //internal expect fun openUrl(url: String?)
 
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.tab.CurrentTab
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import cafe.adriel.voyager.navigator.tab.Tab
+import cafe.adriel.voyager.navigator.tab.TabNavigator
+import org.jetbrains.compose.resources.Font
 import org.koin.compose.KoinContext
-import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
-import org.videotrade.shopot.presentation.screens.intro.IntroScreen
-import org.videotrade.shopot.presentation.screens.main.MainScreen
-import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
-import org.videotrade.shopot.presentation.screens.test.TestScreen
+import org.videotrade.shopot.presentation.screens.tabs.ChatsTab
+import org.videotrade.shopot.presentation.screens.tabs.ContactsTab
+import org.videotrade.shopot.presentation.screens.tabs.ProfileTab
 import org.videotrade.shopot.theme.AppTheme
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 internal fun App() = AppTheme {
     
     KoinContext {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Navigator(
-//                IntroScreen()
-//                MainScreen()
-                TestScreen()
-            ) { navigator ->
-                SlideTransition(navigator)
+        MaterialTheme {
+            TabNavigator(
+                tab = ChatsTab
+            ) {
+                
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = {
+                        BottomNavigation(backgroundColor = Color(241, 238, 238)) {
+                            TabNavigationItem(ProfileTab)
+                            TabNavigationItem(ChatsTab)
+                            TabNavigationItem(ContactsTab)
+                        }
+                        
+                    },
+                    content = { CurrentTab() },
+                )
             }
         }
     }
 }
 
+
+@Composable
+private fun RowScope.TabNavigationItem(tab: Tab) {
+    val tabNavigator: TabNavigator = LocalTabNavigator.current
+    
+    
+    BottomNavigationItem(
+        selected = tabNavigator.current == tab,
+        onClick = { tabNavigator.current = tab },
+        icon = {
+            Spacer(modifier = Modifier.height(30.dp))
+            
+            tab.options.icon?.let { icon ->
+                Icon(
+                    modifier = Modifier.size(30.dp).padding(bottom = 5.dp),
+                    painter = icon,
+                    contentDescription =
+                    tab.options.title,
+                    tint = if (tabNavigator.current == tab) Color(3, 104, 255) else Color.Black
+                
+                
+                )
+            }
+        },
+        label = {
+            
+            Text(
+                tab.options.title,
+                textAlign = TextAlign.Center,
+                fontSize = 13.sp,
+                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                color = if (tabNavigator.current == tab) Color(3, 104, 255) else Color.Black,
+            )
+            
+        }
+    )
+    Spacer(modifier = Modifier.height(70.dp))
+    
+    
+}

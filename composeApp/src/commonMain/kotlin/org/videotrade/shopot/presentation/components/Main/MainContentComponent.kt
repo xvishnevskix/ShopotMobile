@@ -159,7 +159,6 @@ fun MainContentComponent(drawerState: DrawerState, viewModel: MainViewModel) {
                 }
             }
 
-            BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
         }
 }
 

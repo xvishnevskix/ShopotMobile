@@ -41,7 +41,6 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.components.Main.BottomBar
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -126,7 +125,7 @@ class CreateGroupSecondScreen() : Screen {
                     }
                 }
                 }
-                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
+//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
     }
 }
