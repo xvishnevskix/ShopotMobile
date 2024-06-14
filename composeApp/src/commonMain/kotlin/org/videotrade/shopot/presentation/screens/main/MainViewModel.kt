@@ -39,7 +39,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     val chats: StateFlow<List<ChatItem>> = _chats.asStateFlow()
     
     
-    val profile = MutableStateFlow<ProfileDTO?>(null)
+    val profile = MutableStateFlow(ProfileDTO())
     
     
     val navigator = MutableStateFlow<Navigator?>(null)

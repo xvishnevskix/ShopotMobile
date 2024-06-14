@@ -30,9 +30,9 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.tabs.ChatsTab
-import org.videotrade.shopot.presentation.screens.tabs.ContactsTab
-import org.videotrade.shopot.presentation.screens.tabs.ProfileTab
+import org.videotrade.shopot.presentation.tabs.ChatsTab
+import org.videotrade.shopot.presentation.tabs.ContactsTab
+import org.videotrade.shopot.presentation.tabs.ProfileTab
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 

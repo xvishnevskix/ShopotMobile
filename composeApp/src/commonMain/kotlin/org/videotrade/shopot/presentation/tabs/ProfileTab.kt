@@ -1,4 +1,4 @@
-package org.videotrade.shopot.presentation.screens.tabs
+package org.videotrade.shopot.presentation.tabs
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
@@ -12,8 +12,10 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.profileNav
@@ -36,7 +38,9 @@ object ProfileTab : Tab {
     
     @Composable
     override fun Content() {
-        Navigator(screen = ProfileScreen(ProfileDTO())) { navigator ->
+        val viewModel: MainViewModel = koinInject()
+        
+        Navigator(screen = ProfileScreen(viewModel.profile.value)) { navigator ->
             SlideTransition(navigator = navigator)
         }
     }
