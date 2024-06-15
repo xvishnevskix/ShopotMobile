@@ -38,9 +38,8 @@ object ProfileTab : Tab {
     
     @Composable
     override fun Content() {
-        val viewModel: MainViewModel = koinInject()
         
-        Navigator(screen = ProfileScreen(viewModel.profile.value)) { navigator ->
+        Navigator(screen = ProfileScreen()) { navigator ->
             SlideTransition(navigator = navigator)
         }
     }

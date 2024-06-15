@@ -4,6 +4,7 @@ import Avatar
 import ProfileSettingsButton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,8 +36,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -54,10 +59,15 @@ data class ProfileSettingsItem(
     val boxText: String
 )
 
-class ProfileScreen(private val profile: ProfileDTO) : Screen {
+class ProfileScreen : Screen {
     
     @Composable
     override fun Content() {
+        val mainViewModel: MainViewModel = koinInject()
+        val commonViewModel: CommonViewModel = koinInject()
+        
+        val profile = mainViewModel.profile.collectAsState(initial = ProfileDTO()).value
+        
         val navigator = LocalNavigator.currentOrThrow
 //        val items = listOf(
 ////            ProfileSettingsItem(
@@ -86,7 +96,10 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(bottomEnd = 46.dp, bottomStart = 46.dp))
                         .background(Color(0xFFF3F4F6))
-                        .padding(16.dp)
+                        .padding(16.dp).clickable {
+                            commonViewModel.setShowButtonNav(false)
+                            mainViewModel.leaveApp(navigator)
+                        }
                 ) {
                     ProfileHeader("Информация")
                     Avatar(

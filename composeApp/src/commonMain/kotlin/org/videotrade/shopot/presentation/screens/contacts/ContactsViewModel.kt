@@ -45,6 +45,8 @@ class ContactsViewModel() : ViewModel(),
             
             val contactsSort = ContactsUseCase.getContacts()
             
+            println("contactsSort ${contactsSort}")
+            
             if (contactsSort.isEmpty()) {
                 fetchContacts()
             } else {

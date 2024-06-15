@@ -11,5 +11,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
     
     val showButtonNav = MutableStateFlow(true)
     
-    
+    fun setShowButtonNav(value: Boolean) {
+        showButtonNav.value = value
+    }
 }
