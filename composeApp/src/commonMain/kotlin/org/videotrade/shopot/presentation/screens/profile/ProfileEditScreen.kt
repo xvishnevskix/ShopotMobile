@@ -104,7 +104,7 @@ class ProfileEditScreen : Screen {
                         ) {
                             BasicTextField(
                                 value = textState.value.firstName,
-                                onValueChange = { newText -> textState.value.firstName = newText },
+                                onValueChange = { newText -> textState.value = textState.value.copy(firstName = newText) },
                                 singleLine = true,
                                 textStyle = textStyle,
                                 cursorBrush = SolidColor(Color.Black),
