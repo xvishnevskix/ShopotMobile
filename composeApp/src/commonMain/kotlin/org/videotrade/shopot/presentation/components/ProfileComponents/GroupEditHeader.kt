@@ -63,7 +63,9 @@ fun GroupEditHeader(text: String) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
-            modifier = Modifier.padding(start = 0.dp,end = 1.dp)
+            modifier = Modifier.padding(start = 10.dp,end = 1.dp).clickable {
+                navigator.pop()
+            }
         )
         Text(
             text = text,
@@ -77,7 +79,7 @@ fun GroupEditHeader(text: String) {
         Image(
             painter = painterResource(Res.drawable.check_mark),
             contentDescription = "Avatar",
-            modifier = Modifier.size(width = 16.dp, height = 12.dp),
+            modifier = Modifier.padding(start = 0.dp,end = 6.dp).size(width = 16.dp, height = 12.dp),
             contentScale = ContentScale.FillBounds
         )
     }

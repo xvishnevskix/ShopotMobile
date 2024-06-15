@@ -1,5 +1,6 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -24,9 +25,11 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.Navigator
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.presentation.screens.profile.ProfileEditScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
@@ -40,6 +43,7 @@ fun ProfileSettingsButton(
     size: Dp = 22.dp,
     mainText: String,
 //    boxText: String,
+    onClick: () -> Unit
 ) {
 
 
@@ -49,7 +53,10 @@ fun ProfileSettingsButton(
             .clip(RoundedCornerShape(12.dp))
             .background(Color(0xFFF3F4F6))
             .fillMaxWidth(0.9F)
-            .padding(start = 15.dp, top = 14.dp, end = 10.dp, bottom = 14.dp),
+            .padding(start = 15.dp, top = 14.dp, end = 10.dp, bottom = 14.dp)
+            .clickable{
+                    onClick()
+            },
         contentAlignment = Alignment.Center
     ) {
         Row(
@@ -103,7 +110,7 @@ fun ProfileSettingsButton(
 //                }
                 Image(
                     modifier = Modifier
-                        .size(18.dp),
+                        .size(18.dp).padding(top = 5.dp),
                     painter = painterResource(Res.drawable.arrowleft),
                     contentDescription = null,
                     contentScale = ContentScale.Crop

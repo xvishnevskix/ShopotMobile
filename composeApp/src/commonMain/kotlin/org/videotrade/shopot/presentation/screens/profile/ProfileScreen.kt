@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
@@ -39,20 +40,15 @@ import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHe
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.black_star
 import shopot.composeapp.generated.resources.carbon_media_library
-import shopot.composeapp.generated.resources.download_photo
-import shopot.composeapp.generated.resources.edit_group_name
-import shopot.composeapp.generated.resources.mute_icon
-import shopot.composeapp.generated.resources.search_icon
-import shopot.composeapp.generated.resources.signal
 
 
 data class ProfileSettingsItem(
     val drawableRes: DrawableResource,
     val size: Dp,
     val mainText: String,
-//    val boxText: String
+//    val boxText: String,
+    val onClick: () -> Unit
 )
 
 class ProfileScreen(private val profile: ProfileDTO) : Screen {
@@ -61,10 +57,11 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val items = listOf(
-            ProfileSettingsItem(Res.drawable.edit_group_name, 22.dp, "Медиа, ссылки и файлы"),
-            ProfileSettingsItem(Res.drawable.carbon_media_library, 22.dp, "Медиа, ссылки и файлы"),
-            ProfileSettingsItem(Res.drawable.carbon_media_library, 22.dp, "Медиа, ссылки и файлы"),
-            ProfileSettingsItem(Res.drawable.carbon_media_library, 22.dp, "Медиа, ссылки и файлы"),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Редактировать профиль", {navigator.push(ProfileEditScreen())}),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы", {navigator.push(ProfileMediaScreen(profile))} ),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Тема", {}),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Обои", {}),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Выход", {}),
 //            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
 //            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
 //            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
@@ -184,7 +181,7 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                             drawableRes = item.drawableRes,
                             size = item.size,
                             mainText = item.mainText,
-
+                            onClick = item.onClick
                         )
                     }
 
