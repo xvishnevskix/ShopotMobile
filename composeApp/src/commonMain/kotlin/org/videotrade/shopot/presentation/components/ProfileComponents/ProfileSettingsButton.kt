@@ -39,7 +39,7 @@ fun ProfileSettingsButton(
     drawableRes: DrawableResource,
     size: Dp = 22.dp,
     mainText: String,
-    boxText: String,
+//    boxText: String,
 ) {
 
 
@@ -83,24 +83,24 @@ fun ProfileSettingsButton(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-                        .background(if (boxText.isEmpty()) Color.Transparent else Color(0xFF2A293C))
-                ) {
-                    Text(
-                        "${boxText}",
-                        textAlign = TextAlign.Center,
-                        fontSize = 12.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFFFFFFFF),
-                        modifier = Modifier
-                            .padding(start = 6.dp, end = 6.dp, top = 1.dp, bottom = 1.dp)
-                    )
-
-                }
+//                Box(
+//                    modifier = Modifier
+//                        .clip(RoundedCornerShape(6.dp))
+//                        .background(if (boxText.isEmpty()) Color.Transparent else Color(0xFF2A293C))
+//                ) {
+//                    Text(
+//                        "${boxText}",
+//                        textAlign = TextAlign.Center,
+//                        fontSize = 12.sp,
+//                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                        lineHeight = 20.sp,
+//                        color = Color(0xFFFFFFFF),
+//                        modifier = Modifier
+//                            .padding(start = 6.dp, end = 6.dp, top = 1.dp, bottom = 1.dp)
+//                    )
+//
+//                }
                 Image(
                     modifier = Modifier
                         .size(18.dp),

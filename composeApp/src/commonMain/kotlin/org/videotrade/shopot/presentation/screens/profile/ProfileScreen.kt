@@ -42,6 +42,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.black_star
 import shopot.composeapp.generated.resources.carbon_media_library
 import shopot.composeapp.generated.resources.download_photo
+import shopot.composeapp.generated.resources.edit_group_name
 import shopot.composeapp.generated.resources.mute_icon
 import shopot.composeapp.generated.resources.search_icon
 import shopot.composeapp.generated.resources.signal
@@ -51,7 +52,7 @@ data class ProfileSettingsItem(
     val drawableRes: DrawableResource,
     val size: Dp,
     val mainText: String,
-    val boxText: String
+//    val boxText: String
 )
 
 class ProfileScreen(private val profile: ProfileDTO) : Screen {
@@ -59,20 +60,18 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-//        val items = listOf(
-////            ProfileSettingsItem(
-////                Res.drawable.carbon_media_library,
-////                22.dp,
-////                "Медиа, ссылки и файлы",
-////                "17"
-////            ),
-////            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения", "Нет"),
-////            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату", ""),
-////            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить", "Нет"),
-//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал", "Стандарт"),
-////            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото", "Стандарт"),
-//        )
-//
+        val items = listOf(
+            ProfileSettingsItem(Res.drawable.edit_group_name, 22.dp, "Медиа, ссылки и файлы"),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 22.dp, "Медиа, ссылки и файлы"),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 22.dp, "Медиа, ссылки и файлы"),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 22.dp, "Медиа, ссылки и файлы"),
+//            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
+//            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
+//            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
+//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
+//            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
+        )
+
         
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -131,20 +130,20 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                         }
                     }
                 }
-//                Box(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Canvas(modifier = Modifier.size(width = 46.dp, height = 33.dp)) {
-//                        val path = Path().apply {
-//                            moveTo(x = 0f, y = 0f)
-//                            lineTo(x = size.width, y = 0f)
-//                            lineTo(x = size.width / 2, y = size.height)
-//                            close()
-//                        }
-//                        drawPath(path = path, color = Color(0xFFF3F4F6))
-//                    }
-//                }
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Canvas(modifier = Modifier.size(width = 46.dp, height = 23.dp)) {
+                        val path = Path().apply {
+                            moveTo(x = 0f, y = 0f)
+                            lineTo(x = size.width, y = 0f)
+                            lineTo(x = size.width / 2, y = size.height)
+                            close()
+                        }
+                        drawPath(path = path, color = Color(0xFFF3F4F6))
+                    }
+                }
                 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -174,22 +173,22 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
 //                    )
                 }
 
-//                LazyColumn(
-//                    modifier = Modifier
-//                        .padding(top = 6.dp, bottom = 35.dp)
-//                        .fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    items(items) { item ->
-//                        ProfileSettingsButton(
-//                            drawableRes = item.drawableRes,
-//                            size = item.size,
-//                            mainText = item.mainText,
-//                            boxText = item.boxText
-//                        )
-//                    }
-//
-//                }
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 6.dp, bottom = 35.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(items) { item ->
+                        ProfileSettingsButton(
+                            drawableRes = item.drawableRes,
+                            size = item.size,
+                            mainText = item.mainText,
+
+                        )
+                    }
+
+                }
                 
                 
             }
