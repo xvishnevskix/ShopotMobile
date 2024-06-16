@@ -54,7 +54,9 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.add_photo
 import shopot.composeapp.generated.resources.arrowleft
+import shopot.composeapp.generated.resources.delete_account
 import shopot.composeapp.generated.resources.delete_circle
+import shopot.composeapp.generated.resources.exit
 
 data class SignUpTextState(
     var firstName: String = "",
@@ -254,7 +256,7 @@ class ProfileEditScreen : Screen {
                                 modifier = Modifier
                                     .padding(end = 18.dp)
                                     .size(width = 39.dp, height = 25.dp),
-                                painter = painterResource(Res.drawable.delete_circle),
+                                painter = painterResource(Res.drawable.delete_account),
                                 contentDescription = null,
                                 contentScale = ContentScale.FillBounds
                             )
