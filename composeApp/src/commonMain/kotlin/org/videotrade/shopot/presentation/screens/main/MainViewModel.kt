@@ -44,9 +44,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     val navigator = MutableStateFlow<Navigator?>(null)
 
-    private val _currentScreen = MutableStateFlow<Screen>(MainScreen())
     
-    val currentScreen: StateFlow<Screen> = _currentScreen
     
     
     init {
@@ -59,14 +57,10 @@ class MainViewModel : ViewModel(), KoinComponent {
                 
                 getWsSession()
                 
-                if (it !== null) {
-                    
-                    
-                    println("userID : ${it.id}")
-                    
-                    navigator.value?.let { navigator -> callUseCase.connectionWs(it.id, navigator) }
-                    
-                }
+                
+                println("userID : ${it.id}")
+                
+                navigator.value?.let { navigator -> callUseCase.connectionWs(it.id, navigator) }
                 
             }
             
@@ -113,10 +107,6 @@ class MainViewModel : ViewModel(), KoinComponent {
     fun getNavigator(navigatorGet: Navigator) {
         
         navigator.value = navigatorGet
-    }
-
-    fun navigateTo(screen: Screen) {
-        _currentScreen.value = screen
     }
 
 
@@ -175,7 +165,6 @@ class MainViewModel : ViewModel(), KoinComponent {
             
             delValueInStorage("accessToken")
             delValueInStorage("refreshToken")
-            
             
             navigator.replace(SignInScreen())
             

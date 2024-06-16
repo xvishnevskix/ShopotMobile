@@ -37,15 +37,13 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 fun UserComponentItem(chat: ChatItem, commonViewModel: CommonViewModel) {
-    val navigator = LocalNavigator.currentOrThrow
     
     
     println("dasdafafa  ${chat.icon} ${chat.lastName}")
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
-            commonViewModel.setShowButtonNav(false)
-            navigator.push(ChatScreen(chat))
+            commonViewModel.mainNavigator.value?.push(ChatScreen(chat))
         },
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

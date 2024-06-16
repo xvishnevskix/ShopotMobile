@@ -65,7 +65,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                 
                 viewModel.clearMessages()
                 viewModel.setCount(0)
-                commonViewModel.setShowButtonNav(true)
                 navigator.pop()
                 
                 

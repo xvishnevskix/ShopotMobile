@@ -27,9 +27,7 @@ import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class IntroViewModel : ViewModel(), KoinComponent {
     
-    private val ContactsUseCase: ContactsUseCase by inject()
-    
-    
+    private val contactsUseCase: ContactsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
 
@@ -47,32 +45,37 @@ class IntroViewModel : ViewModel(), KoinComponent {
     
     init {
         viewModelScope.launch {
-            profile.collect { _ ->
-                
-                
-                profile.value?.id?.let {
-                    
-                    if (navigator.value !== null) {
-                        
-                        println("navigator.value31311 $it")
-                        
-                        observeWsConnection(it, navigator.value!!)
-                        connectionWs(it, navigator.value!!)
-                    }
-                    
-                    
-                }
-                
-                
-            }
+//            profile.onEach { _ ->
+//
+//                println("navigator.value1111111")
+//
+//                profile.value?.id?.let {
+//                    println("navigator.value222222 $it")
+//
+//                    if (navigator.value !== null) {
+//
+//                        println("navigator.value333333 $it")
+//
+//
+//                    }
+//
+//
+//                }
+//
+//
+//            }.launchIn(viewModelScope)
+            
+            observeWsConnection()
+            
+            
         }
     }
     
     private fun chatsInit(navigator: Navigator) {
         
         viewModelScope.launch {
-        
-        downloadProfile(navigator)
+            
+            downloadProfile(navigator)
             
         }
     }
@@ -100,7 +103,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             
             
-            val contacts = ContactsUseCase.fetchContacts()
+            val contacts = contactsUseCase.fetchContacts()
             println("response3131 $contacts")
             
             
@@ -136,24 +139,26 @@ class IntroViewModel : ViewModel(), KoinComponent {
                 
                 return@launch
                 
+            } else {
+                addValueInStorage("profileId", profileCase.id)
+                
+                println("profileCase $profileCase")
+                
+                profile.value = profileCase
+                
+                connectionWs(profileCase.id, navigator)
             }
-            
-            addValueInStorage("profileId", profileCase.id)
-
-
-//            BackgroundTaskManagerFactory.create().scheduleTask()
-            
-            
-            profile.value = profileCase
-            
             
         }
     }
     
-    private fun observeWsConnection(userId: String, navigator: Navigator) {
+    private fun observeWsConnection() {
         println("wsSessionIntrowsUseCase.wsSession ${wsUseCase.wsSession.value}")
         wsUseCase.wsSession
             .onEach { wsSessionNew ->
+                println("wsSessionNew ${wsUseCase.wsSession.value} ${profile.value?.id} ${isObserving.value}")
+                
+                
                 if (profile.value?.id !== null && isObserving.value) {
                     
                     if (wsSessionNew != null) {
@@ -174,7 +179,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
                             
                             wsSessionNew.send(Frame.Text(jsonContent))
                             
-                            navigator.replace(MainScreen())
+                            navigator.value?.replace(MainScreen())
                             
                             println("Message sent successfully")
                         } catch (e: Exception) {

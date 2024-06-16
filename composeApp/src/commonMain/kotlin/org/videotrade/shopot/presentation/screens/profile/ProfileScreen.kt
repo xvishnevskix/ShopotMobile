@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -67,6 +68,7 @@ class ProfileScreen : Screen {
         val commonViewModel: CommonViewModel = koinInject()
         
         val profile = mainViewModel.profile.collectAsState(initial = ProfileDTO()).value
+        val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
         
         val navigator = LocalNavigator.currentOrThrow
 //        val items = listOf(
@@ -89,6 +91,7 @@ class ProfileScreen : Screen {
             contentAlignment = Alignment.TopStart
         ) {
             
+            
             Column {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -97,8 +100,9 @@ class ProfileScreen : Screen {
                         .clip(RoundedCornerShape(bottomEnd = 46.dp, bottomStart = 46.dp))
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp).clickable {
-                            commonViewModel.setShowButtonNav(false)
-                            mainViewModel.leaveApp(navigator)
+                            if (mainScreenNavigator != null) {
+                                mainViewModel.leaveApp(mainScreenNavigator)
+                            }
                         }
                 ) {
                     ProfileHeader("Информация")

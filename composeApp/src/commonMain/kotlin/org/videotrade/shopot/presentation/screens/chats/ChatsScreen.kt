@@ -19,13 +19,12 @@ class ChatsScreen : Screen {
     override fun Content() {
         val viewModel: MainViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
-        val navigator = LocalNavigator.current
         
         
         
         LaunchedEffect(Unit) {
-            if (navigator != null) {
-                viewModel.getNavigator(navigator)
+            if (commonViewModel.mainNavigator.value != null) {
+                viewModel.getNavigator(commonViewModel.mainNavigator.value!!)
                 
                 viewModel.getProfile()
                 viewModel.loadUsers()

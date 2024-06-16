@@ -27,6 +27,7 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
         val chatsUseCase: ChatsUseCase by inject()
         val contactsUseCase: ContactsUseCase by inject()
         
+        println("aaaaaaaa1111111")
         
         handleConnectWebSocket(
             navigator,
