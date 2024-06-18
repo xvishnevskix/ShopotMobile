@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -31,6 +33,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dokar.sonner.Toast
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
@@ -50,6 +53,7 @@ class CreateGroupFirstScreen() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
+        val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
 
@@ -59,84 +63,56 @@ class CreateGroupFirstScreen() : Screen {
             contacts
         } else {
             contacts.filter {
-                
                 if (it.firstName !== null) {
-                    it.firstName.contains(
-                        searchQuery.value,
-                        ignoreCase = true
-                    ) || it.phone.contains(
-                        searchQuery.value
-                    )
+                    it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(searchQuery.value)
                 } else {
-                    
                     false
                 }
-                
-                
             }
         }
 
-
-            Box(
-                modifier = Modifier
-                    //background
-                    .fillMaxWidth()
-                    .background(Color(255, 255, 255))
-            ) {
-                SafeArea {
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color(255, 255, 255))
+        ) {
+            SafeArea {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    CreateChatHeader(
+                        "Создать группу",
+                        isSearching = isSearching,
+                        searchQuery = searchQuery,
+                    )
+                    LazyColumn(
                         modifier = Modifier
-                            //background
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.8F)
+                            .background(color = Color(255, 255, 255))
                     ) {
-                        CreateChatHeader(
-                            "Создать группу",
-                            isSearching = isSearching,
-                            searchQuery = searchQuery,
-                        )
-                        LazyColumn(
-                            modifier = Modifier
-
-                                .fillMaxWidth()
-                                .fillMaxHeight(0.8F)
-                                .background(color = Color(255, 255, 255))
-                        ) {
-
-                            itemsIndexed(
-
-                                filteredContacts
-
-                            ) { _, item ->
-                                ChatItem(item = item, sharedViewModel = viewModel)
-
-
+                        itemsIndexed(filteredContacts) { _, item ->
+                            ChatItem(item = item, sharedViewModel = viewModel)
+                        }
+                    }
+                    Box(modifier = Modifier.padding(top = 5.dp)) {
+                        CustomButton(
+                            "Далее",
+                            {
+                                if (selectedContacts.isEmpty()) {
+//                                    Toast.makeText(context, "Выберите участников", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    navigator.push(CreateGroupSecondScreen())
+                                }
                             }
-                        }
-
-
-
-                        Box(
-                            modifier = Modifier.padding(top = 5.dp)
-                        ) {
-                            CustomButton(
-                                "Далее",
-                                {
-                                    navigator.push(
-                                        CreateGroupSecondScreen()
-                                    )
-
-                                })
-                        }
-
+                        )
                     }
                 }
-//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
         }
+    }
 }
-
-
 
 @Composable
 private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
@@ -145,6 +121,7 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
     Box(
         modifier = Modifier
             .padding(top = 22.dp)
+            .clip(RoundedCornerShape(4.dp))
             .background(Color(255, 255, 255))
             .fillMaxWidth()
             .clickable {
@@ -160,7 +137,9 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.padding().fillMaxWidth()
+                modifier = Modifier
+                    .padding()
+                    .fillMaxWidth()
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding()) {
                     Avatar(item.icon, 80.dp)
@@ -213,5 +192,3 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
         }
     }
 }
-
-
