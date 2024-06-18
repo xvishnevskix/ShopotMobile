@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
@@ -141,7 +142,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.Send,
                 contentDescription = "Send",
-                modifier = Modifier.padding(2.dp).clickable {
+                modifier = Modifier.padding(2.dp).pointerInput(Unit) {
                     
                     if (text.isNotBlank())
                         viewModel.sendMessage(

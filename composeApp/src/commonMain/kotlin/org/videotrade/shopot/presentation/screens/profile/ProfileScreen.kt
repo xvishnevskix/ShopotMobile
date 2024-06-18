@@ -66,11 +66,6 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
             ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
             ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
             ProfileSettingsItem(Res.drawable.exit, 25.dp, "Выход", {}),
-//            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
-//            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
-//            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
-//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
-//            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
         )
 
         
