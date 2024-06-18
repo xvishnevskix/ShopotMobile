@@ -26,6 +26,7 @@ import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 
 
 private val domainModule = module {
@@ -43,6 +44,9 @@ private val presentationModule = module {
     single<WsRepository> {
         WsRepositoryImpl()
     }
+    
+    
+    
     
     single<ChatsRepository> {
         ChatsRepositoryImpl()
@@ -78,6 +82,8 @@ private val presentationModule = module {
     single { ContactsViewModel() }
     
     single { CommonViewModel() }
+    
+    single { ProfileViewModel() }
     
     
 }

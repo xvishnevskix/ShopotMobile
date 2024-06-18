@@ -1,4 +1,5 @@
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
@@ -18,7 +19,12 @@ import shopot.composeapp.generated.resources.person
 fun Avatar(
     icon: String? = null,
     size: Dp = 40.dp,
-    modifier: Modifier = Modifier.size(size),
+    onClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier.size(size).clickable {
+        if (onClick != null) {
+            onClick()
+        }
+    },
     contentScale: ContentScale = ContentScale.Crop,
     bitmap: ImageBitmap? = null,
 ) {
@@ -48,7 +54,6 @@ fun Avatar(
             contentDescription = "Avatar",
             contentScale = contentScale,  // Используем contentScale как есть
             modifier = modifier,
-            
         )
         
         

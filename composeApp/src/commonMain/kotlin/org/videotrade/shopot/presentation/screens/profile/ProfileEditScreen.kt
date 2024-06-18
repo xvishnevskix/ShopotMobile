@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.profile
 
 
+import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,11 +17,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,7 +52,10 @@ import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.image.picker.toImageBitmap
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditHeader
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
@@ -57,7 +64,7 @@ import shopot.composeapp.generated.resources.add_photo
 import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.delete_account
 
-data class SignUpTextState(
+data class ProfileTextState(
     var firstName: String = "",
     var lastName: String = "",
     var status: String = ""
@@ -67,8 +74,12 @@ class ProfileEditScreen : Screen {
     
     @Composable
     override fun Content() {
+        val mainViewModel: MainViewModel = koinInject()
+        val profileViewModel: ProfileViewModel = koinInject()
+        val profile = mainViewModel.profile.collectAsState(initial = ProfileDTO()).value
+        
         val navigator = LocalNavigator.currentOrThrow
-        val textState = remember { mutableStateOf(SignUpTextState()) }
+        val textState = remember { mutableStateOf(profile.copy()) }
         val textStyle = TextStyle(
             color = Color.Black,
             fontSize = 14.sp,
@@ -105,30 +116,44 @@ class ProfileEditScreen : Screen {
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
                 Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
+//                    horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(bottomEnd = 46.dp, bottomStart = 46.dp))
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    GroupEditHeader("Изменить")
+                    GroupEditHeader("Изменить") {
+                        
+                        
+                        profileViewModel.sendNewProfile(
+                            textState.value,
+                            byteArray
+                        )
+                        
+                    }
+                    
+                    
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         if (images !== null) {
-                            Image(
-                                bitmap = images!!,
-                                contentDescription = "Avatar",
-                                contentScale = ContentScale.Crop,  // Используем contentScale как есть
-                                modifier = Modifier.size(140.dp),
-                            )
+                            Surface(
+                                modifier = Modifier.size(70.dp),
+                                shape = CircleShape,
+                            ) {
+                                Image(
+                                    bitmap = images!!,
+                                    contentDescription = "Avatar",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.size(70.dp),
+                                )
+                            }
                         } else {
-                        
-                        
+                            Avatar(icon = profile.icon, size = 70.dp)
                         }
-
+                        
                         
                         Column(
                         
@@ -212,36 +237,48 @@ class ProfileEditScreen : Screen {
                         }
                     }
                     
-                    Row(
-                        modifier = Modifier.padding(top = 25.dp, bottom = 10.dp)
-                            .fillMaxWidth(0.95F),
-                        horizontalArrangement = Arrangement.Start,
-                        
+                    
+                    Box(
+                        modifier = Modifier
+                            .padding(top = 25.dp, bottom = 10.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable {
+                                singleImagePicker.launch()
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
-                        Image(
-                            painter = painterResource(Res.drawable.add_photo),
-                            contentDescription = "Avatar",
-                            modifier = Modifier.size(width = 27.75.dp, height = 20.dp),
-                            contentScale = ContentScale.FillBounds
-                        )
-                        Text(
-                            "Загрузить фотографию",
-                            textAlign = TextAlign.Center,
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 15.sp,
-                            color = Color(0xFF2A293C),
-                            modifier = Modifier.padding(start = 10.dp, bottom = 20.dp)
-                        )
+                            Image(
+                                painter = painterResource(Res.drawable.add_photo),
+                                contentDescription = "Avatar",
+                                modifier = Modifier.size(width = 27.75.dp, height = 20.dp),
+                                contentScale = ContentScale.FillBounds
+                            )
+                            Text(
+                                "Загрузить фотографию",
+                                textAlign = TextAlign.Center,
+                                fontSize = 14.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 15.sp,
+                                color = Color(0xFF2A293C),
+                                modifier = Modifier.padding(start = 10.dp)
+                            )
+                        }
                     }
+                    
                     
                     Box(
                         contentAlignment = Alignment.TopCenter,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         BasicTextField(
-                            value = textState.value.status,
+                            value = "${textState.value.status}",
                             onValueChange = { newText ->
                                 textState.value = textState.value.copy(status = newText)
                             },
@@ -265,7 +302,7 @@ class ProfileEditScreen : Screen {
                                         contentAlignment = Alignment.TopCenter
                                     ) {
                                         
-                                        if (textState.value.status.isEmpty()) {
+                                        if (textState.value.status?.isEmpty() == true) {
                                             Text(
                                                 "Статус",
                                                 style = textStyle.copy(color = Color.Gray)
@@ -330,8 +367,8 @@ class ProfileEditScreen : Screen {
                         Row(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                        
-                        Image(
+                            
+                            Image(
                                 modifier = Modifier
                                     .size(18.dp).padding(top = 5.dp),
                                 painter = painterResource(Res.drawable.arrowleft),

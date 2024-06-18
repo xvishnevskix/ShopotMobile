@@ -7,7 +7,7 @@ import org.videotrade.shopot.domain.repository.ProfileRepository
 
 class ProfileRepositoryImpl : ProfileRepository {
     
-    private val profile = mutableStateOf<ProfileDTO?>(null)
+    private val profile = mutableStateOf(ProfileDTO())
     
     
     override suspend fun downloadProfile(): ProfileDTO? {
@@ -27,13 +27,13 @@ class ProfileRepositoryImpl : ProfileRepository {
     }
     
     
-    override fun getProfile(): ProfileDTO? {
+    override fun getProfile(): ProfileDTO {
         
-        return profile.value
+        return profile.value.copy()
         
     }
     
     override fun clearData() {
-        profile.value = null
+        profile.value = ProfileDTO()
     }
 }
