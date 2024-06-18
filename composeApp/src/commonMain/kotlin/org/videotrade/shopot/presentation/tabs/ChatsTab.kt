@@ -21,7 +21,7 @@ object ChatsTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Chats"
+            val title = "Чаты"
             val icon: Painter = painterResource(Res.drawable.chatNav)
             
             

@@ -24,7 +24,7 @@ object ProfileTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Profile"
+            val title = "Профиль"
             val icon: Painter = painterResource(Res.drawable.profileNav)
             
             return remember {

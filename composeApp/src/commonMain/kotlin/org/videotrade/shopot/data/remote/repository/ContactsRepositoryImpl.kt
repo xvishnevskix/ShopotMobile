@@ -15,7 +15,9 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.domain.repository.ContactsRepository
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
+import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.presentation.tabs.ContactsTab
 
 class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     private val _contacts = MutableStateFlow<List<ContactDTO>>(
@@ -102,8 +104,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     }
     
     
-    
-    override suspend fun createChat(profileId: String, contact: ContactDTO, navigator: Navigator) {
+    override suspend fun createChat(profileId: String, contact: ContactDTO) {
         val wsUseCase: WsUseCase by inject()
 
 
@@ -138,9 +139,6 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             )
             
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContentSocket))
-            
-            
-            navigator.push(MainScreen())
         } catch (e: Exception) {
             
             println("error createChat")
