@@ -43,7 +43,7 @@ fun UserComponentItem(chat: ChatItem, commonViewModel: CommonViewModel) {
     println("dasdafafa  ${chat.icon} ${chat.lastName}")
     
     Row(
-        modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
+        modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clip(RoundedCornerShape(4.dp)).clickable {
             commonViewModel.showButtonNav.value = false
             navigator.push(ChatScreen(chat))
         },
