@@ -134,18 +134,24 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.KoinContext
+import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.profile.ProfileEditScreen
+import org.videotrade.shopot.presentation.screens.profile.ProfileMediaScreen
+import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import org.videotrade.shopot.theme.AppTheme
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 internal fun App() = AppTheme {
-    
+    val viewModel: MainViewModel = koinInject()
     KoinContext {
         
         Navigator(
             IntroScreen()
+//            ProfileScreen(viewModel.profile.value!!)
         ) { navigator ->
             SlideTransition(navigator)
         }

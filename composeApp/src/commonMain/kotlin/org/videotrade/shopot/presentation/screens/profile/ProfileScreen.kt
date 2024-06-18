@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
@@ -45,19 +46,19 @@ import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.black_star
 import shopot.composeapp.generated.resources.carbon_media_library
-import shopot.composeapp.generated.resources.download_photo
-import shopot.composeapp.generated.resources.mute_icon
-import shopot.composeapp.generated.resources.search_icon
-import shopot.composeapp.generated.resources.signal
+import shopot.composeapp.generated.resources.edit_profile
+import shopot.composeapp.generated.resources.exit
+import shopot.composeapp.generated.resources.theme
+import shopot.composeapp.generated.resources.wallpaper
 
 
 data class ProfileSettingsItem(
     val drawableRes: DrawableResource,
     val size: Dp,
     val mainText: String,
-    val boxText: String
+//    val boxText: String,
+    val onClick: () -> Unit
 )
 
 class ProfileScreen : Screen {
@@ -71,20 +72,19 @@ class ProfileScreen : Screen {
         val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
         
         val navigator = LocalNavigator.currentOrThrow
-//        val items = listOf(
-////            ProfileSettingsItem(
-////                Res.drawable.carbon_media_library,
-////                22.dp,
-////                "Медиа, ссылки и файлы",
-////                "17"
-////            ),
-////            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения", "Нет"),
-////            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату", ""),
-////            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить", "Нет"),
-//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал", "Стандарт"),
-////            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото", "Стандарт"),
-//        )
-//
+        val items = listOf(
+            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, "Редактировать профиль", {navigator.push(ProfileEditScreen())}),
+            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы", {navigator.push(ProfileMediaScreen(profile))} ),
+            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
+            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
+            ProfileSettingsItem(Res.drawable.exit, 25.dp, "Выход", {}),
+//            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
+//            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
+//            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
+//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
+//            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
+        )
+
         
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -148,20 +148,20 @@ class ProfileScreen : Screen {
                         }
                     }
                 }
-//                Box(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    Canvas(modifier = Modifier.size(width = 46.dp, height = 33.dp)) {
-//                        val path = Path().apply {
-//                            moveTo(x = 0f, y = 0f)
-//                            lineTo(x = size.width, y = 0f)
-//                            lineTo(x = size.width / 2, y = size.height)
-//                            close()
-//                        }
-//                        drawPath(path = path, color = Color(0xFFF3F4F6))
-//                    }
-//                }
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Canvas(modifier = Modifier.size(width = 46.dp, height = 23.dp)) {
+                        val path = Path().apply {
+                            moveTo(x = 0f, y = 0f)
+                            lineTo(x = size.width, y = 0f)
+                            lineTo(x = size.width / 2, y = size.height)
+                            close()
+                        }
+                        drawPath(path = path, color = Color(0xFFF3F4F6))
+                    }
+                }
                 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -191,22 +191,22 @@ class ProfileScreen : Screen {
 //                    )
                 }
 
-//                LazyColumn(
-//                    modifier = Modifier
-//                        .padding(top = 6.dp, bottom = 35.dp)
-//                        .fillMaxWidth(),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-//                ) {
-//                    items(items) { item ->
-//                        ProfileSettingsButton(
-//                            drawableRes = item.drawableRes,
-//                            size = item.size,
-//                            mainText = item.mainText,
-//                            boxText = item.boxText
-//                        )
-//                    }
-//
-//                }
+                LazyColumn(
+                    modifier = Modifier
+                        .padding(top = 6.dp, bottom = 35.dp)
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    items(items) { item ->
+                        ProfileSettingsButton(
+                            drawableRes = item.drawableRes,
+                            size = item.size,
+                            mainText = item.mainText,
+                            onClick = item.onClick
+                        )
+                    }
+
+                }
                 
                 
             }
