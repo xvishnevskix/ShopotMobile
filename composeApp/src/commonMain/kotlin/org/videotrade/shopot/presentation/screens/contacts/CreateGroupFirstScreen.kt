@@ -41,7 +41,6 @@ import org.videotrade.shopot.presentation.components.ProfileComponents.CreateCha
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.randomUser
 
 
 class CreateGroupFirstScreen() : Screen {

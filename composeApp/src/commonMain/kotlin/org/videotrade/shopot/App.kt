@@ -150,7 +150,8 @@ internal fun App() = AppTheme {
     KoinContext {
         
         Navigator(
-            IntroScreen()
+//            IntroScreen()
+            ProfileEditScreen()
 //            ProfileScreen(viewModel.profile.value!!)
         ) { navigator ->
             SlideTransition(navigator)

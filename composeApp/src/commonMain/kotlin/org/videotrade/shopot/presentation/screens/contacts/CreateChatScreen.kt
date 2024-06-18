@@ -34,22 +34,18 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.tabs.ChatsTab
-import org.videotrade.shopot.presentation.tabs.ContactsTab
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.create_group
-import shopot.composeapp.generated.resources.randomUser
 
 class CreateChatScreen() : Screen {
     @Composable

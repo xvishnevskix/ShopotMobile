@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
@@ -46,11 +44,8 @@ import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.carbon_media_library
 import shopot.composeapp.generated.resources.edit_profile
 import shopot.composeapp.generated.resources.exit_profile
-import shopot.composeapp.generated.resources.theme
-import shopot.composeapp.generated.resources.wallpaper
 
 
 data class ProfileSettingsItem(

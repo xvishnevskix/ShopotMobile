@@ -9,7 +9,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import shopot.composeapp.generated.resources.Res
@@ -21,7 +20,7 @@ fun Avatar(
     size: Dp = 40.dp,
     modifier: Modifier = Modifier.size(size),
     contentScale: ContentScale = ContentScale.Crop,
-    bitmap: ImageBitmap? = null
+    bitmap: ImageBitmap? = null,
 ) {
     val imagePainter = if (icon == null) {
         painterResource(Res.drawable.person)

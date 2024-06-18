@@ -1,43 +1,29 @@
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.arrowleft
-import shopot.composeapp.generated.resources.carbon_media_library
-import shopot.composeapp.generated.resources.check_mark
 import shopot.composeapp.generated.resources.delete_circle
-import shopot.composeapp.generated.resources.person
 
 
 @Composable

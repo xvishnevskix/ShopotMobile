@@ -22,15 +22,12 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
