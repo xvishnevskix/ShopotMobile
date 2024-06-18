@@ -55,8 +55,6 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.add_photo
 import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.delete_account
-import shopot.composeapp.generated.resources.delete_circle
-import shopot.composeapp.generated.resources.exit
 
 data class SignUpTextState(
     var firstName: String = "",

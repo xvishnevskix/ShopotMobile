@@ -48,7 +48,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.carbon_media_library
 import shopot.composeapp.generated.resources.edit_profile
-import shopot.composeapp.generated.resources.exit
+import shopot.composeapp.generated.resources.exit_profile
 import shopot.composeapp.generated.resources.theme
 import shopot.composeapp.generated.resources.wallpaper
 
@@ -73,11 +73,22 @@ class ProfileScreen : Screen {
         
         val navigator = LocalNavigator.currentOrThrow
         val items = listOf(
-            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, "Редактировать профиль", {navigator.push(ProfileEditScreen())}),
-            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы", {navigator.push(ProfileMediaScreen(profile))} ),
-            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
-            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
-            ProfileSettingsItem(Res.drawable.exit, 25.dp, "Выход", {}),
+            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, "Редактировать профиль") {
+                navigator.push(
+                    ProfileEditScreen()
+                )
+            },
+//            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы") {
+//                navigator.push(
+//                    ProfileMediaScreen(profile)
+//                )
+//            },
+//            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
+//            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
+            ProfileSettingsItem(Res.drawable.exit_profile, 25.dp, "Выход") {
+                
+                commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
+            },
 //            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
 //            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
 //            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
