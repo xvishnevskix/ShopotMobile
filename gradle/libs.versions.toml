@@ -10,6 +10,7 @@ kotlinxDatetime = "0.5.0"
 kotlinxSerializationJson = "1.6.3"
 ktorClientCore = "2.3.11"
 ktorClientDarwin = "2.3.11"
+lifecycleRuntimeKtx = "2.8.2"
 peekabooUi = "0.5.2"
 sonner = "0.3.6"
 voyager = "1.0.0"
@@ -30,10 +31,18 @@ animationCoreAndroid = "1.6.7"
 imageLoader = "1.8.1"
 gms = "4.4.0"
 firebaseCommon = "1.10.0"
+
 workRuntimeKtx = "2.9.0"
 
 [libraries]
+
+# only Android
+androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtx" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+
+
+
 cafe-voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyagerTabNavigator" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 

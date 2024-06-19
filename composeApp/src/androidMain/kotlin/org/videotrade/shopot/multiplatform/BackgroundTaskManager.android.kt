@@ -14,7 +14,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import org.videotrade.shopot.foregroundService.ForegroundService
+import org.videotrade.shopot.androidSpecificApi.ForegroundService
 
 
 actual class BackgroundTaskManager(private var applicationContext: Context) {

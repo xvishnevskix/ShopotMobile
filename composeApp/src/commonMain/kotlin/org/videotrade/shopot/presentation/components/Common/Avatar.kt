@@ -28,7 +28,7 @@ fun Avatar(
     contentScale: ContentScale = ContentScale.Crop,
     bitmap: ImageBitmap? = null,
 ) {
-    val imagePainter = if (icon == null) {
+    val imagePainter = if (icon.isNullOrBlank()) {
         painterResource(Res.drawable.person)
     } else {
         rememberImagePainter("${serverUrl}file/id/$icon")

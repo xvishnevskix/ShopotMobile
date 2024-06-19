@@ -4,17 +4,15 @@ import Firebase
 import FirebaseCore
 import FirebaseMessaging
 
-
-
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: UIWindow?
-    
+    private var appLifecycleObserver: AppLifecycleObserver?
+
+
     override init() {
         FirebaseApp.configure()
-        NotifierManager.shared.initialize(configuration: NotificationPlatformConfigurationIos.init(showPushNotification: true, askNotificationPermissionOnStart: true))
-
-
+        NotifierManager.shared.initialize(configuration: NotificationPlatformConfigurationIos(showPushNotification: true, askNotificationPermissionOnStart: true))
         KoinHelperKt.doInitKoin()
     }
     
@@ -29,8 +27,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             window.rootViewController = MainKt.MainViewController()
             window.makeKeyAndVisible()
         }
+
         
         requestNotificationAuthorization(application)
+        
+        appLifecycleObserver = ComposeApp.AppLifecycleObserver_iosKt.getAppLifecycleObserver()
         
         return true
     }
@@ -52,6 +53,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("Failed to register for remote notifications: \(error)")
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        appLifecycleObserver?.onAppForegrounded()
+    }
+    
+    func applicationWillResignActive(_ application: UIApplication) {
+        appLifecycleObserver?.onAppBackgrounded()
     }
     
     // Implement UNUserNotificationCenterDelegate methods if needed

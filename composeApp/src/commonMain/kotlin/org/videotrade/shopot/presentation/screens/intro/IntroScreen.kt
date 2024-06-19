@@ -16,6 +16,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
@@ -30,7 +31,7 @@ class IntroScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
-        val toasterViewModel: CommonViewModel = koinInject()
+        val сommonViewModel: CommonViewModel = koinInject()
         
         
         
@@ -63,6 +64,8 @@ class IntroScreen : Screen {
                 
                 if (response != null && response.status == HttpStatusCode.OK) {
                     
+                    
+                    сommonViewModel.setMainNavigator(navigator)
                     
                     viewModel.updateNotificationToken()
                     

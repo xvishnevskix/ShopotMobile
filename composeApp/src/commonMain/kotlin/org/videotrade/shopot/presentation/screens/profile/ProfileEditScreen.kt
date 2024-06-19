@@ -154,7 +154,7 @@ class ProfileEditScreen : Screen {
                             Avatar(icon = profile.icon, size = 70.dp)
                         }
                         
-                        
+                        println("profile.icon ${profile.icon}")
                         Column(
                         
                         ) {

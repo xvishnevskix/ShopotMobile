@@ -13,6 +13,7 @@ interface WsRepository {
     suspend fun connectionWs(userId: String, navigator: Navigator)
     
     suspend fun getWsSession(): DefaultClientWebSocketSession?
+    fun setWsSession(wsSession: DefaultClientWebSocketSession)
     
     
     suspend fun clearData()

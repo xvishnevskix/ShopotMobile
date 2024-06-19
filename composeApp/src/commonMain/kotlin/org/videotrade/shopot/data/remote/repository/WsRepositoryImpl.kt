@@ -27,7 +27,7 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
         val chatsUseCase: ChatsUseCase by inject()
         val contactsUseCase: ContactsUseCase by inject()
         
-        println("aaaaaaaa1111111")
+        println("aaaaaaaa1111111 $userId")
         
         handleConnectWebSocket(
             navigator,
@@ -46,6 +46,12 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
     override suspend fun getWsSession(): DefaultClientWebSocketSession? {
         
         return wsSession.value
+    }
+    
+    
+    override fun setWsSession(wsSession: DefaultClientWebSocketSession) {
+        
+        _wsSession.value = wsSession
     }
     
     override suspend fun clearData() {
