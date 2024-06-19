@@ -20,6 +20,10 @@ class WsUseCase : KoinComponent {
         return repository.getWsSession()
     }
     
+    fun setWsSession(wsSession: DefaultClientWebSocketSession) {
+        repository.setWsSession(wsSession)
+    }
+    
     
     suspend fun clearData() {
         repository.clearData()

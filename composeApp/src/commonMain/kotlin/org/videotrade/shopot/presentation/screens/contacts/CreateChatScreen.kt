@@ -35,18 +35,19 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
+import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.create_group
-import shopot.composeapp.generated.resources.randomUser
 
 class CreateChatScreen() : Screen {
     @Composable
@@ -182,6 +183,9 @@ private fun makeA_group(contacts: List<ContactDTO>) {
 @Composable
 private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
     val navigator = LocalNavigator.currentOrThrow
+//    val tabNavigator: TabNavigator = LocalTabNavigator.current
+    val tabNavigator = LocalTabNavigator.current
+    
     
     Box(
         modifier = Modifier
@@ -193,7 +197,9 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
             .fillMaxWidth()
             .clickable {
                 
-                viewModel.createChat(item, navigator)
+                viewModel.createChat(item, tabNavigator)
+                
+                tabNavigator.current = ChatsTab
             }
     
     ) {
@@ -230,7 +236,7 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                             color = Color(0xFF000000)
                         )
                         Text(
-                            text = "${item.phone}",
+                            text = item.phone,
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                             textAlign = TextAlign.Center,

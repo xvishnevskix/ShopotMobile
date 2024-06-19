@@ -24,7 +24,7 @@ object ProfileTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Profile"
+            val title = "Профиль"
             val icon: Painter = painterResource(Res.drawable.profileNav)
             
             return remember {
@@ -38,9 +38,8 @@ object ProfileTab : Tab {
     
     @Composable
     override fun Content() {
-        val viewModel: MainViewModel = koinInject()
         
-        Navigator(screen = ProfileScreen(viewModel.profile.value)) { navigator ->
+        Navigator(screen = ProfileScreen()) { navigator ->
             SlideTransition(navigator = navigator)
         }
     }

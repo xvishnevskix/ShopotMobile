@@ -7,7 +7,7 @@ interface ProfileRepository {
     
     
     suspend fun downloadProfile() : ProfileDTO?
-    fun getProfile() : ProfileDTO?
+    fun getProfile(): ProfileDTO
     
     fun clearData()
 }

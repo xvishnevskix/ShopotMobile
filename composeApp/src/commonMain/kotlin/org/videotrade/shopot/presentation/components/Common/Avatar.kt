@@ -1,4 +1,5 @@
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
@@ -9,7 +10,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import shopot.composeapp.generated.resources.Res
@@ -19,11 +19,16 @@ import shopot.composeapp.generated.resources.person
 fun Avatar(
     icon: String? = null,
     size: Dp = 40.dp,
-    modifier: Modifier = Modifier.size(size),
+    onClick: (() -> Unit)? = null,
+    modifier: Modifier = Modifier.size(size).clickable {
+        if (onClick != null) {
+            onClick()
+        }
+    },
     contentScale: ContentScale = ContentScale.Crop,
-    bitmap: ImageBitmap? = null
+    bitmap: ImageBitmap? = null,
 ) {
-    val imagePainter = if (icon == null) {
+    val imagePainter = if (icon.isNullOrBlank()) {
         painterResource(Res.drawable.person)
     } else {
         rememberImagePainter("${serverUrl}file/id/$icon")
@@ -49,7 +54,6 @@ fun Avatar(
             contentDescription = "Avatar",
             contentScale = contentScale,  // Используем contentScale как есть
             modifier = modifier,
-            
         )
         
         

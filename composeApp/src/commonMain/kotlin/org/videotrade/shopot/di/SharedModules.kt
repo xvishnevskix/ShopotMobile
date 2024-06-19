@@ -7,18 +7,21 @@ import org.videotrade.shopot.data.remote.repository.ChatRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.ContactsRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.ProfileRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.ChatsRepositoryImpl
+import org.videotrade.shopot.data.remote.repository.CommonRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.WsRepositoryImpl
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.repository.ChatRepository
 import org.videotrade.shopot.domain.repository.ContactsRepository
 import org.videotrade.shopot.domain.repository.ProfileRepository
 import org.videotrade.shopot.domain.repository.ChatsRepository
+import org.videotrade.shopot.domain.repository.CommonRepository
 import org.videotrade.shopot.domain.repository.WsRepository
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
+import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -26,6 +29,7 @@ import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 
 
 private val domainModule = module {
@@ -35,6 +39,7 @@ private val domainModule = module {
     factory { WsUseCase() }
     factory { CallUseCase() }
     factory { ContactsUseCase() }
+    factory { CommonUseCase() }
     
 }
 
@@ -43,6 +48,9 @@ private val presentationModule = module {
     single<WsRepository> {
         WsRepositoryImpl()
     }
+    
+    
+    
     
     single<ChatsRepository> {
         ChatsRepositoryImpl()
@@ -77,7 +85,12 @@ private val presentationModule = module {
     }
     single { ContactsViewModel() }
     
+    single<CommonRepository> {
+        CommonRepositoryImpl()
+    }
     single { CommonViewModel() }
+    
+    single { ProfileViewModel() }
     
     
 }

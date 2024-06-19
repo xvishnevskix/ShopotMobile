@@ -4,6 +4,7 @@ import Avatar
 import ProfileSettingsButton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,20 +33,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.carbon_media_library
 import shopot.composeapp.generated.resources.edit_profile
-import shopot.composeapp.generated.resources.exit
-import shopot.composeapp.generated.resources.theme
-import shopot.composeapp.generated.resources.wallpaper
+import shopot.composeapp.generated.resources.exit_profile
 
 
 data class ProfileSettingsItem(
@@ -55,17 +56,39 @@ data class ProfileSettingsItem(
     val onClick: () -> Unit
 )
 
-class ProfileScreen(private val profile: ProfileDTO) : Screen {
+class ProfileScreen : Screen {
     
     @Composable
     override fun Content() {
+        val mainViewModel: MainViewModel = koinInject()
+        val commonViewModel: CommonViewModel = koinInject()
+        
+        val profile = mainViewModel.profile.collectAsState(initial = ProfileDTO()).value
+        val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
+        
         val navigator = LocalNavigator.currentOrThrow
         val items = listOf(
-            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, "Редактировать профиль", {navigator.push(ProfileEditScreen())}),
-            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы", {navigator.push(ProfileMediaScreen(profile))} ),
-            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
-            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
-            ProfileSettingsItem(Res.drawable.exit, 25.dp, "Выход", {}),
+            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, "Редактировать профиль") {
+                navigator.push(
+                    ProfileEditScreen()
+                )
+            },
+//            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы") {
+//                navigator.push(
+//                    ProfileMediaScreen(profile)
+//                )
+//            },
+//            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
+//            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
+            ProfileSettingsItem(Res.drawable.exit_profile, 25.dp, "Выход") {
+                
+                commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
+            },
+//            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
+//            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
+//            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
+//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
+//            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
         )
 
         
@@ -74,6 +97,7 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
             contentAlignment = Alignment.TopStart
         ) {
             
+            
             Column {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -81,7 +105,11 @@ class ProfileScreen(private val profile: ProfileDTO) : Screen {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(bottomEnd = 46.dp, bottomStart = 46.dp))
                         .background(Color(0xFFF3F4F6))
-                        .padding(16.dp)
+                        .padding(16.dp).clickable {
+                            if (mainScreenNavigator != null) {
+                                mainViewModel.leaveApp(mainScreenNavigator)
+                            }
+                        }
                 ) {
                     ProfileHeader("Информация")
                     Avatar(

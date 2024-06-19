@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.main
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,6 +25,8 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -41,40 +45,46 @@ class MainScreen : Screen {
     
     @Composable
     override fun Content() {
-        val viewModel: MainViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
-        val showButtonNav = commonViewModel.showButtonNav.collectAsState(initial = true).value
+        val navigator = LocalNavigator.currentOrThrow
+        
+        
+        LaunchedEffect(Unit) {
+            commonViewModel.setMainNavigator(navigator)
+        }
+        
         
         
         MaterialTheme {
             TabNavigator(
                 tab = ChatsTab
             ) {
-                
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
-                        
-                        if (showButtonNav)
                             BottomNavigation(backgroundColor = Color(241, 238, 238)) {
                                 TabNavigationItem(ProfileTab)
                                 TabNavigationItem(ChatsTab)
                                 TabNavigationItem(ContactsTab)
                             }
-                        
                     },
-                    content = { CurrentTab() },
+                    content = {
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            
+                            CurrentTab()
+                            
+                        }
+                    },
                 )
             }
         }
     }
+    
 }
-
 
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
     val tabNavigator: TabNavigator = LocalTabNavigator.current
-    
     
     BottomNavigationItem(
         selected = tabNavigator.current == tab,
@@ -84,18 +94,16 @@ private fun RowScope.TabNavigationItem(tab: Tab) {
             
             tab.options.icon?.let { icon ->
                 Icon(
-                    modifier = Modifier.size(30.dp).padding(bottom = 5.dp),
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(bottom = 5.dp),
                     painter = icon,
-                    contentDescription =
-                    tab.options.title,
+                    contentDescription = tab.options.title,
                     tint = if (tabNavigator.current == tab) Color(3, 104, 255) else Color.Black
-                
-                
                 )
             }
         },
         label = {
-            
             Text(
                 tab.options.title,
                 textAlign = TextAlign.Center,
@@ -105,12 +113,9 @@ private fun RowScope.TabNavigationItem(tab: Tab) {
                 lineHeight = 20.sp,
                 color = if (tabNavigator.current == tab) Color(3, 104, 255) else Color.Black,
             )
-            
         },
         modifier = Modifier.size(80.dp)
     )
     Spacer(modifier = Modifier.height(70.dp))
-    
-    
 }
 

@@ -318,7 +318,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         if (peerConnection.value !== null) {
             
-            val stream = MediaDevices.getUserMedia(audio = true, video = true)
+            val stream = MediaDevices.getUserMedia(audio = true)
             
             localStream.value = stream
             

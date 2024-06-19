@@ -140,6 +140,7 @@ import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileEditScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileMediaScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
+import org.videotrade.shopot.presentation.screens.test.TestScreen
 import org.videotrade.shopot.theme.AppTheme
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -151,6 +152,8 @@ internal fun App() = AppTheme {
         
         Navigator(
             IntroScreen()
+//            ProfileEditScreen()
+//                    TestScreen()
 //            ProfileScreen(viewModel.profile.value!!)
         ) { navigator ->
             SlideTransition(navigator)

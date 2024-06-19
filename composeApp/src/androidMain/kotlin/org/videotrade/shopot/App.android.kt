@@ -21,6 +21,7 @@ import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
 //import org.videotrade.shopot.multiplatform.MediaProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProvider
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
 import javax.annotation.Nullable
 
 
@@ -37,6 +38,7 @@ class AndroidApp : Application() {
     }
     
     private fun initializeFactories(context: Context) {
+        
         DeviceIdProviderFactory.initialize(context)
         ContactsProviderFactory.initialize(context)
         BackgroundTaskManagerFactory.initialize(context)
@@ -45,6 +47,7 @@ class AndroidApp : Application() {
 
 class AppActivity : ComponentActivity() {
     private var permissionResultCallback: ((Int, Boolean) -> Unit)? = null
+    
     
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -58,7 +61,7 @@ class AppActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         
         Firebase.initialize(this) // This line
-        
+        getAppLifecycleObserver()
         
         enableEdgeToEdge()
         initializeProviders()

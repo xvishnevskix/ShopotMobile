@@ -27,7 +27,7 @@ object ContactsTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Contacts"
+            val title = "Контакты"
             val icon: Painter = painterResource(Res.drawable.contactsNav)
             
             

@@ -13,8 +13,7 @@ class ProfileUseCase : KoinComponent {
     }
     
     
-    
-     fun getProfile(): ProfileDTO? {
+    fun getProfile(): ProfileDTO {
         return repository.getProfile()
     }
     

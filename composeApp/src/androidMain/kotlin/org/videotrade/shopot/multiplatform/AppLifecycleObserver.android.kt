@@ -1,0 +1,51 @@
+package org.videotrade.shopot.multiplatform
+
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.ProcessLifecycleOwner
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import org.videotrade.shopot.domain.usecase.CommonUseCase
+import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.domain.usecase.WsUseCase
+
+
+class AndroidAppLifecycleObserver : LifecycleObserver, AppLifecycleObserver, KoinComponent {
+    private val wsUseCase: WsUseCase by inject()
+    private val commonUseCase: CommonUseCase by inject()
+    private val profileUseCase: ProfileUseCase by inject()
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    
+    init {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+    }
+    
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    override fun onAppBackgrounded() {
+        println("Android: Приложение свернуто")
+    }
+    
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    override fun onAppForegrounded() {
+        
+        println("Android: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
+        
+        if (commonUseCase.mainNavigator.value !== null && wsUseCase.wsSession.value?.isActive == false) {
+            coroutineScope.launch {
+                wsUseCase.connectionWs(
+                    profileUseCase.getProfile().id,
+                    commonUseCase.mainNavigator.value!!
+                )
+            }
+        }
+    }
+}
+
+actual fun getAppLifecycleObserver(): AppLifecycleObserver {
+    return AndroidAppLifecycleObserver()
+}

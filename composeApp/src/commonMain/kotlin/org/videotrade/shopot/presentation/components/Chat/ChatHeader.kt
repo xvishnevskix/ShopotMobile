@@ -66,7 +66,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                 
                 viewModel.clearMessages()
                 viewModel.setCount(0)
-                commonViewModel.showButtonNav.value = true
                 navigator.pop()
                 
                 
@@ -106,31 +105,38 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                 modifier = Modifier.padding(end = 23.dp).size(20.dp).pointerInput(Unit) {
                     
                     scope.launch {
-                        val cameraPer =
-                            PermissionsProviderFactory.create().getPermission("microphone")
-                        
-                        if (!cameraPer) return@launch
-                        
-                        viewModel.sendNotify(
-                            "Звонок",
-                            "от ${chat.firstName} ${chat.lastName}",
-                            chat.notificationToken
-                        )
-                        
-                        navigator.push(
-                            CallScreen(
-                                chat.userId,
-                                "Call",
-                                ProfileDTO(
-                                    firstName = chat.firstName,
-                                    lastName = chat.firstName,
-                                    id = chat.userId,
-                                    phone = chat.phone,
+                        try {
+                            val cameraPer =
+                                PermissionsProviderFactory.create().getPermission("microphone")
+                            
+                            if (!cameraPer) return@launch
+                            
+                            
+                            
+                            viewModel.sendNotify(
+                                "Звонок",
+                                "от ${chat.firstName} ${chat.lastName}",
+                                chat.notificationToken
+                            )
+                            
+                            navigator.push(
+                                CallScreen(
+                                    chat.userId,
+                                    "Call",
+                                    ProfileDTO(
+                                        firstName = chat.firstName,
+                                        lastName = chat.firstName,
+                                        id = chat.userId,
+                                        phone = chat.phone,
+                                    )
                                 )
                             )
-                        )
-                        
-                        
+                            
+                            
+                        } catch (e: Exception) {
+                            println("ERROR : $e")
+                            
+                        }
                     }
                     println("userID : ${chat.userId}")
                     

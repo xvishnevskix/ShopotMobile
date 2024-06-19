@@ -1,4 +1,4 @@
-package org.videotrade.shopot.foregroundService
+package org.videotrade.shopot.androidSpecificApi
 
 import android.app.Notification
 import android.app.NotificationChannel

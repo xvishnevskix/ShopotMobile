@@ -49,7 +49,6 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.edit_group_name
-import shopot.composeapp.generated.resources.randomUser
 import kotlin.math.abs
 
 
