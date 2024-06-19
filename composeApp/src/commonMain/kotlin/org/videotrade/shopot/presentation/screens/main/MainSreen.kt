@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -90,8 +91,6 @@ private fun RowScope.TabNavigationItem(tab: Tab) {
         selected = tabNavigator.current == tab,
         onClick = { tabNavigator.current = tab },
         icon = {
-            Spacer(modifier = Modifier.height(30.dp))
-            
             tab.options.icon?.let { icon ->
                 Icon(
                     modifier = Modifier
@@ -114,7 +113,7 @@ private fun RowScope.TabNavigationItem(tab: Tab) {
                 color = if (tabNavigator.current == tab) Color(3, 104, 255) else Color.Black,
             )
         },
-        modifier = Modifier.size(80.dp)
+        modifier = Modifier.size(56.dp)
     )
     Spacer(modifier = Modifier.height(70.dp))
 }
