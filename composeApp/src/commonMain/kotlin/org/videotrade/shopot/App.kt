@@ -110,40 +110,15 @@ package org.videotrade.shopot
 //internal expect fun openUrl(url: String?)
 
 
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import cafe.adriel.voyager.navigator.tab.Tab
-import cafe.adriel.voyager.navigator.tab.TabNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
-import org.jetbrains.compose.resources.Font
 import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
-import org.videotrade.shopot.presentation.screens.profile.ProfileEditScreen
-import org.videotrade.shopot.presentation.screens.profile.ProfileMediaScreen
-import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import org.videotrade.shopot.presentation.screens.test.TestScreen
 import org.videotrade.shopot.theme.AppTheme
-import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 internal fun App() = AppTheme {
@@ -151,9 +126,9 @@ internal fun App() = AppTheme {
     KoinContext {
         
         Navigator(
-            IntroScreen()
+//            IntroScreen()
 //            ProfileEditScreen()
-//                    TestScreen()
+            TestScreen()
 //            ProfileScreen(viewModel.profile.value!!)
         ) { navigator ->
             SlideTransition(navigator)

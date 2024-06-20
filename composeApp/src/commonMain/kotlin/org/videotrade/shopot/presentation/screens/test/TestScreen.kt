@@ -1,25 +1,22 @@
 package org.videotrade.shopot.presentation.screens.test
 
-import androidx.compose.material.Button
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.http.HttpMethod
-import io.ktor.websocket.Frame
-import io.ktor.websocket.readText
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.channels.consumeEach
 import org.koin.compose.koinInject
-import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
+import org.videotrade.shopot.multiplatform.AudioFactory
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
@@ -28,32 +25,62 @@ class TestScreen : Screen {
     override fun Content() {
         val scope = rememberCoroutineScope()
         val commonViewModel: CommonViewModel = koinInject()
-        val navigator = LocalNavigator.currentOrThrow
+        val audioRecorder = remember { AudioFactory.createAudioRecorder() }
+        val audioPlayer = remember { AudioFactory.createAudioPlayer() }
         
-        
-        
-        LaunchedEffect(Unit) {
-            
-            
-        }
-        
- 
-        
+        var isRecording by remember { mutableStateOf(false) }
+        var audioFilePath by remember { mutableStateOf("") }
+
+
+
         MaterialTheme {
-            
             SafeArea {
-                Button(content = {
-                    Text("Connect")
-                }, onClick = {
-                    val httpClient = HttpClient {
-                        install(WebSockets)
+                Column {
+                    Button(
+                        onClick = {
+                            
+                            scope.launch {
+                                val microphonePer =
+                                    PermissionsProviderFactory.create().getPermission("microphone")
+                                
+                                println("microphonePer ${microphonePer}")
+                                if (microphonePer) {
+                                    if (isRecording) {
+                                        audioRecorder.stopRecording()
+                                        isRecording = false
+                                    } else {
+                                        val audioFilePathNew = FileProviderFactory.create()
+                                            .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
+                                        
+                                        audioFilePath = audioFilePathNew
+                                        
+                                        println("audioFilePathNew $audioFilePathNew")
+
+//                                return@Button
+                                        
+                                        audioRecorder.startRecording(audioFilePath)
+                                        isRecording = true
+                                    }
+                                }
+                            }
+                        }
+                    ) {
+                        Text(
+                            if (isRecording) "Stop Recording" else "Start Recording",
+                            color = Color.White
+                        )
                     }
                     
-                    scope.launch {
-                        commonViewModel.connectionWs(navigator)
+                    Button(
+                        onClick = {
+                            audioPlayer.startPlaying(audioFilePath)
+                        }
+                    ) {
+                        Text("Play Audio")
                     }
-                })
+                }
             }
         }
     }
 }
+

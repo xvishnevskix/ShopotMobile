@@ -18,6 +18,7 @@ import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.BackgroundTaskManagerFactory
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
+import org.videotrade.shopot.multiplatform.FileProviderFactory
 //import org.videotrade.shopot.multiplatform.MediaProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProvider
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
@@ -33,12 +34,13 @@ class AndroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
         initializeFactories(this)
-        startKoin { modules(getSharedModules()) }
+        startKoin {
+            modules(getSharedModules())
+        }
         INSTANCE = this
     }
     
     private fun initializeFactories(context: Context) {
-        
         DeviceIdProviderFactory.initialize(context)
         ContactsProviderFactory.initialize(context)
         BackgroundTaskManagerFactory.initialize(context)
