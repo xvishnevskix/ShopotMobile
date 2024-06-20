@@ -76,7 +76,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var isRecording by remember { mutableStateOf(false) }
     var recordingTime by remember { mutableStateOf(0) }
 
-    // Timer for recording
+
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
@@ -88,7 +88,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         }
     }
 
-    // Animation for recording circle
+
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -176,7 +176,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         modifier = Modifier
                             .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
                             .weight(1f)
-                            .padding(3.dp), // Here you can add other modifiers if necessary
+                            .padding(3.dp),
                         textStyle = TextStyle(
                             color = Color.Black,
                             fontSize = 16.sp
@@ -315,8 +315,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             .background(
                                 brush = Brush.linearGradient(
                                     colors = listOf(
-                                        Color(0xFF29303C), // Начальный цвет градиента
-                                        Color(0xFF182C4F)  // Конечный цвет градиента
+                                        Color(0xFF29303C),
+                                        Color(0xFF182C4F)
                                     )
                                 )
                             )
