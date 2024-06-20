@@ -227,10 +227,12 @@ class ProfileMediaScreen(private val profile: ProfileDTO) : Screen {
                         ) {
                             ProfileMediaTabs.entries.forEachIndexed { index, currentTab ->
                                 Tab(
-                                    modifier = Modifier.fillMaxWidth().padding(0.dp),
+                                    modifier = Modifier.fillMaxWidth().padding(0.dp).clip(
+                                        RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
                                     selected = selectedTabIndex.value == index,
                                     selectedContentColor = Color(0xFF29303C),
                                     unselectedContentColor = Color(0xFFA9A8AA),
+
                                     onClick = {
                                         scope.launch {
                                             pagerState.animateScrollToPage(currentTab.ordinal)

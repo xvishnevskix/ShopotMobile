@@ -41,6 +41,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -132,7 +133,7 @@ fun CreateChatHeader(
                         contentDescription = "Close",
                         modifier = Modifier
                             .padding()
-                            .clickable {
+                            .pointerInput(Unit) {
                                 isSearching.value = false
                                 searchQuery.value = ""
                             }
@@ -162,7 +163,7 @@ fun CreateChatHeader(
                         modifier = Modifier
                             .padding(end = 5.dp)
                             .size(15.dp)
-                            .clickable {
+                            .pointerInput(Unit) {
                                 isSearching.value = true
                             }
                     )

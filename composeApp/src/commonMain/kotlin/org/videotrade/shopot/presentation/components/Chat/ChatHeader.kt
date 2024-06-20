@@ -20,6 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -61,7 +62,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
         ) {
             
             
-            BackIcon(Modifier.padding(start = 23.dp, end = 8.dp).clickable {
+            BackIcon(Modifier.padding(start = 23.dp, end = 8.dp).pointerInput(Unit) {
                 
                 viewModel.clearMessages()
                 viewModel.setCount(0)
@@ -101,7 +102,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
             Icon(
                 imageVector = Icons.Default.Call,
                 contentDescription = "Call",
-                modifier = Modifier.padding(end = 23.dp).size(20.dp).clickable {
+                modifier = Modifier.padding(end = 23.dp).size(20.dp).pointerInput(Unit) {
                     
                     scope.launch {
                         try {

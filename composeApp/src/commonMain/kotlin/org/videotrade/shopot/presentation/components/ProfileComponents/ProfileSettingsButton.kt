@@ -51,12 +51,13 @@ fun ProfileSettingsButton(
         modifier = Modifier
             .padding(top = 15.dp)
             .clip(RoundedCornerShape(12.dp))
+            .clickable{
+                onClick()
+            }
             .background(Color(0xFFF3F4F6))
             .fillMaxWidth(0.9F)
             .padding(start = 15.dp, top = 14.dp, end = 10.dp, bottom = 14.dp)
-            .clickable{
-                    onClick()
-            },
+            ,
         contentAlignment = Alignment.Center
     ) {
         Row(
