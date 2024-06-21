@@ -44,6 +44,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -143,17 +145,17 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
         ) {
             if (!isRecording) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
-                ) {
+//                Row(
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(horizontal = 15.dp)
+//                ) {
                     Box(
                         modifier = Modifier
 
-                            .padding(end = 15.dp)
+                            .padding(start = 15.dp ,end = 15.dp)
                             .size(37.dp)
                             .background(color = Color(0xFF2A293C), shape = CircleShape),
                         contentAlignment = Alignment.Center
@@ -201,66 +203,31 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                     )
 
-                    if (text.isNotEmpty()) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Send",
-                            modifier = Modifier
-                                .padding(2.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onTap = {
-                                        if (text.isNotBlank()) {
-                                            viewModel.sendMessage(
-                                                content = text,
-                                                fromUser = viewModel.profile.value.id,
-                                                chatId = chat.id,
-                                                userId = chat.userId,
-                                                notificationToken = chat.notificationToken,
-                                                attachments = emptyList()
-                                            )
-                                            text = ""
-                                        }
-                                    })
-                                }
-                        )
-                    } else {
-                        Image(
-                            modifier = Modifier
-                                .size(width = 16.dp, height = 26.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onLongPress = { isRecording = true },
-                                        onPress = {
-                                            val wasRecording = isRecording
-                                            tryAwaitRelease()
-                                            if (wasRecording) {
-                                                isRecording = false
-                                            }
-                                        }
-                                    )
-                                },
-                            painter = painterResource(Res.drawable.chat_microphone),
-                            contentDescription = null,
-                        )
-                    }
-                }
+
+//                }
             } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(start = 15.dp).pointerInput(Unit) {
-                        detectTapGestures(
-                            onPress = {
-                                val wasRecording = isRecording
-                                tryAwaitRelease()
-                                if (wasRecording) {
-                                    isRecording = false
-                                }
-                            }
-                        )
-                    },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ){
+//                Row(
+//                    modifier = Modifier.fillMaxWidth().padding(start = 15.dp)
+//                        .pointerInput(Unit) {
+//                            awaitPointerEventScope {
+//                                while (true) {
+//                                    val event = awaitPointerEvent()
+//                                    event.changes.forEach { change ->
+//                                        if (change.changedToUp()) {
+//                                            if (isRecording) {
+//                                                isRecording = false
+//                                                // Логика завершения записи
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        },
+//                    horizontalArrangement = Arrangement.SpaceBetween,
+//                    verticalAlignment = Alignment.CenterVertically,
+//                ){
                     Row(
+                        modifier = Modifier.padding(start = 15.dp) ,
                         verticalAlignment = Alignment.CenterVertically,
 
                     ) {
@@ -308,28 +275,80 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
                     }
 
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(65.dp).clip(RoundedCornerShape(50))
 
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0xFF29303C),
-                                        Color(0xFF182C4F)
+//                }
+            }
+
+            if (text.isNotEmpty()) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "Send",
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .padding(end = 15.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = {
+                                if (text.isNotBlank()) {
+                                    viewModel.sendMessage(
+                                        content = text,
+                                        fromUser = viewModel.profile.value.id,
+                                        chatId = chat.id,
+                                        userId = chat.userId,
+                                        notificationToken = chat.notificationToken,
+                                        attachments = emptyList()
                                     )
-                                )
-                            )
-                    ) {
-                        Image(
-                            modifier = Modifier.size(width = 16.dp, height = 26.dp),
-                            painter = painterResource(Res.drawable.chat_active_microphone),
-                            contentDescription = null,
-                        )
+                                    text = ""
+                                }
+                            })
+                        }
+                )
+            } else {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding( 0.dp).size(65.dp).clip(RoundedCornerShape(50))
 
-                    }
+                        .background(
+                            if (isRecording) Color(0xFF29303C) else Color(0xFFF3F4F6)
+                        )
+                ) {
+                    Image(
+                        modifier = Modifier
+
+                            .size(width = 16.dp, height = 26.dp)
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        var event = awaitPointerEvent()
+                                        val isPressed = event.changes.any { it.pressed }
+
+                                        if (isPressed) {
+                                            //  долгое нажатие
+                                            withTimeoutOrNull(500) {
+                                                while (event.changes.any { it.pressed }) {
+                                                    event = awaitPointerEvent()
+                                                }
+                                            }
+                                            if (event.changes.all { it.pressed }) {
+                                                isRecording = true
+                                                // начинаю запись
+                                            }
+                                        } else {
+                                            if (isRecording) {
+                                                isRecording = false
+                                                // завершение
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_active_microphone),
+                        contentDescription = null,
+                    )
                 }
+
             }
         }
     }
 }
+
+
