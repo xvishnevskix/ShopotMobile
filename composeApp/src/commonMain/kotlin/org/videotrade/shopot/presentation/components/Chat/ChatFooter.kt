@@ -47,6 +47,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
@@ -67,6 +68,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_active_microphone
 import shopot.composeapp.generated.resources.chat_arrow_left
+import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
 
 @Composable
@@ -77,6 +79,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
     var isRecording by remember { mutableStateOf(false) }
     var recordingTime by remember { mutableStateOf(0) }
+
+
 
 
     LaunchedEffect(isRecording) {
@@ -307,14 +311,19 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     contentAlignment = Alignment.Center,
                     modifier = Modifier.padding( 0.dp).size(65.dp).clip(RoundedCornerShape(50))
 
-                        .background(
-                            if (isRecording) Color(0xFF29303C) else Color(0xFFF3F4F6)
-                        )
+//                        .background(
+////                            if (isRecording) Color(0xFF29303C) else Color(0xFFF3F4F6)
+//                        )
                 ) {
-                    Image(
-                        modifier = Modifier
 
-                            .size(width = 16.dp, height = 26.dp)
+                    val sizeModifier = if (isRecording) {
+                        Modifier.size(width = 76.dp, height = 76.dp)
+                    } else {
+                        Modifier.size(width = 16.dp, height = 26.dp)
+                    }
+
+                    Image(
+                        modifier = sizeModifier
                             .pointerInput(Unit) {
                                 awaitPointerEventScope {
                                     while (true) {
@@ -341,8 +350,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     }
                                 }
                             },
-                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_active_microphone),
+                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
                         contentDescription = null,
+                        contentScale = ContentScale.Crop
                     )
                 }
 
