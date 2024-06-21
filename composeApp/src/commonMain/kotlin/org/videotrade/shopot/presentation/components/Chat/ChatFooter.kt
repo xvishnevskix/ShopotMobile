@@ -309,13 +309,47 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             } else {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding( 0.dp).size(65.dp).clip(RoundedCornerShape(50))
+                    modifier = Modifier
+                        .padding(0.dp)
+                        .size(65.dp)
+                        .clip(RoundedCornerShape(50))
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    var event = awaitPointerEvent()
+                                    val isPressed = event.changes.any { it.pressed }
 
-//                        .background(
-////                            if (isRecording) Color(0xFF29303C) else Color(0xFFF3F4F6)
-//                        )
+                                    if (isPressed) {
+                                        //  долгое нажатие
+                                        withTimeoutOrNull(500) {
+                                            while (event.changes.any { it.pressed }) {
+                                                event = awaitPointerEvent()
+                                            }
+                                        }
+                                        if (event.changes.all { it.pressed }) {
+                                            isRecording = true
+                                            // начинаю запись
+                                        }
+                                    } else {
+                                        if (isRecording) {
+                                            isRecording = false
+                                            // завершение
+                                        }
+                                    }
+
+                                    // Check if the pointer is outside the bounds of the Box
+                                    val pointerOutsideBox = event.changes.any { change ->
+                                        change.position.x < 0 || change.position.y < 0 ||
+                                                change.position.x > 65.dp.toPx() || change.position.y > 65.dp.toPx()
+                                    }
+                                    if (pointerOutsideBox && isRecording) {
+                                        isRecording = false
+                                        // Stop recording if the pointer is outside the box
+                                    }
+                                }
+                            }
+                        }
                 ) {
-
                     val sizeModifier = if (isRecording) {
                         Modifier.size(width = 76.dp, height = 76.dp)
                     } else {
@@ -323,33 +357,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     }
 
                     Image(
-                        modifier = sizeModifier
-                            .pointerInput(Unit) {
-                                awaitPointerEventScope {
-                                    while (true) {
-                                        var event = awaitPointerEvent()
-                                        val isPressed = event.changes.any { it.pressed }
-
-                                        if (isPressed) {
-                                            //  долгое нажатие
-                                            withTimeoutOrNull(500) {
-                                                while (event.changes.any { it.pressed }) {
-                                                    event = awaitPointerEvent()
-                                                }
-                                            }
-                                            if (event.changes.all { it.pressed }) {
-                                                isRecording = true
-                                                // начинаю запись
-                                            }
-                                        } else {
-                                            if (isRecording) {
-                                                isRecording = false
-                                                // завершение
-                                            }
-                                        }
-                                    }
-                                }
-                            },
+                        modifier = sizeModifier,
                         painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
