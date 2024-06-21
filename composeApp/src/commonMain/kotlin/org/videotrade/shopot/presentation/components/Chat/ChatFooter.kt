@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -10,7 +11,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -52,6 +56,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -70,6 +75,7 @@ import shopot.composeapp.generated.resources.chat_active_microphone
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
+import kotlin.math.roundToInt
 
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
@@ -79,6 +85,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
     var isRecording by remember { mutableStateOf(false) }
     var recordingTime by remember { mutableStateOf(0) }
+    val swipeOffset = remember { Animatable(0f) }
+    var isSwiped by remember { mutableStateOf(false) }
 
 
 
@@ -257,6 +265,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
                     Row (
                         modifier = Modifier
+                            .padding(start = 40.dp)
+                            .fillMaxWidth(0.45f)
                             .offset(x = textOffset.dp)
                             .animateContentSize(),
                         verticalAlignment = Alignment.CenterVertically,
@@ -274,6 +284,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
                             color = Color(0xFF979797),
+                            modifier = Modifier
 
                         )
 
@@ -307,54 +318,69 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                 )
             } else {
+
                 Box(
-                    contentAlignment = Alignment.Center,
+                    contentAlignment = Alignment.CenterEnd,
                     modifier = Modifier
-                        .padding(0.dp)
-                        .size(65.dp)
+                        .padding( end = 10.dp)
+                        .size(height = 65.dp, width = 150.dp)
                         .clip(RoundedCornerShape(50))
+                        .offset { IntOffset(swipeOffset.value.roundToInt(), 0) }
                         .pointerInput(Unit) {
                             awaitPointerEventScope {
                                 while (true) {
                                     var event = awaitPointerEvent()
                                     val isPressed = event.changes.any { it.pressed }
 
-                                    if (isPressed) {
-                                        //  долгое нажатие
+                                    if (isPressed && !isSwiped) {
+                                        // долгое нажатие
                                         withTimeoutOrNull(500) {
                                             while (event.changes.any { it.pressed }) {
                                                 event = awaitPointerEvent()
                                             }
                                         }
-                                        if (event.changes.all { it.pressed }) {
+                                        if (event.changes.all { it.pressed } && !isSwiped)  {
                                             isRecording = true
                                             // начинаю запись
                                         }
                                     } else {
-                                        if (isRecording) {
+                                        if (isRecording && !isSwiped) {
                                             isRecording = false
                                             // завершение
                                         }
                                     }
-
-                                    // Check if the pointer is outside the bounds of the Box
-                                    val pointerOutsideBox = event.changes.any { change ->
-                                        change.position.x < 0 || change.position.y < 0 ||
-                                                change.position.x > 65.dp.toPx() || change.position.y > 65.dp.toPx()
-                                    }
-                                    if (pointerOutsideBox && isRecording) {
-                                        isRecording = false
-                                        // Stop recording if the pointer is outside the box
-                                    }
                                 }
                             }
                         }
+                        .draggable(
+                            orientation = Orientation.Horizontal,
+                            state = rememberDraggableState { delta ->
+                                scope.launch {
+                                    swipeOffset.snapTo((swipeOffset.value + delta).coerceIn(-200f, 0f))
+                                }
+                                if (swipeOffset.value <= -200f) {
+                                    isRecording = false
+                                    isSwiped = true
+                                    scope.launch {
+                                        swipeOffset.animateTo(0f)
+                                    }
+                                }
+                            },
+                            onDragStopped = {
+                                scope.launch {
+                                    swipeOffset.animateTo(0f)
+                                }
+                                isSwiped = false
+                            }
+                        )
                 ) {
                     val sizeModifier = if (isRecording) {
-                        Modifier.size(width = 76.dp, height = 76.dp)
+                        Modifier.size(width = 65.dp, height = 60.dp)
                     } else {
                         Modifier.size(width = 16.dp, height = 26.dp)
                     }
+
+
 
                     Image(
                         modifier = sizeModifier,
