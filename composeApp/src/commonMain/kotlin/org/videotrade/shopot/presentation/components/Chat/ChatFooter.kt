@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -10,7 +11,10 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,15 +44,20 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -65,7 +74,9 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_active_microphone
 import shopot.composeapp.generated.resources.chat_arrow_left
+import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
+import kotlin.math.roundToInt
 
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
@@ -75,8 +86,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
     var isRecording by remember { mutableStateOf(false) }
     var recordingTime by remember { mutableStateOf(0) }
+    val swipeOffset = remember { Animatable(0f) }
+    var isSwiped by remember { mutableStateOf(false) }
 
-    // Timer for recording
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
@@ -88,7 +100,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         }
     }
 
-    // Animation for recording circle
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -98,7 +109,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             repeatMode = RepeatMode.Reverse
         )
     )
-
 
     val textOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -143,193 +153,212 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
         ) {
             if (!isRecording) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
+                        .padding(start = 15.dp, end = 15.dp)
+                        .size(37.dp)
+                        .background(color = Color(0xFF2A293C), shape = CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .size(20.dp)
+                            .clickable {
+                                singleImagePicker.launch()
+                            }
+                    )
+                }
+
+                BasicTextField(
+                    value = text,
+                    onValueChange = { text = it },
+                    modifier = Modifier
+                        .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
+                        .weight(1f)
+                        .padding(3.dp),
+                    textStyle = TextStyle(
+                        color = Color.Black,
+                        fontSize = 16.sp
+                    ),
+                    cursorBrush = SolidColor(Color.Black),
+                    visualTransformation = VisualTransformation.None,
+                    decorationBox = { innerTextField ->
+                        Box {
+                            if (text.isEmpty()) {
+                                Text(
+                                    "Написать...",
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                    lineHeight = 20.sp,
+                                    color = Color(0xFF979797),
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
+                )
+            } else {
+                Row(
+                    modifier = Modifier.padding(start = 15.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Box(
                         modifier = Modifier
+                            .size(10.dp)
+                            .background(Color.Red.copy(alpha = recordingCircleAlpha), shape = CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(15.dp))
+                    val hours = recordingTime / 3600
+                    val minutes = (recordingTime % 3600) / 60
+                    val seconds = recordingTime % 60
+                    Text(
+                        text = "$hours:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}",
+                        fontSize = 13.sp,
+                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        lineHeight = 20.sp,
+                        color = Color(0xFF979797),
+                    )
+                }
 
-                            .padding(end = 15.dp)
-                            .size(37.dp)
-                            .background(color = Color(0xFF2A293C), shape = CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Add",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .size(20.dp)
-                                .clickable {
-                                    singleImagePicker.launch()
-                                }
-                        )
-                    }
-
-                    BasicTextField(
-                        value = text,
-                        onValueChange = { text = it },
+                Row(
+                    modifier = Modifier
+                        .padding(start = 50.dp)
+                        .fillMaxWidth(0.45f)
+                        .offset(x = (textOffset + swipeOffset.value).dp)
+                        .alpha(1f + (swipeOffset.value / 100f))
+                        .animateContentSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Image(
                         modifier = Modifier
-                            .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
-                            .weight(1f)
-                            .padding(3.dp), // Here you can add other modifiers if necessary
-                        textStyle = TextStyle(
-                            color = Color.Black,
-                            fontSize = 16.sp
-                        ),
-                        cursorBrush = SolidColor(Color.Black),
-                        visualTransformation = VisualTransformation.None,
-                        decorationBox = { innerTextField ->
-                            Box {
-                                if (text.isEmpty()) {
-                                    Text(
-                                        "Написать...",
-                                        textAlign = TextAlign.Center,
-                                        fontSize = 16.sp,
-                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                        lineHeight = 20.sp,
-                                        color = Color(0xFF979797),
+                            .padding(end = 3.dp)
+                            .size(width = 7.dp, height = 14.dp),
+                        painter = painterResource(Res.drawable.chat_arrow_left),
+                        contentDescription = null,
+                    )
+                    Text(
+                        text = "Влево - отмена",
+                        fontSize = 13.sp,
+                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        lineHeight = 20.sp,
+                        color = Color(0xFF979797),
+                        modifier = Modifier
+                    )
+                }
+            }
+
+            if (text.isNotEmpty()) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Send,
+                    contentDescription = "Send",
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .padding(end = 15.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = {
+                                if (text.isNotBlank()) {
+                                    viewModel.sendMessage(
+                                        content = text,
+                                        fromUser = viewModel.profile.value.id,
+                                        chatId = chat.id,
+                                        userId = chat.userId,
+                                        notificationToken = chat.notificationToken,
+                                        attachments = emptyList()
                                     )
+                                    text = ""
                                 }
-                                innerTextField()
+                            })
+                        }
+                )
+            } else {
+                Box(
+                    contentAlignment = Alignment.CenterEnd,
+                    modifier = Modifier
+                        .let {
+                            if (!isRecording) {
+                                it.padding(end = 15.dp)
+                            } else {
+                                it
                             }
                         }
-                    )
+                        .size(height = 65.dp, width = 150.dp)
+                        .clip(RoundedCornerShape(50))
+                        .offset { IntOffset(swipeOffset.value.roundToInt(), 0) }
+                        .pointerInput(Unit) {
+                            awaitPointerEventScope {
+                                while (true) {
+                                    var event = awaitPointerEvent()
+                                    val isPressed = event.changes.any { it.pressed }
 
-                    if (text.isNotEmpty()) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Send,
-                            contentDescription = "Send",
-                            modifier = Modifier
-                                .padding(2.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(onTap = {
-                                        if (text.isNotBlank()) {
-                                            viewModel.sendMessage(
-                                                content = text,
-                                                fromUser = viewModel.profile.value.id,
-                                                chatId = chat.id,
-                                                userId = chat.userId,
-                                                notificationToken = chat.notificationToken,
-                                                attachments = emptyList()
-                                            )
-                                            text = ""
-                                        }
-                                    })
-                                }
-                        )
-                    } else {
-                        Image(
-                            modifier = Modifier
-                                .size(width = 16.dp, height = 26.dp)
-                                .pointerInput(Unit) {
-                                    detectTapGestures(
-                                        onLongPress = { isRecording = true },
-                                        onPress = {
-                                            val wasRecording = isRecording
-                                            tryAwaitRelease()
-                                            if (wasRecording) {
-                                                isRecording = false
+                                    if (isPressed && !isSwiped) {
+                                        withTimeoutOrNull(500) {
+                                            while (event.changes.any { it.pressed }) {
+                                                event = awaitPointerEvent()
                                             }
                                         }
-                                    )
-                                },
-                            painter = painterResource(Res.drawable.chat_microphone),
-                            contentDescription = null,
-                        )
-                    }
-                }
-            } else {
-                Row(
-                    modifier = Modifier.fillMaxWidth().padding(start = 15.dp).pointerInput(Unit) {
-                        detectTapGestures(
-                            onPress = {
-                                val wasRecording = isRecording
-                                tryAwaitRelease()
-                                if (wasRecording) {
-                                    isRecording = false
+                                        if (event.changes.all { it.pressed } && !isSwiped) {
+                                            isRecording = true
+                                        }
+                                    } else {
+                                        if (isRecording && !isSwiped) {
+                                            isRecording = false
+                                        }
+                                    }
                                 }
                             }
-                        )
-                    },
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ){
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(10.dp)
-                                .background(Color.Red.copy(alpha = recordingCircleAlpha), shape = CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(15.dp))
-                        val hours = recordingTime / 3600
-                        val minutes = (recordingTime % 3600) / 60
-                        val seconds = recordingTime % 60
-                        Text(
-                            text = "$hours:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}",
-
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF979797),
-                        )
-                    }
-
-                    Row (
-                        modifier = Modifier
-                            .offset(x = textOffset.dp)
-                            .animateContentSize(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Image(
-                            modifier = Modifier.padding(end = 3.dp).size(width = 7.dp, height = 14.dp),
-                            painter = painterResource(Res.drawable.chat_arrow_left),
-                            contentDescription = null,
-                        )
-                        Text(
-                            text = "Влево - отмена",
-                            fontSize = 13.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF979797),
-
-                        )
-
-                    }
-
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(65.dp).clip(RoundedCornerShape(50))
-
-                            .background(
-                                brush = Brush.linearGradient(
-                                    colors = listOf(
-                                        Color(0xFF29303C), // Начальный цвет градиента
-                                        Color(0xFF182C4F)  // Конечный цвет градиента
-                                    )
+                        }
+                        .let {
+                            if (isRecording) {
+                                it.draggable(
+                                    orientation = Orientation.Horizontal,
+                                    state = rememberDraggableState { delta ->
+                                        scope.launch {
+                                            swipeOffset.snapTo((swipeOffset.value + delta).coerceIn(-200f, 0f))
+                                        }
+                                        if (swipeOffset.value <= -200f) {
+                                            isRecording = false
+                                            isSwiped = true
+                                            scope.launch {
+                                                swipeOffset.animateTo(0f)
+                                            }
+                                        }
+                                    },
+                                    onDragStopped = {
+                                        scope.launch {
+                                            swipeOffset.animateTo(0f)
+                                        }
+                                        isSwiped = false
+                                    }
                                 )
-                            )
-                    ) {
-                        Image(
-                            modifier = Modifier.size(width = 16.dp, height = 26.dp),
-                            painter = painterResource(Res.drawable.chat_active_microphone),
-                            contentDescription = null,
-                        )
-
+                            } else {
+                                it
+                            }
+                        }
+                ) {
+                    val sizeModifier = if (isRecording) {
+                        Modifier.size(width = 65.dp, height = 60.dp)
+                    } else {
+                        Modifier.size(width = 16.dp, height = 26.dp)
                     }
+
+                    Image(
+                        modifier = sizeModifier,
+                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
                 }
             }
         }
     }
 }
+
+
