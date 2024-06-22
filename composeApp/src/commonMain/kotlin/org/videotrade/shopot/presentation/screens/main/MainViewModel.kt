@@ -143,6 +143,22 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    
+    fun setZeroUnread(chat: ChatItem) {
+        viewModelScope.launch {
+            chatsUseCase.setZeroUnread(chat)
+        }
+    }
+    
+    
+    fun setCurrentChat(chatValue: String) {
+        viewModelScope.launch {
+            chatsUseCase.setCurrentChat(chatValue)
+        }
+    }
+    
+    
+    
      fun loadUsers() {
         viewModelScope.launch {
             

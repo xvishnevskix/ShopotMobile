@@ -49,8 +49,8 @@ import shopot.composeapp.generated.resources.profileNav
 import shopot.composeapp.generated.resources.smart_encryption
 
 @Composable
-fun MainContentComponent(viewModel: MainViewModel, commonViewModel: CommonViewModel) {
-    val chatState = viewModel.chats.collectAsState(initial = listOf()).value
+fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonViewModel) {
+    val chatState = mainViewModel.chats.collectAsState(initial = listOf()).value
     val navigator = LocalNavigator.currentOrThrow
     
     
@@ -80,7 +80,7 @@ fun MainContentComponent(viewModel: MainViewModel, commonViewModel: CommonViewMo
                         verticalArrangement = Arrangement.Center,
                     ) {
                         items(chatState) { item ->
-                            UserComponentItem(item, commonViewModel = commonViewModel)
+                            UserComponentItem(item, commonViewModel, mainViewModel)
                         }
                         
                         if (chatState.isNotEmpty()) {
@@ -156,100 +156,3 @@ fun MainContentComponent(viewModel: MainViewModel, commonViewModel: CommonViewMo
         
     }
 }
-
-//@Composable
-//fun BottomBar(modifier: Modifier = Modifier) {
-//    val navigator = LocalNavigator.currentOrThrow
-//    val viewModel: MainViewModel = koinInject()
-//    val currentScreen by viewModel.currentScreen.collectAsState()
-//
-//    Box(
-//        modifier = modifier
-//            .fillMaxWidth()
-//            .background(Color(0xFFF1EEEE))
-//            .padding(start = 34.dp, end = 34.dp, top = 6.dp),
-//
-//        ) {
-//        Row(
-//            modifier = modifier
-//                .fillMaxWidth().height(84.dp),
-//            horizontalArrangement = Arrangement.SpaceBetween,
-//            verticalAlignment = Alignment.Top
-//        ) {
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
-//                    if (viewModel.profile.value !== null && currentScreen !is ProfileScreen) {
-//                        viewModel.navigateTo(ProfileScreen())
-//                        navigator.push(ProfileScreen())
-//                    }
-//                }
-//            ) {
-//                Image(
-//                    modifier = Modifier.size(35.dp),
-//                    painter = painterResource(Res.drawable.profileNav),
-//                    contentDescription = null,
-//                )
-//                Text(
-//                    "Профиль",
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 13.sp,
-//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                    lineHeight = 20.sp,
-//                    color = if (currentScreen is ProfileScreen) Color(0xFF8dbfe5) else Color(
-//                        0xFF000000
-//                    ),
-//                )
-//            }
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
-//                    if (currentScreen !is MainScreen) {
-//                        viewModel.navigateTo(MainScreen())
-//                        navigator.push(MainScreen())
-//                    }
-//                }
-//            ) {
-//                Image(
-//                    modifier = Modifier.size(35.dp),
-//                    painter = painterResource(Res.drawable.chatNav),
-//                    contentDescription = null,
-//                )
-//                Text(
-//                    "Чаты",
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 13.sp,
-//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                    lineHeight = 20.sp,
-////                    color = Color(0xFF000000),
-//                    color = if (currentScreen is MainScreen) Color(0xFF8dbfe5) else Color(0xFF000000),
-//                )
-//            }
-//            Column(
-//                horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
-//                    if (currentScreen !is CreateChatScreen) {
-//                        viewModel.navigateTo(CreateChatScreen())
-//                        navigator.push(CreateChatScreen())
-//                    }
-//                }
-//            ) {
-//                Image(
-//                    modifier = Modifier.size(35.dp),
-//                    painter = painterResource(Res.drawable.contactsNav),
-//                    contentDescription = null,
-//                )
-//                Text(
-//                    "Контакты",
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 13.sp,
-//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                    lineHeight = 20.sp,
-//                    color = if (currentScreen is CreateChatScreen) Color(0xFF8dbfe5) else Color(
-//                        0xFF000000
-//                    ),
-//                )
-//            }
-//        }
-//    }
-//}

@@ -28,18 +28,26 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
-fun UserComponentItem(chat: ChatItem, commonViewModel: CommonViewModel) {
+fun UserComponentItem(
+    chat: ChatItem,
+    commonViewModel: CommonViewModel,
+    mainViewModel: MainViewModel
+) {
     
     
     println("dasdafafa  ${chat.icon} ${chat.lastName}")
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
+            
+            mainViewModel.setCurrentChat(chat.id)
+            mainViewModel.setZeroUnread(chat)
             commonViewModel.mainNavigator.value?.push(ChatScreen(chat))
         },
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -133,19 +141,20 @@ fun UserComponentItem(chat: ChatItem, commonViewModel: CommonViewModel) {
 //                        .background(if (boxText.isEmpty()) Color.Transparent else Color(0xFF2A293C))
                         .background(Color(0xFF2A293C))
                 ) {
-//                    Text(
-//                        "3",
-//                        modifier = Modifier
-//                            .padding(start = 6.dp, end = 6.dp, top = 0.dp, bottom = 0.dp),
-//                        textAlign = TextAlign.Center,
-//                        fontSize = 10.sp,
-//                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                        lineHeight = 20.sp,
-//                        color = Color(0xFFFFFFFF),
-//
-//                        )
-                    
+                    if (chat.unread !== 0) {
+                        Text(
+                            text = "${chat.unread}",
+                            modifier = Modifier
+                                .padding(start = 6.dp, end = 6.dp, top = 0.dp, bottom = 0.dp),
+                            textAlign = TextAlign.Center,
+                            fontSize = 10.sp,
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                            lineHeight = 20.sp,
+                            color = Color(0xFFFFFFFF),
+                            
+                            )
+                    }
                 }
             }
             

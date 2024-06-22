@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,6 +25,7 @@ import org.videotrade.shopot.presentation.components.Chat.Chat
 import org.videotrade.shopot.presentation.components.Chat.ChatFooter
 import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
 
 class ChatScreen(
@@ -34,6 +36,7 @@ class ChatScreen(
     override fun Content() {
         
         val viewModel: ChatViewModel = koinInject()
+        val mainViewModel: MainViewModel = koinInject()
         val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
         
         
@@ -44,6 +47,11 @@ class ChatScreen(
             
         }
         
+        DisposableEffect(Unit) {
+            onDispose {
+                mainViewModel.setCurrentChat("")
+            }
+        }
         
         var selectedMessage by remember { mutableStateOf<MessageItem?>(null) }
         var selectedMessageY by remember { mutableStateOf(0) }

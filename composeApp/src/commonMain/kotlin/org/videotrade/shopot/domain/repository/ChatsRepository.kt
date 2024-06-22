@@ -14,6 +14,10 @@ interface ChatsRepository {
     
     
     fun updateLastMessageChat(messageItem: MessageItem)
+    fun setZeroUnread(chat: ChatItem)
+    fun setCurrentChat(chatValue: String)
+    
+    
     fun delChat(chat: ChatItem)
     fun addChat(chat: ChatItem)
     fun addChats(chatsInit: MutableList<ChatItem>)

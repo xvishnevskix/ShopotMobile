@@ -28,7 +28,16 @@ class ChatsUseCase : KoinComponent {
     fun delChat(user: ChatItem) {
         return repository.delChat(user)
     }
-
+    
+    fun setZeroUnread(chat: ChatItem) {
+        return repository.setZeroUnread(chat)
+    }
+    
+    fun setCurrentChat(chatValue: String) {
+        return repository.setCurrentChat(chatValue)
+    }
+    
+    
     fun addChat(user: ChatItem) {
         return repository.addChat(user)
     }
