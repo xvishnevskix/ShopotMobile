@@ -12,6 +12,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
@@ -46,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -279,68 +282,93 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                 )
             } else {
+//                Box(
+//                    contentAlignment = Alignment.CenterEnd,
+//                    modifier = Modifier
+//                        .padding(end = if (!isRecording) 15.dp else 0.dp)
+//                        .size(height = 65.dp, width = 150.dp)
+//                        .clip(RoundedCornerShape(50))
+//                        .offset { IntOffset(swipeOffset.value.roundToInt(), 0) }
+//                        .pointerInput(Unit) {
+//                            detectTapGestures(
+//                                onLongPress = {
+//                                    isRecording = true
+//                                },
+//                                onPress = {
+//                                    tryAwaitRelease()
+//                                    if (isRecording && !isSwiped) {
+//                                        isRecording = false
+//                                    }
+//                                }
+//                            )
+//                        }
+//                        .draggable(
+//                            orientation = Orientation.Horizontal,
+//                            state = rememberDraggableState { delta ->
+//                                scope.launch {
+//                                    swipeOffset.snapTo((swipeOffset.value + delta).coerceIn(-200f, 0f))
+//                                }
+//                                if (swipeOffset.value <= -200f) {
+//                                    isRecording = false
+//                                    isSwiped = true
+//                                    scope.launch {
+//                                        swipeOffset.animateTo(0f)
+//                                    }
+//                                }
+//                            },
+//                            onDragStopped = {
+//                                scope.launch {
+//                                    swipeOffset.animateTo(0f)
+//                                }
+//                                isSwiped = false
+//                            }
+//                        )
+//                ) {
+//                    val sizeModifier = if (isRecording) {
+//                        Modifier.size(width = 65.dp, height = 60.dp)
+//                    } else {
+//                        Modifier.size(width = 16.dp, height = 26.dp)
+//                    }
+//
+//                    Image(
+//                        modifier = sizeModifier,
+//                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
+//                        contentDescription = null,
+//                        contentScale = ContentScale.Crop
+//                    )
+//                }
+                var offset by remember { mutableStateOf(Offset.Zero) }
+                
                 Box(
                     contentAlignment = Alignment.CenterEnd,
                     modifier = Modifier
-                        .let {
-                            if (!isRecording) {
-                                it.padding(end = 15.dp)
-                            } else {
-                                it
-                            }
-                        }
+                        .padding(end = if (!isRecording) 15.dp else 0.dp)
                         .size(height = 65.dp, width = 150.dp)
                         .clip(RoundedCornerShape(50))
-                        .offset { IntOffset(swipeOffset.value.roundToInt(), 0) }
                         .pointerInput(Unit) {
-                            awaitPointerEventScope {
-                                while (true) {
-                                    var event = awaitPointerEvent()
-                                    val isPressed = event.changes.any { it.pressed }
-
-                                    if (isPressed && !isSwiped) {
-                                        withTimeoutOrNull(500) {
-                                            while (event.changes.any { it.pressed }) {
-                                                event = awaitPointerEvent()
-                                            }
-                                        }
-                                        if (event.changes.all { it.pressed } && !isSwiped) {
-                                            isRecording = true
-                                        }
-                                    } else {
-                                        if (isRecording && !isSwiped) {
-                                            isRecording = false
-                                        }
-                                    }
+                            detectDragGestures(
+                                onDragStart = { },
+                                onDragEnd = {
+                                    offset = Offset.Zero
+                                    isRecording = false
+                                },
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    val newOffset = Offset(
+                                        x = (offset.x + dragAmount.x).coerceAtLeast(-100f)
+                                            .coerceAtMost(0f),
+                                        y = offset.y
+                                    )
+                                    offset = newOffset
                                 }
-                            }
+                            )
                         }
-                        .let {
-                            if (isRecording) {
-                                it.draggable(
-                                    orientation = Orientation.Horizontal,
-                                    state = rememberDraggableState { delta ->
-                                        scope.launch {
-                                            swipeOffset.snapTo((swipeOffset.value + delta).coerceIn(-200f, 0f))
-                                        }
-                                        if (swipeOffset.value <= -200f) {
-                                            isRecording = false
-                                            isSwiped = true
-                                            scope.launch {
-                                                swipeOffset.animateTo(0f)
-                                            }
-                                        }
-                                    },
-                                    onDragStopped = {
-                                        scope.launch {
-                                            swipeOffset.animateTo(0f)
-                                        }
-                                        isSwiped = false
-                                    }
-                                )
-                            } else {
-                                it
-                            }
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onPress = {
+                                    isRecording = !isRecording
+                                }
+                            )
                         }
                 ) {
                     val sizeModifier = if (isRecording) {
@@ -348,9 +376,14 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     } else {
                         Modifier.size(width = 16.dp, height = 26.dp)
                     }
-
+                    
                     Image(
-                        modifier = sizeModifier,
+                        modifier = sizeModifier.offset {
+                            IntOffset(
+                                offset.x.roundToInt(),
+                                offset.y.roundToInt()
+                            )
+                        },
                         painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
