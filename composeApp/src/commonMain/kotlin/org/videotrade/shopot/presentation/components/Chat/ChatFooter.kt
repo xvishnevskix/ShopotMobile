@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -91,7 +92,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isSwiped by remember { mutableStateOf(false) }
-    var offset by remember { mutableStateOf(Offset.Zero) }
+    var isDragging by remember { mutableStateOf(false) }
 
     LaunchedEffect(isRecording) {
         if (isRecording) {
@@ -283,62 +284,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                 )
             } else {
-//                Box(
-//                    contentAlignment = Alignment.CenterEnd,
-//                    modifier = Modifier
-//                        .padding(end = if (!isRecording) 15.dp else 0.dp)
-//                        .size(height = 65.dp, width = 150.dp)
-//                        .clip(RoundedCornerShape(50))
-//                        .offset { IntOffset(swipeOffset.value.roundToInt(), 0) }
-//                        .pointerInput(Unit) {
-//                            detectTapGestures(
-//                                onLongPress = {
-//                                    isRecording = true
-//                                },
-//                                onPress = {
-//                                    tryAwaitRelease()
-//                                    if (isRecording && !isSwiped) {
-//                                        isRecording = false
-//                                    }
-//                                }
-//                            )
-//                        }
-//                        .draggable(
-//                            orientation = Orientation.Horizontal,
-//                            state = rememberDraggableState { delta ->
-//                                scope.launch {
-//                                    swipeOffset.snapTo((swipeOffset.value + delta).coerceIn(-200f, 0f))
-//                                }
-//                                if (swipeOffset.value <= -200f) {
-//                                    isRecording = false
-//                                    isSwiped = true
-//                                    scope.launch {
-//                                        swipeOffset.animateTo(0f)
-//                                    }
-//                                }
-//                            },
-//                            onDragStopped = {
-//                                scope.launch {
-//                                    swipeOffset.animateTo(0f)
-//                                }
-//                                isSwiped = false
-//                            }
-//                        )
-//                ) {
-//                    val sizeModifier = if (isRecording) {
-//                        Modifier.size(width = 65.dp, height = 60.dp)
-//                    } else {
-//                        Modifier.size(width = 16.dp, height = 26.dp)
-//                    }
-//
-//                    Image(
-//                        modifier = sizeModifier,
-//                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
-//                        contentDescription = null,
-//                        contentScale = ContentScale.Crop
-//                    )
-//                }
-                
+                var offset by remember { mutableStateOf(Offset.Zero) }
+
+//                val alpha = (105f + offset.x) / 20f
+                val scale = 1f + (offset.x / 850f)
+
                 Box(
                     contentAlignment = Alignment.CenterEnd,
                     modifier = Modifier
@@ -347,15 +297,22 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .clip(RoundedCornerShape(50))
                         .pointerInput(Unit) {
                             detectDragGestures(
-                                onDragStart = { },
+                                onDragStart = {
+                                    isDragging = true
+                                },
                                 onDragEnd = {
-                                    offset = Offset.Zero
-                                    isRecording = false
+                                    isDragging = false
+                                    if (offset.x > -200f) {
+                                        offset = Offset.Zero
+                                    } else {
+                                        isRecording = false
+                                        offset = Offset.Zero
+                                    }
                                 },
                                 onDrag = { change, dragAmount ->
                                     change.consume()
                                     val newOffset = Offset(
-                                        x = (offset.x + dragAmount.x).coerceAtLeast(-100f)
+                                        x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
                                             .coerceAtMost(0f),
                                         y = offset.y
                                     )
@@ -366,7 +323,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onPress = {
-                                    isRecording = !isRecording
+                                    isRecording = !isDragging
                                 }
                             )
                         }
@@ -376,14 +333,17 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     } else {
                         Modifier.size(width = 16.dp, height = 26.dp)
                     }
-                    
+
                     Image(
-                        modifier = sizeModifier.offset {
-                            IntOffset(
-                                offset.x.roundToInt(),
-                                offset.y.roundToInt()
-                            )
-                        },
+                        modifier = sizeModifier
+                            .offset {
+                                IntOffset(
+                                    offset.x.roundToInt(),
+                                    offset.y.roundToInt()
+                                )
+                            }
+//                            .alpha(alpha)
+                            .scale(scale),
                         painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
@@ -393,5 +353,3 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         }
     }
 }
-
-
