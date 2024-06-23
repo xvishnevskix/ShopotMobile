@@ -1,8 +1,14 @@
 package org.videotrade.shopot.data.remote.repository
 
+import io.ktor.websocket.Frame
+import io.ktor.websocket.WebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatsRepository
@@ -25,6 +31,27 @@ class ChatsRepositoryImpl : ChatsRepository {
     override fun getChats(): List<ChatItem> {
         
         return chats.value
+        
+    }
+    
+    
+    override suspend fun getChatsInBack(wsSession: WebSocketSession, userId: String) {
+        try {
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "getUserChats")
+                    put("userId", userId)
+                }
+            )
+            println("jsonContent $jsonContent")
+            
+            wsSession.send(Frame.Text(jsonContent))
+            
+            println("Message sent successfully")
+        } catch (e: Exception) {
+            println("Failed to send message: ${e.message}")
+        }
+        
         
     }
     

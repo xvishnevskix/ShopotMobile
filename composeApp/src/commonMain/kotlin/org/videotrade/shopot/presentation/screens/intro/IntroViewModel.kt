@@ -19,6 +19,7 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
@@ -30,6 +31,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
     private val contactsUseCase: ContactsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
+    private val chatsUseCase: ChatsUseCase by inject()
 
 //
 //    val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
@@ -165,27 +167,30 @@ class IntroViewModel : ViewModel(), KoinComponent {
                         println("wsSessionIntro $wsSessionNew")
                         
                         stopObserving()
+
+//                        val jsonContent = Json.encodeToString(
+//                            buildJsonObject {
+//                                put("action", "getUserChats")
+//                                put("userId", profile.value?.id)
+//                            }
+//                        )
+//
+//                        try {
+//
+//                            println("jsonContent $jsonContent")
+//
+//                            wsSessionNew.send(Frame.Text(jsonContent))
+//
+//                            navigator.value?.replace(MainScreen())
+//
+//                            println("Message sent successfully")
+//                        } catch (e: Exception) {
+//                            println("Failed to send message: ${e.message}")
+//                        }
+//
+                        chatsUseCase.getChatsInBack(wsSessionNew, profile.value!!.id)
                         
-                        val jsonContent = Json.encodeToString(
-                            buildJsonObject {
-                                put("action", "getUserChats")
-                                put("userId", profile.value?.id)
-                            }
-                        )
-                        
-                        try {
-                            
-                            println("jsonContent $jsonContent")
-                            
-                            wsSessionNew.send(Frame.Text(jsonContent))
-                            
-                            navigator.value?.replace(MainScreen())
-                            
-                            println("Message sent successfully")
-                        } catch (e: Exception) {
-                            println("Failed to send message: ${e.message}")
-                        }
-                        
+                        navigator.value?.replace(MainScreen())
                         
                     }
                 }

@@ -91,6 +91,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isSwiped by remember { mutableStateOf(false) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
 
     LaunchedEffect(isRecording) {
         if (isRecording) {
@@ -337,7 +338,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                        contentScale = ContentScale.Crop
 //                    )
 //                }
-                var offset by remember { mutableStateOf(Offset.Zero) }
                 
                 Box(
                     contentAlignment = Alignment.CenterEnd,

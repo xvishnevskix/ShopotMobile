@@ -1,5 +1,6 @@
 package org.videotrade.shopot.domain.repository
 
+import io.ktor.websocket.WebSocketSession
 import kotlinx.coroutines.flow.StateFlow
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -12,6 +13,7 @@ interface ChatsRepository {
     
     fun getChats(): List<ChatItem>
     
+    suspend fun getChatsInBack(wsSession: WebSocketSession, userId: String)
     
     fun updateLastMessageChat(messageItem: MessageItem)
     fun setZeroUnread(chat: ChatItem)

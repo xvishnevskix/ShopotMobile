@@ -1,6 +1,5 @@
 package org.videotrade.shopot.presentation.screens.main
 
-import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -9,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
@@ -43,13 +43,10 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     
     val navigator = MutableStateFlow<Navigator?>(null)
-
-    
     
     
     init {
         viewModelScope.launch {
-            
             
             
             observeUsers()
@@ -67,14 +64,15 @@ class MainViewModel : ViewModel(), KoinComponent {
             
         }
     }
-
-//    private fun observeUsers() {
-//        userUseCase.chats.onEach { newUsers ->
-//            _chats.value = newUsers
-//
-//        }.launchIn(viewModelScope)
-//
-//    }
+    
+    fun getChatsInBack() {
+        viewModelScope.launch {
+            if (wsUseCase.wsSession.value !== null && wsUseCase.wsSession.value!!.isActive) {
+                chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
+            }
+        }
+        
+    }
     
     
     private fun List<Int>.toLocalDateTimeOrNull(): LocalDateTime? {
@@ -158,8 +156,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     }
     
     
-    
-     fun loadUsers() {
+    fun loadUsers() {
         viewModelScope.launch {
             
             println("prrrr ${chatsUseCase.chats.value}")
