@@ -287,7 +287,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 var offset by remember { mutableStateOf(Offset.Zero) }
 
 //                val alpha = (105f + offset.x) / 20f
-                val scale = 1f + (offset.x / 650f)
+                val scale = 1f + (offset.x / 850f)
 
                 Box(
                     contentAlignment = Alignment.CenterEnd,
@@ -302,7 +302,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 },
                                 onDragEnd = {
                                     isDragging = false
-                                    if (offset.x > -100f) {
+                                    if (offset.x > -200f) {
                                         offset = Offset.Zero
                                     } else {
                                         isRecording = false
@@ -312,7 +312,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 onDrag = { change, dragAmount ->
                                     change.consume()
                                     val newOffset = Offset(
-                                        x = (offset.x + dragAmount.x).coerceAtLeast(-100f)
+                                        x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
                                             .coerceAtMost(0f),
                                         y = offset.y
                                     )
