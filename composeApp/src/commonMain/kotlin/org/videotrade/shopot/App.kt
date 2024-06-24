@@ -118,6 +118,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.theme.AppTheme
 
@@ -127,17 +128,17 @@ internal fun App() = AppTheme {
     KoinContext {
         
         Navigator(
-//            IntroScreen()
+            IntroScreen()
 //            ProfileEditScreen()
 //            TestScreen()
-            ChatScreen(
-                ChatItem(
-                    "", true, "", "", "", "", 0, "", MessageItem(
-                        "", "", "", "", "", 0,
-                        listOf(), false, "", true, true, null
-                    ), "", ""
-                )
-            )
+//            ChatScreen(
+//                ChatItem(
+//                    "", true, "", "", "", "", 0, "", MessageItem(
+//                        "", "", "", "", "", 0,
+//                        listOf(), false, "", true, true, null
+//                    ), "", ""
+//                )
+//            )
         ) { navigator ->
             SlideTransition(navigator)
         }
