@@ -1,11 +1,13 @@
 package org.videotrade.shopot.domain.usecase
 
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.websocket.WebSocketSession
 import kotlinx.coroutines.flow.StateFlow
-import org.videotrade.shopot.domain.model.ChatItem
-import org.videotrade.shopot.domain.repository.ChatsRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.repository.ChatsRepository
 
 class ChatsUseCase : KoinComponent {
     private val repository: ChatsRepository by inject()
@@ -13,22 +15,33 @@ class ChatsUseCase : KoinComponent {
     val chats: StateFlow<List<ChatItem>> get() = repository.chats
     
     
-
     fun getChats(): List<ChatItem> {
         
         
         return repository.getChats()
     }
     
-    
+    suspend fun getChatsInBack(wsSession: DefaultClientWebSocketSession, userId: String) {
+        return repository.getChatsInBack(wsSession, userId)
+    }
     
     fun updateLastMessageChat(messageItem: MessageItem) {
         return repository.updateLastMessageChat(messageItem)
     }
+    
     fun delChat(user: ChatItem) {
         return repository.delChat(user)
     }
-
+    
+    fun setZeroUnread(chat: ChatItem) {
+        return repository.setZeroUnread(chat)
+    }
+    
+    fun setCurrentChat(chatValue: String) {
+        return repository.setCurrentChat(chatValue)
+    }
+    
+    
     fun addChat(user: ChatItem) {
         return repository.addChat(user)
     }
@@ -36,6 +49,7 @@ class ChatsUseCase : KoinComponent {
     fun addChats(chatsInit: MutableList<ChatItem>) {
         return repository.addChats(chatsInit)
     }
+    
     fun clearData() {
         repository.clearData()
     }

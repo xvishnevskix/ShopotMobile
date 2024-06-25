@@ -11,16 +11,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
@@ -34,7 +30,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,11 +45,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -76,7 +68,6 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.chat_active_microphone
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
@@ -85,15 +76,14 @@ import kotlin.math.roundToInt
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
-
+    
     var text by remember { mutableStateOf("") }
-
+    
     var isRecording by remember { mutableStateOf(false) }
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
-    var isSwiped by remember { mutableStateOf(false) }
     var isDragging by remember { mutableStateOf(false) }
-
+    
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
@@ -104,7 +94,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             recordingTime = 0
         }
     }
-
+    
+    LaunchedEffect(swipeOffset.value) {
+        println("swipeOffset ${swipeOffset}")
+    }
+    
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -114,7 +108,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             repeatMode = RepeatMode.Reverse
         )
     )
-
+    
     val textOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -10f,
@@ -123,7 +117,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             repeatMode = RepeatMode.Reverse
         )
     )
-
+    
     val singleImagePicker = rememberImagePickerLauncher(
         selectionMode = SelectionMode.Single,
         scope = scope,
@@ -140,7 +134,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             }
         }
     )
-
+    
     Box(
         modifier = Modifier
             .imePadding()
@@ -155,7 +149,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 .heightIn(max = 125.dp, min = 58.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(Color(0xFFF3F4F6))
-
+        
         ) {
             if (!isRecording) {
                 Box(
@@ -176,7 +170,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             }
                     )
                 }
-
+                
                 BasicTextField(
                     value = text,
                     onValueChange = { text = it },
@@ -215,14 +209,19 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     Box(
                         modifier = Modifier
                             .size(10.dp)
-                            .background(Color.Red.copy(alpha = recordingCircleAlpha), shape = CircleShape)
+                            .background(
+                                Color.Red.copy(alpha = recordingCircleAlpha),
+                                shape = CircleShape
+                            )
                     )
                     Spacer(modifier = Modifier.width(15.dp))
                     val hours = recordingTime / 3600
                     val minutes = (recordingTime % 3600) / 60
                     val seconds = recordingTime % 60
                     Text(
-                        text = "$hours:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}",
+                        text = "$hours:${minutes.toString().padStart(2, '0')}:${
+                            seconds.toString().padStart(2, '0')
+                        }",
                         fontSize = 13.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
@@ -230,7 +229,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         color = Color(0xFF979797),
                     )
                 }
-
+                
                 Row(
                     modifier = Modifier
                         .padding(start = 50.dp)
@@ -259,7 +258,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     )
                 }
             }
-
+            
             if (text.isNotEmpty()) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
@@ -288,7 +287,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
 //                val alpha = (105f + offset.x) / 20f
                 val scale = 1f + (offset.x / 850f)
-
+                
                 Box(
                     contentAlignment = Alignment.CenterEnd,
                     modifier = Modifier
@@ -298,13 +297,18 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .pointerInput(Unit) {
                             detectDragGestures(
                                 onDragStart = {
+                                    println("Drag started")
                                     isDragging = true
                                 },
                                 onDragEnd = {
+                                    println("Drag ended")
                                     isDragging = false
+                                    // Проверяем, если смещение больше -200f, то сбрасываем смещение
                                     if (offset.x > -200f) {
+                                        isRecording = false
                                         offset = Offset.Zero
                                     } else {
+                                        // Если смещение больше чем -200f, завершаем запись
                                         isRecording = false
                                         offset = Offset.Zero
                                     }
@@ -322,8 +326,24 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                         .pointerInput(Unit) {
                             detectTapGestures(
+                                onTap = {
+                                    
+                                    val seconds = recordingTime % 60
+                                    
+                                    if (seconds > 2) {
+                                    
+                                    }
+                                    
+                                    isRecording = false
+                                    recordingTime = 0
+                                    isDragging = false
+                                    
+                                },
                                 onPress = {
-                                    isRecording = !isDragging
+                                    if (!isDragging) {
+                                        isRecording = !isRecording
+                                    }
+                                    println("Press released")
                                 }
                             )
                         }
@@ -333,7 +353,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     } else {
                         Modifier.size(width = 16.dp, height = 26.dp)
                     }
-
+                    
                     Image(
                         modifier = sizeModifier
                             .offset {
@@ -342,13 +362,15 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     offset.y.roundToInt()
                                 )
                             }
-//                            .alpha(alpha)
-                            .scale(scale),
-                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(Res.drawable.chat_micro_active),
+                            .scale(1f + (offset.x / 850f)),
+                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(
+                            Res.drawable.chat_micro_active
+                        ),
                         contentDescription = null,
                         contentScale = ContentScale.Crop
                     )
                 }
+                
             }
         }
     }
