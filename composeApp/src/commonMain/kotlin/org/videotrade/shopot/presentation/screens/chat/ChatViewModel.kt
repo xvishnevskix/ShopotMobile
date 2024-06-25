@@ -157,6 +157,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 file, contentType, fileName
             )
             
+            println("fileId ${fileId}")
             
             if (fileId !== null)
                 sendMessage(

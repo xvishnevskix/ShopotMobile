@@ -164,7 +164,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         chatId = chat.id,
                         it,
                         "image",
-                        "image"
+                        "jpg"
                     )
                 }
             }

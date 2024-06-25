@@ -310,6 +310,14 @@ fun MessageFormat(message: MessageItem, profile: ProfileDTO) {
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
         MessageText(message, profile)
     } else {
+        
+        when (message.attachments!![0].type) {
+        
+        
+        }
+        
+        
+        
         MessageImage(message, profile)
     }
 
