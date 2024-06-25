@@ -159,19 +159,7 @@ fun MessageBlurBox(
                         color = Color(0xFF2A293C)
                     ) {
                         message.content?.let {
-                            Text(
-                                text = it,
-                                style = TextStyle(
-                                    color = Color.White,
-                                    fontSize = 16.sp
-                                ),
-                                modifier = Modifier.padding(
-                                    start = 25.dp,
-                                    end = 25.dp,
-                                    top = 13.dp,
-                                    bottom = 12.dp
-                                ),
-                            )
+                            MessageFormat(message, profile, onClick)
                         }
                     }
                 } else {
@@ -187,19 +175,7 @@ fun MessageBlurBox(
                         color = Color(0xFFF3F4F6)
                     ) {
                         message.content?.let {
-                            Text(
-                                text = it,
-                                style = TextStyle(
-                                    color = Color.Black,
-                                    fontSize = 16.sp
-                                ),
-                                modifier = Modifier.padding(
-                                    start = 25.dp,
-                                    end = 25.dp,
-                                    top = 13.dp,
-                                    bottom = 12.dp
-                                ),
-                            )
+                            MessageFormat(message, profile, onClick)
                         }
                     }
                 }
