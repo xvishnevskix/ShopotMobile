@@ -193,11 +193,11 @@ class SignUpScreen(private val phone: String) : Screen {
                                             val icon = byteArray.value?.let {
                                                 origin().sendFile(
                                                     "file/upload",
-                                                    it, "image/jpeg"
+                                                    it, "image/jpeg", "image"
                                                 )
                                                 
                                             }
-                                            println("icon3131 ${ icon?.id}")
+                                            println("icon3131 ${icon?.id}")
                                             
                                             val jsonContent = Json.encodeToString(
                                                 buildJsonObject {
@@ -239,10 +239,10 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 refreshToken?.let {
                                                     addValueInStorage("refreshToken", refreshToken)
                                                 }
-
-
+                                                
+                                                
                                                 viewModel.updateNotificationToken()
-
+                                                
                                                 viewModel.startObserving()
                                                 viewModel.fetchContacts(navigator)
                                             }

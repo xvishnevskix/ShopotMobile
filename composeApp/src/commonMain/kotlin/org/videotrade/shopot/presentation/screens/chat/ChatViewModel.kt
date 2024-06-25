@@ -2,12 +2,7 @@ package org.videotrade.shopot.presentation.screens.chat
 
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.client.plugins.websocket.WebSockets
-import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.http.HttpMethod
-import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,7 +13,6 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -40,9 +34,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     val profile = MutableStateFlow(ProfileDTO())
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-    
-    
-    
     
     
     init {
@@ -88,7 +79,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    
     fun sendMessage(
         content: String? = null,
         fromUser: String,
@@ -109,10 +99,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 ),
                 attachments
             )
-
+            
             sendNotify("Новое сообщение", content, notificationToken)
-            
-            
+
+
 //            val httpClient = HttpClient {
 //                install(WebSockets)
 //
@@ -155,14 +145,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
         content: String?,
         fromUser: String,
         chatId: String,
-        file: ByteArray
+        file: ByteArray,
+        contentType: String,
+        fileName: String
     ) {
         viewModelScope.launch {
             
             
             val fileId = origin().sendFile(
                 "file/upload",
-                file, "image"
+                file, contentType, fileName
             )
             
             

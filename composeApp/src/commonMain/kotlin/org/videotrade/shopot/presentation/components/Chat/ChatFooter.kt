@@ -65,6 +65,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.multiplatform.AudioFactory
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -83,12 +86,43 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
+    var audioFilePath by remember { mutableStateOf("") }
+    val audioRecorder = remember { AudioFactory.createAudioRecorder() }
     
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
                 delay(1000L)
+                
                 recordingTime++
+                
+                var seconds = recordingTime
+                println("Senddddd ${seconds} ")
+                seconds++
+                
+                if (seconds > 2) {
+                    println("Senddddd")
+                    scope.launch {
+                        val microphonePer =
+                            PermissionsProviderFactory.create().getPermission("microphone")
+                        if (microphonePer) {
+                            val audioFilePathNew = FileProviderFactory.create()
+                                .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
+                            
+                            audioFilePath = audioFilePathNew
+                            
+                            println("audioFilePathNew $audioFilePathNew")
+                            
+                            audioRecorder.startRecording(audioFilePath)
+                        }
+                    }
+//                                    viewModel.sendAttachments(
+//                                        content = text,
+//                                        fromUser = viewModel.profile.value.id,
+//                                        chatId = chat.id,
+//                                        it,
+//                                        "image")
+                }
             }
         } else {
             recordingTime = 0
@@ -128,7 +162,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         content = text,
                         fromUser = viewModel.profile.value.id,
                         chatId = chat.id,
-                        it
+                        it,
+                        "image",
+                        "image"
                     )
                 }
             }
@@ -327,11 +363,24 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onTap = {
+                                    println("Tap detected")
                                     
                                     val seconds = recordingTime % 60
                                     
                                     if (seconds > 2) {
-                                    
+                                        val stopByte = audioRecorder.stopRecording(true)
+                                        
+                                        if (stopByte !== null) {
+                                            viewModel.sendAttachments(
+                                                content = text,
+                                                fromUser = viewModel.profile.value.id,
+                                                chatId = chat.id,
+                                                stopByte,
+                                                "audio/mp4",
+                                                "audio_record"
+                                            
+                                            )
+                                        }
                                     }
                                     
                                     isRecording = false
