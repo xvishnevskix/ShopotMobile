@@ -15,23 +15,43 @@ import platform.Foundation.*
 import platform.posix.memcpy
 
 actual class FileProvider {
+    
     actual fun getAudioFilePath(fileName: String): String {
         val fileManager = NSFileManager.defaultManager()
-        val urls = fileManager.URLsForDirectory(NSCachesDirectory, NSUserDomainMask)
+        val urls = fileManager.URLsForDirectory(NSDocumentDirectory, NSUserDomainMask)
         val documentDirectory = urls.first() as NSURL
         
+        // Создайте новую папку в директории документов
+        val newFolderName = "MyAudioFiles"
+        val newFolderURL = documentDirectory.URLByAppendingPathComponent(newFolderName)
+        val newFolderPath = newFolderURL!!.path
+        
+        if (!newFolderPath?.let { fileManager.fileExistsAtPath(it) }) {
+            try {
+                val attributes = emptyMap<Any?, Any>() // Пустой атрибуты
+                fileManager.createDirectoryAtPath(newFolderPath, true, attributes)
+                println("Folder created at path: $newFolderPath")
+            } catch (e: Exception) {
+                println("Error creating folder: ${e}")
+            }
+        } else {
+            println("Folder already exists at path: $newFolderPath")
+        }
+        
+        // Создайте уникальный файл внутри новой папки
         var fileURL: NSURL
         do {
             val randomSuffix = (0..100000).random()
             val newFileName =
                 "${fileName.substringBeforeLast(".")}_$randomSuffix.${fileName.substringAfterLast(".")}"
-            fileURL = documentDirectory.URLByAppendingPathComponent(newFileName)!!
+            fileURL = newFolderURL.URLByAppendingPathComponent(newFileName)!!
         } while (fileManager.fileExistsAtPath(fileURL.path!!))
         
         println("fileURL.path ${fileURL.path}")
         
         return fileURL.path!!
     }
+
     
     @OptIn(ExperimentalForeignApi::class)
     actual suspend fun downloadFileToDirectory(url: String, fileDirectory: String) {
@@ -46,7 +66,7 @@ actual class FileProvider {
                 while (!response.isClosedForRead) {
                     val packet = response.readRemaining(8192)
                     
-                    println("packet.readBytes() ${packet.readBytes()} $packet")
+                    println("packet.readBytes() $packet")
                     
                     packet.readBytes().usePinned { pinned ->
                         data.appendBytes(pinned.addressOf(0), packet.remaining.toULong())
