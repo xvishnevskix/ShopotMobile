@@ -47,6 +47,7 @@ class TestScreen : Screen {
         
         var isRecording by remember { mutableStateOf(false) }
         var audioFilePath by remember { mutableStateOf("") }
+        var fileId by remember { mutableStateOf("") }
         
         
         
@@ -106,7 +107,8 @@ class TestScreen : Screen {
                                                 if (response.status.isSuccess()) {
                                                     val responseData: FileDTO =
                                                         Json.decodeFromString(response.bodyAsText())
-                                                    
+                                                    println("responseData ${responseData.id}")
+                                                    fileId = responseData.id
                                                     
                                                 } else {
                                                     println("Failed to retrieve data: ${response.status.description} ${response.request}")
@@ -135,7 +137,7 @@ class TestScreen : Screen {
 
 //                                return@Button
                                         
-                                        audioRecorder.startRecording(audioFilePath)
+                                        audioRecorder.startRecording(audioFilePathNew)
                                         isRecording = true
                                     }
                                 }
@@ -162,7 +164,7 @@ class TestScreen : Screen {
                             scope.launch {
                                 val audioFile = FileProviderFactory.create()
                                 val url =
-                                    "https://videotradedev.ru/api/file/id/52d8ab3e-076e-43c3-932a-f704674df694"
+                                    "https://videotradedev.ru/api/file/id/${fileId}"
                                 val fileName = "downloadedFile.mp4"
                                 
                                 val filePath = audioFile.getAudioFilePath(fileName)

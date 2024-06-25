@@ -86,8 +86,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
-    var audioFilePath by remember { mutableStateOf("") }
     val audioRecorder = remember { AudioFactory.createAudioRecorder() }
+    var isStartRecording by remember { mutableStateOf(false) }
+    
     
     LaunchedEffect(isRecording) {
         if (isRecording) {
@@ -101,27 +102,26 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 seconds++
                 
                 if (seconds > 2) {
-                    println("Senddddd")
-                    scope.launch {
-                        val microphonePer =
-                            PermissionsProviderFactory.create().getPermission("microphone")
-                        if (microphonePer) {
-                            val audioFilePathNew = FileProviderFactory.create()
-                                .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
+                    if (!isStartRecording) {
+                        scope.launch {
+                            println("isStartRecording")
                             
-                            audioFilePath = audioFilePathNew
-                            
-                            println("audioFilePathNew $audioFilePathNew")
-                            
-                            audioRecorder.startRecording(audioFilePath)
+                            val microphonePer =
+                                PermissionsProviderFactory.create().getPermission("microphone")
+                            if (microphonePer) {
+                                val audioFilePathNew = FileProviderFactory.create()
+                                    .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
+
+//                                audioFilePath = audioFilePathNew
+                                
+                                println("audioFilePathNew $audioFilePathNew")
+                                
+                                audioRecorder.startRecording(audioFilePathNew)
+                                isStartRecording = true
+                            }
                         }
                     }
-//                                    viewModel.sendAttachments(
-//                                        content = text,
-//                                        fromUser = viewModel.profile.value.id,
-//                                        chatId = chat.id,
-//                                        it,
-//                                        "image")
+                    
                 }
             }
         } else {
@@ -366,11 +366,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     println("Tap detected")
                                     
                                     val seconds = recordingTime % 60
-                                    
+
                                     if (seconds > 2) {
                                         val stopByte = audioRecorder.stopRecording(true)
                                         
                                         if (stopByte !== null) {
+                                            isStartRecording = false
+                                            
                                             viewModel.sendAttachments(
                                                 content = text,
                                                 fromUser = viewModel.profile.value.id,

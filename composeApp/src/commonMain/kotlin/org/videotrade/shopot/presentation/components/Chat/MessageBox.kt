@@ -87,7 +87,7 @@ fun MessageBox(
                 shadowElevation = 4.dp,
                 color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
             ) {
-                MessageFormat(message, profile)
+                MessageFormat(message, profile, onClick)
             }
         }
         
