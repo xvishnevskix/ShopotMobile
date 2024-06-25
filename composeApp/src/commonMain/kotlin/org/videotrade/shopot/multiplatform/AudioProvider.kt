@@ -9,6 +9,9 @@ expect class AudioRecorder {
 expect class AudioPlayer {
     fun startPlaying(filePath: String)
     fun stopPlaying()
+    
+    fun getAudioDuration(filePath: String): String
+    
 }
 
 expect object AudioFactory {

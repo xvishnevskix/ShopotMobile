@@ -230,7 +230,8 @@ class origin {
     suspend fun sendFile(
         url: String,
         fileBytes: ByteArray,
-        contentType: String
+        contentType: String,
+        filename: String
     ): FileDTO? {
         val client =
             HttpClient(getHttpClientEngine())
@@ -243,7 +244,7 @@ class origin {
                     formData {
                         append("file", fileBytes, Headers.build {
                             append(HttpHeaders.ContentType, contentType)
-                            append(HttpHeaders.ContentDisposition, "filename=\"jpg\"")
+                            append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
                         })
                     }
                 ))

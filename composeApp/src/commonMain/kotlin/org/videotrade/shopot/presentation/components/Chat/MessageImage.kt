@@ -11,15 +11,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 
 
 @Composable
-fun MessageImage(message: MessageItem, profile: ProfileDTO) {
+fun MessageImage(
+    message: MessageItem, profile: ProfileDTO,
+    attachments: List<Attachment>
+) {
     
     val imagePainter =
-        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${message.attachments?.get(0)?.fileId}")
+        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
     
     
     

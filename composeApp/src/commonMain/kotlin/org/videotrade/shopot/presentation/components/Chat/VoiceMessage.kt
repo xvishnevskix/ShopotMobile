@@ -8,7 +8,6 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,9 +19,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.IconButton
@@ -31,22 +28,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.LayoutCoordinates
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -54,16 +48,21 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.api.formatTimestamp
+import org.koin.compose.koinInject
+import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.AudioFactory
+import org.videotrade.shopot.multiplatform.AudioPlayer
+import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.double_message_check
-import shopot.composeapp.generated.resources.single_message_check
 import shopot.composeapp.generated.resources.voice_message_pause
 import shopot.composeapp.generated.resources.voice_message_play_dark
 import shopot.composeapp.generated.resources.voice_message_play_white
@@ -75,146 +74,90 @@ fun VoiceMessageBox(
     duration: String,
 //    waveData: List<Float>,
 //    onPlayPauseClick: () -> Unit,
-
-    viewModel: ChatViewModel,
+    
     message: MessageItem,
-    profile: ProfileDTO,
-    onClick: () -> Unit,
-    onPositioned: (LayoutCoordinates) -> Unit,
-    isVisible: Boolean
+    attachments: List<Attachment>
 ) {
-
-    val isReadByMe = remember { mutableStateOf(false) }
-
-    LaunchedEffect(viewModel.messages.value) {
-        if (message.fromUser == profile.id) {
-            if (message.anotherRead) {
-                isReadByMe.value = true
-            }
-        } else {
-            if (!message.iread) {
-                viewModel.sendReadMessage(message.id)
-            }
-        }
-    }
-
-
+    val scope = rememberCoroutineScope()
+    
+    val viewModel: ChatViewModel = koinInject()
+    val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
+    
     var isPlaying by remember { mutableStateOf(false) }
     val waveData = remember { generateRandomWaveData(50) }
-
-    Column(
-        modifier = Modifier
-            .onGloballyPositioned(onPositioned)
-            .alpha(if (isVisible) 1f else 0f)
-    ) {
-        Box(
-            contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { onClick() }
-                    )
-                }
-        ) {
-            Surface(
-                modifier = Modifier.wrapContentSize().widthIn(max = 240.dp),
-                shape = RoundedCornerShape(
-                    topStart = 20.dp,
-                    topEnd = 20.dp,
-                    bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                    bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
-                ),
-                shadowElevation = 4.dp,
-                color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
-            ) {
-
-//           TODO     VoiceMessageFormat(message, profile)
-
-                Row(
-                    modifier = Modifier
-                        .padding(start = 22.dp, end = 22.dp, top = 12.dp, bottom = 12.dp)
-                        ,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { isPlaying = !isPlaying },
-                        modifier = Modifier
-                            .size(45.dp)
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .size(45.dp),
-                            painter =
-                            if (!isPlaying) {
-                                if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_play_white)
-                                else  painterResource(Res.drawable.voice_message_play_dark)
-                            } else {
-                                painterResource(Res.drawable.voice_message_pause)
-                            }
-
-                            ,
-                            contentDescription = null,
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
-                    Column(
-                        verticalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        Waveform(waveData = waveData, message, profile)
-                        Text(
-                            text = duration,
-                            color = if (message.fromUser == profile.id) Color.White else Color(0xFF2A293C),
-                            textAlign = TextAlign.Center,
-                            fontSize = 12.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-
-                        )
-                    }
-                }
-
-                    //
-            }
+    var audioFilePath by remember { mutableStateOf("") }
+    val audioPlayer = remember { AudioFactory.createAudioPlayer() }
+    
+    
+    LaunchedEffect(Unit) {
+        scope.launch {
+            val audioFile = FileProviderFactory.create()
+            val url =
+                "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+            val fileName = "downloadedFile.mp4"
+            
+            val filePath = audioFile.getAudioFilePath(fileName)
+            
+            audioFile.downloadFileToDirectory(url, filePath)
+            
+            
+            println("filePath $filePath")
+            
+            audioFilePath = filePath
+            
         }
-
-        Row(
-            horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
-            modifier = Modifier
-                .padding(start = 2.dp, end = 2.dp)
-                .fillMaxWidth()
-        ) {
-            if (message.fromUser == profile.id)
-                if (message.anotherRead) {
-                    Image(
-                        modifier = Modifier
-                            .padding(top = 2.dp, end = 4.dp)
-                            .size(14.dp),
-                        painter = painterResource(Res.drawable.double_message_check),
-                        contentDescription = null,
-                    )
+    }
+    
+    Row(
+        modifier = Modifier
+            .padding(start = 22.dp, end = 22.dp, top = 12.dp, bottom = 12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IconButton(
+            onClick = {
+                isPlaying = !isPlaying
+                println("isPlaying $isPlaying")
+                
+                if (isPlaying) {
+                    playVoice(audioPlayer, audioFilePath)
+                    
                 } else {
-                    Image(
-                        modifier = Modifier
-                            .padding(top = 2.dp, end = 4.dp)
-                            .size(14.dp),
-                        painter = painterResource(Res.drawable.single_message_check),
-                        contentDescription = null,
-                    )
+                    stopVoice(audioPlayer)
                 }
-
-            Text(
-                text = formatTimestamp(message.created),
-                style = TextStyle(
-                    color = Color.Gray,
-                    fontSize = 16.sp
-                ),
-                modifier = Modifier.padding(),
+            },
+            modifier = Modifier
+                .size(45.dp)
+        ) {
+            Image(
+                modifier = Modifier
+                    .size(45.dp),
+                painter =
+                if (!isPlaying) {
+                    if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_play_white)
+                    else painterResource(Res.drawable.voice_message_play_dark)
+                } else {
+                    painterResource(Res.drawable.voice_message_pause)
+                },
+                contentDescription = null,
             )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Column(
+            verticalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Waveform(waveData = waveData, message, profile)
+            Text(
+                text = duration,
+                color = if (message.fromUser == profile.id) Color.White else Color(0xFF2A293C),
+                textAlign = TextAlign.Center,
+                fontSize = 12.sp,
+                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                
+                )
         }
     }
 }
@@ -255,15 +198,24 @@ fun VoiceMessageBox(
 //    }
 
 
+fun playVoice(audioPlayer: AudioPlayer, audioFilePath: String) {
+    audioPlayer.startPlaying(audioFilePath)
+}
+
+fun stopVoice(audioPlayer: AudioPlayer) {
+    audioPlayer.stopPlaying()
+}
+
 @Composable
-fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO,) {
-    Canvas(modifier = Modifier
-        .fillMaxWidth()
-        .height(19.dp)
+fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO) {
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(19.dp)
     ) {
         val barWidth = size.width / (waveData.size * 2 - 1)
         val maxBarHeight = size.height
-
+        
         waveData.forEachIndexed { index, amplitude ->
             val barHeight = maxBarHeight * amplitude
             drawRect(
@@ -274,7 +226,6 @@ fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO,) 
         }
     }
 }
-
 
 
 fun generateRandomWaveData(size: Int): List<Float> {
@@ -290,7 +241,7 @@ fun VoiceMessageBlurBox(
     visible: Boolean
 ) {
     val clipboardManager = LocalClipboardManager.current
-
+    
     val transition = updateTransition(targetState = visible, label = "MessageBlurBoxTransition")
     val orientation: Dp = if (message.fromUser == profile.id) 100.dp else -75.dp
     val firstColumnOffsetX by transition.animateDp(
@@ -299,14 +250,14 @@ fun VoiceMessageBlurBox(
     ) { state ->
         if (state) 0.dp else orientation
     }
-
+    
     val secondColumnOffsetY by transition.animateDp(
         transitionSpec = { tween(durationMillis = 300, easing = FastOutSlowInEasing) },
         label = "SecondColumnOffsetY"
     ) { state ->
         if (state) 0.dp else 200.dp
     }
-
+    
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -339,7 +290,7 @@ fun VoiceMessageBlurBox(
                         color = Color(0xFF2A293C)
                     ) {
                         message.content?.let {
-                            MessageFormat(message, profile)
+//                            MessageFormat(message, profile)
                         }
                     }
                 } else {
@@ -355,7 +306,7 @@ fun VoiceMessageBlurBox(
                         color = Color(0xFFF3F4F6)
                     ) {
                         message.content?.let {
-                            MessageFormat(message, profile)
+//                            MessageFormat(message, profile)
                         }
                     }
                 }
@@ -379,7 +330,7 @@ fun VoiceMessageBlurBox(
                 )
             }
         }
-
+        
         Column(
             modifier = Modifier
                 .offset(y = secondColumnOffsetY)
@@ -395,9 +346,9 @@ fun VoiceMessageBlurBox(
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
                         .fillMaxWidth().clickable {
-
-
-                            editOption.onClick(viewModel, message, clipboardManager)
+                        
+                        
+                        editOption.onClick(viewModel, message, clipboardManager)
                         }
                 ) {
                     Text(
