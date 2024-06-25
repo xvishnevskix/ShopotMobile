@@ -180,6 +180,7 @@ fun MessageBlurBox(
                     }
                 }
             }
+
             Row(
                 horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
                 modifier = Modifier
