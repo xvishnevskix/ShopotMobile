@@ -29,7 +29,6 @@ import kotlinx.serialization.json.Json
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.FileDTO
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -61,7 +60,7 @@ class TestScreen : Screen {
                                 val microphonePer =
                                     PermissionsProviderFactory.create().getPermission("microphone")
                                 
-                                println("microphonePer ${microphonePer}")
+                                println("microphonePer $microphonePer")
                                 if (microphonePer) {
                                     if (isRecording) {
                                         val stopByte = audioRecorder.stopRecording(true)
@@ -156,104 +155,33 @@ class TestScreen : Screen {
                     ) {
                         Text("Play Audio")
                     }
+                    
+                    
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val audioFile = FileProviderFactory.create()
+                                val url =
+                                    "https://videotradedev.ru/api/file/id/52d8ab3e-076e-43c3-932a-f704674df694"
+                                val fileName = "downloadedFile.mp4"
+                                
+                                val filePath = audioFile.getAudioFilePath(fileName)
+                                
+                                audioFile.downloadFileToDirectory(url, filePath)
+                                
+                                
+                                audioFilePath = filePath
+                                
+                            }
+                        }
+                    ) {
+                        Text("Download Audio")
+                    }
                 }
             }
         }
     }
 }
-//package org.videotrade.shopot.presentation.screens.test
-//
-//import androidx.compose.foundation.layout.*
-//import androidx.compose.foundation.lazy.LazyColumn
-//import androidx.compose.foundation.lazy.items
-//import androidx.compose.material.ExperimentalMaterialApi
-//import androidx.compose.material.pullrefresh.PullRefreshState
-//import androidx.compose.material.pullrefresh.pullRefresh
-//import androidx.compose.material.pullrefresh.rememberPullRefreshState
-//import androidx.compose.material3.*
-//import androidx.compose.runtime.*
-//import androidx.compose.ui.Alignment
-//import androidx.compose.ui.Modifier
-//import androidx.compose.ui.geometry.Offset
-//import androidx.compose.ui.text.style.TextAlign
-//import androidx.compose.ui.unit.IntOffset
-//import androidx.compose.ui.unit.dp
-//import androidx.compose.ui.unit.sp
-//import cafe.adriel.voyager.core.screen.Screen
-//import kotlinx.coroutines.delay
-//import kotlinx.coroutines.launch
-//import org.koin.compose.koinInject
-//import org.videotrade.shopot.presentation.components.Common.SafeArea
-//import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-//
-//class TestScreen : Screen {
-//    @OptIn(ExperimentalMaterialApi::class)
-//    @Composable
-//    override fun Content() {
-//        val scope = rememberCoroutineScope()
-//        val commonViewModel: CommonViewModel = koinInject()
-//
-//        var items by remember { mutableStateOf(listOf("Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3", "Item 1", "Item 2", "Item 3")) }
-//        var refreshing by remember { mutableStateOf(false) }
-//
-//        val refreshState = rememberPullRefreshState(
-//            refreshing = refreshing,
-//            onRefresh = {
-//                scope.launch {
-//                    // Имитируем обновление данных
-//                    refreshing = true
-//                    items = items + "New Item"
-//                    refreshing = false
-//                }
-//            }
-//        )
-//
-//        MaterialTheme {
-//            SafeArea {
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .pullRefresh(refreshState)
-//                ) {
-//                    LazyColumn(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .offset { IntOffset(x = 0, y = (refreshState.progress * 100).toInt()) },
-//                        verticalArrangement = Arrangement.Top,
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//                    ) {
-//                        items(items) { item ->
-//                            Text(
-//                                text = item,
-//                                fontSize = 20.sp,
-//                                modifier = Modifier
-//                                    .padding(16.dp)
-//                                    .fillMaxWidth(),
-//                                textAlign = TextAlign.Center
-//                            )
-//                        }
-//                    }
-//                    PullRefreshIndicator(refreshState, Modifier.align(Alignment.TopCenter))
-//                }
-//            }
-//        }
-//    }
-//}
-//
-//@OptIn(ExperimentalMaterialApi::class)
-//@Composable
-//fun PullRefreshIndicator(state: PullRefreshState, modifier: Modifier = Modifier) {
-//    val progress = state.progress
-//
-//    Box(
-//        contentAlignment = Alignment.Center,
-//        modifier = modifier
-//            .size(56.dp)
-//            .padding(16.dp)
-//    ) {
-//        CircularProgressIndicator(
-//            progress = progress
-//        )
-//    }
-//}
+
+
 
