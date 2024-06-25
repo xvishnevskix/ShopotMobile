@@ -112,8 +112,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 val audioFilePathNew = FileProviderFactory.create()
                                     .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
 
-//                                audioFilePath = audioFilePathNew
-                                
                                 println("audioFilePathNew $audioFilePathNew")
                                 
                                 audioRecorder.startRecording(audioFilePathNew)

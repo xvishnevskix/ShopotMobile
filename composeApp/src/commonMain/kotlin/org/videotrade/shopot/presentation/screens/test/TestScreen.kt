@@ -130,8 +130,8 @@ class TestScreen : Screen {
                                     } else {
                                         val audioFilePathNew = FileProviderFactory.create()
                                             .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
-                                        
-                                        audioFilePath = audioFilePathNew
+
+//                                        audioFilePath = audioFilePathNew
                                         
                                         println("audioFilePathNew $audioFilePathNew")
 
@@ -165,12 +165,16 @@ class TestScreen : Screen {
                                 val audioFile = FileProviderFactory.create()
                                 val url =
                                     "https://videotradedev.ru/api/file/id/${fileId}"
-                                val fileName = "downloadedFile.mp4"
+                                val fileName = "downloadedFile.m4a"
                                 
                                 val filePath = audioFile.getAudioFilePath(fileName)
                                 
-                                audioFile.downloadFileToDirectory(url, filePath)
-                                
+                                try {
+                                    audioFile.downloadFileToDirectory(url, filePath)
+                                    
+                                } catch (e: Exception) {
+                                    println("errrrrrrr $e")
+                                }
                                 
                                 audioFilePath = filePath
                                 
@@ -179,11 +183,22 @@ class TestScreen : Screen {
                     ) {
                         Text("Download Audio")
                     }
+                    
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                val audioRecorderaa = audioPlayer.getAudioDuration(audioFilePath)
+                                
+                                
+                                println("audioRecorder $audioRecorderaa")
+                                
+                            }
+                        }
+                    ) {
+                        Text("getDurr Audio")
+                    }
                 }
             }
         }
     }
 }
-
-
-

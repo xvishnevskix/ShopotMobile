@@ -19,11 +19,18 @@ import platform.AVFAudio.AVFormatIDKey
 import platform.AVFAudio.AVNumberOfChannelsKey
 import platform.AVFAudio.AVSampleRateKey
 import platform.AVFAudio.setActive
+import platform.AVFoundation.AVAsset
+import platform.AVFoundation.AVKeyValueStatus
 import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
+import platform.CoreMedia.CMTimeGetSeconds
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.Foundation.create
+import platform.darwin.DISPATCH_TIME_FOREVER
+import platform.darwin.dispatch_semaphore_create
+import platform.darwin.dispatch_semaphore_signal
+import platform.darwin.dispatch_semaphore_wait
 import platform.posix.fclose
 import platform.posix.fopen
 import platform.posix.fread
@@ -137,16 +144,23 @@ actual class AudioPlayer {
             val errorPtr = alloc<ObjCObjectVar<NSError?>>()
             try {
                 println("Initializing AVAudioPlayer")
-                audioPlayer = AVAudioPlayer(audioURL, errorPtr.ptr).apply {
-                    if (errorPtr.value == null) {
-                        println("Successfully initialized AVAudioPlayer")
-                        val prepared = prepareToPlay()
-                        println("Prepared to play: $prepared")
-                        val playing = play()
-                        println("Playing started: $playing")
+                val player = AVAudioPlayer(audioURL, errorPtr.ptr)
+                
+                if (errorPtr.value != null) {
+                    println("Error initializing AVAudioPlayer: ${errorPtr.value?.localizedDescription}")
+                    return@memScoped
+                }
+                
+                audioPlayer = player.apply {
+                    if (prepareToPlay()) {
+                        println("Prepared to play")
+                        if (play()) {
+                            println("Playing started")
+                        } else {
+                            println("Failed to start playing")
+                        }
                     } else {
-                        println("Error initializing AVAudioPlayer: ${errorPtr.value?.localizedDescription}")
-                        audioPlayer = null // Устанавливаем в null, если произошла ошибка
+                        println("Failed to prepare to play")
                     }
                 }
             } catch (e: Exception) {
@@ -162,6 +176,41 @@ actual class AudioPlayer {
         audioPlayer?.stop()
         println("Playing stopped")
         audioPlayer = null
+    }
+    
+    
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun getAudioDuration(filePath: String): String {
+        val url = NSURL.fileURLWithPath(filePath)
+        val asset = AVAsset.assetWithURL(url)
+        
+        // Подождем пока asset будет загружен
+        val semaphore = dispatch_semaphore_create(0)
+        var duration: Long = 0L
+        
+        asset.loadValuesAsynchronouslyForKeys(listOf("duration")) {
+            memScoped {
+                val errorPtr = alloc<ObjCObjectVar<NSError?>>()
+                if (asset.statusOfValueForKey("duration", errorPtr.ptr) == AVKeyValueStatusLoaded) {
+                    val durationCMTime = asset.duration
+                    duration = (CMTimeGetSeconds(durationCMTime) * 1000).toLong()
+                }
+                dispatch_semaphore_signal(semaphore)
+            }
+        }
+        
+        // Ждем пока asset загрузится
+        dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER)
+        
+        val totalSeconds = duration / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        return "${if (minutes < 10) "0" else ""}$minutes:${if (seconds < 10) "0" else ""}$seconds"
+    }
+    
+    
+    companion object {
+        private const val AVKeyValueStatusLoaded: Long = 2
     }
 }
 

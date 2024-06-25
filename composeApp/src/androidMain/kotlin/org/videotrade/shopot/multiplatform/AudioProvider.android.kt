@@ -1,5 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
+import android.annotation.SuppressLint
+import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import java.io.File
@@ -56,6 +58,20 @@ actual class AudioPlayer {
     actual fun stopPlaying() {
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+    
+    @SuppressLint("DefaultLocale")
+    actual fun getAudioDuration(filePath: String): String {
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(filePath)
+        val durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        retriever.release()
+        
+        val milliseconds = durationStr?.toLongOrNull() ?: 0L
+        val totalSeconds = milliseconds / 1000
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        return String.format("%02d:%02d", minutes, seconds)
     }
 }
 
