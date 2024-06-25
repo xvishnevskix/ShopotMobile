@@ -2,7 +2,7 @@ package org.videotrade.shopot.multiplatform
 
 expect class AudioRecorder {
     fun startRecording(outputFilePath: String)
-    fun stopRecording()
+    fun stopRecording(getByte: Boolean): ByteArray?
 }
 
 

@@ -6,6 +6,7 @@ import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
 import kotlinx.cinterop.ptr
+import kotlinx.cinterop.refTo
 import kotlinx.cinterop.value
 import platform.AVFAudio.AVAudioPlayer
 import platform.AVFAudio.AVAudioQualityHigh
@@ -22,14 +23,22 @@ import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
-
+import platform.Foundation.create
+import platform.posix.fclose
+import platform.posix.fopen
+import platform.posix.fread
+import platform.posix.fseek
+import platform.posix.ftell
+import platform.posix.rewind
 
 actual class AudioRecorder {
     private var audioRecorder: AVAudioRecorder? = null
+    private var outputFile: String = ""
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     actual fun startRecording(outputFilePath: String) {
         println("Start recording with outputFilePath: $outputFilePath")
+        outputFile = outputFilePath
         val audioFilename = NSURL.fileURLWithPath(outputFilePath)
         val fileManager = NSFileManager.defaultManager
         val fileExists = audioFilename.path?.let { fileManager.fileExistsAtPath(it) }
@@ -88,13 +97,31 @@ actual class AudioRecorder {
         }
     }
     
-    actual fun stopRecording() {
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun stopRecording(getByte: Boolean): ByteArray? {
         println("Stop recording")
         audioRecorder?.apply {
             stop()
             println("Recording stopped")
         }
         audioRecorder = null
+        
+        return if (getByte) {
+            val file = fopen(outputFile, "rb")
+            if (file != null) {
+                fseek(file, 0, platform.posix.SEEK_END)
+                val fileSize = ftell(file).toInt()
+                rewind(file)
+                val byteArray = ByteArray(fileSize)
+                fread(byteArray.refTo(0), 1u, fileSize.toULong(), file)
+                fclose(file)
+                byteArray
+            } else {
+                null
+            }
+        } else {
+            null
+        }
     }
 }
 
