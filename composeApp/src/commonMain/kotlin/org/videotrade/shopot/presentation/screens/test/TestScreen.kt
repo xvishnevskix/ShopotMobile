@@ -1,6 +1,10 @@
 package org.videotrade.shopot.presentation.screens.test
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -10,7 +14,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.MultiPartFormDataContent
@@ -34,6 +42,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.presentation.components.Chat.generateRandomWaveData
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
@@ -48,6 +57,7 @@ class TestScreen : Screen {
         var isRecording by remember { mutableStateOf(false) }
         var audioFilePath by remember { mutableStateOf("") }
         var fileId by remember { mutableStateOf("") }
+        val waveData = remember { generateRandomWaveData(50) }
         
         
         
@@ -130,13 +140,13 @@ class TestScreen : Screen {
                                     } else {
                                         val audioFilePathNew = FileProviderFactory.create()
                                             .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
-
-//                                        audioFilePath = audioFilePathNew
+                                        
+                                        audioFilePath = audioFilePathNew
                                         
                                         println("audioFilePathNew $audioFilePathNew")
 
 //                                return@launch
-
+                                        
                                         audioRecorder.startRecording(audioFilePathNew)
                                         isRecording = true
                                     }
@@ -203,8 +213,48 @@ class TestScreen : Screen {
                     ) {
                         Text("getDurr Audio")
                     }
+                    
+                    Button(
+                        onClick = {
+                            scope.launch {
+                            
+                            
+                            }
+                        }
+                    ) {
+                        Text("Set Audio")
+                    }
+                    
+                    Spacer(Modifier.height(40.dp))
+                    Waveform(waveData)
                 }
+                
+                
             }
+            
+            
+        }
+    }
+}
+
+
+@Composable
+fun Waveform(waveData: List<Float>) {
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(19.dp)
+    ) {
+        val barWidth = size.width / (waveData.size * 2 - 1)
+        val maxBarHeight = size.height
+        
+        waveData.forEachIndexed { index, amplitude ->
+            val barHeight = maxBarHeight * amplitude
+            drawRect(
+                color = Color(0xFF2A293C),
+                topLeft = Offset(index * 2 * barWidth, maxBarHeight / 2 - barHeight / 2),
+                size = Size(barWidth, barHeight)
+            )
         }
     }
 }

@@ -88,13 +88,17 @@ fun VoiceMessageBox(
         }
     }
     
-    LaunchedEffect(Unit) {
+    LaunchedEffect(message) {
+        
+        println("fileId ${message.attachments?.get(0)?.fileId}")
+        val audioFile = FileProviderFactory.create()
+        val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+        val fileName = "${attachments[0].name}.m4a"
+        
+        println("fileName $fileName")
+        val filePath = audioFile.getAudioFilePath(fileName)
         scope.launch {
-            val audioFile = FileProviderFactory.create()
-            val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
-            val fileName = "${attachments[0].name}.m4a"
             
-            val filePath = audioFile.getAudioFilePath(fileName)
             audioFile.downloadFileToDirectory(url, filePath)
             
             println("filePath $filePath")
