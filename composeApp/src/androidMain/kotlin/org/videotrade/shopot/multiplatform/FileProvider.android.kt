@@ -1,7 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
+import android.content.Context
 import android.os.Build
-import android.os.Environment
 import androidx.annotation.RequiresApi
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -15,10 +15,10 @@ import java.nio.file.Paths
 import kotlin.random.Random
 
 
-actual class FileProvider {
+actual class FileProvider(private val applicationContext: Context) {
     actual fun getAudioFilePath(fileName: String): String {
-        val directory =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        // Используем каталог кэша приложения
+        val directory = applicationContext.cacheDir
         if (!directory.exists()) {
             directory.mkdirs()
         }
@@ -30,7 +30,6 @@ actual class FileProvider {
                 "${fileName.substringBeforeLast(".")}_$randomSuffix.${fileName.substringAfterLast(".")}"
             file = File(directory, newFileName)
         } while (file.exists())
-        
         
         println("file.absolutePath ${file.absolutePath}")
         
@@ -60,8 +59,14 @@ actual class FileProvider {
 
 
 actual object FileProviderFactory {
+    
+    private lateinit var applicationContext: Context
+    fun initialize(context: Context) {
+        this.applicationContext = context
+    }
+    
     actual fun create(): FileProvider {
-        return FileProvider()
+        return FileProvider(applicationContext)
     }
 }
 

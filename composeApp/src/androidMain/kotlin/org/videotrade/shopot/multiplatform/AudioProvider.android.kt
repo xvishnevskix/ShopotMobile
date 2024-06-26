@@ -1,9 +1,12 @@
 package org.videotrade.shopot.multiplatform
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import org.junit.runner.manipulation.Ordering
 import java.io.File
 import java.io.FileInputStream
 
@@ -44,10 +47,18 @@ actual class AudioRecorder {
     }
 }
 
-actual class AudioPlayer {
+actual class AudioPlayer(private val applicationContext: Context) {
     private var mediaPlayer: MediaPlayer? = null
     
     actual fun startPlaying(filePath: String) {
+        // Получение экземпляра AudioManager
+        val audioManager =
+            applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        
+        // Установка аудиосессии для воспроизведения через основной динамик
+        audioManager.mode = AudioManager.MODE_NORMAL
+        audioManager.isSpeakerphoneOn = true
+        
         mediaPlayer = MediaPlayer().apply {
             setDataSource(filePath)
             prepare()
@@ -76,11 +87,18 @@ actual class AudioPlayer {
 }
 
 actual object AudioFactory {
+    
+    private lateinit var applicationContext: Context
+    
+    fun initialize(context: Context) {
+        applicationContext = context
+    }
+    
     actual fun createAudioRecorder(): AudioRecorder {
         return AudioRecorder()
     }
     
     actual fun createAudioPlayer(): AudioPlayer {
-        return AudioPlayer()
+        return AudioPlayer(applicationContext)
     }
 }

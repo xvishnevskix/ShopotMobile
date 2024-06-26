@@ -92,18 +92,16 @@ class ChatScreen(
                 }
             }
             
-            if (profile != null) {
-                BlurredMessageOverlay(
-                    profile,
-                    viewModel,
-                    selectedMessage = selectedMessage,
-                    selectedMessageY = selectedMessageY,
-                    onDismiss = {
-                        selectedMessage = null
-                        hiddenMessageId = null
-                    }
-                )
-            }
+            BlurredMessageOverlay(
+                profile,
+                viewModel,
+                selectedMessage = selectedMessage,
+                selectedMessageY = selectedMessageY,
+                onDismiss = {
+                    selectedMessage = null
+                    hiddenMessageId = null
+                }
+            )
         }
     }
 }

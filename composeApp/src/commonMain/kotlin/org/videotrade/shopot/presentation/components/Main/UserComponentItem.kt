@@ -171,6 +171,13 @@ fun MessageContent(message: MessageItem): String {
     return if (message.attachments == null || message.attachments?.isEmpty() == true) {
         message.content ?: "Начните переписку"
     } else {
-        "Фото"
+        
+        when (message.attachments!![0].type) {
+            "audio/mp4" -> "Аудио"
+            "image" -> "Фото"
+            else -> ""
+        }
+        
+        
     }
 }

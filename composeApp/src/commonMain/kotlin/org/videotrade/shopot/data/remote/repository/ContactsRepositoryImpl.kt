@@ -137,6 +137,8 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
                     put("secondUserId", contact.id)
                 }
             )
+            println("error createChat $jsonContentSocket")
+            
             
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContentSocket))
         } catch (e: Exception) {

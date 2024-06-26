@@ -246,7 +246,6 @@ fun MessageFormat(
             
             "audio/mp4" -> {
                 VoiceMessageBox(
-                    "00:10",
                     message,
                     message.attachments!!
                 )

@@ -13,6 +13,7 @@ import platform.AVFAudio.AVAudioQualityHigh
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
+import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.AVAudioSessionModeDefault
 import platform.AVFAudio.AVEncoderAudioQualityKey
 import platform.AVFAudio.AVFormatIDKey
@@ -144,6 +145,17 @@ actual class AudioPlayer {
             val errorPtr = alloc<ObjCObjectVar<NSError?>>()
             try {
                 println("Initializing AVAudioPlayer")
+                
+                // Настройка аудиосессии для использования основного динамика
+                val audioSession = AVAudioSession.sharedInstance()
+                audioSession.setCategory(AVAudioSessionCategoryPlayback, error = errorPtr.ptr)
+                audioSession.setActive(true, error = errorPtr.ptr)
+                
+                if (errorPtr.value != null) {
+                    println("Error setting audio session: ${errorPtr.value?.localizedDescription}")
+                    return@memScoped
+                }
+                
                 val player = AVAudioPlayer(audioURL, errorPtr.ptr)
                 
                 if (errorPtr.value != null) {
@@ -170,6 +182,7 @@ actual class AudioPlayer {
             }
         }
     }
+    
     
     actual fun stopPlaying() {
         println("Stop playing")

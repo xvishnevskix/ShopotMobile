@@ -295,12 +295,15 @@ suspend fun handleConnectWebSocket(
                                     
                                     try {
                                         
+                                        println("createChat")
                                         
                                         val dataJson =
                                             jsonElement.jsonObject["data"]?.jsonObject
                                         
                                         
                                         if (dataJson != null) {
+                                            
+                                            println("createChatdataJson $dataJson")
                                             
                                             
                                             val chat =

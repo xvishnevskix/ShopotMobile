@@ -62,9 +62,7 @@ class ContactsViewModel() : ViewModel(),
         viewModelScope.launch {
             val profile = ProfileUseCase.getProfile()
             
-            if (profile != null) {
-                ContactsUseCase.createChat(profile.id, contact)
-            }
+            ContactsUseCase.createChat(profile.id, contact)
             
         }
         

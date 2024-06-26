@@ -135,8 +135,8 @@ class TestScreen : Screen {
                                         
                                         println("audioFilePathNew $audioFilePathNew")
 
-//                                return@Button
-                                        
+//                                return@launch
+
                                         audioRecorder.startRecording(audioFilePathNew)
                                         isRecording = true
                                     }
@@ -165,11 +165,17 @@ class TestScreen : Screen {
                                 val audioFile = FileProviderFactory.create()
                                 val url =
                                     "https://videotradedev.ru/api/file/id/${fileId}"
+//                                val url =
+//                                    "https://example-files.online-convert.com/audio/m4a/example.m4a"
+                                
+                                
                                 val fileName = "downloadedFile.m4a"
                                 
                                 val filePath = audioFile.getAudioFilePath(fileName)
                                 
                                 try {
+                                    println("filePath $filePath")
+                                    
                                     audioFile.downloadFileToDirectory(url, filePath)
                                     
                                 } catch (e: Exception) {
