@@ -2,6 +2,7 @@ package org.videotrade.shopot.multiplatform
 
 import android.content.Context
 import android.os.Build
+import android.os.Environment
 import androidx.annotation.RequiresApi
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
@@ -22,7 +23,7 @@ actual class FileProvider(private val applicationContext: Context) {
         if (!directory.exists()) {
             directory.mkdirs()
         }
-        
+
         var file: File
         do {
             val randomSuffix = Random.nextInt(0, 100000)
@@ -36,6 +37,27 @@ actual class FileProvider(private val applicationContext: Context) {
         return file.absolutePath
     }
     
+    //actual fun getAudioFilePath(fileName: String): String {
+//    val directory =
+//        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//    if (!directory.exists()) {
+//        directory.mkdirs()
+//    }
+//
+//    var file: File
+//    do {
+//        val randomSuffix = Random.nextInt(0, 100000)
+//        val newFileName =
+//            "${fileName.substringBeforeLast(".")}_$randomSuffix.${fileName.substringAfterLast(".")}"
+//        file = File(directory, newFileName)
+//    } while (file.exists())
+//
+//
+//    println("file.absolutePath ${file.absolutePath}")
+//
+//    return file.absolutePath
+//}
+//
     @RequiresApi(Build.VERSION_CODES.O)
     actual suspend fun downloadFileToDirectory(url: String, fileDirectory: String) {
         val client = HttpClient()

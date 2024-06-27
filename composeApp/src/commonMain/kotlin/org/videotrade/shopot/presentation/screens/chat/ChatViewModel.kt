@@ -85,7 +85,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         chatId: String,
         userId: String? = null,
         notificationToken: String?,
-        attachments: List<String>? = null
+        attachments: List<String>? = null,
+        login: String? = null
     ) {
         viewModelScope.launch {
             chatUseCase.sendMessage(
@@ -100,7 +101,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 attachments
             )
             
-            sendNotify("Новое сообщение", content, notificationToken)
+            sendNotify("Новое сообщение от $login ", content, notificationToken)
 
 
 //            val httpClient = HttpClient {

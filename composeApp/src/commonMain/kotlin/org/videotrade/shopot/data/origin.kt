@@ -121,45 +121,43 @@ class origin {
         
         return null
     }
-
-
+    
+    
     suspend inline fun put(
         url: String,
         data: String
-    ) {
-
+    ): HttpResponse? {
+        
         try {
             val token = getValueInStorage("accessToken")
-
+            
             val response: HttpResponse =
                 client.put("${EnvironmentConfig.serverUrl}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
                 }
-
-
+            
+            
             println("response.bodyAsText() ${response.bodyAsText()}")
-
+            
             if (response.status.isSuccess()) {
+                
+                return response
 
-
-//                val responseData = Json.decodeFromString(response.bodyAsText())
-//
-//
-//                return responseData
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                
+                return null
+                
             }
         } catch (e: Exception) {
-
             println("Error: $e")
-
-
+            return null
+            
         } finally {
             client.close()
         }
-
     }
     
     

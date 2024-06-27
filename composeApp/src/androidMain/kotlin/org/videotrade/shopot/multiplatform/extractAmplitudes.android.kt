@@ -22,5 +22,9 @@ actual fun extractAmplitudes(filePath: String): List<Float> {
         }
     }
     extractor.release()
-    return amplitudes
+    
+    // Фильтрация низкоуровневого шума и нормализация
+    val filteredAmplitudes = amplitudes.map { amplitude -> if (amplitude < 10f) 0f else amplitude }
+    val maxAmplitude = filteredAmplitudes.maxOrNull() ?: 1f
+    return filteredAmplitudes.map { it / maxAmplitude }
 }

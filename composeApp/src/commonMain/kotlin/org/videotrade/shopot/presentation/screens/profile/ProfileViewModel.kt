@@ -2,7 +2,7 @@ package org.videotrade.shopot.presentation.screens.profile
 
 import androidx.compose.runtime.MutableState
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import kotlinx.coroutines.launch
+import io.ktor.client.statement.bodyAsText
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -26,35 +26,43 @@ class ProfileViewModel : ViewModel(), KoinComponent {
 //        }
 //    }
     
-    fun sendNewProfile(newProfile: ProfileDTO, imageArray: MutableState<ByteArray?>) {
-        viewModelScope.launch {
-
-//            val icon = imageArray.value?.let {
-//                origin().sendFile(
-//                    "file/upload",
-//                    it, "image/jpeg"
-//                )
-//
-//            }
-            
-            
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                    put("firstName", newProfile.firstName)
-                    put("lastName", newProfile.lastName)
-//                    put("icon", icon?.id)
-                    put("status", newProfile.status)
-                }
+    suspend fun sendNewProfile(
+        newProfile: ProfileDTO,
+        imageArray: MutableState<ByteArray?>
+    ): Boolean {
+        
+        val fileId = imageArray.value?.let {
+            origin().sendFile(
+                "file/upload",
+                it, "image", "profileImage"
             )
-            
-            
-            println("jsonContent321323 $jsonContent")
-
-
-//            origin().put("user/profile/edit", jsonContent)
-        
-        
         }
+        
+        
+        val jsonContent = Json.encodeToString(
+            buildJsonObject {
+                put("firstName", newProfile.firstName)
+                put("lastName", newProfile.lastName)
+                put("icon", fileId?.id)
+                put("status", newProfile.status)
+            }
+        )
+        
+        
+        println("jsonContent321323 $jsonContent")
+        
+        
+        val profileUpdate = origin().put("user/profile/edit", jsonContent)
+        
+        
+        val responseData = profileUpdate?.bodyAsText()
+        
+        return if (responseData == "true") {
+            true
+        } else {
+            false
+        }
+        
     }
     
     

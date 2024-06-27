@@ -105,15 +105,11 @@ class ProfileScreen : Screen {
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(bottomEnd = 46.dp, bottomStart = 46.dp))
                         .background(Color(0xFFF3F4F6))
-                        .padding(16.dp).clickable {
-                            if (mainScreenNavigator != null) {
-                                mainViewModel.leaveApp(mainScreenNavigator)
-                            }
-                        }
+                        .padding(16.dp)
                 ) {
                     ProfileHeader("Информация")
                     Avatar(
-                        icon = null,
+                        icon = profile.icon,
                         size = 186.dp
                     )
                     Text(

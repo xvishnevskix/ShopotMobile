@@ -50,11 +50,13 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.image.picker.toImageBitmap
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditHeader
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
@@ -76,6 +78,7 @@ class ProfileEditScreen : Screen {
     override fun Content() {
         val mainViewModel: MainViewModel = koinInject()
         val profileViewModel: ProfileViewModel = koinInject()
+        val commonViewModel: CommonViewModel = koinInject()
         val profile = mainViewModel.profile.collectAsState(initial = ProfileDTO()).value
         
         val navigator = LocalNavigator.currentOrThrow
@@ -124,13 +127,17 @@ class ProfileEditScreen : Screen {
                         .padding(16.dp)
                 ) {
                     GroupEditHeader("Изменить") {
-                        
-                        
-                        profileViewModel.sendNewProfile(
-                            textState.value,
-                            byteArray
-                        )
-                        
+                        scope.launch {
+                            val profileUpdate = profileViewModel.sendNewProfile(
+                                textState.value,
+                                byteArray
+                            )
+                            
+                            if (profileUpdate) {
+                                navigator.push(ProfileScreen())
+                            }
+                            
+                        }
                     }
                     
                     
@@ -332,7 +339,7 @@ class ProfileEditScreen : Screen {
                         .fillMaxWidth(0.9F)
                         .padding(start = 15.dp, top = 14.dp, end = 10.dp, bottom = 14.dp)
                         .clickable {
-                            navigator.push(ProfileEditScreen())
+                            commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
                         },
                     contentAlignment = Alignment.Center
                 ) {
