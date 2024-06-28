@@ -9,8 +9,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var window: UIWindow?
     private var appLifecycleObserver: AppLifecycleObserver?
 
-
     override init() {
+        super.init()
         FirebaseApp.configure()
         NotifierManager.shared.initialize(configuration: NotificationPlatformConfigurationIos(showPushNotification: true, askNotificationPermissionOnStart: true))
         KoinHelperKt.doInitKoin()
@@ -28,7 +28,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             window.makeKeyAndVisible()
         }
 
-        
         requestNotificationAuthorization(application)
         
         appLifecycleObserver = ComposeApp.AppLifecycleObserver_iosKt.getAppLifecycleObserver()
@@ -42,17 +41,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 DispatchQueue.main.async {
                     application.registerForRemoteNotifications()
                 }
+            } else {
+                print("Notification permission denied: \(String(describing: error?.localizedDescription))")
             }
         }
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Messaging.messaging().apnsToken = deviceToken
-        print("APNS device token: \(deviceToken)")
+        print("APNS device token: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
     }
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("Failed to register for remote notifications: \(error)")
+        print("Failed to register for remote notifications: \(error.localizedDescription)")
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -64,4 +65,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     // Implement UNUserNotificationCenterDelegate methods if needed
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        completionHandler([.alert, .sound, .badge])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        completionHandler()
+    }
 }

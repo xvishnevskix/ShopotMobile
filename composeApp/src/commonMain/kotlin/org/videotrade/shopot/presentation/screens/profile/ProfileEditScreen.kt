@@ -134,6 +134,7 @@ class ProfileEditScreen : Screen {
                             )
                             
                             if (profileUpdate) {
+                                mainViewModel.downloadProfile()
                                 navigator.push(ProfileScreen())
                             }
                             

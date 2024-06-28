@@ -106,13 +106,7 @@ class MainViewModel : ViewModel(), KoinComponent {
         
         navigator.value = navigatorGet
     }
-
-
-//        fun getPeerConnection() {
-//        viewModelScope.launch {
-//            _peerConnection.value =  callUseCase.getPeerConnection()
-//        }
-//    }
+    
     
     private fun getWsSession() {
         viewModelScope.launch {
