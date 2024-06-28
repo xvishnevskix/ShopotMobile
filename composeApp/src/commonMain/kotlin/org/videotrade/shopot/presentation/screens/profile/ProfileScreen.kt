@@ -4,7 +4,6 @@ import Avatar
 import ProfileSettingsButton
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -70,7 +69,7 @@ class ProfileScreen : Screen {
         val items = listOf(
             ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, "Редактировать профиль") {
                 navigator.push(
-                    ProfileEditScreen()
+                    ProfileEditScreen(profile)
                 )
             },
 //            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы") {
@@ -90,7 +89,7 @@ class ProfileScreen : Screen {
 //            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
 //            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
         )
-
+        
         
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -124,7 +123,7 @@ class ProfileScreen : Screen {
                     )
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier.padding(bottom = 24.dp),
+                        modifier = Modifier.padding(bottom = 15.dp),
                     ) {
                         Text(
                             profile.phone,
@@ -148,6 +147,20 @@ class ProfileScreen : Screen {
                                 color = Color(0xFF979797)
                             )
                         }
+                    }
+                    
+                    profile.description?.let {
+                        Text(
+                            it,
+                            textAlign = TextAlign.Center,
+                            fontSize = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                            lineHeight = 20.sp,
+                            color = Color(0xFF979797),
+                            modifier = Modifier.padding(bottom = 15.dp),
+                            
+                            )
                     }
                 }
                 Box(
@@ -192,7 +205,7 @@ class ProfileScreen : Screen {
 //                        color = Color(0xFF979797)
 //                    )
                 }
-
+                
                 LazyColumn(
                     modifier = Modifier
                         .padding(top = 6.dp, bottom = 35.dp)
@@ -207,7 +220,7 @@ class ProfileScreen : Screen {
                             onClick = item.onClick
                         )
                     }
-
+                    
                 }
                 
                 

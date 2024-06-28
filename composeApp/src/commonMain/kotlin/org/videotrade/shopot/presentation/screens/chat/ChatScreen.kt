@@ -49,6 +49,13 @@ class ChatScreen(
         
         DisposableEffect(Unit) {
             onDispose {
+                
+                if (
+                    viewModel.isRecording.value
+                ) {
+                    viewModel.audioRecorder.value.stopRecording(false)
+                }
+                
                 mainViewModel.setCurrentChat("")
             }
         }

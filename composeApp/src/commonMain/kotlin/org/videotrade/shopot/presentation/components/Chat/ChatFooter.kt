@@ -34,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +66,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
@@ -82,12 +84,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     
     var text by remember { mutableStateOf("") }
     
-    var isRecording by remember { mutableStateOf(false) }
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
-    val audioRecorder = remember { AudioFactory.createAudioRecorder() }
     var isStartRecording by remember { mutableStateOf(false) }
+    
+    val audioRecorder = viewModel.audioRecorder.collectAsState().value
+    val isRecording = viewModel.isRecording.collectAsState().value
     
     
     LaunchedEffect(isRecording) {
@@ -126,10 +129,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             recordingTime = 0
         }
     }
-    
-    LaunchedEffect(swipeOffset.value) {
-        println("swipeOffset ${swipeOffset}")
-    }
+
     
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
@@ -361,11 +361,12 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 )
                                             }
                                         }
-                                        isRecording = false
+                                        viewModel.setIsRecording(false)
                                         offset = Offset.Zero
                                     } else {
                                         // Если смещение больше чем -200f, завершаем запись
-                                        isRecording = false
+                                        viewModel.setIsRecording(false)
+                                        
                                         offset = Offset.Zero
                                     }
                                 },
@@ -380,7 +381,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     )
                                     
                                     if (newOffset.x <= -200f) {
-                                        isRecording = false
+                                        viewModel.setIsRecording(false)
+                                        
                                         audioRecorder.stopRecording(false)
                                         offset = Offset.Zero
                                     }
@@ -414,14 +416,15 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         }
                                     }
                                     
-                                    isRecording = false
+                                    viewModel.setIsRecording(false)
+                                    
                                     recordingTime = 0
                                     isDragging = false
                                     
                                 },
                                 onPress = {
                                     if (!isDragging) {
-                                        isRecording = !isRecording
+                                        viewModel.setIsRecording(!isRecording)
                                     }
                                     println("Press released")
                                 }

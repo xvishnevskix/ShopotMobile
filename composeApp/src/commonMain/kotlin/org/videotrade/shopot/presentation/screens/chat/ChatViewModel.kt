@@ -1,6 +1,10 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +23,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.AudioFactory
 
 class ChatViewModel : ViewModel(), KoinComponent {
     private val chatUseCase: ChatUseCase by inject()
@@ -34,6 +39,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     val profile = MutableStateFlow(ProfileDTO())
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
+    
+    
+    val audioRecorder = MutableStateFlow(AudioFactory.createAudioRecorder())
+    
+    var isRecording = MutableStateFlow(false)
     
     
     init {
@@ -52,6 +62,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    
+    fun setIsRecording(isRecordingNew: Boolean) {
+        isRecording.value = isRecordingNew
+    }
     
     fun sendReadMessage(messageId: String) {
         viewModelScope.launch {

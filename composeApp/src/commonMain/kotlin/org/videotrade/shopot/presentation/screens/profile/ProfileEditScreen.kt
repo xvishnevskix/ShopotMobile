@@ -66,13 +66,8 @@ import shopot.composeapp.generated.resources.add_photo
 import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.delete_account
 
-data class ProfileTextState(
-    var firstName: String = "",
-    var lastName: String = "",
-    var status: String = ""
-)
 
-class ProfileEditScreen : Screen {
+class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
     
     @Composable
     override fun Content() {
@@ -134,7 +129,6 @@ class ProfileEditScreen : Screen {
                             )
                             
                             if (profileUpdate) {
-                                mainViewModel.downloadProfile()
                                 navigator.push(ProfileScreen())
                             }
                             
@@ -189,7 +183,7 @@ class ProfileEditScreen : Screen {
                                             
                                             if (textState.value.firstName.isEmpty()) {
                                                 Text(
-                                                    "Имя",
+                                                    profile.firstName,
                                                     style = textStyle.copy(color = Color.Gray)
                                                 )
                                             }
@@ -227,7 +221,7 @@ class ProfileEditScreen : Screen {
                                             
                                             if (textState.value.lastName.isEmpty()) {
                                                 Text(
-                                                    "Фамилия",
+                                                    profile.lastName,
                                                     style = textStyle.copy(color = Color.Gray)
                                                 )
                                             }
@@ -286,9 +280,9 @@ class ProfileEditScreen : Screen {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         BasicTextField(
-                            value = "${textState.value.status}",
+                            value = "${textState.value.description}",
                             onValueChange = { newText ->
-                                textState.value = textState.value.copy(status = newText)
+                                textState.value = textState.value.copy(description = newText)
                             },
                             singleLine = true,
                             textStyle = textStyle.copy(textAlign = TextAlign.Center),
@@ -310,9 +304,9 @@ class ProfileEditScreen : Screen {
                                         contentAlignment = Alignment.TopCenter
                                     ) {
                                         
-                                        if (textState.value.status?.isEmpty() == true) {
+                                        if (textState.value.description?.isEmpty() == true) {
                                             Text(
-                                                "Статус",
+                                                if (profile.description.isNullOrBlank()) "Описание" else profile.description,
                                                 style = textStyle.copy(color = Color.Gray)
                                             )
                                         }
