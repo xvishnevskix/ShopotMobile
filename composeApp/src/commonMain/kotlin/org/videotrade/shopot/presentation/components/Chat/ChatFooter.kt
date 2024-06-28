@@ -98,20 +98,20 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 recordingTime++
                 
                 var seconds = recordingTime
-                println("Senddddd ${seconds} ")
                 seconds++
                 
-                if (seconds > 2) {
+                if (seconds > 1) {
                     if (!isStartRecording) {
                         scope.launch {
-                            println("isStartRecording")
+//                            println("isStartRecording")
+                            println("start Audio")
                             
                             val microphonePer =
                                 PermissionsProviderFactory.create().getPermission("microphone")
                             if (microphonePer) {
                                 val audioFilePathNew = FileProviderFactory.create()
                                     .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
-
+                                
                                 println("audioFilePathNew $audioFilePathNew")
                                 
                                 audioRecorder.startRecording(audioFilePathNew)
@@ -340,6 +340,27 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     isDragging = false
                                     // Проверяем, если смещение больше -200f, то сбрасываем смещение
                                     if (offset.x > -200f) {
+                                        println("Drag send")
+                                        
+                                        val seconds = recordingTime % 60
+                                        
+                                        if (seconds > 1) {
+                                            val stopByte = audioRecorder.stopRecording(true)
+                                            
+                                            if (stopByte !== null) {
+                                                isStartRecording = false
+                                                
+                                                viewModel.sendAttachments(
+                                                    content = text,
+                                                    fromUser = viewModel.profile.value.id,
+                                                    chatId = chat.id,
+                                                    stopByte,
+                                                    "audio/mp4",
+                                                    "audio_record"
+                                                
+                                                )
+                                            }
+                                        }
                                         isRecording = false
                                         offset = Offset.Zero
                                     } else {
@@ -349,12 +370,21 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     }
                                 },
                                 onDrag = { change, dragAmount ->
+                                    
+                                    
                                     change.consume()
                                     val newOffset = Offset(
                                         x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
                                             .coerceAtMost(0f),
                                         y = offset.y
                                     )
+                                    
+                                    if (newOffset.x <= -200f) {
+                                        isRecording = false
+                                        audioRecorder.stopRecording(false)
+                                        offset = Offset.Zero
+                                    }
+                                    
                                     offset = newOffset
                                 }
                             )
@@ -365,8 +395,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     println("Tap detected")
                                     
                                     val seconds = recordingTime % 60
-
-                                    if (seconds > 2) {
+                                    
+                                    if (seconds > 1) {
                                         val stopByte = audioRecorder.stopRecording(true)
                                         
                                         if (stopByte !== null) {

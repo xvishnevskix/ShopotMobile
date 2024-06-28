@@ -143,9 +143,8 @@ suspend fun handleConnectWebSocket(
                                                 
                                                 val message: MessageItem =
                                                     Json.decodeFromString(messageItem.toString())
-                                                
-                                                
-                                                
+
+
 //                                                chatUseCase.addMessage(message)
                                                 messages.add(message)
                                                 
@@ -312,8 +311,33 @@ suspend fun handleConnectWebSocket(
                                             println("createChat1 $chat")
                                             
                                             
-                                            chatsUseCase.addChat(chat)
-
+                                            
+                                            fun normalizePhoneNumber(phone: String): String {
+                                                return phone.replace(Regex("[^0-9]"), "")
+                                            }
+                                            
+                                            val contactsMap =
+                                                contactsUseCase.contacts.value.associateBy {
+                                                    normalizePhoneNumber(it.phone)
+                                                }
+                                            
+                                            
+                                            val normalizedChatPhone =
+                                                normalizePhoneNumber(chat.phone)
+                                            
+                                            val contact = contactsMap[normalizedChatPhone]
+                                            
+                                            if (contact != null) {
+                                                val sortChat = chat.copy(
+                                                    firstName = "${contact.firstName}",
+                                                    lastName = "${contact.lastName}"
+                                                )
+                                                println("sortChat $sortChat")
+                                                chatsUseCase.addChat(sortChat)
+                                            } else {
+                                                chatsUseCase.addChat(chat)
+                                            }
+                                            
 //                                            navigator.push(MainScreen())
                                         }
                                         

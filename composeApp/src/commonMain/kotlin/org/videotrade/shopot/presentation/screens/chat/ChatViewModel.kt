@@ -152,7 +152,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ) {
         viewModelScope.launch {
             
-            
+            println("send Audio")
             val fileId = origin().sendFile(
                 "file/upload",
                 file, contentType, fileName
