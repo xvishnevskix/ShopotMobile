@@ -241,8 +241,8 @@ fun MessageFormat(
     message: MessageItem, profile: ProfileDTO, onMessageClick: () -> Unit,
 ) {
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
-//        MessageText(message, profile)
-        FileMessage(message, )
+        MessageText(message, profile)
+//        FileMessage(message, )
     } else {
         
         when (message.attachments!![0].type) {
