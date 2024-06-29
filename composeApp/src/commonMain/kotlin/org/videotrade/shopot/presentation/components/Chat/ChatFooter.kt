@@ -15,9 +15,11 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
@@ -30,8 +32,10 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -75,6 +79,26 @@ import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
 import kotlin.math.roundToInt
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.window.Popup
+import org.jetbrains.compose.resources.DrawableResource
+import org.videotrade.shopot.domain.model.MessageItem
+import shopot.composeapp.generated.resources.edit_pencil
+import shopot.composeapp.generated.resources.menu_file
+import shopot.composeapp.generated.resources.menu_gallery
+
+
+data class MenuItem(
+    val text: String,
+    val imagePath: DrawableResource,
+    val onClick: () -> Unit,
+)
+
+
 
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
@@ -88,6 +112,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var isDragging by remember { mutableStateOf(false) }
     val audioRecorder = remember { AudioFactory.createAudioRecorder() }
     var isStartRecording by remember { mutableStateOf(false) }
+    var showMenu by remember { mutableStateOf(false) }
+
+
     
     
     LaunchedEffect(isRecording) {
@@ -168,12 +195,101 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             }
         }
     )
+
+    val menuItems = listOf(
+        MenuItem(
+            text = "Галерея",
+            imagePath = Res.drawable.menu_gallery,
+            onClick = {
+                singleImagePicker.launch()
+            }
+        ),
+//    MenuItem(
+//        text = "Фото",
+//        imagePath = Res.drawable.edit_pencil,
+//        onClick = {
+//
+//        }
+//    ),
+        MenuItem(
+            text = "Файл",
+            imagePath = Res.drawable.menu_file,
+            onClick = {
+
+            }
+        ),
+//     MenuItem(
+//        text = "Видео",
+//        imagePath = Res.drawable.edit_pencil,
+//        onClick = {
+//
+//        }
+//    ),
+    )
     
     Box(
         modifier = Modifier
             .imePadding()
             .padding(vertical = 15.dp)
     ) {
+
+        if (showMenu) {
+            Popup(
+                alignment = Alignment.TopStart,
+                onDismissRequest = { showMenu = false },
+
+                ) {
+                Column(
+                    modifier = Modifier
+                        .padding(bottom = 55.dp, start = 12.dp)
+                        .fillMaxWidth(0.5f)
+                        .shadow(elevation = 6.dp, shape = RoundedCornerShape(8.dp), clip = false, ambientColor = Color.Gray, spotColor = Color.Gray)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White)
+                ) {
+                    menuItems.forEachIndexed { index, editOption ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 9.dp,
+                                    bottom = 5.dp
+                                )
+                                .fillMaxWidth()
+                                .clickable {
+                                    editOption.onClick()
+                                    showMenu = false
+                                }
+                        ) {
+                            Image(
+                                painter = painterResource(editOption.imagePath),
+                                contentDescription = null,
+                                modifier = Modifier.size(25.dp)
+                            )
+                            Spacer(modifier = Modifier.width(20.dp))
+                            Text(
+                                text = editOption.text,
+                                textAlign = TextAlign.Center,
+                                fontSize = 15.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                color = Color(0xFF000000)
+                            )
+                        }
+                        if (index < editOptions.size - 1) {
+                            Divider(color = Color.Gray.copy(alpha = 0.12f))
+                        } else {
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
+                    }
+                }
+            }
+        }
+
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -199,10 +315,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         tint = Color.White,
                         modifier = Modifier
                             .size(20.dp)
+//                            .clickable {
+//                                singleImagePicker.launch()
+//                            }
+
                             .clickable {
-                                singleImagePicker.launch()
+                                showMenu = true
                             }
                     )
+
+
                 }
                 
                 BasicTextField(
