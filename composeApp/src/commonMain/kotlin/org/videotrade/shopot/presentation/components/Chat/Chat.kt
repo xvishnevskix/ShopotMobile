@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import FileMessage
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -229,6 +230,7 @@ fun Chat(
                 },
                 isVisible = isVisible
             )
+
             
         }
     }
@@ -240,12 +242,13 @@ fun MessageFormat(
 ) {
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
         MessageText(message, profile)
+//        FileMessage(message, )
     } else {
         
         when (message.attachments!![0].type) {
             
             "audio/mp4" -> {
-                VoiceMessageBox(
+                VoiceMessage(
                     message,
                     message.attachments!!
                 )
@@ -257,6 +260,14 @@ fun MessageFormat(
                     message.attachments!!
                 )
                 
+            }
+
+            "files" -> {
+                MessageImage(
+                    message, profile,
+                    message.attachments!!
+                )
+
             }
         }
         

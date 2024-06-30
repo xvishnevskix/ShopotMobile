@@ -55,7 +55,7 @@ import shopot.composeapp.generated.resources.voice_message_play_white
 import kotlin.random.Random
 
 @Composable
-fun VoiceMessageBox(
+fun VoiceMessage(
     message: MessageItem,
     attachments: List<Attachment>
 ) {
