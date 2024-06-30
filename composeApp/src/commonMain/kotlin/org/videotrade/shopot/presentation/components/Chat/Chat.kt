@@ -236,6 +236,8 @@ fun Chat(
     }
 }
 
+
+
 @Composable
 fun MessageFormat(
     message: MessageItem, profile: ProfileDTO, onMessageClick: () -> Unit,
