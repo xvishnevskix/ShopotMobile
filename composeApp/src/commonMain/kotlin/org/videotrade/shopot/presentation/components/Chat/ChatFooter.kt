@@ -215,7 +215,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = "Файл",
             imagePath = Res.drawable.menu_file,
             onClick = {
-
+            
+            
             }
         ),
 //     MenuItem(
