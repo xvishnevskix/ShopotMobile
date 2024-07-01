@@ -69,13 +69,17 @@ fun UserComponentItem(
                 modifier = Modifier.padding(start = 10.dp),
                 verticalArrangement = Arrangement.Center
             ) {
+                val fullName = listOfNotNull(chat.firstName, chat.lastName)
+                    .joinToString(" ")
+                    .takeIf { it.isNotBlank() }
+                    ?.let {
+                        if (it.length > 35) "${it.take(32)}..." else it
+                    } ?: ""
+                
+                val displayName = fullName.ifBlank { chat.phone }
+                
                 Text(
-                    text = listOfNotNull(chat.firstName, chat.lastName)
-                        .joinToString(" ")
-                        .takeIf { it.isNotBlank() }
-                        ?.let {
-                            if (it.length > 35) "${it.take(32)}..." else it
-                        } ?: "",
+                    text = displayName,
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -83,6 +87,7 @@ fun UserComponentItem(
                     lineHeight = 20.sp,
                     color = Color(0xFF000000)
                 )
+                
                 
                 
                 
