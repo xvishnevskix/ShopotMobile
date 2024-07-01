@@ -1,7 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
 expect class FileProvider {
-    fun getAudioFilePath(fileName: String): String
+    fun getFilePath(fileName: String, fileType: String): String
     
     
     suspend fun downloadFileToDirectory(url: String, fileDirectory: String)
@@ -9,13 +9,19 @@ expect class FileProvider {
     
     fun getFileBytesForDir(fileDirectory: String): ByteArray?
     
-    fun getFileType(fileDirectory: String): String?
+    fun getFileData(fileDirectory: String): FileData?
     
     
-    
+    fun existingFile(fileName: String, fileType: String): String?
     
 }
 
 expect object FileProviderFactory {
     fun create(): FileProvider
 }
+
+
+data class FileData(
+    val fileName: String,
+    val fileType: String
+)

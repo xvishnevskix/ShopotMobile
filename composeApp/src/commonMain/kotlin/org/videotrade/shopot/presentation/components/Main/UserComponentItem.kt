@@ -43,9 +43,6 @@ fun UserComponentItem(
 ) {
     val viewModel: ChatViewModel = koinInject()
     
-    
-    println("dasdafafa  ${chat.icon} ${chat.lastName}")
-    
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
             

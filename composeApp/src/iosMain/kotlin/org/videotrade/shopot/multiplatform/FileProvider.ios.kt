@@ -24,18 +24,23 @@ import platform.CoreServices.UTTypeCopyPreferredTagWithClass
 import platform.CoreServices.UTTypeCreatePreferredIdentifierForTag
 import platform.CoreServices.kUTTagClassFilenameExtension
 import platform.CoreServices.kUTTagClassMIMEType
+import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSString
 import platform.Foundation.NSURL
 import platform.Foundation.NSUserDomainMask
 import platform.Foundation.URLByAppendingPathComponent
 import platform.Foundation.create
+import platform.Foundation.lastPathComponent
 import platform.Foundation.pathExtension
+import platform.Foundation.stringByAppendingPathComponent
 import platform.posix.memcpy
 
 actual class FileProvider {
-    actual fun getAudioFilePath(fileName: String): String {
+    actual fun getFilePath(fileName: String, fileType: String): String {
         val fileManager = NSFileManager.defaultManager()
         val urls = fileManager.URLsForDirectory(NSDocumentDirectory, NSUserDomainMask)
         val documentDirectory = urls.first() as NSURL
@@ -91,13 +96,13 @@ actual class FileProvider {
     }
     
     
-    actual fun getFileType(fileDirectory: String): String? {
+    actual fun getFileData(fileDirectory: String): FileData? {
         val url = NSURL.fileURLWithPath(fileDirectory)
         return getMimeType(url)
     }
     
     @OptIn(ExperimentalForeignApi::class)
-    private fun getMimeType(url: NSURL): String? {
+    private fun getMimeType(url: NSURL): FileData? {
         val pathExtension = url.pathExtension ?: return null
         val pathExtensionCF = pathExtension.toCFString()
         
@@ -119,7 +124,14 @@ actual class FileProvider {
             CFRelease(mimeType)
         }
         
-        return mimeTypeString
+        val fileType = mimeTypeString?.substringAfter("application/")
+        val fileName = url.lastPathComponent ?: "unknown"
+        
+        return if (fileType != null) {
+            FileData(fileName, fileType)
+        } else {
+            null
+        }
     }
     
     // Extension function to convert String to CFStringRef
@@ -131,12 +143,48 @@ actual class FileProvider {
     // Function to convert CFStringRef to Kotlin String
     @OptIn(ExperimentalForeignApi::class)
     fun convertCFStringToString(cfString: CFStringRef): String {
-        val length = CFStringGetLength(cfString) + 1 // +1 for null-terminator
-        val buffer = ByteArray(length.toInt())
+        val length = CFStringGetLength(cfString).toInt() + 1 // +1 for null-terminator
+        val buffer = ByteArray(length)
         CFStringGetCString(cfString, buffer.refTo(0), buffer.size.toLong(), kCFStringEncodingUTF8)
         return buffer.toKString().trimEnd('\u0000') // Remove null terminator
     }
-
+    
+    
+    actual fun existingFile(fileName: String, fileType: String): String? {
+        val directory: NSString? = when (fileType) {
+            "audio/mp4" -> getCacheDirectory()
+            "image" -> getDownloadDirectory()
+            else -> getDownloadDirectory()
+        }
+        
+        directory ?: return null
+        
+        return findFileInDirectory(directory, fileName, fileType)
+    }
+    
+    private fun getCacheDirectory(): NSString? {
+        val paths = NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true)
+        return paths.firstOrNull() as NSString?
+    }
+    
+    private fun getDownloadDirectory(): NSString? {
+        val paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true)
+        return paths.firstOrNull() as NSString?
+    }
+    
+    private fun findFileInDirectory(
+        directory: NSString,
+        fileName: String,
+        fileType: String
+    ): String? {
+        val filePath = directory.stringByAppendingPathComponent(fileName)
+        val fileManager = NSFileManager.defaultManager
+        return if (fileManager.fileExistsAtPath(filePath)) {
+            filePath
+        } else {
+            null
+        }
+    }
     
 }
 

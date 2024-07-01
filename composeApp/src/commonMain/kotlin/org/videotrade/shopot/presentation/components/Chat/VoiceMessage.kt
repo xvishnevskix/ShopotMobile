@@ -96,7 +96,7 @@ fun VoiceMessage(
         val fileName = "${attachments[0].name}.m4a"
         
         println("fileName $fileName")
-        val filePath = audioFile.getAudioFilePath(fileName)
+        val filePath = audioFile.getFilePath(fileName, "")
         scope.launch {
             
             audioFile.downloadFileToDirectory(url, filePath)

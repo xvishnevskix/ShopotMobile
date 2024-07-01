@@ -230,7 +230,7 @@ fun Chat(
                 },
                 isVisible = isVisible
             )
-
+            
             
         }
     }
@@ -261,13 +261,12 @@ fun MessageFormat(
                 )
                 
             }
-
-            "files" -> {
-                MessageImage(
-                    message, profile,
+            
+            else -> {
+                FileMessage(
+                    message,
                     message.attachments!!
                 )
-
             }
         }
         

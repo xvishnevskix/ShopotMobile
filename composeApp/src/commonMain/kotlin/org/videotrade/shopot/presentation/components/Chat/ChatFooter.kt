@@ -117,11 +117,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             
             scope.launch {
                 try {
-                    val fileType = FileProviderFactory.create().getFileType(platformFile.path)
-
-//                    println("efffffff $fileType")
-
-//                    val byteArrays = platformFile.getFileByteArray()
+                    val fileDate = FileProviderFactory.create().getFileData(platformFile.path)
                     
                     val byteArrays =
                         FileProviderFactory.create().getFileBytesForDir(platformFile.path)
@@ -130,7 +126,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     println("byteArrays $byteArrays")
 
 //
-                    if (fileType !== null) {
+                    if (fileDate !== null) {
                         if (byteArrays != null) {
                             byteArrays.firstOrNull()?.let {
                                 viewModel.sendAttachments(
@@ -138,8 +134,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     fromUser = viewModel.profile.value.id,
                                     chatId = chat.id,
                                     byteArrays,
-                                    fileType,
-                                    fileType
+                                    fileDate.fileType,
+                                    fileDate.fileName
                                 )
                             }
                         }
@@ -184,7 +180,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 PermissionsProviderFactory.create().getPermission("microphone")
                             if (microphonePer) {
                                 val audioFilePathNew = FileProviderFactory.create()
-                                    .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
+                                    .getFilePath("audio_record.m4a", "") // Генерация пути к файлу
                                 
                                 println("audioFilePathNew $audioFilePathNew")
                                 
