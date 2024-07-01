@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
+import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.AudioFactory
@@ -37,16 +38,27 @@ class TestScreen : Screen {
         val scope = rememberCoroutineScope()
         var showDirPicker by remember { mutableStateOf(false) }
         
-        DirectoryPicker(showDirPicker) { path ->
+        FilePicker(showDirPicker) { path ->
             showDirPicker = false
             // do something with path
+            
+            println("platformFile ${path?.platformFile}")
+            
+            
+            
         }
         
         MaterialTheme {
             SafeArea {
                 Column {
-                
-                
+                    
+                    Button({
+                        showDirPicker = true
+                        
+                        
+                    }, content = {
+                        Text("sssss")
+                    })
                 }
             }
         }

@@ -32,10 +32,9 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -49,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -63,15 +63,16 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.domain.model.ChatItem
-import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -80,18 +81,9 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
-import kotlin.math.roundToInt
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.window.Popup
-import org.jetbrains.compose.resources.DrawableResource
-import org.videotrade.shopot.domain.model.MessageItem
-import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
+import kotlin.math.roundToInt
 
 
 data class MenuItem(
@@ -99,7 +91,6 @@ data class MenuItem(
     val imagePath: DrawableResource,
     val onClick: () -> Unit,
 )
-
 
 
 @Composable
@@ -113,8 +104,61 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var isDragging by remember { mutableStateOf(false) }
     var isStartRecording by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
+    var showFilePicker by remember { mutableStateOf(false) }
+    
+    
+    val filterFileType = listOf("pdf", "zip")
+    FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
+        showFilePicker = false
+        // do something with the file
+        
+        
+        if (platformFile?.path !== null) {
+            
+            scope.launch {
+                try {
+                    val fileType = FileProviderFactory.create().getFileType(platformFile.path)
 
+//                    println("efffffff $fileType")
 
+//                    val byteArrays = platformFile.getFileByteArray()
+                    
+                    val byteArrays =
+                        FileProviderFactory.create().getFileBytesForDir(platformFile.path)
+                    
+                    
+                    println("byteArrays $byteArrays")
+
+//
+                    if (fileType !== null) {
+                        if (byteArrays != null) {
+                            byteArrays.firstOrNull()?.let {
+                                viewModel.sendAttachments(
+                                    content = text,
+                                    fromUser = viewModel.profile.value.id,
+                                    chatId = chat.id,
+                                    byteArrays,
+                                    fileType,
+                                    fileType
+                                )
+                            }
+                        }
+                    }
+                    
+                    
+                } catch (e: Exception) {
+                    
+                    println("error $e")
+                    
+                }
+                
+                
+            }
+            
+            
+        }
+    }
+    
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
@@ -156,7 +200,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             recordingTime = 0
         }
     }
-
+    
     
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
@@ -195,7 +239,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             }
         }
     )
-
+    
     val menuItems = listOf(
         MenuItem(
             text = "Галерея",
@@ -215,8 +259,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = "Файл",
             imagePath = Res.drawable.menu_file,
             onClick = {
-            
-            
+                showFilePicker = true
             }
         ),
 //     MenuItem(
@@ -233,18 +276,24 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             .imePadding()
             .padding(vertical = 15.dp)
     ) {
-
+        
         if (showMenu) {
             Popup(
                 alignment = Alignment.TopStart,
                 onDismissRequest = { showMenu = false },
-
+                
                 ) {
                 Column(
                     modifier = Modifier
                         .padding(bottom = 55.dp, start = 12.dp)
                         .fillMaxWidth(0.5f)
-                        .shadow(elevation = 6.dp, shape = RoundedCornerShape(8.dp), clip = false, ambientColor = Color.Gray, spotColor = Color.Gray)
+                        .shadow(
+                            elevation = 6.dp,
+                            shape = RoundedCornerShape(8.dp),
+                            clip = false,
+                            ambientColor = Color.Gray,
+                            spotColor = Color.Gray
+                        )
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.White)
                 ) {
@@ -289,8 +338,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 }
             }
         }
-
-
+        
+        
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -319,13 +368,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                            .clickable {
 //                                singleImagePicker.launch()
 //                            }
-
+                            
                             .clickable {
                                 showMenu = true
                             }
                     )
-
-
+                    
+                    
                 }
                 
                 BasicTextField(

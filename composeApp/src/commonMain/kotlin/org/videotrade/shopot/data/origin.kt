@@ -144,7 +144,7 @@ class origin {
             if (response.status.isSuccess()) {
                 
                 return response
-
+                
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
                 
@@ -236,7 +236,7 @@ class origin {
         try {
             val token = getValueInStorage("accessToken")
             
-            
+            println("contentType $contentType")
             val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
                 setBody(MultiPartFormDataContent(
                     formData {

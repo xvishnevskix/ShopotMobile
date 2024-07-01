@@ -1,10 +1,6 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +14,7 @@ import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatUseCase
@@ -34,10 +31,12 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
     
-    val messagesA: StateFlow<List<MessageItem>> = chatUseCase.getMessages()
-    
-    
     val profile = MutableStateFlow(ProfileDTO())
+    
+    
+    val _currentChat = MutableStateFlow<ChatItem?>(null)
+    val currentChat: StateFlow<ChatItem?> get() = _currentChat.asStateFlow()
+    
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     
     
@@ -62,6 +61,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    
+    fun setCurrentChat(chat: ChatItem) {
+        _currentChat.value = chat
+    }
     
     fun setIsRecording(isRecordingNew: Boolean) {
         isRecording.value = isRecordingNew

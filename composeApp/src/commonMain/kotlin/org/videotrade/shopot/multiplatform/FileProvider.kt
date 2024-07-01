@@ -7,6 +7,13 @@ expect class FileProvider {
     suspend fun downloadFileToDirectory(url: String, fileDirectory: String)
     
     
+    fun getFileBytesForDir(fileDirectory: String): ByteArray?
+    
+    fun getFileType(fileDirectory: String): String?
+    
+    
+    
+    
 }
 
 expect object FileProviderFactory {

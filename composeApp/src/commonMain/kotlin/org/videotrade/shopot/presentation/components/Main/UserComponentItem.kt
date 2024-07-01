@@ -23,10 +23,12 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -39,6 +41,7 @@ fun UserComponentItem(
     commonViewModel: CommonViewModel,
     mainViewModel: MainViewModel
 ) {
+    val viewModel: ChatViewModel = koinInject()
     
     
     println("dasdafafa  ${chat.icon} ${chat.lastName}")
@@ -48,7 +51,8 @@ fun UserComponentItem(
             
             mainViewModel.setCurrentChat(chat.id)
             mainViewModel.setZeroUnread(chat)
-            commonViewModel.mainNavigator.value?.push(ChatScreen(chat))
+            viewModel.setCurrentChat(chat)
+            commonViewModel.mainNavigator.value?.push(ChatScreen())
         },
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
