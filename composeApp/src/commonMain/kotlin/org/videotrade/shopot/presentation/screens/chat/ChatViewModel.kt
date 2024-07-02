@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
+import androidx.compose.runtime.MutableState
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,8 +46,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     var isRecording = MutableStateFlow(false)
     
     
-    var downloadProgress = MutableStateFlow(0)
-
+    var downloadProgress = MutableStateFlow(0f)
+    
     init {
         
         
@@ -195,6 +196,27 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    fun sendLargeFile(
+        content: String?,
+        fromUser: String,
+        chatId: String,
+        contentType: String,
+        fileName: String,
+        fileDir: String? = null,
+        progress: MutableState<Float>,
+    ) {
+        viewModelScope.launch {
+            
+            val fileId = origin().sendLargeFile(
+                "file/upload",
+                fileDir,
+                contentType,
+                fileName,
+                progress
+            )
+        }
+    }
+    
     
     fun sendNotify(
         title: String,
@@ -215,6 +237,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 origin().post<Any>("notification/notify", jsonContent)
             }
         }
+    }
+    
+    fun addMessage(message: MessageItem) {
+        
+        chatUseCase.addMessage(message)
     }
     
     fun deleteMessage(message: MessageItem) {
@@ -238,9 +265,3 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
 }
 
-
-data class UploadItem(
-    val id: String,
-    val progress: String,
-    
-    )

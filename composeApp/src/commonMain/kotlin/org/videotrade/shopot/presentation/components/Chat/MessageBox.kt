@@ -116,6 +116,8 @@ fun MessageBox(
                     )
                 }
             
+            
+            if (message.created.isNotEmpty())
             Text(
                 text = formatTimestamp(message.created),
                 style = TextStyle(

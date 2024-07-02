@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
@@ -65,7 +64,8 @@ fun FileMessage(
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
     
     var isLoading by remember { mutableStateOf(false) }
-    var progress by remember { mutableStateOf(0f) }
+//    var progress by remember { mutableStateOf(0f) }
+    var progress = remember { mutableStateOf(0f) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var filePath by remember { mutableStateOf("") }
     val audioFile by remember { mutableStateOf(FileProviderFactory.create()) }
@@ -73,6 +73,30 @@ fun FileMessage(
     
     
     LaunchedEffect(message) {
+        
+        if (message.upload !== null) {
+            downloadJob?.cancel()
+            progress.value = 0f
+            isLoading = true
+            
+            
+            downloadJob = scope.launch {
+                isLoading = true
+                
+                message.attachments?.get(0)?.let {
+                    viewModel.sendLargeFile(
+                        message.content, message.fromUser, message.chatId, it.type,
+                        it.name, it.originalFileDir,
+                        progress
+                    )
+                }
+                isLoading = false
+            }
+            
+            return@LaunchedEffect
+        }
+        
+        
         
         println("fileId ${message.attachments?.get(0)?.fileId}")
         val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
@@ -85,7 +109,7 @@ fun FileMessage(
             
             downloadJob?.cancel()
             isLoading = false
-            progress = 1f
+            progress.value = 1f
             println("filePath $filePath")
             filePath = existingFile
         }
@@ -105,7 +129,7 @@ fun FileMessage(
                 onClick = {
                     if (!isLoading) {
                         downloadJob?.cancel()
-                        progress = 0f
+                        progress.value = 0f
                         isLoading = true
                         
                         
@@ -115,7 +139,7 @@ fun FileMessage(
                         downloadJob = scope.launch {
                             isLoading = true
                             audioFile.downloadFileToDirectory(url, getFilePath) { newProgress ->
-                                progress = newProgress
+                                progress.value = newProgress
                             }
                             isLoading = false
                         }
@@ -123,14 +147,14 @@ fun FileMessage(
                         
                         downloadJob?.cancel()
                         isLoading = false
-                        progress = 0f
+                        progress.value = 0f
                     }
                 },
                 modifier = Modifier.size(43.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        progress = progress,
+                        progress = progress.value,
                         color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
                         strokeWidth = 2.dp,
                         modifier = Modifier.fillMaxSize()
@@ -150,7 +174,7 @@ fun FileMessage(
                     println("dsasdadadaa")
                     Image(
                         painter = painterResource(
-                            if (progress == 1f) {
+                            if (progress.value == 1f) {
                                 if (message.fromUser == profile.id) Res.drawable.file_message_white
                                 else Res.drawable.file_message_dark
                             } else {

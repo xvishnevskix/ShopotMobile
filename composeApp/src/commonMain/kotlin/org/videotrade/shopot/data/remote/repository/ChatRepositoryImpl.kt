@@ -65,7 +65,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     }
     
     
-    override suspend fun addMessage(message: MessageItem) {
+    override fun addMessage(message: MessageItem) {
         _messages.value = listOf(message) + _messages.value
     }
     

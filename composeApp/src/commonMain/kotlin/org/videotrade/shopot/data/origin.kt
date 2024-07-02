@@ -1,5 +1,6 @@
 package org.videotrade.shopot.data
 
+import androidx.compose.runtime.MutableState
 import io.ktor.client.HttpClient
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -296,6 +297,30 @@ class origin {
         }
         
         
+    }
+    
+    
+    suspend fun sendLargeFile(
+        url: String,
+        fileDir: String? = null,
+        contentType: String,
+        filename: String,
+        progress: MutableState<Float>
+    ): FileDTO? {
+        return if (fileDir != null) {
+            FileProviderFactory.create().uploadFileToDirectory(
+                "file/upload",
+                fileDir,
+                contentType,
+                filename
+            ) {
+                
+                progress.value = it
+                println("progress ${it}")
+            }
+        } else {
+            null
+        }
     }
     
 }

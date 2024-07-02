@@ -55,7 +55,7 @@ class ChatUseCase : KoinComponent {
     }
     
     
-    suspend fun addMessage(message: MessageItem) {
+    fun addMessage(message: MessageItem) {
         return repository.addMessage(message)
     }
     

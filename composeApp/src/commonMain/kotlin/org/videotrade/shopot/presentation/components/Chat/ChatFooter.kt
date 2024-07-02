@@ -72,7 +72,9 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -124,15 +126,43 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     
                     
                     if (fileData !== null) {
-                        viewModel.sendAttachments(
-                            content = text,
-                            fromUser = viewModel.profile.value.id,
-                            chatId = chat.id,
-                            contentType = fileData.fileType,
-                            fileName = fileData.fileName,
-                            fileDir = platformFile.path,
-                        )
                         
+                        viewModel.addMessage(
+                            MessageItem(
+                                "1",
+                                viewModel.profile.value.id,
+                                "1",
+                                "1",
+                                "1",
+                                0,
+                                listOf(),
+                                false,
+                                chat.id,
+                                false,
+                                true,
+                                listOf(
+                                    Attachment(
+                                        "1",
+                                        "1",
+                                        viewModel.profile.value.id,
+                                        "",
+                                        fileData.fileType,
+                                        fileData.fileName,
+                                        platformFile.path
+                                    )
+                                ),
+                                upload = true
+                            )
+                        )
+
+//                        viewModel.sendAttachments(
+//                            content = text,
+//                            fromUser = viewModel.profile.value.id,
+//                            chatId = chat.id,
+//                            contentType = fileData.fileType,
+//                            fileName = fileData.fileName,
+//                            fileDir = platformFile.path,
+//                        )
                     }
                     
                     
@@ -525,8 +555,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                     null,
                                                     stopByte,
                                                     
-                                                
-                                                )
+                                                    
+                                                    )
                                             }
                                         }
                                         viewModel.setIsRecording(false)
@@ -580,8 +610,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 "audio_record",
                                                 null,
                                                 stopByte,
-                                            
-                                            )
+                                                
+                                                )
                                         }
                                     }
                                     
