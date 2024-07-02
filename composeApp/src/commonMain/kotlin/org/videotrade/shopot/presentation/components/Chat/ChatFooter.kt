@@ -112,33 +112,27 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         showFilePicker = false
         // do something with the file
         
+        println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
         
         if (platformFile?.path !== null) {
             
             scope.launch {
                 try {
-                    val fileDate = FileProviderFactory.create().getFileData(platformFile.path)
+                    val fileData = FileProviderFactory.create().getFileData(platformFile.path)
                     
-                    val byteArrays =
-                        FileProviderFactory.create().getFileBytesForDir(platformFile.path)
+                    println("fileData $fileData")
                     
                     
-                    println("byteArrays $byteArrays")
-
-//
-                    if (fileDate !== null) {
-                        if (byteArrays != null) {
-                            byteArrays.firstOrNull()?.let {
-                                viewModel.sendAttachments(
-                                    content = text,
-                                    fromUser = viewModel.profile.value.id,
-                                    chatId = chat.id,
-                                    byteArrays,
-                                    fileDate.fileType,
-                                    fileDate.fileName
-                                )
-                            }
-                        }
+                    if (fileData !== null) {
+                        viewModel.sendAttachments(
+                            content = text,
+                            fromUser = viewModel.profile.value.id,
+                            chatId = chat.id,
+                            contentType = fileData.fileType,
+                            fileName = fileData.fileName,
+                            fileDir = platformFile.path,
+                        )
+                        
                     }
                     
                     
@@ -180,7 +174,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 PermissionsProviderFactory.create().getPermission("microphone")
                             if (microphonePer) {
                                 val audioFilePathNew = FileProviderFactory.create()
-                                    .getFilePath("audio_record.m4a", "") // Генерация пути к файлу
+                                    .getFilePath(
+                                        "audio_record.m4a",
+                                        "audio/mp4"
+                                    ) // Генерация пути к файлу
                                 
                                 println("audioFilePathNew $audioFilePathNew")
                                 
@@ -227,9 +224,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         content = text,
                         fromUser = viewModel.profile.value.id,
                         chatId = chat.id,
-                        it,
                         "image",
-                        "jpg"
+                        "jpg",
+                        null,
+                        it,
                     )
                 }
             }
@@ -522,9 +520,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                     content = text,
                                                     fromUser = viewModel.profile.value.id,
                                                     chatId = chat.id,
-                                                    stopByte,
                                                     "audio/mp4",
-                                                    "audio_record"
+                                                    "audio_record",
+                                                    null,
+                                                    stopByte,
+                                                    
                                                 
                                                 )
                                             }
@@ -576,9 +576,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 content = text,
                                                 fromUser = viewModel.profile.value.id,
                                                 chatId = chat.id,
-                                                stopByte,
                                                 "audio/mp4",
-                                                "audio_record"
+                                                "audio_record",
+                                                null,
+                                                stopByte,
                                             
                                             )
                                         }

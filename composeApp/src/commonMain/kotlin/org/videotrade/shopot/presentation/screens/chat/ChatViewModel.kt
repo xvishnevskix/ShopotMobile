@@ -45,6 +45,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     var isRecording = MutableStateFlow(false)
     
     
+    var downloadProgress = MutableStateFlow(0)
+
     init {
         
         
@@ -163,16 +165,21 @@ class ChatViewModel : ViewModel(), KoinComponent {
         content: String?,
         fromUser: String,
         chatId: String,
-        file: ByteArray,
         contentType: String,
-        fileName: String
-    ) {
+        fileName: String,
+        fileDir: String? = null,
+        fileBytes: ByteArray? = null,
+        
+        ) {
         viewModelScope.launch {
             
             println("send Audio")
             val fileId = origin().sendFile(
                 "file/upload",
-                file, contentType, fileName
+                fileDir,
+                contentType,
+                fileName,
+                fileBytes
             )
             
             println("fileId ${fileId}")
@@ -232,3 +239,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
 }
 
 
+data class UploadItem(
+    val id: String,
+    val progress: String,
+    
+    )

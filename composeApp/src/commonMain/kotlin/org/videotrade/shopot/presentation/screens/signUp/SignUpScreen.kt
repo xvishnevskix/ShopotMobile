@@ -193,7 +193,9 @@ class SignUpScreen(private val phone: String) : Screen {
                                             val icon = byteArray.value?.let {
                                                 origin().sendFile(
                                                     "file/upload",
-                                                    it, "image/jpeg", "image"
+                                                    null,
+                                                    "image/jpeg", "image",
+                                                    it,
                                                 )
                                                 
                                             }

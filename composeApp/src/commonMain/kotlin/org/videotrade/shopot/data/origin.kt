@@ -28,6 +28,7 @@ import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
+import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 
 class origin {
@@ -227,52 +228,73 @@ class origin {
     
     suspend fun sendFile(
         url: String,
-        fileBytes: ByteArray,
+        fileDir: String? = null,
         contentType: String,
-        filename: String
-    ): FileDTO? {
-        val client =
-            HttpClient(getHttpClientEngine())
-        try {
-            val token = getValueInStorage("accessToken")
-            
-            println("contentType $contentType")
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-                setBody(MultiPartFormDataContent(
-                    formData {
-                        append("file", fileBytes, Headers.build {
-                            append(HttpHeaders.ContentType, contentType)
-                            append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                        })
-                    }
-                ))
-                header(HttpHeaders.Authorization, "Bearer $token")
+        filename: String,
+        fileBytes: ByteArray? = null,
+        
+        ): FileDTO? {
+        
+        if (fileBytes == null) {
+            return if (fileDir != null) {
+                FileProviderFactory.create().uploadFileToDirectory(
+                    "file/upload",
+                    fileDir,
+                    contentType,
+                    filename
+                ) {
+                    println("progress ${it}")
+                }
+            } else {
+                null
             }
             
-            
-            
-            println("response.Send ${response.status} ${response.bodyAsText()}")
-            
-            if (response.status.isSuccess()) {
-                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
+        } else {
+            val client =
+                HttpClient(getHttpClientEngine())
+            try {
+                val token = getValueInStorage("accessToken")
+                
+                println("contentType $contentType")
+                val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                    setBody(MultiPartFormDataContent(
+                        formData {
+                            append("file", fileBytes, Headers.build {
+                                append(HttpHeaders.ContentType, contentType)
+                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+                            })
+                        }
+                    ))
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                }
                 
                 
-                return responseData
                 
-            } else {
-                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                println("response.Send ${response.status} ${response.bodyAsText()}")
+                
+                if (response.status.isSuccess()) {
+                    val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
+                    
+                    
+                    return responseData
+                    
+                } else {
+                    println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                    return null
+                    
+                }
+            } catch (e: Exception) {
+                
+                println("Error111: $e")
+                
                 return null
                 
+            } finally {
+                client.close()
             }
-        } catch (e: Exception) {
             
-            println("Error111: $e")
-            
-            return null
-            
-        } finally {
-            client.close()
         }
+        
         
     }
     

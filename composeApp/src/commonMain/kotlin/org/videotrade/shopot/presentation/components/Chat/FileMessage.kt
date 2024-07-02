@@ -62,6 +62,7 @@ fun FileMessage(
     
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
+    val downloadProgress = viewModel.downloadProgress.collectAsState().value
     
     var isLoading by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0f) }
@@ -111,24 +112,13 @@ fun FileMessage(
                         val getFilePath = audioFile.getFilePath(attachments[0].name, "file")
                         val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
                         
-                        scope.launch {
-                            audioFile.downloadFileToDirectory(url, getFilePath)
-                            
-                            filePath = getFilePath
+                        downloadJob = scope.launch {
+                            isLoading = true
+                            audioFile.downloadFileToDirectory(url, getFilePath) { newProgress ->
+                                progress = newProgress
+                            }
+                            isLoading = false
                         }
-                        
-                        
-                        println("getFilePath $getFilePath")
-
-//                        downloadJob = scope.launch {
-//
-//                            for (i in 1..100) {
-//                                delay(50)
-//                                progress = i / 100f
-//                            }
-//                            isLoading = false
-//                            progress = 1f
-//                        }
                     } else {
                         
                         downloadJob?.cancel()
