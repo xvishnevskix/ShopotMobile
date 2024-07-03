@@ -194,7 +194,7 @@ fun MessageContent(message: MessageItem): String {
         when (message.attachments!![0].type) {
             "audio/mp4" -> "Аудио"
             "image" -> "Фото"
-            else -> ""
+            else -> "Файл"
         }
         
         

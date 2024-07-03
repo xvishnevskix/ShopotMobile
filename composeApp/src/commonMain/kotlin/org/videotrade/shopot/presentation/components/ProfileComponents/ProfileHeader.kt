@@ -72,6 +72,7 @@ fun ProfileHeader(text: String) {
             textAlign = TextAlign.Center,
             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
             lineHeight = 24.sp,
+            color = Color(151, 151, 151)
         )
 //        Spacer(modifier = Modifier.width(40.dp))
     }

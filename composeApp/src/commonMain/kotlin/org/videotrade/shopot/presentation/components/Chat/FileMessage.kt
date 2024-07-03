@@ -68,13 +68,15 @@ fun FileMessage(
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var filePath by remember { mutableStateOf("") }
     val audioFile by remember { mutableStateOf(FileProviderFactory.create()) }
-    var isUploading by remember { mutableStateOf(false) }
+//    var isUploading by remember { mutableStateOf(false) }
+    
+    
     
     
     
     LaunchedEffect(message) {
         
-        if (!isUploading && message.upload !== null) {
+        if (message.upload !== null) {
             downloadJob?.cancel()
             progress = 0f
             isLoading = true
@@ -98,7 +100,6 @@ fun FileMessage(
                     
                     if (fileId !== null) {
                         println("fileId ${fileId.id}")
-                        isUploading = true
 
 //                        viewModel.sendAttachments(
 //                            message.content,

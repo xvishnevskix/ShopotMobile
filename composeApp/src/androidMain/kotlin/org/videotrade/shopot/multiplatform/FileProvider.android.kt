@@ -141,11 +141,8 @@ actual class FileProvider(private val applicationContext: Context) {
     
     @RequiresApi(Build.VERSION_CODES.Q)
     actual fun getFileData(fileDirectory: String): FileData? {
-        
         println("uri $fileDirectory")
-        
         val uri = Uri.parse(fileDirectory)
-        
         return getData(applicationContext, uri)
     }
     
@@ -167,12 +164,25 @@ actual class FileProvider(private val applicationContext: Context) {
         // Получаем имя файла из URI
         val fileName = getFileNameFromUri(contentResolver, uri)
         
-        // Получаем абсолютный путь файла из URI
+        // Получаем размер файла из URI
+        val fileSize = getFileSizeFromUri(contentResolver, uri)
         
-        return if (fileName != null && fileType != null) {
-            FileData(fileName, fileType)
+        return if (fileName != null && fileType != null && fileSize != null) {
+            FileData(fileName, fileType, fileSize)
         } else {
             null
+        }
+    }
+    
+    private fun getFileSizeFromUri(contentResolver: ContentResolver, uri: Uri): Int? {
+        val cursor = contentResolver.query(uri, null, null, null, null)
+        return cursor?.use {
+            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+            if (sizeIndex != -1 && it.moveToFirst()) {
+                it.getLong(sizeIndex).toInt()
+            } else {
+                null
+            }
         }
     }
     

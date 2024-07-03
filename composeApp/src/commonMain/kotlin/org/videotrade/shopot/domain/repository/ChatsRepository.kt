@@ -6,9 +6,11 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 
 interface ChatsRepository {
-
+    
     
     val chats: StateFlow<List<ChatItem>>
+    
+    val currentChat: StateFlow<String>
     
     
     fun getChats(): List<ChatItem>

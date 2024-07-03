@@ -13,7 +13,7 @@ class ChatsUseCase : KoinComponent {
     private val repository: ChatsRepository by inject()
     
     val chats: StateFlow<List<ChatItem>> get() = repository.chats
-    
+    val currentChat: StateFlow<String> get() = repository.currentChat
     
     fun getChats(): List<ChatItem> {
         

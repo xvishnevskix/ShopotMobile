@@ -26,6 +26,9 @@ interface ChatRepository {
     
     
     fun addMessage(message: MessageItem)
+    fun updateUploadMessage(message: MessageItem)
+    
+    
     suspend fun sendMessage(message: MessageItem, attachments: List<String>?)
     suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?)
     

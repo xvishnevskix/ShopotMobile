@@ -236,43 +236,6 @@ fun Chat(
     }
 }
 
-@Composable
-fun MessageFormat(
-    message: MessageItem, profile: ProfileDTO, onMessageClick: () -> Unit,
-) {
-    if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        MessageText(message, profile)
-//        FileMessage(message, )
-    } else {
-        
-        when (message.attachments!![0].type) {
-            
-            "audio/mp4" -> {
-                VoiceMessage(
-                    message,
-                    message.attachments!!
-                )
-            }
-            
-            "image" -> {
-                MessageImage(
-                    message, profile,
-                    message.attachments!!
-                )
-                
-            }
-            
-            else -> {
-                FileMessage(
-                    message,
-                    message.attachments!!
-                )
-            }
-        }
-        
-        
-    }
-    
-}
+
 
 

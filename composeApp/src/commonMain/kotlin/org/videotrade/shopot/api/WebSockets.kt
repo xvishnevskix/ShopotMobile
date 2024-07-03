@@ -169,15 +169,21 @@ suspend fun handleConnectWebSocket(
                                         if (messageJson != null) {
                                             
                                             
-                                            println("tttt ${messageJson}")
+                                            println("ttttaaaaa ${messageJson}")
+                                            
+                                            println("currentChat ${chatsUseCase.currentChat.value}")
                                             
                                             
                                             val message: MessageItem =
                                                 Json.decodeFromString(messageJson.toString())
+
+
+//                                            println("currentChat ${chatsUseCase.currentChat}")
                                             
                                             
-                                            
-                                            chatUseCase.addMessage(message)// Инициализация сообщений
+                                            if (chatsUseCase.currentChat.value == message.chatId) {
+                                                chatUseCase.addMessage(message)
+                                            }
                                             
                                             chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
                                             
@@ -206,9 +212,24 @@ suspend fun handleConnectWebSocket(
                                             val message: MessageItem =
                                                 Json.decodeFromString(messageJson.toString())
                                             
+                                            println("message ${userId} ${message.fromUser}")
                                             
-                                            
-                                            chatUseCase.addMessage(message)// Инициализация сообщений
+                                            if (userId == message.fromUser) {
+                                                
+                                                val uploadId =
+                                                    jsonElement.jsonObject["uploadId"]?.jsonPrimitive?.content
+                                                
+                                                chatUseCase.updateUploadMessage(
+                                                    message.copy(
+                                                        uploadId = uploadId
+                                                    )
+                                                )// Инициализация сообщений
+                                                
+                                            } else {
+                                                println("message2 ${message}")
+                                                
+                                                chatUseCase.addMessage(message)// Инициализация сообщений
+                                            }
                                             
                                             chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
                                             
@@ -369,7 +390,7 @@ suspend fun handleConnectWebSocket(
                                             } else {
                                                 chatsUseCase.addChat(chat)
                                             }
-                                            
+
 //                                            navigator.push(MainScreen())
                                         }
                                         

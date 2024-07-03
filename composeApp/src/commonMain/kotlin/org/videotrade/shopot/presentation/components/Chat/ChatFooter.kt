@@ -72,6 +72,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.getCurrentTimeList
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -130,13 +131,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         
                         viewModel.addMessage(
                             MessageItem(
-                                "1",
+                                Random.nextInt(1, 501).toString(),
                                 viewModel.profile.value.id,
                                 "",
                                 "1",
                                 "1",
                                 0,
-                                listOf(),
+                                getCurrentTimeList(),
                                 false,
                                 chat.id,
                                 false,
@@ -150,7 +151,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         fileData.fileType,
                                         fileData.fileName,
                                         platformFile.path,
-//                                        0
+                                        fileData.fileSize
                                     )
                                 ),
                                 upload = true,

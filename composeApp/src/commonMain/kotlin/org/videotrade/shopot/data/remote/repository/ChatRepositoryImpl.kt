@@ -67,15 +67,15 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         try {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
-//                    put("action", "sendUploadMessage")
-//                    put("content", message.content)
-//                    put("fromUser", message.fromUser)
-//                    put("uploadId", message.uploadId)
-//                    put("chatId", message.chatId)
-                    put("action", "sendMessage")
+                    put("action", "sendUploadMessage")
                     put("content", message.content)
                     put("fromUser", message.fromUser)
+                    put("uploadId", message.uploadId)
                     put("chatId", message.chatId)
+//                    put("action", "sendMessage")
+//                    put("content", message.content)
+//                    put("fromUser", message.fromUser)
+//                    put("chatId", message.chatId)
                     put(
                         "attachments",
                         Json.encodeToJsonElement(attachments)
@@ -93,6 +93,45 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     
     override fun addMessage(message: MessageItem) {
         _messages.value = listOf(message) + _messages.value
+        
+        
+        println(
+            "_messages_messages ${
+                _messages.value.size
+                
+            }"
+        )
+    }
+    
+    override fun updateUploadMessage(message: MessageItem) {
+        _messages.update { currentChat ->
+            currentChat.map { messageItem ->
+                println("messageItem.id == message.uploadId ${messageItem.id} ${message.uploadId}")
+                
+                if (messageItem.uploadId == message.uploadId) {
+                    messageItem.copy(
+                        id = message.id,
+                        fromUser = message.fromUser,
+                        content = message.content,
+                        forwardMessage = message.forwardMessage,
+                        answerMessage = message.answerMessage,
+                        replaces = message.replaces,
+                        created = message.created,
+                        isDeleted = message.isDeleted,
+                        chatId = message.chatId,
+                        anotherRead = message.anotherRead,
+                        iread = message.iread,
+                        attachments = message.attachments,
+                        upload = null,
+                        uploadId = message.uploadId
+                    )
+                } else {
+                    messageItem
+                }
+            }
+        }
+
+        
     }
     
     
@@ -144,17 +183,17 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         try {
             
             
-                val jsonContent = Json.encodeToString(
-                    buildJsonObject {
-                        put("action", "getMessages")
-                        put("chatId", chatId)
-                        put("page", messageCount.value)
-                    }
-                )
-                println("jsonContent4144141 ${jsonContent}")
-                wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-                
-                
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "getMessages")
+                    put("chatId", chatId)
+                    put("page", messageCount.value)
+                }
+            )
+            println("jsonContent4144141 ${jsonContent}")
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+            
+            
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }

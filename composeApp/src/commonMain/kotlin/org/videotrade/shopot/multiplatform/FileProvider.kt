@@ -39,5 +39,5 @@ expect object FileProviderFactory {
 data class FileData(
     val fileName: String,
     val fileType: String,
-    
+    val fileSize: Int,
 )

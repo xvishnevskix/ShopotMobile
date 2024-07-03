@@ -132,6 +132,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             textAlign = TextAlign.Center,
                             letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
                             lineHeight = 24.sp,
+                            color = Color.Black
+                            
                             
                             )
                         Text(

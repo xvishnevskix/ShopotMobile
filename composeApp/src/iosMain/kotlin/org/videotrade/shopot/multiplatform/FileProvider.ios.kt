@@ -60,7 +60,9 @@ import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSFileSize
 import platform.Foundation.NSMakeRange
+import platform.Foundation.NSNumber
 import platform.Foundation.NSOutputStream
 import platform.Foundation.NSRange
 import platform.Foundation.NSSearchPathDirectory
@@ -204,9 +206,10 @@ actual class FileProvider {
         
         val fileType = mimeTypeString?.substringAfter("application/")
         val fileName = url.lastPathComponent ?: "unknown"
+        val fileSize = getFileSize(url) ?: return null
         
         return if (fileType != null) {
-            FileData(fileName, fileType)
+            FileData(fileName, fileType, fileSize)
         } else {
             null
         }
@@ -217,6 +220,16 @@ actual class FileProvider {
     fun String.toCFString(): CFStringRef? {
         return CFStringCreateWithCString(null, this, kCFStringEncodingUTF8)
     }
+    
+    @OptIn(ExperimentalForeignApi::class)
+    private fun getFileSize(url: NSURL): Int? {
+        val filePath = url.path ?: return null
+        val fileManager = NSFileManager.defaultManager()
+        val attributes = fileManager.attributesOfItemAtPath(filePath, null) ?: return null
+        val fileSize = attributes[NSFileSize] as? NSNumber
+        return fileSize?.intValue
+    }
+
     
     // Function to convert CFStringRef to Kotlin String
     @OptIn(ExperimentalForeignApi::class)
