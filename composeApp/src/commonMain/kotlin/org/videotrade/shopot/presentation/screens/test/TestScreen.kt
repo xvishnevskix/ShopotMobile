@@ -9,6 +9,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.darkrockstudios.libraries.mpfilepicker.DirectoryPicker
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
+import com.mmk.kmpnotifier.notification.NotifierManager
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.AudioFactory
@@ -36,28 +38,21 @@ class TestScreen : Screen {
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
-        var showDirPicker by remember { mutableStateOf(false) }
         
-        FilePicker(showDirPicker) { path ->
-            showDirPicker = false
-            // do something with path
-            
-            println("platformFile ${path?.platformFile}")
-            
-            
-            
-        }
+        
+        
         
         MaterialTheme {
             SafeArea {
                 Column {
                     
                     Button({
-                        showDirPicker = true
-                        
-                        
+                        scope.launch {
+                            println("token ${NotifierManager.getPushNotifier().getToken()}")
+                            
+                        }
                     }, content = {
-                        Text("sssss")
+                        Text("getToken")
                     })
                 }
             }

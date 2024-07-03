@@ -136,7 +136,7 @@ fun CreateChatHeader(
                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                         lineHeight = 20.sp,
                         modifier = Modifier.padding(end = 10.dp),
-                        color = Color(151, 151, 151)
+                        color = Color.Black
                     
                     )
                     Image(

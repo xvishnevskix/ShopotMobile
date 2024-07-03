@@ -104,8 +104,12 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
         )
         
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.TopStart
+            modifier = Modifier.fillMaxSize().background(
+                color = Color(255, 255, 255)
+            ),
+            contentAlignment = Alignment.TopStart,
+         
+            
         ) {
             
             Column(

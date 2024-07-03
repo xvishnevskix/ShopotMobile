@@ -168,7 +168,7 @@ private fun makeA_group(contacts: List<ContactDTO>) {
                     lineHeight = 20.sp,
                     modifier = Modifier
                         .padding(start = 20.dp),
-                    color = Color(151, 151, 151)
+                    color = Color.Black
                 
                 )
             }
