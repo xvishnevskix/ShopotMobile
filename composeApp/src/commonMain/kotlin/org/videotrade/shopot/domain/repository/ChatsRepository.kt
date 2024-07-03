@@ -16,6 +16,8 @@ interface ChatsRepository {
     suspend fun getChatsInBack(wsSession: WebSocketSession, userId: String)
     
     fun updateLastMessageChat(messageItem: MessageItem)
+    fun updateReadLastMessageChat(messageItem: MessageItem)
+    
     fun setZeroUnread(chat: ChatItem)
     fun setCurrentChat(chatValue: String)
     

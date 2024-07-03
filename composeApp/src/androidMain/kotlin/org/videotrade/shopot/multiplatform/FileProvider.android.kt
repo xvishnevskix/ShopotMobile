@@ -12,6 +12,7 @@ import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import io.ktor.client.HttpClient
+import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onDownload
@@ -22,6 +23,7 @@ import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.prepareGet
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsChannel
@@ -31,7 +33,9 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
-import io.ktor.utils.io.jvm.javaio.copyTo
+import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.core.isEmpty
+import io.ktor.utils.io.core.readBytes
 import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -93,39 +97,41 @@ actual class FileProvider(private val applicationContext: Context) {
         fileDirectory: String,
         onProgress: (Float) -> Unit
     ) {
-        val client = HttpClient {
-            HttpResponseValidator {
-                handleResponseExceptionWithRequest { exception, _ ->
-                    throw exception
-                }
-            }
-        }
+        val client = HttpClient()
         
         try {
-            val response: HttpResponse = client.get(url) {
-                onDownload { bytesSentTotal, contentLength ->
-                    if (contentLength != -1L) { // -1 means that the content length is unknown
-                        val progress =
-                            (bytesSentTotal.toDouble() / contentLength * 100).roundToInt() / 100f
-                        onProgress(progress)
+            client.prepareGet(url).execute { httpResponse ->
+                val channel: ByteReadChannel = httpResponse.body()
+                val totalBytes = httpResponse.contentLength() ?: -1L
+                val file = File(fileDirectory)
+                
+                file.outputStream().use { outputStream ->
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    var bytesCopied: Long = 0
+                    var bytesRead: Int
+                    
+                    while (!channel.isClosedForRead) {
+                        bytesRead = channel.readAvailable(buffer, 0, buffer.size)
+                        if (bytesRead == -1) break
+                        
+                        outputStream.write(buffer, 0, bytesRead)
+                        bytesCopied += bytesRead
+                        
+                        if (totalBytes != -1L) {
+                            val progress =
+                                (bytesCopied.toDouble() / totalBytes * 100).roundToInt() / 100f
+                            onProgress(progress)
+                        }
                     }
                 }
+                onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
+                println("A file saved to ${file.path}")
             }
-            
-            val totalBytes = response.contentLength() ?: -1
-            println("Total file size: ${totalBytes / (1024 * 1024)} MB")
-            
-            val file = File(fileDirectory)
-            withContext(Dispatchers.IO) {
-                FileOutputStream(file).use { outputStream ->
-                    response.bodyAsChannel().copyTo(outputStream)
-                }
-            }
-            onProgress(1f) // Set progress to 100% after download is complete
         } finally {
             client.close()
         }
     }
+    
     
     actual fun getFileBytesForDir(fileDirectory: String): ByteArray? {
         val uri = Uri.parse(fileDirectory)

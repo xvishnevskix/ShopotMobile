@@ -64,6 +64,10 @@ class ChatUseCase : KoinComponent {
         return repository.sendMessage(message, attachments = attachments)
     }
     
+    suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?) {
+        return repository.sendUploadMessage(message, attachments = attachments)
+    }
+    
     fun clearData() {
         repository.clearData()
     }

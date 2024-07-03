@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import Avatar
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +26,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
@@ -34,6 +38,8 @@ import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.single_message_check
 
 @Composable
 fun UserComponentItem(
@@ -42,6 +48,7 @@ fun UserComponentItem(
     mainViewModel: MainViewModel
 ) {
     val viewModel: ChatViewModel = koinInject()
+    val profile = mainViewModel.profile.collectAsState().value
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
@@ -113,16 +120,22 @@ fun UserComponentItem(
             Column(
                 modifier = Modifier.padding(top = 12.dp, end = 5.dp)
             ) {
-//                Image(
-//                    modifier = Modifier.size(14.dp),
-//                    painter = painterResource(Res.drawable.double_message_check),
-//                    contentDescription = null,
-//                )
-//                Image(
-//                    modifier = Modifier.size(14.dp),
-//                    painter = painterResource(Res.drawable.single_message_check),
-//                    contentDescription = null,
-//                )
+                if (chat.lastMessage?.fromUser == profile.id) {
+                    if (chat.lastMessage?.anotherRead == true) {
+                        Image(
+                            modifier = Modifier.size(14.dp),
+                            painter = painterResource(Res.drawable.double_message_check),
+                            contentDescription = null,
+                        )
+                    } else {
+                        Image(
+                            modifier = Modifier.size(14.dp),
+                            painter = painterResource(Res.drawable.single_message_check),
+                            contentDescription = null,
+                        )
+                    }
+                }
+                
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,

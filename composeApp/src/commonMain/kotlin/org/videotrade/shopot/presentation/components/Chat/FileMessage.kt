@@ -64,32 +64,65 @@ fun FileMessage(
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
     
     var isLoading by remember { mutableStateOf(false) }
-//    var progress by remember { mutableStateOf(0f) }
-    var progress = remember { mutableStateOf(0f) }
+    var progress by remember { mutableStateOf(0f) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var filePath by remember { mutableStateOf("") }
     val audioFile by remember { mutableStateOf(FileProviderFactory.create()) }
+    var isUploading by remember { mutableStateOf(false) }
     
     
     
     LaunchedEffect(message) {
         
-        if (message.upload !== null) {
+        if (!isUploading && message.upload !== null) {
             downloadJob?.cancel()
-            progress.value = 0f
+            progress = 0f
             isLoading = true
             
             
             downloadJob = scope.launch {
                 isLoading = true
                 
-                message.attachments?.get(0)?.let {
-                    viewModel.sendLargeFile(
-                        message.content, message.fromUser, message.chatId, it.type,
-                        it.name, it.originalFileDir,
-                        progress
-                    )
+                message.attachments?.get(0)?.let { attachment ->
+                    val fileId = FileProviderFactory.create().uploadFileToDirectory(
+                        "file/upload",
+                        attachment.originalFileDir!!,
+                        attachment.type,
+                        attachment.name
+                    ) {
+                        progress = it / 100f
+                        println("progress ${it}")
+                    }
+                    
+                    
+                    
+                    if (fileId !== null) {
+                        println("fileId ${fileId.id}")
+                        isUploading = true
+
+//                        viewModel.sendAttachments(
+//                            message.content,
+//                            message.fromUser,
+//                            message.chatId,
+//                            message.uploadId!!,
+//                            fileId.id
+//                        )
+                        
+                        
+                        viewModel.sendLargeFileAttachments(
+                            message.content,
+                            message.fromUser,
+                            message.chatId,
+                            message.uploadId!!,
+                            fileId.id
+                        )
+                    }
+                    
+                    
                 }
+                
+                isLoading = false
+                progress = 1f
                 isLoading = false
             }
             
@@ -109,7 +142,7 @@ fun FileMessage(
             
             downloadJob?.cancel()
             isLoading = false
-            progress.value = 1f
+            progress = 1f
             println("filePath $filePath")
             filePath = existingFile
         }
@@ -129,7 +162,7 @@ fun FileMessage(
                 onClick = {
                     if (!isLoading) {
                         downloadJob?.cancel()
-                        progress.value = 0f
+                        progress = 0f
                         isLoading = true
                         
                         
@@ -139,7 +172,7 @@ fun FileMessage(
                         downloadJob = scope.launch {
                             isLoading = true
                             audioFile.downloadFileToDirectory(url, getFilePath) { newProgress ->
-                                progress.value = newProgress
+                                progress = newProgress
                             }
                             isLoading = false
                         }
@@ -147,14 +180,14 @@ fun FileMessage(
                         
                         downloadJob?.cancel()
                         isLoading = false
-                        progress.value = 0f
+                        progress = 0f
                     }
                 },
                 modifier = Modifier.size(43.dp)
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
-                        progress = progress.value,
+                        progress = progress,
                         color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
                         strokeWidth = 2.dp,
                         modifier = Modifier.fillMaxSize()
@@ -174,7 +207,7 @@ fun FileMessage(
                     println("dsasdadadaa")
                     Image(
                         painter = painterResource(
-                            if (progress.value == 1f) {
+                            if (progress == 1f) {
                                 if (message.fromUser == profile.id) Res.drawable.file_message_white
                                 else Res.drawable.file_message_dark
                             } else {

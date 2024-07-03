@@ -29,6 +29,11 @@ class ChatsUseCase : KoinComponent {
         return repository.updateLastMessageChat(messageItem)
     }
     
+    fun updateReadLastMessageChat(messageItem: MessageItem) {
+        return repository.updateReadLastMessageChat(messageItem)
+    }
+    
+    
     fun delChat(user: ChatItem) {
         return repository.delChat(user)
     }

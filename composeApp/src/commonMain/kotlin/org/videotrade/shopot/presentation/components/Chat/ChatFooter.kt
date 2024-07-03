@@ -86,6 +86,7 @@ import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 
 data class MenuItem(
@@ -122,16 +123,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 try {
                     val fileData = FileProviderFactory.create().getFileData(platformFile.path)
                     
-                    println("fileData $fileData")
-                    
-                    
+                    println("fileData $fileData ${Random.nextInt(1, 501)}")
+         
+                 
                     if (fileData !== null) {
                         
                         viewModel.addMessage(
                             MessageItem(
                                 "1",
                                 viewModel.profile.value.id,
-                                "1",
+                                "",
                                 "1",
                                 "1",
                                 0,
@@ -148,10 +149,12 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         "",
                                         fileData.fileType,
                                         fileData.fileName,
-                                        platformFile.path
+                                        platformFile.path,
+//                                        0
                                     )
                                 ),
-                                upload = true
+                                upload = true,
+                                uploadId = Random.nextInt(1, 501).toString()
                             )
                         )
 
@@ -503,7 +506,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         content = text,
                                         fromUser = viewModel.profile.value.id,
                                         chatId = chat.id,
-                                        userId = chat.userId,
                                         notificationToken = chat.notificationToken,
                                         attachments = emptyList(),
                                         login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}"

@@ -43,9 +43,35 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     
     override suspend fun sendMessage(message: MessageItem, attachments: List<String>?) {
         try {
-            
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
+                    put("action", "sendMessage")
+                    put("content", message.content)
+                    put("fromUser", message.fromUser)
+                    put("chatId", message.chatId)
+                    put(
+                        "attachments",
+                        Json.encodeToJsonElement(attachments)
+                    )
+                }
+            )
+            println("jsonContent $jsonContent")
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+            
+        } catch (e: Exception) {
+            println("Failed to send message: ${e.message}")
+        }
+    }
+    
+    override suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?) {
+        try {
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+//                    put("action", "sendUploadMessage")
+//                    put("content", message.content)
+//                    put("fromUser", message.fromUser)
+//                    put("uploadId", message.uploadId)
+//                    put("chatId", message.chatId)
                     put("action", "sendMessage")
                     put("content", message.content)
                     put("fromUser", message.fromUser)

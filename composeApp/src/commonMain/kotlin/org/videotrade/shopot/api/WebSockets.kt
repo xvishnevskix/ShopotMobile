@@ -39,8 +39,6 @@ suspend fun handleConnectWebSocket(
         
     }
     if (!isConnected.value) {
-        
-        
         try {
             httpClient.webSocket(
                 method = HttpMethod.Get,
@@ -61,6 +59,7 @@ suspend fun handleConnectWebSocket(
                             
                             val text = frame.readText()
                             
+                            println("text $text")
                             
                             val jsonElement = Json.parseToJsonElement(text)
                             val action = jsonElement.jsonObject["action"]?.jsonPrimitive?.content
@@ -139,8 +138,6 @@ suspend fun handleConnectWebSocket(
                                         if (dataJson != null) {
                                             
                                             for (messageItem in dataJson) {
-                                                
-                                                
                                                 val message: MessageItem =
                                                     Json.decodeFromString(messageItem.toString())
 
@@ -164,8 +161,37 @@ suspend fun handleConnectWebSocket(
                                 
                                 "messageSent" -> {
                                     try {
+                                        val messageJson =
+                                            jsonElement.jsonObject["message"]?.jsonObject
                                         
                                         
+                                        
+                                        if (messageJson != null) {
+                                            
+                                            
+                                            println("tttt ${messageJson}")
+                                            
+                                            
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
+                                            
+                                            
+                                            
+                                            chatUseCase.addMessage(message)// Инициализация сообщений
+                                            
+                                            chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
+                                            
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                }
+                                
+                                "sendUploadMessage" -> {
+                                    try {
                                         val messageJson =
                                             jsonElement.jsonObject["message"]?.jsonObject
                                         
@@ -272,6 +298,8 @@ suspend fun handleConnectWebSocket(
                                         
                                         if (messageJson != null) {
                                             
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
                                             
                                             val messageId =
                                                 messageJson["id"]?.jsonPrimitive?.content
@@ -280,6 +308,10 @@ suspend fun handleConnectWebSocket(
                                             if (messageId != null) {
                                                 chatUseCase.readMessage(messageId)
                                             }
+                                            
+                                            
+                                            chatsUseCase.updateReadLastMessageChat(message)
+                                            
                                         }
                                         
                                     } catch (e: Exception) {
