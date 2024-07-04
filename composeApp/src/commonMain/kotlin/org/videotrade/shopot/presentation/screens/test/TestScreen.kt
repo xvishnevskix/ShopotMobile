@@ -89,21 +89,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import io.ktor.utils.io.charsets.Charsets
 import io.ktor.utils.io.core.toByteArray
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.multiplatform.EncapsulateChecker
-import org.videotrade.shopot.multiplatform.decupsChachaMessage
-import org.videotrade.shopot.multiplatform.encupsChachaMessage
-import org.videotrade.shopot.multiplatform.sharedSecret
 
 class TestScreen : Screen {
     @Composable
     override fun Content() {
+        val checker: EncapsulateChecker = KoinPlatform.getKoin().get()
+        
         var publicKey by remember { mutableStateOf("opsda") }
         
         var errorMessage by remember { mutableStateOf("") }
         
-        EncapsulateChecker
+        
         
         Column(
             modifier = Modifier
@@ -118,10 +117,10 @@ class TestScreen : Screen {
                 try {
                     val publicKeyBytes = publicKey.toByteArray()
                     
-                    val result =
-                        
-                        
-                        println("result3 $result")
+                    val result = checker.encapsulateAvailable(publicKeyBytes)
+                    
+                    
+                    println("result3 $result")
                     
                 } catch (e: Exception) {
                     errorMessage = "Error: ${e.message}"
