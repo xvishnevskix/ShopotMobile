@@ -193,6 +193,7 @@ android {
 
 dependencies {
     implementation(libs.androidx.animation.core.android)
+    implementation(project(":composeApp"))
 }
 
 buildConfig {

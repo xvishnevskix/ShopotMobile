@@ -13,6 +13,7 @@
 		4BA72F992C36AF8500CCBE12 /* liboqs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F982C36AF8500CCBE12 /* liboqs.a */; };
 		4BA72F9B2C36AF9600CCBE12 /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F9A2C36AF9600CCBE12 /* libwolfssl.a */; };
 		4BA72F9D2C36AFA800CCBE12 /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F9C2C36AFA800CCBE12 /* libwolfssl.a */; };
+		4BA72FA02C36BDA100CCBE12 /* SharedSecretWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BA72F9F2C36BDA100CCBE12 /* SharedSecretWrapper.m */; };
 		4BBB6F182C14A1F100C72863 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB6F172C14A1F100C72863 /* GoogleService-Info.plist */; };
 		4BBB6F1D2C14A94200C72863 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 4BBB6F1C2C14A94200C72863 /* FirebaseInstallations */; };
 		4BBB6F1F2C14A94200C72863 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 4BBB6F1E2C14A94200C72863 /* FirebaseMessaging */; };
@@ -32,6 +33,8 @@
 		4BA72F982C36AF8500CCBE12 /* liboqs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liboqs.a; path = ../composeApp/libs/liboqs/libs/ios/release/liboqs.a; sourceTree = "<group>"; };
 		4BA72F9A2C36AF9600CCBE12 /* libwolfssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwolfssl.a; path = ../composeApp/libs/wolfssl/libs/ios/debug/libwolfssl.a; sourceTree = "<group>"; };
 		4BA72F9C2C36AFA800CCBE12 /* libwolfssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwolfssl.a; path = ../composeApp/libs/wolfssl/libs/ios/release/libwolfssl.a; sourceTree = "<group>"; };
+		4BA72F9E2C36BD9100CCBE12 /* SharedSecretWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SharedSecretWrapper.h; sourceTree = "<group>"; };
+		4BA72F9F2C36BDA100CCBE12 /* SharedSecretWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SharedSecretWrapper.m; sourceTree = "<group>"; };
 		4BBB6F172C14A1F100C72863 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4BBB6F202C14ACB800C72863 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		A93A953729CC810C00F8E227 /* shopot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = shopot.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -74,6 +77,8 @@
 		A93A952E29CC810C00F8E227 = {
 			isa = PBXGroup;
 			children = (
+				4BA72F9F2C36BDA100CCBE12 /* SharedSecretWrapper.m */,
+				4BA72F9E2C36BD9100CCBE12 /* SharedSecretWrapper.h */,
 				4BA72F932C36ABF300CCBE12 /* SharedSecret.h */,
 				4BA72F912C36AB9000CCBE12 /* SharedSecret.m */,
 				A93A953929CC810C00F8E227 /* iosApp */,
@@ -215,6 +220,7 @@
 			files = (
 				4BA72F922C36AB9000CCBE12 /* SharedSecret.m in Sources */,
 				A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */,
+				4BA72FA02C36BDA100CCBE12 /* SharedSecretWrapper.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
