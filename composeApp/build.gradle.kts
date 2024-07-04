@@ -17,8 +17,6 @@ plugins {
     id("com.google.gms.google-services")
 }
 
-
-
 kotlin {
     
     cocoapods {
@@ -34,7 +32,6 @@ kotlin {
         }
     }
     
-    
     androidTarget {
         compilations.all {
             kotlinOptions {
@@ -42,7 +39,6 @@ kotlin {
                 freeCompilerArgs += "-Xjdk-release=${JavaVersion.VERSION_1_8}"
             }
         }
-        //https://www.jetbrains.com/help/kotlin-multiplatform-dev/compose-test.html
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         instrumentedTestVariant {
             sourceSetTree.set(KotlinSourceSetTree.test)
@@ -51,10 +47,7 @@ kotlin {
                 implementation(libs.androidx.junit4)
             }
         }
-        
-        
     }
-    
     
     listOf(
         iosX64 { configureWebRtcCinterops() },
@@ -68,9 +61,7 @@ kotlin {
         }
     }
     
-    
     sourceSets {
-        
         
         all {
             languageSettings {
@@ -110,9 +101,8 @@ kotlin {
             implementation(libs.mpfilepicker)
             implementation(libs.sonner)
             api(libs.image.loader.v181)
-            api(libs.kmpnotifier) // in iOS export this library
+            api(libs.kmpnotifier)
             implementation(libs.firebase.common)
-
         }
         
         commonTest.dependencies {
@@ -127,24 +117,15 @@ kotlin {
             implementation(libs.androidx.activityCompose)
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
-            implementation(project.dependencies.platform("com.google.firebase:firebase-bom:30.0.1"))
+            implementation(libs.firebase.bom)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.lifecycle.process)
-            
-            
         }
         
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
-            
-            
         }
-
-
-//        val iosMain by getting
-//        val iosSimulatorArm64Main by getting
-//        iosSimulatorArm64Main.dependsOn(iosMain)
     }
 }
 
@@ -161,37 +142,55 @@ android {
         versionName = "1.0.0"
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        
+        externalNativeBuild {
+            cmake {
+                cppFlags += ""
+                arguments += listOf("-DANDROID_TOOLCHAIN=clang")
+                abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            }
+        }
     }
+    
     sourceSets["main"].apply {
         manifest.srcFile("src/androidMain/AndroidManifest.xml")
         res.srcDirs("src/androidMain/res")
     }
-    //https://developer.android.com/studio/test/gradle-managed-devices
+    
     @Suppress("UnstableApiUsage")
     testOptions {
-        managedDevices.devices {
-            maybeCreate<ManagedVirtualDevice>("pixel5").apply {
-                device = "Pixel 5"
-                apiLevel = 34
-                systemImageSource = "aosp"
+        managedDevices {
+            devices {
+                maybeCreate<ManagedVirtualDevice>("pixel5").apply {
+                    device = "Pixel 5"
+                    apiLevel = 34
+                    systemImageSource = "aosp"
+                }
             }
         }
     }
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+    
     buildFeatures {
         compose = true
     }
+    
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.11"
     }
     
-    
-    
-    
+    externalNativeBuild {
+        cmake {
+            path = file("CMakeLists.txt")
+            version = "3.10.2"
+        }
+    }
 }
+
 dependencies {
     implementation(libs.androidx.animation.core.android)
 }
@@ -200,8 +199,6 @@ buildConfig {
     // BuildConfig configuration here.
     // https://github.com/gmazzo/gradle-buildconfig-plugin#usage-in-kts
 }
-
-
 
 fun KotlinNativeTarget.configureWebRtcCinterops() {
     val webRtcFrameworkPath = file("$buildDir/cocoapods/synthetic/IOS/Pods/WebRTC-SDK")
@@ -226,7 +223,6 @@ fun KotlinNativeTarget.configureWebRtcCinterops() {
     }
 }
 
-
 fun File.resolveArchPath(target: KonanTarget, framework: String): File? {
     val archPaths = resolve("$framework.xcframework")
         .listFiles { _, name -> target.matches(name) }
@@ -241,9 +237,7 @@ private fun KonanTarget.matches(dir: String): Boolean {
     return when (this) {
         KonanTarget.IOS_SIMULATOR_ARM64,
         KonanTarget.IOS_X64 -> dir.startsWith("ios") && dir.endsWith("simulator")
-        
         KonanTarget.IOS_ARM64 -> dir.startsWith("ios-arm64") && !dir.contains("x86")
-        
         else -> error("Unsupported target $name")
     }
 }
