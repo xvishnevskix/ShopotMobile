@@ -24,6 +24,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.mmk.kmpnotifier.notification.NotifierManager
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -255,7 +256,8 @@ suspend fun sendRequestToBackend(
 suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewModel) {
     
     
-    val response = sendRequestToBackend(phone, null, "auth/login")
+    val response =
+        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login")
     
     
     println("sadada")

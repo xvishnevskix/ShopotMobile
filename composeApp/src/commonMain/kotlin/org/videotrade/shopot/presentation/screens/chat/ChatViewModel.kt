@@ -118,7 +118,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 ),
                 attachments
             )
-
+            println("сообщениесообщениесообщениесообщение")
             sendNotify("Новое сообщение от $login ", content, notificationToken)
         }
     }
@@ -188,6 +188,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         notificationToken: String?
     ) {
         viewModelScope.launch {
+            println("Уведомление ${notificationToken}")
+            
             if (notificationToken !== null) {
                 val jsonContent = Json.encodeToString(
                     buildJsonObject {
@@ -197,6 +199,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                         
                     }
                 )
+                
+                println("Уведомление ${jsonContent}")
                 
                 origin().post<Any>("notification/notify", jsonContent)
             }
