@@ -18,9 +18,8 @@ internal fun App() = AppTheme {
     KoinContext {
         
         Navigator(
-            IntroScreen()
-//            ProfileEditScreen()
-//            TestScreen()
+//            IntroScreen()
+            TestScreen()
 //            ChatScreen(
 //                ChatItem(
 //                    "", true, "", "", "", "", 0, "", MessageItem(

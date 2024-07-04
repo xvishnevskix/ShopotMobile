@@ -8,8 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		4B25B1ED2BEE1AF800AAB866 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 4B25B1EC2BEE1AF800AAB866 /* WebRTC */; };
+		4BA72F922C36AB9000CCBE12 /* SharedSecret.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BA72F912C36AB9000CCBE12 /* SharedSecret.m */; };
+		4BA72F972C36AF6A00CCBE12 /* liboqs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F962C36AF6A00CCBE12 /* liboqs.a */; };
+		4BA72F992C36AF8500CCBE12 /* liboqs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F982C36AF8500CCBE12 /* liboqs.a */; };
+		4BA72F9B2C36AF9600CCBE12 /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F9A2C36AF9600CCBE12 /* libwolfssl.a */; };
+		4BA72F9D2C36AFA800CCBE12 /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F9C2C36AFA800CCBE12 /* libwolfssl.a */; };
 		4BBB6F182C14A1F100C72863 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB6F172C14A1F100C72863 /* GoogleService-Info.plist */; };
-		4BBB6F1B2C14A5CF00C72863 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 4BBB6F1A2C14A5CF00C72863 /* FirebaseInstallations */; };
 		4BBB6F1D2C14A94200C72863 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 4BBB6F1C2C14A94200C72863 /* FirebaseInstallations */; };
 		4BBB6F1F2C14A94200C72863 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 4BBB6F1E2C14A94200C72863 /* FirebaseMessaging */; };
 		A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A93A953A29CC810C00F8E227 /* iosApp.swift */; };
@@ -20,6 +24,14 @@
 /* Begin PBXFileReference section */
 		4B25B1E52BEDA00A00AAB866 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4B25B1E72BEDA1A600AAB866 /* Specs */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Specs; path = "../../../Library/Developer/Xcode/DerivedData/iosApp-aqpjntnwydssvpbfaxdymfedbggc/SourcePackages/checkouts/Specs"; sourceTree = "<group>"; };
+		4BA72F902C36AB9000CCBE12 /* iosApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iosApp-Bridging-Header.h"; sourceTree = "<group>"; };
+		4BA72F912C36AB9000CCBE12 /* SharedSecret.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SharedSecret.m; path = iosApp/cipherFuncs/SharedSecret.m; sourceTree = "<group>"; };
+		4BA72F932C36ABF300CCBE12 /* SharedSecret.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SharedSecret.h; path = iosApp/cipherFuncs/SharedSecret.h; sourceTree = "<group>"; };
+		4BA72F942C36AF5000CCBE12 /* liboqs */ = {isa = PBXFileReference; lastKnownFileType = folder; name = liboqs; path = ../composeApp/libs/liboqs; sourceTree = "<group>"; };
+		4BA72F962C36AF6A00CCBE12 /* liboqs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liboqs.a; path = ../composeApp/libs/liboqs/libs/ios/degub/liboqs.a; sourceTree = "<group>"; };
+		4BA72F982C36AF8500CCBE12 /* liboqs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liboqs.a; path = ../composeApp/libs/liboqs/libs/ios/release/liboqs.a; sourceTree = "<group>"; };
+		4BA72F9A2C36AF9600CCBE12 /* libwolfssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwolfssl.a; path = ../composeApp/libs/wolfssl/libs/ios/debug/libwolfssl.a; sourceTree = "<group>"; };
+		4BA72F9C2C36AFA800CCBE12 /* libwolfssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwolfssl.a; path = ../composeApp/libs/wolfssl/libs/ios/release/libwolfssl.a; sourceTree = "<group>"; };
 		4BBB6F172C14A1F100C72863 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4BBB6F202C14ACB800C72863 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		A93A953729CC810C00F8E227 /* shopot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = shopot.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -33,10 +45,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BA72F9D2C36AFA800CCBE12 /* libwolfssl.a in Frameworks */,
+				4BA72F9B2C36AF9600CCBE12 /* libwolfssl.a in Frameworks */,
+				4BA72F992C36AF8500CCBE12 /* liboqs.a in Frameworks */,
+				4BA72F972C36AF6A00CCBE12 /* liboqs.a in Frameworks */,
 				4BBB6F1F2C14A94200C72863 /* FirebaseMessaging in Frameworks */,
 				4BBB6F1D2C14A94200C72863 /* FirebaseInstallations in Frameworks */,
 				4B25B1ED2BEE1AF800AAB866 /* WebRTC in Frameworks */,
-				4BBB6F1B2C14A5CF00C72863 /* FirebaseInstallations in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -46,6 +61,11 @@
 		4B25B1E62BEDA02800AAB866 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				4BA72F9A2C36AF9600CCBE12 /* libwolfssl.a */,
+				4BA72F9C2C36AFA800CCBE12 /* libwolfssl.a */,
+				4BA72F962C36AF6A00CCBE12 /* liboqs.a */,
+				4BA72F982C36AF8500CCBE12 /* liboqs.a */,
+				4BA72F942C36AF5000CCBE12 /* liboqs */,
 				4B25B1E72BEDA1A600AAB866 /* Specs */,
 			);
 			name = Frameworks;
@@ -54,9 +74,12 @@
 		A93A952E29CC810C00F8E227 = {
 			isa = PBXGroup;
 			children = (
+				4BA72F932C36ABF300CCBE12 /* SharedSecret.h */,
+				4BA72F912C36AB9000CCBE12 /* SharedSecret.m */,
 				A93A953929CC810C00F8E227 /* iosApp */,
 				A93A953829CC810C00F8E227 /* Products */,
 				4B25B1E62BEDA02800AAB866 /* Frameworks */,
+				4BA72F902C36AB9000CCBE12 /* iosApp-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -108,7 +131,6 @@
 			name = iosApp;
 			packageProductDependencies = (
 				4B25B1EC2BEE1AF800AAB866 /* WebRTC */,
-				4BBB6F1A2C14A5CF00C72863 /* FirebaseInstallations */,
 				4BBB6F1C2C14A94200C72863 /* FirebaseInstallations */,
 				4BBB6F1E2C14A94200C72863 /* FirebaseMessaging */,
 			);
@@ -127,6 +149,7 @@
 				TargetAttributes = {
 					A93A953629CC810C00F8E227 = {
 						CreatedOnToolsVersion = 14.2;
+						LastSwiftMigration = 1500;
 					};
 				};
 			};
@@ -190,6 +213,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4BA72F922C36AB9000CCBE12 /* SharedSecret.m in Sources */,
 				A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -317,6 +341,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
@@ -328,6 +353,10 @@
 					"$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/include\"",
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/include\"",
+				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Приложению требуется доступ к камере для съемки фотографий.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.";
@@ -340,6 +369,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/libs/ios/degub\"",
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/libs/ios/debug\"",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"${inherited}",
@@ -349,6 +382,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.videotrade.shopot.iosApp;
 				PRODUCT_NAME = shopot;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "iosApp-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -360,6 +395,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = iosApp/iosApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
@@ -371,6 +407,10 @@
 					"$(SRCROOT)/../composeApp/build/xcode-frameworks/$(CONFIGURATION)/$(SDK_NAME)",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/include\"",
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/include\"",
+				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Приложению требуется доступ к камере для съемки фотографий.";
 				INFOPLIST_KEY_NSContactsUsageDescription = "Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.";
@@ -383,6 +423,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/libs/ios/release\"",
+					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/libs/ios/release\"",
+				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"${inherited}",
@@ -392,6 +436,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = org.videotrade.shopot.iosApp;
 				PRODUCT_NAME = shopot;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "iosApp-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -444,11 +489,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4B25B1EB2BEE1AF800AAB866 /* XCRemoteSwiftPackageReference "Specs" */;
 			productName = WebRTC;
-		};
-		4BBB6F1A2C14A5CF00C72863 /* FirebaseInstallations */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4BBB6F192C14A5CF00C72863 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseInstallations;
 		};
 		4BBB6F1C2C14A94200C72863 /* FirebaseInstallations */ = {
 			isa = XCSwiftPackageProductDependency;
