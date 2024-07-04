@@ -24,3 +24,23 @@ actual fun decupsChachaMessage(
 actual fun getSharedSecret(publicKeyBase64: String): List<String> {
     TODO("Not yet implemented")
 }
+
+actual class EncryptionWrapper {
+    actual fun encapsulate(publicKey: ByteArray): EncapsulationResult? {
+        TODO("Not yet implemented")
+    }
+}
+
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+actual class InternetConnectionChecker actual constructor(checker: ConnectionChecker) {
+    actual fun isInternetAvailable(): Boolean {
+        TODO("Not yet implemented")
+    }
+}
+
+@Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+actual class EncapsulateChecker actual constructor(checker: EncryptionWrapper) {
+    actual fun encapsulate(publicKey: ByteArray): EncapsulationResult? {
+        TODO("Not yet implemented")
+    }
+}

@@ -11,7 +11,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     override init() {
         super.init()
-        KoinHelperKt.doInitKoin()
+        KoinHelperKt.doInitKoin(checker: IOChecker())
     }
 
     func application(
@@ -36,7 +36,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         return true
     }
-    
 
     func requestNotificationAuthorization(_ application: UIApplication) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in

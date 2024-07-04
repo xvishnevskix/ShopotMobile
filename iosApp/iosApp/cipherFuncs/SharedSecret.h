@@ -1,6 +1,7 @@
-#import <Foundation/Foundation.h>
+#ifndef SHARED_SECRET_H
+#define SHARED_SECRET_H
 
-NS_ASSUME_NONNULL_BEGIN
+#include <oqs/oqs.h>
 
 typedef struct {
     unsigned char *ciphertext;
@@ -9,16 +10,4 @@ typedef struct {
 
 EncapsulationResult encapsulate_with_public_key(unsigned char *public_key);
 
-extern const int OQS_KEM_kyber_768_length_ciphertext;
-extern const int OQS_KEM_kyber_768_length_shared_secret;
-
-@interface SharedSecretModule : NSObject
-
-+ (NSArray
-
-<NSString *> *)getSharedSecret:(NSString *)
-publicKeyBase64;
-
-@end
-
-NS_ASSUME_NONNULL_END
+#endif // SHARED_SECRET_H
