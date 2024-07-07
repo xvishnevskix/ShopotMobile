@@ -92,7 +92,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import io.ktor.utils.io.core.toByteArray
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.multiplatform.CipherWrapper
-import org.videotrade.shopot.multiplatform.sharedSecret
 
 class TestScreen : Screen {
     @Composable
@@ -126,12 +125,14 @@ class TestScreen : Screen {
 //                    println("result2 $result2")
                     
                     
-                    val result3 = cipherWrapper.decupsChachaMessageCommon(
-                        result2.cipher,
-                        result2.block,
-                        result2.authTag,
-                        result.sharedSecret
-                    )
+                    val result3 = result2?.let {
+                        cipherWrapper.decupsChachaMessageCommon(
+                            it.cipher,
+                            result2.block,
+                            result2.authTag,
+                            result.sharedSecret
+                        )
+                    }
                     
                     
                     

@@ -14,10 +14,14 @@ import com.google.firebase.initialize
 import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import org.koin.core.context.startKoin
+import org.koin.core.module.Module
+import org.koin.dsl.module
 import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.AudioPlayer
 import org.videotrade.shopot.multiplatform.BackgroundTaskManagerFactory
+import org.videotrade.shopot.multiplatform.CipherInterface
+import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -33,11 +37,16 @@ class AndroidApp : Application() {
         lateinit var INSTANCE: AndroidApp
     }
     
+    internal fun provideEncapsulateChecker(cipherInterface: CipherInterface? = null): Module =
+        module {
+            single<CipherWrapper> { CipherWrapper(cipherInterface) }
+        }
+    
     override fun onCreate() {
         super.onCreate()
         initializeFactories(this)
         startKoin {
-            modules(getSharedModules())
+            modules(getSharedModules() + provideEncapsulateChecker())
         }
         INSTANCE = this
     }

@@ -16,12 +16,12 @@ interface CipherInterface {
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-expect class CipherWrapper(cipherInterface: CipherInterface) {
+expect class CipherWrapper(cipherInterface: CipherInterface? = null) {
     fun getSharedSecretCommon(publicKey: ByteArray): SharedSecretResult?
     fun encupsChachaMessageCommon(
         message: String,
         sharedSecret: ByteArray
-    ): EncapsulationMessageResult
+    ): EncapsulationMessageResult?
     
     fun decupsChachaMessageCommon(
         cipher: ByteArray,

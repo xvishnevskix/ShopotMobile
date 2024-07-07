@@ -4,7 +4,7 @@ import org.videotrade.shopot.cipher.SharedSecretModule
 import org.videotrade.shopot.cipher.WolfsslModule
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class CipherWrapper actual constructor(cipherInterface: CipherInterface) {
+actual class CipherWrapper actual constructor(cipherInterface: CipherInterface?) {
     actual fun getSharedSecretCommon(publicKey: ByteArray): SharedSecretResult? {
         return SharedSecretModule.sharedSecretC(publicKey)
     }
@@ -12,7 +12,7 @@ actual class CipherWrapper actual constructor(cipherInterface: CipherInterface) 
     actual fun encupsChachaMessageCommon(
         message: String,
         sharedSecret: ByteArray
-    ): EncapsulationMessageResult {
+    ): EncapsulationMessageResult? {
         return WolfsslModule.encupsChachaMessage(message, sharedSecret)
     }
     

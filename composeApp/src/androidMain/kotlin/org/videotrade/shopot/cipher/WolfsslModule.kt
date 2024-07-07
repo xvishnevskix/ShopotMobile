@@ -1,6 +1,6 @@
 package org.videotrade.shopot.cipher
 
-import org.videotrade.shopot.multiplatform.EncapsulationResultJava
+import org.videotrade.shopot.multiplatform.EncapsulationMessageResult
 
 
 object WolfsslModule {
@@ -12,7 +12,7 @@ object WolfsslModule {
     external fun encupsChachaMessage(
         message: String,
         sharedSecret: ByteArray
-    ): EncapsulationResultJava
+    ): EncapsulationMessageResult
     
     
     external fun decupsChachaMessage(

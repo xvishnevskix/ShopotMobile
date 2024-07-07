@@ -1,17 +1,17 @@
 package org.videotrade.shopot.multiplatform
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
 actual class CipherWrapper actual constructor(
-    private val cipherInterface: CipherInterface
+    private val cipherInterface: CipherInterface?
 ) {
     actual fun getSharedSecretCommon(publicKey: ByteArray): SharedSecretResult? {
-        return cipherInterface.getSharedSecretAndCipherText(publicKey)
+        return cipherInterface?.getSharedSecretAndCipherText(publicKey)
     }
     
     actual fun encupsChachaMessageCommon(
         message: String,
         sharedSecret: ByteArray
-    ): EncapsulationMessageResult {
-        return cipherInterface.encupsChachaMessage(message, sharedSecret)
+    ): EncapsulationMessageResult? {
+        return cipherInterface?.encupsChachaMessage(message, sharedSecret)
     }
     
     actual fun decupsChachaMessageCommon(
@@ -20,7 +20,7 @@ actual class CipherWrapper actual constructor(
         authTag: ByteArray,
         sharedSecret: ByteArray
     ): String? {
-        return cipherInterface.decupsChachaMessage(cipher, block, authTag, sharedSecret)
+        return cipherInterface?.decupsChachaMessage(cipher, block, authTag, sharedSecret)
         
     }
 }
