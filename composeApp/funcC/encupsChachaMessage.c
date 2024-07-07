@@ -108,7 +108,7 @@ Java_org_videotrade_shopot_cipher_WolfsslModule_encupsChachaMessage(JNIEnv *env,
     (*env)->SetByteArrayRegion(env, authTagJava, 0, 16, (jbyte *) result.authTag);
 
     jclass resultClass = (*env)->FindClass(env,
-                                           "org/videotrade/shopot/multiplatform/EncapsulationResultJava");
+                                           "org/videotrade/shopot/multiplatform/EncapsulationMessageResult");
     jmethodID constructor = (*env)->GetMethodID(env, resultClass, "<init>", "([B[B[B)V");
     jobject resultObj = (*env)->NewObject(env, resultClass, constructor, cipherJava, blockJava,
                                           authTagJava);

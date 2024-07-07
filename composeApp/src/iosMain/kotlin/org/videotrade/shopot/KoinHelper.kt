@@ -4,21 +4,14 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.videotrade.shopot.di.getSharedModules
-import org.videotrade.shopot.multiplatform.ConnectionChecker
-import org.videotrade.shopot.multiplatform.EncapsulateChecker
-import org.videotrade.shopot.multiplatform.EncryptionWrapperChecker
-import org.videotrade.shopot.multiplatform.InternetConnectionChecker
+import org.videotrade.shopot.multiplatform.CipherInterface
+import org.videotrade.shopot.multiplatform.CipherWrapper
 
-
-internal fun provideChecker(realChecker: ConnectionChecker): Module = module {
-    single<InternetConnectionChecker> { InternetConnectionChecker(realChecker) }
+internal fun provideEncapsulateChecker(cipherInterface: CipherInterface): Module = module {
+    single<CipherWrapper> { CipherWrapper(cipherInterface) }
 }
 
-internal fun provideEncapsulateChecker(realChecker: EncryptionWrapperChecker): Module = module {
-    single<EncapsulateChecker> { EncapsulateChecker(realChecker) }
-}
-
-fun doInitKoin(checker: EncryptionWrapperChecker) {
+fun doInitKoin(checker: CipherInterface) {
     val modules = getSharedModules() + provideEncapsulateChecker(checker)
     
     startKoin {

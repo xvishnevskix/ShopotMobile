@@ -1,16 +1,13 @@
 package org.videotrade.shopot.cipher
 
+import org.videotrade.shopot.multiplatform.SharedSecretResult
+
 object SharedSecretModule {
     init {
         System.loadLibrary("sharedSecret")
     }
     
     @JvmStatic
-    external fun sharedSecretC(publicKey: ByteArray): Array<ByteArray>
+    external fun sharedSecretC(publicKey: ByteArray): SharedSecretResult
 }
 
-
-fun sharedSecret(publicKey: ByteArray): ByteArray {
-    val result = SharedSecretModule.sharedSecretC(publicKey)
-    return result[1] // Предположим, что второй элемент массива - это ваш общий секрет (shared secret)
-}

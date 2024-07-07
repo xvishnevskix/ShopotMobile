@@ -91,12 +91,13 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import io.ktor.utils.io.core.toByteArray
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.multiplatform.EncapsulateChecker
+import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.sharedSecret
 
 class TestScreen : Screen {
     @Composable
     override fun Content() {
-        val checker: EncapsulateChecker = KoinPlatform.getKoin().get()
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
         var publicKey by remember { mutableStateOf("opsda") }
         
@@ -117,10 +118,24 @@ class TestScreen : Screen {
                 try {
                     val publicKeyBytes = publicKey.toByteArray()
                     
-                    val result = checker.encapsulateAvailable(publicKeyBytes)
+                    val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
+                    
+                    val result2 =
+                        cipherWrapper.encupsChachaMessageCommon("privet", result?.sharedSecret!!)
+
+//                    println("result2 $result2")
                     
                     
-                    println("result3 $result")
+                    val result3 = cipherWrapper.decupsChachaMessageCommon(
+                        result2.cipher,
+                        result2.block,
+                        result2.authTag,
+                        result.sharedSecret
+                    )
+                    
+                    
+                    
+                    println("result3 $result3")
                     
                 } catch (e: Exception) {
                     errorMessage = "Error: ${e.message}"

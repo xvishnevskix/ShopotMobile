@@ -70,15 +70,28 @@ JNIEXPORT jobject JNICALL Java_org_videotrade_shopot_cipher_SharedSecretModule_s
     jbyteArray sharedSecretJava = (*env)->NewByteArray(env, OQS_KEM_kyber_768_length_shared_secret);
     (*env)->SetByteArrayRegion(env, sharedSecretJava, 0, OQS_KEM_kyber_768_length_shared_secret, (jbyte *) result.shared_secret);
 
-    // Создание jobjectArray для хранения обоих jbyteArrays
-    jclass byteArrayClass = (*env)->FindClass(env, "[B");
-    jobjectArray returnArray = (*env)->NewObjectArray(env, 2, byteArrayClass, NULL);
-    (*env)->SetObjectArrayElement(env, returnArray, 0, ciphertextJava);
-    (*env)->SetObjectArrayElement(env, returnArray, 1, sharedSecretJava);
+    // Находим класс SharedSecretResult
+    jclass resultClass = (*env)->FindClass(env,
+                                           "org/videotrade/shopot/multiplatform/SharedSecretResult");
+    if (resultClass == NULL) {
+        // Обработка ошибки, если класс не найден
+        return NULL;
+    }
+
+    // Находим конструктор класса SharedSecretResult
+    jmethodID constructor = (*env)->GetMethodID(env, resultClass, "<init>", "([B[B)V");
+    if (constructor == NULL) {
+        // Обработка ошибки, если конструктор не найден
+        return NULL;
+    }
+
+    // Создание объекта SharedSecretResult
+    jobject sharedSecretResult = (*env)->NewObject(env, resultClass, constructor, ciphertextJava,
+                                                   sharedSecretJava);
 
     // Освобождение памяти, выделенной в C
     free(result.ciphertext);
     free(result.shared_secret);
 
-    return returnArray;
+    return sharedSecretResult;
 }

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		4B25B1ED2BEE1AF800AAB866 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 4B25B1EC2BEE1AF800AAB866 /* WebRTC */; };
+		4B7C65B62C3820BC00429124 /* WolfsslModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7C65B52C3820BC00429124 /* WolfsslModule.m */; };
 		4BA72F922C36AB9000CCBE12 /* SharedSecret.m in Sources */ = {isa = PBXBuildFile; fileRef = 4BA72F912C36AB9000CCBE12 /* SharedSecret.m */; };
 		4BA72F972C36AF6A00CCBE12 /* liboqs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F962C36AF6A00CCBE12 /* liboqs.a */; };
 		4BA72F992C36AF8500CCBE12 /* liboqs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F982C36AF8500CCBE12 /* liboqs.a */; };
@@ -25,6 +26,8 @@
 /* Begin PBXFileReference section */
 		4B25B1E52BEDA00A00AAB866 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4B25B1E72BEDA1A600AAB866 /* Specs */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Specs; path = "../../../Library/Developer/Xcode/DerivedData/iosApp-aqpjntnwydssvpbfaxdymfedbggc/SourcePackages/checkouts/Specs"; sourceTree = "<group>"; };
+		4B7C65B52C3820BC00429124 /* WolfsslModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WolfsslModule.m; path = iosApp/cipherFuncs/WolfsslModule.m; sourceTree = "<group>"; };
+		4B7C65B72C3820E600429124 /* WolfsslModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WolfsslModule.h; path = iosApp/cipherFuncs/WolfsslModule.h; sourceTree = "<group>"; };
 		4BA72F902C36AB9000CCBE12 /* iosApp-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iosApp-Bridging-Header.h"; sourceTree = "<group>"; };
 		4BA72F912C36AB9000CCBE12 /* SharedSecret.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SharedSecret.m; path = iosApp/cipherFuncs/SharedSecret.m; sourceTree = "<group>"; };
 		4BA72F932C36ABF300CCBE12 /* SharedSecret.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SharedSecret.h; path = iosApp/cipherFuncs/SharedSecret.h; sourceTree = "<group>"; };
@@ -76,6 +79,8 @@
 		A93A952E29CC810C00F8E227 = {
 			isa = PBXGroup;
 			children = (
+				4B7C65B72C3820E600429124 /* WolfsslModule.h */,
+				4B7C65B52C3820BC00429124 /* WolfsslModule.m */,
 				4BA72FAA2C3726D800CCBE12 /* SwiftEncryptionWrapper.swift */,
 				4BA72F932C36ABF300CCBE12 /* SharedSecret.h */,
 				4BA72F912C36AB9000CCBE12 /* SharedSecret.m */,
@@ -218,6 +223,7 @@
 			files = (
 				4BA72F922C36AB9000CCBE12 /* SharedSecret.m in Sources */,
 				4BA72FAB2C3726D800CCBE12 /* SwiftEncryptionWrapper.swift in Sources */,
+				4B7C65B62C3820BC00429124 /* WolfsslModule.m in Sources */,
 				A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
