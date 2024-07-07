@@ -72,6 +72,7 @@ fun ProfileHeader(text: String) {
             textAlign = TextAlign.Center,
             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
             lineHeight = 24.sp,
+            color = androidx.compose.ui.graphics.Color.Black
         )
 //        Spacer(modifier = Modifier.width(40.dp))
     }

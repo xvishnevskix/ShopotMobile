@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import Avatar
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,9 +10,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,15 +26,20 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.single_message_check
 
 @Composable
 fun UserComponentItem(
@@ -39,16 +47,16 @@ fun UserComponentItem(
     commonViewModel: CommonViewModel,
     mainViewModel: MainViewModel
 ) {
-    
-    
-    println("dasdafafa  ${chat.icon} ${chat.lastName}")
+    val viewModel: ChatViewModel = koinInject()
+    val profile = mainViewModel.profile.collectAsState().value
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
             
             mainViewModel.setCurrentChat(chat.id)
             mainViewModel.setZeroUnread(chat)
-            commonViewModel.mainNavigator.value?.push(ChatScreen(chat))
+            viewModel.setCurrentChat(chat)
+            commonViewModel.mainNavigator.value?.push(ChatScreen())
         },
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
@@ -65,13 +73,17 @@ fun UserComponentItem(
                 modifier = Modifier.padding(start = 10.dp),
                 verticalArrangement = Arrangement.Center
             ) {
+                val fullName = listOfNotNull(chat.firstName, chat.lastName)
+                    .joinToString(" ")
+                    .takeIf { it.isNotBlank() }
+                    ?.let {
+                        if (it.length > 35) "${it.take(32)}..." else it
+                    } ?: ""
+                
+                val displayName = fullName.ifBlank { chat.phone }
+                
                 Text(
-                    text = listOfNotNull(chat.firstName, chat.lastName)
-                        .joinToString(" ")
-                        .takeIf { it.isNotBlank() }
-                        ?.let {
-                            if (it.length > 35) "${it.take(32)}..." else it
-                        } ?: "",
+                    text = displayName,
                     textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -79,6 +91,7 @@ fun UserComponentItem(
                     lineHeight = 20.sp,
                     color = Color(0xFF000000)
                 )
+                
                 
                 
                 
@@ -107,16 +120,22 @@ fun UserComponentItem(
             Column(
                 modifier = Modifier.padding(top = 12.dp, end = 5.dp)
             ) {
-//                Image(
-//                    modifier = Modifier.size(14.dp),
-//                    painter = painterResource(Res.drawable.double_message_check),
-//                    contentDescription = null,
-//                )
-//                Image(
-//                    modifier = Modifier.size(14.dp),
-//                    painter = painterResource(Res.drawable.single_message_check),
-//                    contentDescription = null,
-//                )
+                if (chat.lastMessage?.fromUser == profile.id) {
+                    if (chat.lastMessage?.anotherRead == true) {
+                        Image(
+                            modifier = Modifier.size(14.dp),
+                            painter = painterResource(Res.drawable.double_message_check),
+                            contentDescription = null,
+                        )
+                    } else {
+                        Image(
+                            modifier = Modifier.size(14.dp),
+                            painter = painterResource(Res.drawable.single_message_check),
+                            contentDescription = null,
+                        )
+                    }
+                }
+                
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -175,7 +194,7 @@ fun MessageContent(message: MessageItem): String {
         when (message.attachments!![0].type) {
             "audio/mp4" -> "Аудио"
             "image" -> "Фото"
-            else -> ""
+            else -> "Файл"
         }
         
         

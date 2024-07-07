@@ -55,7 +55,7 @@ import shopot.composeapp.generated.resources.voice_message_play_white
 import kotlin.random.Random
 
 @Composable
-fun VoiceMessageBox(
+fun VoiceMessage(
     message: MessageItem,
     attachments: List<Attachment>
 ) {
@@ -96,10 +96,12 @@ fun VoiceMessageBox(
         val fileName = "${attachments[0].name}.m4a"
         
         println("fileName $fileName")
-        val filePath = audioFile.getAudioFilePath(fileName)
+        val filePath = audioFile.getFilePath(fileName, "audio/mp4")
         scope.launch {
             
-            audioFile.downloadFileToDirectory(url, filePath)
+            audioFile.downloadFileToDirectory(url, filePath) {
+            
+            }
             
             println("filePath $filePath")
             val audioDuration = audioPlayer.getAudioDuration(filePath)

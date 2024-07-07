@@ -19,6 +19,7 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +72,10 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
             }
         }
     )
+
+    LaunchedEffect(Unit) {
+        mainViewModel.getChatsInBack()
+    }
     
     Box(modifier = Modifier.fillMaxSize()) {
         SafeArea {

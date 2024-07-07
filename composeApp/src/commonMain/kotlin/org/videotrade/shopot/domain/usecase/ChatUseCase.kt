@@ -55,14 +55,23 @@ class ChatUseCase : KoinComponent {
     }
     
     
-    suspend fun addMessage(message: MessageItem) {
+    fun addMessage(message: MessageItem) {
         return repository.addMessage(message)
+    }
+    
+    fun updateUploadMessage(message: MessageItem) {
+        return repository.updateUploadMessage(message)
     }
     
     
     suspend fun sendMessage(message: MessageItem, attachments: List<String>?) {
         return repository.sendMessage(message, attachments = attachments)
     }
+    
+    suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?) {
+        return repository.sendUploadMessage(message, attachments = attachments)
+    }
+    
     
     fun clearData() {
         repository.clearData()

@@ -1,10 +1,6 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +14,7 @@ import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatUseCase
@@ -34,10 +31,12 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
     
-    val messagesA: StateFlow<List<MessageItem>> = chatUseCase.getMessages()
-    
-    
     val profile = MutableStateFlow(ProfileDTO())
+    
+    
+    val _currentChat = MutableStateFlow<ChatItem?>(null)
+    val currentChat: StateFlow<ChatItem?> get() = _currentChat.asStateFlow()
+    
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     
     
@@ -45,6 +44,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     var isRecording = MutableStateFlow(false)
     
+    
+    var downloadProgress = MutableStateFlow(0f)
     
     init {
         
@@ -62,6 +63,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    
+    fun setCurrentChat(chat: ChatItem) {
+        _currentChat.value = chat
+    }
     
     fun setIsRecording(isRecordingNew: Boolean) {
         isRecording.value = isRecordingNew
@@ -97,7 +102,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
         content: String? = null,
         fromUser: String,
         chatId: String,
-        userId: String? = null,
         notificationToken: String?,
         attachments: List<String>? = null,
         login: String? = null
@@ -114,44 +118,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 ),
                 attachments
             )
-            
+            println("сообщениесообщениесообщениесообщение")
             sendNotify("Новое сообщение от $login ", content, notificationToken)
-
-
-//            val httpClient = HttpClient {
-//                install(WebSockets)
-//
-//            }
-//
-//            println("aaaaaa3123131 ${userId} $fromUser")
-//
-//
-//            var profileId = getValueInStorage("profileId")
-//
-//            try {
-//                httpClient.webSocket(
-//                    method = HttpMethod.Get,
-//                    host = "192.168.31.223",
-//                    port = 3001,
-//                    path = "/message",
-//                    request = {
-//                        profileId?.let { url.parameters.append("callerId", it) }
-//                    }
-//                ) {
-//
-//                    val jsonContent = Json.encodeToString(
-//                        buildJsonObject {
-//                            put("type", "call")
-//                            put("calleeId", userId)
-//
-//                        }
-//                    )
-//
-//                    send(Frame.Text(jsonContent))
-//                }
-//            } catch (e: Exception) {
-//
-//            }
         }
     }
     
@@ -160,16 +128,21 @@ class ChatViewModel : ViewModel(), KoinComponent {
         content: String?,
         fromUser: String,
         chatId: String,
-        file: ByteArray,
         contentType: String,
-        fileName: String
-    ) {
+        fileName: String,
+        fileDir: String? = null,
+        fileBytes: ByteArray? = null,
+        
+        ) {
         viewModelScope.launch {
             
             println("send Audio")
             val fileId = origin().sendFile(
                 "file/upload",
-                file, contentType, fileName
+                fileDir,
+                contentType,
+                fileName,
+                fileBytes
             )
             
             println("fileId ${fileId}")
@@ -185,6 +158,29 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    fun sendLargeFileAttachments(
+        content: String? = null,
+        fromUser: String,
+        chatId: String,
+        uploadId: String,
+        fileId: String
+    ) {
+        viewModelScope.launch {
+            chatUseCase.sendUploadMessage(
+                MessageItem(
+                    content = content,
+                    fromUser = fromUser,
+                    chatId = chatId,
+                    uploadId = uploadId,
+                    anotherRead = false,
+                    iread = false,
+                    attachments = null
+                ),
+                listOf(fileId)
+            )
+        }
+    }
+    
     
     fun sendNotify(
         title: String,
@@ -192,6 +188,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         notificationToken: String?
     ) {
         viewModelScope.launch {
+            println("Уведомление ${notificationToken}")
+            
             if (notificationToken !== null) {
                 val jsonContent = Json.encodeToString(
                     buildJsonObject {
@@ -202,9 +200,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     }
                 )
                 
+                println("Уведомление ${jsonContent}")
+                
                 origin().post<Any>("notification/notify", jsonContent)
             }
         }
+    }
+    
+    fun addMessage(message: MessageItem) {
+        
+        chatUseCase.addMessage(message)
     }
     
     fun deleteMessage(message: MessageItem) {
@@ -227,5 +232,4 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     
 }
-
 

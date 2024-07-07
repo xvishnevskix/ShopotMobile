@@ -24,6 +24,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.mmk.kmpnotifier.notification.NotifierManager
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -132,6 +133,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             textAlign = TextAlign.Center,
                             letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
                             lineHeight = 24.sp,
+                            color = Color.Black
+                            
                             
                             )
                         Text(
@@ -253,7 +256,8 @@ suspend fun sendRequestToBackend(
 suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewModel) {
     
     
-    val response = sendRequestToBackend(phone, null, "auth/login")
+    val response =
+        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login")
     
     
     println("sadada")

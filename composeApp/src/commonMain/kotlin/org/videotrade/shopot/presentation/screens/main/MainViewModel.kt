@@ -69,6 +69,7 @@ class MainViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             if (wsUseCase.wsSession.value !== null && wsUseCase.wsSession.value!!.isActive) {
                 chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
+                observeUsers()
             }
         }
         

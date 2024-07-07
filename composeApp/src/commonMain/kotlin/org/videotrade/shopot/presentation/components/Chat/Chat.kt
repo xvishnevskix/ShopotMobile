@@ -1,5 +1,7 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import FileMessage
+import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -13,6 +15,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
@@ -214,7 +217,7 @@ fun Chat(
     LazyColumn(
         state = listState,
         reverseLayout = true,
-        modifier = modifier,
+        modifier = modifier.background(Color.White),
     ) {
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }
@@ -230,39 +233,11 @@ fun Chat(
                 isVisible = isVisible
             )
             
+            
         }
     }
 }
 
-@Composable
-fun MessageFormat(
-    message: MessageItem, profile: ProfileDTO, onMessageClick: () -> Unit,
-) {
-    if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        MessageText(message, profile)
-    } else {
-        
-        when (message.attachments!![0].type) {
-            
-            "audio/mp4" -> {
-                VoiceMessageBox(
-                    message,
-                    message.attachments!!
-                )
-            }
-            
-            "image" -> {
-                MessageImage(
-                    message, profile,
-                    message.attachments!!
-                )
-                
-            }
-        }
-        
-        
-    }
-    
-}
+
 
 

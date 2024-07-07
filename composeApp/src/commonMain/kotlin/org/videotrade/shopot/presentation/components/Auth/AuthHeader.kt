@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,7 +41,8 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
                 contentDescription = "Back",
                 modifier = Modifier.padding(end = 8.dp).clickable {
                     navigator.pop()
-                }
+                },
+                tint = Color.Black
             )
 
             Text(
@@ -51,6 +53,8 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
                 textAlign = TextAlign.Center,
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                 lineHeight = 24.sp,
+                color = Color.Black
+                
             )
 
     }

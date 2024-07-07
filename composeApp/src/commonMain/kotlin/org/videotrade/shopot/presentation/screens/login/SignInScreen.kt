@@ -94,6 +94,8 @@ class SignInScreen : Screen {
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
                             modifier = Modifier.padding(bottom = 5.dp),
+                            color = Color.Black
+                            
                         )
                         Text(
                             "Для того, чтобы продолжить \nавторизуйтесь",
