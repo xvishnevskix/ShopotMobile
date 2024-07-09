@@ -121,8 +121,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                             
                             if (!cameraPer) return@launch
                             
-                            
-                            
                             viewModel.sendNotify(
                                 "Звонок",
                                 "от ${chat.firstName} ${chat.lastName}",
@@ -130,7 +128,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                             )
                             
                             callViewModel.initWebrtc()
-                            callViewModel.updateOtherUserId(chat.userId)
                             
                             navigator.push(
                                 CallScreen(

@@ -46,6 +46,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
@@ -80,7 +81,7 @@ class CallScreen(
         
         val callState = remember { mutableStateOf("") }
         
-        val isMuted = remember { mutableStateOf(false) }
+        val isSwitchToSpeaker = remember { mutableStateOf(true) }
         
         
         LaunchedEffect(wsSession) {
@@ -88,7 +89,7 @@ class CallScreen(
                 when (callCase) {
                     "Call" -> {
 //                        viewModel.initWebrtc()
-//                        viewModel.updateOtherUserId(userId)
+                        viewModel.updateOtherUserId(userId)
                         viewModel.makeCall(userId)
                     }
                     
@@ -251,29 +252,15 @@ class CallScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 microfonBtn {
-//                    val audioTrack: AudioStreamTrack? = localStream?.audioTracks?.firstOrNull()
-//                    println("AAAAA")
-//                    if (audioTrack != null) {
-//                        println("AAAAA")
-//
-//                        audioTrack.state.value.mute()
-//
-//                        if (!isMuted.value) {
-//                            println("AAAAA")
-//
-//                            audioTrack.state.value.mute()
-//                        } else {
-//                            println("AAAAA")
-//
-//                            audioTrack.state.value.unmute()
-//                        }
-//                        isMuted.value = !isMuted.value
-//                    }
-                    
                     viewModel.setMicro()
                 }
                 videoBtn { }
-                speakerBtn { }
+                speakerBtn {
+                    CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
+                    
+                    
+                    isSwitchToSpeaker.value = !isSwitchToSpeaker.value
+                }
             }
             Spacer(modifier = Modifier.height(56.dp))
             Row(

@@ -20,6 +20,7 @@ import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.AudioPlayer
 import org.videotrade.shopot.multiplatform.BackgroundTaskManagerFactory
+import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.CipherInterface
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
@@ -58,6 +59,8 @@ class AndroidApp : Application() {
         DeviceIdProviderFactory.initialize(context)
         ContactsProviderFactory.initialize(context)
         BackgroundTaskManagerFactory.initialize(context)
+        CallProviderFactory.initialize(context)
+        
     }
 }
 

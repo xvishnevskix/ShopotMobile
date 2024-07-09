@@ -1,6 +1,7 @@
 package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
@@ -124,6 +125,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _iceState = MutableStateFlow(IceConnectionState.New)
     
     override val iseState: StateFlow<IceConnectionState> get() = _iceState
+    
+    private val isMuted = MutableStateFlow(false)
     
     
     override suspend fun reconnectPeerConnection() {
@@ -324,7 +327,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             localStream.value = stream
             
             
-            
             stream.tracks.forEach { track ->
                 println("addtrack ${track}")
                 peerConnection.value!!.addTrack(track, localStream.value!!)
@@ -432,24 +434,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override fun setMicro() {
         
-        println("sdasdada")
+        localStream.value?.audioTracks?.forEach { it.enabled = isMuted.value }
         
-        
-        localStream.value?.let { stream ->
-            stream.tracks.forEach { track ->
-                track.stop()
-            }
-        }
-        
-        peerConnection.value?.getTransceivers()
-            ?.forEach { peerConnection.value!!.removeTrack(it.sender) }
-        
-        
-        remoteVideoTrack.value?.stop()
-        
-        localStream.value = null
-        remoteVideoTrack.value = null
-        
+        isMuted.value = !isMuted.value
     }
     
     
