@@ -326,6 +326,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             
             stream.tracks.forEach { track ->
+                println("addtrack ${track}")
                 peerConnection.value!!.addTrack(track, localStream.value!!)
             }
             
@@ -463,10 +464,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         coroutineScope {
             if (wsSession.value != null) {
                 try {
+                    println("makeCall")
                     
                     val offer = peerConnection.value?.createOffer(
                         OfferAnswerOptions(
-//                        offerToReceiveVideo = true,
                             offerToReceiveAudio = true
                         )
                     )
@@ -509,7 +510,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             if (wsSession.value != null) {
                 
                 try {
-                    
+                    println("answerCall")
                     setOffer()
                     
                     
@@ -518,7 +519,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     val answer = peerConnection.value?.createAnswer(
                         options = OfferAnswerOptions(
-                            //                            offerToReceiveVideo = true,
                             offerToReceiveAudio = true
                         )
                     )

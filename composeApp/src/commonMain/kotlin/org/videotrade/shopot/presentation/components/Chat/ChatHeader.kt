@@ -38,6 +38,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -51,6 +52,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
     val commonViewModel: CommonViewModel = koinInject()
+    val callViewModel: CallViewModel = koinInject()
+    
     Row(
         modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -125,6 +128,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                                 "от ${chat.firstName} ${chat.lastName}",
                                 chat.notificationToken
                             )
+                            
+                            callViewModel.initWebrtc()
+                            callViewModel.updateOtherUserId(chat.userId)
                             
                             navigator.push(
                                 CallScreen(

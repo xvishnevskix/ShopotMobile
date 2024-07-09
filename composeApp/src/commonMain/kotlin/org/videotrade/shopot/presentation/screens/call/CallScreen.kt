@@ -87,8 +87,8 @@ class CallScreen(
             if (!hasExecuted.value && wsSession != null) {
                 when (callCase) {
                     "Call" -> {
-                        viewModel.initWebrtc()
-                        viewModel.updateOtherUserId(userId)
+//                        viewModel.initWebrtc()
+//                        viewModel.updateOtherUserId(userId)
                         viewModel.makeCall(userId)
                     }
                     
