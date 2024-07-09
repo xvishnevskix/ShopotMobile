@@ -509,7 +509,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         chatId = chat.id,
                                         notificationToken = chat.notificationToken,
                                         attachments = emptyList(),
-                                        login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}"
+                                        login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
+                                        true
                                     )
                                     text = ""
                                 }

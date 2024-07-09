@@ -63,10 +63,13 @@ class IntroScreen : Screen {
                 
                 
                 if (response != null && response.status == HttpStatusCode.OK) {
+
+
+//                    сommonViewModel.cipherShared()
                     
                     
                     сommonViewModel.setMainNavigator(navigator)
-                    
+
                     viewModel.updateNotificationToken()
                     
                     

@@ -13,6 +13,8 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.api.encupsMessage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -21,6 +23,7 @@ import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
+import org.videotrade.shopot.multiplatform.CipherWrapper
 
 class ChatViewModel : ViewModel(), KoinComponent {
     private val chatUseCase: ChatUseCase by inject()
@@ -104,22 +107,37 @@ class ChatViewModel : ViewModel(), KoinComponent {
         chatId: String,
         notificationToken: String?,
         attachments: List<String>? = null,
-        login: String? = null
+        login: String? = null,
+        isCipher: Boolean,
     ) {
         viewModelScope.launch {
-            chatUseCase.sendMessage(
-                MessageItem(
-                    content = content,
-                    fromUser = fromUser,
-                    chatId = chatId,
-                    anotherRead = false,
-                    iread = false,
-                    attachments = null
-                ),
-                attachments
-            )
-            println("сообщениесообщениесообщениесообщение")
-            sendNotify("Новое сообщение от $login ", content, notificationToken)
+//            var contentSort = ""
+//
+//
+//            if (content !== null && isCipher) {
+//                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+//
+//                val resEncups = encupsMessage(content, cipherWrapper)
+//
+//                contentSort = resEncups.toString()
+//            } else {
+//                contentSort = content!!
+//            }
+//
+//
+//            chatUseCase.sendMessage(
+//                MessageItem(
+//                    content = contentSort,
+//                    fromUser = fromUser,
+//                    chatId = chatId,
+//                    anotherRead = false,
+//                    iread = false,
+//                    attachments = null
+//                ),
+//                attachments
+//            )
+//            println("сообщениесообщениесообщениесообщение")
+//            sendNotify("Новое сообщение от $login ", content, notificationToken)
         }
     }
     
@@ -153,7 +171,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     fromUser = fromUser,
                     chatId = chatId,
                     notificationToken = null,
-                    attachments = listOf(fileId.id)
+                    attachments = listOf(fileId.id),
+                    isCipher = false
                 )
         }
     }
