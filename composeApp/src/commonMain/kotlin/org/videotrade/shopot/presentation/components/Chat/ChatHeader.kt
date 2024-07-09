@@ -20,8 +20,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -36,6 +38,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -49,6 +52,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
     val commonViewModel: CommonViewModel = koinInject()
+    val callViewModel: CallViewModel = koinInject()
+    
     Row(
         modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -82,13 +87,18 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                 size = 40.dp
             )
             
+            val fullName = listOfNotNull(chat.firstName, chat.lastName)
+                .joinToString(" ")
+                .takeIf { it.isNotBlank() }
+                ?.let {
+                    if (it.length > 35) "${it.take(32)}..." else it
+                } ?: ""
+            
+            val displayName = fullName.ifBlank { chat.phone }
+            
+            
             Text(
-                text = listOfNotNull(chat.firstName, chat.lastName)
-                    .joinToString(" ")
-                    .takeIf { it.isNotBlank() }
-                    ?.let {
-                        if (it.length > 30) "${it.take(27)}..." else it
-                    } ?: "",
+                text = displayName,
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
@@ -111,13 +121,13 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                             
                             if (!cameraPer) return@launch
                             
-                            
-                            
                             viewModel.sendNotify(
                                 "Звонок",
                                 "от ${chat.firstName} ${chat.lastName}",
                                 chat.notificationToken
                             )
+                            
+                            callViewModel.initWebrtc()
                             
                             navigator.push(
                                 CallScreen(

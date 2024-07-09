@@ -32,12 +32,12 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +48,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
@@ -62,14 +63,19 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
+import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.getCurrentTimeList
+import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
-import org.videotrade.shopot.multiplatform.AudioFactory
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -78,18 +84,10 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
-import kotlin.math.roundToInt
-import androidx.compose.material3.Divider
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.window.Popup
-import org.jetbrains.compose.resources.DrawableResource
-import org.videotrade.shopot.domain.model.MessageItem
-import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
+import kotlin.math.roundToInt
+import kotlin.random.Random
 
 
 data class MenuItem(
@@ -99,22 +97,95 @@ data class MenuItem(
 )
 
 
-
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
     
     var text by remember { mutableStateOf("") }
     
-    var isRecording by remember { mutableStateOf(false) }
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
-    val audioRecorder = remember { AudioFactory.createAudioRecorder() }
     var isStartRecording by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
+    var showFilePicker by remember { mutableStateOf(false) }
+    
+    
+    val filterFileType = listOf("pdf", "zip")
+    FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
+        showFilePicker = false
+        // do something with the file
+        
+        println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
+        
+        if (platformFile?.path !== null) {
+            
+            scope.launch {
+                try {
+                    val fileData = FileProviderFactory.create().getFileData(platformFile.path)
+                    
+                    println("fileData $fileData ${Random.nextInt(1, 501)}")
+         
+                 
+                    if (fileData !== null) {
+                        
+                        viewModel.addMessage(
+                            MessageItem(
+                                Random.nextInt(1, 501).toString(),
+                                viewModel.profile.value.id,
+                                "",
+                                "1",
+                                "1",
+                                0,
+                                getCurrentTimeList(),
+                                false,
+                                chat.id,
+                                false,
+                                true,
+                                listOf(
+                                    Attachment(
+                                        "1",
+                                        "1",
+                                        viewModel.profile.value.id,
+                                        "",
+                                        fileData.fileType,
+                                        fileData.fileName,
+                                        platformFile.path,
+                                        fileData.fileSize
+                                    )
+                                ),
+                                upload = true,
+                                uploadId = Random.nextInt(1, 501).toString()
+                            )
+                        )
 
-
+//                        viewModel.sendAttachments(
+//                            content = text,
+//                            fromUser = viewModel.profile.value.id,
+//                            chatId = chat.id,
+//                            contentType = fileData.fileType,
+//                            fileName = fileData.fileName,
+//                            fileDir = platformFile.path,
+//                        )
+                    }
+                    
+                    
+                } catch (e: Exception) {
+                    
+                    println("error $e")
+                    
+                }
+                
+                
+            }
+            
+            
+        }
+    }
+    
+    
+    val audioRecorder = viewModel.audioRecorder.collectAsState().value
+    val isRecording = viewModel.isRecording.collectAsState().value
     
     
     LaunchedEffect(isRecording) {
@@ -125,20 +196,23 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 recordingTime++
                 
                 var seconds = recordingTime
-                println("Senddddd ${seconds} ")
                 seconds++
                 
-                if (seconds > 2) {
+                if (seconds > 1) {
                     if (!isStartRecording) {
                         scope.launch {
-                            println("isStartRecording")
+//                            println("isStartRecording")
+                            println("start Audio")
                             
                             val microphonePer =
                                 PermissionsProviderFactory.create().getPermission("microphone")
                             if (microphonePer) {
                                 val audioFilePathNew = FileProviderFactory.create()
-                                    .getAudioFilePath("audio_record.m4a") // Генерация пути к файлу
-
+                                    .getFilePath(
+                                        "audio_record.m4a",
+                                        "audio/mp4"
+                                    ) // Генерация пути к файлу
+                                
                                 println("audioFilePathNew $audioFilePathNew")
                                 
                                 audioRecorder.startRecording(audioFilePathNew)
@@ -154,9 +228,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         }
     }
     
-    LaunchedEffect(swipeOffset.value) {
-        println("swipeOffset ${swipeOffset}")
-    }
     
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
@@ -187,15 +258,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         content = text,
                         fromUser = viewModel.profile.value.id,
                         chatId = chat.id,
-                        it,
                         "image",
-                        "jpg"
+                        "jpg",
+                        null,
+                        it,
                     )
                 }
             }
         }
     )
-
+    
     val menuItems = listOf(
         MenuItem(
             text = "Галерея",
@@ -215,7 +287,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = "Файл",
             imagePath = Res.drawable.menu_file,
             onClick = {
-
+                showFilePicker = true
             }
         ),
 //     MenuItem(
@@ -232,18 +304,24 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             .imePadding()
             .padding(vertical = 15.dp)
     ) {
-
+        
         if (showMenu) {
             Popup(
                 alignment = Alignment.TopStart,
                 onDismissRequest = { showMenu = false },
-
+                
                 ) {
                 Column(
                     modifier = Modifier
                         .padding(bottom = 55.dp, start = 12.dp)
                         .fillMaxWidth(0.5f)
-                        .shadow(elevation = 6.dp, shape = RoundedCornerShape(8.dp), clip = false, ambientColor = Color.Gray, spotColor = Color.Gray)
+                        .shadow(
+                            elevation = 6.dp,
+                            shape = RoundedCornerShape(8.dp),
+                            clip = false,
+                            ambientColor = Color.Gray,
+                            spotColor = Color.Gray
+                        )
                         .clip(RoundedCornerShape(8.dp))
                         .background(Color.White)
                 ) {
@@ -288,8 +366,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 }
             }
         }
-
-
+        
+        
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -318,13 +396,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                            .clickable {
 //                                singleImagePicker.launch()
 //                            }
-
+                            
                             .clickable {
                                 showMenu = true
                             }
                     )
-
-
+                    
+                    
                 }
                 
                 BasicTextField(
@@ -429,10 +507,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         content = text,
                                         fromUser = viewModel.profile.value.id,
                                         chatId = chat.id,
-                                        userId = chat.userId,
                                         notificationToken = chat.notificationToken,
                                         attachments = emptyList(),
-                                        login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}"
+                                        login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
+                                        true
                                     )
                                     text = ""
                                 }
@@ -462,21 +540,55 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     isDragging = false
                                     // Проверяем, если смещение больше -200f, то сбрасываем смещение
                                     if (offset.x > -200f) {
-                                        isRecording = false
+                                        println("Drag send")
+                                        
+                                        val seconds = recordingTime % 60
+                                        
+                                        if (seconds > 1) {
+                                            val stopByte = audioRecorder.stopRecording(true)
+                                            
+                                            if (stopByte !== null) {
+                                                isStartRecording = false
+                                                
+                                                viewModel.sendAttachments(
+                                                    content = text,
+                                                    fromUser = viewModel.profile.value.id,
+                                                    chatId = chat.id,
+                                                    "audio/mp4",
+                                                    "audio_record",
+                                                    null,
+                                                    stopByte,
+                                                    
+                                                    
+                                                    )
+                                            }
+                                        }
+                                        viewModel.setIsRecording(false)
                                         offset = Offset.Zero
                                     } else {
                                         // Если смещение больше чем -200f, завершаем запись
-                                        isRecording = false
+                                        viewModel.setIsRecording(false)
+                                        
                                         offset = Offset.Zero
                                     }
                                 },
                                 onDrag = { change, dragAmount ->
+                                    
+                                    
                                     change.consume()
                                     val newOffset = Offset(
                                         x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
                                             .coerceAtMost(0f),
                                         y = offset.y
                                     )
+                                    
+                                    if (newOffset.x <= -200f) {
+                                        viewModel.setIsRecording(false)
+                                        
+                                        audioRecorder.stopRecording(false)
+                                        offset = Offset.Zero
+                                    }
+                                    
                                     offset = newOffset
                                 }
                             )
@@ -487,8 +599,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     println("Tap detected")
                                     
                                     val seconds = recordingTime % 60
-
-                                    if (seconds > 2) {
+                                    
+                                    if (seconds > 1) {
                                         val stopByte = audioRecorder.stopRecording(true)
                                         
                                         if (stopByte !== null) {
@@ -498,22 +610,24 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 content = text,
                                                 fromUser = viewModel.profile.value.id,
                                                 chatId = chat.id,
-                                                stopByte,
                                                 "audio/mp4",
-                                                "audio_record"
-                                            
-                                            )
+                                                "audio_record",
+                                                null,
+                                                stopByte,
+                                                
+                                                )
                                         }
                                     }
                                     
-                                    isRecording = false
+                                    viewModel.setIsRecording(false)
+                                    
                                     recordingTime = 0
                                     isDragging = false
                                     
                                 },
                                 onPress = {
                                     if (!isDragging) {
-                                        isRecording = !isRecording
+                                        viewModel.setIsRecording(!isRecording)
                                     }
                                     println("Press released")
                                 }

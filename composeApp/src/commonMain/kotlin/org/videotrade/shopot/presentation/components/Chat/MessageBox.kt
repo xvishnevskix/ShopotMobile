@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import FileMessage
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -116,6 +117,8 @@ fun MessageBox(
                     )
                 }
             
+            
+            if (message.created.isNotEmpty())
             Text(
                 text = formatTimestamp(message.created),
                 style = TextStyle(
@@ -126,4 +129,44 @@ fun MessageBox(
             )
         }
     }
+}
+
+
+@Composable
+fun MessageFormat(
+    message: MessageItem, profile: ProfileDTO, onMessageClick: () -> Unit,
+) {
+    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        MessageText(message, profile)
+//        FileMessage(message, )
+    } else {
+        
+        when (message.attachments!![0].type) {
+            
+            "audio/mp4" -> {
+                VoiceMessage(
+                    message,
+                    message.attachments!!
+                )
+            }
+            
+            "image" -> {
+                MessageImage(
+                    message, profile,
+                    message.attachments!!
+                )
+                
+            }
+            
+            else -> {
+                FileMessage(
+                    message,
+                    message.attachments!!
+                )
+            }
+        }
+        
+        
+    }
+    
 }

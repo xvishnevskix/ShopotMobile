@@ -1,5 +1,6 @@
 package org.videotrade.shopot.domain.model
 
+import androidx.compose.ui.geometry.Size
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -16,6 +17,8 @@ data class MessageItem(
     var anotherRead: Boolean,
     var iread: Boolean,
     var attachments: List<Attachment>?,
+    var upload: Boolean? = null,
+    var uploadId: String? = null,
 )
 
 
@@ -27,7 +30,8 @@ data class Attachment(
     val fileId: String = "",
     var type: String = "",
     var name: String = "",
-    
+    var originalFileDir: String? = null,
+    var size: Int? = null,
     )
 
 

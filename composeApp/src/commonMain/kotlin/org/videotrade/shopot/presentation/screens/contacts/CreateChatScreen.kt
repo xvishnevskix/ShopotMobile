@@ -167,7 +167,8 @@ private fun makeA_group(contacts: List<ContactDTO>) {
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                     lineHeight = 20.sp,
                     modifier = Modifier
-                        .padding(start = 20.dp)
+                        .padding(start = 20.dp),
+                    color = Color.Black
                 
                 )
             }

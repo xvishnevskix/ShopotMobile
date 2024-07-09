@@ -33,6 +33,10 @@ class ProfileRepositoryImpl : ProfileRepository {
         
     }
     
+    override fun setProfile(newProfile: ProfileDTO) {
+        profile.value = newProfile
+    }
+    
     override fun clearData() {
         profile.value = ProfileDTO()
     }

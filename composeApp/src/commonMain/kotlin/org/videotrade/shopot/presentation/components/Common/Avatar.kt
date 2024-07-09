@@ -54,7 +54,8 @@ fun Avatar(
             contentDescription = "Avatar",
             contentScale = contentScale,  // Используем contentScale как есть
             modifier = modifier,
-        )
+            
+            )
         
         
     }

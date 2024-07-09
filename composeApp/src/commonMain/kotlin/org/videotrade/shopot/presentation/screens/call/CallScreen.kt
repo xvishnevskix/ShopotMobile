@@ -37,13 +37,16 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.PeerConnectionState
+import com.shepeliev.webrtckmp.audioTracks
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
@@ -71,17 +74,21 @@ class CallScreen(
         
         val wsSession by viewModel.wsSession.collectAsState()
         val callStateView by viewModel.callState.collectAsState()
+        val localStream by viewModel.localStreamm.collectAsState()
         
         
         val hasExecuted = remember { mutableStateOf(false) }
         
         val callState = remember { mutableStateOf("") }
         
+        val isSwitchToSpeaker = remember { mutableStateOf(true) }
+        
+        
         LaunchedEffect(wsSession) {
             if (!hasExecuted.value && wsSession != null) {
                 when (callCase) {
                     "Call" -> {
-                        viewModel.initWebrtc()
+//                        viewModel.initWebrtc()
                         viewModel.updateOtherUserId(userId)
                         viewModel.makeCall(userId)
                     }
@@ -172,9 +179,13 @@ class CallScreen(
                     val minutes = (secondsElapsed % 3600) / 60
                     val seconds = secondsElapsed % 60
                     if (hours > 0) {
-                        "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+                        "${hours.toString().padStart(2, '0')}:${
+                            minutes.toString().padStart(2, '0')
+                        }:${seconds.toString().padStart(2, '0')}"
                     } else {
-                        "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+                        "${minutes.toString().padStart(2, '0')}:${
+                            seconds.toString().padStart(2, '0')
+                        }"
                     }
                 } else {
                     callState.value
@@ -218,7 +229,7 @@ class CallScreen(
             )
             
             Spacer(modifier = Modifier.height(159.dp))
-            
+
 //            Row(
 //                verticalAlignment = Alignment.CenterVertically,
 //                horizontalArrangement = Arrangement.SpaceAround,
@@ -234,28 +245,35 @@ class CallScreen(
 //                }, "Завершить")
 //                microfonBtn {}
 //            }
-
+            
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                microfonBtn {}
-                videoBtn {  }
-                speakerBtn { }
+                microfonBtn {
+                    viewModel.setMicro()
+                }
+//                videoBtn { }
+                speakerBtn {
+                    CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
+                    
+                    
+                    isSwitchToSpeaker.value = !isSwitchToSpeaker.value
+                }
             }
             Spacer(modifier = Modifier.height(56.dp))
-            Row (
+            Row(
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 rejectBtn({
-
-                    println("rejectBtn")
+                
+                println("rejectBtn")
                     viewModel.rejectCall(navigator, userId)
-
-
+                    
+                    
                 }, "Завершить")
             }
         }

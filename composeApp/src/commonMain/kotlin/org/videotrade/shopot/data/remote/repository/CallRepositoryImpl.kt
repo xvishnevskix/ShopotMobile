@@ -1,6 +1,7 @@
 package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
@@ -17,6 +18,7 @@ import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
 import com.shepeliev.webrtckmp.SignalingState
 import com.shepeliev.webrtckmp.VideoStreamTrack
+import com.shepeliev.webrtckmp.audioTracks
 import com.shepeliev.webrtckmp.onConnectionStateChange
 import com.shepeliev.webrtckmp.onIceCandidate
 import com.shepeliev.webrtckmp.onIceConnectionStateChange
@@ -123,6 +125,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _iceState = MutableStateFlow(IceConnectionState.New)
     
     override val iseState: StateFlow<IceConnectionState> get() = _iceState
+    
+    private val isMuted = MutableStateFlow(false)
     
     
     override suspend fun reconnectPeerConnection() {
@@ -323,8 +327,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             localStream.value = stream
             
             
-            
             stream.tracks.forEach { track ->
+                println("addtrack ${track}")
                 peerConnection.value!!.addTrack(track, localStream.value!!)
             }
             
@@ -428,6 +432,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
+    override fun setMicro() {
+        
+        localStream.value?.audioTracks?.forEach { it.enabled = isMuted.value }
+        
+        isMuted.value = !isMuted.value
+    }
+    
+    
     override fun updateOtherUserId(userId: String) {
         
         otherUserId.value = userId
@@ -439,10 +451,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         coroutineScope {
             if (wsSession.value != null) {
                 try {
+                    println("makeCall")
                     
                     val offer = peerConnection.value?.createOffer(
                         OfferAnswerOptions(
-//                        offerToReceiveVideo = true,
                             offerToReceiveAudio = true
                         )
                     )
@@ -485,7 +497,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             if (wsSession.value != null) {
                 
                 try {
-                    
+                    println("answerCall")
                     setOffer()
                     
                     
@@ -494,7 +506,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     val answer = peerConnection.value?.createAnswer(
                         options = OfferAnswerOptions(
-                            //                            offerToReceiveVideo = true,
                             offerToReceiveAudio = true
                         )
                     )

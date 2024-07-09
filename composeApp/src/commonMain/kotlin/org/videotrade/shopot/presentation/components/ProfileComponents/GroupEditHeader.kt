@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -46,7 +47,9 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
             contentDescription = "Back",
             modifier = Modifier.padding(start = 10.dp,end = 1.dp).clickable {
                 navigator.pop()
-            }
+            },
+            tint = Color.Black
+            
         )
         Text(
             text = text,
@@ -55,7 +58,9 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
             textAlign = TextAlign.Center,
             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
             lineHeight = 20.sp,
-            modifier = Modifier.padding(end = 10.dp)
+            modifier = Modifier.padding(end = 10.dp),
+            color = Color.Black
+            
         )
         Image(
             painter = painterResource(Res.drawable.check_mark),

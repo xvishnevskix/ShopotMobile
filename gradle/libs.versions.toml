@@ -1,9 +1,10 @@
 [versions]
+firebaseBom = "33.1.1"
 kermit = "2.0.3"
 kmpnotifier = "1.0.0"
 kotlin = "1.9.23"
 compose = "1.6.10"
-agp = "8.2.2"
+agp = "8.4.0"
 androidx-activityCompose = "1.9.0"
 androidx-uiTest = "1.6.7"
 kotlinxDatetime = "0.5.0"
@@ -11,6 +12,7 @@ kotlinxSerializationJson = "1.6.3"
 ktorClientCore = "2.3.11"
 ktorClientDarwin = "2.3.11"
 lifecycleRuntimeKtx = "2.8.2"
+mpfilepicker = "3.1.0"
 peekabooUi = "0.5.2"
 sonner = "0.3.6"
 voyager = "1.0.0"
@@ -44,6 +46,7 @@ androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version
 
 
 cafe-voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyagerTabNavigator" }
+firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "firebaseCommon" }
 
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
@@ -57,6 +60,7 @@ image-loader-v181 = { module = "io.github.qdsfdhvh:image-loader", version.ref = 
 
 ktor-client-core-v200 = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
 ktor-client-darwin-v200 = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientDarwin" }
+mpfilepicker = { module = "com.darkrockstudios:mpfilepicker", version.ref = "mpfilepicker" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekabooUi" }
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekabooUi" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }

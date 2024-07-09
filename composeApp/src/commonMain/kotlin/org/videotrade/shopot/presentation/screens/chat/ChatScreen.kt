@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import org.koin.compose.koinInject
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Chat.BlurredMessageOverlay
@@ -25,19 +24,25 @@ import org.videotrade.shopot.presentation.components.Chat.Chat
 import org.videotrade.shopot.presentation.components.Chat.ChatFooter
 import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
 
 class ChatScreen(
-    private val chat: ChatItem
+//    private val chat: ChatItem
 ) : Screen {
     
     @Composable
     override fun Content() {
-        
         val viewModel: ChatViewModel = koinInject()
         val mainViewModel: MainViewModel = koinInject()
         val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
+        val chat = viewModel.currentChat.collectAsState().value
+        
+        if (chat == null) {
+            mainViewModel.navigator.value?.push(ChatsScreen())
+            return
+        }
         
         
         LaunchedEffect(key1 = viewModel) {
@@ -49,6 +54,13 @@ class ChatScreen(
         
         DisposableEffect(Unit) {
             onDispose {
+                
+                if (
+                    viewModel.isRecording.value
+                ) {
+                    viewModel.audioRecorder.value.stopRecording(false)
+                }
+                
                 mainViewModel.setCurrentChat("")
             }
         }

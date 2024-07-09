@@ -33,8 +33,9 @@ class ProfileViewModel : ViewModel(), KoinComponent {
         
         val fileId = imageArray.value?.let {
             origin().sendFile(
-                "file/upload",
-                it, "image", "profileImage"
+                "file/upload", null,
+                "image", "profileImage",
+                fileBytes = it,
             )
         }
         
@@ -44,7 +45,7 @@ class ProfileViewModel : ViewModel(), KoinComponent {
                 put("firstName", newProfile.firstName)
                 put("lastName", newProfile.lastName)
                 put("icon", fileId?.id)
-                put("status", newProfile.status)
+                put("description", newProfile.description)
             }
         )
         
@@ -55,9 +56,13 @@ class ProfileViewModel : ViewModel(), KoinComponent {
         val profileUpdate = origin().put("user/profile/edit", jsonContent)
         
         
-        val responseData = profileUpdate?.bodyAsText()
         
-        return if (responseData == "true") {
+        
+        return if (profileUpdate !== null) {
+            
+            val responseData: ProfileDTO = Json.decodeFromString(profileUpdate.bodyAsText())
+            profileUseCase.setProfile(responseData)
+            
             true
         } else {
             false

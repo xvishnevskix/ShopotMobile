@@ -45,6 +45,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
     // Флаг для управления наблюдением
     private var isObserving = MutableStateFlow(true)
     
+    
+    val localStreamm = callUseCase.localStream
+    
     init {
         startObserving()
     }
@@ -138,6 +141,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun getCallerId(): String {
         return callUseCase.getCallerId()
+    }
+    
+    fun setMicro() {
+        return callUseCase.setMicro()
     }
     
     fun reconnectPeerConnection() {

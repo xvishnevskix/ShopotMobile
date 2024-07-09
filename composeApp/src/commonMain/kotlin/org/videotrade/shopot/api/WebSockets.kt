@@ -39,8 +39,6 @@ suspend fun handleConnectWebSocket(
         
     }
     if (!isConnected.value) {
-        
-        
         try {
             httpClient.webSocket(
                 method = HttpMethod.Get,
@@ -61,6 +59,7 @@ suspend fun handleConnectWebSocket(
                             
                             val text = frame.readText()
                             
+                            println("text $text")
                             
                             val jsonElement = Json.parseToJsonElement(text)
                             val action = jsonElement.jsonObject["action"]?.jsonPrimitive?.content
@@ -139,13 +138,10 @@ suspend fun handleConnectWebSocket(
                                         if (dataJson != null) {
                                             
                                             for (messageItem in dataJson) {
-                                                
-                                                
                                                 val message: MessageItem =
                                                     Json.decodeFromString(messageItem.toString())
-                                                
-                                                
-                                                
+
+
 //                                                chatUseCase.addMessage(message)
                                                 messages.add(message)
                                                 
@@ -165,8 +161,43 @@ suspend fun handleConnectWebSocket(
                                 
                                 "messageSent" -> {
                                     try {
+                                        val messageJson =
+                                            jsonElement.jsonObject["message"]?.jsonObject
                                         
                                         
+                                        
+                                        if (messageJson != null) {
+                                            
+                                            
+                                            println("ttttaaaaa ${messageJson}")
+                                            
+                                            println("currentChat ${chatsUseCase.currentChat.value}")
+                                            
+                                            
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
+
+
+//                                            println("currentChat ${chatsUseCase.currentChat}")
+                                            
+                                            
+                                            if (chatsUseCase.currentChat.value == message.chatId) {
+                                                chatUseCase.addMessage(message)
+                                            }
+                                            
+                                            chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
+                                            
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                }
+                                
+                                "sendUploadMessage" -> {
+                                    try {
                                         val messageJson =
                                             jsonElement.jsonObject["message"]?.jsonObject
                                         
@@ -181,9 +212,24 @@ suspend fun handleConnectWebSocket(
                                             val message: MessageItem =
                                                 Json.decodeFromString(messageJson.toString())
                                             
+                                            println("message ${userId} ${message.fromUser}")
                                             
-                                            
-                                            chatUseCase.addMessage(message)// Инициализация сообщений
+                                            if (userId == message.fromUser) {
+                                                
+                                                val uploadId =
+                                                    jsonElement.jsonObject["uploadId"]?.jsonPrimitive?.content
+                                                
+                                                chatUseCase.updateUploadMessage(
+                                                    message.copy(
+                                                        uploadId = uploadId
+                                                    )
+                                                )// Инициализация сообщений
+                                                
+                                            } else {
+                                                println("message2 ${message}")
+                                                
+                                                chatUseCase.addMessage(message)// Инициализация сообщений
+                                            }
                                             
                                             chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
                                             
@@ -273,6 +319,8 @@ suspend fun handleConnectWebSocket(
                                         
                                         if (messageJson != null) {
                                             
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
                                             
                                             val messageId =
                                                 messageJson["id"]?.jsonPrimitive?.content
@@ -281,6 +329,10 @@ suspend fun handleConnectWebSocket(
                                             if (messageId != null) {
                                                 chatUseCase.readMessage(messageId)
                                             }
+                                            
+                                            
+                                            chatsUseCase.updateReadLastMessageChat(message)
+                                            
                                         }
                                         
                                     } catch (e: Exception) {
@@ -312,7 +364,32 @@ suspend fun handleConnectWebSocket(
                                             println("createChat1 $chat")
                                             
                                             
-                                            chatsUseCase.addChat(chat)
+                                            
+                                            fun normalizePhoneNumber(phone: String): String {
+                                                return phone.replace(Regex("[^0-9]"), "")
+                                            }
+                                            
+                                            val contactsMap =
+                                                contactsUseCase.contacts.value.associateBy {
+                                                    normalizePhoneNumber(it.phone)
+                                                }
+                                            
+                                            
+                                            val normalizedChatPhone =
+                                                normalizePhoneNumber(chat.phone)
+                                            
+                                            val contact = contactsMap[normalizedChatPhone]
+                                            
+                                            if (contact != null) {
+                                                val sortChat = chat.copy(
+                                                    firstName = "${contact.firstName}",
+                                                    lastName = "${contact.lastName}"
+                                                )
+                                                println("sortChat $sortChat")
+                                                chatsUseCase.addChat(sortChat)
+                                            } else {
+                                                chatsUseCase.addChat(chat)
+                                            }
 
 //                                            navigator.push(MainScreen())
                                         }

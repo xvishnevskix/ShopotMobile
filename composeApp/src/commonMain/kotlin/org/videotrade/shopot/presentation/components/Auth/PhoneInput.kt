@@ -161,6 +161,7 @@ fun CountryPicker(
                     contentDescription = null,
                     modifier = Modifier
                         .clickable { expanded = !expanded },
+                    tint = Color.Black
                 )
 
                 DropdownMenu(

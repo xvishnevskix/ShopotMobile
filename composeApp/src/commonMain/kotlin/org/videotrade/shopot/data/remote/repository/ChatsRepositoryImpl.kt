@@ -23,9 +23,11 @@ class ChatsRepositoryImpl : ChatsRepository {
     )
     override val chats: StateFlow<List<ChatItem>> get() = _chats
     
-    private val currentChat = MutableStateFlow(
+    private val _currentChat = MutableStateFlow(
         ""
     )
+    
+    override val currentChat: StateFlow<String> get() = _currentChat
     
     
     override fun getChats(): List<ChatItem> {
@@ -76,6 +78,22 @@ class ChatsRepositoryImpl : ChatsRepository {
         }
     }
     
+    override fun updateReadLastMessageChat(messageItem: MessageItem) {
+        _chats.update { currentChats ->
+            currentChats.map { chatItem ->
+                if (chatItem.chatId == messageItem.chatId) {
+                    if (chatItem.lastMessage?.id == messageItem.id) {
+                        chatItem.copy(lastMessage = messageItem)
+                    } else {
+                        chatItem
+                    }
+                } else {
+                    chatItem
+                }
+            }
+        }
+    }
+    
     
     override fun setZeroUnread(chat: ChatItem) {
         _chats.update { currentChats ->
@@ -90,7 +108,7 @@ class ChatsRepositoryImpl : ChatsRepository {
     }
     
     override fun setCurrentChat(chatValue: String) {
-        currentChat.value = chatValue
+        _currentChat.value = chatValue
     }
     
     

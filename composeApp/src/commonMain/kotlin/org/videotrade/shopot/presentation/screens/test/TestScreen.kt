@@ -1,150 +1,154 @@
+//package org.videotrade.shopot.presentation.screens.test
+//
+////import org.videotrade.shopot.multiplatform.encupsChachaMessage
+//import androidx.compose.foundation.layout.Column
+//import androidx.compose.foundation.layout.Spacer
+//import androidx.compose.foundation.layout.fillMaxSize
+//import androidx.compose.foundation.layout.height
+//import androidx.compose.foundation.layout.padding
+//import androidx.compose.material3.Button
+//import androidx.compose.material3.Text
+//import androidx.compose.runtime.Composable
+//import androidx.compose.runtime.getValue
+//import androidx.compose.runtime.mutableStateOf
+//import androidx.compose.runtime.remember
+//import androidx.compose.runtime.setValue
+//import androidx.compose.ui.Modifier
+//import androidx.compose.ui.unit.dp
+//import cafe.adriel.voyager.core.screen.Screen
+//import io.ktor.utils.io.charsets.Charsets
+//import io.ktor.utils.io.core.toByteArray
+//import org.videotrade.shopot.multiplatform.decupsChachaMessage
+//import org.videotrade.shopot.multiplatform.encupsChachaMessage
+//import org.videotrade.shopot.multiplatform.sharedSecret
+//
+//class TestScreen : Screen {
+//    @Composable
+//    override fun Content() {
+//        var publicKey by remember { mutableStateOf("opsda") }
+//
+//        var errorMessage by remember { mutableStateOf("") }
+//
+//        Column(
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .padding(16.dp)
+//        ) {
+//
+//
+//            Spacer(modifier = Modifier.height(8.dp))
+//
+//            Button(onClick = {
+//                try {
+//                    val publicKeyBytes = publicKey.toByteArray()
+//
+//                    val result = sharedSecret(publicKeyBytes)
+//
+//                    val result2 = encupsChachaMessage("privet", result[1])
+//
+//                    val result3 = decupsChachaMessage(
+//                        cipher = result2.cipher,
+//                        block = result2.block,
+//                        authTag = result2.authTag,
+//                        result[1]
+//                    )
+//
+//                    println("result3 $result3")
+//
+//                } catch (e: Exception) {
+//                    errorMessage = "Error: ${e.message}"
+//                }
+//            }) {
+//                Text("Generate Shared Secret")
+//            }
+//
+//            Spacer(modifier = Modifier.height(8.dp))
+//
+//        }
+//    }
+//}
+//
+//
+
+
 package org.videotrade.shopot.presentation.screens.test
 
-import androidx.compose.foundation.Canvas
+//import org.videotrade.shopot.multiplatform.encupsChachaMessage
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
-import org.videotrade.shopot.multiplatform.AudioFactory
-import org.videotrade.shopot.multiplatform.FileProviderFactory
-import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
-import org.videotrade.shopot.multiplatform.extractAmplitudes
-import org.videotrade.shopot.presentation.components.Chat.generateRandomWaveData
-import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import io.ktor.utils.io.core.toByteArray
+import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.multiplatform.CipherWrapper
 
 class TestScreen : Screen {
     @Composable
     override fun Content() {
-        val scope = rememberCoroutineScope()
-        val commonViewModel: CommonViewModel = koinInject()
-        val audioRecorder = remember { AudioFactory.createAudioRecorder() }
-        val audioPlayer = remember { AudioFactory.createAudioPlayer() }
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
-        var isRecording by remember { mutableStateOf(false) }
-        var audioFilePath by remember { mutableStateOf("") }
-        var fileId by remember { mutableStateOf("") }
-        var waveData by remember { mutableStateOf<List<Float>?>(null) }
+        var publicKey by remember { mutableStateOf("opsda") }
         
-        MaterialTheme {
-            SafeArea {
-                Column {
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                val microphonePer =
-                                    PermissionsProviderFactory.create().getPermission("microphone")
-                                println("microphonePer $microphonePer")
-                                if (microphonePer) {
-                                    if (isRecording) {
-                                        val stopByte = audioRecorder.stopRecording(false)
-                                        println("microphonePer $stopByte")
-                                        isRecording = false
-                                    } else {
-                                        val audioFilePathNew = FileProviderFactory.create()
-                                            .getAudioFilePath("audio_record.m4a")
-                                        audioFilePath = audioFilePathNew
-                                        println("audioFilePathNew $audioFilePathNew")
-                                        audioRecorder.startRecording(audioFilePathNew)
-                                        isRecording = true
-                                    }
-                                }
-                            }
-                        }
-                    ) {
-                        Text(
-                            if (isRecording) "Stop Recording" else "Start Recording",
-                            color = Color.White
+        var errorMessage by remember { mutableStateOf("") }
+        
+        
+        
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Button(onClick = {
+                try {
+                    val publicKeyBytes = publicKey.toByteArray()
+                    
+                    val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
+                    
+                    val result2 =
+                        cipherWrapper.encupsChachaMessageCommon("privet", result?.sharedSecret!!)
+
+//                    println("result2 $result2")
+                    
+                    
+                    val result3 = result2?.let {
+                        cipherWrapper.decupsChachaMessageCommon(
+                            it.cipher,
+                            result2.block,
+                            result2.authTag,
+                            result.sharedSecret
                         )
                     }
                     
-                    Button(onClick = { audioPlayer.startPlaying(audioFilePath) }) {
-                        Text("Play Audio")
-                    }
                     
-                    Button(onClick = {
-                        scope.launch {
-                            val audioFile = FileProviderFactory.create()
-                            val url = "https://videotradedev.ru/api/file/id/$fileId"
-                            val fileName = "downloadedFile.m4a"
-                            val filePath = audioFile.getAudioFilePath(fileName)
-                            try {
-                                println("filePath $filePath")
-                                audioFile.downloadFileToDirectory(url, filePath)
-                            } catch (e: Exception) {
-                                println("errrrrrrr $e")
-                            }
-                            audioFilePath = filePath
-                        }
-                    }) {
-                        Text("Download Audio")
-                    }
                     
-                    Button(onClick = {
-                        scope.launch {
-                            val audioDuration = audioPlayer.getAudioDuration(audioFilePath)
-                            println("audioDuration $audioDuration")
-                        }
-                    }) {
-                        Text("Get Duration Audio")
-                    }
+                    println("result3 $result3")
                     
-                    Button(onClick = {
-                        scope.launch {
-                            val amplitudes = extractAmplitudes(audioFilePath)
-                            waveData = amplitudes
-                            println("amplitudes $amplitudes")
-                        }
-                    }) {
-                        Text("Extract Amplitudes")
-                    }
-                    
-                    Spacer(Modifier.height(40.dp))
-                    waveData?.let { Waveform(it) }
+                } catch (e: Exception) {
+                    errorMessage = "Error: ${e.message}"
                 }
+            }) {
+                Text("Generate Shared Secret")
             }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
         }
     }
 }
 
-@Composable
-fun Waveform(waveData: List<Float>) {
-    
-    println("waveData $waveData")
-    
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(100.dp)
-    ) {
-        val barWidth = size.width / (waveData.size * 2 - 1)
-        val maxBarHeight = size.height
-        
-        waveData.forEachIndexed { index, amplitude ->
-            val barHeight = maxBarHeight * amplitude
-            drawRect(
-                color = Color(0xFF2A293C),
-                topLeft = Offset(index * 2 * barWidth, maxBarHeight / 2 - barHeight / 2),
-                size = Size(barWidth, barHeight)
-            )
-        }
-    }
-}
 
