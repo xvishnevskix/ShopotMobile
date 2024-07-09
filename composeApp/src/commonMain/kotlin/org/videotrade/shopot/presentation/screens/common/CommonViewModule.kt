@@ -99,8 +99,8 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                     if (result !== null) {
 //                                        val answerPublicKeyJsonContent = Json.encodeToString(
 //                                            buildJsonObject {
-//                                                put("action", "sendCiphertext")
-//                                                put("action", result.ciphertext)
+//                                                put("action", "sendCipherText")
+//                                                put("ciphertext", result.ciphertext)
 //                                            }
 //                                        )
 //

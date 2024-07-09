@@ -17,6 +17,7 @@ import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
 import com.shepeliev.webrtckmp.SignalingState
 import com.shepeliev.webrtckmp.VideoStreamTrack
+import com.shepeliev.webrtckmp.audioTracks
 import com.shepeliev.webrtckmp.onConnectionStateChange
 import com.shepeliev.webrtckmp.onIceCandidate
 import com.shepeliev.webrtckmp.onIceConnectionStateChange
@@ -425,6 +426,29 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override fun getCallerId(): String {
         return callerId.value
+    }
+    
+    
+    override fun setMicro() {
+        
+        println("sdasdada")
+        
+        
+        localStream.value?.let { stream ->
+            stream.tracks.forEach { track ->
+                track.stop()
+            }
+        }
+        
+        peerConnection.value?.getTransceivers()
+            ?.forEach { peerConnection.value!!.removeTrack(it.sender) }
+        
+        
+        remoteVideoTrack.value?.stop()
+        
+        localStream.value = null
+        remoteVideoTrack.value = null
+        
     }
     
     

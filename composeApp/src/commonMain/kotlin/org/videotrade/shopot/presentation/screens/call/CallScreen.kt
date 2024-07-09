@@ -37,7 +37,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.PeerConnectionState
+import com.shepeliev.webrtckmp.audioTracks
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
@@ -71,11 +73,15 @@ class CallScreen(
         
         val wsSession by viewModel.wsSession.collectAsState()
         val callStateView by viewModel.callState.collectAsState()
+        val localStream by viewModel.localStreamm.collectAsState()
         
         
         val hasExecuted = remember { mutableStateOf(false) }
         
         val callState = remember { mutableStateOf("") }
+        
+        val isMuted = remember { mutableStateOf(false) }
+        
         
         LaunchedEffect(wsSession) {
             if (!hasExecuted.value && wsSession != null) {
@@ -172,9 +178,13 @@ class CallScreen(
                     val minutes = (secondsElapsed % 3600) / 60
                     val seconds = secondsElapsed % 60
                     if (hours > 0) {
-                        "${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+                        "${hours.toString().padStart(2, '0')}:${
+                            minutes.toString().padStart(2, '0')
+                        }:${seconds.toString().padStart(2, '0')}"
                     } else {
-                        "${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}"
+                        "${minutes.toString().padStart(2, '0')}:${
+                            seconds.toString().padStart(2, '0')
+                        }"
                     }
                 } else {
                     callState.value
@@ -218,7 +228,7 @@ class CallScreen(
             )
             
             Spacer(modifier = Modifier.height(159.dp))
-            
+
 //            Row(
 //                verticalAlignment = Alignment.CenterVertically,
 //                horizontalArrangement = Arrangement.SpaceAround,
@@ -234,28 +244,49 @@ class CallScreen(
 //                }, "Завершить")
 //                microfonBtn {}
 //            }
-
+            
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceAround,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                microfonBtn {}
-                videoBtn {  }
+                microfonBtn {
+//                    val audioTrack: AudioStreamTrack? = localStream?.audioTracks?.firstOrNull()
+//                    println("AAAAA")
+//                    if (audioTrack != null) {
+//                        println("AAAAA")
+//
+//                        audioTrack.state.value.mute()
+//
+//                        if (!isMuted.value) {
+//                            println("AAAAA")
+//
+//                            audioTrack.state.value.mute()
+//                        } else {
+//                            println("AAAAA")
+//
+//                            audioTrack.state.value.unmute()
+//                        }
+//                        isMuted.value = !isMuted.value
+//                    }
+                    
+                    viewModel.setMicro()
+                }
+                videoBtn { }
                 speakerBtn { }
             }
             Spacer(modifier = Modifier.height(56.dp))
-            Row (
+            Row(
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 rejectBtn({
-
-                    println("rejectBtn")
+                
+                println("rejectBtn")
                     viewModel.rejectCall(navigator, userId)
-
-
+                    
+                    
                 }, "Завершить")
             }
         }

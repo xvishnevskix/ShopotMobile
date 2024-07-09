@@ -39,6 +39,7 @@ interface CallRepository {
     
     
     fun getCallerId(): String
+    fun setMicro()
     
     fun getOtherUserId(): String
     

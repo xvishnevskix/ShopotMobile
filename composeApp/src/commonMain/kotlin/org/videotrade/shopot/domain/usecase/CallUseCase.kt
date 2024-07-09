@@ -55,6 +55,10 @@ class CallUseCase : KoinComponent {
         return repository.getCallerId()
     }
     
+    fun setMicro() {
+        return repository.setMicro()
+    }
+    
     
     fun updateOtherUserId(userId: String) {
         return repository.updateOtherUserId(userId)
