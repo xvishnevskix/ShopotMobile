@@ -55,8 +55,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
@@ -64,10 +62,12 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
@@ -93,6 +93,7 @@ class SignUpScreen(private val phone: String) : Screen {
         val textState = remember { mutableStateOf(SignUpTextState()) }
         val byteArray = remember { mutableStateOf<ByteArray?>(null) }
         var images by remember { mutableStateOf<ImageBitmap?>(null) }
+        val сommonViewModel: CommonViewModel = koinInject()
         
         val singleImagePicker = rememberImagePickerLauncher(
             selectionMode = SelectionMode.Single,
@@ -224,29 +225,33 @@ class SignUpScreen(private val phone: String) : Screen {
                                             println("responseresponse ${response.content}")
                                             
                                             if (response.status.isSuccess()) {
-                                                val jsonString = response.bodyAsText()
-                                                val jsonElement =
-                                                    Json.parseToJsonElement(jsonString).jsonObject
                                                 
-                                                println("accessToken ${jsonElement}")
+                                                val responseData: ReloadRes =
+                                                    Json.decodeFromString(response.bodyAsText())
                                                 
-                                                val accessToken =
-                                                    jsonElement["accessToken"]?.jsonPrimitive?.content
-                                                val refreshToken =
-                                                    jsonElement["refreshToken"]?.jsonPrimitive?.content
                                                 
-                                                accessToken?.let {
-                                                    addValueInStorage("accessToken", accessToken)
-                                                }
-                                                refreshToken?.let {
-                                                    addValueInStorage("refreshToken", refreshToken)
-                                                }
+                                                addValueInStorage(
+                                                    "accessToken",
+                                                    responseData.accessToken
+                                                )
+                                                
+                                                
+                                                addValueInStorage(
+                                                    "refreshToken",
+                                                    responseData.refreshToken
+                                                )
+                                                
                                                 
                                                 
                                                 viewModel.updateNotificationToken()
                                                 
                                                 viewModel.startObserving()
-                                                viewModel.fetchContacts(navigator)
+                                                
+                                                сommonViewModel.cipherShared(
+                                                    responseData.userId,
+                                                    navigator
+                                                )
+                                                
                                             }
                                         } catch (e: Exception) {
                                             e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes

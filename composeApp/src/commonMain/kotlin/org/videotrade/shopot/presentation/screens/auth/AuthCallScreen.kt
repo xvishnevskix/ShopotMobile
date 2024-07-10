@@ -49,6 +49,7 @@ import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import shopot.composeapp.generated.resources.Res
@@ -65,6 +66,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val isSuccessOtp = remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
+        val сommonViewModel: CommonViewModel = koinInject()
 
 
         
@@ -171,7 +173,12 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     
                                     when (authCase) {
                                         
-                                        "SignIn" -> sendLogin(phone, navigator, viewModel)
+                                        "SignIn" -> sendLogin(
+                                            phone,
+                                            navigator,
+                                            viewModel,
+                                            сommonViewModel
+                                        )
                                         "SignUp" -> sendSignUp(phone, navigator)
                                     }
                                 }
@@ -253,7 +260,12 @@ suspend fun sendRequestToBackend(
 }
 
 
-suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewModel) {
+suspend fun sendLogin(
+    phone: String,
+    navigator: Navigator,
+    viewModel: IntroViewModel,
+    сommonViewModel: CommonViewModel
+) {
     
     
     val response =
@@ -271,6 +283,9 @@ suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewM
         val token = jsonElement["accessToken"]?.jsonPrimitive?.content
         val refreshToken =
             jsonElement["refreshToken"]?.jsonPrimitive?.content
+        
+        val userId =
+            jsonElement["userId"]?.jsonPrimitive?.content
         
         
         
@@ -293,7 +308,9 @@ suspend fun sendLogin(phone: String, navigator: Navigator, viewModel: IntroViewM
 //        navigator.push(MainScreen())
         
         viewModel.startObserving()
-        viewModel.fetchContacts(navigator)
+        
+        сommonViewModel.cipherShared(userId, navigator)
+
         
         
     }

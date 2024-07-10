@@ -22,13 +22,12 @@ import io.ktor.util.InternalAPI
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
+import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 
@@ -164,9 +163,7 @@ class origin {
     
     
     @OptIn(InternalAPI::class)
-    suspend fun reloadTokens(
-    
-    ): HttpResponse? {
+    suspend inline fun reloadTokens(): String? {
         val client = HttpClient(getHttpClientEngine())
         
         try {
@@ -190,32 +187,29 @@ class origin {
                     setBody(jsonContent)
                 }
             
-            println("response11 ${response.content}")
+            println("response11 ${response.bodyAsText()}")
             
             
             
             if (response.status.isSuccess()) {
+                val responseData: ReloadRes = Json.decodeFromString(response.bodyAsText())
                 
-                val jsonString = response.bodyAsText()
-                val jsonElement = Json.parseToJsonElement(jsonString)
-                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                addValueInStorage(
+                    "accessToken",
+                    responseData.accessToken
+                )
                 
+                addValueInStorage(
+                    "refreshToken",
+                    responseData.refreshToken
+                )
                 
-                val token = messageObject?.get("accessToken")?.jsonPrimitive?.content
-                
-                token?.let {
-                    addValueInStorage(
-                        "accessToken",
-                        token
-                    )
-                }
-                
-                
-                return response
-                
+                return responseData.userId
                 
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                return null
+                
             }
         } catch (e: Exception) {
             println("Error222: $e")

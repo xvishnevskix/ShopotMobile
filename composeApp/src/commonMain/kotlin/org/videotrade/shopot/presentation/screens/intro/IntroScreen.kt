@@ -11,12 +11,10 @@ import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import io.ktor.http.HttpStatusCode
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
-import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
@@ -62,20 +60,13 @@ class IntroScreen : Screen {
                 
                 
                 
-                if (response != null && response.status == HttpStatusCode.OK) {
+                if (response != null) {
                     
                     
-                    сommonViewModel.cipherShared()
+                    сommonViewModel.cipherShared(response, navigator)
                     
                     
                     сommonViewModel.setMainNavigator(navigator)
-
-                    viewModel.updateNotificationToken()
-                    
-                    
-                    viewModel.fetchContacts(navigator)
-                    
-                    
                     
                     
                     return@LaunchedEffect

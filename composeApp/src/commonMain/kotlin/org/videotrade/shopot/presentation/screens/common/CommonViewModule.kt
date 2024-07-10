@@ -2,11 +2,13 @@ package org.videotrade.shopot.presentation.screens.common
 
 import cafe.adriel.voyager.navigator.Navigator
 import com.dokar.sonner.ToasterState
+import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
+import io.ktor.util.encodeBase64
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,10 +23,13 @@ import okio.ByteString.Companion.decodeBase64
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 
 class CommonViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()
@@ -49,7 +54,26 @@ class CommonViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun cipherShared() {
+    fun updateNotificationToken() {
+        
+        viewModelScope.launch {
+            
+            
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("notificationToken", NotifierManager.getPushNotifier().getToken())
+                }
+            )
+            
+            
+            println("jsonContent321323 $jsonContent")
+            
+            origin().put("user/profile/edit", jsonContent)
+        }
+    }
+    
+    
+    fun cipherShared(userId: String?, navigator: Navigator) {
         viewModelScope.launch {
             val httpClient = HttpClient {
                 install(WebSockets)
@@ -57,11 +81,13 @@ class CommonViewModel : ViewModel(), KoinComponent {
             try {
                 httpClient.webSocket(
                     method = HttpMethod.Get,
-                    host = "localhost",
-                    port = 3001,
+                    host = webSocketsUrl,
+                    port = 3050,
+                    path = "/crypto?userId=$userId",
                     
                     ) {
                     
+                    println("jsonElement$userId")
                     
                     val jsonContent = Json.encodeToString(
                         buildJsonObject {
@@ -74,7 +100,11 @@ class CommonViewModel : ViewModel(), KoinComponent {
                     for (frame in incoming) {
                         if (frame is Frame.Text) {
                             val text = frame.readText()
+                            
                             val jsonElement = Json.parseToJsonElement(text)
+                            
+                            println("jsonElement $jsonElement")
+                            
                             val action =
                                 jsonElement.jsonObject["action"]?.jsonPrimitive?.content
                             
@@ -97,22 +127,34 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                     
                                     
                                     if (result !== null) {
-//                                        val answerPublicKeyJsonContent = Json.encodeToString(
-//                                            buildJsonObject {
-//                                                put("action", "sendCipherText")
-//                                                put("ciphertext", result.ciphertext)
-//                                            }
-//                                        )
-//
-//                                        addValueInStorage(
-//                                            "sharedSecret",
-//                                            result.sharedSecret.toString()
-//                                        )
-//
-//                                        send(Frame.Text(answerPublicKeyJsonContent))
+                                        val answerPublicKeyJsonContent = Json.encodeToString(
+                                            buildJsonObject {
+                                                put("action", "sendCipherText")
+                                                put("ciphertext", result.ciphertext.encodeBase64())
+                                            }
+                                        )
+                                        
+                                        addValueInStorage(
+                                            "sharedSecret",
+                                            result.sharedSecret.toString()
+                                        )
+                                        
+                                        send(Frame.Text(answerPublicKeyJsonContent))
                                     }
                                     
                                     
+                                }
+                                
+                                "successSharedSecret" -> {
+                                    val introViewModel: IntroViewModel =
+                                        KoinPlatform.getKoin().get()
+                                    
+                                    
+                                    updateNotificationToken()
+                                    
+                                    introViewModel.fetchContacts(navigator)
+                                    
+                                    println("successSharedSecret")
                                 }
                             }
                         }
