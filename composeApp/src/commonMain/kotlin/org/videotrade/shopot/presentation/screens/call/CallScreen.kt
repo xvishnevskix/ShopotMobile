@@ -254,7 +254,7 @@ class CallScreen(
                 microfonBtn {
                     viewModel.setMicro()
                 }
-                videoBtn { }
+//                videoBtn { }
                 speakerBtn {
                     CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
                     
