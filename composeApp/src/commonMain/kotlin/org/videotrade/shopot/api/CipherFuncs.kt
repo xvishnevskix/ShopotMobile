@@ -1,34 +1,31 @@
 package org.videotrade.shopot.api
 
 import io.ktor.utils.io.core.toByteArray
-import okio.ByteString.Companion.decodeBase64
+import kotlinx.serialization.json.Json
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationMessageResult
 
 fun decupsMessage(
-    cipher: String,
-    block: String,
-    authTag: String,
+    contentCipher: String,
     cipherWrapper: CipherWrapper
 ): String? {
     try {
         val sharedSecret = getValueInStorage("sharedSecret")
         
-        val cipherBytes =
-            cipher.decodeBase64()?.toByteArray()
-        val blockBytes =
-            block.decodeBase64()?.toByteArray()
-        val authTagBytes =
-            authTag.decodeBase64()?.toByteArray()
+        val contentDecode: EncapsulationMessageResult =
+            Json.decodeFromString(contentCipher)
         
-        
-        if (cipherBytes !== null && blockBytes !== null && authTagBytes !== null && sharedSecret !== null) {
+        if (sharedSecret !== null) {
+            
+            println("sharedSecret $sharedSecret")
+            
             val cipherValue = cipherWrapper.decupsChachaMessageCommon(
-                cipherBytes,
-                blockBytes,
-                authTagBytes,
+                contentDecode.cipher,
+                contentDecode.block,
+                contentDecode.authTag,
                 sharedSecret.toByteArray()
             )
+            println("cipherValue $cipherValue")
             return cipherValue
         }
         

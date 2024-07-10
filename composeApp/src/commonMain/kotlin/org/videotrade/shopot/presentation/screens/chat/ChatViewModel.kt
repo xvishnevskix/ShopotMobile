@@ -111,33 +111,32 @@ class ChatViewModel : ViewModel(), KoinComponent {
         isCipher: Boolean,
     ) {
         viewModelScope.launch {
-//            var contentSort = ""
-//
-//
-//            if (content !== null && isCipher) {
-//                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-//
-//                val resEncups = encupsMessage(content, cipherWrapper)
-//
-//                contentSort = resEncups.toString()
-//            } else {
-//                contentSort = content!!
-//            }
-//
-//
-//            chatUseCase.sendMessage(
-//                MessageItem(
-//                    content = contentSort,
-//                    fromUser = fromUser,
-//                    chatId = chatId,
-//                    anotherRead = false,
-//                    iread = false,
-//                    attachments = null
-//                ),
-//                attachments
-//            )
-//            println("сообщениесообщениесообщениесообщение")
-//            sendNotify("Новое сообщение от $login ", content, notificationToken)
+            var contentSort = ""
+            
+            
+            if (content !== null && isCipher) {
+                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                
+                val resEncups = encupsMessage(content, cipherWrapper)
+                
+                contentSort = Json.encodeToString(resEncups)
+            } else {
+                contentSort = content!!
+            }
+            
+            chatUseCase.sendMessage(
+                MessageItem(
+                    content = contentSort,
+                    fromUser = fromUser,
+                    chatId = chatId,
+                    anotherRead = false,
+                    iread = false,
+                    attachments = null
+                ),
+                attachments
+            )
+            println("сообщениесообщениесообщениесообщение")
+            sendNotify("Новое сообщение от $login ", content, notificationToken)
         }
     }
     

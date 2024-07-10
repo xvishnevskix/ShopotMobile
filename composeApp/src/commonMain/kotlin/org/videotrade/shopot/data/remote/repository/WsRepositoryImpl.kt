@@ -8,11 +8,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.handleConnectWebSocket
 import org.videotrade.shopot.domain.repository.WsRepository
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.multiplatform.CipherWrapper
 
 class WsRepositoryImpl : WsRepository, KoinComponent {
     
@@ -26,6 +28,7 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
         val chatUseCase: ChatUseCase by inject()
         val chatsUseCase: ChatsUseCase by inject()
         val contactsUseCase: ContactsUseCase by inject()
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
         println("aaaaaaaa1111111 $userId")
         
@@ -37,7 +40,7 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
             chatUseCase,
             chatsUseCase,
             contactsUseCase,
-            
+            cipherWrapper
         )
         
         

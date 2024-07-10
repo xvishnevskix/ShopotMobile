@@ -35,6 +35,7 @@ expect class CipherWrapper(cipherInterface: CipherInterface? = null) {
 @Serializable
 data class SharedSecretResult(val ciphertext: ByteArray, val sharedSecret: ByteArray)
 
+@Serializable
 data class EncapsulationMessageResult(
     val cipher: ByteArray,
     val block: ByteArray,

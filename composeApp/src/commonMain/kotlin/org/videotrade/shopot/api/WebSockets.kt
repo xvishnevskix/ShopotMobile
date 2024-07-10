@@ -22,6 +22,7 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.multiplatform.CipherWrapper
 
 suspend fun handleConnectWebSocket(
     navigator: Navigator,
@@ -30,7 +31,8 @@ suspend fun handleConnectWebSocket(
     userId: String,
     chatUseCase: ChatUseCase,
     chatsUseCase: ChatsUseCase,
-    contactsUseCase: ContactsUseCase
+    contactsUseCase: ContactsUseCase,
+    cipherWrapper: CipherWrapper
 ) {
     
     
@@ -94,20 +96,40 @@ suspend fun handleConnectWebSocket(
                                                     Json.decodeFromString(chatItem.toString())
                                                 
                                                 
+                                                var newChat = chat
+                                                
+                                                
+                                                if (chat.lastMessage?.content?.isNotBlank() == true) {
+                                                    val lastMessageContent = decupsMessage(
+                                                        chat.lastMessage?.content!!,
+                                                        cipherWrapper
+                                                    )
+                                                    
+                                                    println("lastMessageContent")
+                                                    
+                                                    newChat = chat.copy(
+                                                        lastMessage = chat.lastMessage!!.copy(
+                                                            content = lastMessageContent
+                                                        )
+                                                    )
+                                                    
+                                                }
+                                                
+                                                
                                                 val normalizedChatPhone =
-                                                    normalizePhoneNumber(chat.phone)
+                                                    normalizePhoneNumber(newChat.phone)
                                                 
                                                 val contact = contactsMap[normalizedChatPhone]
                                                 
                                                 if (contact != null) {
-                                                    val sortChat = chat.copy(
+                                                    val sortChat = newChat.copy(
                                                         firstName = "${contact.firstName}",
                                                         lastName = "${contact.lastName}"
                                                     )
                                                     println("sortChat $sortChat")
                                                     chats.add(sortChat)
                                                 } else {
-                                                    chats.add(chat)
+                                                    chats.add(newChat)
                                                     
                                                 }
                                                 
@@ -140,10 +162,26 @@ suspend fun handleConnectWebSocket(
                                             for (messageItem in dataJson) {
                                                 val message: MessageItem =
                                                     Json.decodeFromString(messageItem.toString())
-
-
-//                                                chatUseCase.addMessage(message)
-                                                messages.add(message)
+                                                
+                                                var messageNew = message
+                                                
+                                                if (message.content?.isNotBlank() == true) {
+                                                    println("attachments11 ${message.answerMessage}")
+                                                    val decups = decupsMessage(
+                                                        message.content,
+                                                        cipherWrapper
+                                                    )
+                                                    
+                                                    messageNew = message.copy(
+                                                        content = decups
+                                                    )
+                                                    
+                                                    if (decups == null) {
+                                                        continue
+                                                    }
+                                                }
+                                                
+                                                messages.add(messageNew)
                                                 
                                             }
                                             
@@ -176,16 +214,24 @@ suspend fun handleConnectWebSocket(
                                             
                                             val message: MessageItem =
                                                 Json.decodeFromString(messageJson.toString())
-
-
-//                                            println("currentChat ${chatsUseCase.currentChat}")
                                             
                                             
-                                            if (chatsUseCase.currentChat.value == message.chatId) {
-                                                chatUseCase.addMessage(message)
+                                            var messageNew = message
+                                            
+                                            if (message.content?.isNotBlank() == true) {
+                                                messageNew = message.copy(
+                                                    content = decupsMessage(
+                                                        message.content,
+                                                        cipherWrapper
+                                                    )
+                                                )
                                             }
                                             
-                                            chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
+                                            if (chatsUseCase.currentChat.value == message.chatId) {
+                                                chatUseCase.addMessage(messageNew)
+                                            }
+                                            
+                                            chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
                                             
                                         }
                                         

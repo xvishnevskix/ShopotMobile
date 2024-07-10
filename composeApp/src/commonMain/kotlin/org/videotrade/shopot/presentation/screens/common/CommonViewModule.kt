@@ -136,7 +136,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                         
                                         addValueInStorage(
                                             "sharedSecret",
-                                            result.sharedSecret.toString()
+                                            result.sharedSecret.encodeBase64()
                                         )
                                         
                                         send(Frame.Text(answerPublicKeyJsonContent))
