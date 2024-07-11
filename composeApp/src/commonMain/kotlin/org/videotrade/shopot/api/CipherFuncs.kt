@@ -1,5 +1,7 @@
 package org.videotrade.shopot.api
 
+import io.ktor.util.decodeBase64Bytes
+import io.ktor.util.encodeBase64
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.serialization.json.Json
 import org.videotrade.shopot.multiplatform.CipherWrapper
@@ -17,13 +19,13 @@ fun decupsMessage(
         
         if (sharedSecret !== null) {
             
-            println("sharedSecret $sharedSecret")
+            println("sharedSecret ${contentDecode}")
             
             val cipherValue = cipherWrapper.decupsChachaMessageCommon(
                 contentDecode.cipher,
                 contentDecode.block,
                 contentDecode.authTag,
-                sharedSecret.toByteArray()
+                sharedSecret.decodeBase64Bytes()
             )
             println("cipherValue $cipherValue")
             return cipherValue
@@ -47,7 +49,7 @@ fun encupsMessage(text: String, cipherWrapper: CipherWrapper): EncapsulationMess
         if (sharedSecret !== null) {
             val cipherValue = cipherWrapper.encupsChachaMessageCommon(
                 text,
-                sharedSecret.toByteArray()
+                sharedSecret.decodeBase64Bytes()
             )
             return cipherValue
         }

@@ -166,7 +166,7 @@ suspend fun handleConnectWebSocket(
                                                 var messageNew = message
                                                 
                                                 if (message.content?.isNotBlank() == true) {
-                                                    println("attachments11 ${message.answerMessage}")
+                                                    println("attachments11 ${message.content}")
                                                     val decups = decupsMessage(
                                                         message.content,
                                                         cipherWrapper

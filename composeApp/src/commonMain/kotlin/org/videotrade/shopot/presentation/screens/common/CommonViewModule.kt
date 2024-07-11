@@ -9,6 +9,7 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.util.encodeBase64
+import io.ktor.utils.io.core.toByteArray
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,6 +26,7 @@ import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
@@ -119,6 +121,9 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                     val publicKeyBytes =
                                         publicKeyString?.decodeBase64()?.toByteArray()
                                     
+                                    println("publicKeyBytes ${publicKeyBytes?.encodeBase64()}")
+                                    
+                                    
                                     val result = publicKeyBytes?.let {
                                         cipherWrapper.getSharedSecretCommon(
                                             it
@@ -130,15 +135,18 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                         val answerPublicKeyJsonContent = Json.encodeToString(
                                             buildJsonObject {
                                                 put("action", "sendCipherText")
-                                                put("ciphertext", result.ciphertext.encodeBase64())
+                                                put("cipherText", result.ciphertext.encodeBase64())
                                             }
                                         )
                                         
+                                        println("successSharedSecret ${result.sharedSecret.encodeBase64()}")
+                                        
+
                                         addValueInStorage(
                                             "sharedSecret",
                                             result.sharedSecret.encodeBase64()
                                         )
-                                        
+
                                         send(Frame.Text(answerPublicKeyJsonContent))
                                     }
                                     
@@ -150,11 +158,13 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                         KoinPlatform.getKoin().get()
                                     
                                     
+                                    val sharedSecret = getValueInStorage("sharedSecret")
+                                    
+                                    
                                     updateNotificationToken()
                                     
                                     introViewModel.fetchContacts(navigator)
                                     
-                                    println("successSharedSecret")
                                 }
                             }
                         }
