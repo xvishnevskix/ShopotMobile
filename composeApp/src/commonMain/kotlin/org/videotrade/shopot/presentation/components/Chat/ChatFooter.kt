@@ -657,7 +657,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         ),
                         contentDescription = null,
                         contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(Color(0xFF29303C))
+//                        colorFilter = ColorFilter.tint(Color(0xFF29303C))
                     )
                 }
                 
