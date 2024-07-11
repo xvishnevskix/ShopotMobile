@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.chat
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import org.koin.compose.koinInject
@@ -69,9 +71,9 @@ class ChatScreen(
         var selectedMessageY by remember { mutableStateOf(0) }
         var hiddenMessageId by remember { mutableStateOf<String?>(null) }
         
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
             SafeArea(isBlurred = selectedMessage != null, 7.dp) {
-                Column(modifier = Modifier.fillMaxSize()) {
+                Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
                     
                     Scaffold(
                         topBar = {
@@ -89,7 +91,7 @@ class ChatScreen(
                             viewModel,
                             profile,
                             chat,
-                            Modifier.fillMaxSize()
+                            Modifier.fillMaxSize().background(Color.White)
                                 .padding(innerPadding),
                             
                             onMessageClick = { message, y ->

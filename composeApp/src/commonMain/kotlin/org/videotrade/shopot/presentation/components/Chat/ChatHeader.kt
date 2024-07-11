@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import Avatar
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -55,7 +56,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
     val callViewModel: CallViewModel = koinInject()
     
     Row(
-        modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp),
+        modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp).background(Color.White),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         
@@ -104,6 +105,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                 lineHeight = 20.sp,
                 modifier = Modifier.padding(start = 16.dp),
+                color = Color(0xFF000000)
             )
         }
         
@@ -112,8 +114,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
             Icon(
                 imageVector = Icons.Default.Call,
                 contentDescription = "Call",
+                tint = Color(0xFF000000),
                 modifier = Modifier.padding(end = 23.dp).size(20.dp).pointerInput(Unit) {
-                    
+
                     scope.launch {
                         try {
                             val cameraPer =

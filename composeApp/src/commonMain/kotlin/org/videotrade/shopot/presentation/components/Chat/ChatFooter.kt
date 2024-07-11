@@ -51,6 +51,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -303,6 +304,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         modifier = Modifier
             .imePadding()
             .padding(vertical = 15.dp)
+            .background(Color.White)
     ) {
         
         if (showMenu) {
@@ -497,6 +499,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
+                    tint = Color(0xFF29303C),
                     modifier = Modifier
                         .padding(2.dp)
                         .padding(end = 15.dp)
@@ -653,7 +656,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             Res.drawable.chat_micro_active
                         ),
                         contentDescription = null,
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+//                        colorFilter = ColorFilter.tint(Color(0xFF29303C))
                     )
                 }
                 
