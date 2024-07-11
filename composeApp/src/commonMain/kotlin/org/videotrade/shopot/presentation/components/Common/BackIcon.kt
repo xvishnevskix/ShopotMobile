@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 
@@ -15,6 +16,7 @@ fun BackIcon(modifier: Modifier = Modifier) {
     Icon(
         imageVector = Icons.Default.ArrowBack,
         contentDescription = "Back",
-        modifier = modifier
+        modifier = modifier,
+        tint = Color(0xFF000000)
     )
 }

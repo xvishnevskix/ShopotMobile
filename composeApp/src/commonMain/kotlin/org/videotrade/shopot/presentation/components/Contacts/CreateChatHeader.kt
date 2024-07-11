@@ -111,6 +111,7 @@ fun CreateChatHeader(
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
+                        tint = Color(0xFF000000),
                         modifier = Modifier
                             .padding()
                             .pointerInput(Unit) {
