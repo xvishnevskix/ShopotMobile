@@ -179,10 +179,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     
     
     override suspend fun getMessagesBack(chatId: String) {
-        
         try {
-            
-            
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("action", "getMessages")
