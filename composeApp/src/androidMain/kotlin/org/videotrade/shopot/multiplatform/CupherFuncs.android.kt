@@ -28,44 +28,44 @@ actual class CipherWrapper actual constructor(cipherInterface: CipherInterface?)
         return WolfsslModule.decupsChachaMessage(cipher, block, authTag, sharedSecret)
             ?.let { String(it, charset("UTF-8")) }
     }
-
-
-//    actual fun encupsChachaFileCommon(
-//        filePath: String,
-//        cipherFilePath: String,
-//        sharedSecret: ByteArray
-//    ): EncapsulationFileResult? {
-//        val uri = Uri.parse(filePath)
-//        println("uri2 $uri")
-//
-//        var filePathNew = ""
-//
-//        // Использование runBlocking для ожидания результата из корутины
-//        runBlocking {
-//            val file = getFileFromUri(getContextObj.getContext(), uri)
-//            println("file $file")
-//            filePathNew = file.absoluteFile.toString()
-//        }
-//
-//        return WolfsslModule.encupsChachaFile(filePathNew, cipherFilePath, sharedSecret)
-//    }
-
-//    actual fun decupsChachaFileCommon(
-//        cipherFilePath: String,
-//        jEncryptedFilePath: String,
-//        block: ByteArray,
-//        authTag: ByteArray,
-//        sharedSecret: ByteArray,
-//    ): String {
-//        return WolfsslModule.decupsChachaFile(
-//            cipherFilePath,
-//            jEncryptedFilePath,
-//            block,
-//            authTag,
-//            sharedSecret
-//        )
-//
-//
-//    }
+    
+    
+    actual fun encupsChachaFileCommon(
+        filePath: String,
+        cipherFilePath: String,
+        sharedSecret: ByteArray
+    ): EncapsulationFileResult? {
+        val uri = Uri.parse(filePath)
+        println("uri2 $uri")
+        
+        var filePathNew = ""
+        
+        // Использование runBlocking для ожидания результата из корутины
+        runBlocking {
+            val file = getFileFromUri(getContextObj.getContext(), uri)
+            println("file $file")
+            filePathNew = file.absoluteFile.toString()
+        }
+        
+        return WolfsslModule.encupsChachaFile(filePathNew, cipherFilePath, sharedSecret)
+    }
+    
+    actual fun decupsChachaFileCommon(
+        cipherFilePath: String,
+        jEncryptedFilePath: String,
+        block: ByteArray,
+        authTag: ByteArray,
+        sharedSecret: ByteArray,
+    ): String? {
+        return WolfsslModule.decupsChachaFile(
+            cipherFilePath,
+            jEncryptedFilePath,
+            block,
+            authTag,
+            sharedSecret
+        )
+        
+        
+    }
     
 }

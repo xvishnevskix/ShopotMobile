@@ -11,14 +11,20 @@ interface CipherInterface {
         authTag: ByteArray,
         sharedSecret: ByteArray
     ): String?
-
-
-//    fun encupsChachaFile(
-//        filePath: String,
-//        cipherFilePath: String,
-//        sharedSecret: ByteArray
-//    ): EncapsulationFileResult
     
+    fun encupsChachaFile(
+        filePath: String,
+        cipherFilePath: String,
+        sharedSecret: ByteArray
+    ): EncapsulationFileResult?
+    
+    fun decupsChachaFile(
+        cipherFilePath: String,
+        jEncryptedFilePath: String,
+        block: ByteArray,
+        authTag: ByteArray,
+        sharedSecret: ByteArray,
+    ): String?
     
 }
 
@@ -36,22 +42,22 @@ expect class CipherWrapper(cipherInterface: CipherInterface? = null) {
         authTag: ByteArray,
         sharedSecret: ByteArray
     ): String?
-
-
-//    fun encupsChachaFileCommon(
-//        filePath: String,
-//        cipherFilePath: String,
-//        sharedSecret: ByteArray
-//    ): EncapsulationFileResult?
-//
-//
-//    fun decupsChachaFileCommon(
-//        cipherFilePath: String,
-//        jEncryptedFilePath: String,
-//        block: ByteArray,
-//        authTag: ByteArray,
-//        sharedSecret: ByteArray,
-//    ): String
+    
+    
+    fun encupsChachaFileCommon(
+        filePath: String,
+        cipherFilePath: String,
+        sharedSecret: ByteArray
+    ): EncapsulationFileResult?
+    
+    
+    fun decupsChachaFileCommon(
+        cipherFilePath: String,
+        jEncryptedFilePath: String,
+        block: ByteArray,
+        authTag: ByteArray,
+        sharedSecret: ByteArray,
+    ): String?
     
 }
 
