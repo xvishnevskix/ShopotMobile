@@ -23,4 +23,22 @@ actual class CipherWrapper actual constructor(
         return cipherInterface?.decupsChachaMessage(cipher, block, authTag, sharedSecret)
         
     }
+
+//    actual fun encupsChachaFileCommon(
+//        filePath: String,
+//        cipherFilePath: String,
+//        sharedSecret: ByteArray
+//    ): EncapsulationFileResult? {
+//        TODO("Not yet implemented")
+//    }
+//
+//    actual fun decupsChachaFileCommon(
+//        cipherFilePath: String,
+//        jEncryptedFilePath: String,
+//        block: ByteArray,
+//        authTag: ByteArray,
+//        sharedSecret: ByteArray
+//    ): String {
+//        TODO("Not yet implemented")
+//    }
 }
