@@ -56,7 +56,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun updateNotificationToken() {
+    private fun updateNotificationToken() {
         
         viewModelScope.launch {
             
