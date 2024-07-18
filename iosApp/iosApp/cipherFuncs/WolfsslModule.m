@@ -75,13 +75,6 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
     return result;
 }
 
-- (NSArray *)byteArrayToWritableArray:(unsigned char *)bytes length:(int)length {
-    NSMutableArray *array = [NSMutableArray arrayWithCapacity:length];
-    for (int i = 0; i < length; i++) {
-        [array addObject:[NSNumber numberWithUnsignedChar:bytes[i]]];
-    }
-    return array;
-}
 
 + (NSData *)decryptWithCipher:(NSData *)cipher block:(NSData *)block authTagData:(NSData *)authTagData sharedSecret:(NSData *)sharedSecret {
     NSLog(@"decryptWithCipher called");
@@ -135,5 +128,168 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
 
     return decryptedData;
 }
+
+#define BUFFER_SIZE 8192 // 8 KB buffer size
+
++ (EncapsulationFileResult *)encryptFile:(NSString *)srcPath destPath:(NSString *)destPath sharedSecret:(NSData *)sharedSecret {
+    FILE *srcFile = NULL;
+    FILE *destFile = NULL;
+    unsigned char block[12];
+    unsigned char authTag[16];
+    RNG rng;
+    EncapsulationFileResult *result = malloc(sizeof(EncapsulationFileResult));
+    if (result == NULL) {
+        NSLog(@"Memory allocation failed for EncapsulationFileResult.");
+        return NULL;
+    }
+    result->block = NULL;
+    result->authTag = NULL;
+
+    // Открытие исходного файла для чтения
+    const char *srcFilePath = [srcPath UTF8String];
+    srcFile = fopen(srcFilePath, "rb");
+    if (srcFile == NULL) {
+        NSLog(@"Failed to open source file: %s", srcFilePath);
+        free(result);
+        return NULL;
+    }
+
+    // Открытие файла для записи зашифрованных данных
+    const char *destFilePath = [destPath UTF8String];
+    destFile = fopen(destFilePath, "wb");
+    if (destFile == NULL) {
+        NSLog(@"Failed to open destination file: %s", destFilePath);
+        fclose(srcFile);
+        free(result);
+        return NULL;
+    }
+
+    // Инициализация параметров шифрования
+    if (wc_InitRng(&rng) != 0 || wc_RNG_GenerateBlock(&rng, block, sizeof(block)) != 0) {
+        NSLog(@"Failed to initialize RNG.");
+        fclose(srcFile);
+        fclose(destFile);
+        free(result);
+        return NULL;
+    }
+    wc_FreeRng(&rng);
+
+    unsigned char buffer[BUFFER_SIZE];
+    size_t bytesRead;
+    unsigned char cipherBuffer[BUFFER_SIZE]; // Данные без тега аутентификации
+
+    // Шифрование файла блоками
+    while ((bytesRead = fread(buffer, 1, BUFFER_SIZE, srcFile)) > 0) {
+        if (wc_ChaCha20Poly1305_Encrypt([sharedSecret bytes], block, NULL, 0, buffer,
+                                        (word32) bytesRead, cipherBuffer, authTag) != 0) {
+            NSLog(@"Encryption failed.");
+            fclose(srcFile);
+            fclose(destFile);
+            free(result);
+            return NULL;
+        }
+        fwrite(cipherBuffer, 1, bytesRead, destFile);
+        fwrite(authTag, 1, 16, destFile);
+    }
+
+    NSLog(@"Encryption successful.");
+
+    // Создание результата
+    result->block = malloc(sizeof(block));
+    if (result->block == NULL) {
+        NSLog(@"Memory allocation failed for block.");
+        fclose(srcFile);
+        fclose(destFile);
+        free(result);
+        return NULL;
+    }
+    memcpy(result->block, block, sizeof(block));
+
+    result->authTag = malloc(sizeof(authTag));
+    if (result->authTag == NULL) {
+        NSLog(@"Memory allocation failed for authTag.");
+        free(result->block);
+        fclose(srcFile);
+        fclose(destFile);
+        free(result);
+        return NULL;
+    }
+    memcpy(result->authTag, authTag, sizeof(authTag));
+
+    // Очистка ресурсов
+    fclose(srcFile);
+    fclose(destFile);
+
+    return result;
+}
+
++ (NSString *)decupsChachaFileWithSrcPath:(NSString *)srcPath
+                                 destPath:(NSString *)destPath
+                                    block:(NSData *)block
+                                  authTag:(NSData *)authTag
+                             sharedSecret:(NSData *)sharedSecret {
+
+    if (!srcPath || !destPath || !block || !authTag || !sharedSecret) {
+        NSLog(@"One or more parameters are nil");
+        return nil;
+    }
+
+    FILE *srcFile = fopen([srcPath UTF8String], "rb");
+    if (srcFile == NULL) {
+        NSLog(@"Failed to open source file: %s", [srcPath UTF8String]);
+        return nil;
+    }
+
+    FILE *destFile = fopen([destPath UTF8String], "wb");
+    if (destFile == NULL) {
+        NSLog(@"Failed to open destination file: %s", [destPath UTF8String]);
+        fclose(srcFile);
+        return nil;
+    }
+
+    unsigned char cipherBuffer[BUFFER_SIZE + 16];
+    unsigned char plainBuffer[BUFFER_SIZE];
+    size_t bytesRead;
+    unsigned char readAuthTag[16];
+
+    const unsigned char *sharedSecretBytes = [sharedSecret bytes];
+    const unsigned char *blockBytes = [block bytes];
+    const unsigned char *authTagBytes = [authTag bytes];
+
+    while ((bytesRead = fread(cipherBuffer, 1, BUFFER_SIZE + 16, srcFile)) > 0) {
+        if (bytesRead <= 16) {
+            NSLog(@"Invalid data read.");
+            fclose(srcFile);
+            fclose(destFile);
+            return nil;
+        }
+        memcpy(readAuthTag, cipherBuffer + bytesRead - 16, 16);
+        if (wc_ChaCha20Poly1305_Decrypt(sharedSecretBytes, blockBytes, NULL, 0, cipherBuffer,
+                                        bytesRead - 16, readAuthTag, plainBuffer) != 0) {
+            NSLog(@"Decryption failed.");
+            fclose(srcFile);
+            fclose(destFile);
+            return nil;
+        }
+        fwrite(plainBuffer, 1, bytesRead - 16, destFile);
+    }
+
+    NSLog(@"Decryption successful.");
+
+    fclose(srcFile);
+    fclose(destFile);
+
+    return destPath;
+}
+
+
+- (NSArray *)byteArrayToWritableArray:(unsigned char *)bytes length:(int)length {
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:length];
+    for (int i = 0; i < length; i++) {
+        [array addObject:[NSNumber numberWithUnsignedChar:bytes[i]]];
+    }
+    return array;
+}
+
 
 @end

@@ -102,12 +102,7 @@ JNIEXPORT jobject JNICALL Java_org_videotrade_shopot_cipher_WolfsslModule_encups
     }
     (*env)->SetByteArrayRegion(env, jAuthTag, 0, sizeof(authTag), (jbyte *) authTag);
 
-    // Логирование данных
-    LOGI("Block: %d %d %d %d %d %d %d %d %d %d %d %d", block[0], block[1], block[2], block[3],
-         block[4], block[5], block[6], block[7], block[8], block[9], block[10], block[11]);
-    LOGI("AuthTag: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", authTag[0], authTag[1],
-         authTag[2], authTag[3], authTag[4], authTag[5], authTag[6], authTag[7], authTag[8],
-         authTag[9], authTag[10], authTag[11], authTag[12], authTag[13], authTag[14], authTag[15]);
+
 
     // Получение ссылки на класс и конструктор EncapsulationFileResult
     cls = (*env)->FindClass(env, "org/videotrade/shopot/multiplatform/EncapsulationFileResult");

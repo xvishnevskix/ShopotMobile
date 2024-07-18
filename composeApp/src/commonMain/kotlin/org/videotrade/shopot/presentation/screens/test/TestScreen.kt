@@ -145,26 +145,26 @@ class TestScreen : Screen {
                             )
                         
                         println("result2 $result2")
-                        
-                        val decupsFile = FileProviderFactory.create()
-                            .getFilePath(
-                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
-                                "pdf"
-                            )
-                        
-                        println("dadadada $cipherFilePath $decupsFile ${result2?.block!!} ${result2.authTag} ${result.sharedSecret}")
-                        
-                        val result3 =
-                            cipherWrapper.decupsChachaFileCommon(
-                                cipherFilePath,
-                                decupsFile,
-                                result2?.block!!,
-                                result2.authTag,
-                                result.sharedSecret
-                            )
-                        
-                        
-                        println("result3 $result3")
+
+//                        val decupsFile = FileProviderFactory.create()
+//                            .getFilePath(
+//                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
+//                                "pdf"
+//                            )
+//
+//                        println("dadadada $cipherFilePath $decupsFile ${result2?.block!!} ${result2.authTag} ${result.sharedSecret}")
+//
+//                        val result3 =
+//                            cipherWrapper.decupsChachaFileCommon(
+//                                cipherFilePath,
+//                                decupsFile,
+//                                result2?.block!!,
+//                                result2.authTag,
+//                                result.sharedSecret
+//                            )
+//
+//
+//                        println("result3 $result3")
                         
                         
                     } catch (e: Exception) {

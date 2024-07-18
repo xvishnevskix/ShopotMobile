@@ -19,12 +19,29 @@ typedef struct {
     unsigned char *authTag;
 } EncapsulationMessageResult;
 
+
+typedef struct {
+    unsigned char *block;
+    unsigned char *authTag;
+} EncapsulationFileResult;
+
 EncapsulationMessageResult
 encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret);
 
 - (NSArray *)byteArrayToWritableArray:(unsigned char *)bytes length:(int)length;
 
 + (NSData *)decryptWithCipher:(NSData *)cipher block:(NSData *)block authTagData:(NSData *)authTagData sharedSecret:(NSData *)sharedSecret;
+
+
++ (EncapsulationFileResult *)encryptFile:(NSString *)srcPath destPath:(NSString *)destPath sharedSecret:(NSData *)sharedSecret;
+
+
++ (NSString *)decupsChachaFileWithSrcPath:(NSString *)srcPath
+                                 destPath:(NSString *)destPath
+                                    block:(NSData *)block
+                                  authTag:(NSData *)authTag
+                             sharedSecret:(NSData *)sharedSecret;
+
 
 @end
 
