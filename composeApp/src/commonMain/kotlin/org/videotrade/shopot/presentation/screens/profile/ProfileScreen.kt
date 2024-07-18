@@ -134,7 +134,7 @@ class ProfileScreen : Screen {
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
-                            modifier = Modifier.padding(end = 18.dp),
+                            modifier = Modifier.padding(end = if (profile.phone == "") 0.dp else 18.dp),
                             color = Color(0xFF979797)
                         )
                         profile.login?.let {
@@ -145,7 +145,6 @@ class ProfileScreen : Screen {
                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                 lineHeight = 20.sp,
-                                
                                 color = Color(0xFF979797)
                             )
                         }
@@ -154,7 +153,7 @@ class ProfileScreen : Screen {
                     profile.description?.let {
                         Text(
                             it,
-                            textAlign = TextAlign.Center,
+                            textAlign = TextAlign.Start,
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),

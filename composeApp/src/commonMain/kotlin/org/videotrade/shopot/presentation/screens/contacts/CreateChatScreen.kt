@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -222,7 +223,7 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                 ) {
                     Avatar(item.icon, 80.dp)
                     Column(
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier.padding(start = 16.dp).fillMaxWidth(0.8f)
                     ) {
                         Text(
                             text = listOfNotNull(item.firstName, item.lastName)
@@ -233,7 +234,7 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                                 } ?: "",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            textAlign = TextAlign.Center,
+                            textAlign = TextAlign.Start,
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
                             color = Color(0xFF000000)

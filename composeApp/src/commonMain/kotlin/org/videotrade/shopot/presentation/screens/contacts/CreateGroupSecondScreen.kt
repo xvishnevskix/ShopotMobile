@@ -163,7 +163,7 @@ private fun ChatItem(item: ContactDTO) {
                 ) {
                     Avatar(icon = item.icon, 80.dp)
                     Column(
-                        modifier = Modifier.padding(start = 16.dp)
+                        modifier = Modifier.padding(start = 16.dp).fillMaxWidth(0.8f)
                     ) {
                         Text(
                             text = listOfNotNull(item.firstName, item.lastName)
@@ -174,7 +174,7 @@ private fun ChatItem(item: ContactDTO) {
                                 } ?: "",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            textAlign = TextAlign.Center,
+                            textAlign = TextAlign.Start,
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
                             color = Color(0xFF000000)
