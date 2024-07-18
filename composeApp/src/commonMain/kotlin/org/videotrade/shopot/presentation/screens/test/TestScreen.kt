@@ -85,13 +85,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.ktor.utils.io.core.toByteArray
+import kotlinx.coroutines.launch
+import okio.ByteString.Companion.decodeBase64
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import kotlin.random.Random
 
 class TestScreen : Screen {
     @Composable
@@ -101,6 +107,77 @@ class TestScreen : Screen {
         var publicKey by remember { mutableStateOf("opsda") }
         
         var errorMessage by remember { mutableStateOf("") }
+        var showFilePicker by remember { mutableStateOf(false) }
+        val scope = rememberCoroutineScope()
+        
+        
+        val filterFileType = listOf("pdf", "zip")
+        FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
+            showFilePicker = false
+            // do something with the file
+            
+            println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
+            
+            if (platformFile?.path !== null) {
+                
+                scope.launch {
+                    try {
+                        println("11111 ")
+                        
+                        
+                        val publicKeyBytes = publicKey.toByteArray()
+                        
+                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
+                        
+                        val cipherFilePath = FileProviderFactory.create()
+                            .getFilePath(
+                                "cipherFile${Random.nextInt(0, 100000)}.enc",
+                                "zip"
+                            )
+                        
+                        println("asdadadasd ${platformFile.path}")
+                        val result2 =
+                            cipherWrapper.encupsChachaFileCommon(
+                                platformFile.path,
+                                cipherFilePath,
+                                result?.sharedSecret!!
+                            )
+                        
+                        println("result2 $result2")
+                        
+                        val decupsFile = FileProviderFactory.create()
+                            .getFilePath(
+                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
+                                "zip"
+                            )
+                        
+                        println("dadadada $cipherFilePath $decupsFile ${result2?.block!!} ${result2.authTag} ${result.sharedSecret}")
+                        
+                        val result3 =
+                            cipherWrapper.decupsChachaFileCommon(
+                                cipherFilePath,
+                                decupsFile,
+                                result2?.block!!,
+                                result2.authTag,
+                                result.sharedSecret
+                            )
+                        
+                        
+                        println("result3 $result3")
+                        
+                        
+                    } catch (e: Exception) {
+                        
+                        println("error $e")
+                        
+                    }
+                    
+                    
+                }
+                
+                
+            }
+        }
         
         
         
@@ -115,28 +192,8 @@ class TestScreen : Screen {
             
             Button(onClick = {
                 try {
-                    val publicKeyBytes = publicKey.toByteArray()
+                    showFilePicker = true
                     
-                    val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
-                    
-                    val result2 =
-                        cipherWrapper.encupsChachaMessageCommon("privet", result?.sharedSecret!!)
-
-//                    println("result2 $result2")
-                    
-                    
-                    val result3 = result2?.let {
-                        cipherWrapper.decupsChachaMessageCommon(
-                            it.cipher,
-                            result2.block,
-                            result2.authTag,
-                            result.sharedSecret
-                        )
-                    }
-                    
-                    
-                    
-                    println("result3 $result3")
                     
                 } catch (e: Exception) {
                     errorMessage = "Error: ${e.message}"

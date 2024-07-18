@@ -1,8 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
 import kotlinx.serialization.Serializable
-import org.koin.core.module.Module
-import org.koin.dsl.module
 
 interface CipherInterface {
     fun getSharedSecretAndCipherText(publicKey: ByteArray): SharedSecretResult?
@@ -13,6 +11,15 @@ interface CipherInterface {
         authTag: ByteArray,
         sharedSecret: ByteArray
     ): String?
+    
+    
+    fun encupsChachaFile(
+        filePath: String,
+        cipherFilePath: String,
+        sharedSecret: ByteArray
+    ): EncapsulationFileResult
+    
+    
 }
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
@@ -29,6 +36,23 @@ expect class CipherWrapper(cipherInterface: CipherInterface? = null) {
         authTag: ByteArray,
         sharedSecret: ByteArray
     ): String?
+    
+    
+    fun encupsChachaFileCommon(
+        filePath: String,
+        cipherFilePath: String,
+        sharedSecret: ByteArray
+    ): EncapsulationFileResult?
+    
+    
+    fun decupsChachaFileCommon(
+        cipherFilePath: String,
+        jEncryptedFilePath: String,
+        block: ByteArray,
+        authTag: ByteArray,
+        sharedSecret: ByteArray,
+    ): String
+    
 }
 
 
@@ -38,6 +62,13 @@ data class SharedSecretResult(val ciphertext: ByteArray, val sharedSecret: ByteA
 @Serializable
 data class EncapsulationMessageResult(
     val cipher: ByteArray,
+    val block: ByteArray,
+    val authTag: ByteArray
+)
+
+
+@Serializable
+data class EncapsulationFileResult(
     val block: ByteArray,
     val authTag: ByteArray
 )

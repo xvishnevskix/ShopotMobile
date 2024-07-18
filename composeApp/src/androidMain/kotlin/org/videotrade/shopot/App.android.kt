@@ -1,5 +1,6 @@
 package org.videotrade.shopot
 
+//import org.videotrade.shopot.multiplatform.MediaProviderFactory
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
@@ -16,9 +17,9 @@ import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfig
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
+import org.videotrade.shopot.androidSpecificApi.getContextObj
 import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.AudioFactory
-import org.videotrade.shopot.multiplatform.AudioPlayer
 import org.videotrade.shopot.multiplatform.BackgroundTaskManagerFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.CipherInterface
@@ -26,11 +27,8 @@ import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
-//import org.videotrade.shopot.multiplatform.MediaProviderFactory
-import org.videotrade.shopot.multiplatform.PermissionsProvider
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
-import javax.annotation.Nullable
 
 
 class AndroidApp : Application() {
@@ -53,6 +51,8 @@ class AndroidApp : Application() {
     }
     
     private fun initializeFactories(context: Context) {
+        
+        getContextObj.initialize(context)
         
         AudioFactory.initialize(context)
         FileProviderFactory.initialize(context)

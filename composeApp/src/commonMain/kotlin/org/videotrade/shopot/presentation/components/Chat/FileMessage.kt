@@ -100,16 +100,6 @@ fun FileMessage(
                     
                     if (fileId !== null) {
                         println("fileId ${fileId.id}")
-
-//                        viewModel.sendAttachments(
-//                            message.content,
-//                            message.fromUser,
-//                            message.chatId,
-//                            message.uploadId!!,
-//                            fileId.id
-//                        )
-                        
-                        
                         viewModel.sendLargeFileAttachments(
                             message.content,
                             message.fromUser,

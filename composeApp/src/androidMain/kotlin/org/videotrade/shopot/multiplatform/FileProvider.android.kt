@@ -59,6 +59,7 @@ actual class FileProvider(private val applicationContext: Context) {
         val directory = when (fileType) {
             "audio/mp4" -> applicationContext.cacheDir
             "image" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            "zip" -> applicationContext.cacheDir
             else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         }
         
@@ -291,38 +292,6 @@ actual class FileProvider(private val applicationContext: Context) {
         }
     }
     
-    private suspend fun getFileFromUri(context: Context, uri: Uri): File =
-        withContext(Dispatchers.IO) {
-            val fileName = getFileName(context, uri)
-            val tempFile = File(context.cacheDir, fileName)
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                FileOutputStream(tempFile).use { outputStream ->
-                    inputStream.copyTo(outputStream)
-                }
-            }
-            tempFile
-        }
-    
-    @SuppressLint("Range")
-    fun getFileName(context: Context, uri: Uri): String {
-        var result: String? = null
-        if (uri.scheme == "content") {
-            context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                if (cursor.moveToFirst()) {
-                    result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-                }
-            }
-        }
-        if (result == null) {
-            result = uri.path
-            val cut = result!!.lastIndexOf('/')
-            if (cut != -1) {
-                result = result!!.substring(cut + 1)
-            }
-        }
-        return result!!
-    }
-    
     
 }
 
@@ -339,6 +308,38 @@ actual object FileProviderFactory {
     }
 }
 
+
+suspend fun getFileFromUri(context: Context, uri: Uri): File =
+    withContext(Dispatchers.IO) {
+        val fileName = getFileName(context, uri)
+        val tempFile = File(context.cacheDir, fileName)
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
+            FileOutputStream(tempFile).use { outputStream ->
+                inputStream.copyTo(outputStream)
+            }
+        }
+        tempFile
+    }
+
+@SuppressLint("Range")
+fun getFileName(context: Context, uri: Uri): String {
+    var result: String? = null
+    if (uri.scheme == "content") {
+        context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+            }
+        }
+    }
+    if (result == null) {
+        result = uri.path
+        val cut = result!!.lastIndexOf('/')
+        if (cut != -1) {
+            result = result!!.substring(cut + 1)
+        }
+    }
+    return result!!
+}
 
 private fun readBytesFromUri(context: Context, uri: Uri): ByteArray? {
     val contentResolver = context.contentResolver
