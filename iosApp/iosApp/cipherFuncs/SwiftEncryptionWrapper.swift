@@ -69,37 +69,67 @@ class EncryptionWrapperIOS: NSObject {
 
     func encupsChachaFile(_ filePath: String, _ cipherFilePath: String, sharedSecret: Data) -> ComposeApp.EncapsulationFileResult? {
         // Преобразование пути к файлу
-        guard let srcURL = URL(string: filePath), let destURL = URL(string: cipherFilePath) else {
-            print("Invalid file path.")
-            return nil
-        }
+        let srcURL = URL(fileURLWithPath: filePath)
+        let destURL = URL(fileURLWithPath: cipherFilePath)
         
         let srcPath = srcURL.path
         let destPath = destURL.path
+
+        print("Source file path: \(srcPath)")
+        print("Destination file path: \(destPath)")
+        
+        let fileManager = FileManager.default
+
+        // Проверка существования и доступности файла
+        guard fileManager.fileExists(atPath: srcPath) else {
+            print("Source file does not exist: \(srcPath)")
+            return nil
+        }
+
+        // Запрос на доступ к файлу
+        if !srcURL.startAccessingSecurityScopedResource() {
+            print("Failed to access security scoped resource: \(srcURL.path)")
+            return nil
+        }
+        defer { srcURL.stopAccessingSecurityScopedResource() }
+
+        // Получение закладки на файл
+        do {
+            let bookmark = try srcURL.bookmarkData(options: .suitableForBookmarkFile, includingResourceValuesForKeys: nil, relativeTo: nil)
+            let bookmarkPath = srcURL.appendingPathExtension("bookmark")
+            try bookmark.write(to: bookmarkPath)
+            print("Bookmark created and saved at: \(bookmarkPath.path)")
+        } catch {
+            print("Failed to create bookmark: \(error)")
+            return nil
+        }
+
         let sharedSecretNSData = sharedSecret as NSData
         
         // Вызов функции из Objective-C
-        guard let result = WolfsslModule.encryptFile(srcPath, destPath: destPath, sharedSecret: sharedSecretNSData as Data) else {
+        guard let resultPointer = WolfsslModule.encryptFile(srcPath, destPath: destPath, sharedSecret: sharedSecretNSData as Data) else {
             print("Encryption failed")
             return nil
         }
         
+        let result = resultPointer.pointee
+
         // Преобразование block и authTag в Data
-        let blockData = Data(bytes: result->block, count: 12)
-        let authTagData = Data(bytes: result->authTag, count: 16)
+        let blockData = Data(bytes: result.block, count: 12)
+        let authTagData = Data(bytes: result.authTag, count: 16)
         
         // Конвертация Data в KotlinByteArray
         let blockKotlinByteArray = KotlinByteArray.fromNSData(blockData)
         let authTagKotlinByteArray = KotlinByteArray.fromNSData(authTagData)
         
         // Освобождение памяти, выделенной в Objective-C коде
-        free(result->block)
-        free(result->authTag)
-        free(result)
+        free(result.block)
+        free(result.authTag)
+        free(resultPointer)
         
         return ComposeApp.EncapsulationFileResult(block: blockKotlinByteArray, authTag: authTagKotlinByteArray)
     }
-
+    
     func decupsChachaFile(cipherFilePath: String, jEncryptedFilePath: String, block: KotlinByteArray, authTag: KotlinByteArray, sharedSecret: KotlinByteArray) -> String? {
         let srcURL = URL(fileURLWithPath: cipherFilePath)
         let destURL = URL(fileURLWithPath: jEncryptedFilePath)

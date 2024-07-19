@@ -32,7 +32,8 @@ actual class CipherWrapper actual constructor(
         cipherFilePath: String,
         sharedSecret: ByteArray
     ): EncapsulationFileResult? {
-        return cipherInterface?.encupsChachaFile(filePath, cipherFilePath, sharedSecret)
+        val file = NSURL.fileURLWithPath(filePath)
+        return cipherInterface?.encupsChachaFile(file.path!!, cipherFilePath, sharedSecret)
     }
     
     actual fun decupsChachaFileCommon(

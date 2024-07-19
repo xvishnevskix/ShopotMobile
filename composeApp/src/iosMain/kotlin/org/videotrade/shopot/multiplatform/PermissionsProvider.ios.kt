@@ -1,5 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
+import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -7,12 +8,20 @@ import platform.AVFAudio.AVAudioSession
 import platform.AVFoundation.*
 import platform.Contacts.CNContactStore
 import platform.Contacts.CNEntityType
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSFileManager
 import platform.Foundation.NSLog
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSString
+import platform.Foundation.NSURL
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.NSUserDomainMask
+import platform.Foundation.URLByAppendingPathComponent
+import platform.Foundation.stringWithContentsOfFile
 import platform.UserNotifications.*
 import kotlin.coroutines.resume
 
 actual class PermissionsProvider {
-    
     actual suspend fun getPermission(permissionName: String): Boolean {
         return when (permissionName) {
             "camera" -> requestCameraPermission()

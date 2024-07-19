@@ -98,6 +98,7 @@ import okio.ByteString.Companion.decodeBase64
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import kotlin.random.Random
 
 class TestScreen : Screen {
@@ -135,16 +136,16 @@ class TestScreen : Screen {
                                 "cipherFile${Random.nextInt(0, 100000)}",
                                 "pdf"
                             )
-                        
-                        println("asdadadasd ${platformFile.path}")
-                        val result2 =
-                            cipherWrapper.encupsChachaFileCommon(
-                                platformFile.path,
-                                cipherFilePath,
-                                result?.sharedSecret!!
-                            )
-                        
-                        println("result2 $result2")
+
+
+//                        val result2 =
+//                            cipherWrapper.encupsChachaFileCommon(
+//                                platformFile.path,
+//                                cipherFilePath,
+//                                result?.sharedSecret!!
+//                            )
+//
+//                        println("result2 $result2")
 
 //                        val decupsFile = FileProviderFactory.create()
 //                            .getFilePath(

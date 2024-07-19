@@ -145,8 +145,8 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
     result->block = NULL;
     result->authTag = NULL;
 
-    // Открытие исходного файла для чтения
     const char *srcFilePath = [srcPath UTF8String];
+    NSLog(@"Opening source file at path: %s", srcFilePath);
     srcFile = fopen(srcFilePath, "rb");
     if (srcFile == NULL) {
         NSLog(@"Failed to open source file: %s", srcFilePath);
@@ -154,8 +154,8 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
         return NULL;
     }
 
-    // Открытие файла для записи зашифрованных данных
     const char *destFilePath = [destPath UTF8String];
+    NSLog(@"Opening destination file at path: %s", destFilePath);
     destFile = fopen(destFilePath, "wb");
     if (destFile == NULL) {
         NSLog(@"Failed to open destination file: %s", destFilePath);
@@ -164,7 +164,6 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
         return NULL;
     }
 
-    // Инициализация параметров шифрования
     if (wc_InitRng(&rng) != 0 || wc_RNG_GenerateBlock(&rng, block, sizeof(block)) != 0) {
         NSLog(@"Failed to initialize RNG.");
         fclose(srcFile);
@@ -178,7 +177,6 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
     size_t bytesRead;
     unsigned char cipherBuffer[BUFFER_SIZE]; // Данные без тега аутентификации
 
-    // Шифрование файла блоками
     while ((bytesRead = fread(buffer, 1, BUFFER_SIZE, srcFile)) > 0) {
         if (wc_ChaCha20Poly1305_Encrypt([sharedSecret bytes], block, NULL, 0, buffer,
                                         (word32) bytesRead, cipherBuffer, authTag) != 0) {
@@ -194,7 +192,6 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
 
     NSLog(@"Encryption successful.");
 
-    // Создание результата
     result->block = malloc(sizeof(block));
     if (result->block == NULL) {
         NSLog(@"Memory allocation failed for block.");
@@ -216,12 +213,12 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
     }
     memcpy(result->authTag, authTag, sizeof(authTag));
 
-    // Очистка ресурсов
     fclose(srcFile);
     fclose(destFile);
 
     return result;
 }
+
 
 + (NSString *)decupsChachaFileWithSrcPath:(NSString *)srcPath
                                  destPath:(NSString *)destPath

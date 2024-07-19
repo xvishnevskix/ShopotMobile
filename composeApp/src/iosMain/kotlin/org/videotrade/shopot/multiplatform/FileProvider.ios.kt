@@ -298,6 +298,7 @@ actual class FileProvider {
         val file = NSURL.fileURLWithPath(fileDirectory)
         val fileData = NSData.dataWithContentsOfURL(file) ?: return null
         
+        
         try {
             val token = getValueInStorage("accessToken")
             
