@@ -46,5 +46,17 @@
     </array>
     <key>NSMicrophoneUsageDescription</key>
     <string>Мы используем ваш микрофон для записи аудио.</string>
+    <key>NSUbiquitousContainers</key>
+    <dict>
+        <key>iCloud.com.yourcompany.yourapp</key>
+        <dict>
+            <key>NSUbiquitousContainerIsDocumentScopePublic</key>
+            <true/>
+            <key>NSUbiquitousContainerName</key>
+            <string>YourAppContainerName</string>
+        </dict>
+    </dict>
+    <key>NSUbiquitousUsageDescription</key>
+    <string>Ваше приложение использует iCloud для доступа к документам.</string>
 </dict>
 </plist>

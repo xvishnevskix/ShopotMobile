@@ -82,6 +82,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -91,15 +92,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.darkrockstudios.libraries.mpfilepicker.FilePicker
-import io.ktor.utils.io.core.toByteArray
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okio.ByteString.Companion.decodeBase64
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
-import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
-import kotlin.random.Random
+import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class TestScreen : Screen {
     @Composable
@@ -125,19 +122,21 @@ class TestScreen : Screen {
                 scope.launch {
                     try {
                         println("11111 ")
-                        
-                        
-                        val publicKeyBytes = publicKey.toByteArray()
-                        
-                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
-                        
-                        val cipherFilePath = FileProviderFactory.create()
-                            .getFilePath(
-                                "cipherFile${Random.nextInt(0, 100000)}",
-                                "pdf"
-                            )
-
-
+//
+//
+//                        val publicKeyBytes = publicKey.toByteArray()
+//
+//                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
+//
+//                        val cipherFilePath = FileProviderFactory.create()
+//                            .getFilePath(
+//                                "cipherFile${Random.nextInt(0, 100000)}",
+//                                "pdf"
+//                            )
+//
+//                        println("platformFile ${ platformFile.platformFile.toString()}")
+//
+//
 //                        val result2 =
 //                            cipherWrapper.encupsChachaFileCommon(
 //                                platformFile.path,
@@ -146,7 +145,14 @@ class TestScreen : Screen {
 //                            )
 //
 //                        println("result2 $result2")
-
+                        
+                        val dirTest = FileProviderFactory.create()
+                            .dirTest(
+                                platformFile.path
+                            )
+                        
+                        
+                        println("dirTest ${dirTest}")
 //                        val decupsFile = FileProviderFactory.create()
 //                            .getFilePath(
 //                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
@@ -182,30 +188,38 @@ class TestScreen : Screen {
         }
         
         
+        LaunchedEffect(Unit) {
+            showFilePicker = true
+            
+        }
         
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Button(onClick = {
-                try {
-                    showFilePicker = true
-                    
-                    
-                } catch (e: Exception) {
-                    errorMessage = "Error: ${e.message}"
+        
+        
+        SafeArea {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                Button(onClick = {
+                    try {
+                        showFilePicker = true
+                        
+                        
+                    } catch (e: Exception) {
+                        errorMessage = "Error: ${e.message}"
+                    }
+                }) {
+                    Text("Generate Shared Secret")
                 }
-            }) {
-                Text("Generate Shared Secret")
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
             }
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
         }
     }
 }

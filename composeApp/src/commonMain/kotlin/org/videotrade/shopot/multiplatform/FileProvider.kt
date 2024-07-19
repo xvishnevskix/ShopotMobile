@@ -5,6 +5,9 @@ import org.videotrade.shopot.domain.model.FileDTO
 
 expect class FileProvider {
     fun getFilePath(fileName: String, fileType: String): String
+    fun dirTest(
+        fileDirectory: String,
+    )
     
     
     suspend fun downloadFileToDirectory(

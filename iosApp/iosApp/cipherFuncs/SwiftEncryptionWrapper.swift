@@ -1,5 +1,6 @@
 import Foundation
 import ComposeApp
+import UIKit
 
 @objcMembers
 class EncryptionWrapperIOS: NSObject {
@@ -65,10 +66,9 @@ class EncryptionWrapperIOS: NSObject {
         return String(data: decryptedData, encoding: .utf8)
     }
 
-
-
+   
     func encupsChachaFile(_ filePath: String, _ cipherFilePath: String, sharedSecret: Data) -> ComposeApp.EncapsulationFileResult? {
-        // Преобразование пути к файлу
+        // Преобразование строки пути в URL
         let srcURL = URL(fileURLWithPath: filePath)
         let destURL = URL(fileURLWithPath: cipherFilePath)
         
@@ -81,8 +81,8 @@ class EncryptionWrapperIOS: NSObject {
         let fileManager = FileManager.default
 
         // Проверка существования и доступности файла
-        guard fileManager.fileExists(atPath: srcPath) else {
-            print("Source file does not exist: \(srcPath)")
+        guard fileManager.fileExists(atPath: filePath) else {
+            print("Source file does not exist: \(filePath)")
             return nil
         }
 
@@ -93,14 +93,27 @@ class EncryptionWrapperIOS: NSObject {
         }
         defer { srcURL.stopAccessingSecurityScopedResource() }
 
-        // Получение закладки на файл
         do {
-            let bookmark = try srcURL.bookmarkData(options: .suitableForBookmarkFile, includingResourceValuesForKeys: nil, relativeTo: nil)
-            let bookmarkPath = srcURL.appendingPathExtension("bookmark")
-            try bookmark.write(to: bookmarkPath)
-            print("Bookmark created and saved at: \(bookmarkPath.path)")
+            // Убедитесь, что файл загружен локально
+            let resourceValues = try srcURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey, .ubiquitousItemIsDownloadingKey])
+            
+            if let isDownloading = resourceValues.ubiquitousItemIsDownloading, isDownloading {
+                print("File is currently downloading: \(srcPath)")
+                return nil
+            }
+
+            if let downloadingStatus = resourceValues.ubiquitousItemDownloadingStatus, downloadingStatus != .current {
+                try fileManager.startDownloadingUbiquitousItem(at: srcURL)
+            }
+
+            // Проверка, что файл действительно загружен
+            let checkResourceValues = try srcURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey])
+            if let downloadingStatus = checkResourceValues.ubiquitousItemDownloadingStatus, downloadingStatus != .current {
+                print("File is not fully downloaded yet: \(srcPath)")
+                return nil
+            }
         } catch {
-            print("Failed to create bookmark: \(error)")
+            print("Error accessing file: \(error)")
             return nil
         }
 
@@ -129,6 +142,7 @@ class EncryptionWrapperIOS: NSObject {
         
         return ComposeApp.EncapsulationFileResult(block: blockKotlinByteArray, authTag: authTagKotlinByteArray)
     }
+
     
     func decupsChachaFile(cipherFilePath: String, jEncryptedFilePath: String, block: KotlinByteArray, authTag: KotlinByteArray, sharedSecret: KotlinByteArray) -> String? {
         let srcURL = URL(fileURLWithPath: cipherFilePath)
