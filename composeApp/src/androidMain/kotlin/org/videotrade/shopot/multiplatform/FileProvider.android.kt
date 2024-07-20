@@ -13,36 +13,33 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.onDownload
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.forms.InputProvider
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
-import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.prepareGet
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsChannel
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
+import io.ktor.util.decodeBase64Bytes
 import io.ktor.utils.io.ByteReadChannel
-import io.ktor.utils.io.core.isEmpty
-import io.ktor.utils.io.core.readBytes
 import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
+import org.videotrade.shopot.domain.model.WebRTCMessage
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -60,6 +57,7 @@ actual class FileProvider(private val applicationContext: Context) {
             "audio/mp4" -> applicationContext.cacheDir
             "image" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             "zip" -> applicationContext.cacheDir
+            "cipher" -> applicationContext.cacheDir
             else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         }
         
@@ -289,6 +287,100 @@ actual class FileProvider(private val applicationContext: Context) {
             
             client.close()
             
+        }
+    }
+    
+    
+    actual suspend fun uploadCipherFile(
+        url: String,
+        fileDirectory: String,
+        cipherFilePath: String,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): FileDTO? {
+        
+        val client = HttpClient() {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 600_000
+                connectTimeoutMillis = 600_000
+                socketTimeoutMillis = 600_000
+            }
+        }
+        
+        val sharedSecret = getValueInStorage("sharedSecret")
+        
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+        
+        val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+            fileDirectory,
+            cipherFilePath,
+            sharedSecret?.decodeBase64Bytes()!!
+        )
+        
+        
+        if (encupsChachaFileResult == null) {
+            
+            return null
+        }
+        println("result2 $fileDirectory")
+        
+        val file = File(cipherFilePath)
+        if (!file.exists()) {
+            println("File not found: ${file.absolutePath}")
+            return null
+        }
+        
+        println("Local file path: ${file.absolutePath}")
+        
+        try {
+            val token = getValueInStorage("accessToken")
+            
+            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                setBody(MultiPartFormDataContent(
+                    formData {
+                        append(
+                            "file",
+                            InputProvider(file.length()) { file.inputStream().asInput() },
+                            Headers.build {
+                                append(HttpHeaders.ContentType, contentType)
+                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+                            }
+                        )
+                        // Добавляем block и authTag как дополнительные поля
+                        append(
+                            "encupsFile",
+                            Json.encodeToString(
+                                EncapsulationFileResult.serializer(),
+                                encupsChachaFileResult
+                            )
+                        )
+                    }
+                ))
+                header(HttpHeaders.Authorization, "Bearer $token")
+                
+                onUpload { bytesSentTotal, contentLength ->
+                    if (contentLength != -1L) { // -1 means that the content length is unknown
+                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
+                        onProgress(progress)
+                    }
+                }
+            }
+            
+            if (response.status.isSuccess()) {
+                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
+                return responseData
+            } else {
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                return null
+            }
+            
+        } catch (e: Exception) {
+            println("File upload failed: ${e.message}")
+            return null
+            
+        } finally {
+            client.close()
         }
     }
     

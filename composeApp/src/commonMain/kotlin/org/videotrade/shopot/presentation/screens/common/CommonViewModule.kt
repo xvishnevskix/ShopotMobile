@@ -32,6 +32,7 @@ import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
+import org.videotrade.shopot.presentation.screens.test.TestScreen
 
 class CommonViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()
@@ -163,7 +164,9 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                     
                                     updateNotificationToken()
                                     
-                                    introViewModel.fetchContacts(navigator)
+                                    
+                                    navigator.push(TestScreen())
+//                                    introViewModel.fetchContacts(navigator)
                                     
                                 }
                             }

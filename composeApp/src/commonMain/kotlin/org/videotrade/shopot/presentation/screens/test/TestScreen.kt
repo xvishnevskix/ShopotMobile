@@ -95,6 +95,7 @@ import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -106,6 +107,8 @@ class TestScreen : Screen {
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
         var publicKey by remember { mutableStateOf("opsda") }
+        var cipherFilePath2 by remember { mutableStateOf("opsda") }
+        var fileName2 by remember { mutableStateOf("opsda") }
         
         var errorMessage by remember { mutableStateOf("") }
         var showFilePicker by remember { mutableStateOf(false) }
@@ -130,44 +133,52 @@ class TestScreen : Screen {
                         
                         val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
                         
+                        val fileName = "cipherFile${Random.nextInt(0, 100000)}"
+                        
                         val cipherFilePath = FileProviderFactory.create()
                             .getFilePath(
-                                "cipherFile${Random.nextInt(0, 100000)}",
-                                "pdf"
+                                fileName,
+                                "cipher1"
                             )
+                        
+                        cipherFilePath2 = cipherFilePath
+                        fileName2 = fileName
                         
                         println("platformFile ${platformFile.platformFile.toString()}")
                         
                         
-                        val result2 =
-                            cipherWrapper.encupsChachaFileCommon(
-                                platformFile.path,
-                                cipherFilePath,
-                                result?.sharedSecret!!
-                            )
-                        
-                        println("result2 $result2")
+                        val fileData = FileProviderFactory.create().getFileData(platformFile.path)
                         
                         
-                        val decupsFile = FileProviderFactory.create()
-                            .getFilePath(
-                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
-                                "pdf"
-                            )
+                        val sendFile = FileProviderFactory.create().uploadCipherFile(
+                            "file/upload",
+                            platformFile.path,
+                            cipherFilePath,
+                            fileData?.fileType!!,
+                            fileName
+                        ) {
                         
-                        println("dadadada $cipherFilePath $decupsFile ${result2?.block!!} ${result2.authTag} ${result.sharedSecret}")
-                        
-                        val result3 =
-                            cipherWrapper.decupsChachaFileCommon(
-                                cipherFilePath,
-                                decupsFile,
-                                result2?.block!!,
-                                result2.authTag,
-                                result.sharedSecret
-                            )
-                        
-                        
-                        println("result3 $result3")
+                        }
+
+//                        val decupsFile = FileProviderFactory.create()
+//                            .getFilePath(
+//                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
+//                                "pdf"
+//                            )
+
+//                        println("dadadada $cipherFilePath $decupsFile ${result2?.block!!} ${result2.authTag} ${result.sharedSecret}")
+//
+//                        val result3 =
+//                            cipherWrapper.decupsChachaFileCommon(
+//                                cipherFilePath,
+//                                decupsFile,
+//                                result2?.block!!,
+//                                result2.authTag,
+//                                result.sharedSecret
+//                            )
+//
+//
+//                        println("result3 $result3")
                         
                         
                     } catch (e: Exception) {
@@ -182,13 +193,13 @@ class TestScreen : Screen {
                 
             }
         }
-        
-        
-        LaunchedEffect(Unit) {
-            showFilePicker = true
-            
-        }
-        
+
+
+//        LaunchedEffect(Unit) {
+//            showFilePicker = true
+//
+//        }
+//
         
         
         SafeArea {
@@ -210,14 +221,28 @@ class TestScreen : Screen {
                         errorMessage = "Error: ${e.message}"
                     }
                 }) {
-                    Text("Generate Shared Secret")
+                    Text("Файл")
                 }
                 
+                Button(onClick = {
+                    try {
+                        
+                        val sendFile =
+                            FileProviderFactory.create().existingFile(cipherFilePath2, fileName2)
+                        
+                        
+                    } catch (e: Exception) {
+                        errorMessage = "Error: ${e.message}"
+                    }
+                }) {
+                    Text("Файл2")
+                }
                 Spacer(modifier = Modifier.height(8.dp))
                 
             }
         }
     }
 }
+
 
 

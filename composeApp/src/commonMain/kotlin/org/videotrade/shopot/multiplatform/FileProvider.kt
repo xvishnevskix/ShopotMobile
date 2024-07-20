@@ -20,6 +20,16 @@ expect class FileProvider {
         onProgress: (Float) -> Unit
     ): FileDTO?
     
+    
+    suspend fun uploadCipherFile(
+        url: String,
+        fileDirectory: String,
+        cipherFilePath: String,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): FileDTO?
+    
     fun getFileBytesForDir(fileDirectory: String): ByteArray?
     
     fun getFileData(fileDirectory: String): FileData?
