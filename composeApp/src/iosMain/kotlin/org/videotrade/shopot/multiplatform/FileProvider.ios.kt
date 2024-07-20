@@ -354,36 +354,6 @@ actual class FileProvider {
     }
     
     
-    actual fun dirTest(fileDirectory: String) {
-        println("fileData $fileDirectory")
-        
-        // Преобразование пути в NSURL
-        val file = NSURL.fileURLWithPath(fileDirectory)
-        val filePath = file.path ?: run {
-            println("Invalid file path")
-            return
-        }
-        
-        val fileManager = NSFileManager.defaultManager
-        val fileReadable = fileManager.isReadableFileAtPath(filePath)
-        
-        println("Checking file at path: $filePath")
-        println("File is readable: $fileReadable")
-        
-        if (fileReadable) {
-            // Файл существует и читаем, пытаемся загрузить его данные
-            val fileData = NSData.dataWithContentsOfURL(file)
-            
-            if (fileData != null) {
-                println("fileData ${fileData.toByteArray()}")
-            } else {
-                println("Failed to load file data")
-            }
-        } else {
-            println("File is not readable or does not exist")
-        }
-    }
-    
 }
 
 actual object FileProviderFactory {

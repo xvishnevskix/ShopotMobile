@@ -33,8 +33,8 @@ actual class CipherWrapper actual constructor(
         sharedSecret: ByteArray
     ): EncapsulationFileResult? {
         println("file $filePath")
-        return null
-//        return cipherInterface?.encupsChachaFile(file, cipherFilePath, sharedSecret)
+//        return null
+        return cipherInterface?.encupsChachaFile(filePath, cipherFilePath, sharedSecret)
     }
     
     actual fun decupsChachaFileCommon(
