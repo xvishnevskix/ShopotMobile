@@ -95,6 +95,7 @@ import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import io.ktor.utils.io.core.toByteArray
 import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -105,51 +106,52 @@ class TestScreen : Screen {
     @Composable
     override fun Content() {
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-        
+
         var publicKey by remember { mutableStateOf("opsda") }
         var cipherFilePath2 by remember { mutableStateOf("opsda") }
         var fileName2 by remember { mutableStateOf("opsda") }
-        
+
         var errorMessage by remember { mutableStateOf("") }
         var showFilePicker by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
-        
-        
+        var fileId by remember { mutableStateOf("") }
+
+
         val filterFileType = listOf("pdf", "zip")
         FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
             showFilePicker = false
             // do something with the file
-            
+
             println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
-            
+
             if (platformFile?.path !== null) {
-                
+
                 scope.launch {
                     try {
                         println("11111 ")
 //
 //
                         val publicKeyBytes = publicKey.toByteArray()
-                        
+
                         val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
-                        
+
                         val fileName = "cipherFile${Random.nextInt(0, 100000)}"
-                        
+
                         val cipherFilePath = FileProviderFactory.create()
                             .getFilePath(
                                 fileName,
                                 "cipher1"
                             )
-                        
+
                         cipherFilePath2 = cipherFilePath
                         fileName2 = fileName
-                        
+
                         println("platformFile ${platformFile.platformFile.toString()}")
-                        
-                        
+
+
                         val fileData = FileProviderFactory.create().getFileData(platformFile.path)
-                        
-                        
+
+
                         val sendFile = FileProviderFactory.create().uploadCipherFile(
                             "file/upload",
                             platformFile.path,
@@ -157,9 +159,10 @@ class TestScreen : Screen {
                             fileData?.fileType!!,
                             fileName
                         ) {
-                        
+
                         }
 
+                        fileId
 //                        val decupsFile = FileProviderFactory.create()
 //                            .getFilePath(
 //                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
@@ -179,18 +182,18 @@ class TestScreen : Screen {
 //
 //
 //                        println("result3 $result3")
-                        
-                        
+
+
                     } catch (e: Exception) {
-                        
+
                         println("error $e")
-                        
+
                     }
-                    
-                    
+
+
                 }
-                
-                
+
+
             }
         }
 
@@ -200,23 +203,23 @@ class TestScreen : Screen {
 //
 //        }
 //
-        
-        
+
+
         SafeArea {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(16.dp)
             ) {
-                
-                
+
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Button(onClick = {
                     try {
                         showFilePicker = true
-                        
-                        
+
+
                     } catch (e: Exception) {
                         errorMessage = "Error: ${e.message}"
                     }
@@ -224,25 +227,39 @@ class TestScreen : Screen {
                     Text("Отправить файл")
                 }
 
-//                Button(onClick = {
-//                    try {
-//
-//                        val sendFile =
-//                            FileProviderFactory.create().existingFile(cipherFilePath2, fileName2)
-//
-//
-//                    } catch (e: Exception) {
-//                        errorMessage = "Error: ${e.message}"
-//                    }
-//                }) {
-//                    Text("Файл2")
-//                }
-                Spacer(modifier = Modifier.height(8.dp))
-                
+                Button(onClick = {
+                    try {
+
+                        val fileProviderFactory = FileProviderFactory.create()
+
+                        val cipherFilePath = fileProviderFactory
+                            .getFilePath(
+                                "cipher File",
+                                "file"
+                            )
+                        val url = "${EnvironmentConfig.serverUrl}file/id/"
+
+             scope.launch {
+                 fileProviderFactory.downloadFileToDirectory(url, cipherFilePath) { newProgress ->
+
+                 }
+             }
+
+
+                    } catch (e: Exception) {
+                        errorMessage = "Error: ${e.message}"
+                    }
+                }) {
+                    Text("Скачать файл")
+
+
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                }
             }
         }
     }
-}
 
 
 
