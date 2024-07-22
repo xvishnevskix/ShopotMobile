@@ -1,6 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
@@ -35,11 +36,13 @@ import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -299,6 +302,7 @@ actual class FileProvider(private val applicationContext: Context) {
         filename: String,
         onProgress: (Float) -> Unit
     ): FileDTO? {
+        val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
         
         val client = HttpClient() {
             install(HttpTimeout) {
@@ -368,14 +372,23 @@ actual class FileProvider(private val applicationContext: Context) {
             }
             
             if (response.status.isSuccess()) {
+                
+                commonViewModel.toaster.show("isSuccess")
+                
+                
                 val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
                 return responseData
             } else {
+                
+                commonViewModel.toaster.show("Filed")
+                
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
                 return null
             }
             
         } catch (e: Exception) {
+            commonViewModel.toaster.show("Filed")
+            
             println("File upload failed: ${e.message}")
             return null
             

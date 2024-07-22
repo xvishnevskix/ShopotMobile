@@ -221,22 +221,22 @@ class TestScreen : Screen {
                         errorMessage = "Error: ${e.message}"
                     }
                 }) {
-                    Text("Файл")
+                    Text("Отправить файл")
                 }
-                
-                Button(onClick = {
-                    try {
-                        
-                        val sendFile =
-                            FileProviderFactory.create().existingFile(cipherFilePath2, fileName2)
-                        
-                        
-                    } catch (e: Exception) {
-                        errorMessage = "Error: ${e.message}"
-                    }
-                }) {
-                    Text("Файл2")
-                }
+
+//                Button(onClick = {
+//                    try {
+//
+//                        val sendFile =
+//                            FileProviderFactory.create().existingFile(cipherFilePath2, fileName2)
+//
+//
+//                    } catch (e: Exception) {
+//                        errorMessage = "Error: ${e.message}"
+//                    }
+//                }) {
+//                    Text("Файл2")
+//                }
                 Spacer(modifier = Modifier.height(8.dp))
                 
             }
