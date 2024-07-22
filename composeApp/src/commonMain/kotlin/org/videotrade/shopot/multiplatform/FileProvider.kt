@@ -38,6 +38,13 @@ expect class FileProvider {
     fun existingFile(fileName: String, fileType: String): String?
     
     
+    suspend fun downloadCipherFile(
+        url: String,
+        fileDirectory: String,
+        onProgress: (Float) -> Unit
+    )
+    
+    
 }
 
 expect object FileProviderFactory {

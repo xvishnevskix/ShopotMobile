@@ -1,7 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
@@ -36,12 +35,10 @@ import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
-import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -134,6 +131,70 @@ actual class FileProvider(private val applicationContext: Context) {
         }
     }
     
+    
+    @RequiresApi(Build.VERSION_CODES.O)
+    actual suspend fun downloadCipherFile(
+        url: String,
+        fileDirectory: String,
+        onProgress: (Float) -> Unit
+    ) {
+        val client = HttpClient()
+        
+        try {
+            client.prepareGet(url).execute { httpResponse ->
+                val channel: ByteReadChannel = httpResponse.body()
+                val totalBytes = httpResponse.contentLength() ?: -1L
+                val file = File(fileDirectory)
+                
+                file.outputStream().use { outputStream ->
+                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                    var bytesCopied: Long = 0
+                    var bytesRead: Int
+                    
+                    while (!channel.isClosedForRead) {
+                        bytesRead = channel.readAvailable(buffer, 0, buffer.size)
+                        if (bytesRead == -1) break
+                        
+                        outputStream.write(buffer, 0, bytesRead)
+                        bytesCopied += bytesRead
+                        
+                        if (totalBytes != -1L) {
+                            val progress =
+                                (bytesCopied.toDouble() / totalBytes * 100).roundToInt() / 100f
+                            onProgress(progress)
+                        }
+                    }
+                }
+
+//                val sharedSecret = getValueInStorage("sharedSecret")
+//
+//                println("result2 $sharedSecret")
+//
+//
+//                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+//
+//                val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+//                    fileDirectory,
+//                    cipherFilePath,
+//                    sharedSecret?.decodeBase64Bytes()!!
+//                )
+//
+//
+//                if (encupsChachaFileResult == null) {
+//
+//                    return null
+//                }
+                
+                onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
+                println("A file saved to ${file.path}")
+            }
+        } catch (e: Exception) {
+            println("Error file ${e}")
+            
+        } finally {
+            client.close()
+        }
+    }
     
     actual fun getFileBytesForDir(fileDirectory: String): ByteArray? {
         val uri = Uri.parse(fileDirectory)
@@ -313,6 +374,8 @@ actual class FileProvider(private val applicationContext: Context) {
         }
         
         val sharedSecret = getValueInStorage("sharedSecret")
+        
+        println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
         
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
