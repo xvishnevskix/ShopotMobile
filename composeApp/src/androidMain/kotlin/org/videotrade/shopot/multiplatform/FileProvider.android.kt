@@ -327,7 +327,7 @@ actual class FileProvider(private val applicationContext: Context) {
             
             return null
         }
-        println("result2 $fileDirectory")
+        println("result2 $encupsChachaFileResult")
         
         val file = File(cipherFilePath)
         if (!file.exists()) {
