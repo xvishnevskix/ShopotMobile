@@ -14,6 +14,7 @@ import com.google.firebase.Firebase
 import com.google.firebase.initialize
 import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
+import io.github.vinceglb.filekit.core.FileKit
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -43,6 +44,7 @@ class AndroidApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
+        
         initializeFactories(this)
         startKoin {
             modules(getSharedModules() + provideEncapsulateChecker())
@@ -78,6 +80,9 @@ class AppActivity : ComponentActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FileKit.init(this)
+        
+        
         
         Firebase.initialize(this) // This line
         getAppLifecycleObserver()

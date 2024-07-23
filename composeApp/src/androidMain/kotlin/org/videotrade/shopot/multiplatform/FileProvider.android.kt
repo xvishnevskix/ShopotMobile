@@ -11,6 +11,9 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
+import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
@@ -33,9 +36,13 @@ import io.ktor.util.decodeBase64Bytes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.androidSpecificApi.getContextObj
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
@@ -51,6 +58,32 @@ import kotlin.random.Random
 
 
 actual class FileProvider(private val applicationContext: Context) {
+    actual suspend fun pickFileAndGetAbsolutePath(pickerType: PickerType): PlatformFilePick? {
+        try {
+            val filePick = FileKit.pickFile(
+                type = pickerType,
+                mode = PickerMode.Single,
+            )
+            
+            var filePathNew = ""
+            
+            if (filePick?.uri !== null) {
+                
+                runBlocking {
+                    val file = getFileFromUri(getContextObj.getContext(), filePick.uri)
+                    filePathNew = file.absoluteFile.toString()
+                }
+                
+                return PlatformFilePick(filePick.uri.toString(), filePathNew)
+                
+            }
+            return null
+        } catch (e: Exception) {
+            return null
+        }
+    }
+    
+    
     actual fun getFilePath(fileName: String, fileType: String): String {
         // Используем каталог кэша приложения
         val directory = when (fileType) {
@@ -136,14 +169,27 @@ actual class FileProvider(private val applicationContext: Context) {
     actual suspend fun downloadCipherFile(
         url: String,
         fileDirectory: String,
+        dectyptFilePath: String,
         onProgress: (Float) -> Unit
     ) {
         val client = HttpClient()
         
+        println("starting decrypt")
+        
         try {
-            client.prepareGet(url).execute { httpResponse ->
+            val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+            
+            val token = getValueInStorage("accessToken")
+            
+            client.prepareGet(url) { header("Authorization", "Bearer $token") }
+                .execute { httpResponse ->
+                    val block = httpResponse.headers["block"]
+                    val authTag = httpResponse.headers["authTag"]
                 val channel: ByteReadChannel = httpResponse.body()
                 val totalBytes = httpResponse.contentLength() ?: -1L
+                    
+                    println("totalBytes $totalBytes")
+                
                 val file = File(fileDirectory)
                 
                 file.outputStream().use { outputStream ->
@@ -165,35 +211,162 @@ actual class FileProvider(private val applicationContext: Context) {
                         }
                     }
                 }
-
-//                val sharedSecret = getValueInStorage("sharedSecret")
-//
-//                println("result2 $sharedSecret")
-//
-//
-//                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-//
-//                val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
-//                    fileDirectory,
-//                    cipherFilePath,
-//                    sharedSecret?.decodeBase64Bytes()!!
-//                )
-//
-//
-//                if (encupsChachaFileResult == null) {
-//
-//                    return null
-//                }
+                    
+                    val sharedSecret = getValueInStorage("sharedSecret")
+                    
+                    val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                    
+                    val result3 =
+                        cipherWrapper.decupsChachaFileCommon(
+                            fileDirectory,
+                            dectyptFilePath,
+                            block.decodeBase64Bytes(),
+                            authTag.decodeBase64Bytes(),
+                            sharedSecret.decodeBase64Bytes()
+                        
+                        )
+                    
+                    
+                    if (result3 !== null) {
+                        
+                        
+                        commonViewModel.toaster.show("isSuccessDecrypt")
+                        
+                        
+                        println("encupsChachaFileResult $result3")
+                    }
+                
+                
                 
                 onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
                 println("A file saved to ${file.path}")
             }
         } catch (e: Exception) {
             println("Error file ${e}")
-            
         } finally {
             client.close()
         }
+    }
+    
+    actual suspend fun uploadCipherFile(
+        url: String,
+        fileDirectory: String,
+        cipherFilePath: String,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String? {
+        val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+        
+        val client = HttpClient() {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 600_000
+                connectTimeoutMillis = 600_000
+                socketTimeoutMillis = 600_000
+            }
+        }
+
+//        val sharedSecret = getValueInStorage("sharedSecret")
+        val sharedSecret = "OHO0K3XHfx8T5nO095t+jLuwO2MvyJjLlpEZW/MBt7o="
+        
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+        
+        val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+            fileDirectory,
+            cipherFilePath,
+            sharedSecret?.decodeBase64Bytes()!!
+        )
+        
+        
+        if (encupsChachaFileResult == null) {
+            
+            return null
+        }
+        println("result2 $encupsChachaFileResult")
+        
+        val file = File(cipherFilePath)
+        if (!file.exists()) {
+            println("File not found: ${file.absolutePath}")
+            return null
+        }
+        
+        println("Local file path: ${file.absolutePath}")
+        
+        try {
+            val token = getValueInStorage("accessToken")
+            
+            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                setBody(MultiPartFormDataContent(
+                    formData {
+                        append(
+                            "file",
+                            InputProvider(file.length()) { file.inputStream().asInput() },
+                            Headers.build {
+                                append(HttpHeaders.ContentType, contentType)
+                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+                            }
+                        )
+                        // Добавляем block и authTag как дополнительные поля
+                        append(
+                            "encupsFile",
+                            Json.encodeToString(
+                                EncapsulationFileResult.serializer(),
+                                encupsChachaFileResult
+                            )
+                        )
+                    }
+                ))
+                header(HttpHeaders.Authorization, "Bearer $token")
+                
+                onUpload { bytesSentTotal, contentLength ->
+                    if (contentLength != -1L) { // -1 means that the content length is unknown
+                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
+                        onProgress(progress)
+                    }
+                }
+            }
+            
+            if (response.status.isSuccess()) {
+                
+                commonViewModel.toaster.show("isSuccess")
+
+
+//                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
+//                return responseData
+                
+                val jsonElement = Json.parseToJsonElement(response.bodyAsText())
+                
+                println("jsonElementFile ${jsonElement}")
+                
+                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                
+                println("id $id")
+                
+                return id
+                
+            } else {
+                
+                commonViewModel.toaster.show("Filed")
+                
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                return null
+            }
+            
+        } catch (e: Exception) {
+            commonViewModel.toaster.show("Filed")
+            
+            println("File upload failed: ${e.message}")
+            return null
+            
+        } finally {
+            
+            client.close()
+            
+            
+        }
+        
+        return null
+        
     }
     
     actual fun getFileBytesForDir(fileDirectory: String): ByteArray? {
@@ -206,6 +379,9 @@ actual class FileProvider(private val applicationContext: Context) {
     actual fun getFileData(fileDirectory: String): FileData? {
         println("uri $fileDirectory")
         val uri = Uri.parse(fileDirectory)
+        
+        println("uri $uri")
+        
         return getData(applicationContext, uri)
     }
     
@@ -215,6 +391,8 @@ actual class FileProvider(private val applicationContext: Context) {
         
         // Получаем MIME-тип из ContentResolver
         val mimeType = contentResolver.getType(uri)
+        
+        println("mimeType $mimeType")
         
         // Определяем тип файла
         val fileType = mimeType?.substringAfter("application/") ?: run {
@@ -355,112 +533,6 @@ actual class FileProvider(private val applicationContext: Context) {
     }
     
     
-    actual suspend fun uploadCipherFile(
-        url: String,
-        fileDirectory: String,
-        cipherFilePath: String,
-        contentType: String,
-        filename: String,
-        onProgress: (Float) -> Unit
-    ): FileDTO? {
-        val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
-        
-        val client = HttpClient() {
-            install(HttpTimeout) {
-                requestTimeoutMillis = 600_000
-                connectTimeoutMillis = 600_000
-                socketTimeoutMillis = 600_000
-            }
-        }
-        
-        val sharedSecret = getValueInStorage("sharedSecret")
-        
-        println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
-        
-        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-        
-        val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
-            fileDirectory,
-            cipherFilePath,
-            sharedSecret?.decodeBase64Bytes()!!
-        )
-        
-        
-        if (encupsChachaFileResult == null) {
-            
-            return null
-        }
-        println("result2 $encupsChachaFileResult")
-        
-        val file = File(cipherFilePath)
-        if (!file.exists()) {
-            println("File not found: ${file.absolutePath}")
-            return null
-        }
-        
-        println("Local file path: ${file.absolutePath}")
-        
-        try {
-            val token = getValueInStorage("accessToken")
-            
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-                setBody(MultiPartFormDataContent(
-                    formData {
-                        append(
-                            "file",
-                            InputProvider(file.length()) { file.inputStream().asInput() },
-                            Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
-                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                            }
-                        )
-                        // Добавляем block и authTag как дополнительные поля
-                        append(
-                            "encupsFile",
-                            Json.encodeToString(
-                                EncapsulationFileResult.serializer(),
-                                encupsChachaFileResult
-                            )
-                        )
-                    }
-                ))
-                header(HttpHeaders.Authorization, "Bearer $token")
-                
-                onUpload { bytesSentTotal, contentLength ->
-                    if (contentLength != -1L) { // -1 means that the content length is unknown
-                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
-                        onProgress(progress)
-                    }
-                }
-            }
-            
-            if (response.status.isSuccess()) {
-                
-                commonViewModel.toaster.show("isSuccess")
-                
-                
-                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
-                return responseData
-            } else {
-                
-                commonViewModel.toaster.show("Filed")
-                
-                println("Failed to retrieve data: ${response.status.description} ${response.request}")
-                return null
-            }
-            
-        } catch (e: Exception) {
-            commonViewModel.toaster.show("Filed")
-            
-            println("File upload failed: ${e.message}")
-            return null
-            
-        } finally {
-            client.close()
-        }
-    }
-    
-    
 }
 
 
@@ -535,7 +607,5 @@ private fun readBytesFromUri(context: Context, uri: Uri): ByteArray? {
     
     return byteArrayOutputStream.toByteArray()
 }
-
-
 
 

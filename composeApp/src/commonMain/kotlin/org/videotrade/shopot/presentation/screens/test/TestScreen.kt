@@ -90,8 +90,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import com.darkrockstudios.libraries.mpfilepicker.FilePicker
-import io.ktor.utils.io.core.toByteArray
+import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
@@ -113,87 +112,110 @@ class TestScreen : Screen {
         var showFilePicker by remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         var fileId by remember { mutableStateOf("") }
-        
-        
-        val filterFileType = listOf("pdf", "zip")
-        FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
-            showFilePicker = false
-            // do something with the file
-            
-            println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
-            
-            if (platformFile?.path !== null) {
-                
-                scope.launch {
-                    try {
-                        println("11111 ")
+
+
+//        val filterFileType = listOf("pdf", "zip")
+//        FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
+//            showFilePicker = false
+//            // do something with the file
+//
+//            println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
+//
+//            if (platformFile?.path !== null) {
+//
+//                scope.launch {
+//                    try {
+//                        println("11111 ")
+////
+////
+//                        val publicKeyBytes = publicKey.toByteArray()
+//
+//                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
+//
+//                        val fileName = "cipherFile${Random.nextInt(0, 100000)}"
+//
+//                        val cipherFilePath = FileProviderFactory.create()
+//                            .getFilePath(
+//                                fileName,
+//                                "cipher1"
+//                            )
+//
+//                        cipherFilePath2 = cipherFilePath
+//                        fileName2 = fileName
+//
+//                        println("platformFile ${platformFile.path}")
 //
 //
-                        val publicKeyBytes = publicKey.toByteArray()
-                        
-                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
-                        
-                        val fileName = "cipherFile${Random.nextInt(0, 100000)}"
-                        
-                        val cipherFilePath = FileProviderFactory.create()
-                            .getFilePath(
-                                fileName,
-                                "cipher1"
-                            )
-                        
-                        cipherFilePath2 = cipherFilePath
-                        fileName2 = fileName
-                        
-                        println("platformFile ${platformFile.platformFile.toString()}")
-                        
-                        
-                        val fileData = FileProviderFactory.create().getFileData(platformFile.path)
-                        
-                        
-                        val sendFile = FileProviderFactory.create().uploadCipherFile(
-                            "file/upload",
-                            platformFile.path,
-                            cipherFilePath,
-                            fileData?.fileType!!,
-                            fileName
-                        ) {
-                        
-                        }
-                        
-                        fileId
+//                        val fileData = FileProviderFactory.create().getFileData(platformFile.path)
+//
+//                        println("fileData $fileData")
+
+
+//                        val sendFile = FileProviderFactory.create().uploadCipherFile(
+//                            "file/upload",
+//                            platformFile.path,
+//                            cipherFilePath,
+//                            fileData?.fileType!!,
+//                            fileName
+//                        ) {
+//
+//                        }
+//
+//
+//                        if (sendFile !== null)
+//                            fileId = sendFile
+
+//                        val sharedSecret = getValueInStorage("sharedSecret")
+//
+//                        println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
+//
+//                        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+//
+//                        val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+//                            platformFile.path,
+//                            cipherFilePath,
+//                            sharedSecret?.decodeBase64Bytes()!!
+//                        )
+//
+//
+//                        println("result2 $encupsChachaFileResult")
+//
 //                        val decupsFile = FileProviderFactory.create()
 //                            .getFilePath(
 //                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
 //                                "pdf"
 //                            )
-
-//                        println("dadadada $cipherFilePath $decupsFile ${result2?.block!!} ${result2.authTag} ${result.sharedSecret}")
+//
+//
+//
+//                        println("dadadada ${EncapsulationMessageResult(encupsChachaFileResult?.block!!, encupsChachaFileResult.authTag, sharedSecret?.decodeBase64Bytes()!!)} $cipherFilePath $decupsFile")
 //
 //                        val result3 =
 //                            cipherWrapper.decupsChachaFileCommon(
 //                                cipherFilePath,
 //                                decupsFile,
-//                                result2?.block!!,
-//                                result2.authTag,
-//                                result.sharedSecret
+//                                encupsChachaFileResult?.block!!,
+//                                encupsChachaFileResult.authTag,
+//                                sharedSecret?.decodeBase64Bytes()!!
+//
 //                            )
 //
 //
 //                        println("result3 $result3")
-                    
-                    
-                    } catch (e: Exception) {
-                        
-                        println("error $e")
-                        
-                    }
-                    
-                    
-                }
-                
-                
-            }
-        }
+
+
+//                    } catch (e: Exception) {
+//
+//                        println("error $e")
+//
+//                    }
+//
+//
+//                }
+//
+//
+//            }
+//        }
 
 
 //        LaunchedEffect(Unit) {
@@ -215,8 +237,51 @@ class TestScreen : Screen {
                 
                 Button(onClick = {
                     try {
-                        showFilePicker = true
-                        
+                        scope.launch {
+                            val absltPath = FileProviderFactory.create()
+                                .pickFileAndGetAbsolutePath(PickerType.File(listOf("pdf", "zip")))
+                            
+                            
+                            if (absltPath !== null) {
+                                
+                                val fileName = "cipherFile${Random.nextInt(0, 100000)}"
+                                
+                                
+                                val fileData =
+                                    FileProviderFactory.create()
+                                        .getFileData(absltPath.fileContentPath)
+                                
+                                
+                                if (fileData !== null) {
+                                    val cipherFilePath = FileProviderFactory.create()
+                                        .getFilePath(
+                                            fileName,
+                                            fileData.fileType
+                                        )
+                                    
+                                    
+                                    val sendFile = FileProviderFactory.create().uploadCipherFile(
+                                        "file/upload",
+                                        absltPath.fileAbsolutePath,
+                                        cipherFilePath,
+                                        fileData.fileType,
+                                        fileName
+                                    ) {
+                                    
+                                    }
+                                    
+                                    
+                                    if (sendFile != null) {
+                                        fileId = sendFile
+                                    }
+                                    
+                                }
+                                
+                                
+                            }
+                            
+                            
+                        }
                         
                     } catch (e: Exception) {
                         errorMessage = "Error: ${e.message}"
@@ -230,17 +295,28 @@ class TestScreen : Screen {
                         
                         val fileProviderFactory = FileProviderFactory.create()
                         
+                        val cipherFilefileName = "cipherFileDec${Random.nextInt(0, 100000)}"
+                        val decryptFilefileName = "decryptSuccess${Random.nextInt(0, 100000)}.pdf"
+                        
+                        
                         val cipherFilePath = fileProviderFactory
                             .getFilePath(
-                                "cipher File",
-                                "file"
+                                cipherFilefileName,
+                                "pdf"
                             )
-                        val url = "${EnvironmentConfig.serverUrl}file/id/"
+                        
+                        val dectyptFilePath = fileProviderFactory
+                            .getFilePath(
+                                decryptFilefileName,
+                                "pdf"
+                            )
+                        val url = "${EnvironmentConfig.serverUrl}file/id/$fileId"
                         
                         scope.launch {
-                            fileProviderFactory.downloadFileToDirectory(
+                            fileProviderFactory.downloadCipherFile(
                                 url,
-                                cipherFilePath
+                                cipherFilePath,
+                                dectyptFilePath
                             ) { newProgress ->
                             
                             }

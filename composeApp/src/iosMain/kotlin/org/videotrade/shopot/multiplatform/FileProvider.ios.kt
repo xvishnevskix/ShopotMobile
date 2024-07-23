@@ -1,6 +1,9 @@
 package org.videotrade.shopot.multiplatform
 
 
+import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.core.PickerMode
+import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.call.receive
@@ -27,6 +30,7 @@ import io.ktor.http.contentLength
 import io.ktor.http.headersOf
 import io.ktor.http.isSuccess
 import io.ktor.util.InternalAPI
+import io.ktor.util.decodeBase64Bytes
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.CPointer
@@ -40,9 +44,11 @@ import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
 import okio.Buffer
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
@@ -86,6 +92,57 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 actual class FileProvider {
+    
+    actual suspend fun pickAndSendFileCipher(pickerType: PickerType) {
+        try {
+            val filePick = FileKit.pickFile(
+                type = pickerType,
+                mode = PickerMode.Single,
+            )
+            
+            val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+            println("file.path1")
+            
+            
+            val sharedSecret = getValueInStorage("sharedSecret")
+            
+            println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
+            
+            val fileName = "cipherFile${Random.nextInt(0, 100000)}"
+            
+            val cipherFilePath = FileProviderFactory.create()
+                .getFilePath(
+                    fileName,
+                    "pdf"
+                )
+            
+            
+            
+            println("encupsChachaFileResult ${filePick?.path}")
+
+//            if(filePick?.uri !== null) {
+//                var filePathNew = ""
+//
+//                runBlocking {
+//                    val file = getFileFromUri(getContextObj.getContext(), filePick.uri)
+//                    filePathNew = file.absoluteFile.toString()
+//                }
+//
+//                val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+//                    filePathNew,
+//                    cipherFilePath,
+//                    sharedSecret?.decodeBase64Bytes()!!
+//                )
+//
+//                println("encupsChachaFileResult ${encupsChachaFileResult}")
+//            }
+            
+        } catch (e: Exception) {
+        
+        }
+        
+        
+    }
     
     actual fun getFilePath(fileName: String, fileType: String): String {
         val directory: NSURL? = when (fileType) {
@@ -352,6 +409,27 @@ actual class FileProvider {
     actual fun getFileBytesForDir(fileDirectory: String): ByteArray? {
         TODO("Not yet implemented")
     }
+    
+    actual suspend fun uploadCipherFile(
+        url: String,
+        fileDirectory: String,
+        cipherFilePath: String,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String? {
+        TODO("Not yet implemented")
+    }
+    
+    actual suspend fun downloadCipherFile(
+        url: String,
+        fileDirectory: String,
+        dectyptFilePath: String,
+        onProgress: (Float) -> Unit
+    ) {
+    }
+    
+
     
     
 }

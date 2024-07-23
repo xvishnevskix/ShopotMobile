@@ -98,11 +98,12 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.peekaboo.ui)
             implementation(libs.peekaboo.image.picker)
-            implementation(libs.mpfilepicker)
             implementation(libs.sonner)
             api(libs.image.loader.v181)
             api(libs.kmpnotifier)
             implementation(libs.firebase.common)
+            implementation(libs.filekit.core)
+            
         }
         
         commonTest.dependencies {

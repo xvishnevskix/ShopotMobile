@@ -65,7 +65,6 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
-import com.darkrockstudios.libraries.mpfilepicker.FilePicker
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import kotlinx.coroutines.delay
@@ -110,79 +109,79 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var isStartRecording by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
     var showFilePicker by remember { mutableStateOf(false) }
-    
-    
-    val filterFileType = listOf("pdf", "zip")
-    FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
-        showFilePicker = false
-        // do something with the file
-        
-        println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
-        
-        if (platformFile?.path !== null) {
-            
-            scope.launch {
-                try {
-                    val fileData = FileProviderFactory.create().getFileData(platformFile.path)
-                    
-                    println("fileData $fileData ${Random.nextInt(1, 501)}")
-         
-                 
-                    if (fileData !== null) {
-                        
-                        viewModel.addMessage(
-                            MessageItem(
-                                Random.nextInt(1, 501).toString(),
-                                viewModel.profile.value.id,
-                                "",
-                                "1",
-                                "1",
-                                0,
-                                getCurrentTimeList(),
-                                false,
-                                chat.id,
-                                false,
-                                true,
-                                listOf(
-                                    Attachment(
-                                        "1",
-                                        "1",
-                                        viewModel.profile.value.id,
-                                        "",
-                                        fileData.fileType,
-                                        fileData.fileName,
-                                        platformFile.path,
-                                        fileData.fileSize
-                                    )
-                                ),
-                                upload = true,
-                                uploadId = Random.nextInt(1, 501).toString()
-                            )
-                        )
 
-//                        viewModel.sendAttachments(
-//                            content = text,
-//                            fromUser = viewModel.profile.value.id,
-//                            chatId = chat.id,
-//                            contentType = fileData.fileType,
-//                            fileName = fileData.fileName,
-//                            fileDir = platformFile.path,
+
+//    val filterFileType = listOf("pdf", "zip")
+//    FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
+//        showFilePicker = false
+//        // do something with the file
+//
+//        println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
+//
+//        if (platformFile?.path !== null) {
+//
+//            scope.launch {
+//                try {
+//                    val fileData = FileProviderFactory.create().getFileData(platformFile.path)
+//
+//                    println("fileData $fileData ${Random.nextInt(1, 501)}")
+//
+//
+//                    if (fileData !== null) {
+//
+//                        viewModel.addMessage(
+//                            MessageItem(
+//                                Random.nextInt(1, 501).toString(),
+//                                viewModel.profile.value.id,
+//                                "",
+//                                "1",
+//                                "1",
+//                                0,
+//                                getCurrentTimeList(),
+//                                false,
+//                                chat.id,
+//                                false,
+//                                true,
+//                                listOf(
+//                                    Attachment(
+//                                        "1",
+//                                        "1",
+//                                        viewModel.profile.value.id,
+//                                        "",
+//                                        fileData.fileType,
+//                                        fileData.fileName,
+//                                        platformFile.path,
+//                                        fileData.fileSize
+//                                    )
+//                                ),
+//                                upload = true,
+//                                uploadId = Random.nextInt(1, 501).toString()
+//                            )
 //                        )
-                    }
-                    
-                    
-                } catch (e: Exception) {
-                    
-                    println("error $e")
-                    
-                }
-                
-                
-            }
-            
-            
-        }
-    }
+//
+////                        viewModel.sendAttachments(
+////                            content = text,
+////                            fromUser = viewModel.profile.value.id,
+////                            chatId = chat.id,
+////                            contentType = fileData.fileType,
+////                            fileName = fileData.fileName,
+////                            fileDir = platformFile.path,
+////                        )
+//                    }
+//
+//
+//                } catch (e: Exception) {
+//
+//                    println("error $e")
+//
+//                }
+//
+//
+//            }
+//
+//
+//        }
+//    }
     
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value

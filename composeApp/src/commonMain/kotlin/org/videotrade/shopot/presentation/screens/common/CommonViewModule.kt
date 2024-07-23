@@ -31,6 +31,7 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
 
@@ -140,7 +141,14 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                             }
                                         )
                                         
-                                        println("successSharedSecret ${result.sharedSecret.encodeBase64()}")
+                                        println(
+                                            "successSharedSecret111 ${
+                                                EncapsulationFileResult(
+                                                    result.sharedSecret,
+                                                    result.sharedSecret
+                                                )
+                                            }"
+                                        )
                                         
 
                                         addValueInStorage(

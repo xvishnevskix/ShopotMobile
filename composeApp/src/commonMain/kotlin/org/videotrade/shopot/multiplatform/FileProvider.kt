@@ -1,9 +1,12 @@
 package org.videotrade.shopot.multiplatform
 
-import com.eygraber.uri.Uri
+import io.github.vinceglb.filekit.core.PickerType
 import org.videotrade.shopot.domain.model.FileDTO
 
 expect class FileProvider {
+    
+    suspend fun pickFileAndGetAbsolutePath(pickerType: PickerType): PlatformFilePick?
+    
     fun getFilePath(fileName: String, fileType: String): String
     
     suspend fun downloadFileToDirectory(
@@ -28,7 +31,7 @@ expect class FileProvider {
         contentType: String,
         filename: String,
         onProgress: (Float) -> Unit
-    ): FileDTO?
+    ): String?
     
     fun getFileBytesForDir(fileDirectory: String): ByteArray?
     
@@ -41,6 +44,7 @@ expect class FileProvider {
     suspend fun downloadCipherFile(
         url: String,
         fileDirectory: String,
+        dectyptFilePath: String,
         onProgress: (Float) -> Unit
     )
     
@@ -56,4 +60,9 @@ data class FileData(
     val fileName: String,
     val fileType: String,
     val fileSize: Int,
+)
+
+data class PlatformFilePick(
+    val fileContentPath: String,
+    val fileAbsolutePath: String
 )
