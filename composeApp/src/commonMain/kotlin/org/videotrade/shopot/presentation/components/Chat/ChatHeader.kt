@@ -80,7 +80,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
         
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth(0.85f).padding(end = 5.dp)
         ) {
             
             Avatar(

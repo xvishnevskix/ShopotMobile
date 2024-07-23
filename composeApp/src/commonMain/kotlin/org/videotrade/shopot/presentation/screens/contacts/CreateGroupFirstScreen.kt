@@ -142,7 +142,7 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding()) {
                     Avatar(item.icon, 80.dp)
-                    Column(modifier = Modifier.padding(start = 16.dp)) {
+                    Column(modifier = Modifier.padding(start = 16.dp).fillMaxWidth(0.8f)) {
                         Text(
                             text = listOfNotNull(item.firstName, item.lastName)
                                 .joinToString(" ")
@@ -152,7 +152,7 @@ private fun ChatItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                                 } ?: "",
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            textAlign = TextAlign.Center,
+                            textAlign = TextAlign.Start,
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
                             color = Color(0xFF000000)

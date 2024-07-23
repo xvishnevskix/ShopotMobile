@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -135,7 +136,10 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                             )
                                         }
                                         
-                                        Row {
+                                        Row (
+                                            horizontalArrangement = Arrangement.Center,
+                                            modifier = Modifier.fillMaxWidth()
+                                        ) {
                                             Text(
                                                 "Все чаты зашифрованы  ",
                                                 textAlign = TextAlign.Center,
@@ -147,7 +151,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                             )
                                             Text(
                                                 "ассиметричным и постквантовым шифрованием",
-                                                textAlign = TextAlign.Center,
+                                                textAlign = TextAlign.Start,
                                                 fontSize = 10.sp,
                                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                                                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),

@@ -84,7 +84,7 @@ fun UserComponentItem(
                 
                 Text(
                     text = displayName,
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
