@@ -263,7 +263,6 @@ class TestScreen : Screen {
                                     val sendFile = FileProviderFactory.create().uploadCipherFile(
                                         "file/upload",
                                         absltPath.fileAbsolutePath,
-                                        cipherFilePath,
                                         fileData.fileType,
                                         fileName
                                     ) {

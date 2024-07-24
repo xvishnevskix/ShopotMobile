@@ -166,15 +166,10 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                     val introViewModel: IntroViewModel =
                                         KoinPlatform.getKoin().get()
                                     
-                                    
-                                    val sharedSecret = getValueInStorage("sharedSecret")
-                                    
-                                    
                                     updateNotificationToken()
-                                    
-                                    
-                                    navigator.push(TestScreen())
-//                                    introViewModel.fetchContacts(navigator)
+
+//                                    navigator.push(TestScreen())
+                                    introViewModel.fetchContacts(navigator)
                                     
                                 }
                             }

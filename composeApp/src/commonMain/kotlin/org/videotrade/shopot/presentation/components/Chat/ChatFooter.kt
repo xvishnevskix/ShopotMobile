@@ -51,7 +51,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -67,6 +66,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
@@ -109,79 +109,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var isStartRecording by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
     var showFilePicker by remember { mutableStateOf(false) }
-
-
-//    val filterFileType = listOf("pdf", "zip")
-//    FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
-//        showFilePicker = false
-//        // do something with the file
-//
-//        println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
-//
-//        if (platformFile?.path !== null) {
-//
-//            scope.launch {
-//                try {
-//                    val fileData = FileProviderFactory.create().getFileData(platformFile.path)
-//
-//                    println("fileData $fileData ${Random.nextInt(1, 501)}")
-//
-//
-//                    if (fileData !== null) {
-//
-//                        viewModel.addMessage(
-//                            MessageItem(
-//                                Random.nextInt(1, 501).toString(),
-//                                viewModel.profile.value.id,
-//                                "",
-//                                "1",
-//                                "1",
-//                                0,
-//                                getCurrentTimeList(),
-//                                false,
-//                                chat.id,
-//                                false,
-//                                true,
-//                                listOf(
-//                                    Attachment(
-//                                        "1",
-//                                        "1",
-//                                        viewModel.profile.value.id,
-//                                        "",
-//                                        fileData.fileType,
-//                                        fileData.fileName,
-//                                        platformFile.path,
-//                                        fileData.fileSize
-//                                    )
-//                                ),
-//                                upload = true,
-//                                uploadId = Random.nextInt(1, 501).toString()
-//                            )
-//                        )
-//
-////                        viewModel.sendAttachments(
-////                            content = text,
-////                            fromUser = viewModel.profile.value.id,
-////                            chatId = chat.id,
-////                            contentType = fileData.fileType,
-////                            fileName = fileData.fileName,
-////                            fileDir = platformFile.path,
-////                        )
-//                    }
-//
-//
-//                } catch (e: Exception) {
-//
-//                    println("error $e")
-//
-//                }
-//
-//
-//            }
-//
-//
-//        }
-//    }
     
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
@@ -287,7 +214,58 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = "Файл",
             imagePath = Res.drawable.menu_file,
             onClick = {
-                showFilePicker = true
+                
+                scope.launch {
+                    try {
+                        val absltPath = FileProviderFactory.create()
+                            .pickFileAndGetAbsolutePath(PickerType.File(listOf("pdf", "zip")))
+                        
+                        if (absltPath !== null) {
+                            val fileData =
+                                FileProviderFactory.create().getFileData(absltPath.fileContentPath)
+                            
+                            println("fileData $fileData ${Random.nextInt(1, 501)}")
+                            
+                            val uploadIdd = Random.nextInt(1, 501).toString()
+                            
+                            if (fileData !== null) {
+                                viewModel.addMessage(
+                                    MessageItem(
+                                        Random.nextInt(1, 501).toString(),
+                                        viewModel.profile.value.id,
+                                        "",
+                                        "",
+                                        "",
+                                        0,
+                                        getCurrentTimeList(),
+                                        false,
+                                        chat.id,
+                                        false,
+                                        true,
+                                        listOf(
+                                            Attachment(
+                                                Random.nextInt(1, 501).toString(),
+                                                Random.nextInt(1, 501).toString(),
+                                                viewModel.profile.value.id,
+                                                Random.nextInt(1, 501).toString(),
+                                                fileData.fileType,
+                                                fileData.fileName,
+                                                originalFileDir = absltPath.fileAbsolutePath,
+                                                fileData.fileSize
+                                            )
+                                        ),
+                                        upload = true,
+                                        uploadId = Random.nextInt(1, 501).toString()
+                                    )
+                                )
+                            }
+                        }
+                        
+                        
+                    } catch (e: Exception) {
+                        println("Error: ${e.message}")
+                    }
+                }
             }
         ),
 //     MenuItem(

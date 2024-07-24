@@ -185,32 +185,32 @@ actual class FileProvider(private val applicationContext: Context) {
                 .execute { httpResponse ->
                     val block = httpResponse.headers["block"]
                     val authTag = httpResponse.headers["authTag"]
-                val channel: ByteReadChannel = httpResponse.body()
-                val totalBytes = httpResponse.contentLength() ?: -1L
+                    val channel: ByteReadChannel = httpResponse.body()
+                    val totalBytes = httpResponse.contentLength() ?: -1L
                     
                     println("totalBytes $totalBytes")
-                
-                val file = File(fileDirectory)
-                
-                file.outputStream().use { outputStream ->
-                    val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-                    var bytesCopied: Long = 0
-                    var bytesRead: Int
                     
-                    while (!channel.isClosedForRead) {
-                        bytesRead = channel.readAvailable(buffer, 0, buffer.size)
-                        if (bytesRead == -1) break
+                    val file = File(fileDirectory)
+                    
+                    file.outputStream().use { outputStream ->
+                        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+                        var bytesCopied: Long = 0
+                        var bytesRead: Int
                         
-                        outputStream.write(buffer, 0, bytesRead)
-                        bytesCopied += bytesRead
-                        
-                        if (totalBytes != -1L) {
-                            val progress =
-                                (bytesCopied.toDouble() / totalBytes * 100).roundToInt() / 100f
-                            onProgress(progress)
+                        while (!channel.isClosedForRead) {
+                            bytesRead = channel.readAvailable(buffer, 0, buffer.size)
+                            if (bytesRead == -1) break
+                            
+                            outputStream.write(buffer, 0, bytesRead)
+                            bytesCopied += bytesRead
+                            
+                            if (totalBytes != -1L) {
+                                val progress =
+                                    (bytesCopied.toDouble() / totalBytes * 100).roundToInt() / 100f
+                                onProgress(progress)
+                            }
                         }
                     }
-                }
                     
                     val sharedSecret = getValueInStorage("sharedSecret")
                     
@@ -220,9 +220,9 @@ actual class FileProvider(private val applicationContext: Context) {
                         cipherWrapper.decupsChachaFileCommon(
                             fileDirectory,
                             dectyptFilePath,
-                            block.decodeBase64Bytes(),
-                            authTag.decodeBase64Bytes(),
-                            sharedSecret.decodeBase64Bytes()
+                            block?.decodeBase64Bytes()!!,
+                            authTag?.decodeBase64Bytes()!!,
+                            sharedSecret?.decodeBase64Bytes()!!
                         
                         )
                     
@@ -235,12 +235,12 @@ actual class FileProvider(private val applicationContext: Context) {
                         
                         println("encupsChachaFileResult $result3")
                     }
-                
-                
-                
-                onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
-                println("A file saved to ${file.path}")
-            }
+                    
+                    
+                    
+                    onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
+                    println("A file saved to ${file.path}")
+                }
         } catch (e: Exception) {
             println("Error file ${e}")
         } finally {
@@ -251,11 +251,11 @@ actual class FileProvider(private val applicationContext: Context) {
     actual suspend fun uploadCipherFile(
         url: String,
         fileDirectory: String,
-        cipherFilePath: String,
         contentType: String,
         filename: String,
         onProgress: (Float) -> Unit
     ): String? {
+        println("11111111")
         val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
         
         val client = HttpClient() {
@@ -265,18 +265,31 @@ actual class FileProvider(private val applicationContext: Context) {
                 socketTimeoutMillis = 600_000
             }
         }
-
-//        val sharedSecret = getValueInStorage("sharedSecret")
-        val sharedSecret = "OHO0K3XHfx8T5nO095t+jLuwO2MvyJjLlpEZW/MBt7o="
+        
+        val sharedSecret = getValueInStorage("sharedSecret")
         
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+        
+        
+        println("22222 $filename $contentType")
+        
+        val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
+        
+        
+        val cipherFilePath = FileProviderFactory.create()
+            .getFilePath(
+                fileNameCipher,
+                "cipher"
+            )
+        
+        println("3333333")
         
         val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
             fileDirectory,
             cipherFilePath,
             sharedSecret?.decodeBase64Bytes()!!
         )
-        
+        println("444444")
         
         if (encupsChachaFileResult == null) {
             
@@ -289,6 +302,7 @@ actual class FileProvider(private val applicationContext: Context) {
             println("File not found: ${file.absolutePath}")
             return null
         }
+        println("11111111 ${file.inputStream().asInput()}")
         
         println("Local file path: ${file.absolutePath}")
         
@@ -326,13 +340,11 @@ actual class FileProvider(private val applicationContext: Context) {
                 }
             }
             
+            
+            println("11111111 ${response.status} ${response.toString()}")
+            
             if (response.status.isSuccess()) {
-                
-                commonViewModel.toaster.show("isSuccess")
-
-
-//                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
-//                return responseData
+                println("11111111")
                 
                 val jsonElement = Json.parseToJsonElement(response.bodyAsText())
                 
@@ -341,6 +353,8 @@ actual class FileProvider(private val applicationContext: Context) {
                 val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
                 
                 println("id $id")
+                
+                file.delete()
                 
                 return id
                 

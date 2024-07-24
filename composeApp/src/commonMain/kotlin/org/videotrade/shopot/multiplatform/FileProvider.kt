@@ -27,7 +27,6 @@ expect class FileProvider {
     suspend fun uploadCipherFile(
         url: String,
         fileDirectory: String,
-        cipherFilePath: String,
         contentType: String,
         filename: String,
         onProgress: (Float) -> Unit

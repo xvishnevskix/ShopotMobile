@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
@@ -64,14 +65,12 @@ fun FileMessage(
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
     
     var isLoading by remember { mutableStateOf(false) }
+    var isStartCipherLoading by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0f) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var filePath by remember { mutableStateOf("") }
     val audioFile by remember { mutableStateOf(FileProviderFactory.create()) }
 //    var isUploading by remember { mutableStateOf(false) }
-    
-    
-    
     
     
     LaunchedEffect(message) {
@@ -83,38 +82,48 @@ fun FileMessage(
             
             
             downloadJob = scope.launch {
-                isLoading = true
-                
-                message.attachments?.get(0)?.let { attachment ->
-                    val fileId = FileProviderFactory.create().uploadFileToDirectory(
-                        "file/upload",
-                        attachment.originalFileDir!!,
-                        attachment.type,
-                        attachment.name
-                    ) {
-                        progress = it / 100f
-                        println("progress ${it}")
-                    }
-                    
-                    
-                    
-                    if (fileId !== null) {
-                        println("fileId ${fileId.id}")
-                        viewModel.sendLargeFileAttachments(
-                            message.content,
-                            message.fromUser,
-                            message.chatId,
-                            message.uploadId!!,
-                            fileId.id
-                        )
-                    }
-                    
-                    
-                }
-                
-                isLoading = false
-                progress = 1f
-                isLoading = false
+//                isLoading = true
+                isStartCipherLoading = true
+//                message.attachments?.get(0)?.let { attachment ->
+////                    val fileId = FileProviderFactory.create().uploadCipherFile(
+////                        "file/upload",
+////                        attachment.originalFileDir!!,
+////                        attachment.type,
+////                        attachment.name
+////                    ) {
+////                        progress = it / 100f
+////                        println("progress ${it}")
+////                    }
+//
+//                    val fileId = FileProviderFactory.create().uploadCipherFile(
+//                        "file/upload",
+//                        attachment.originalFileDir!!,
+//                        attachment.type,
+//                        attachment.name
+//                    ) {
+//                        progress = it / 100f
+//                        println("progress ${it}")
+//                    }
+//
+//
+//                    if (fileId !== null) {
+//                        println("fileId ${fileId}")
+//                        viewModel.sendLargeFileAttachments(
+//                            message.content,
+//                            message.fromUser,
+//                            message.chatId,
+//                            message.uploadId!!,
+//                            fileId
+//                        )
+//                    }
+//
+//
+//                }
+
+//                delay(2000)
+//                isLoading = false
+//                progress = 1f
+//                isLoading = false
             }
             
             return@LaunchedEffect
@@ -176,7 +185,8 @@ fun FileMessage(
                 },
                 modifier = Modifier.size(43.dp)
             ) {
-                if (isLoading) {
+                if (isStartCipherLoading) {
+                    
                     CircularProgressIndicator(
                         progress = progress,
                         color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
@@ -194,22 +204,43 @@ fun FileMessage(
                         tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
                     )
                 } else {
-                    
-                    println("dsasdadadaa")
-                    Image(
-                        painter = painterResource(
-                            if (progress == 1f) {
-                                if (message.fromUser == profile.id) Res.drawable.file_message_white
-                                else Res.drawable.file_message_dark
-                            } else {
-                                if (message.fromUser == profile.id) Res.drawable.file_message_download_white
-                                else Res.drawable.file_message_download_dark
-                            }
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.size(45.dp)
-                    )
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            progress = progress,
+                            color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            modifier = Modifier
+                                .padding()
+                                .pointerInput(Unit) {
+                                
+                                },
+                            tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
+                        )
+                    } else {
+                        
+                        println("dsasdadadaa")
+                        Image(
+                            painter = painterResource(
+                                if (progress == 1f) {
+                                    if (message.fromUser == profile.id) Res.drawable.file_message_white
+                                    else Res.drawable.file_message_dark
+                                } else {
+                                    if (message.fromUser == profile.id) Res.drawable.file_message_download_white
+                                    else Res.drawable.file_message_download_dark
+                                }
+                            ),
+                            contentDescription = null,
+                            modifier = Modifier.size(45.dp)
+                        )
+                    }
                 }
+                
+                
             }
         }
         
