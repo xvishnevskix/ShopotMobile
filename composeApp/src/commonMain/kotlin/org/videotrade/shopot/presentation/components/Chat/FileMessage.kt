@@ -1,3 +1,5 @@
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,8 +73,12 @@ fun FileMessage(
     var filePath by remember { mutableStateOf("") }
     val audioFile by remember { mutableStateOf(FileProviderFactory.create()) }
 //    var isUploading by remember { mutableStateOf(false) }
-    
-    
+
+    val animatedProgress by animateFloatAsState(
+        targetValue = if (isLoading) progress else 0f,
+        animationSpec = tween(durationMillis = 4000)  // Adjust duration as needed
+    )
+
     LaunchedEffect(message) {
         
         if (message.upload !== null) {
@@ -84,6 +90,16 @@ fun FileMessage(
             downloadJob = scope.launch {
 //                isLoading = true
                 isStartCipherLoading = true
+                delay(2000)
+
+                isStartCipherLoading = false
+                isLoading = true
+
+                // Начинаем анимировать прогресс
+                progress = 1f
+                delay(4000)
+
+                isLoading = false
 //                message.attachments?.get(0)?.let { attachment ->
 ////                    val fileId = FileProviderFactory.create().uploadCipherFile(
 ////                        "file/upload",
@@ -135,11 +151,11 @@ fun FileMessage(
         val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
         val fileName = attachments[0].name
         println("fileName $fileName")
-        
+
         val existingFile = audioFile.existingFile(fileName, attachments[0].type)
-        
+
         if (!existingFile.isNullOrBlank()) {
-            
+
             downloadJob?.cancel()
             isLoading = false
             progress = 1f
@@ -147,7 +163,7 @@ fun FileMessage(
             filePath = existingFile
         }
     }
-    
+
     Row(
         modifier = Modifier
             .widthIn(max = 204.dp)
@@ -164,20 +180,18 @@ fun FileMessage(
                         downloadJob?.cancel()
                         progress = 0f
                         isLoading = true
-                        
-                        
-                        val getFilePath = audioFile.getFilePath(attachments[0].name, "file")
-                        val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
-                        
-                        downloadJob = scope.launch {
-                            isLoading = true
-                            audioFile.downloadFileToDirectory(url, getFilePath) { newProgress ->
-                                progress = newProgress
-                            }
-                            isLoading = false
-                        }
+
+//                        val getFilePath = audioFile.getFilePath(attachments[0].name, "file")
+//                        val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+//
+//                        downloadJob = scope.launch {
+//                            isLoading = true
+//                            audioFile.downloadFileToDirectory(url, getFilePath) { newProgress ->
+//                                progress = newProgress
+//                            }
+//                            isLoading = false
+//                        }
                     } else {
-                        
                         downloadJob?.cancel()
                         isLoading = false
                         progress = 0f
@@ -186,27 +200,11 @@ fun FileMessage(
                 modifier = Modifier.size(43.dp)
             ) {
                 if (isStartCipherLoading) {
-                    
-                    CircularProgressIndicator(
-                        progress = progress,
-                        color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
-                        modifier = Modifier
-                            .padding()
-                            .pointerInput(Unit) {
-                            
-                            },
-                        tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
-                    )
-                } else {
-                    if (isLoading) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.size(45.dp)
+                    ) {
                         CircularProgressIndicator(
-                            progress = progress,
                             color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
                             strokeWidth = 2.dp,
                             modifier = Modifier.fillMaxSize()
@@ -217,13 +215,30 @@ fun FileMessage(
                             modifier = Modifier
                                 .padding()
                                 .pointerInput(Unit) {
-                                
+                                    isStartCipherLoading = false
+                                },
+                            tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
+                        )
+                    }
+                } else {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            progress = animatedProgress,  // Use animated progress
+                            color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                            strokeWidth = 2.dp,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Close",
+                            modifier = Modifier
+                                .padding()
+                                .pointerInput(Unit) {
+                                    isLoading = false
                                 },
                             tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
                         )
                     } else {
-                        
-                        println("dsasdadadaa")
                         Image(
                             painter = painterResource(
                                 if (progress == 1f) {
@@ -235,17 +250,18 @@ fun FileMessage(
                                 }
                             ),
                             contentDescription = null,
-                            modifier = Modifier.size(45.dp)
+                            modifier = Modifier.size(45.dp).pointerInput(Unit) {
+                                if (progress != 1f)
+                                isStartCipherLoading = true
+                            },
                         )
                     }
                 }
-                
-                
             }
         }
-        
+
         Spacer(modifier = Modifier.width(16.dp))
-        
+
         Column(verticalArrangement = Arrangement.SpaceBetween) {
             message.attachments?.get(0)?.let {
                 Text(
