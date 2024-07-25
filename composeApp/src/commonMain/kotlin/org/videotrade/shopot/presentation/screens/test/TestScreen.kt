@@ -91,10 +91,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import io.github.vinceglb.filekit.core.PickerType
+import io.ktor.util.decodeBase64Bytes
 import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.EncapsulationMessageResult
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import kotlin.random.Random
@@ -128,82 +131,88 @@ class TestScreen : Screen {
 //                        println("11111 ")
 ////
 ////
-//                        val publicKeyBytes = publicKey.toByteArray()
-//
-//                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
-//
+////                        val publicKeyBytes = publicKey.toByteArray()
+////
+////                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
+////
 //                        val fileName = "cipherFile${Random.nextInt(0, 100000)}"
-//
+////
 //                        val cipherFilePath = FileProviderFactory.create()
 //                            .getFilePath(
 //                                fileName,
 //                                "cipher1"
 //                            )
+////
+////                        cipherFilePath2 = cipherFilePath
+////                        fileName2 = fileName
+////
+////                        println("platformFile ${platformFile.path}")
+////
+////
+////                        val fileData = FileProviderFactory.create().getFileData(platformFile.path)
+////
+////                        println("fileData $fileData")
+////
+////
+////                        val sendFile = cipherFilePath?.let {
+////                            FileProviderFactory.create().uploadCipherFile(
+////                                "file/upload",
+////                                platformFile.path,
+////                                it,
+////                                fileData?.fileType!!,
+////                                fileName
+////                            ) {
+////
+////                            }
+////                        }
+////
+////
+////                        if (sendFile !== null)
+////                            fileId = sendFile
 //
-//                        cipherFilePath2 = cipherFilePath
-//                        fileName2 = fileName
-//
-//                        println("platformFile ${platformFile.path}")
-//
-//
-//                        val fileData = FileProviderFactory.create().getFileData(platformFile.path)
-//
-//                        println("fileData $fileData")
-
-
-//                        val sendFile = FileProviderFactory.create().uploadCipherFile(
-//                            "file/upload",
-//                            platformFile.path,
-//                            cipherFilePath,
-//                            fileData?.fileType!!,
-//                            fileName
-//                        ) {
-//
-//                        }
-//
-//
-//                        if (sendFile !== null)
-//                            fileId = sendFile
-
 //                        val sharedSecret = getValueInStorage("sharedSecret")
 //
 //                        println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
 //
 //                        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
 //
-//                        val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
-//                            platformFile.path,
-//                            cipherFilePath,
-//                            sharedSecret?.decodeBase64Bytes()!!
-//                        )
+//                        val encupsChachaFileResult = cipherFilePath?.let {
+//                            cipherWrapper.encupsChachaFileCommon(
+//                                platformFile.path,
+//                                it,
+//                                sharedSecret?.decodeBase64Bytes()!!
+//                            )
+//                        }
 //
 //
 //                        println("result2 $encupsChachaFileResult")
+////
+////                        val decupsFile = FileProviderFactory.create()
+////                            .getFilePath(
+////                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
+////                                "pdf"
+////                            )
+////
+////
+////
+////                        println("dadadada ${EncapsulationMessageResult(encupsChachaFileResult?.block!!, encupsChachaFileResult.authTag, sharedSecret?.decodeBase64Bytes()!!)} $cipherFilePath $decupsFile")
+////
+////                        val result3 =
+////                            decupsFile?.let {
+////                                cipherWrapper.decupsChachaFileCommon(
+////                                    cipherFilePath,
+////                                    it,
+////                                    encupsChachaFileResult?.block!!,
+////                                    encupsChachaFileResult.authTag,
+////                                    sharedSecret?.decodeBase64Bytes()!!
+////
+////                                )
+////                            }
+////
+////
+////                        println("result3 $result3")
 //
-//                        val decupsFile = FileProviderFactory.create()
-//                            .getFilePath(
-//                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
-//                                "pdf"
-//                            )
 //
-//
-//
-//                        println("dadadada ${EncapsulationMessageResult(encupsChachaFileResult?.block!!, encupsChachaFileResult.authTag, sharedSecret?.decodeBase64Bytes()!!)} $cipherFilePath $decupsFile")
-//
-//                        val result3 =
-//                            cipherWrapper.decupsChachaFileCommon(
-//                                cipherFilePath,
-//                                decupsFile,
-//                                encupsChachaFileResult?.block!!,
-//                                encupsChachaFileResult.authTag,
-//                                sharedSecret?.decodeBase64Bytes()!!
-//
-//                            )
-//
-//
-//                        println("result3 $result3")
-
-
 //                    } catch (e: Exception) {
 //
 //                        println("error $e")
@@ -237,13 +246,13 @@ class TestScreen : Screen {
                 
                 Button(onClick = {
                     try {
+//                        showFilePicker = true
                         scope.launch {
                             val absltPath = FileProviderFactory.create()
-                                .pickFileAndGetAbsolutePath(PickerType.File(listOf("pdf", "zip")))
-                            
-                            
+                                .pickFile(PickerType.File(listOf("pdf", "zip")))
+
                             if (absltPath !== null) {
-                                
+
                                 val fileName = "cipherFile${Random.nextInt(0, 100000)}"
                                 
                                 
@@ -258,15 +267,15 @@ class TestScreen : Screen {
                                             fileName,
                                             fileData.fileType
                                         )
-                                    
-                                    
+                                    println("sdadasdsadadadasda")
+
                                     val sendFile = FileProviderFactory.create().uploadCipherFile(
                                         "file/upload",
                                         absltPath.fileAbsolutePath,
                                         fileData.fileType,
                                         fileName
                                     ) {
-                                    
+
                                     }
                                     
                                     

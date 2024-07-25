@@ -193,14 +193,12 @@ class SignUpScreen(private val phone: String) : Screen {
                                             
                                             val icon = byteArray.value?.let {
                                                 origin().sendFile(
-                                                    "file/upload",
                                                     null,
                                                     "image/jpeg", "image",
-                                                    it,
                                                 )
                                                 
                                             }
-                                            println("icon3131 ${icon?.id}")
+                                            println("icon3131 ${icon}")
                                             
                                             val jsonContent = Json.encodeToString(
                                                 buildJsonObject {
@@ -211,7 +209,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     put("description", textState.value.firstName)
                                                     put("login", textState.value.nickname)
                                                     put("status", "active")
-                                                    put("icon", icon?.id)
+                                                    put("icon", icon)
                                                 }
                                             )
                                             

@@ -2,8 +2,6 @@ package org.videotrade.shopot.data
 
 import androidx.compose.runtime.MutableState
 import io.ktor.client.HttpClient
-import io.ktor.client.request.forms.MultiPartFormDataContent
-import io.ktor.client.request.forms.formData
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -13,7 +11,6 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.ContentType
-import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
@@ -222,75 +219,72 @@ class origin {
     
     
     suspend fun sendFile(
-        url: String,
         fileDir: String? = null,
         contentType: String,
         filename: String,
-        fileBytes: ByteArray? = null,
-        
-        ): FileDTO? {
-        
-        if (fileBytes == null) {
-            return if (fileDir != null) {
-                FileProviderFactory.create().uploadFileToDirectory(
-                    "file/upload",
-                    fileDir,
-                    contentType,
-                    filename
-                ) {
-                    println("progress ${it}")
-                }
-            } else {
-                null
+    ): String? {
+
+//        if (fileBytes == null) {
+        return if (fileDir != null) {
+            FileProviderFactory.create().uploadCipherFile(
+                "file/upload",
+                fileDir,
+                contentType,
+                filename
+            ) {
+                println("progress ${it}")
             }
-            
         } else {
-            val client =
-                HttpClient(getHttpClientEngine())
-            try {
-                val token = getValueInStorage("accessToken")
-                
-                println("contentType $contentType")
-                val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-                    setBody(MultiPartFormDataContent(
-                        formData {
-                            append("file", fileBytes, Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
-                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                            })
-                        }
-                    ))
-                    header(HttpHeaders.Authorization, "Bearer $token")
-                }
-                
-                
-                
-                println("response.Send ${response.status} ${response.bodyAsText()}")
-                
-                if (response.status.isSuccess()) {
-                    val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
-                    
-                    
-                    return responseData
-                    
-                } else {
-                    println("Failed to retrieve data: ${response.status.description} ${response.request}")
-                    return null
-                    
-                }
-            } catch (e: Exception) {
-                
-                println("Error111: $e")
-                
-                return null
-                
-            } finally {
-                client.close()
-            }
-            
+            null
         }
-        
-        
+//
+//        } else {
+//            val client =
+//                HttpClient(getHttpClientEngine())
+//            try {
+//                val token = getValueInStorage("accessToken")
+//
+//                println("contentType $contentType")
+//                val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+//                    setBody(MultiPartFormDataContent(
+//                        formData {
+//                            append("file", fileBytes, Headers.build {
+//                                append(HttpHeaders.ContentType, contentType)
+//                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+//                            })
+//                        }
+//                    ))
+//                    header(HttpHeaders.Authorization, "Bearer $token")
+//                }
+//
+//
+//
+//                println("response.Send ${response.status} ${response.bodyAsText()}")
+//
+//                if (response.status.isSuccess()) {
+//                    val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
+//
+//
+//                    return responseData
+//
+//                } else {
+//                    println("Failed to retrieve data: ${response.status.description} ${response.request}")
+//                    return null
+//
+//                }
+//            } catch (e: Exception) {
+//
+//                println("Error111: $e")
+//
+//                return null
+//
+//            } finally {
+//                client.close()
+//            }
+//
+//        }
+//
+//
     }
     
     

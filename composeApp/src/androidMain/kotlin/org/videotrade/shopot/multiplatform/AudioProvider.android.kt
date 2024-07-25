@@ -26,21 +26,21 @@ actual class AudioRecorder {
         }
     }
     
-    actual fun stopRecording(getByte: Boolean): ByteArray? {
+    actual fun stopRecording(getDir: Boolean): String? {
         mediaRecorder?.apply {
             stop()
             release()
         }
         mediaRecorder = null
         
-        return if (getByte) {
+        return if (getDir) {
             val file = File(outputFile)
             val fileSize = file.length().toInt()
             val byteArray = ByteArray(fileSize)
             val fis = FileInputStream(file)
             fis.read(byteArray)
             fis.close()
-            byteArray
+            outputFile // Возвращаем абсолютный путь к файлу
         } else {
             null
         }

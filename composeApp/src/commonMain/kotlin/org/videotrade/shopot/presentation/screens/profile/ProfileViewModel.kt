@@ -33,9 +33,8 @@ class ProfileViewModel : ViewModel(), KoinComponent {
         
         val fileId = imageArray.value?.let {
             origin().sendFile(
-                "file/upload", null,
+                null,
                 "image", "profileImage",
-                fileBytes = it,
             )
         }
         
@@ -44,7 +43,7 @@ class ProfileViewModel : ViewModel(), KoinComponent {
             buildJsonObject {
                 put("firstName", newProfile.firstName)
                 put("lastName", newProfile.lastName)
-                put("icon", fileId?.id)
+                put("icon", fileId)
                 put("description", newProfile.description)
             }
         )

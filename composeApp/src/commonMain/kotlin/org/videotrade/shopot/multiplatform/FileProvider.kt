@@ -5,7 +5,7 @@ import org.videotrade.shopot.domain.model.FileDTO
 
 expect class FileProvider {
     
-    suspend fun pickFileAndGetAbsolutePath(pickerType: PickerType): PlatformFilePick?
+    suspend fun pickFile(pickerType: PickerType): PlatformFilePick?
     
     fun getFilePath(fileName: String, fileType: String): String?
     

@@ -81,8 +81,8 @@ class EncryptionWrapperIOS: NSObject {
         let fileManager = FileManager.default
 
         // Проверка существования и доступности файла
-        guard fileManager.fileExists(atPath: filePath) else {
-            print("Source file does not exist: \(filePath)")
+        guard fileManager.fileExists(atPath: srcPath) else {
+            print("Source file does not exist: \(srcPath)")
             return nil
         }
 

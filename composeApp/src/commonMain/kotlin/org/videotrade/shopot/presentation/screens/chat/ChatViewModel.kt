@@ -147,22 +147,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
         chatId: String,
         contentType: String,
         fileName: String,
-        fileDir: String? = null,
-        fileBytes: ByteArray? = null,
-        
+        fileDir: String
         ) {
         viewModelScope.launch {
-            
-            println("send Audio")
             val fileId = origin().sendFile(
-                "file/upload",
                 fileDir,
                 contentType,
                 fileName,
-                fileBytes
             )
-            
-            println("fileId ${fileId}")
             
             if (fileId !== null)
                 sendMessage(
@@ -170,7 +162,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     fromUser = fromUser,
                     chatId = chatId,
                     notificationToken = null,
-                    attachments = listOf(fileId.id),
+                    attachments = listOf(fileId),
                     isCipher = false
                 )
         }

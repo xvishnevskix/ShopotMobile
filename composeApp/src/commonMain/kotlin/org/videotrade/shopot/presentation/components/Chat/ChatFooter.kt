@@ -178,33 +178,33 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             repeatMode = RepeatMode.Reverse
         )
     )
-    
-    val singleImagePicker = rememberImagePickerLauncher(
-        selectionMode = SelectionMode.Single,
-        scope = scope,
-        onResult = { byteArrays ->
-            byteArrays.firstOrNull()?.let {
-                scope.launch {
-                    viewModel.sendAttachments(
-                        content = text,
-                        fromUser = viewModel.profile.value.id,
-                        chatId = chat.id,
-                        "image",
-                        "jpg",
-                        null,
-                        it,
-                    )
-                }
-            }
-        }
-    )
+
+//    val singleImagePicker = rememberImagePickerLauncher(
+//        selectionMode = SelectionMode.Single,
+//        scope = scope,
+//        onResult = { byteArrays ->
+//            byteArrays.firstOrNull()?.let {
+//                scope.launch {
+//                    viewModel.sendAttachments(
+//                        content = text,
+//                        fromUser = viewModel.profile.value.id,
+//                        chatId = chat.id,
+//                        "image",
+//                        "jpg",
+//                        null,
+//                        it,
+//                    )
+//                }
+//            }
+//        }
+//    )
     
     val menuItems = listOf(
         MenuItem(
             text = "Галерея",
             imagePath = Res.drawable.menu_gallery,
             onClick = {
-                singleImagePicker.launch()
+//                singleImagePicker.launch()
             }
         ),
 //    MenuItem(
@@ -222,7 +222,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
-                            .pickFileAndGetAbsolutePath(PickerType.File(listOf("pdf", "zip")))
+                            .pickFile(PickerType.File(listOf("pdf", "zip")))
                         
                         if (filePick !== null) {
                             val fileData =
@@ -527,9 +527,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         val seconds = recordingTime % 60
                                         
                                         if (seconds > 1) {
-                                            val stopByte = audioRecorder.stopRecording(true)
+                                            val fileDir = audioRecorder.stopRecording(true)
                                             
-                                            if (stopByte !== null) {
+                                            if (fileDir !== null) {
                                                 isStartRecording = false
                                                 
                                                 viewModel.sendAttachments(
@@ -538,11 +538,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                     chatId = chat.id,
                                                     "audio/mp4",
                                                     "audio_record",
-                                                    null,
-                                                    stopByte,
-                                                    
-                                                    
-                                                    )
+                                                    fileDir = fileDir,
+                                                )
                                             }
                                         }
                                         viewModel.setIsRecording(false)
@@ -583,9 +580,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     val seconds = recordingTime % 60
                                     
                                     if (seconds > 1) {
-                                        val stopByte = audioRecorder.stopRecording(true)
+                                        val fileDir = audioRecorder.stopRecording(true)
                                         
-                                        if (stopByte !== null) {
+                                        if (fileDir !== null) {
                                             isStartRecording = false
                                             
                                             viewModel.sendAttachments(
@@ -594,9 +591,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 chatId = chat.id,
                                                 "audio/mp4",
                                                 "audio_record",
-                                                null,
-                                                stopByte,
-                                                
+                                                fileDir = fileDir,
                                                 )
                                         }
                                     }

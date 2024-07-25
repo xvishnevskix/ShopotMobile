@@ -59,7 +59,7 @@ import kotlin.random.Random
 
 
 actual class FileProvider(private val applicationContext: Context) {
-    actual suspend fun pickFileAndGetAbsolutePath(pickerType: PickerType): PlatformFilePick? {
+    actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {
         try {
             val filePick = FileKit.pickFile(
                 type = pickerType,
@@ -193,7 +193,6 @@ actual class FileProvider(private val applicationContext: Context) {
         println("starting decrypt")
         
         try {
-            val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
             
             val token = getValueInStorage("accessToken")
             println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
@@ -295,7 +294,7 @@ actual class FileProvider(private val applicationContext: Context) {
         filename: String,
         onProgress: (Float) -> Unit
     ): String? {
-        println("11111111")
+        println("111111111313123123131")
         val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
         
         val client = HttpClient() {
@@ -322,7 +321,6 @@ actual class FileProvider(private val applicationContext: Context) {
                 "cipher"
             )
         
-        println("3333333")
         if (cipherFilePath == null) return null
         
         
