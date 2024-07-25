@@ -53,6 +53,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.util.Locale
+import java.util.concurrent.ThreadLocalRandom
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -74,7 +75,12 @@ actual class FileProvider(private val applicationContext: Context) {
                     filePathNew = file.absoluteFile.toString()
                 }
                 
-                return PlatformFilePick(filePick.uri.toString(), filePathNew)
+                return PlatformFilePick(
+                    filePick.uri.toString(),
+                    filePathNew,
+                    filePick.getSize(),
+                    filePick.name
+                )
                 
             }
             return null
@@ -84,23 +90,35 @@ actual class FileProvider(private val applicationContext: Context) {
     }
     
     
-    actual fun getFilePath(fileName: String, fileType: String): String {
+    actual fun getFilePath(fileName: String, fileType: String): String? {
+        println("111111111")
+        
         // Используем каталог кэша приложения
         val directory = when (fileType) {
             "audio/mp4" -> applicationContext.cacheDir
             "image" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             "zip" -> applicationContext.cacheDir
+            "file" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             "cipher" -> applicationContext.cacheDir
             else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         }
+        println("2222222")
         
         if (!directory.exists()) {
             directory.mkdirs()
         }
+        println("333333")
+        
+        // Проверка, существует ли файл
+        val existingFile = File(directory, fileName)
+        if (existingFile.exists()) {
+            println("file.absolutePath ${existingFile.absolutePath}")
+            return null
+        }
         
         var file: File
         do {
-            val randomSuffix = Random.nextInt(0, 100000)
+            val randomSuffix = ThreadLocalRandom.current().nextInt(0, 100000)
             
             val newFileName = when (fileType) {
                 "audio/mp4" -> "${fileName.substringBeforeLast(".")}_$randomSuffix.${
@@ -110,18 +128,16 @@ actual class FileProvider(private val applicationContext: Context) {
                 }"
                 
                 else -> fileName
-                
             }
-//            val newFileName =
-//                "${fileName.substringBeforeLast(".")}_$randomSuffix.${fileName.substringAfterLast(".")}"
+            
             file = File(directory, newFileName)
+            
         } while (file.exists())
         
         println("file.absolutePath ${file.absolutePath}")
         
         return file.absolutePath
     }
-    
     
     @RequiresApi(Build.VERSION_CODES.O)
     actual suspend fun downloadFileToDirectory(
@@ -168,10 +184,10 @@ actual class FileProvider(private val applicationContext: Context) {
     @RequiresApi(Build.VERSION_CODES.O)
     actual suspend fun downloadCipherFile(
         url: String,
-        fileDirectory: String,
-        dectyptFilePath: String,
+        contentType: String,
+        filename: String,
         onProgress: (Float) -> Unit
-    ) {
+    ): String? {
         val client = HttpClient()
         
         println("starting decrypt")
@@ -180,6 +196,22 @@ actual class FileProvider(private val applicationContext: Context) {
             val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
             
             val token = getValueInStorage("accessToken")
+            println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
+            
+            val fileDirectory =
+                getFilePath(
+                    Random.nextInt(1, 10000).toString() + filename.substringBeforeLast(
+                        ".",
+                        filename
+                    ), "cipher"
+                ) ?: return null
+            
+            val dectyptFilePath = getFilePath(
+                filename,
+                "file"
+            ) ?: return null
+            
+            var filePath = ""
             
             client.prepareGet(url) { header("Authorization", "Bearer $token") }
                 .execute { httpResponse ->
@@ -189,6 +221,7 @@ actual class FileProvider(private val applicationContext: Context) {
                     val totalBytes = httpResponse.contentLength() ?: -1L
                     
                     println("totalBytes $totalBytes")
+                    
                     
                     val file = File(fileDirectory)
                     
@@ -216,6 +249,9 @@ actual class FileProvider(private val applicationContext: Context) {
                     
                     val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
                     
+                    println("filenameDown ${filename}")
+                    
+                    
                     val result3 =
                         cipherWrapper.decupsChachaFileCommon(
                             fileDirectory,
@@ -223,17 +259,15 @@ actual class FileProvider(private val applicationContext: Context) {
                             block?.decodeBase64Bytes()!!,
                             authTag?.decodeBase64Bytes()!!,
                             sharedSecret?.decodeBase64Bytes()!!
-                        
                         )
                     
                     
                     if (result3 !== null) {
                         
-                        
-                        commonViewModel.toaster.show("isSuccessDecrypt")
-                        
-                        
+                        file.delete()
                         println("encupsChachaFileResult $result3")
+                        
+                        filePath = result3
                     }
                     
                     
@@ -241,11 +275,17 @@ actual class FileProvider(private val applicationContext: Context) {
                     onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
                     println("A file saved to ${file.path}")
                 }
+            
+            return filePath
+            
         } catch (e: Exception) {
+            
             println("Error file ${e}")
         } finally {
             client.close()
         }
+        return null
+        
     }
     
     actual suspend fun uploadCipherFile(
@@ -283,6 +323,8 @@ actual class FileProvider(private val applicationContext: Context) {
             )
         
         println("3333333")
+        if (cipherFilePath == null) return null
+        
         
         val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
             fileDirectory,
@@ -356,18 +398,22 @@ actual class FileProvider(private val applicationContext: Context) {
                 
                 file.delete()
                 
+                val fileCopy = File(fileDirectory)
+                
+                fileCopy.delete()
+                
                 return id
                 
             } else {
-                
-                commonViewModel.toaster.show("Filed")
+
+//                commonViewModel.toaster.show("Filed")
                 
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
                 return null
             }
             
         } catch (e: Exception) {
-            commonViewModel.toaster.show("Filed")
+//            commonViewModel.toaster.show("Filed")
             
             println("File upload failed: ${e.message}")
             return null
@@ -415,15 +461,15 @@ actual class FileProvider(private val applicationContext: Context) {
                 .getMimeTypeFromExtension(fileExtension?.lowercase(Locale.ROOT))
                 ?.substringAfter("application/")
         }
+
+//        // Получаем имя файла из URI
+//        val fileName = getFileNameFromUri(contentResolver, uri)
+//
+//        // Получаем размер файла из URI
+//        val fileSize = getFileSizeFromUri(contentResolver, uri)
         
-        // Получаем имя файла из URI
-        val fileName = getFileNameFromUri(contentResolver, uri)
-        
-        // Получаем размер файла из URI
-        val fileSize = getFileSizeFromUri(contentResolver, uri)
-        
-        return if (fileName != null && fileType != null && fileSize != null) {
-            FileData(fileName, fileType, fileSize)
+        return if (fileType != null) {
+            FileData(fileType)
         } else {
             null
         }

@@ -99,6 +99,8 @@ fun VoiceMessage(
         val filePath = audioFile.getFilePath(fileName, "audio/mp4")
         scope.launch {
             
+            if (filePath == null) return@launch
+            
             audioFile.downloadFileToDirectory(url, filePath) {
             
             }

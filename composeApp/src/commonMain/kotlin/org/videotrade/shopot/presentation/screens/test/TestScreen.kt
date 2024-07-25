@@ -310,16 +310,16 @@ class TestScreen : Screen {
                                 "pdf"
                             )
                         val url = "${EnvironmentConfig.serverUrl}file/id/$fileId"
-                        
-                        scope.launch {
-                            fileProviderFactory.downloadCipherFile(
-                                url,
-                                cipherFilePath,
-                                dectyptFilePath
-                            ) { newProgress ->
-                            
-                            }
-                        }
+
+//                        scope.launch {
+//                            fileProviderFactory.downloadCipherFile(
+//                                url,
+//                                cipherFilePath,
+//                                dectyptFilePath
+//                            ) { newProgress ->
+//
+//                            }
+//                        }
                         
                         
                     } catch (e: Exception) {

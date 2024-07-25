@@ -80,9 +80,8 @@ class AppActivity : ComponentActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
         FileKit.init(this)
-        
-        
         
         Firebase.initialize(this) // This line
         getAppLifecycleObserver()

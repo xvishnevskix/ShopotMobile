@@ -7,13 +7,19 @@ expect class FileProvider {
     
     suspend fun pickFileAndGetAbsolutePath(pickerType: PickerType): PlatformFilePick?
     
-    fun getFilePath(fileName: String, fileType: String): String
+    fun getFilePath(fileName: String, fileType: String): String?
     
     suspend fun downloadFileToDirectory(
         url: String,
         fileDirectory: String,
         onProgress: (Float) -> Unit
     )
+    suspend fun downloadCipherFile(
+        url: String,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String?
     
     suspend fun uploadFileToDirectory(
         url: String,
@@ -40,12 +46,7 @@ expect class FileProvider {
     fun existingFile(fileName: String, fileType: String): String?
     
     
-    suspend fun downloadCipherFile(
-        url: String,
-        fileDirectory: String,
-        dectyptFilePath: String,
-        onProgress: (Float) -> Unit
-    )
+
     
     
 }
@@ -56,12 +57,14 @@ expect object FileProviderFactory {
 
 
 data class FileData(
-    val fileName: String,
+//    val fileName: String,
     val fileType: String,
-    val fileSize: Int,
+//    val fileSize: Long,
 )
 
 data class PlatformFilePick(
     val fileContentPath: String,
-    val fileAbsolutePath: String
+    val fileAbsolutePath: String,
+    val fileSize: Long?,
+    val fileName: String,
 )

@@ -132,7 +132,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             println("start Audio")
                             
                             val microphonePer =
-                                PermissionsProviderFactory.create().getPermission("microphone")
+                                PermissionsProviderFactory.create().checkPermission("microphone")
                             if (microphonePer) {
                                 val audioFilePathNew = FileProviderFactory.create()
                                     .getFilePath(
@@ -142,8 +142,12 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 
                                 println("audioFilePathNew $audioFilePathNew")
                                 
-                                audioRecorder.startRecording(audioFilePathNew)
+                                if (audioFilePathNew != null) {
+                                    audioRecorder.startRecording(audioFilePathNew)
+                                }
                                 isStartRecording = true
+                            } else {
+                            
                             }
                         }
                     }
@@ -217,16 +221,14 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 
                 scope.launch {
                     try {
-                        val absltPath = FileProviderFactory.create()
+                        val filePick = FileProviderFactory.create()
                             .pickFileAndGetAbsolutePath(PickerType.File(listOf("pdf", "zip")))
                         
-                        if (absltPath !== null) {
+                        if (filePick !== null) {
                             val fileData =
-                                FileProviderFactory.create().getFileData(absltPath.fileContentPath)
+                                FileProviderFactory.create().getFileData(filePick.fileContentPath)
                             
                             println("fileData $fileData ${Random.nextInt(1, 501)}")
-                            
-                            val uploadIdd = Random.nextInt(1, 501).toString()
                             
                             if (fileData !== null) {
                                 viewModel.addMessage(
@@ -249,9 +251,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 viewModel.profile.value.id,
                                                 Random.nextInt(1, 501).toString(),
                                                 fileData.fileType,
-                                                fileData.fileName,
-                                                originalFileDir = absltPath.fileAbsolutePath,
-                                                fileData.fileSize
+                                                filePick.fileName,
+                                                originalFileDir = filePick.fileAbsolutePath,
+                                                filePick.fileSize
                                             )
                                         ),
                                         upload = true,

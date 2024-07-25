@@ -31,7 +31,7 @@ data class Attachment(
     var type: String = "",
     var name: String = "",
     var originalFileDir: String? = null,
-    var size: Int? = null,
+    var size: Long? = null,
     )
 
 
