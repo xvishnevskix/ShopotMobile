@@ -106,7 +106,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     override fun updateUploadMessage(message: MessageItem) {
         _messages.update { currentChat ->
             currentChat.map { messageItem ->
-                println("messageItem.id == message.uploadId ${messageItem.id} ${message.uploadId}")
+                println("messageItem.id == message.uploadId ${messageItem.uploadId} ${message.uploadId}")
                 
                 if (messageItem.uploadId == message.uploadId) {
                     messageItem.copy(

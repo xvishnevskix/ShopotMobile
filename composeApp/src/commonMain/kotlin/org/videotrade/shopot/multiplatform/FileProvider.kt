@@ -18,6 +18,7 @@ expect class FileProvider {
         url: String,
         contentType: String,
         filename: String,
+        dirType: String,
         onProgress: (Float) -> Unit
     ): String?
     
@@ -44,9 +45,7 @@ expect class FileProvider {
     
     
     fun existingFile(fileName: String, fileType: String): String?
-    
-    
-
+    fun getFileSizeFromUri(fileDirectory: String): Long?
     
     
 }
@@ -59,7 +58,8 @@ expect object FileProviderFactory {
 data class FileData(
 //    val fileName: String,
     val fileType: String,
-//    val fileSize: Long,
+    val fileSize: Long?,
+//    var fileSize: Long,
 )
 
 data class PlatformFilePick(

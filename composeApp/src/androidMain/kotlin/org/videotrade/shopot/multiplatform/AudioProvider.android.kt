@@ -6,7 +6,6 @@ import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import org.junit.runner.manipulation.Ordering
 import java.io.File
 import java.io.FileInputStream
 
@@ -35,6 +34,9 @@ actual class AudioRecorder {
         
         return if (getDir) {
             val file = File(outputFile)
+            println("outputFile ${outputFile}")
+            if (!file.exists()) return null
+            
             val fileSize = file.length().toInt()
             val byteArray = ByteArray(fileSize)
             val fis = FileInputStream(file)
@@ -54,7 +56,7 @@ actual class AudioPlayer(private val applicationContext: Context) {
         // Получение экземпляра AudioManager
         val audioManager =
             applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-
+        
         // Установка аудиосессии для воспроизведения через основной динамик
         audioManager.mode = AudioManager.MODE_NORMAL
         audioManager.isSpeakerphoneOn = true
@@ -72,17 +74,22 @@ actual class AudioPlayer(private val applicationContext: Context) {
     }
     
     @SuppressLint("DefaultLocale")
-    actual fun getAudioDuration(filePath: String): String {
-        val retriever = MediaMetadataRetriever()
-        retriever.setDataSource(filePath)
-        val durationStr = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        retriever.release()
-        
-        val milliseconds = durationStr?.toLongOrNull() ?: 0L
-        val totalSeconds = milliseconds / 1000
-        val minutes = totalSeconds / 60
-        val seconds = totalSeconds % 60
-        return String.format("%02d:%02d", minutes, seconds)
+    actual fun getAudioDuration(filePath: String, fileName: String): String? {
+        try {
+            val retriever = MediaMetadataRetriever()
+            retriever.setDataSource(filePath)
+            val durationStr =
+                retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            retriever.release()
+            
+            val milliseconds = durationStr?.toLongOrNull() ?: 0L
+            val totalSeconds = milliseconds / 1000
+            val minutes = totalSeconds / 60
+            val seconds = totalSeconds % 60
+            return String.format("%02d:%02d", minutes, seconds)
+        } catch (e: Exception) {
+            return null
+        }
     }
 }
 

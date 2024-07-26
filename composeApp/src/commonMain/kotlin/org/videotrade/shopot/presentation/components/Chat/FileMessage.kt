@@ -80,6 +80,9 @@ fun FileMessage(
         animationSpec = tween(durationMillis = 4000)  // Adjust duration as needed
     )
     
+    
+    
+    
     LaunchedEffect(message) {
         
         if (message.upload !== null) {
@@ -154,7 +157,6 @@ fun FileMessage(
             downloadJob?.cancel()
             isLoading = false
             progress = 1f
-            println("filePath $filePath")
             filePath = existingFile
         }
     }
@@ -186,6 +188,7 @@ fun FileMessage(
                                     url,
                                     attachment.type,
                                     attachment.name,
+                                    "file"
                                 ) { newProgress ->
                                     isStartCipherLoading = false
                                     progress = newProgress

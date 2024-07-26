@@ -15,7 +15,9 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.encupsMessage
+import org.videotrade.shopot.api.getCurrentTimeList
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -24,6 +26,8 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
     private val chatUseCase: ChatUseCase by inject()
@@ -148,7 +152,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
         contentType: String,
         fileName: String,
         fileDir: String
-        ) {
+    ) {
         viewModelScope.launch {
             val fileId = origin().sendFile(
                 fileDir,
@@ -238,6 +242,45 @@ class ChatViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             profile.value = profileUseCase.getProfile()!!
         }
+    }
+    
+    
+    fun sendVoice(fileDir: String, chat: ChatItem, voiceName: String) {
+        val fileSize =
+            FileProviderFactory.create().getFileSizeFromUri(fileDir)
+        
+        println("fileSize ${fileSize}")
+
+//        if(fileSize !== null)
+        addMessage(
+            MessageItem(
+                Random.nextInt(1, 501).toString(),
+                profile.value.id,
+                "",
+                "",
+                "",
+                0,
+                getCurrentTimeList(),
+                false,
+                chat.id,
+                false,
+                true,
+                listOf(
+                    Attachment(
+                        Random.nextInt(1, 501).toString(),
+                        Random.nextInt(1, 501).toString(),
+                        profile.value.id,
+                        Random.nextInt(1, 501).toString(),
+                        "audio/mp4",
+                        voiceName,
+                        originalFileDir = fileDir,
+//                        fileSize
+                    )
+                ),
+                upload = true,
+                uploadId = Random.nextInt(1, 501).toString()
+            )
+        )
     }
     
     

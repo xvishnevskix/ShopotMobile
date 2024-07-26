@@ -10,7 +10,7 @@ expect class AudioPlayer {
     fun startPlaying(filePath: String)
     fun stopPlaying()
     
-    fun getAudioDuration(filePath: String): String
+    fun getAudioDuration(filePath: String, fileName: String): String?
     
 }
 

@@ -21,17 +21,16 @@ import platform.AVFAudio.AVNumberOfChannelsKey
 import platform.AVFAudio.AVSampleRateKey
 import platform.AVFAudio.setActive
 import platform.AVFoundation.AVAsset
-import platform.AVFoundation.AVKeyValueStatus
 import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
-import platform.Foundation.create
 import platform.darwin.DISPATCH_TIME_FOREVER
 import platform.darwin.dispatch_semaphore_create
 import platform.darwin.dispatch_semaphore_signal
 import platform.darwin.dispatch_semaphore_wait
+import platform.posix.SEEK_END
 import platform.posix.fclose
 import platform.posix.fopen
 import platform.posix.fread
@@ -106,7 +105,7 @@ actual class AudioRecorder {
     }
     
     @OptIn(ExperimentalForeignApi::class)
-    actual fun stopRecording(getByte: Boolean): ByteArray? {
+    actual fun stopRecording(getDir: Boolean): String? {
         println("Stop recording")
         audioRecorder?.apply {
             stop()
@@ -114,24 +113,25 @@ actual class AudioRecorder {
         }
         audioRecorder = null
         
-        return if (getByte) {
+        return if (getDir) {
             val file = fopen(outputFile, "rb")
             if (file != null) {
-                fseek(file, 0, platform.posix.SEEK_END)
+                fseek(file, 0, SEEK_END)
                 val fileSize = ftell(file).toInt()
                 rewind(file)
                 val byteArray = ByteArray(fileSize)
                 fread(byteArray.refTo(0), 1u, fileSize.toULong(), file)
                 fclose(file)
-                byteArray
+                outputFile // Возвращаем абсолютный путь к файлу
             } else {
                 null
             }
         } else {
-            null
+            outputFile // Возвращаем абсолютный путь к файлу
         }
     }
 }
+
 
 actual class AudioPlayer {
     private var audioPlayer: AVAudioPlayer? = null
@@ -193,7 +193,7 @@ actual class AudioPlayer {
     
     
     @OptIn(ExperimentalForeignApi::class)
-    actual fun getAudioDuration(filePath: String): String {
+    actual fun getAudioDuration(filePath: String, fileName: String): String? {
         val url = NSURL.fileURLWithPath(filePath)
         val asset = AVAsset.assetWithURL(url)
         

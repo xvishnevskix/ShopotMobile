@@ -64,8 +64,6 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
-import com.preat.peekaboo.image.picker.SelectionMode
-import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -109,6 +107,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var isStartRecording by remember { mutableStateOf(false) }
     var showMenu by remember { mutableStateOf(false) }
     var showFilePicker by remember { mutableStateOf(false) }
+    var voiceName by remember { mutableStateOf("") }
+    var offset by remember { mutableStateOf(Offset.Zero) }
     
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
@@ -130,13 +130,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         scope.launch {
 //                            println("isStartRecording")
                             println("start Audio")
-                            
+                            voiceName = "audio_record${Random.nextInt(0, 100000)}.m4a"
                             val microphonePer =
-                                PermissionsProviderFactory.create().checkPermission("microphone")
+                                PermissionsProviderFactory.create().getPermission("microphone")
                             if (microphonePer) {
                                 val audioFilePathNew = FileProviderFactory.create()
                                     .getFilePath(
-                                        "audio_record.m4a",
+                                        voiceName,
                                         "audio/mp4"
                                     ) // Генерация пути к файлу
                                 
@@ -147,7 +147,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 }
                                 isStartRecording = true
                             } else {
-                            
+                                
+                                println("perStop")
+                                
+                                viewModel.setIsRecording(false)
+                                
+                                audioRecorder.stopRecording(false)
+                                offset = Offset.Zero
                             }
                         }
                     }
@@ -500,7 +506,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                 )
             } else {
-                var offset by remember { mutableStateOf(Offset.Zero) }
 
 //                val alpha = (105f + offset.x) / 20f
                 val scale = 1f + (offset.x / 850f)
@@ -531,15 +536,19 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                             
                                             if (fileDir !== null) {
                                                 isStartRecording = false
+
+//                                                viewModel.sendAttachments(
+//                                                    content = text,
+//                                                    fromUser = viewModel.profile.value.id,
+//                                                    chatId = chat.id,
+//                                                    "audio/mp4",
+//                                                    voiceName,
+//                                                    fileDir = fileDir,
+//                                                )
                                                 
-                                                viewModel.sendAttachments(
-                                                    content = text,
-                                                    fromUser = viewModel.profile.value.id,
-                                                    chatId = chat.id,
-                                                    "audio/mp4",
-                                                    "audio_record",
-                                                    fileDir = fileDir,
-                                                )
+                                                
+                                                viewModel.sendVoice(fileDir, chat, voiceName)
+                                            
                                             }
                                         }
                                         viewModel.setIsRecording(false)
@@ -584,15 +593,18 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         
                                         if (fileDir !== null) {
                                             isStartRecording = false
+
+//                                            viewModel.sendAttachments(
+//                                                content = text,
+//                                                fromUser = viewModel.profile.value.id,
+//                                                chatId = chat.id,
+//                                                "audio/mp4",
+//                                                voiceName,
+//                                                fileDir = fileDir,
+//                                            )
                                             
-                                            viewModel.sendAttachments(
-                                                content = text,
-                                                fromUser = viewModel.profile.value.id,
-                                                chatId = chat.id,
-                                                "audio/mp4",
-                                                "audio_record",
-                                                fileDir = fileDir,
-                                                )
+                                            viewModel.sendVoice(fileDir, chat, voiceName)
+                                            
                                         }
                                     }
                                     
@@ -638,4 +650,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             }
         }
     }
+}
+
+
+fun sendVoiceMessage() {
+
+
 }

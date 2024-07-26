@@ -28,8 +28,8 @@ data class Attachment(
     val messageId: String = "",
     val userId: String,
     val fileId: String = "",
-    var type: String = "",
-    var name: String = "",
+    var type: String,
+    var name: String,
     var originalFileDir: String? = null,
     var size: Long? = null,
     )

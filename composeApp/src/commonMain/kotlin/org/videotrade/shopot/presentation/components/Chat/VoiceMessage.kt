@@ -3,15 +3,21 @@ package org.videotrade.shopot.presentation.components.Chat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,12 +33,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -70,6 +78,12 @@ fun VoiceMessage(
     val audioPlayer = remember { AudioFactory.createAudioPlayer() }
     var currentTime by remember { mutableStateOf(0) }
     val duration = remember { mutableStateOf("00:00") }
+    var isLoading by remember { mutableStateOf(false) }
+    var isStartCipherLoading by remember { mutableStateOf(false) }
+    var progress by remember { mutableStateOf(0f) }
+    var downloadJob by remember { mutableStateOf<Job?>(null) }
+    var isUpload = remember { mutableStateOf(false) }
+    
     
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
@@ -83,39 +97,152 @@ fun VoiceMessage(
                 isPlaying = false
             }
         } else {
-            if (duration.value.isNotBlank())
-                currentTime = durationToSeconds(duration.value)
+            if (duration.value.isNotBlank()) {
+                
+                val durationToSecondsSort = durationToSeconds(duration.value)
+                
+                if (durationToSecondsSort != null) {
+                    currentTime = durationToSecondsSort
+                    
+                }
+            }
+            
         }
+    }
+    
+    
+    LaunchedEffect(Unit) {
+        
+        println("adasdada ${message.upload}")
+        
+        
     }
     
     LaunchedEffect(message) {
         
-        println("fileId ${message.attachments?.get(0)?.fileId}")
-        val audioFile = FileProviderFactory.create()
-        val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
-        val fileName = "${attachments[0].name}.m4a"
-        
-        println("fileName $fileName")
-        val filePath = audioFile.getFilePath(fileName, "audio/mp4")
-        scope.launch {
+        if (!isUpload.value && message.upload !== null) {
             
-            if (filePath == null) return@launch
+            downloadJob = scope.launch {
+                isLoading = true
+                isStartCipherLoading = true
+                
+                message.attachments?.get(0)?.let { attachment ->
+                    
+                    println("sendFileaasa ${attachment.name} ${attachment.type}")
+                    val fileId = FileProviderFactory.create().uploadCipherFile(
+                        "file/upload",
+                        attachment.originalFileDir!!,
+                        attachment.type,
+                        attachment.name
+                    ) {
+                        isStartCipherLoading = false
+                        println("progress1 ${it / 100f}")
+                        
+                        progress = it / 100f
+                    }
+                    
+                    
+                    if (fileId !== null) {
+                        println("uploadId ${message.uploadId!!}")
+                        viewModel.sendLargeFileAttachments(
+                            message.content,
+                            message.fromUser,
+                            message.chatId,
+                            message.uploadId!!,
+                            fileId
+                        )
+                        
+                        audioFilePath = attachment.originalFileDir!!
+                    }
+                    
+                    
+                }
+                
+                isUpload.value = true
+                isLoading = false
+                progress = 1f
+                isLoading = false
+            }
+        } else {
+            println("existingFile ${attachments[0].name} ${attachments[0].type}")
             
-            audioFile.downloadFileToDirectory(url, filePath) {
+            val existingFile =
+                FileProviderFactory.create().existingFile(attachments[0].name, attachments[0].type)
             
+            println("existingFile $existingFile")
+            
+            
+            
+            if (!existingFile.isNullOrBlank()) {
+                
+                println("existingFile 3131")
+                
+                downloadJob?.cancel()
+                isLoading = false
+                progress = 1f
+                
+                
+                val audioDuration = audioPlayer.getAudioDuration(existingFile, attachments[0].name)
+                
+                println("audioDuration $audioDuration")
+                if (audioDuration !== null) {
+                    
+                    val durationToSecondsSort = durationToSeconds(audioDuration)
+                    
+                    if (durationToSecondsSort != null) {
+                        currentTime = durationToSecondsSort
+                    }
+                    
+                    duration.value = audioDuration
+                }
+                
+                
+                audioFilePath = existingFile
+                return@LaunchedEffect
             }
             
-            println("filePath $filePath")
-            val audioDuration = audioPlayer.getAudioDuration(filePath)
+            println("fileId ${message.attachments?.get(0)?.fileId}")
+            val audioFile = FileProviderFactory.create()
+            val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+            val fileName = attachments[0].name
+            val fileType = attachments[0].type
             
-            println("audioDuration $audioDuration")
             
-            currentTime = durationToSeconds(audioDuration)
-            
-            duration.value = audioDuration
-            
-            audioFilePath = filePath
+            scope.launch {
+                
+                val pathResult = audioFile.downloadCipherFile(
+                    url,
+                    fileType,
+                    fileName,
+                    "audio/mp4"
+                ) {
+                
+                }
+                
+                if (pathResult !== null) {
+                    val audioDuration = audioPlayer.getAudioDuration(pathResult, fileName)
+                    
+                    println("audioDuration $audioDuration")
+                    
+                    if (audioDuration == null) return@launch
+                    val durationToSecondsSort = durationToSeconds(audioDuration)
+                    
+                    if (durationToSecondsSort != null) {
+                        currentTime = durationToSecondsSort
+                        
+                        duration.value = pathResult
+                        
+                    }
+                    
+                    duration.value = audioDuration
+                    
+                    audioFilePath = pathResult
+                }
+                
+                
+            }
         }
+        
     }
     
     Row(
@@ -124,31 +251,83 @@ fun VoiceMessage(
             .padding(start = 22.dp, end = 22.dp, top = 12.dp, bottom = 12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        IconButton(
-            onClick = {
-                isPlaying = !isPlaying
-                println("isPlaying $isPlaying")
-                
-                if (isPlaying) {
-                    playVoice(audioPlayer, audioFilePath)
-                } else {
-                    stopVoice(audioPlayer)
+        
+        
+        if (isStartCipherLoading) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(45.dp)
+            ) {
+                CircularProgressIndicator(
+                    color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                    strokeWidth = 2.dp,
+                    modifier = Modifier.fillMaxSize()
+                )
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = "Close",
+                    modifier = Modifier
+                        .padding()
+                        .pointerInput(Unit) {
+                            isStartCipherLoading = false
+                            viewModel.deleteMessage(message)
+                        },
+                    tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
+                )
+            }
+        } else {
+            if (isLoading) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(45.dp)
+                ) {
+                    CircularProgressIndicator(
+                        progress = progress,  // Use animated progress
+                        color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        modifier = Modifier
+                            .padding()
+                            .pointerInput(Unit) {
+                                isLoading = false
+                                
+                            },
+                        tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
+                    )
                 }
-            },
-            modifier = Modifier.size(45.dp)
-        ) {
-            Image(
-                modifier = Modifier.size(45.dp),
-                painter = if (!isPlaying) {
-                    if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_play_white)
-                    else painterResource(Res.drawable.voice_message_play_dark)
-                } else {
-                    if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_pause_white)
-                    else painterResource(Res.drawable.voice_message_pause_dark)
-                },
-                contentDescription = null
-            )
+            } else {
+                IconButton(
+                    onClick = {
+                        isPlaying = !isPlaying
+                        println("isPlaying $isPlaying")
+                        
+                        if (isPlaying) {
+                            playVoice(audioPlayer, audioFilePath)
+                        } else {
+                            stopVoice(audioPlayer)
+                        }
+                    },
+                    modifier = Modifier.size(45.dp)
+                ) {
+                    Image(
+                        modifier = Modifier.size(45.dp),
+                        painter = if (!isPlaying) {
+                            if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_play_white)
+                            else painterResource(Res.drawable.voice_message_play_dark)
+                        } else {
+                            if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_pause_white)
+                            else painterResource(Res.drawable.voice_message_pause_dark)
+                        },
+                        contentDescription = null
+                    )
+                }
+            }
         }
+        
         
         Spacer(modifier = Modifier.width(16.dp))
         
@@ -200,9 +379,18 @@ fun generateRandomWaveData(size: Int): List<Float> {
     return List(size) { Random.nextFloat() }
 }
 
-fun durationToSeconds(duration: String): Int {
-    val parts = duration.split(":")
-    return parts[0].toInt() * 60 + parts[1].toInt()
+fun durationToSeconds(duration: String): Int? {
+    
+    println("duration ${duration}")
+    
+    try {
+        val parts = duration.split(":")
+        return parts[0].toInt() * 60 + parts[1].toInt()
+    } catch (e: Exception) {
+        println("error durationToSeconds: ${e}")
+        return null
+    }
+    
 }
 
 fun formatSecondsToDuration(seconds: Int): String {

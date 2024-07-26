@@ -30,7 +30,6 @@ import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
-import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.refTo
 import kotlinx.cinterop.reinterpret
@@ -43,6 +42,7 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.FileDTO
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import platform.CoreFoundation.CFRelease
 import platform.CoreFoundation.CFStringCreateWithCString
 import platform.CoreFoundation.CFStringGetCString
@@ -212,7 +212,10 @@ actual class FileProvider {
     
     actual fun getFilePath(fileName: String, fileType: String): String? {
         val directory: NSURL? = when (fileType) {
-            "audio/mp4" -> NSURL.fileURLWithPath(NSTemporaryDirectory(), true)
+            "audio/mp4" -> NSFileManager.defaultManager.URLsForDirectory(
+                NSCachesDirectory,
+                NSUserDomainMask
+            ).firstOrNull() as NSURL?
             "image" -> NSFileManager.defaultManager.URLsForDirectory(
                 NSDocumentDirectory,
                 NSUserDomainMask
@@ -244,18 +247,7 @@ actual class FileProvider {
         
         var file: NSURL
         do {
-            val randomSuffix = Random.nextInt(0, 100000)
-            val newFileName = when (fileType) {
-                "audio/mp4" -> "${fileName.substringBeforeLast(".")}_$randomSuffix.${
-                    fileName.substringAfterLast(
-                        "."
-                    )
-                }"
-                
-                else -> fileName
-            }
-            
-            file = directory.URLByAppendingPathComponent(newFileName)!!
+            file = directory.URLByAppendingPathComponent(fileName)!!
         } while (file.path?.let { NSFileManager.defaultManager.fileExistsAtPath(it) } == true)
         
         println("file.absolutePath ${file.path}")
@@ -317,6 +309,7 @@ actual class FileProvider {
         url: String,
         contentType: String,
         filename: String,
+        dirType: String,
         onProgress: (Float) -> Unit
     ): String? {
         val client = HttpClient(Darwin)
@@ -329,7 +322,7 @@ actual class FileProvider {
             println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
             
             val fileDirectory = getFilePath(
-                Random.nextInt(1, 10000).toString() + filename.substringBeforeLast(
+                filename.substringBeforeLast(
                     ".",
                     filename
                 ), "cipher"
@@ -337,7 +330,7 @@ actual class FileProvider {
             
             val dectyptFilePath = getFilePath(
                 filename,
-                "file"
+                dirType
             ) ?: return null
             
             var filePath = ""
@@ -397,7 +390,12 @@ actual class FileProvider {
                         
                         println("encupsChachaFileResult $result3")
                         
-                        savePickedFile(result3, filename)
+                        
+                        
+                        if (dirType !== "audio/mp4") {
+                            savePickedFile(result3, filename)
+                            
+                        }
                         
                         filePath = result3
                     }
@@ -505,7 +503,6 @@ actual class FileProvider {
         
         val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
         
-        println("333333331231 ${fileDirectory}")
         
         val cipherFilePath = FileProviderFactory.create()
             .getFilePath(
@@ -513,8 +510,8 @@ actual class FileProvider {
                 "cipher"
             )
         
-        println("3333333")
         if (cipherFilePath == null) return null
+        
         
         val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
             fileDirectory,
@@ -528,7 +525,6 @@ actual class FileProvider {
             return null
         }
         println("result2 $encupsChachaFileResult")
-        println("55555")
         
         // Get the file from the provided directory
         val file = NSURL.fileURLWithPath(cipherFilePath)
@@ -622,9 +618,12 @@ actual class FileProvider {
         }
         
         val fileType = mimeTypeString?.substringAfter("application/")
+        val fileSize = getFileSize(url)
+        
+        
         
         return if (fileType != null) {
-            FileData(fileType)
+            FileData(fileType, fileSize)
         } else {
             null
         }
@@ -637,12 +636,12 @@ actual class FileProvider {
     }
     
     @OptIn(ExperimentalForeignApi::class)
-    private fun getFileSize(url: NSURL): Int? {
+    private fun getFileSize(url: NSURL): Long? {
         val filePath = url.path ?: return null
         val fileManager = NSFileManager.defaultManager()
         val attributes = fileManager.attributesOfItemAtPath(filePath, null) ?: return null
         val fileSize = attributes[NSFileSize] as? NSNumber
-        return fileSize?.intValue
+        return fileSize?.longValue
     }
     
     
@@ -706,6 +705,11 @@ actual class FileProvider {
     
     actual fun getFileBytesForDir(fileDirectory: String): ByteArray? {
         TODO("Not yet implemented")
+    }
+    
+    actual fun getFileSizeFromUri(fileDirectory: String): Long? {
+        val url = NSURL.fileURLWithPath(fileDirectory)
+        return getFileSize(url)
     }
     
     

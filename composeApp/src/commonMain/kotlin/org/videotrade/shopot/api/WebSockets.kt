@@ -265,6 +265,9 @@ suspend fun handleConnectWebSocket(
                                                 val uploadId =
                                                     jsonElement.jsonObject["uploadId"]?.jsonPrimitive?.content
                                                 
+                                                println("uploadId ${uploadId}")
+                                                
+                                                
                                                 chatUseCase.updateUploadMessage(
                                                     message.copy(
                                                         uploadId = uploadId
