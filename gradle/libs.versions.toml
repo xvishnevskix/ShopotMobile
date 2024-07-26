@@ -37,6 +37,8 @@ firebaseCommon = "1.10.0"
 
 workRuntimeKtx = "2.9.0"
 
+coil3 = "3.0.0-alpha06"
+
 [libraries]
 
 # only Android
@@ -90,8 +92,13 @@ stately-common = { module = "co.touchlab:stately-common", version.ref = "stately
 webrtc-kmp = { module = "com.shepeliev:webrtc-kmp", version.ref = "webrtcKmp" }
 androidx-animation-core-android = { group = "androidx.compose.animation", name = "animation-core-android", version.ref = "animationCoreAndroid" }
 
-[plugins]
+# coil
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3" }
+coil-compose-core = { module = "io.coil-kt.coil3:coil-compose-core", version.ref = "coil3" }
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor", version.ref = "coil3" }
+coil-mp = { module = "io.coil-kt.coil3:coil", version.ref = "coil3" }
 
+[plugins]
 multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
 android-application = { id = "com.android.application", version.ref = "agp" }

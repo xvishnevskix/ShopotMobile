@@ -392,7 +392,7 @@ actual class FileProvider {
                         
                         
                         
-                        if (dirType !== "audio/mp4") {
+                        if (dirType !== "audio/mp4" && dirType !== "image") {
                             savePickedFile(result3, filename)
                             
                         }

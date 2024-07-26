@@ -210,7 +210,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = "Галерея",
             imagePath = Res.drawable.menu_gallery,
             onClick = {
-//                singleImagePicker.launch()
+                viewModel.sendImage(
+                    text,
+                    viewModel.profile.value.id,
+                    chat.id,
+                    "image",
+                    "jpg",
+                )
             }
         ),
 //    MenuItem(
@@ -548,7 +554,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 
                                                 
                                                 viewModel.sendVoice(fileDir, chat, voiceName)
-                                            
+                                                
                                             }
                                         }
                                         viewModel.setIsRecording(false)

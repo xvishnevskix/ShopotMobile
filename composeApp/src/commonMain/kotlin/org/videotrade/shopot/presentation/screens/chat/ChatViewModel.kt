@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.screens.chat
 
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -281,6 +282,32 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 uploadId = Random.nextInt(1, 501).toString()
             )
         )
+    }
+    
+    
+    fun sendImage(
+        content: String? = null,
+        fromUser: String,
+        chatId: String,
+        uploadId: String,
+        fileId: String
+    ) {
+        viewModelScope.launch {
+            val filePick = FileProviderFactory.create()
+                .pickFile(PickerType.Image)
+            if (filePick !== null) {
+                sendAttachments(
+                    content,
+                    fromUser,
+                    chatId,
+                    "image",
+                    filePick.fileName,
+                    filePick.fileAbsolutePath,
+                )
+                
+            }
+        }
+        
     }
     
     

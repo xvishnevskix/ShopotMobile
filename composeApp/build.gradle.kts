@@ -103,6 +103,10 @@ kotlin {
             api(libs.kmpnotifier)
             implementation(libs.firebase.common)
             implementation(libs.filekit.core)
+            implementation(libs.coil.compose.core)
+            implementation(libs.coil.compose)
+            implementation(libs.coil.mp)
+            implementation(libs.coil.network.ktor)
             
         }
         
