@@ -35,7 +35,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.github.vinceglb.filekit.core.PlatformFile
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -68,6 +67,7 @@ fun FileMessage(
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
     
     var isLoading by remember { mutableStateOf(false) }
+    var isLoadingSuccess by remember { mutableStateOf(false) }
     var isStartCipherLoading by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0f) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
@@ -153,7 +153,7 @@ fun FileMessage(
         val existingFile = audioFile.existingFile(fileName, attachments[0].type)
         
         if (!existingFile.isNullOrBlank()) {
-
+            isLoadingSuccess = true
             downloadJob?.cancel()
             isLoading = false
             progress = 1f
@@ -173,6 +173,9 @@ fun FileMessage(
         ) {
             IconButton(
                 onClick = {
+                    
+                    if (isLoadingSuccess) return@IconButton
+                    
                     message.attachments?.get(0)?.let { attachment ->
                         if (!isLoading) {
                             downloadJob?.cancel()
@@ -193,6 +196,7 @@ fun FileMessage(
                                     isStartCipherLoading = false
                                     progress = newProgress
                                 }
+                                isLoadingSuccess = true
                                 isLoading = false
                             }
                         } else {
@@ -258,6 +262,7 @@ fun FileMessage(
                             ),
                             contentDescription = null,
                             modifier = Modifier.size(45.dp).pointerInput(Unit) {
+                                println("dasdadadaaaaaa ${progress != 1f}")
                                 if (progress != 1f)
                                     isStartCipherLoading = true
                             },

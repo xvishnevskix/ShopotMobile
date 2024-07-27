@@ -86,6 +86,7 @@ class origin {
         
         try {
             val token = getValueInStorage("accessToken")
+            println("url ${EnvironmentConfig.serverUrl}$url}")
             
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.serverUrl}$url") {
@@ -109,7 +110,7 @@ class origin {
             }
         } catch (e: Exception) {
             
-            println("Error: $e")
+            println("Error1111: $e")
             
             return null
             

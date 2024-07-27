@@ -55,7 +55,7 @@ class MainViewModel : ViewModel(), KoinComponent {
                 getWsSession()
                 
                 
-                println("userID : ${it.id}")
+                println("userIDWWWWW : ${it.id}")
                 
                 navigator.value?.let { navigator -> callUseCase.connectionWs(it.id, navigator) }
                 

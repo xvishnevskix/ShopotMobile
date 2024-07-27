@@ -155,7 +155,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     _wsSession.value = this
                     isConnected.value = true
                     
-                    
                     val callOutputRoutine = launch {
                         for (frame in incoming) {
                             if (frame is Frame.Text) {
@@ -448,6 +447,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     @OptIn(DelicateCoroutinesApi::class)
     suspend override fun makeCall(userId: String, calleeId: String) {
+        println("makeCall31313131 ${wsSession.value}")
+        
         coroutineScope {
             if (wsSession.value != null) {
                 try {

@@ -85,6 +85,9 @@ class CallScreen(
         
         
         LaunchedEffect(wsSession) {
+            
+            println("dsadadadadad $user")
+            
             if (!hasExecuted.value && wsSession != null) {
                 when (callCase) {
                     "Call" -> {
@@ -206,7 +209,7 @@ class CallScreen(
                 modifier = Modifier
                     .padding(top = 12.5.dp)
                     .align(Alignment.CenterHorizontally),
-                text = "${user.firstName} ${user.firstName}",
+                text = "${user.firstName} ${user.lastName}",
                 fontSize = 26.sp,
                 color = Color(255, 255, 255),
                 textAlign = TextAlign.Center,
