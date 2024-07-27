@@ -97,7 +97,6 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CipherWrapper
-import org.videotrade.shopot.multiplatform.EncapsulationMessageResult
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import kotlin.random.Random
@@ -250,40 +249,41 @@ class TestScreen : Screen {
                         scope.launch {
                             val absltPath = FileProviderFactory.create()
                                 .pickFile(PickerType.File(listOf("pdf", "zip")))
-
+                            
                             if (absltPath !== null) {
-
+                                
+                                val sharedSecret = getValueInStorage("sharedSecret")
+                                
+                                println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
+                                
+                                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                                
+                                
                                 val fileName = "cipherFile${Random.nextInt(0, 100000)}"
                                 
                                 
-                                val fileData =
-                                    FileProviderFactory.create()
-                                        .getFileData(absltPath.fileContentPath)
+                                val cipherFilePath = FileProviderFactory.create()
+                                    .getFilePath(
+                                        fileName,
+                                        "cipher1"
+                                    )
                                 
-                                
-                                if (fileData !== null) {
-                                    val cipherFilePath = FileProviderFactory.create()
-                                        .getFilePath(
-                                            fileName,
-                                            fileData.fileType
+                                val encupsChachaFileResult = absltPath.let {
+                                    if (cipherFilePath != null) {
+                                        val op = cipherWrapper.encupsChachaFileCommon(
+                                            absltPath.fileAbsolutePath,
+                                            cipherFilePath,
+                                            sharedSecret?.decodeBase64Bytes()!!
                                         )
-                                    println("sdadasdsadadadasda")
-
-                                    val sendFile = FileProviderFactory.create().uploadCipherFile(
-                                        "file/upload",
-                                        absltPath.fileAbsolutePath,
-                                        fileData.fileType,
-                                        fileName
-                                    ) {
-
+                                        
+                                        
+                                        println("op221313 $op")
+                                        
                                     }
-                                    
-                                    
-                                    if (sendFile != null) {
-                                        fileId = sendFile
-                                    }
-                                    
                                 }
+                                
+                                
+                                println("result2 $encupsChachaFileResult")
                                 
                                 
                             }

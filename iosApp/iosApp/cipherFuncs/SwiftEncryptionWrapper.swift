@@ -86,15 +86,8 @@ class EncryptionWrapperIOS: NSObject {
             return nil
         }
 
-        // Запрос на доступ к файлу
-        if !srcURL.startAccessingSecurityScopedResource() {
-            print("Failed to access security scoped resource: \(srcURL.path)")
-            return nil
-        }
-        defer { srcURL.stopAccessingSecurityScopedResource() }
-
         do {
-            // Убедитесь, что файл загружен локально
+            // Убедитесь, что файл загружен локально, если он из iCloud
             let resourceValues = try srcURL.resourceValues(forKeys: [.ubiquitousItemDownloadingStatusKey, .ubiquitousItemIsDownloadingKey])
             
             if let isDownloading = resourceValues.ubiquitousItemIsDownloading, isDownloading {

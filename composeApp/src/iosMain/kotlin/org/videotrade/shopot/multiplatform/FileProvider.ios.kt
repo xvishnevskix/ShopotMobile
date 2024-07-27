@@ -30,11 +30,13 @@ import kotlinx.cinterop.ObjCObjectVar
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.alloc
 import kotlinx.cinterop.memScoped
+import kotlinx.cinterop.nativeHeap
 import kotlinx.cinterop.ptr
 import kotlinx.cinterop.refTo
 import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
+import kotlinx.cinterop.value
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -57,6 +59,8 @@ import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSError
+import platform.Foundation.NSFileCoordinator
+import platform.Foundation.NSFileCoordinatorReadingOptions
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
 import platform.Foundation.NSMakeRange
@@ -80,9 +84,12 @@ import platform.UIKit.UIDocumentPickerViewController
 import platform.darwin.NSObject
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import platform.Foundation.*
+import kotlin.concurrent.AtomicReference
 
 actual class FileProvider {
     
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {
         try {
             val filePick = FileKit.pickFile(
@@ -90,23 +97,83 @@ actual class FileProvider {
                 mode = PickerMode.Single,
             )
             
-            if (filePick?.path != null) {
-                val fileManager = NSFileManager.defaultManager
+            if (filePick?.nsUrl != null) {
                 val filePath = filePick.nsUrl.path
-                if (filePath != null && fileManager.fileExistsAtPath(filePath)) {
-                    println("file exists at path: $filePath")
+                val fileManager = NSFileManager.defaultManager
+                
+                if (filePath != null) {
+                    val fileURL = NSURL.fileURLWithPath(filePath)
                     
-                    // Копируем файл в директорию Documents
-                    copyFileToDocuments(filePath, filePick.name)
+                    // Начинаем доступ к файлу
+                    val securityScoped = fileURL.startAccessingSecurityScopedResource()
                     
-                    return PlatformFilePick(
-                        filePick.path!!,
-                        filePath,
-                        filePick.getSize()!!,
-                        filePick.name
-                    )
+                    // Проверяем существование файла
+                    val fileExists = fileManager.fileExistsAtPath(filePath)
+                    println("fileExists at path $filePath: $fileExists")
+                    
+                    if (fileExists) {
+                        println("file exists at path: $filePath")
+                        
+                        // Копируем файл в директорию Documents
+                        val documentsDirectories =
+                            fileManager.URLsForDirectory(NSDocumentDirectory, NSUserDomainMask)
+                        val documentsDirectory = documentsDirectories[0] as? NSURL
+                        if (documentsDirectory != null) {
+                            val destinationURL =
+                                documentsDirectory.URLByAppendingPathComponent(filePick.name)
+                            
+                            // Проверка и удаление существующего файла
+                            if (fileManager.fileExistsAtPath(destinationURL?.path!!)) {
+                                val deleteErrorPtr = nativeHeap.alloc<ObjCObjectVar<NSError?>>()
+                                fileManager.removeItemAtURL(destinationURL, deleteErrorPtr.ptr)
+                                if (deleteErrorPtr.value != null) {
+                                    println("Error deleting existing file: ${deleteErrorPtr.value}")
+                                    return null
+                                }
+                            }
+                            
+                            val success = copyFile(fileURL, destinationURL)
+                            if (success) {
+                                println("file copied to: ${destinationURL.path}")
+                                
+                                // Заканчиваем доступ к файлу
+                                if (securityScoped) {
+                                    fileURL.stopAccessingSecurityScopedResource()
+                                }
+                                
+                                // Проверка значений для PlatformFilePick
+                                val originalPath = filePick.path
+                                val destinationPath = destinationURL.path
+                                val fileSize = getFileSize(destinationURL)
+                                val fileName = filePick.name
+                                
+                                if (originalPath == null || destinationPath == null || fileSize == null) {
+                                    println("Null value detected: originalPath=$originalPath, destinationPath=$destinationPath, fileSize=$fileSize, fileName=$fileName")
+                                    throw NullPointerException("One or more values are null")
+                                }
+                                
+                                return PlatformFilePick(
+                                    originalPath,
+                                    destinationPath,
+                                    fileSize,
+                                    fileName
+                                )
+                            } else {
+                                println("Failed to copy file to: ${destinationURL.path}")
+                            }
+                        } else {
+                            println("Could not find documents directory")
+                        }
+                    } else {
+                        println("file does not exist at path: $filePath")
+                    }
+                    
+                    // Заканчиваем доступ к файлу
+                    if (securityScoped) {
+                        fileURL.stopAccessingSecurityScopedResource()
+                    }
                 } else {
-                    println("file does not exist at path: $filePath")
+                    println("filePath is null")
                 }
             } else {
                 println("filePick is null or nsUrl is null")
@@ -118,6 +185,19 @@ actual class FileProvider {
         }
     }
     
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    private fun copyFile(sourceURL: NSURL, destinationURL: NSURL): Boolean {
+        val fileManager = NSFileManager.defaultManager
+        memScoped {
+            val errorPtr = alloc<ObjCObjectVar<NSError?>>()
+            fileManager.copyItemAtURL(sourceURL, destinationURL, errorPtr.ptr)
+            if (errorPtr.value != null) {
+                println("Error copying file: ${errorPtr.value}")
+                return false
+            }
+        }
+        return true
+    }
     @OptIn(ExperimentalForeignApi::class)
     fun copyFileToDocuments(filePath: String, destinationFilename: String): Boolean {
         return try {
