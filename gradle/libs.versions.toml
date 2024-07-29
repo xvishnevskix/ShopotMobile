@@ -15,6 +15,7 @@ ktorClientCore = "2.3.11"
 ktorClientDarwin = "2.3.11"
 lifecycleRuntimeKtx = "2.8.2"
 peekabooUi = "0.5.2"
+resources = "0.24.1"
 sonner = "0.3.6"
 voyager = "1.0.0"
 composeImageLoader = "1.8.1"
@@ -66,6 +67,8 @@ ktor-client-core-v200 = { module = "io.ktor:ktor-client-core", version.ref = "kt
 ktor-client-darwin-v200 = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientDarwin" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekabooUi" }
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekabooUi" }
+resources = { module = "dev.icerock.moko:resources", version.ref = "resources" }
+resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "resources" }
 sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator" }

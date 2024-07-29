@@ -107,7 +107,8 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.mp)
             implementation(libs.coil.network.ktor)
-            
+            implementation(libs.resources)
+            implementation(libs.resources.compose) // for compose multiplatfor
         }
         
         commonTest.dependencies {
