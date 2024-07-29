@@ -1,6 +1,7 @@
 import com.android.build.api.dsl.Lint
 import com.android.build.api.dsl.LintOptions
 import com.android.build.api.dsl.ManagedVirtualDevice
+import dev.icerock.gradle.MRVisibility
 import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetTree
@@ -15,7 +16,10 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     kotlin("native.cocoapods")
     id("com.google.gms.google-services")
+    id("dev.icerock.mobile.multiplatform-resources") version "0.24.1"
+    
 }
+
 
 kotlin {
     
@@ -163,6 +167,7 @@ android {
         res.srcDirs("src/androidMain/res")
     }
     
+    
     @Suppress("UnstableApiUsage")
     testOptions {
         managedDevices {
@@ -195,6 +200,38 @@ android {
             version = "3.22.1"
         }
     }
+}
+
+multiplatformResources {
+    resourcesPackage.set("org.videotrade.shopot") // required
+    resourcesClassName.set("SharedRes") // optional, default MR
+    resourcesVisibility.set(MRVisibility.Internal) // optional, default Public
+    iosBaseLocalizationRegion.set("en") // optional, default "en"
+    iosMinimalDeploymentTarget.set("11.0") // optional, default "9.0"
+}
+
+tasks.getByName("preBuild") {
+    dependsOn("generateMRcommonMain")
+}
+
+configurations {
+    create("resolvableMetadataCompilationApi") {
+        extendsFrom(configurations.getByName("metadataCompilationApi"))
+        isCanBeResolved = true
+        isCanBeConsumed = false
+    }
+}
+
+tasks.register("someTask") {
+    doLast {
+        val dependencies =
+            configurations.getByName("resolvableMetadataCompilationApi").resolvedConfiguration.resolvedArtifacts
+        // Используйте зависимости...
+    }
+}
+
+tasks.withType<dev.icerock.gradle.tasks.GenerateMultiplatformResourcesTask> {
+    outputs.upToDateWhen { false }
 }
 
 dependencies {
