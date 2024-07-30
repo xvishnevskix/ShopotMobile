@@ -199,9 +199,9 @@ fun MessageContent(message: MessageItem): String {
     } else {
         
         when (message.attachments!![0].type) {
-            "audio/mp4" -> "Аудио"
-            "image" -> "Фото"
-            else -> "Файл"
+            "audio/mp4" -> stringResource(SharedRes.strings.audio)
+            "image" -> stringResource(SharedRes.strings.photo)
+            else -> stringResource(SharedRes.strings.file)
         }
         
         

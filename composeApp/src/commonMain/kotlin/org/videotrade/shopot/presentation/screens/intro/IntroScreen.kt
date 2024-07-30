@@ -14,6 +14,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -30,14 +31,14 @@ class IntroScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
-        
-        
-        
+
+
+        AppInitializer()
         
         LaunchedEffect(key1 = Unit) {
             try {
-                
-                
+
+
                 viewModel.navigator.value = navigator
                 
                 

@@ -7,6 +7,9 @@
     <string name="start_conversation">Начните переписку</string>
     <string name="encryption_info_1">Все чаты зашифрованы</string>
     <string name="encryption_info_2"> ассиметричным и постквантовым шифрованием</string>
+    <string name="audio">Аудио</string>
+    <string name="photo">Фото</string>
+    <string name="whisper">Шёпот</string>
 
     <string name="profile">Профиль</string>
     <string name="chats">Чаты</string>

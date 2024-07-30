@@ -26,9 +26,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
@@ -71,7 +73,7 @@ fun HeaderMain() {
                 )
 
             Text(
-                "Шёпот",
+                stringResource(SharedRes.strings.whisper),
                 modifier = Modifier.padding(start = 7.dp),
 
                 textAlign = TextAlign.Center,
