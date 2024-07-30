@@ -34,8 +34,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.dokar.sonner.Toast
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
@@ -81,7 +83,7 @@ class CreateGroupFirstScreen() : Screen {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     CreateChatHeader(
-                        "Создать группу",
+                        stringResource(SharedRes.strings.create_group),
                         isSearching = isSearching,
                         searchQuery = searchQuery,
                     )
@@ -97,7 +99,7 @@ class CreateGroupFirstScreen() : Screen {
                     }
                     Box(modifier = Modifier.padding(top = 5.dp)) {
                         CustomButton(
-                            "Далее",
+                            stringResource(SharedRes.strings.next),
                             {
                                 if (selectedContacts.isEmpty()) {
 //                                    Toast.makeText(context, "Выберите участников", Toast.LENGTH_SHORT).show()

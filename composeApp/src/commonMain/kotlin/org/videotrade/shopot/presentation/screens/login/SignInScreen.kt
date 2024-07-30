@@ -35,8 +35,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -88,7 +90,7 @@ class SignInScreen : Screen {
                         )
 
                         Text(
-                            "Добро пожаловать!",
+                            stringResource(SharedRes.strings.greeting),
                             fontSize = 28.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
@@ -98,7 +100,7 @@ class SignInScreen : Screen {
                             
                         )
                         Text(
-                            "Для того, чтобы продолжить \nавторизуйтесь",
+                            stringResource(SharedRes.strings.to_continue_please_log_in),
                             textAlign = TextAlign.Center,
                             fontSize = 18.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
@@ -118,7 +120,7 @@ class SignInScreen : Screen {
 
 
                         CustomButton(
-                            "Войти",
+                            stringResource(SharedRes.strings.login),
                             {
                                 navigator.push(
                                     AuthCallScreen(
@@ -138,7 +140,7 @@ class SignInScreen : Screen {
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(
-                                "У вас еще нет акканута?",
+                                stringResource(SharedRes.strings.do_not_have_an_account_yet),
                                 fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                                 textAlign = TextAlign.Center,
                                 fontSize = 12.sp,
@@ -146,7 +148,7 @@ class SignInScreen : Screen {
                                 color = Color(0xFF979797),
                             )
                             Text(
-                                " Зарегистрироваться",
+                                " " + stringResource(SharedRes.strings.sign_up),
                                 fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                                 textAlign = TextAlign.Center,
                                 fontSize = 12.sp,

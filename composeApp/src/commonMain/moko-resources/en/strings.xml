@@ -1,4 +1,82 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="my_string">Моя строка локализации по умолчанию</string>
+    <string name="my_string">My default localization string</string>
+
+
+
+    <string name="start_conversation">Start a conversation</string>
+    <string name="encryption_info_1">All chats are encrypted</string>
+    <string name="encryption_info_2">with asymmetric and post-quantum encryption</string>
+
+    <string name="profile">Profile</string>
+    <string name="chats">Chats</string>
+    <string name="contacts">Contacts</string>
+
+    <string name="create_group">Create a group chat</string>
+    <string name="create_chat">Create a chat</string>
+    <string name="next">Next</string>
+    <string name="enter_group_name">Enter the group name</string>
+    <string name="enter_name_or_phone">Enter your name or phone number</string>
+
+    <string name="participant">participant</string>
+    <string name="participants_1">participants</string>
+    <string name="participants_2">participants</string>
+
+    <string name="edit_profile">Edit profile</string>
+    <string name="info">Info</string>
+    <string name="log_out">Log out</string>
+    <string name="edit">Edit</string>
+    <string name="upload_photo">Upload a photo</string>
+    <string name="delete_account">Delete account</string>
+    <string name="description">Description</string>
+
+    <string name="write_message">Message...</string>
+    <string name="gallery">Gallery</string>
+    <string name="file">File</string>
+    <string name="left_cancel">Left - cancel</string>
+    <string name="delete">Delete</string>
+    <string name="copy">Copy</string>
+
+
+    <string name="call_incoming">Call incoming...</string>
+    <string name="connection_establishment_in_progress">The connection establishment process is in progress.</string>
+    <string name="connection_established">Connection established.</string>
+    <string name="connection_was_broken">The connection was broken.</string>
+    <string name="error_occurred_while_establishing_connection">An error occurred while establishing a connection.</string>
+    <string name="connection_was_closed">The connection was closed.</string>
+    <string name="end_call">End call</string>
+    <string name="microphone">Microphone</string>
+    <string name="speaker">Speaker</string>
+    <string name="video_call">Video call</string>
+    <string name="incoming_call">Incoming call...</string>
+
+    <string name="greeting">Welcome!</string>
+    <string name="to_continue_please_log_in">To continue, please \n
+        log in.</string>
+    <string name="do_not_have_an_account_yet">Don't have an account yet?</string>
+    <string name="sign_up">Sign Up</string>
+    <string name="login">Login</string>
+
+    <string name="enter_last_4_digits_of_the_incoming_call">Enter the last 4 digits of the incoming call</string>
+    <string name="you_will_receive_a_call_to_your_number_enter_the_last_4">You will receive a call to your number. Enter the last 4 digits +X XXX XXX 12 34</string>
+    <string name="confirm">Confirm</string>
+
+    <string name="create_account">Create an account</string>
+    <string name="enter_your_phone_number">Enter your phone number</string>
+    <string name="send_code">Send code</string>
+    <string name="name">Name</string>
+    <string name="lastname">Lastname</string>
+    <string name="come_up_nickname">Nickname</string>
+
+    <string name="ru">Russian Federation</string>
+    <string name="ge">Georgia</string>
+    <string name="am">Armenia</string>
+    <string name="by">Belarus</string>
+    <string name="kg">Kyrgyzstan</string>
+    <string name="tj">Tajikistan</string>
+    <string name="uz">Uzbekistan</string>
+    <string name="lv">Latvia</string>
+    <string name="ph">Philippines</string>
+
+
 </resources>

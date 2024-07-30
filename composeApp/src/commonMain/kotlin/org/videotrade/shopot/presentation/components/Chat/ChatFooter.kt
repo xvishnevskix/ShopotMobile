@@ -1,5 +1,7 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
@@ -8,6 +10,10 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -64,12 +70,14 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
+import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.api.getCurrentTimeList
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
@@ -95,6 +103,7 @@ data class MenuItem(
 )
 
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
@@ -207,7 +216,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     
     val menuItems = listOf(
         MenuItem(
-            text = "Галерея",
+            text = stringResource(SharedRes.strings.gallery),
             imagePath = Res.drawable.menu_gallery,
             onClick = {
                 viewModel.sendImage(
@@ -227,21 +236,21 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //        }
 //    ),
         MenuItem(
-            text = "Файл",
+            text = stringResource(SharedRes.strings.file),
             imagePath = Res.drawable.menu_file,
             onClick = {
-                
+
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
                             .pickFile(PickerType.File(listOf("pdf", "zip")))
-                        
+
                         if (filePick !== null) {
                             val fileData =
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
-                            
+
                             println("fileData $fileData ${Random.nextInt(1, 501)}")
-                            
+
                             if (fileData !== null) {
                                 viewModel.addMessage(
                                     MessageItem(
@@ -274,8 +283,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 )
                             }
                         }
-                        
-                        
+
+
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
@@ -290,6 +299,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //        }
 //    ),
     )
+    val editOptions =  getEditOptions()
+
+
     
     Box(
         modifier = Modifier
@@ -297,70 +309,78 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             .padding(vertical = 15.dp)
             .background(Color.White)
     ) {
-        
-        if (showMenu) {
-            Popup(
-                alignment = Alignment.TopStart,
-                onDismissRequest = { showMenu = false },
-                
+
+
+
+
+                Popup(
+                    alignment = Alignment.TopStart,
+                    onDismissRequest = { showMenu = false },
                 ) {
-                Column(
-                    modifier = Modifier
-                        .padding(bottom = 55.dp, start = 12.dp)
-                        .fillMaxWidth(0.5f)
-                        .shadow(
-                            elevation = 6.dp,
-                            shape = RoundedCornerShape(8.dp),
-                            clip = false,
-                            ambientColor = Color.Gray,
-                            spotColor = Color.Gray
-                        )
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White)
-                ) {
-                    menuItems.forEachIndexed { index, editOption ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .padding(
-                                    start = 16.dp,
-                                    end = 16.dp,
-                                    top = 9.dp,
-                                    bottom = 5.dp
+                    AnimatedVisibility(
+                        visible = showMenu,
+                        enter = fadeIn() + scaleIn(initialScale = 0.1f),
+                        exit = fadeOut() + scaleOut(targetScale = 0.9f)
+                    ) {
+                    Column(
+                        modifier = Modifier
+                            .pointerInput(Unit) { showMenu = false }
+                            .padding(bottom = 55.dp, start = 12.dp)
+                            .fillMaxWidth(0.5f)
+                            .shadow(
+                                elevation = 6.dp,
+                                shape = RoundedCornerShape(8.dp),
+                                clip = false,
+                                ambientColor = Color.Gray,
+                                spotColor = Color.Gray
+                            )
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.White)
+
+                    ) {
+                        menuItems.forEachIndexed { index, editOption ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .padding(
+                                        start = 16.dp,
+                                        end = 16.dp,
+                                        top = 9.dp,
+                                        bottom = 5.dp
+                                    )
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        editOption.onClick()
+                                        showMenu = false
+                                    }
+                            ) {
+                                Image(
+                                    painter = painterResource(editOption.imagePath),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(25.dp)
                                 )
-                                .fillMaxWidth()
-                                .clickable {
-                                    editOption.onClick()
-                                    showMenu = false
-                                }
-                        ) {
-                            Image(
-                                painter = painterResource(editOption.imagePath),
-                                contentDescription = null,
-                                modifier = Modifier.size(25.dp)
-                            )
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Text(
-                                text = editOption.text,
-                                textAlign = TextAlign.Center,
-                                fontSize = 15.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF000000)
-                            )
-                        }
-                        if (index < editOptions.size - 1) {
-                            Divider(color = Color.Gray.copy(alpha = 0.12f))
-                        } else {
-                            Spacer(modifier = Modifier.height(4.dp))
+                                Spacer(modifier = Modifier.width(20.dp))
+                                Text(
+                                    text = editOption.text,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 15.sp,
+                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                    lineHeight = 20.sp,
+                                    color = Color(0xFF000000)
+                                )
+                            }
+                            if (index < menuItems.size - 1) {
+                                Divider(color = Color.Gray.copy(alpha = 0.12f))
+                            } else {
+                                Spacer(modifier = Modifier.height(4.dp))
+                            }
                         }
                     }
                 }
             }
-        }
-        
-        
+
+
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -415,7 +435,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         Box {
                             if (text.isEmpty()) {
                                 Text(
-                                    "Написать...",
+                                    stringResource(SharedRes.strings.write_message),
                                     textAlign = TextAlign.Center,
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -475,7 +495,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         contentDescription = null,
                     )
                     Text(
-                        text = "Влево - отмена",
+                        text = stringResource(SharedRes.strings.left_cancel),
                         fontSize = 13.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),

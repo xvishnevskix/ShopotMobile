@@ -26,7 +26,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.components.Common.CustomButton
@@ -56,7 +58,7 @@ class SignUpPhoneScreen : Screen {
         
         SafeArea {
             
-            AuthHeader("Создать аккаунт", 0.75F)
+            AuthHeader(stringResource(SharedRes.strings.create_account), 0.75F)
             
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -65,7 +67,7 @@ class SignUpPhoneScreen : Screen {
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                     item {
                         Text(
-                            "Введите номер телефона",
+                            stringResource(SharedRes.strings.enter_your_phone_number),
                             modifier = Modifier.padding(bottom = 5.dp),
                             fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
                             fontSize = 20.sp,
@@ -83,7 +85,7 @@ class SignUpPhoneScreen : Screen {
                             modifier = Modifier.padding(top = 20.dp)
                         ) {
                             CustomButton(
-                                "Отправить код",
+                                stringResource(SharedRes.strings.send_code),
                                 {
 
 

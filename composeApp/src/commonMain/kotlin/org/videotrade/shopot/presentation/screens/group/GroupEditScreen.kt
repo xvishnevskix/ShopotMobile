@@ -38,8 +38,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import dev.icerock.moko.resources.compose.stringResource
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditHeader
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.SharedRes
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -74,7 +76,7 @@ class GroupEditScreen : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    GroupEditHeader("Изменить")
+                    GroupEditHeader(stringResource(SharedRes.strings.edit))
                     Row(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
@@ -123,7 +125,7 @@ class GroupEditScreen : Screen {
                             contentScale = ContentScale.FillBounds
                         )
                         Text(
-                            "Загрузить фотографию",
+                            stringResource(SharedRes.strings.upload_photo),
                             textAlign = TextAlign.Center,
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),

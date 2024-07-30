@@ -40,11 +40,13 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.audioTracks
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
@@ -101,7 +103,8 @@ class CallScreen(
                 hasExecuted.value = true
             }
         }
-        
+
+
         
         LaunchedEffect(isRunning) {
             while (isRunning) {
@@ -109,24 +112,32 @@ class CallScreen(
                 secondsElapsed++
             }
         }
+
+        val callIncoming: String = stringResource(SharedRes.strings.call_incoming)
+        val connectionEstablishmentInProgress: String = stringResource(SharedRes.strings.connection_establishment_in_progress)
+        val connectionEstablished: String = stringResource(SharedRes.strings.connection_established)
+        val connectionWasBroken: String = stringResource(SharedRes.strings.connection_was_broken)
+        val errorOccurredWhileEstablishingConnection: String = stringResource(SharedRes.strings.error_occurred_while_establishing_connection)
+        val connectionWasClosed: String = stringResource(SharedRes.strings.connection_was_closed)
+
         
         LaunchedEffect(callStateView) {
             when (callStateView) {
-                PeerConnectionState.New -> callState.value = "Идет вызов..."
+                PeerConnectionState.New -> callState.value = callIncoming
                 PeerConnectionState.Connecting -> callState.value =
-                    "Идет процесс установления соединения."
+                    connectionEstablishmentInProgress
                 
                 PeerConnectionState.Connected -> {
-                    callState.value = "Соединение установлено."
+                    callState.value = connectionEstablished
                     delay(500)
                     isRunning = true
                 }
                 
-                PeerConnectionState.Disconnected -> callState.value = "Соединение было разорвано."
+                PeerConnectionState.Disconnected -> callState.value = connectionWasBroken
                 PeerConnectionState.Failed -> callState.value =
-                    "Произошла ошибка при установлении соединения."
+                    errorOccurredWhileEstablishingConnection
                 
-                PeerConnectionState.Closed -> callState.value = "Соединение было закрыто."
+                PeerConnectionState.Closed -> callState.value = connectionWasClosed
             }
         }
         
@@ -277,7 +288,7 @@ class CallScreen(
                     viewModel.rejectCall(navigator, userId)
                     
                     
-                }, "Завершить")
+                }, stringResource(SharedRes.strings.end_call))
             }
         }
     }

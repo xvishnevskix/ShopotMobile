@@ -42,6 +42,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.image.picker.toImageBitmap
+import dev.icerock.moko.resources.compose.stringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -59,6 +60,7 @@ import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
@@ -110,7 +112,7 @@ class SignUpScreen(private val phone: String) : Screen {
         
         
         SafeArea {
-            AuthHeader("Создать аккаунт", 0.75F)
+            AuthHeader(stringResource(SharedRes.strings.create_account), 0.75F)
             
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -151,30 +153,30 @@ class SignUpScreen(private val phone: String) : Screen {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             TextFieldWithTitle(
-                                title = "Имя",
+                                title = stringResource(SharedRes.strings.name),
                                 value = textState.value.firstName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(firstName = it)
                                 },
-                                placeholder = "Имя"
+                                placeholder = stringResource(SharedRes.strings.name)
                             )
                             
                             TextFieldWithTitle(
-                                title = "Фамилия",
+                                title = stringResource(SharedRes.strings.lastname),
                                 value = textState.value.lastName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(lastName = it)
                                 },
-                                placeholder = "Фамилия"
+                                placeholder = stringResource(SharedRes.strings.lastname)
                             )
                             
                             TextFieldWithTitle(
-                                title = "Придумайте ник",
+                                title = stringResource(SharedRes.strings.come_up_nickname),
                                 value = textState.value.nickname,
                                 onValueChange = {
                                     textState.value = textState.value.copy(nickname = it)
                                 },
-                                placeholder = "Придумайте ник"
+                                placeholder = stringResource(SharedRes.strings.come_up_nickname)
                             )
                         }
                     }
@@ -184,7 +186,7 @@ class SignUpScreen(private val phone: String) : Screen {
                             modifier = Modifier.padding(top = 20.dp)
                         ) {
                             CustomButton(
-                                "Создать аккаунт",
+                                stringResource(SharedRes.strings.create_account),
                                 { scope ->
                                     scope.launch {
                                         val client = HttpClient(getHttpClientEngine())

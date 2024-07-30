@@ -38,9 +38,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
@@ -101,7 +103,7 @@ class CreateChatScreen() : Screen {
                 SafeArea {
                 Column {
                     CreateChatHeader(
-                        text = "Создать чат",
+                        text = stringResource(SharedRes.strings.create_chat),
                         isSearching = isSearching,
                         searchQuery = searchQuery,
                     )
@@ -161,7 +163,7 @@ private fun makeA_group(contacts: List<ContactDTO>) {
                 )
                 
                 Text(
-                    text = "Создать группу",
+                    text = stringResource(SharedRes.strings.create_group),
                     fontSize = 20.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                     textAlign = TextAlign.Center,

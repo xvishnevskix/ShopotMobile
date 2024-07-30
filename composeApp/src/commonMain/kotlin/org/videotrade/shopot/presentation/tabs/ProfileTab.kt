@@ -11,8 +11,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -24,7 +26,7 @@ object ProfileTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Профиль"
+            val title = stringResource(SharedRes.strings.profile)
             val icon: Painter = painterResource(Res.drawable.profileNav)
             
             return remember {

@@ -40,10 +40,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -88,7 +90,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        "Чаты",
+                        stringResource(SharedRes.strings.chats),
                         modifier = Modifier.padding(bottom = 15.dp, top = 5.dp),
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
@@ -141,7 +143,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                             modifier = Modifier.fillMaxWidth()
                                         ) {
                                             Text(
-                                                "Все чаты зашифрованы  ",
+                                                stringResource(SharedRes.strings.encryption_info_1),
                                                 textAlign = TextAlign.Center,
                                                 fontSize = 10.sp,
                                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -150,7 +152,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                 color = Color(0xFF000000),
                                             )
                                             Text(
-                                                "ассиметричным и постквантовым шифрованием",
+                                              "  " + stringResource(SharedRes.strings.encryption_info_2),
                                                 textAlign = TextAlign.Start,
                                                 fontSize = 10.sp,
                                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),

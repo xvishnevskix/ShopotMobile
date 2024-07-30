@@ -42,8 +42,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupProfileHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -85,7 +87,7 @@ class GroupProfileScreen : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    GroupProfileHeader("Изменить")
+                    GroupProfileHeader(stringResource(SharedRes.strings.edit))
                     Avatar(
                         icon = null,
                         size = 116.dp
@@ -157,7 +159,7 @@ class GroupProfileScreen : Screen {
                             drawableRes = Res.drawable.edit_pencil,
                             width = 13.dp,
                             height = 13.dp,
-                            text = "Изменить"
+                            text = stringResource(SharedRes.strings.edit)
                         )
                     }
                     

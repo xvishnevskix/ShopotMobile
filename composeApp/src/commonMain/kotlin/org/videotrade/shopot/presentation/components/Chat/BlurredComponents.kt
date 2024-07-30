@@ -126,6 +126,8 @@ fun MessageBlurBox(
     ) { state ->
         if (state) 0.dp else 200.dp
     }
+
+    val editOptions =  getEditOptions()
     
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,

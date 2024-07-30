@@ -25,6 +25,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.mmk.kmpnotifier.notification.NotifierManager
+import dev.icerock.moko.resources.compose.stringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -42,6 +43,7 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
@@ -113,8 +115,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         SafeArea {
             
             when (authCase) {
-                "SignIn" -> AuthHeader("Вход", 0.55F)
-                "SignUp" -> AuthHeader("Создать аккаунт", 0.75F)
+                "SignIn" -> AuthHeader(stringResource(SharedRes.strings.login), 0.55F)
+                "SignUp" -> AuthHeader(stringResource(SharedRes.strings.create_account), 0.75F)
             }
             
             Box(
@@ -128,7 +130,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     
                     item {
                         Text(
-                            "Введите последние 4 цифры входящего звонка",
+                            stringResource(SharedRes.strings.enter_last_4_digits_of_the_incoming_call),
                             modifier = Modifier.padding(bottom = 10.dp),
                             fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
                             fontSize = 20.sp,
@@ -140,7 +142,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             
                             )
                         Text(
-                            "На ваш номер $phone поступит звонок. Введите последние 4 цифры +X XXX XXX 12 34 ",
+                            stringResource(SharedRes.strings.you_will_receive_a_call_to_your_number_enter_the_last_4),
                             textAlign = TextAlign.Center,
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -155,7 +157,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         
                         
                         CustomButton(
-                            "Подтвердить",
+                            stringResource(SharedRes.strings.confirm),
                             {
                                 val otpText = otpFields.joinToString("")
                                 

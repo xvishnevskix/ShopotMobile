@@ -19,11 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.text.AnnotatedString
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -168,22 +170,25 @@ data class EditOption(
     val onClick: (viewModule: ChatViewModel, message: MessageItem, clipboardManager: ClipboardManager) -> Unit,
 )
 
-val editOptions = listOf(
-    EditOption(
-        text = "Удалить",
-        imagePath = Res.drawable.edit_pencil,
-        onClick = { viewModule, message, _ ->
-            viewModule.deleteMessage(message)
-        }
-    ),
-    EditOption(
-        text = "Копировать",
-        imagePath = Res.drawable.edit_pencil,
-        onClick = { _, message, clipboardManager ->
-            message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
-        }
-    ),
-)
+@Composable
+fun getEditOptions(): List<EditOption> {
+    return listOf(
+        EditOption(
+            text = stringResource(SharedRes.strings.delete),
+            imagePath = Res.drawable.edit_pencil,
+            onClick = { viewModel, message, _ ->
+                viewModel.deleteMessage(message)
+            }
+        ),
+        EditOption(
+            text = stringResource(SharedRes.strings.copy),
+            imagePath = Res.drawable.edit_pencil,
+            onClick = { _, message, clipboardManager ->
+                message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
+            }
+        )
+    )
+}
 
 @OptIn(FlowPreview::class)
 @Composable
@@ -198,6 +203,8 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+
+
     
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }

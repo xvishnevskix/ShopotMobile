@@ -38,8 +38,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.SharedRes
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -94,7 +96,7 @@ fun CreateChatHeader(
                             ) {
                                 if (searchQuery.value.isEmpty()) {
                                     Text(
-                                        "Введите имя или телефон",
+                                        stringResource(SharedRes.strings.enter_name_or_phone),
                                         style = textStyle.copy(color = androidx.compose.ui.graphics.Color.Gray)
                                     )
                                 }

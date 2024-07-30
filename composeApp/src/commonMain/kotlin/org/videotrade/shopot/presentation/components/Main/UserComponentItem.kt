@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -20,14 +21,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.icerock.moko.resources.compose.stringResource
+import dev.icerock.moko.resources.desc.StringDesc
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -49,6 +54,8 @@ fun UserComponentItem(
 ) {
     val viewModel: ChatViewModel = koinInject()
     val profile = mainViewModel.profile.collectAsState().value
+
+    val string: String = stringResource(SharedRes.strings.my_string)
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
@@ -101,7 +108,7 @@ fun UserComponentItem(
                         MessageContent(message = it)
                     }?.takeIf { it.isNotEmpty() }?.let {
                         if (it.length > 35) "${it.take(32)}..." else it
-                    } ?: "Начните переписку",
+                    } ?: stringResource(SharedRes.strings.start_conversation),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -188,7 +195,7 @@ fun UserComponentItem(
 @Composable
 fun MessageContent(message: MessageItem): String {
     return if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        message.content ?: "Начните переписку"
+        message.content ?: stringResource(SharedRes.strings.start_conversation)
     } else {
         
         when (message.attachments!![0].type) {

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,10 +34,14 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
+import dev.icerock.moko.resources.desc.StringDesc
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -67,7 +72,7 @@ class ProfileScreen : Screen {
         
         val navigator = LocalNavigator.currentOrThrow
         val items = listOf(
-            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, "Редактировать профиль") {
+            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, stringResource(SharedRes.strings.edit_profile)) {
                 navigator.push(
                     ProfileEditScreen(profile)
                 )
@@ -79,7 +84,7 @@ class ProfileScreen : Screen {
 //            },
 //            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
 //            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
-            ProfileSettingsItem(Res.drawable.exit_profile, 25.dp, "Выход") {
+            ProfileSettingsItem(Res.drawable.exit_profile, 25.dp, stringResource(SharedRes.strings.log_out)) {
                 
                 commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
             },
@@ -89,7 +94,7 @@ class ProfileScreen : Screen {
 //            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
 //            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
         )
-        
+
         
         Box(
             modifier = Modifier.fillMaxSize().background(
@@ -108,7 +113,7 @@ class ProfileScreen : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader("Информация")
+                    ProfileHeader(stringResource(SharedRes.strings.info))
                     Avatar(
                         icon = profile.icon,
                         size = 186.dp
@@ -183,6 +188,8 @@ class ProfileScreen : Screen {
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+
+                    LanguageSelector()
 //                    profile.description?.let {
 //                        Text(
 //                            it,
@@ -223,7 +230,8 @@ class ProfileScreen : Screen {
                     }
                     
                 }
-                
+
+
                 
             }
 //            BottomBar(modifier = Modifier.align(Alignment.BottomCenter))

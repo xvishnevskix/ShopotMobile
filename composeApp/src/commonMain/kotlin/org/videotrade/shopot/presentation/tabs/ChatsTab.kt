@@ -10,7 +10,9 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import cafe.adriel.voyager.transitions.SlideTransition
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
@@ -21,7 +23,7 @@ object ChatsTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = "Чаты"
+            val title = stringResource(SharedRes.strings.chats)
             val icon: Painter = painterResource(Res.drawable.chatNav)
             
             

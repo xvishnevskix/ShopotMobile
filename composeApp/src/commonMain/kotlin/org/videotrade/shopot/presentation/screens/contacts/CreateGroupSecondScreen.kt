@@ -37,9 +37,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -91,7 +93,7 @@ class CreateGroupSecondScreen() : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CreateChatHeader(
-                        "Создать группу",
+                        stringResource(SharedRes.strings.create_group),
                         isSearching = isSearching,
                         searchQuery = searchQuery,
                     )
@@ -116,7 +118,7 @@ class CreateGroupSecondScreen() : Screen {
                         modifier = Modifier.padding(top = 5.dp)
                     ) {
                         CustomButton(
-                            "Далее",
+                            stringResource(SharedRes.strings.next),
                             {
                                 navigator.push(
                                     MainScreen()
@@ -231,7 +233,7 @@ fun CreateGroupInput() {
                 .padding(bottom = 15.dp, start = 25.dp)
                 .background(Color(255, 255, 255)),
             
-            label = { Text("Введите имя группы") },
+            label = { Text(stringResource(SharedRes.strings.enter_group_name)) },
             value = message.value,
             singleLine = true,
             textStyle = androidx.compose.ui.text.TextStyle(
@@ -269,8 +271,9 @@ fun ParticipantCountText(count: Int) {
     )
 }
 
+@Composable
 fun getParticipantCountText(count: Int): String {
-    val forms = arrayOf("участник", "участника", "участников")
+    val forms = arrayOf( stringResource(SharedRes.strings.participant), stringResource(SharedRes.strings.participants_1), stringResource(SharedRes.strings.participants_2))
     return "$count ${getPluralForm(count, forms)}"
 }
 
