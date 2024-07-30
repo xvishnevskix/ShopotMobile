@@ -99,13 +99,8 @@ class ProfileScreen : Screen {
 //            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
         )
 
-        var currentLanguage by remember { mutableStateOf("en") }
 
-        // Обновление текущего языка
-        val updateLanguage: (String) -> Unit = { language ->
-            currentLanguage = language
-        }
-        
+
         Box(
             modifier = Modifier.fillMaxSize().background(
                 color = Color(255, 255, 255)
@@ -199,7 +194,7 @@ class ProfileScreen : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    LanguageSelector()
+                    LanguageSelector(commonViewModel)
 //                    profile.description?.let {
 //                        Text(
 //                            it,
