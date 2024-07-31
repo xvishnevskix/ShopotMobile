@@ -42,6 +42,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.StringDesc
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.SharedRes
 import org.videotrade.shopot.domain.model.ProfileDTO
