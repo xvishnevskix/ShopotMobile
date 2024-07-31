@@ -195,7 +195,7 @@ class ProfileScreen : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
 
-                    LanguageSelector(commonViewModel)
+
 //                    profile.description?.let {
 //                        Text(
 //                            it,

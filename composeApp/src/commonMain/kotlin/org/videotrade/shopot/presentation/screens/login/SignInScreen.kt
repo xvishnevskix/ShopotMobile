@@ -39,6 +39,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -132,16 +133,17 @@ class SignInScreen : Screen {
 
                             })
 
-                        Text(
-                            "Continue in English" ,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                            textAlign = TextAlign.Center,
-                            fontSize = 13.sp,
-                            lineHeight = 15.sp,
-                            color = Color(0xFF000000),
-                            modifier =  Modifier.padding(top = 25.dp),
-                                    textDecoration = TextDecoration.Underline
-                        )
+//                        Text(
+//                            "Continue in English" ,
+//                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+//                            textAlign = TextAlign.Center,
+//                            fontSize = 13.sp,
+//                            lineHeight = 15.sp,
+//                            color = Color(0xFF000000),
+//                            modifier =  Modifier.padding(top = 25.dp),
+//                                    textDecoration = TextDecoration.Underline
+//                        )
+                        LanguageSelector()
 
                         Spacer(modifier = Modifier.height(154.dp))
 
