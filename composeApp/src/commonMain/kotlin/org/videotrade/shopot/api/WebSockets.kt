@@ -277,7 +277,11 @@ suspend fun handleConnectWebSocket(
                                             } else {
                                                 println("message2 ${message}")
                                                 
-                                                chatUseCase.addMessage(message)// Инициализация сообщений
+                                                
+                                                if (chatsUseCase.currentChat.value == message.chatId) {
+                                                    
+                                                    chatUseCase.addMessage(message)// Инициализация сообщений
+                                                }
                                             }
                                             
                                             chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
