@@ -132,31 +132,51 @@ class SignInScreen : Screen {
 
                             })
 
+                        Text(
+                            "Continue in English" ,
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                            textAlign = TextAlign.Center,
+                            fontSize = 13.sp,
+                            lineHeight = 15.sp,
+                            color = Color(0xFF000000),
+                            modifier =  Modifier.padding(top = 25.dp),
+                                    textDecoration = TextDecoration.Underline
+                        )
+
                         Spacer(modifier = Modifier.height(154.dp))
 
-                        Row(
-                            modifier = Modifier.padding(10.dp).fillMaxWidth()
-                                .clickable { navigator.push(SignUpPhoneScreen()) },
-                            horizontalArrangement = Arrangement.Center
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            Text(
-                                stringResource(SharedRes.strings.do_not_have_an_account_yet),
-                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                textAlign = TextAlign.Center,
-                                fontSize = 12.sp,
-                                lineHeight = 15.sp,
-                                color = Color(0xFF979797),
-                            )
-                            Text(
-                                " " + stringResource(SharedRes.strings.sign_up),
-                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                textAlign = TextAlign.Center,
-                                fontSize = 12.sp,
-                                lineHeight = 15.sp,
-                                color = Color(0xFF000000),
-                                textDecoration = TextDecoration.Underline
-                            )
 
+
+
+                            Row(
+                                modifier = Modifier.padding(10.dp).fillMaxWidth()
+                                    .clickable { navigator.push(SignUpPhoneScreen()) },
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Text(
+                                    stringResource(SharedRes.strings.do_not_have_an_account_yet),
+                                    fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 12.sp,
+                                    lineHeight = 15.sp,
+                                    color = Color(0xFF979797),
+                                )
+                                Text(
+                                    " " + stringResource(SharedRes.strings.sign_up),
+                                    fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 12.sp,
+                                    lineHeight = 15.sp,
+                                    color = Color(0xFF000000),
+                                    textDecoration = TextDecoration.Underline
+                                )
+
+                            }
                         }
                     }
                     
