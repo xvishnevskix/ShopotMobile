@@ -74,29 +74,54 @@
 package org.videotrade.shopot.presentation.screens.test
 
 //import org.videotrade.shopot.multiplatform.encupsChachaMessage
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.compose.painterResource
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.util.decodeBase64Bytes
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.vectorResource
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
@@ -104,265 +129,115 @@ import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.theme.LocalThemeIsDark
+import shopot.composeapp.generated.resources.IndieFlower_Regular
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.cyclone
+import shopot.composeapp.generated.resources.ic_cyclone
+import shopot.composeapp.generated.resources.ic_dark_mode
+import shopot.composeapp.generated.resources.ic_light_mode
+import shopot.composeapp.generated.resources.ic_rotate_right
+import shopot.composeapp.generated.resources.stop
+import shopot.composeapp.generated.resources.theme
 import kotlin.random.Random
 
 class TestScreen : Screen {
     @Composable
     override fun Content() {
-        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-        
-        var publicKey by remember { mutableStateOf("opsda") }
-        var cipherFilePath2 by remember { mutableStateOf("opsda") }
-        var fileName2 by remember { mutableStateOf("opsda") }
-        
-        var errorMessage by remember { mutableStateOf("") }
-        var showFilePicker by remember { mutableStateOf(false) }
-        val scope = rememberCoroutineScope()
-        var fileId by remember { mutableStateOf("") }
-
-
-//        val filterFileType = listOf("pdf", "zip")
-//        FilePicker(show = showFilePicker, fileExtensions = filterFileType) { platformFile ->
-//            showFilePicker = false
-//            // do something with the file
-//
-//            println("showFilePicker ${platformFile?.platformFile} ${platformFile?.path}")
-//
-//            if (platformFile?.path !== null) {
-//
-//                scope.launch {
-//                    try {
-//                        println("11111 ")
-////
-////
-////                        val publicKeyBytes = publicKey.toByteArray()
-////
-////                        val result = cipherWrapper.getSharedSecretCommon(publicKeyBytes)
-////
-//                        val fileName = "cipherFile${Random.nextInt(0, 100000)}"
-////
-//                        val cipherFilePath = FileProviderFactory.create()
-//                            .getFilePath(
-//                                fileName,
-//                                "cipher1"
-//                            )
-////
-////                        cipherFilePath2 = cipherFilePath
-////                        fileName2 = fileName
-////
-////                        println("platformFile ${platformFile.path}")
-////
-////
-////                        val fileData = FileProviderFactory.create().getFileData(platformFile.path)
-////
-////                        println("fileData $fileData")
-////
-////
-////                        val sendFile = cipherFilePath?.let {
-////                            FileProviderFactory.create().uploadCipherFile(
-////                                "file/upload",
-////                                platformFile.path,
-////                                it,
-////                                fileData?.fileType!!,
-////                                fileName
-////                            ) {
-////
-////                            }
-////                        }
-////
-////
-////                        if (sendFile !== null)
-////                            fileId = sendFile
-//
-//                        val sharedSecret = getValueInStorage("sharedSecret")
-//
-//                        println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
-//
-//                        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-//
-//                        val encupsChachaFileResult = cipherFilePath?.let {
-//                            cipherWrapper.encupsChachaFileCommon(
-//                                platformFile.path,
-//                                it,
-//                                sharedSecret?.decodeBase64Bytes()!!
-//                            )
-//                        }
-//
-//
-//                        println("result2 $encupsChachaFileResult")
-////
-////                        val decupsFile = FileProviderFactory.create()
-////                            .getFilePath(
-////                                "decupsFile${Random.nextInt(0, 100000)}.pdf",
-////                                "pdf"
-////                            )
-////
-////
-////
-////                        println("dadadada ${EncapsulationMessageResult(encupsChachaFileResult?.block!!, encupsChachaFileResult.authTag, sharedSecret?.decodeBase64Bytes()!!)} $cipherFilePath $decupsFile")
-////
-////                        val result3 =
-////                            decupsFile?.let {
-////                                cipherWrapper.decupsChachaFileCommon(
-////                                    cipherFilePath,
-////                                    it,
-////                                    encupsChachaFileResult?.block!!,
-////                                    encupsChachaFileResult.authTag,
-////                                    sharedSecret?.decodeBase64Bytes()!!
-////
-////                                )
-////                            }
-////
-////
-////                        println("result3 $result3")
-//
-//
-//                    } catch (e: Exception) {
-//
-//                        println("error $e")
-//
-//                    }
-//
-//
-//                }
-//
-//
-//            }
-//        }
-
-
-//        LaunchedEffect(Unit) {
-//            showFilePicker = true
-//
-//        }
-//
-        
-        
-        fun getMyString(): StringDesc {
-            return StringDesc.Resource(MokoRes.strings.my_string)
-        }
-        
-        val myStringDesc = getMyString()
-        
-        
-        // Пример использования stringResource в Composable
-        val myString = stringResource(MokoRes.strings.my_string)
-        // Вставьте myString в UI
-        
-        println("getMyString: ${myStringDesc.localized()}")
-        
-        
-        SafeArea {
-            Column(
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .windowInsetsPadding(WindowInsets.safeDrawing)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = org.jetbrains.compose.resources.stringResource(Res.string.cyclone),
+                fontFamily = FontFamily(Font(Res.font.IndieFlower_Regular)),
+                style = MaterialTheme.typography.displayLarge
+            )
+            
+            var isAnimate by remember { mutableStateOf(false) }
+            val transition = rememberInfiniteTransition()
+            val rotate by transition.animateFloat(
+                initialValue = 0f,
+                targetValue = 360f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1000, easing = LinearEasing)
+                )
+            )
+            
+            Image(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .size(250.dp)
                     .padding(16.dp)
-            ) {
-                
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                Button(onClick = {
-                    try {
-//                        showFilePicker = true
-                        scope.launch {
-                            val absltPath = FileProviderFactory.create()
-                                .pickFile(PickerType.File(listOf("pdf", "zip")))
-                            
-                            if (absltPath !== null) {
-                                
-                                val sharedSecret = getValueInStorage("sharedSecret")
-                                
-                                println("sharedSecret $sharedSecret ${sharedSecret?.decodeBase64Bytes()?.size}")
-                                
-                                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                                
-                                
-                                val fileName = "cipherFile${Random.nextInt(0, 100000)}"
-                                
-                                
-                                val cipherFilePath = FileProviderFactory.create()
-                                    .getFilePath(
-                                        fileName,
-                                        "cipher1"
-                                    )
-                                
-                                val encupsChachaFileResult = absltPath.let {
-                                    if (cipherFilePath != null) {
-                                        val op = cipherWrapper.encupsChachaFileCommon(
-                                            absltPath.fileAbsolutePath,
-                                            cipherFilePath,
-                                            sharedSecret?.decodeBase64Bytes()!!
-                                        )
-                                        
-                                        
-                                        println("op221313 $op")
-                                        
-                                    }
-                                }
-                                
-                                
-                                println("result2 $encupsChachaFileResult")
-                                
-                                
-                            }
-                            
-                            
-                        }
-                        
-                    } catch (e: Exception) {
-                        errorMessage = "Error: ${e.message}"
-                    }
-                }) {
-                    Text("Отправить файл")
+                    .run { if (isAnimate) rotate(rotate) else this },
+                imageVector = vectorResource(Res.drawable.ic_cyclone),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                contentDescription = null
+            )
+            
+            ElevatedButton(
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .widthIn(min = 200.dp),
+                onClick = { isAnimate = !isAnimate },
+                content = {
+                    Icon(vectorResource(Res.drawable.ic_rotate_right), contentDescription = null)
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                 }
-                
-                Button(onClick = {
-                    try {
-                        
-                        val fileProviderFactory = FileProviderFactory.create()
-                        
-                        val cipherFilefileName = "cipherFileDec${Random.nextInt(0, 100000)}"
-                        val decryptFilefileName = "decryptSuccess${Random.nextInt(0, 100000)}.pdf"
-                        
-                        
-                        val cipherFilePath = fileProviderFactory
-                            .getFilePath(
-                                cipherFilefileName,
-                                "pdf"
-                            )
-                        
-                        val dectyptFilePath = fileProviderFactory
-                            .getFilePath(
-                                decryptFilefileName,
-                                "pdf"
-                            )
-                        val url = "${EnvironmentConfig.serverUrl}file/id/$fileId"
-
-//                        scope.launch {
-//                            fileProviderFactory.downloadCipherFile(
-//                                url,
-//                                cipherFilePath,
-//                                dectyptFilePath
-//                            ) { newProgress ->
-//
-//                            }
-//                        }
-                        
-                        
-                    } catch (e: Exception) {
-                        errorMessage = "Error: ${e.message}"
-                    }
-                }) {
-                    Text("Скачать файл")
-                    
-                    
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
+            )
+            
+            var isDark by LocalThemeIsDark.current
+            val icon = remember(isDark) {
+                if (isDark) Res.drawable.ic_light_mode
+                else Res.drawable.ic_dark_mode
+            }
+            
+            ElevatedButton(
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    .widthIn(min = 200.dp),
+                onClick = { isDark = !isDark },
+                content = {
+                    Icon(vectorResource(icon), contentDescription = null)
+                    Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                    Text(org.jetbrains.compose.resources.stringResource(Res.string.theme))
                 }
+            )
+            
+            Text("Moko resources:")
+            Text(
+                text = dev.icerock.moko.resources.compose.stringResource(MokoRes.strings.hello_world)
+            )
+            LanguageSelector()
+            
+            Text("Shopot")
+            
+        }
+    }
+    
+    
+    @Composable
+    fun LanguageSelector() {
+        Column {
+            Button(onClick = { updateLocale("en") }) {
+                Text(text = "English")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { updateLocale("ru") }) {
+                Text(text = "Русский")
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Button(onClick = { updateLocale("es") }) {
+                Text(text = "Español")
             }
         }
+    }
+    
+    fun updateLocale(locale: String) {
+        StringDesc.localeType = StringDesc.LocaleType.Custom(locale)
+        // Вставьте логику для перерисовки UI, если необходимо
     }
 }
 

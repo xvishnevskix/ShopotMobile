@@ -55,8 +55,6 @@ fun UserComponentItem(
     val viewModel: ChatViewModel = koinInject()
     val profile = mainViewModel.profile.collectAsState().value
     
-    val string: String = stringResource(MokoRes.strings.my_string)
-    
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
             

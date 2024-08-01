@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="hello_world">Espain</string>
+    <string name="test">Second value for Test</string>
+    <string name="start_conversation">Начните переписку</string>
+    <string name="encryption_info_1">Все чаты зашифрованы</string>
+    <string name="encryption_info_2">ассиметричным и постквантовым шифрованием</string>
+    <string name="audio">Аудио</string>
+    <string name="photo">Фото</string>
+    <string name="whisper">Шёпот</string>
+
+    <string name="profile">Профиль</string>
+    <string name="chats">Чаты</string>
+    <string name="contacts">Контакты</string>
+
+    <string name="create_group">Создать группу</string>
+    <string name="create_chat">Создать чат</string>
+    <string name="next">Далее</string>
+    <string name="enter_group_name">Введите имя группы</string>
+    <string name="enter_name_or_phone">Введите имя или телефон</string>
+    <string name="participant">участник</string>
+    <string name="participants_1">участника</string>
+    <string name="participants_2">участников</string>
+
+    <string name="edit_profile">Редактировать профиль</string>
+    <string name="info">Информация</string>
+    <string name="log_out">Выход</string>
+    <string name="edit">Изменить</string>
+    <string name="upload_photo">Загрузить фотографию</string>
+    <string name="delete_account">Удалить аккаунт</string>
+    <string name="description">Описание</string>
+
+    <string name="write_message">Написать...</string>
+    <string name="gallery">Галерея</string>
+    <string name="file">Файл</string>
+    <string name="left_cancel">Влево - отмена</string>
+    <string name="delete">Удалить</string>
+    <string name="copy">Копировать</string>
+
+    <string name="call_incoming">Идет вызов...</string>
+    <string name="connection_establishment_in_progress">Идет процесс установления соединения.
+    </string>
+    <string name="connection_established">Соединение установлено.</string>
+    <string name="connection_was_broken">Соединение было разорвано.</string>
+    <string name="error_occurred_while_establishing_connection">Произошла ошибка при установлении
+        соединения.
+    </string>
+    <string name="connection_was_closed">Соединение было закрыто.</string>
+    <string name="end_call">Завершить</string>
+    <string name="microphone">Микрофон</string>
+    <string name="speaker">Динамик</string>
+    <string name="video_call">Видеозвонок</string>
+    <string name="incoming_call">Входящий звонок...</string>
+
+    <string name="greeting">Добро пожаловать!</string>
+    <string name="to_continue_please_log_in">Для того, чтобы продолжить \n авторизуйтесь</string>
+    <string name="do_not_have_an_account_yet">У вас еще нет акканута?</string>
+    <string name="sign_up">Зарегистрироваться</string>
+    <string name="login">Войти</string>
+
+    <string name="enter_last_4_digits_of_the_incoming_call">Введите последние 4 цифры входящего
+        звонка
+    </string>
+    <string name="you_will_receive_a_call_to_your_number_enter_the_last_4">На ваш номер поступит
+        звонок. Введите последние 4 цифры +X XXX XXX 12 34
+    </string>
+    <string name="confirm">Подтвердить</string>
+
+    <string name="create_account">Создать аккаунт</string>
+    <string name="enter_your_phone_number">Введите номер телефона</string>
+    <string name="send_code">Отправить код</string>
+    <string name="name">Имя</string>
+    <string name="lastname">Фамилия</string>
+    <string name="come_up_nickname">Придумайте ник</string>
+
+    <string name="ru">Российская Федерация</string>
+    <string name="ge">Грузия</string>
+    <string name="am">Армения</string>
+    <string name="by">Беларусь</string>
+    <string name="kg">Киргизия</string>
+    <string name="tj">Таджикистан</string>
+    <string name="uz">Узбекистан</string>
+    <string name="lv">Латвия</string>
+    <string name="ph">Филиппины</string>
+</resources>
