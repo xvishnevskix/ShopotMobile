@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -174,14 +174,14 @@ data class EditOption(
 fun getEditOptions(): List<EditOption> {
     return listOf(
         EditOption(
-            text = stringResource(SharedRes.strings.delete),
+            text = stringResource(MokoRes.strings.delete),
             imagePath = Res.drawable.edit_pencil,
             onClick = { viewModel, message, _ ->
                 viewModel.deleteMessage(message)
             }
         ),
         EditOption(
-            text = stringResource(SharedRes.strings.copy),
+            text = stringResource(MokoRes.strings.copy),
             imagePath = Res.drawable.edit_pencil,
             onClick = { _, message, clipboardManager ->
                 message.content?.let { clipboardManager.setText(AnnotatedString(it)) }

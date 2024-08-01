@@ -38,8 +38,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.SharedRes
-import org.videotrade.shopot.multiplatform.LanguageSelector
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -91,7 +90,7 @@ class SignInScreen : Screen {
                         )
 
                         Text(
-                            stringResource(SharedRes.strings.greeting),
+                            stringResource(MokoRes.strings.greeting),
                             fontSize = 28.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
@@ -101,7 +100,7 @@ class SignInScreen : Screen {
                             
                         )
                         Text(
-                            stringResource(SharedRes.strings.to_continue_please_log_in),
+                            stringResource(MokoRes.strings.to_continue_please_log_in),
                             textAlign = TextAlign.Center,
                             fontSize = 18.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
@@ -121,7 +120,7 @@ class SignInScreen : Screen {
 
 
                         CustomButton(
-                            stringResource(SharedRes.strings.login),
+                            stringResource(MokoRes.strings.login),
                             {
                                 navigator.push(
                                     AuthCallScreen(
@@ -133,52 +132,31 @@ class SignInScreen : Screen {
 
                             })
 
-//                        Text(
-//                            "Continue in English" ,
-//                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 13.sp,
-//                            lineHeight = 15.sp,
-//                            color = Color(0xFF000000),
-//                            modifier =  Modifier.padding(top = 25.dp),
-//                                    textDecoration = TextDecoration.Underline
-//                        )
-                        LanguageSelector()
-
                         Spacer(modifier = Modifier.height(154.dp))
 
-                        Column(
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
+                        Row(
+                            modifier = Modifier.padding(10.dp).fillMaxWidth()
+                                .clickable { navigator.push(SignUpPhoneScreen()) },
+                            horizontalArrangement = Arrangement.Center
                         ) {
+                            Text(
+                                stringResource(MokoRes.strings.do_not_have_an_account_yet),
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                lineHeight = 15.sp,
+                                color = Color(0xFF979797),
+                            )
+                            Text(
+                                " " + stringResource(MokoRes.strings.sign_up),
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                lineHeight = 15.sp,
+                                color = Color(0xFF000000),
+                                textDecoration = TextDecoration.Underline
+                            )
 
-
-
-                            Row(
-                                modifier = Modifier.padding(10.dp).fillMaxWidth()
-                                    .clickable { navigator.push(SignUpPhoneScreen()) },
-                                horizontalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    stringResource(SharedRes.strings.do_not_have_an_account_yet),
-                                    fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 12.sp,
-                                    lineHeight = 15.sp,
-                                    color = Color(0xFF979797),
-                                )
-                                Text(
-                                    " " + stringResource(SharedRes.strings.sign_up),
-                                    fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 12.sp,
-                                    lineHeight = 15.sp,
-                                    color = Color(0xFF000000),
-                                    textDecoration = TextDecoration.Underline
-                                )
-
-                            }
                         }
                     }
                     

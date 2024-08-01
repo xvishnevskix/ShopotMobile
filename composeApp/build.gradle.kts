@@ -60,6 +60,7 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             export("io.github.mirzemehdi:kmpnotifier:1.0.0")
+            export(libs.resources)
             baseName = "ComposeApp"
             isStatic = true
         }
@@ -111,8 +112,8 @@ kotlin {
             implementation(libs.coil.compose)
             implementation(libs.coil.mp)
             implementation(libs.coil.network.ktor)
-            implementation(libs.resources)
-            implementation(libs.resources.compose) // for compose multiplatfor
+            api(libs.resources)
+            api(libs.resources.compose) // for compose multiplatfor
         }
         
         commonTest.dependencies {
@@ -204,35 +205,38 @@ android {
 
 multiplatformResources {
     resourcesPackage.set("org.videotrade.shopot") // required
-    resourcesClassName.set("SharedRes") // optional, default MR
-    resourcesVisibility.set(MRVisibility.Internal) // optional, default Public
-    iosBaseLocalizationRegion.set("en") // optional, default "en"
-    iosMinimalDeploymentTarget.set("11.0") // optional, default "9.0"
+    resourcesClassName.set("MokoRes") // optional, default MR
+//    iosBaseLocalizationRegion = "en"
+//    iosBaseLocalizationRegion = "ru"
+    
+//    resourcesVisibility.set(MRVisibility.Internal) // optional, default Public
+//    iosBaseLocalizationRegion.set("en") // optional, default "en"
+//    iosMinimalDeploymentTarget.set("11.0") // optional, default "9.0"
 }
-
-tasks.getByName("preBuild") {
-    dependsOn("generateMRcommonMain")
-}
-
-configurations {
-    create("resolvableMetadataCompilationApi") {
-        extendsFrom(configurations.getByName("metadataCompilationApi"))
-        isCanBeResolved = true
-        isCanBeConsumed = false
-    }
-}
-
-tasks.register("someTask") {
-    doLast {
-        val dependencies =
-            configurations.getByName("resolvableMetadataCompilationApi").resolvedConfiguration.resolvedArtifacts
-        // Используйте зависимости...
-    }
-}
-
-tasks.withType<dev.icerock.gradle.tasks.GenerateMultiplatformResourcesTask> {
-    outputs.upToDateWhen { false }
-}
+//
+//tasks.getByName("preBuild") {
+//    dependsOn("generateMRcommonMain")
+//}
+//
+//configurations {
+//    create("resolvableMetadataCompilationApi") {
+//        extendsFrom(configurations.getByName("metadataCompilationApi"))
+//        isCanBeResolved = true
+//        isCanBeConsumed = false
+//    }
+//}
+//
+//tasks.register("someTask") {
+//    doLast {
+//        val dependencies =
+//            configurations.getByName("resolvableMetadataCompilationApi").resolvedConfiguration.resolvedArtifacts
+//        // Используйте зависимости...
+//    }
+//}
+//
+//tasks.withType<dev.icerock.gradle.tasks.GenerateMultiplatformResourcesTask> {
+//    outputs.upToDateWhen { false }
+//}
 
 dependencies {
     implementation(libs.androidx.animation.core.android)

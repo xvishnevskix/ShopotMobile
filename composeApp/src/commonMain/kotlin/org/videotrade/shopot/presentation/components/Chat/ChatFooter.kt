@@ -77,7 +77,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.getCurrentTimeList
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
@@ -216,7 +216,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     
     val menuItems = listOf(
         MenuItem(
-            text = stringResource(SharedRes.strings.gallery),
+            text = stringResource(MokoRes.strings.gallery),
             imagePath = Res.drawable.menu_gallery,
             onClick = {
                 viewModel.sendImage(
@@ -236,7 +236,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //        }
 //    ),
         MenuItem(
-            text = stringResource(SharedRes.strings.file),
+            text = stringResource(MokoRes.strings.file),
             imagePath = Res.drawable.menu_file,
             onClick = {
 
@@ -435,7 +435,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         Box {
                             if (text.isEmpty()) {
                                 Text(
-                                    stringResource(SharedRes.strings.write_message),
+                                    stringResource(MokoRes.strings.write_message),
                                     textAlign = TextAlign.Center,
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -495,7 +495,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         contentDescription = null,
                     )
                     Text(
-                        text = stringResource(SharedRes.strings.left_cancel),
+                        text = stringResource(MokoRes.strings.left_cancel),
                         fontSize = 13.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),

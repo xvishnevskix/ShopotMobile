@@ -35,7 +35,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -107,7 +107,7 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
                 
                 Text(
                     modifier = Modifier.padding(top = 25.dp),
-                    text = stringResource(SharedRes.strings.incoming_call),
+                    text = stringResource(MokoRes.strings.incoming_call),
                     fontSize = 16.sp,
                     color = Color.White
                 )

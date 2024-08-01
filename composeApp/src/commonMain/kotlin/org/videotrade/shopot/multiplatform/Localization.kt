@@ -88,6 +88,8 @@ fun LanguageSelector()  {
 @Composable
 fun AppInitializer() {
     val storedLanguage = getValueInStorage("selected_language")
+    
+    println("storedLanguage ${StringDesc.LocaleType.System}")
     StringDesc.localeType = when (storedLanguage) {
         "en" -> StringDesc.LocaleType.Custom("en")
         "ru" -> StringDesc.LocaleType.Custom("ru")

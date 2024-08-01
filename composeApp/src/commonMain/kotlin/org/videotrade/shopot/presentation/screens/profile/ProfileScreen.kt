@@ -44,7 +44,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
@@ -77,7 +77,11 @@ class ProfileScreen : Screen {
         
         val navigator = LocalNavigator.currentOrThrow
         val items = listOf(
-            ProfileSettingsItem(Res.drawable.edit_profile, 25.dp, stringResource(SharedRes.strings.edit_profile)) {
+            ProfileSettingsItem(
+                Res.drawable.edit_profile,
+                25.dp,
+                stringResource(MokoRes.strings.edit_profile)
+            ) {
                 navigator.push(
                     ProfileEditScreen(profile)
                 )
@@ -89,7 +93,11 @@ class ProfileScreen : Screen {
 //            },
 //            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
 //            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
-            ProfileSettingsItem(Res.drawable.exit_profile, 25.dp, stringResource(SharedRes.strings.log_out)) {
+            ProfileSettingsItem(
+                Res.drawable.exit_profile,
+                25.dp,
+                stringResource(MokoRes.strings.log_out)
+            ) {
                 
                 commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
             },
@@ -119,7 +127,7 @@ class ProfileScreen : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader(stringResource(SharedRes.strings.info))
+                    ProfileHeader(stringResource(MokoRes.strings.info))
                     Avatar(
                         icon = profile.icon,
                         size = 186.dp

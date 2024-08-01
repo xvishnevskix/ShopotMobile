@@ -45,7 +45,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupProfileHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -87,7 +87,7 @@ class GroupProfileScreen : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    GroupProfileHeader(stringResource(SharedRes.strings.edit))
+                    GroupProfileHeader(stringResource(MokoRes.strings.edit))
                     Avatar(
                         icon = null,
                         size = 116.dp
@@ -159,7 +159,7 @@ class GroupProfileScreen : Screen {
                             drawableRes = Res.drawable.edit_pencil,
                             width = 13.dp,
                             height = 13.dp,
-                            text = stringResource(SharedRes.strings.edit)
+                            text = stringResource(MokoRes.strings.edit)
                         )
                     }
                     

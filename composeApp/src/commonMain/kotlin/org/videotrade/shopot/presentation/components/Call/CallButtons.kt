@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.acceptCall
@@ -111,7 +111,7 @@ fun speakerBtn(onClick: () -> Unit) {
         )
         Text(
             modifier = Modifier.padding(top = 2.dp).align(Alignment.CenterHorizontally),
-            text = stringResource(SharedRes.strings.speaker),
+            text = stringResource(MokoRes.strings.speaker),
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
@@ -136,7 +136,7 @@ fun microfonBtn(onClick: () -> Unit) {
         )
         Text(
             modifier = Modifier.padding(top = 2.dp).align(Alignment.CenterHorizontally),
-            text = stringResource(SharedRes.strings.microphone),
+            text = stringResource(MokoRes.strings.microphone),
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
@@ -168,7 +168,7 @@ fun videoBtn(onClick: () -> Unit) {
 //        }
         Text(
             modifier = Modifier.padding(top = 2.dp).align(Alignment.CenterHorizontally),
-            text = stringResource(SharedRes.strings.video_call),
+            text = stringResource(MokoRes.strings.video_call),
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),

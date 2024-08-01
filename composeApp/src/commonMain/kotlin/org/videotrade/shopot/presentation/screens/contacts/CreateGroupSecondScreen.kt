@@ -41,7 +41,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -93,7 +93,7 @@ class CreateGroupSecondScreen() : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CreateChatHeader(
-                        stringResource(SharedRes.strings.create_group),
+                        stringResource(MokoRes.strings.create_group),
                         isSearching = isSearching,
                         searchQuery = searchQuery,
                     )
@@ -118,7 +118,7 @@ class CreateGroupSecondScreen() : Screen {
                         modifier = Modifier.padding(top = 5.dp)
                     ) {
                         CustomButton(
-                            stringResource(SharedRes.strings.next),
+                            stringResource(MokoRes.strings.next),
                             {
                                 navigator.push(
                                     MainScreen()
@@ -233,7 +233,7 @@ fun CreateGroupInput() {
                 .padding(bottom = 15.dp, start = 25.dp)
                 .background(Color(255, 255, 255)),
             
-            label = { Text(stringResource(SharedRes.strings.enter_group_name)) },
+            label = { Text(stringResource(MokoRes.strings.enter_group_name)) },
             value = message.value,
             singleLine = true,
             textStyle = androidx.compose.ui.text.TextStyle(
@@ -273,7 +273,11 @@ fun ParticipantCountText(count: Int) {
 
 @Composable
 fun getParticipantCountText(count: Int): String {
-    val forms = arrayOf( stringResource(SharedRes.strings.participant), stringResource(SharedRes.strings.participants_1), stringResource(SharedRes.strings.participants_2))
+    val forms = arrayOf(
+        stringResource(MokoRes.strings.participant),
+        stringResource(MokoRes.strings.participants_1),
+        stringResource(MokoRes.strings.participants_2)
+    )
     return "$count ${getPluralForm(count, forms)}"
 }
 

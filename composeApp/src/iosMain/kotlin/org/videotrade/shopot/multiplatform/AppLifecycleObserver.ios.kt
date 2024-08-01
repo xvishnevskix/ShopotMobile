@@ -33,9 +33,12 @@ class IOSAppLifecycleObserver : AppLifecycleObserver, KoinComponent {
     
     override fun onAppForegrounded() {
         
-        println("Android: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
+        println("iOS: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
         
         if (commonUseCase.mainNavigator.value !== null && wsUseCase.wsSession.value?.isActive == false) {
+            
+            println("Android: Reconnect")
+            
             coroutineScope.launch {
                 wsUseCase.connectionWs(
                     profileUseCase.getProfile().id,

@@ -39,7 +39,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -53,15 +53,15 @@ fun PhoneInput(
 
     var countryCode by remember { mutableStateOf("+7") }
     val countries = listOf(
-        "+7" to "\uD83C\uDDF7\uD83C\uDDFA   ${stringResource(SharedRes.strings.ru)}",
-        "+995" to "\uD83C\uDDEC\uD83C\uDDEA   ${stringResource(SharedRes.strings.ge)}",
-        "+374" to "\uD83C\uDDE6\uD83C\uDDF2   ${stringResource(SharedRes.strings.am)}",
-        "+375" to "\uD83C\uDDE7\uD83C\uDDFE   ${stringResource(SharedRes.strings.by)}",
-        "+996" to "\uD83C\uDDF0\uD83C\uDDEC   ${stringResource(SharedRes.strings.kg)}",
-        "+992" to "\uD83C\uDDF9\uD83C\uDDEF   ${stringResource(SharedRes.strings.tj)}",
-        "+998" to "\uD83C\uDDFA\uD83C\uDDFF   ${stringResource(SharedRes.strings.uz)}",
-        "+371" to "\uD83C\uDDF1\uD83C\uDDFB   ${stringResource(SharedRes.strings.lv)}",
-        "+63" to "\uD83C\uDDF5\uD83C\uDDED   ${stringResource(SharedRes.strings.ph)}"
+        "+7" to "\uD83C\uDDF7\uD83C\uDDFA   ${stringResource(MokoRes.strings.ru)}",
+        "+995" to "\uD83C\uDDEC\uD83C\uDDEA   ${stringResource(MokoRes.strings.ge)}",
+        "+374" to "\uD83C\uDDE6\uD83C\uDDF2   ${stringResource(MokoRes.strings.am)}",
+        "+375" to "\uD83C\uDDE7\uD83C\uDDFE   ${stringResource(MokoRes.strings.by)}",
+        "+996" to "\uD83C\uDDF0\uD83C\uDDEC   ${stringResource(MokoRes.strings.kg)}",
+        "+992" to "\uD83C\uDDF9\uD83C\uDDEF   ${stringResource(MokoRes.strings.tj)}",
+        "+998" to "\uD83C\uDDFA\uD83C\uDDFF   ${stringResource(MokoRes.strings.uz)}",
+        "+371" to "\uD83C\uDDF1\uD83C\uDDFB   ${stringResource(MokoRes.strings.lv)}",
+        "+63" to "\uD83C\uDDF5\uD83C\uDDED   ${stringResource(MokoRes.strings.ph)}"
     )
 
     val getPhoneNumberLength = { code: String ->
