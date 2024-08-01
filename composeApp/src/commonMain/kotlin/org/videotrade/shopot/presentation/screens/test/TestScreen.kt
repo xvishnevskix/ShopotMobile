@@ -98,7 +98,7 @@ import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.util.decodeBase64Bytes
 import kotlinx.coroutines.launch
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CipherWrapper
@@ -239,14 +239,14 @@ class TestScreen : Screen {
         
         
         fun getMyString(): StringDesc {
-            return StringDesc.Resource(SharedRes.strings.my_string)
+            return StringDesc.Resource(MokoRes.strings.my_string)
         }
         
         val myStringDesc = getMyString()
         
         
         // Пример использования stringResource в Composable
-        val myString = stringResource(SharedRes.strings.my_string)
+        val myString = stringResource(MokoRes.strings.my_string)
         // Вставьте myString в UI
         
         println("getMyString: ${myStringDesc.localized()}")

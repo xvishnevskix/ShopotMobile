@@ -42,7 +42,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
@@ -103,7 +103,7 @@ class CreateChatScreen() : Screen {
                 SafeArea {
                 Column {
                     CreateChatHeader(
-                        text = stringResource(SharedRes.strings.create_chat),
+                        text = stringResource(MokoRes.strings.create_chat),
                         isSearching = isSearching,
                         searchQuery = searchQuery,
                     )
@@ -163,7 +163,7 @@ private fun makeA_group(contacts: List<ContactDTO>) {
                 )
                 
                 Text(
-                    text = stringResource(SharedRes.strings.create_group),
+                    text = stringResource(MokoRes.strings.create_group),
                     fontSize = 20.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                     textAlign = TextAlign.Center,

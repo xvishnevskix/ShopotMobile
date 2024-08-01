@@ -32,7 +32,7 @@ import dev.icerock.moko.resources.desc.StringDesc
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -54,8 +54,8 @@ fun UserComponentItem(
 ) {
     val viewModel: ChatViewModel = koinInject()
     val profile = mainViewModel.profile.collectAsState().value
-
-    val string: String = stringResource(SharedRes.strings.my_string)
+    
+    val string: String = stringResource(MokoRes.strings.my_string)
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
@@ -108,7 +108,7 @@ fun UserComponentItem(
                         MessageContent(message = it)
                     }?.takeIf { it.isNotEmpty() }?.let {
                         if (it.length > 35) "${it.take(32)}..." else it
-                    } ?: stringResource(SharedRes.strings.start_conversation),
+                    } ?: stringResource(MokoRes.strings.start_conversation),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -195,13 +195,13 @@ fun UserComponentItem(
 @Composable
 fun MessageContent(message: MessageItem): String {
     return if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        message.content ?: stringResource(SharedRes.strings.start_conversation)
+        message.content ?: stringResource(MokoRes.strings.start_conversation)
     } else {
         
         when (message.attachments!![0].type) {
-            "audio/mp4" -> stringResource(SharedRes.strings.audio)
-            "image" -> stringResource(SharedRes.strings.photo)
-            else -> stringResource(SharedRes.strings.file)
+            "audio/mp4" -> stringResource(MokoRes.strings.audio)
+            "image" -> stringResource(MokoRes.strings.photo)
+            else -> stringResource(MokoRes.strings.file)
         }
         
         

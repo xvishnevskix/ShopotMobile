@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-<string name="my_string">Моя строка локализации по умолчанию</string>
-
-
-
+    <string name="hello_world">Hello moko-resources World</string>
+    <string name="test">Second value for Test</string>
     <string name="start_conversation">Начните переписку</string>
     <string name="encryption_info_1">Все чаты зашифрованы</string>
-    <string name="encryption_info_2"> ассиметричным и постквантовым шифрованием</string>
+    <string name="encryption_info_2">ассиметричным и постквантовым шифрованием</string>
     <string name="audio">Аудио</string>
     <string name="photo">Фото</string>
     <string name="whisper">Шёпот</string>
@@ -40,10 +38,13 @@
     <string name="copy">Копировать</string>
 
     <string name="call_incoming">Идет вызов...</string>
-    <string name="connection_establishment_in_progress">Идет процесс установления соединения.</string>
+    <string name="connection_establishment_in_progress">Идет процесс установления соединения.
+    </string>
     <string name="connection_established">Соединение установлено.</string>
     <string name="connection_was_broken">Соединение было разорвано.</string>
-    <string name="error_occurred_while_establishing_connection">Произошла ошибка при установлении соединения.</string>
+    <string name="error_occurred_while_establishing_connection">Произошла ошибка при установлении
+        соединения.
+    </string>
     <string name="connection_was_closed">Соединение было закрыто.</string>
     <string name="end_call">Завершить</string>
     <string name="microphone">Микрофон</string>
@@ -57,8 +58,12 @@
     <string name="sign_up">Зарегистрироваться</string>
     <string name="login">Войти</string>
 
-    <string name="enter_last_4_digits_of_the_incoming_call">Введите последние 4 цифры входящего звонка</string>
-    <string name="you_will_receive_a_call_to_your_number_enter_the_last_4">На ваш номер поступит звонок. Введите последние 4 цифры +X XXX XXX 12 34 </string>
+    <string name="enter_last_4_digits_of_the_incoming_call">Введите последние 4 цифры входящего
+        звонка
+    </string>
+    <string name="you_will_receive_a_call_to_your_number_enter_the_last_4">На ваш номер поступит
+        звонок. Введите последние 4 цифры +X XXX XXX 12 34
+    </string>
     <string name="confirm">Подтвердить</string>
 
     <string name="create_account">Создать аккаунт</string>
@@ -77,6 +82,4 @@
     <string name="uz">Узбекистан</string>
     <string name="lv">Латвия</string>
     <string name="ph">Филиппины</string>
-
-
 </resources>

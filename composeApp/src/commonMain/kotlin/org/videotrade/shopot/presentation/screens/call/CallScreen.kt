@@ -46,7 +46,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
@@ -112,13 +112,15 @@ class CallScreen(
                 secondsElapsed++
             }
         }
-
-        val callIncoming: String = stringResource(SharedRes.strings.call_incoming)
-        val connectionEstablishmentInProgress: String = stringResource(SharedRes.strings.connection_establishment_in_progress)
-        val connectionEstablished: String = stringResource(SharedRes.strings.connection_established)
-        val connectionWasBroken: String = stringResource(SharedRes.strings.connection_was_broken)
-        val errorOccurredWhileEstablishingConnection: String = stringResource(SharedRes.strings.error_occurred_while_establishing_connection)
-        val connectionWasClosed: String = stringResource(SharedRes.strings.connection_was_closed)
+        
+        val callIncoming: String = stringResource(MokoRes.strings.call_incoming)
+        val connectionEstablishmentInProgress: String =
+            stringResource(MokoRes.strings.connection_establishment_in_progress)
+        val connectionEstablished: String = stringResource(MokoRes.strings.connection_established)
+        val connectionWasBroken: String = stringResource(MokoRes.strings.connection_was_broken)
+        val errorOccurredWhileEstablishingConnection: String =
+            stringResource(MokoRes.strings.error_occurred_while_establishing_connection)
+        val connectionWasClosed: String = stringResource(MokoRes.strings.connection_was_closed)
 
         
         LaunchedEffect(callStateView) {
@@ -288,7 +290,7 @@ class CallScreen(
                     viewModel.rejectCall(navigator, userId)
                     
                     
-                }, stringResource(SharedRes.strings.end_call))
+                }, stringResource(MokoRes.strings.end_call))
             }
         }
     }

@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
-    <string name="my_string">My default localization string</string>
-
-
-
+    <string name="hello_world">Привет Мир moko-resources</string>
+    <string name="test">Второе значение, тестовое</string>
     <string name="start_conversation">Start a conversation</string>
     <string name="encryption_info_1">All chats are encrypted</string>
     <string name="encryption_info_2">with asymmetric and post-quantum encryption</string>
@@ -42,10 +40,14 @@
 
 
     <string name="call_incoming">Call incoming...</string>
-    <string name="connection_establishment_in_progress">The connection establishment process is in progress.</string>
+    <string name="connection_establishment_in_progress">The connection establishment process is in
+        progress.
+    </string>
     <string name="connection_established">Connection established.</string>
     <string name="connection_was_broken">The connection was broken.</string>
-    <string name="error_occurred_while_establishing_connection">An error occurred while establishing a connection.</string>
+    <string name="error_occurred_while_establishing_connection">An error occurred while establishing
+        a connection.
+    </string>
     <string name="connection_was_closed">The connection was closed.</string>
     <string name="end_call">End call</string>
     <string name="microphone">Microphone</string>
@@ -55,13 +57,18 @@
 
     <string name="greeting">Welcome!</string>
     <string name="to_continue_please_log_in">To continue, please \n
-        log in.</string>
+        log in.
+    </string>
     <string name="do_not_have_an_account_yet">Don't have an account yet?</string>
     <string name="sign_up">Sign Up</string>
     <string name="login">Login</string>
 
-    <string name="enter_last_4_digits_of_the_incoming_call">Enter the last 4 digits of the incoming call</string>
-    <string name="you_will_receive_a_call_to_your_number_enter_the_last_4">You will receive a call to your number. Enter the last 4 digits +X XXX XXX 12 34</string>
+    <string name="enter_last_4_digits_of_the_incoming_call">Enter the last 4 digits of the incoming
+        call
+    </string>
+    <string name="you_will_receive_a_call_to_your_number_enter_the_last_4">You will receive a call
+        to your number. Enter the last 4 digits +X XXX XXX 12 34
+    </string>
     <string name="confirm">Confirm</string>
 
     <string name="create_account">Create an account</string>

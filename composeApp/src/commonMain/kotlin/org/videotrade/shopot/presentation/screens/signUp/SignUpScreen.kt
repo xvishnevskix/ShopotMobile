@@ -60,7 +60,7 @@ import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
@@ -112,7 +112,7 @@ class SignUpScreen(private val phone: String) : Screen {
         
         
         SafeArea {
-            AuthHeader(stringResource(SharedRes.strings.create_account), 0.75F)
+            AuthHeader(stringResource(MokoRes.strings.create_account), 0.75F)
             
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -153,30 +153,30 @@ class SignUpScreen(private val phone: String) : Screen {
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             TextFieldWithTitle(
-                                title = stringResource(SharedRes.strings.name),
+                                title = stringResource(MokoRes.strings.name),
                                 value = textState.value.firstName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(firstName = it)
                                 },
-                                placeholder = stringResource(SharedRes.strings.name)
+                                placeholder = stringResource(MokoRes.strings.name)
                             )
                             
                             TextFieldWithTitle(
-                                title = stringResource(SharedRes.strings.lastname),
+                                title = stringResource(MokoRes.strings.lastname),
                                 value = textState.value.lastName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(lastName = it)
                                 },
-                                placeholder = stringResource(SharedRes.strings.lastname)
+                                placeholder = stringResource(MokoRes.strings.lastname)
                             )
                             
                             TextFieldWithTitle(
-                                title = stringResource(SharedRes.strings.come_up_nickname),
+                                title = stringResource(MokoRes.strings.come_up_nickname),
                                 value = textState.value.nickname,
                                 onValueChange = {
                                     textState.value = textState.value.copy(nickname = it)
                                 },
-                                placeholder = stringResource(SharedRes.strings.come_up_nickname)
+                                placeholder = stringResource(MokoRes.strings.come_up_nickname)
                             )
                         }
                     }
@@ -186,7 +186,7 @@ class SignUpScreen(private val phone: String) : Screen {
                             modifier = Modifier.padding(top = 20.dp)
                         ) {
                             CustomButton(
-                                stringResource(SharedRes.strings.create_account),
+                                stringResource(MokoRes.strings.create_account),
                                 { scope ->
                                     scope.launch {
                                         val client = HttpClient(getHttpClientEngine())

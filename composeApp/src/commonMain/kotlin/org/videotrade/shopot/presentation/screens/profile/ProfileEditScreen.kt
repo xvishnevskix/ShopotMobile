@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.SharedRes
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditHeader
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -127,7 +127,7 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    GroupEditHeader(stringResource(SharedRes.strings.edit)) {
+                    GroupEditHeader(stringResource(MokoRes.strings.edit)) {
                         scope.launch {
                             val profileUpdate = profileViewModel.sendNewProfile(
                                 textState.value,
@@ -268,7 +268,7 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                                 contentScale = ContentScale.FillBounds
                             )
                             Text(
-                                stringResource(SharedRes.strings.upload_photo),
+                                stringResource(MokoRes.strings.upload_photo),
                                 textAlign = TextAlign.Center,
                                 fontSize = 14.sp,
                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -312,7 +312,9 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                                         
                                         if (textState.value.description?.isEmpty() == true) {
                                             Text(
-                                                if (profile.description.isNullOrBlank()) stringResource(SharedRes.strings.description) else profile.description,
+                                                if (profile.description.isNullOrBlank()) stringResource(
+                                                    MokoRes.strings.description
+                                                ) else profile.description,
                                                 style = textStyle.copy(color = Color.Gray)
                                             )
                                         }
@@ -363,7 +365,7 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                                 contentScale = ContentScale.FillBounds
                             )
                             Text(
-                                stringResource(SharedRes.strings.delete_account),
+                                stringResource(MokoRes.strings.delete_account),
                                 textAlign = TextAlign.Center,
                                 fontSize = 14.sp,
                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
