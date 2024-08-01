@@ -1,6 +1,5 @@
 package org.videotrade.shopot.data.remote.repository
 
-import androidx.compose.runtime.mutableStateOf
 import cafe.adriel.voyager.navigator.Navigator
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.close
@@ -18,7 +17,7 @@ import org.videotrade.shopot.multiplatform.CipherWrapper
 
 class WsRepositoryImpl : WsRepository, KoinComponent {
     
-    private val isConnected = mutableStateOf(false)
+    private val isConnected = MutableStateFlow(false)
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
@@ -44,6 +43,17 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
         )
         
         
+    }
+    
+    
+    override suspend fun disconnectWs() {
+//        clearData()
+        _wsSession.value?.close()
+        
+    }
+    
+    override fun setConnection(isConnection: Boolean) {
+        isConnected.value = isConnection
     }
     
     override suspend fun getWsSession(): DefaultClientWebSocketSession? {

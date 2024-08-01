@@ -1,6 +1,5 @@
 package org.videotrade.shopot.api
 
-import androidx.compose.runtime.MutableState
 import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
@@ -16,6 +15,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -23,11 +23,12 @@ import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
 suspend fun handleConnectWebSocket(
     navigator: Navigator,
     webSocketSession: MutableStateFlow<DefaultClientWebSocketSession?>,
-    isConnected: MutableState<Boolean>,
+    isConnected: MutableStateFlow<Boolean>,
     userId: String,
     chatUseCase: ChatUseCase,
     chatsUseCase: ChatsUseCase,
@@ -40,7 +41,12 @@ suspend fun handleConnectWebSocket(
         install(WebSockets)
         
     }
+    
+    println("isConnected.value ${isConnected.value}")
+    
     if (!isConnected.value) {
+        println("isConnected.value ${isConnected.value}")
+        
         try {
             httpClient.webSocket(
                 method = HttpMethod.Get,
@@ -49,10 +55,13 @@ suspend fun handleConnectWebSocket(
                 path = "/chat?userId=$userId",
                 
                 ) {
+                val mainViewModel: MainViewModel = KoinPlatform.getKoin().get()
                 
                 
                 webSocketSession.value = this
                 isConnected.value = true
+                
+                mainViewModel.getChatsInBack(this, userId)
                 
                 val callOutputRoutine = launch {
                     
