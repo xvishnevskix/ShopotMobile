@@ -27,12 +27,14 @@ class AndroidAppLifecycleObserver : LifecycleObserver, AppLifecycleObserver, Koi
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
     }
     
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     override fun onAppBackgrounded() {
         coroutineScope.launch {
             println("iOS: Приложение свернуто disconnect")
         }
     }
     
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
     override fun onAppForegrounded() {
         
         println("iOS: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
