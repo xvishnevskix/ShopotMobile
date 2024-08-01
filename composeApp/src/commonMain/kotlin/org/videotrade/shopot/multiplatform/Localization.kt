@@ -47,6 +47,7 @@ fun LanguageSelector()  {
                 delValueInStorage("selected_language")
                 StringDesc.localeType = StringDesc.LocaleType.Custom("ru")
                 addValueInStorage("selected_language", "ru")
+
             },
             textDecoration = TextDecoration.Underline
         )
@@ -61,6 +62,7 @@ fun LanguageSelector()  {
                 delValueInStorage("selected_language")
                 StringDesc.localeType = StringDesc.LocaleType.Custom("en")
                 addValueInStorage("selected_language", "en")
+                //        commonViewModel.mainNavigator.value?.push(IntroScreen())
             },
             textDecoration = TextDecoration.Underline
         )

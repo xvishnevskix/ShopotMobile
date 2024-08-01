@@ -39,6 +39,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -57,7 +58,7 @@ class SignInScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        
+
  
         
         
@@ -131,7 +132,7 @@ class SignInScreen : Screen {
                                 )
 
                             })
-
+                        LanguageSelector()
                         Spacer(modifier = Modifier.height(154.dp))
 
                         Row(
