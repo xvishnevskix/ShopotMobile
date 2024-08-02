@@ -540,7 +540,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     contentAlignment = Alignment.CenterEnd,
                     modifier = Modifier
                         .padding(end = if (!isRecording) 15.dp else 0.dp)
-                        .size(height = 65.dp, width = 150.dp)
+                        .size(height = 65.dp, width = 100.dp)
                         .clip(RoundedCornerShape(50))
                         .pointerInput(Unit) {
                             detectDragGestures(

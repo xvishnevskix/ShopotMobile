@@ -34,6 +34,8 @@ import shopot.composeapp.generated.resources.Res
 fun LanguageSelector()  {
 //    val tabNavigator: TabNavigator = LocalTabNavigator.current
     val storedLanguage = getValueInStorage("selected_language")
+    
+    println("storedLanguage $storedLanguage")
 
     when (storedLanguage) {
         "en" -> Text(
@@ -53,6 +55,22 @@ fun LanguageSelector()  {
         )
         "ru" -> Text(
             "Continue in English" ,
+            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+            textAlign = TextAlign.Center,
+            fontSize = 13.sp,
+            lineHeight = 15.sp,
+            color = Color(0xFF000000),
+            modifier = Modifier.padding(top = 25.dp).clickable {
+                delValueInStorage("selected_language")
+                StringDesc.localeType = StringDesc.LocaleType.Custom("en")
+                addValueInStorage("selected_language", "en")
+                //        commonViewModel.mainNavigator.value?.push(IntroScreen())
+            },
+            textDecoration = TextDecoration.Underline
+        )
+        
+        else -> Text(
+            "Continue in English",
             fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
             textAlign = TextAlign.Center,
             fontSize = 13.sp,
