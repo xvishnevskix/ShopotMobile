@@ -217,7 +217,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 
                 println("Уведомление ${jsonContent}")
                 
-                origin().post<Any>("notification/notify", jsonContent)
+                origin().post("notification/notify", jsonContent)
             }
         }
     }

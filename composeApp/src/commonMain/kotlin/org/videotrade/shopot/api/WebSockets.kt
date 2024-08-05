@@ -372,17 +372,17 @@ suspend fun handleConnectWebSocket(
                                 
                                 "messageReadNotification" -> {
                                     try {
-                                        
-                                        
                                         val messageJson =
                                             jsonElement.jsonObject["message"]?.jsonObject
                                         
                                         println("messageReadNotification1 $messageJson")
                                         
+                                        
                                         if (messageJson != null) {
                                             
                                             val message: MessageItem =
                                                 Json.decodeFromString(messageJson.toString())
+                                            
                                             
                                             val messageId =
                                                 messageJson["id"]?.jsonPrimitive?.content
@@ -392,8 +392,27 @@ suspend fun handleConnectWebSocket(
                                                 chatUseCase.readMessage(messageId)
                                             }
                                             
+                                            if (message.fromUser == userId) {
+                                                var messageNew = message
+                                                
+                                                if (message.content?.isNotBlank() == true) {
+                                                    messageNew = message.copy(
+                                                        content = decupsMessage(
+                                                            message.content,
+                                                            cipherWrapper
+                                                        )
+                                                    )
+                                                }
+//
+                                                chatsUseCase.updateReadLastMessageChat(messageNew)
+                                            } else {
+//                                                chatsUseCase.updateReadLastMessageChat(message)
                                             
-                                            chatsUseCase.updateReadLastMessageChat(message)
+                                            }
+                                            
+                                            
+                                            
+                                       
                                             
                                         }
                                         
