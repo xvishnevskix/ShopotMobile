@@ -50,11 +50,13 @@ import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.settings.LanguageScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.edit_profile
 import shopot.composeapp.generated.resources.exit_profile
+import shopot.composeapp.generated.resources.language
 
 
 data class ProfileSettingsItem(
@@ -93,6 +95,18 @@ class ProfileScreen : Screen {
 //            },
 //            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
 //            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
+
+            ProfileSettingsItem(
+                Res.drawable.language,
+                25.dp,
+                stringResource(MokoRes.strings.language)
+            ) {
+                navigator.push(
+                    LanguageScreen()
+                )
+            },
+
+
             ProfileSettingsItem(
                 Res.drawable.exit_profile,
                 25.dp,
@@ -101,6 +115,7 @@ class ProfileScreen : Screen {
                 
                 commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
             },
+
 //            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
 //            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
 //            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
