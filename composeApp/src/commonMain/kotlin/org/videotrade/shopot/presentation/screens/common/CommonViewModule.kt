@@ -48,7 +48,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
     
     fun setMainNavigator(value: Navigator) {
         mainNavigator.value = value
-        
+        println("dsadaasaaaa")
         commonUseCase.setNavigator(value)
     }
     

@@ -6,11 +6,10 @@ import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -23,9 +22,6 @@ import org.videotrade.shopot.presentation.screens.main.MainScreen
 class CallViewModel() : ViewModel(), KoinComponent {
     private val callUseCase: CallUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
-    
-    private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-    val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
     
     private val _isConnectedWebrtc = MutableStateFlow(false)
     val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
@@ -47,15 +43,14 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     
     val localStreamm = callUseCase.localStream
-    
-    init {
-        startObserving()
-    }
+
+//    init {
+//        startObserving()
+//    }
     
     private fun startObserving() {
         viewModelScope.launch {
             observeCallStates()
-            observeWsConnection()
             observeIsConnectedWebrtc()
             observeStreams()
         }
@@ -112,16 +107,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
             .launchIn(viewModelScope)
     }
     
-    private fun observeWsConnection() {
-        callUseCase.wsSession
-            .onEach { wsSessionNew ->
-                if (isObserving.value) {
-                    _wsSession.value = wsSessionNew
-                    println("wsSessionNew1111 $wsSessionNew")
-                }
-            }
-            .launchIn(viewModelScope)
-    }
     
     fun getWsSession() {
         viewModelScope.launch {
@@ -161,7 +146,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     suspend fun makeCall(calleeId: String) {
-        profileUseCase.getProfile()?.let { callUseCase.makeCall( it.id , calleeId) }
+        println("aaaaaaa ${profileUseCase.getProfile()}")
+        profileUseCase.getProfile().let { callUseCase.makeCall(it.id, calleeId) }
     }
     
     @OptIn(DelicateCoroutinesApi::class)
@@ -171,13 +157,13 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun rejectCall(navigator: Navigator, userId: String) {
         viewModelScope.launch {
-            val isRejectCall = callUseCase.rejectCall(navigator,userId)
+            val isRejectCall = callUseCase.rejectCall(navigator, userId)
             
             if (isRejectCall) {
                 navigator.push(MainScreen())
+
             }
         }
-        
         
     }
     
@@ -199,4 +185,24 @@ class CallViewModel() : ViewModel(), KoinComponent {
         isObserving.value = true
         startObserving()
     }
+    
+    fun initCall(callCase: String, userId: String) {
+        println("dsadadadadad ${callUseCase.wsSession.value}")
+        
+        viewModelScope.launch {
+            if (callUseCase.wsSession.value != null) {
+                when (callCase) {
+                    "Call" -> {
+                        updateOtherUserId(userId)
+                        makeCall(userId)
+                    }
+                    
+                    "IncomingCall" -> answerCall()
+                }
+            }
+        }
+        
+    }
+    
+
 }

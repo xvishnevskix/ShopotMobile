@@ -90,4 +90,10 @@ class CallUseCase : KoinComponent {
     fun clearData() {
         repository.clearData()
     }
+    
+    fun setIsIncomingCall(isIncomingCallValue: Boolean) {
+        repository.setIsIncomingCall(isIncomingCallValue)
+    }
+    
+    
 }

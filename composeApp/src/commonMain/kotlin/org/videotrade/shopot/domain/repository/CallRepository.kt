@@ -55,4 +55,7 @@ interface CallRepository {
 //    fun rejectCallAnswer()
     
     fun clearData()
+    fun setIsIncomingCall(isIncomingCallValue: Boolean)
+    
+    
 }

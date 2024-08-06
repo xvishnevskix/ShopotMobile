@@ -1,7 +1,6 @@
 package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
@@ -73,7 +72,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     // Создание конфигурации для PeerConnection
     val rtcConfiguration = RtcConfiguration(
         iceServers = listOf(
-            IceServer(iceServers),
+//            IceServer(iceServers),
             IceServer(
                 urls = turnServers, // URL TURN сервера
                 username = "andrew", // Имя пользователя
@@ -94,7 +93,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     private val isCall = mutableStateOf(false)
-    
+    private val isIncomingCall = mutableStateOf(false)
     
     private val callerId = mutableStateOf(generateRandomNumber())
     
@@ -154,6 +153,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 ) {
                     _wsSession.value = this
                     isConnected.value = true
+                    println("Connection Call")
                     
                     val callOutputRoutine = launch {
                         for (frame in incoming) {
@@ -213,7 +213,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         
                                                         otherUserId.value = userId
                                                         
-                                                        
+                                                        isIncomingCall.value = true
                                                         
                                                         navigator.push(
                                                             IncomingCallScreen(
@@ -271,16 +271,18 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
+                                        if (isIncomingCall.value) {
+                                            navigator.push(MainScreen())
+                                        }
                                         
-                                        println("rejectCall1")
+                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
                                         if (isCall.value)
                                             rejectCallAnswer(navigator)
                                         
                                         println("rejectCall2 ${isConnectedWebrtc.value}")
                                         
                                         
-                                        if (!isConnectedWebrtc.value) {
-                                            
+                                        if (isConnectedWebrtc.value) {
                                             
                                             navigator.push(MainScreen())
                                             
@@ -480,7 +482,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
                     
                     wsSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully")
+                    println("Message sent successfully Call")
                     
                     
                 } catch (e: Exception) {
@@ -532,6 +534,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
                     
+                    setIsIncomingCall(false)
                     
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     println("Message sent successfully")
@@ -558,6 +561,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             rejectCallAnswer(navigator)
             
+            setIsIncomingCall(false)
             
             wsSession.value?.send(Frame.Text(jsonContent))
             println("rejectCall13")
@@ -645,5 +649,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _callState.value = PeerConnectionState.New
         _wsSession.value = null
     }
+    
+    
+    override fun setIsIncomingCall(isIncomingCallValue: Boolean) {
+        isIncomingCall.value = isIncomingCallValue
+    }
+    
     
 }

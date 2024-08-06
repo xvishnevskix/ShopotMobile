@@ -63,11 +63,9 @@ class IntroScreen : Screen {
                 
                 if (response != null) {
                     
+                    сommonViewModel.setMainNavigator(navigator)
                     
                     сommonViewModel.cipherShared(response, navigator)
-                    
-                    
-                    сommonViewModel.setMainNavigator(navigator)
                     
                     
                     return@LaunchedEffect

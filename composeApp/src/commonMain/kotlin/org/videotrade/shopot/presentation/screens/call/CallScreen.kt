@@ -37,9 +37,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.PeerConnectionState
-import com.shepeliev.webrtckmp.audioTracks
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.DrawableResource
@@ -52,7 +50,6 @@ import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
-import org.videotrade.shopot.presentation.components.Call.videoBtn
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -73,8 +70,6 @@ class CallScreen(
         var isRunning by remember { mutableStateOf(false) }
         
         val viewModel: CallViewModel = koinInject()
-        
-        val wsSession by viewModel.wsSession.collectAsState()
         val callStateView by viewModel.callState.collectAsState()
         val localStream by viewModel.localStreamm.collectAsState()
         
@@ -86,22 +81,8 @@ class CallScreen(
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         
         
-        LaunchedEffect(wsSession) {
-            
-            println("dsadadadadad $user")
-            
-            if (!hasExecuted.value && wsSession != null) {
-                when (callCase) {
-                    "Call" -> {
-//                        viewModel.initWebrtc()
-                        viewModel.updateOtherUserId(userId)
-                        viewModel.makeCall(userId)
-                    }
-                    
-                    "IncomingCall" -> viewModel.answerCall()
-                }
-                hasExecuted.value = true
-            }
+        LaunchedEffect(Unit) {
+            viewModel.initCall(callCase, userId)
         }
 
 

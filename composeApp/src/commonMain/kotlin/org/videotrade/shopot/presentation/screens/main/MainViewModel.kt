@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -20,6 +21,7 @@ import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 
 class MainViewModel : ViewModel(), KoinComponent {
@@ -27,6 +29,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()
     private val callUseCase: CallUseCase by inject()
     private val chatsUseCase: ChatsUseCase by inject()
+    val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
     
     val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
@@ -55,9 +58,14 @@ class MainViewModel : ViewModel(), KoinComponent {
                 getWsSession()
                 
                 
-                println("userIDWWWWW : ${it.id}")
+                println("userIDWWWWW : ${commonViewModel.mainNavigator.value}")
                 
-                navigator.value?.let { navigator -> callUseCase.connectionWs(it.id, navigator) }
+                commonViewModel.mainNavigator.value?.let { navigator ->
+                    callUseCase.connectionWs(
+                        it.id,
+                        navigator
+                    )
+                }
                 
             }
             
@@ -115,7 +123,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     
     fun getNavigator(navigatorGet: Navigator) {
-        
+        println("aasaasasasa")
         navigator.value = navigatorGet
     }
     
