@@ -53,18 +53,22 @@ actual class AudioPlayer(private val applicationContext: Context) {
     private var mediaPlayer: MediaPlayer? = null
     
     actual fun startPlaying(filePath: String) {
-        // Получение экземпляра AudioManager
-        val audioManager =
-            applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        
-        // Установка аудиосессии для воспроизведения через основной динамик
-        audioManager.mode = AudioManager.MODE_NORMAL
-        audioManager.isSpeakerphoneOn = true
-        println("filePath $filePath")
-        mediaPlayer = MediaPlayer().apply {
-            setDataSource(filePath)
-            prepare()
-            start()
+        try {
+            // Получение экземпляра AudioManager
+            val audioManager =
+                applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            
+            // Установка аудиосессии для воспроизведения через основной динамик
+            audioManager.mode = AudioManager.MODE_NORMAL
+            audioManager.isSpeakerphoneOn = true
+            println("filePath $filePath")
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(filePath)
+                prepare()
+                start()
+            }
+        } catch (e: Exception) {
+            println("error $e")
         }
     }
     

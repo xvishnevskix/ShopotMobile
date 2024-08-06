@@ -44,90 +44,101 @@ actual class AudioRecorder {
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     actual fun startRecording(outputFilePath: String) {
-        println("Start recording with outputFilePath: $outputFilePath")
-        outputFile = outputFilePath
-        val audioFilename = NSURL.fileURLWithPath(outputFilePath)
-        val fileManager = NSFileManager.defaultManager
-        val fileExists = audioFilename.path?.let { fileManager.fileExistsAtPath(it) }
-        
-        if (fileExists == true) {
-            println("File already exists: ${audioFilename.path}")
-        } else {
-            println("File does not exist, attempting to create: ${audioFilename.path}")
-            val created = audioFilename.path?.let { fileManager.createFileAtPath(it, null, null) }
-            println("File creation successful: $created")
-        }
-        
-        val settings = mapOf<Any?, Any?>(
-            AVFormatIDKey to kAudioFormatMPEG4AAC,
-            AVSampleRateKey to 12000.0,
-            AVNumberOfChannelsKey to 1,
-            AVEncoderAudioQualityKey to AVAudioQualityHigh
-        )
-        
-        memScoped {
-            val errorPtr = alloc<ObjCObjectVar<NSError?>>()
-            try {
-                // Настройка AVAudioSession
-                val audioSession = AVAudioSession.sharedInstance()
-                audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord, errorPtr.ptr)
-                audioSession.setMode(AVAudioSessionModeDefault, errorPtr.ptr)
-                audioSession.setActive(true, errorPtr.ptr)
-                
-                println("Initializing AVAudioRecorder with settings: $settings $audioFilename ${errorPtr.ptr}")
-                audioRecorder = AVAudioRecorder(audioFilename, settings, errorPtr.ptr)
-                println("AVAudioRecorder instance created: $audioRecorder")
-                
-                if (errorPtr.value != null) {
-                    println("Error pointer is not null: ${errorPtr.value?.localizedDescription}")
-                } else {
-                    println("Error pointer is null, proceeding to prepare and record")
-                    audioRecorder?.apply {
-                        val prepared = prepareToRecord()
-                        println("Prepared to record: $prepared")
-                        if (prepared) {
-                            val recording = record()
-                            println("Recording started: $recording")
-                            if (!recording) {
-                                println("Recording failed to start")
+        try {
+            println("Start recording with outputFilePath: $outputFilePath")
+            outputFile = outputFilePath
+            val audioFilename = NSURL.fileURLWithPath(outputFilePath)
+            val fileManager = NSFileManager.defaultManager
+            val fileExists = audioFilename.path?.let { fileManager.fileExistsAtPath(it) }
+            
+            if (fileExists == true) {
+                println("File already exists: ${audioFilename.path}")
+            } else {
+                println("File does not exist, attempting to create: ${audioFilename.path}")
+                val created =
+                    audioFilename.path?.let { fileManager.createFileAtPath(it, null, null) }
+                println("File creation successful: $created")
+            }
+            
+            val settings = mapOf<Any?, Any?>(
+                AVFormatIDKey to kAudioFormatMPEG4AAC,
+                AVSampleRateKey to 12000.0,
+                AVNumberOfChannelsKey to 1,
+                AVEncoderAudioQualityKey to AVAudioQualityHigh
+            )
+            
+            memScoped {
+                val errorPtr = alloc<ObjCObjectVar<NSError?>>()
+                try {
+                    // Настройка AVAudioSession
+                    val audioSession = AVAudioSession.sharedInstance()
+                    audioSession.setCategory(AVAudioSessionCategoryPlayAndRecord, errorPtr.ptr)
+                    audioSession.setMode(AVAudioSessionModeDefault, errorPtr.ptr)
+                    audioSession.setActive(true, errorPtr.ptr)
+                    
+                    println("Initializing AVAudioRecorder with settings: $settings $audioFilename ${errorPtr.ptr}")
+                    audioRecorder = AVAudioRecorder(audioFilename, settings, errorPtr.ptr)
+                    println("AVAudioRecorder instance created: $audioRecorder")
+                    
+                    if (errorPtr.value != null) {
+                        println("Error pointer is not null: ${errorPtr.value?.localizedDescription}")
+                    } else {
+                        println("Error pointer is null, proceeding to prepare and record")
+                        audioRecorder?.apply {
+                            val prepared = prepareToRecord()
+                            println("Prepared to record: $prepared")
+                            if (prepared) {
+                                val recording = record()
+                                println("Recording started: $recording")
+                                if (!recording) {
+                                    println("Recording failed to start")
+                                }
+                            } else {
+                                println("Failed to prepare for recording")
                             }
-                        } else {
-                            println("Failed to prepare for recording")
                         }
                     }
+                } catch (e: Exception) {
+                    println("Exception while initializing AVAudioRecorder: $e")
+                    e.printStackTrace()
+                    audioRecorder = null
                 }
-            } catch (e: Exception) {
-                println("Exception while initializing AVAudioRecorder: $e")
-                e.printStackTrace()
-                audioRecorder = null
             }
+        } catch (e: Exception) {
+            println("error: $e")
         }
     }
     
     @OptIn(ExperimentalForeignApi::class)
     actual fun stopRecording(getDir: Boolean): String? {
-        println("Stop recording")
-        audioRecorder?.apply {
-            stop()
-            println("Recording stopped")
-        }
-        audioRecorder = null
-        
-        return if (getDir) {
-            val file = fopen(outputFile, "rb")
-            if (file != null) {
-                fseek(file, 0, SEEK_END)
-                val fileSize = ftell(file).toInt()
-                rewind(file)
-                val byteArray = ByteArray(fileSize)
-                fread(byteArray.refTo(0), 1u, fileSize.toULong(), file)
-                fclose(file)
-                outputFile // Возвращаем абсолютный путь к файлу
-            } else {
-                null
+        try {
+            println("Stop recording")
+            audioRecorder?.apply {
+                stop()
+                println("Recording stopped")
             }
-        } else {
-            outputFile // Возвращаем абсолютный путь к файлу
+            audioRecorder = null
+            
+            return if (getDir) {
+                val file = fopen(outputFile, "rb")
+                if (file != null) {
+                    fseek(file, 0, SEEK_END)
+                    val fileSize = ftell(file).toInt()
+                    rewind(file)
+                    val byteArray = ByteArray(fileSize)
+                    fread(byteArray.refTo(0), 1u, fileSize.toULong(), file)
+                    fclose(file)
+                    outputFile // Возвращаем абсолютный путь к файлу
+                } else {
+                    null
+                }
+            } else {
+                outputFile // Возвращаем абсолютный путь к файлу
+            }
+        } catch (e: Exception) {
+            println("error: $e")
+            
+            return null
         }
     }
 }
