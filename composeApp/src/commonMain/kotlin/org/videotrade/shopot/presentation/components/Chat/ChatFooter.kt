@@ -308,6 +308,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             .imePadding()
             .padding(vertical = 15.dp)
             .background(Color.White)
+            .height(60.dp)
     ) {
 
 
@@ -388,7 +389,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth()
-                .heightIn(max = 125.dp, min = 58.dp)
+                .heightIn(max = 125.dp, min = 60.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(Color(0xFFF3F4F6))
         
@@ -508,7 +509,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                         innerTextField()
                     }
-                }
+                },
+                enabled = !isRecording
             )
 
 
