@@ -42,12 +42,13 @@ import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.profile.ProfileMediaScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
+fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val interactionSource =
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
@@ -81,7 +82,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth(0.85f).padding(end = 5.dp)
+            modifier = Modifier.fillMaxWidth(0.85f).padding(end = 5.dp).pointerInput(Unit) {
+                navigator.push(ProfileMediaScreen(profile, chat))
+            }
         ) {
             
             Avatar(
@@ -89,13 +92,13 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel) {
                 size = 40.dp
             )
             
-            val fullName = listOfNotNull(chat.firstName, chat.lastName)
+            val fullName = listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.firstName)
                 .joinToString(" ")
                 .takeIf { it.isNotBlank() }
                 ?.let {
                     if (it.length > 35) "${it.take(32)}..." else it
                 } ?: ""
-            
+
             val displayName = fullName.ifBlank { chat.phone }
             
             
