@@ -93,7 +93,8 @@ fun BlurredMessageOverlay(
                         profile = profile,
                         viewModel = viewModel,
                         onClick = {},
-                        visible = visible
+                        visible = visible,
+                        onDismiss
                     )
                 }
             }
@@ -107,7 +108,8 @@ fun MessageBlurBox(
     profile: ProfileDTO,
     viewModel: ChatViewModel,
     onClick: () -> Unit,
-    visible: Boolean
+    visible: Boolean,
+    onDismiss: () -> Unit
 ) {
     val clipboardManager = LocalClipboardManager.current
     
@@ -147,6 +149,7 @@ fun MessageBlurBox(
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
                     .clickable(onClick = onClick)
+
             ) {
                 if (message.fromUser == profile.id) {
                     Surface(
@@ -158,7 +161,8 @@ fun MessageBlurBox(
                             bottomStart = 20.dp
                         ),
                         shadowElevation = 4.dp,
-                        color = Color(0xFF2A293C)
+                        color = Color(0xFF2A293C),
+
                     ) {
                         message.content?.let {
                             MessageFormat(message, profile, onClick)
@@ -189,6 +193,7 @@ fun MessageBlurBox(
                 modifier = Modifier
                     .padding(start = 2.dp, end = 2.dp)
                     .fillMaxWidth()
+
             ) {
                 Image(
                     modifier = Modifier
@@ -218,11 +223,12 @@ fun MessageBlurBox(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
-                        .fillMaxWidth().clickable {
-                            
-                            
+                        .fillMaxWidth()
+                        .clickable {
                             editOption.onClick(viewModel, message, clipboardManager)
+                            onDismiss()
                         }
+
                 ) {
                     Text(
                         text = editOption.text,
