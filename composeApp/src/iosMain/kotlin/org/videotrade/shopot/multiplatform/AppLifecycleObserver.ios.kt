@@ -1,6 +1,5 @@
 package org.videotrade.shopot.multiplatform
 
-import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCAction
 import kotlinx.coroutines.CoroutineScope
@@ -12,8 +11,6 @@ import org.koin.core.component.inject
 import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.UIKit.UIApplicationDidBecomeActiveNotification
@@ -27,8 +24,9 @@ class IOSAppLifecycleObserver : AppLifecycleObserver, KoinComponent {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
     
     override fun onAppBackgrounded() {
-        
-        println("iOS: Приложение свернуто")
+        coroutineScope.launch {
+            println("iOS: Приложение свернуто disconnect")
+        }
     }
     
     override fun onAppForegrounded() {
@@ -36,8 +34,8 @@ class IOSAppLifecycleObserver : AppLifecycleObserver, KoinComponent {
         println("iOS: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
         
         if (commonUseCase.mainNavigator.value !== null && wsUseCase.wsSession.value?.isActive == false) {
-            
-            println("Android: Reconnect")
+            wsUseCase.setConnection(false)
+            println("iOS: Reconnect")
             
             coroutineScope.launch {
                 wsUseCase.connectionWs(

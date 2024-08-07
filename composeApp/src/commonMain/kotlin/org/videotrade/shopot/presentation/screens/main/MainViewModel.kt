@@ -65,8 +65,19 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun getChatsInBack() {
+    fun getChatsInBack(
+        defaultClientWebSocketSession: DefaultClientWebSocketSession? = null,
+        userId: String? = null
+    ) {
         viewModelScope.launch {
+            if (defaultClientWebSocketSession !== null) {
+                chatsUseCase.getChatsInBack(defaultClientWebSocketSession, userId!!)
+                observeUsers()
+                
+                return@launch
+            }
+            
+            
             if (wsUseCase.wsSession.value !== null && wsUseCase.wsSession.value!!.isActive) {
                 chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
                 observeUsers()

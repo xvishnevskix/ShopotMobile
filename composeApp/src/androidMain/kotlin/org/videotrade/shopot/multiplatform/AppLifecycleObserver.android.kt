@@ -29,16 +29,19 @@ class AndroidAppLifecycleObserver : LifecycleObserver, AppLifecycleObserver, Koi
     
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     override fun onAppBackgrounded() {
-        println("Android: Приложение свернуто")
+        coroutineScope.launch {
+            println("iOS: Приложение свернуто disconnect")
+        }
     }
     
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     override fun onAppForegrounded() {
         
-        println("Android: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
+        println("iOS: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
         
         if (commonUseCase.mainNavigator.value !== null && wsUseCase.wsSession.value?.isActive == false) {
-            println("Android: Reconnect")
+            wsUseCase.setConnection(false)
+            println("iOS: Reconnect")
             
             coroutineScope.launch {
                 wsUseCase.connectionWs(

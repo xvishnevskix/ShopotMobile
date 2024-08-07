@@ -1,7 +1,6 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +42,6 @@ import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -76,9 +73,9 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
     )
 
-    LaunchedEffect(Unit) {
-        mainViewModel.getChatsInBack()
-    }
+//    LaunchedEffect(Unit) {
+//        mainViewModel.getChatsInBack()
+//    }
     
     Box(modifier = Modifier.fillMaxSize()) {
         SafeArea {
