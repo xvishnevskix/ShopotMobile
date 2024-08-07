@@ -481,7 +481,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
             BasicTextField(
                 value = text,
-                onValueChange = { text = it },
+                onValueChange = { newText ->
+                    if (!isRecording) {
+                        text = newText
+                    }
+                },
                 modifier = Modifier
                     .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
                     .weight(1f)
@@ -510,7 +514,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         innerTextField()
                     }
                 },
-                enabled = !isRecording
             )
 
 
