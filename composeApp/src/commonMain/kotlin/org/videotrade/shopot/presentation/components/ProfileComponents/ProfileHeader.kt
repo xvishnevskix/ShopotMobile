@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,6 +40,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import shopot.composeapp.generated.resources.Montserrat_Bold
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -52,18 +54,16 @@ fun ProfileHeader(text: String) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 23.dp).background(Color(0xFFF3F4F6)),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.SpaceBetween,
 
         ) {
-//        Icon(
-//            imageVector = Icons.Default.ArrowBack,
-//            contentDescription = "Back",
-//            modifier = Modifier
-//                .padding(start = 0.dp, end = 1.dp)
-//                .clickable {
-//                    navigator.pop()
-//                }
-//        )
+        BackIcon(Modifier.padding(start = 10.dp, end = 0.dp).width(25.dp).pointerInput(Unit) {
+
+
+            navigator.pop()
+
+
+        })
         Text(
             text = text,
             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -74,7 +74,7 @@ fun ProfileHeader(text: String) {
             lineHeight = 24.sp,
             color = androidx.compose.ui.graphics.Color.Black
         )
-//        Spacer(modifier = Modifier.width(40.dp))
+        Spacer(modifier = Modifier.width(35.dp))
     }
 
 }

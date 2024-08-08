@@ -27,14 +27,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.formatTimestamp
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.double_message_check
 import shopot.composeapp.generated.resources.single_message_check
 
@@ -45,7 +49,8 @@ fun MessageBox(
     profile: ProfileDTO,
     onClick: () -> Unit,
     onPositioned: (LayoutCoordinates) -> Unit,
-    isVisible: Boolean
+    isVisible: Boolean,
+     chat: ChatItem
 ) {
     val isReadByMe = remember { mutableStateOf(false) }
     
@@ -66,6 +71,10 @@ fun MessageBox(
             .onGloballyPositioned(onPositioned)
             .alpha(if (isVisible) 1f else 0f) // Manage visibility with alpha
     ) {
+
+
+
+
         Box(
             contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
@@ -88,7 +97,31 @@ fun MessageBox(
                 shadowElevation = 4.dp,
                 color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
             ) {
-                MessageFormat(message, profile, onClick)
+
+                Column(
+
+                ) {
+                    if (chat.personal) {} else {
+                        if (message.fromUser == profile.id) {} else {
+                            Text(
+                                text = chat.firstName + " " + chat.lastName,
+                                style = TextStyle(
+                                    color = Color.Gray,
+                                    fontSize = 12.sp,
+                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                ),
+                                modifier = Modifier.padding(start = 25.dp,
+                                    end = 25.dp,
+                                    top = 7.dp,
+                                    bottom = 0.dp
+                                ),
+                            )
+                        }
+                    }
+
+                    MessageFormat(message, profile, onClick)
+                }
+
             }
         }
         
@@ -123,7 +156,8 @@ fun MessageBox(
                 text = formatTimestamp(message.created),
                 style = TextStyle(
                     color = Color.Gray,
-                    fontSize = 16.sp
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                 ),
                 modifier = Modifier.padding(),
             )

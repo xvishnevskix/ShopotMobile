@@ -60,6 +60,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
@@ -107,7 +108,7 @@ data class MenuItem(
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
-    
+
     var text by remember { mutableStateOf("") }
     
     var recordingTime by remember { mutableStateOf(0) }
@@ -118,7 +119,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var showFilePicker by remember { mutableStateOf(false) }
     var voiceName by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
@@ -308,6 +308,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             .imePadding()
             .padding(vertical = 15.dp)
             .background(Color.White)
+            .height(60.dp)
     ) {
 
 
@@ -349,10 +350,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         bottom = 5.dp
                                     )
                                     .fillMaxWidth()
-                                    .clickable {
+                                    .pointerInput(Unit) {
                                         editOption.onClick()
                                         showMenu = false
                                     }
+
                             ) {
                                 Image(
                                     painter = painterResource(editOption.imagePath),
@@ -387,7 +389,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             modifier = Modifier
                 .padding(horizontal = 10.dp)
                 .fillMaxWidth()
-                .heightIn(max = 125.dp, min = 58.dp)
+                .heightIn(max = 125.dp, min = 60.dp)
                 .clip(RoundedCornerShape(20.dp))
                 .background(Color(0xFFF3F4F6))
         
@@ -409,7 +411,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                            .clickable {
 //                                singleImagePicker.launch()
 //                            }
-                            
+
                             .clickable {
                                 showMenu = true
                             }
@@ -418,36 +420,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     
                 }
                 
-                BasicTextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    modifier = Modifier
-                        .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
-                        .weight(1f)
-                        .padding(3.dp),
-                    textStyle = TextStyle(
-                        color = Color.Black,
-                        fontSize = 16.sp
-                    ),
-                    cursorBrush = SolidColor(Color.Black),
-                    visualTransformation = VisualTransformation.None,
-                    decorationBox = { innerTextField ->
-                        Box {
-                            if (text.isEmpty()) {
-                                Text(
-                                    stringResource(MokoRes.strings.write_message),
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 16.sp,
-                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                    lineHeight = 20.sp,
-                                    color = Color(0xFF979797),
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
-                )
+
             } else {
                 Row(
                     modifier = Modifier.padding(start = 15.dp),
@@ -476,7 +449,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         color = Color(0xFF979797),
                     )
                 }
-                
+
                 Row(
                     modifier = Modifier
                         .padding(start = 50.dp)
@@ -505,7 +478,45 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     )
                 }
             }
-            
+
+            BasicTextField(
+                value = text,
+                onValueChange = { newText ->
+                    if (!isRecording) {
+                        text = newText
+                    }
+                },
+                modifier = Modifier
+                    .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
+                    .weight(1f)
+                    .padding(3.dp)
+                    .alpha(if (isRecording) 0f else 1f)
+                    .then(if (isRecording) Modifier.height(0.dp) else Modifier),
+                textStyle = TextStyle(
+                    color = Color.Black,
+                    fontSize = 16.sp
+                ),
+                cursorBrush = SolidColor(Color.Black),
+                visualTransformation = VisualTransformation.None,
+                decorationBox = { innerTextField ->
+                    Box {
+                        if (text.isEmpty()) {
+                            Text(
+                                stringResource(MokoRes.strings.write_message),
+                                textAlign = TextAlign.Center,
+                                fontSize = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                color = Color(0xFF979797),
+                            )
+                        }
+                        innerTextField()
+                    }
+                },
+            )
+
+
             if (text.isNotEmpty()) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
@@ -540,7 +551,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     contentAlignment = Alignment.CenterEnd,
                     modifier = Modifier
                         .padding(end = if (!isRecording) 15.dp else 0.dp)
-                        .size(height = 65.dp, width = 100.dp)
+                        .size(height = 65.dp, width = if (isRecording) 150.dp else 20.dp)
                         .clip(RoundedCornerShape(50))
                         .pointerInput(Unit) {
                             detectDragGestures(
@@ -638,6 +649,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     
                                     recordingTime = 0
                                     isDragging = false
+
+
                                     
                                 },
                                 onPress = {
@@ -645,6 +658,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         viewModel.setIsRecording(!isRecording)
                                     }
                                     println("Press released")
+
+
                                 }
                             )
                         }

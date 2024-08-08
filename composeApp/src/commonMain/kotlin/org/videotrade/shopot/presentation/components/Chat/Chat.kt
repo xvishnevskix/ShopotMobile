@@ -237,7 +237,8 @@ fun Chat(
                 onPositioned = { coordinates ->
                     messageY = coordinates.positionInParent().y.toInt()
                 },
-                isVisible = isVisible
+                isVisible = isVisible,
+                chat = chat
             )
             
             

@@ -43,6 +43,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -56,7 +57,7 @@ import shopot.composeapp.generated.resources.search_icon
 import shopot.composeapp.generated.resources.video_icon
 
 
-class ProfileMediaScreen(private val profile: ProfileDTO) : Screen {
+class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: ChatItem) : Screen {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
@@ -88,7 +89,7 @@ class ProfileMediaScreen(private val profile: ProfileDTO) : Screen {
                         size = 186.dp
                     )
                     Text(
-                        "${profile.firstName} ${profile.lastName}",
+                        "${chat.firstName} ${chat.lastName}",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -102,7 +103,7 @@ class ProfileMediaScreen(private val profile: ProfileDTO) : Screen {
                         modifier = Modifier.padding(bottom = 24.dp),
                     ) {
                         Text(
-                            profile.phone,
+                            chat.phone,
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),

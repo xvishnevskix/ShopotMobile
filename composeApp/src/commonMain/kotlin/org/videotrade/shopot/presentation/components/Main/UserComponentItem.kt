@@ -82,7 +82,7 @@ fun UserComponentItem(
                     .joinToString(" ")
                     .takeIf { it.isNotBlank() }
                     ?.let {
-                        if (it.length > 35) "${it.take(32)}..." else it
+                        if (it.length > 27) "${it.take(24)}..." else it
                     } ?: ""
                 
                 val displayName = fullName.ifBlank { chat.phone }
