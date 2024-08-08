@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,7 +47,6 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -62,6 +62,7 @@ class CreateGroupSecondScreen() : Screen {
         val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
+        val groupName = remember { mutableStateOf("") }
         
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             selectedContacts
@@ -106,7 +107,7 @@ class CreateGroupSecondScreen() : Screen {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
-                            CreateGroupInput()
+                            CreateGroupInput(groupName)
                             ParticipantCountText(selectedContacts.size)
                         }
                         itemsIndexed(filteredContacts) { _, item ->
@@ -120,9 +121,8 @@ class CreateGroupSecondScreen() : Screen {
                         CustomButton(
                             stringResource(MokoRes.strings.next),
                             {
-                                navigator.push(
-                                    MainScreen()
-                                )
+                                
+                                viewModel.createGroupChat(groupName.value)
 
                             })
                     }
@@ -146,7 +146,8 @@ private fun ChatItem(item: ContactDTO) {
             )
             .background(Color(255, 255, 255))
             .fillMaxWidth()
-            .clickable { }
+            .clickable {
+            }
     
     ) {
         Column(
@@ -207,9 +208,8 @@ private fun ChatItem(item: ContactDTO) {
 
 
 @Composable
-fun CreateGroupInput() {
+fun CreateGroupInput(groupName: MutableState<String>) {
     
-    val message = remember { mutableStateOf("") }
     Row(
         modifier = Modifier
             .padding(start = 9.dp).fillMaxWidth(),
@@ -234,7 +234,7 @@ fun CreateGroupInput() {
                 .background(Color(255, 255, 255)),
             
             label = { Text(stringResource(MokoRes.strings.enter_group_name)) },
-            value = message.value,
+            value = groupName.value,
             singleLine = true,
             textStyle = androidx.compose.ui.text.TextStyle(
                 fontSize = 16.sp,
@@ -244,7 +244,7 @@ fun CreateGroupInput() {
                 lineHeight = 20.sp,
                 color = Color(0xFF000000),
             ),
-            onValueChange = { newText -> message.value = newText },
+            onValueChange = { newText -> groupName.value = newText },
             colors = TextFieldDefaults.colors(
                 disabledLabelColor = Color(0xff979797),
                 focusedLabelColor = Color.Transparent,

@@ -1,6 +1,5 @@
 package org.videotrade.shopot.domain.usecase
 
-import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -18,12 +17,16 @@ class ContactsUseCase : KoinComponent {
         return repository.fetchContacts()
     }
     
-     fun getContacts(): List<ContactDTO> {
+    fun getContacts(): List<ContactDTO> {
         return repository.getContacts()
     }
     
     suspend fun createChat(profileId: String, contact: ContactDTO) {
         return repository.createChat(profileId, contact)
+    }
+    
+    suspend fun createGroupChat(users: List<String?>, groupName: String) {
+        return repository.createGroupChat(users, groupName)
     }
     
     fun clearData() {

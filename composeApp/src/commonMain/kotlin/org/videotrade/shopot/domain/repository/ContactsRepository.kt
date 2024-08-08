@@ -1,6 +1,5 @@
 package org.videotrade.shopot.domain.repository
 
-import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.coroutines.flow.StateFlow
 import org.videotrade.shopot.domain.model.ContactDTO
 
@@ -13,6 +12,7 @@ interface ContactsRepository {
     
     
     suspend fun createChat(profileId: String, contact: ContactDTO)
+    suspend fun createGroupChat(users: List<String?>, groupName: String)
     
     fun clearData()
 }

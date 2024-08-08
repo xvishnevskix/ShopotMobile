@@ -23,6 +23,7 @@ import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
 suspend fun handleConnectWebSocket(
@@ -85,6 +86,15 @@ suspend fun handleConnectWebSocket(
                                         val dataJson = jsonElement.jsonObject["data"]?.jsonArray
                                         
                                         val chats = mutableListOf<ChatItem>()
+                                        
+                                        println("chatSize ${dataJson?.size}")
+                                        
+                                        val commonViewModel: CommonViewModel =
+                                            KoinPlatform.getKoin().get()
+                                        
+                                        
+                                        commonViewModel.toaster.show("chats size ${dataJson?.size}")
+                                        
                                         if (dataJson != null) {
                                             
                                             
@@ -481,6 +491,33 @@ suspend fun handleConnectWebSocket(
                                     }
                                     
                                 }
+                                
+                                "createGroupChat" -> {
+                                    
+                                    try {
+                                        
+                                        println("createGroupChat")
+                                        val commonViewModel: CommonViewModel =
+                                            KoinPlatform.getKoin().get()
+                                        
+                                        
+                                        commonViewModel.toaster.show("createGroupChat success")
+                                        
+                                        val dataJson =
+                                            jsonElement.jsonObject["data"]?.jsonObject
+                                        
+                                        
+                                        if (dataJson != null) {
+                                        
+                                        }
+                                        
+                                    } catch (e: Exception) {
+                                        
+                                        Logger.d("Error228: $e")
+                                    }
+                                    
+                                }
+                                
                                 
                             }
                         }

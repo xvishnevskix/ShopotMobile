@@ -1,12 +1,14 @@
 package org.videotrade.shopot.data.remote.repository
 
-import cafe.adriel.voyager.navigator.Navigator
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -15,9 +17,6 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.domain.repository.ContactsRepository
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
-import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
-import org.videotrade.shopot.presentation.screens.main.MainScreen
-import org.videotrade.shopot.presentation.tabs.ContactsTab
 
 class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     private val _contacts = MutableStateFlow<List<ContactDTO>>(
@@ -40,7 +39,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             // Функция для нормализации номера телефона
             fun normalizePhoneNumber(phone: String): String {
-
+                
                 return phone.replace(Regex("[^0-9]"), "")
             }
             
@@ -55,8 +54,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             // Сравнение контактов по нормализованному номеру телефона
             for (contact in contactsNative) {
                 val normalizedPhone = normalizePhoneNumber(contact.phone)
-
-
+                
                 
                 val backendContact = backendContactsMap[normalizedPhone]
                 
@@ -98,7 +96,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         
     }
     
-    override  fun getContacts(): List<ContactDTO> {
+    override fun getContacts(): List<ContactDTO> {
         
         return contacts.value
     }
@@ -106,29 +104,6 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     
     override suspend fun createChat(profileId: String, contact: ContactDTO) {
         val wsUseCase: WsUseCase by inject()
-
-
-//        val jsonContent = Json.encodeToString(
-//            buildJsonObject {
-//                put("firstUserId", profileId)
-//                put("secondUserId", contact.id)
-//
-//            }
-//        )
-//
-//        println("jsonContent $jsonContent")
-//
-//        @Serializable
-//        data class PersonalChat(
-//            val id: String,
-//            val createdAt: String,
-//            val firstUserId: String,
-//            val secondUserId: String
-//        )
-//
-//        val contactsGet = origin().post<PersonalChat>("personal-chat", jsonContent)
-        
-        
         try {
             val jsonContentSocket = Json.encodeToString(
                 buildJsonObject {
@@ -147,6 +122,34 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         }
         
         
+    }
+    
+    override suspend fun createGroupChat(users: List<String?>, groupName: String) {
+        val wsUseCase: WsUseCase by inject()
+        try {
+            // Преобразуйте список пользователей в JSON-массив строк
+            val usersJsonArray = buildJsonArray {
+                users.forEach { user ->
+                    add(JsonPrimitive(user))
+                }
+            }
+            println(" createChat $usersJsonArray")
+            
+            // Создайте JSON-объект с массивом пользователей
+            val jsonContentSocket = buildJsonObject {
+                put("action", "createGroupChat")
+                put("groupName", groupName)
+                put("users", usersJsonArray)
+            }
+            
+            val jsonString = Json.encodeToString(jsonContentSocket)
+            
+            println("error createChat $jsonString")
+            
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonString))
+        } catch (e: Exception) {
+            println("error createChat: ${e.message}")
+        }
     }
     
     override fun clearData() {

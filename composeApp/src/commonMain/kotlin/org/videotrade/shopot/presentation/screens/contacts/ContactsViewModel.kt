@@ -2,7 +2,6 @@ package org.videotrade.shopot.presentation.screens.contacts
 
 
 import androidx.compose.runtime.mutableStateListOf
-import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +25,7 @@ class ContactsViewModel() : ViewModel(),
     private val _contacts = MutableStateFlow<List<ContactDTO>>(emptyList())
     
     val contacts: StateFlow<List<ContactDTO>> get() = _contacts
+    
     
     fun fetchContacts() {
         viewModelScope.launch {
@@ -66,6 +66,14 @@ class ContactsViewModel() : ViewModel(),
             
         }
         
+    }
+    
+    fun createGroupChat(groupName: String) {
+        viewModelScope.launch {
+            val idUsers = selectedContacts.map { it.id }.toMutableList()
+            idUsers.add(ProfileUseCase.getProfile().id)
+            ContactsUseCase.createGroupChat(idUsers, groupName)
+        }
     }
     
     
