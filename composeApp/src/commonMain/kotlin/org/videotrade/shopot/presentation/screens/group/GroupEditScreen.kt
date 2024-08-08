@@ -53,7 +53,7 @@ class GroupEditScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val textState = remember { mutableStateOf("Работа над проектом") }
+        val textState = remember { mutableStateOf("") }
         val textStyle = TextStyle(
             color = Color.Black,
             fontSize = 14.sp,
@@ -102,7 +102,7 @@ class GroupEditScreen : Screen {
                                     ) {
 
                                         if (textState.value.isEmpty()) {
-                                            Text("Введите текст", style = textStyle.copy(color = Color.Gray))
+                                            Text(stringResource(MokoRes.strings.enter_group_name), style = textStyle.copy(color = Color.Gray))
                                         }
                                         innerTextField()
                                     }
@@ -144,7 +144,7 @@ class GroupEditScreen : Screen {
                     contentAlignment = Alignment.TopStart
                 ) {
                     Text(
-                        "Редактировать участников",
+                        stringResource(MokoRes.strings.edit_members),
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
@@ -169,17 +169,6 @@ class GroupEditScreen : Screen {
                                 GroupUserCard(isEdit = true)
                                 GroupUserCard(isEdit = true)
                                 GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-
                             }
                         }
                 }

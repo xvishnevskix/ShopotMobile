@@ -70,8 +70,12 @@ class GroupProfileScreen : Screen {
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
         }
-        
-        
+
+
+        val usersTitle = stringResource(MokoRes.strings.edit)
+        val mediaTitle = stringResource(MokoRes.strings.media)
+
+
         
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -103,7 +107,7 @@ class GroupProfileScreen : Screen {
                         color = Color(0xFF000000)
                     )
                     Text(
-                        "6 участников",
+                       "6" + " " + stringResource(MokoRes.strings.members),
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -122,28 +126,28 @@ class GroupProfileScreen : Screen {
                             drawableRes = Res.drawable.video_icon,
                             width = 22.5.dp,
                             height = 15.dp,
-                            text = "Видеочат",
+                            text = stringResource(MokoRes.strings.video_call),
                             onClick = {}
                         )
                         GroupShortButton(
                             drawableRes = Res.drawable.call,
                             width = 16.dp,
                             height = 16.dp,
-                            text = "Звонок",
+                            text = stringResource(MokoRes.strings.call),
                             onClick = {}
                         )
                         GroupShortButton(
                             drawableRes = Res.drawable.notification,
                             width = 18.dp,
                             height = 15.dp,
-                            text = "Уведомления",
+                            text = stringResource(MokoRes.strings.notifications),
                             onClick = {}
                         )
                         GroupShortButton(
                             drawableRes = Res.drawable.search_icon,
                             width = 16.85.dp,
                             height = 16.85.dp,
-                            text = "Поиск",
+                            text = stringResource(MokoRes.strings.search),
                             onClick = {}
                         )
                     }
@@ -157,7 +161,7 @@ class GroupProfileScreen : Screen {
                             drawableRes = Res.drawable.add_user,
                             width = 13.dp,
                             height = 10.dp,
-                            text = "Добавить",
+                            text = stringResource(MokoRes.strings.add),
                             onClick = {}
                         )
                         GroupLongButton(
@@ -254,12 +258,6 @@ class GroupProfileScreen : Screen {
                                             GroupUserCard()
                                             GroupUserCard()
                                             GroupUserCard()
-                                            GroupUserCard()
-                                            GroupUserCard()
-                                            GroupUserCard()
-                                            GroupUserCard()
-                                            GroupUserCard()
-                                            GroupUserCard()
                                         }
                                     }
                                 } else {
@@ -282,7 +280,7 @@ class GroupProfileScreen : Screen {
 
 private enum class Tabs(
     val text: String,
-    val title: String
+    var title: String
 ) {
     Users(
         title = "Участники",
@@ -303,7 +301,5 @@ private enum class Tabs(
     Links(
         title = "Ссылки",
         text = "Здесь будут ваши ссылки"
-    ),
-    
-    
+    );
 }
