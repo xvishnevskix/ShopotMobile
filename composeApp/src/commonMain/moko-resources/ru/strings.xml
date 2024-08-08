@@ -107,5 +107,8 @@
 
     <string name="language">Язык</string>
 
+    <string name="enable_permissions">Включите разрешения</string>
+    <string name="notification_and_contact_permissions">Разрешения уведомлений и контактов позволяют вам узнавать, когда приходят сообщения, и помогают найти людей, которых вы знаете.</string>
+
 
 </resources>

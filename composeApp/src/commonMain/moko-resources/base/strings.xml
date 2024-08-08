@@ -115,4 +115,9 @@
     <string name="ph">Philippines</string>
 
     <string name="language">Language</string>
+
+    <string name="enable_permissions">Enable Permissions</string>
+    <string name="notification_and_contact_permissions">Notification and contact permissions let you know when messages arrive and help you find people you know.</string>
+
+
 </resources>
