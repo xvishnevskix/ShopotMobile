@@ -41,8 +41,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
@@ -83,7 +85,7 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader("Медиа")
+                    ProfileHeader(stringResource(MokoRes.strings.media))
                     Avatar(
                         icon = null,
                         size = 186.dp
@@ -150,7 +152,7 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                                 drawableRes = Res.drawable.video_icon,
                                 width = 22.5.dp,
                                 height = 15.dp,
-                                text = "Видеочат",
+                                text = stringResource(MokoRes.strings.video_call),
                                 onClick = {}
 
                             )
@@ -158,21 +160,21 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                                 drawableRes = Res.drawable.call,
                                 width = 16.dp,
                                 height = 16.dp,
-                                text = "Звонок",
+                                text = stringResource(MokoRes.strings.call),
                                 onClick = {}
                             )
                             GroupShortButton(
                                 drawableRes = Res.drawable.notification,
                                 width = 18.dp,
                                 height = 15.dp,
-                                text = "Уведомления",
+                                text = stringResource(MokoRes.strings.notifications),
                                 onClick = {}
                             )
                             GroupShortButton(
                                 drawableRes = Res.drawable.search_icon,
                                 width = 16.85.dp,
                                 height = 16.85.dp,
-                                text = "Поиск",
+                                text = stringResource(MokoRes.strings.search),
                                 onClick = {}
                             )
                         }
