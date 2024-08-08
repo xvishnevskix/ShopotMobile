@@ -19,9 +19,9 @@
     <string name="enter_group_name">Enter the group name</string>
     <string name="enter_name_or_phone">Enter your name or phone number</string>
 
-    <string name="participant">participant</string>
-    <string name="participants_1">participants</string>
-    <string name="participants_2">participants</string>
+    <string name="participant">member</string>
+    <string name="participants_1">members</string>
+    <string name="participants_2">members</string>
 
     <string name="edit_profile">Edit profile</string>
     <string name="info">Info</string>
@@ -53,6 +53,32 @@
     <string name="microphone">Microphone</string>
     <string name="speaker">Speaker</string>
     <string name="video_call">Video call</string>
+    <string name="call">Сall</string>
+    <string name="notifications">Notifications</string>
+    <string name="search">Search</string>
+    <string name="add">Add</string>
+
+    <string name="members">Members</string>
+    <string name="media">Media</string>
+    <string name="files">Files</string>
+    <string name="voice">Voice</string>
+    <string name="links">Links</string>
+
+    <string name="your_media">Your media files will be here</string>
+    <string name="your_files">Your files will be here</string>
+    <string name="your_voice">Your voice messages will be here</string>
+    <string name="your_links">Your links will be here</string>
+
+    <string name="nothing_here">There's nothing here yet</string>
+
+    <string name="online">online</string>
+    <string name="owner">owner</string>
+
+
+
+    <string name="edit_members">Edit members</string>
+
+
     <string name="incoming_call">Incoming call...</string>
 
     <string name="greeting">Welcome!</string>
@@ -89,4 +115,9 @@
     <string name="ph">Philippines</string>
 
     <string name="language">Language</string>
+
+    <string name="enable_permissions">Enable Permissions</string>
+    <string name="notification_and_contact_permissions">Notification and contact permissions let you know when messages arrive and help you find people you know.</string>
+
+
 </resources>

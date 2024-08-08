@@ -1,5 +1,6 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,6 +44,7 @@ fun GroupShortButton(
     width: Dp,
     height: Dp,
     text: String,
+    onClick: () -> Unit
 ) {
 
 
@@ -50,6 +52,9 @@ fun GroupShortButton(
         modifier = Modifier
             .padding(top = 20.dp)
             .clip(RoundedCornerShape(8.dp))
+            .clickable{
+
+            }
             .background(Color(0xFFFFFFFF))
             .padding( top = 11.dp, bottom = 11.dp)
             .width(78.dp),

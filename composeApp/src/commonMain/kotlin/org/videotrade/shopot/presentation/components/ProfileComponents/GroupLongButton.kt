@@ -1,5 +1,6 @@
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,12 +44,16 @@ fun GroupLongButton(
     width: Dp,
     height: Dp,
     text: String,
+    onClick: () -> Unit
 ) {
 
 
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
+            .clickable{
+                onClick()
+            }
             .background(Color(0xFFFFFFFF))
             .padding( top = 20.dp, bottom = 20.dp)
             .width(178.dp),

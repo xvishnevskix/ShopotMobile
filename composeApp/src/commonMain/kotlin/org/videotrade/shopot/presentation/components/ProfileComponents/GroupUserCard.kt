@@ -18,8 +18,10 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -59,7 +61,7 @@ fun GroupUserCard(
                         color = Color(0xFF000000)
                     )
                     Text(
-                        text = "в сети",
+                        text = stringResource(MokoRes.strings.online),
                         textAlign = TextAlign.Center,
                         fontSize = 13.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -72,7 +74,7 @@ fun GroupUserCard(
 
             if (!isEdit) {
                 Text(
-                    text = "владелец",
+                    text = stringResource(MokoRes.strings.owner),
                     textAlign = TextAlign.Center,
                     fontSize = 13.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),

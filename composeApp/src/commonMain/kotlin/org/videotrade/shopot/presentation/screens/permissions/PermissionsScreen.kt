@@ -31,9 +31,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
@@ -52,10 +54,10 @@ class PermissionsScreen : Screen {
         
         val items = listOf(
             PermissionItemDTO(
-                "Контакты",
+                stringResource(MokoRes.strings.contacts),
             ),
             PermissionItemDTO(
-                "Уведомления",
+                stringResource(MokoRes.strings.notifications),
             )
         )
         
@@ -70,7 +72,7 @@ class PermissionsScreen : Screen {
                     .align(Alignment.Center)
             ) {
                 Text(
-                    text = "Включите разрешения",
+                    text = stringResource(MokoRes.strings.enable_permissions),
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
                     textAlign = TextAlign.Center,
                     fontSize = 24.sp,
@@ -81,7 +83,7 @@ class PermissionsScreen : Screen {
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    text = "Разрешения уведомлений и контактов позволяют вам узнавать, когда приходят сообщения, и помогают найти людей, которых вы знаете.",
+                    text = stringResource(MokoRes.strings.notification_and_contact_permissions),
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
                     textAlign = TextAlign.Center,
@@ -125,7 +127,7 @@ class PermissionsScreen : Screen {
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Включите разрешения",
+                        text = stringResource(MokoRes.strings.enable_permissions),
                         color = Color.White
                     )
                 }
