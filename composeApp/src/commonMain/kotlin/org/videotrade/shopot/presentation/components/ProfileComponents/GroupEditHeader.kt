@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -45,7 +46,7 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Back",
-            modifier = Modifier.padding(start = 10.dp,end = 1.dp).clickable {
+            modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
                 navigator.pop()
             },
             tint = Color.Black
@@ -66,7 +67,7 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
             painter = painterResource(Res.drawable.check_mark),
             contentDescription = "Avatar",
             modifier = Modifier.padding(start = 0.dp, end = 6.dp)
-                .size(width = 16.dp, height = 12.dp).clickable {
+                .size(width = 16.dp, height = 12.dp).pointerInput(Unit) {
                 if (onClick != null) {
                     onClick()
                 }

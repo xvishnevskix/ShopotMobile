@@ -150,25 +150,30 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                                 drawableRes = Res.drawable.video_icon,
                                 width = 22.5.dp,
                                 height = 15.dp,
-                                text = "Видеочат"
+                                text = "Видеочат",
+                                onClick = {}
+
                             )
                             GroupShortButton(
                                 drawableRes = Res.drawable.call,
                                 width = 16.dp,
                                 height = 16.dp,
-                                text = "Звонок"
+                                text = "Звонок",
+                                onClick = {}
                             )
                             GroupShortButton(
                                 drawableRes = Res.drawable.notification,
                                 width = 18.dp,
                                 height = 15.dp,
-                                text = "Уведомления"
+                                text = "Уведомления",
+                                onClick = {}
                             )
                             GroupShortButton(
                                 drawableRes = Res.drawable.search_icon,
                                 width = 16.85.dp,
                                 height = 16.85.dp,
-                                text = "Поиск"
+                                text = "Поиск",
+                                onClick = {}
                             )
                         }
                 }
