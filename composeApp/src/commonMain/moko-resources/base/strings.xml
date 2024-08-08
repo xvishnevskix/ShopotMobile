@@ -64,8 +64,17 @@
     <string name="voice">Voice</string>
     <string name="links">Links</string>
 
+    <string name="your_media">Your media files will be here</string>
+    <string name="your_files">Your files will be here</string>
+    <string name="your_voice">Your voice messages will be here</string>
+    <string name="your_links">Your links will be here</string>
+
+    <string name="nothing_here">There's nothing here yet</string>
+
     <string name="online">online</string>
     <string name="owner">owner</string>
+
+
 
     <string name="edit_members">Edit members</string>
 

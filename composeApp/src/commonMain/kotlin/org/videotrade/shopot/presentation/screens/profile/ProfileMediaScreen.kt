@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -69,6 +70,13 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
         val pagerState = rememberPagerState(pageCount = { ProfileMediaTabs.entries.size })
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
+        }
+
+        val tabs = ProfileMediaTabs.entries.map { tab ->
+            org.videotrade.shopot.presentation.screens.group.TabInfo(
+                title = stringResource(tab.titleResId),
+                text = stringResource(tab.textResId)
+            )
         }
 
         Box(
@@ -234,6 +242,10 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
 
                         ) {
                             ProfileMediaTabs.entries.forEachIndexed { index, currentTab ->
+
+                                val tabInfo = tabs[index]
+
+
                                 Tab(
                                     modifier = Modifier.fillMaxWidth().padding(0.dp).clip(
                                         RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
@@ -250,7 +262,7 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                                     text = {
                                         Text(
                                             modifier = Modifier.wrapContentWidth(),
-                                            text = currentTab.title,
+                                            text = tabInfo.title,
                                             textAlign = TextAlign.Start,
                                             fontSize = 15.sp,
                                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
@@ -275,9 +287,10 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
 
                                 contentAlignment = Alignment.TopCenter,
                             ) {
+                                val selectedTab = tabs[selectedTabIndex.value]
 //                                Text( text = Tabs.entries[selectedTabIndex.value].text)
 
-                                if (ProfileMediaTabs.entries[selectedTabIndex.value].text == "Участники") {
+                                if (selectedTab.text == stringResource(MokoRes.strings.media)) {
                                     LazyColumn(
                                         verticalArrangement = Arrangement.Top,
                                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -293,7 +306,7 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                                         contentAlignment = Alignment.Center
                                     ) {
                                         Text(
-                                            text = ProfileMediaTabs.entries[selectedTabIndex.value].text,
+                                            text = selectedTab.text,
                                             fontSize = 15.sp,
                                             fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
                                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
@@ -316,30 +329,70 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
 
 
 
-private enum class ProfileMediaTabs(
-    val text: String,
-    val title: String
+enum class ProfileMediaTabs(
+    val textResId: StringResource,
+    val titleResId: StringResource
 ) {
     Media(
-        title = "Медиа",
-        text = "Пока тут пусто"
+        titleResId = MokoRes.strings.media,
+        textResId = MokoRes.strings.nothing_here
     ),
-
     Files(
-        title = "Файлы",
-        text = "Пока тут пусто"
+        titleResId = MokoRes.strings.files,
+        textResId = MokoRes.strings.nothing_here
     ),
     Voice(
-        title = "Голос",
-        text = "Пока тут пусто"
+        titleResId = MokoRes.strings.voice,
+        textResId = MokoRes.strings.nothing_here
     ),
     Links(
-        title = "Ссылки",
-        text = "Пока тут пусто"
-    ),
-    GIF(
-        title = "GIF",
-        text = "Пока тут пусто"
-    ),
+        titleResId = MokoRes.strings.links,
+        textResId = MokoRes.strings.nothing_here
+    );
 
+    companion object {
+        @Composable
+        fun createTabs(): List<TabInfo> {
+            return entries.map { tab ->
+                TabInfo(
+                    title = stringResource(tab.titleResId),
+                    text = stringResource(tab.textResId)
+                )
+            }
+        }
+    }
 }
+
+data class TabInfo(
+    val title: String,
+    val text: String
+)
+
+
+//private enum class ProfileMediaTabs(
+//    val text: String,
+//    val title: String
+//) {
+//    Media(
+//        title = "Медиа",
+//        text = "Пока тут пусто"
+//    ),
+//
+//    Files(
+//        title = "Файлы",
+//        text = "Пока тут пусто"
+//    ),
+//    Voice(
+//        title = "Голос",
+//        text = "Пока тут пусто"
+//    ),
+//    Links(
+//        title = "Ссылки",
+//        text = "Пока тут пусто"
+//    ),
+//    GIF(
+//        title = "GIF",
+//        text = "Пока тут пусто"
+//    ),
+//
+//}

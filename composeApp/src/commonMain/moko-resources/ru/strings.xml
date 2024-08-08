@@ -62,6 +62,13 @@
     <string name="voice">Голос</string>
     <string name="links">Ссылки</string>
 
+    <string name="your_media">Здесь будут ваши медиафайлы</string>
+    <string name="your_files">Здесь будут ваши файлы</string>
+    <string name="your_voice">Здесь будут ваши голосовые сообщения</string>
+    <string name="your_links">Здесь будут ваши ссылки</string>
+
+    <string name="nothing_here">Пока тут пусто</string>
+
     <string name="online">в сети</string>
     <string name="owner">владелец</string>
 

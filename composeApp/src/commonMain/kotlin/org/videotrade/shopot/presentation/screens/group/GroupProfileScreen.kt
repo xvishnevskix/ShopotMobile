@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -66,17 +67,18 @@ class GroupProfileScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
-        val pagerState = rememberPagerState(pageCount = { Tabs.entries.size })
+        val pagerState = rememberPagerState(pageCount = { GroupProfileTabs.entries.size })
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
         }
 
+        val tabs = GroupProfileTabs.entries.map { tab ->
+            TabInfo(
+                title = stringResource(tab.titleResId),
+                text = stringResource(tab.textResId)
+            )
+        }
 
-        val usersTitle = stringResource(MokoRes.strings.edit)
-        val mediaTitle = stringResource(MokoRes.strings.media)
-
-
-        
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopStart
@@ -204,9 +206,16 @@ class GroupProfileScreen : Screen {
                             }
                         
                         ) {
-                            Tabs.entries.forEachIndexed { index, currentTab ->
+                            GroupProfileTabs.entries.forEachIndexed { index, currentTab ->
+                                val tabInfo = tabs[index] // Получаем соответствующий TabInfo для текущего индекса
+
                                 Tab(
-                                    modifier = Modifier.fillMaxWidth().padding(0.dp),
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(0.dp)
+                                        .clip(
+                                            RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+                                        ),
                                     selected = selectedTabIndex.value == index,
                                     selectedContentColor = Color(0xFF29303C),
                                     unselectedContentColor = Color(0xFFA9A8AA),
@@ -215,11 +224,10 @@ class GroupProfileScreen : Screen {
                                             pagerState.animateScrollToPage(currentTab.ordinal)
                                         }
                                     },
-                                    
                                     text = {
                                         Text(
                                             modifier = Modifier.wrapContentWidth(),
-                                            text = currentTab.title,
+                                            text = tabInfo.title, // Используем строку из TabInfo
                                             textAlign = TextAlign.Start,
                                             fontSize = 12.sp,
                                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
@@ -241,22 +249,17 @@ class GroupProfileScreen : Screen {
                         ) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
-                                
                                 contentAlignment = Alignment.TopCenter,
                             ) {
-//                                Text( text = Tabs.entries[selectedTabIndex.value].text)
-                                
-                                if (Tabs.entries[selectedTabIndex.value].text == "Участники") {
+                                val selectedTab = tabs[selectedTabIndex.value]
+
+                                if (selectedTab.text == stringResource(MokoRes.strings.members)) {
                                     LazyColumn(
                                         verticalArrangement = Arrangement.Top,
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         modifier = Modifier.fillMaxSize()
                                     ) {
-                                        item {
-                                            GroupUserCard()
-                                            GroupUserCard()
-                                            GroupUserCard()
-                                            GroupUserCard()
+                                        items(5) {
                                             GroupUserCard()
                                         }
                                     }
@@ -265,7 +268,7 @@ class GroupProfileScreen : Screen {
                                         modifier = Modifier.fillMaxHeight(0.7F),
                                         contentAlignment = Alignment.Center
                                     ) {
-                                        Text(text = Tabs.entries[selectedTabIndex.value].text)
+                                        Text(text = selectedTab.text)
                                     }
                                 }
                             }
@@ -278,28 +281,72 @@ class GroupProfileScreen : Screen {
 }
 
 
-private enum class Tabs(
-    val text: String,
-    var title: String
+//private enum class Tabs(
+//    val text: String,
+//    var title: String
+//) {
+//    Users(
+//        title = "Участники",
+//        text = "Участники",
+//    ),
+//    Media(
+//        title = "Медиа",
+//        text = "Здесь будут ваши медиафайлы"
+//    ),
+//    Files(
+//        title = "Файлы",
+//        text = "Здесь будут ваши файлы"
+//    ),
+//    Voice(
+//        title = "Голос",
+//        text = "Здесь будут ваши голосовые сообщения"
+//    ),
+//    Links(
+//        title = "Ссылки",
+//        text = "Здесь будут ваши ссылки"
+//    );
+//}
+
+
+enum class GroupProfileTabs(
+    val textResId: StringResource,
+    val titleResId: StringResource
 ) {
     Users(
-        title = "Участники",
-        text = "Участники",
+        titleResId = MokoRes.strings.members,
+        textResId = MokoRes.strings.members
     ),
     Media(
-        title = "Медиа",
-        text = "Здесь будут ваши медиафайлы"
+        titleResId = MokoRes.strings.media,
+        textResId = MokoRes.strings.your_media
     ),
     Files(
-        title = "Файлы",
-        text = "Здесь будут ваши файлы"
+        titleResId = MokoRes.strings.files,
+        textResId = MokoRes.strings.your_files
     ),
     Voice(
-        title = "Голос",
-        text = "Здесь будут ваши голосовые сообщения"
+        titleResId = MokoRes.strings.voice,
+        textResId = MokoRes.strings.your_voice
     ),
     Links(
-        title = "Ссылки",
-        text = "Здесь будут ваши ссылки"
+        titleResId = MokoRes.strings.links,
+        textResId = MokoRes.strings.your_links
     );
+
+    companion object {
+        @Composable
+        fun createTabs(): List<TabInfo> {
+            return entries.map { tab ->
+                TabInfo(
+                    title = stringResource(tab.titleResId),
+                    text = stringResource(tab.textResId)
+                )
+            }
+        }
+    }
 }
+
+data class TabInfo(
+    val title: String,
+    val text: String
+)
