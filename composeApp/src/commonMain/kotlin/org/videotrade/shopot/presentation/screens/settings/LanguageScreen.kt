@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import dev.icerock.moko.resources.compose.stringResource
@@ -105,6 +107,8 @@ class LanguageScreen : Screen {
 fun LanguageItem(language: String, translation: String, emoji: String, isSelected: Boolean, isLastItem: Boolean, letters: String,) {
     val alpha = if (isSelected) 1f else 0.50f
     val tabNavigator: TabNavigator = LocalTabNavigator.current
+    val navigator = LocalNavigator.currentOrThrow
+    
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -115,7 +119,8 @@ fun LanguageItem(language: String, translation: String, emoji: String, isSelecte
                     delValueInStorage("selected_language")
                     StringDesc.localeType = StringDesc.LocaleType.Custom(letters)
                     addValueInStorage("selected_language", letters)
-                    tabNavigator.current = ChatsTab
+//                    tabNavigator.current = ChatsTab
+                    navigator.pop()
                 },
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

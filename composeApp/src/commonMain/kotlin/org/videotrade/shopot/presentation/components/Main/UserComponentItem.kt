@@ -78,26 +78,37 @@ fun UserComponentItem(
                 modifier = Modifier.padding(start = 10.dp),
                 verticalArrangement = Arrangement.Center
             ) {
-                val fullName = listOfNotNull(chat.firstName, chat.lastName)
-                    .joinToString(" ")
-                    .takeIf { it.isNotBlank() }
-                    ?.let {
-                        if (it.length > 27) "${it.take(24)}..." else it
-                    } ?: ""
+                val fullName =
+                    listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.groupName)
+                        .joinToString(" ")
+                        .takeIf { it.isNotBlank() }
+                        ?.let {
+                            if (it.length > 27) "${it.take(24)}..." else it
+                        } ?: ""
                 
-                val displayName = fullName.ifBlank { chat.phone }
-                
-                Text(
-                    text = displayName,
-                    textAlign = TextAlign.Start,
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    color = Color(0xFF000000)
-                )
-                
-                
+                if (chat.personal) {
+                    val displayName = fullName.ifBlank { chat.phone!! }
+                    
+                    Text(
+                        text = displayName,
+                        textAlign = TextAlign.Start,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        lineHeight = 20.sp,
+                        color = Color(0xFF000000)
+                    )
+                } else {
+                    Text(
+                        text = fullName,
+                        textAlign = TextAlign.Start,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        lineHeight = 20.sp,
+                        color = Color(0xFF000000)
+                    )
+                }
                 
                 
                 

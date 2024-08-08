@@ -15,14 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,14 +34,11 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
-import dev.icerock.moko.resources.desc.StringDesc
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -67,14 +59,22 @@ data class ProfileSettingsItem(
     val onClick: () -> Unit
 )
 
-class ProfileScreen : Screen {
+class ProfileScreen(
+    private val profile: ProfileDTO? = null,
+    private val anotherUser: Boolean,
+    
+    ) : Screen {
     
     @Composable
     override fun Content() {
         val mainViewModel: MainViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
         
-        val profile = mainViewModel.profile.collectAsState(initial = ProfileDTO()).value
+        val profile =
+            if (profile !== null && anotherUser) profile else mainViewModel.profile.collectAsState(
+                initial = ProfileDTO()
+            ).value
+        
         val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
         
         val navigator = LocalNavigator.currentOrThrow
@@ -95,7 +95,7 @@ class ProfileScreen : Screen {
 //            },
 //            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
 //            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
-
+            
             ProfileSettingsItem(
                 Res.drawable.language,
                 25.dp,
@@ -105,8 +105,8 @@ class ProfileScreen : Screen {
                     LanguageScreen()
                 )
             },
-
-
+            
+            
             ProfileSettingsItem(
                 Res.drawable.exit_profile,
                 25.dp,
@@ -122,9 +122,9 @@ class ProfileScreen : Screen {
 //            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
 //            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
         )
-
-
-
+        
+        
+        
         Box(
             modifier = Modifier.fillMaxSize().background(
                 color = Color(255, 255, 255)
@@ -142,7 +142,7 @@ class ProfileScreen : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader(stringResource(MokoRes.strings.info))
+                    ProfileHeader(stringResource(MokoRes.strings.info), false)
                     Avatar(
                         icon = profile.icon,
                         size = 186.dp
@@ -259,8 +259,7 @@ class ProfileScreen : Screen {
                     }
                     
                 }
-
-
+                
                 
             }
 //            BottomBar(modifier = Modifier.align(Alignment.BottomCenter))

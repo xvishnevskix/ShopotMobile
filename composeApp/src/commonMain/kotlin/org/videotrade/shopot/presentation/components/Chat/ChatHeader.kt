@@ -2,7 +2,6 @@ package org.videotrade.shopot.presentation.components.Chat
 
 import Avatar
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -43,6 +41,7 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileMediaScreen
+import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -57,7 +56,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val callViewModel: CallViewModel = koinInject()
     
     Row(
-        modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp).background(Color.White),
+        modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp)
+            .background(Color.White),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         
@@ -83,7 +83,13 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
             modifier = Modifier.fillMaxWidth(0.85f).padding(end = 5.dp).pointerInput(Unit) {
-                navigator.push(ProfileMediaScreen(profile, chat))
+                
+                if (chat.personal) {
+//                    navigator.push(ProfileScreen(profile, true))
+                } else {
+                    navigator.push(ProfileMediaScreen(profile, chat))
+                    
+                }
             }
         ) {
             
@@ -92,25 +98,39 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                 size = 40.dp
             )
             
-            val fullName = listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.firstName)
-                .joinToString(" ")
-                .takeIf { it.isNotBlank() }
-                ?.let {
-                    if (it.length > 35) "${it.take(32)}..." else it
-                } ?: ""
-
-            val displayName = fullName.ifBlank { chat.phone }
+            val fullName =
+                listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.groupName)
+                    .joinToString(" ")
+                    .takeIf { it.isNotBlank() }
+                    ?.let {
+                        if (it.length > 35) "${it.take(32)}..." else it
+                    } ?: ""
+            
+            if (chat.personal) {
+                val displayName = fullName.ifBlank { chat.phone!! }
+                
+                Text(
+                    text = displayName,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                    modifier = Modifier.padding(start = 16.dp),
+                    color = Color(0xFF000000)
+                )
+            } else {
+                Text(
+                    text = fullName,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                    modifier = Modifier.padding(start = 16.dp),
+                    color = Color(0xFF000000)
+                )
+            }
             
             
-            Text(
-                text = displayName,
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-                modifier = Modifier.padding(start = 16.dp),
-                color = Color(0xFF000000)
-            )
         }
         
         
@@ -120,7 +140,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                 contentDescription = "Call",
                 tint = Color(0xFF000000),
                 modifier = Modifier.padding(end = 23.dp).size(20.dp).pointerInput(Unit) {
-
+                    
                     scope.launch {
                         try {
                             val cameraPer =
@@ -136,18 +156,20 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                             
                             callViewModel.initWebrtc()
                             
-                            navigator.push(
-                                CallScreen(
-                                    chat.userId,
-                                    "Call",
-                                    ProfileDTO(
-                                        firstName = chat.firstName,
-                                        lastName = chat.lastName,
-                                        id = chat.userId,
-                                        phone = chat.phone,
+                            if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
+                                navigator.push(
+                                    CallScreen(
+                                        chat.userId,
+                                        "Call",
+                                        ProfileDTO(
+                                            firstName = chat.firstName!!,
+                                            lastName = chat.lastName!!,
+                                            id = chat.userId,
+                                            phone = chat.phone!!,
+                                        )
                                     )
                                 )
-                            )
+                            }
                             
                             
                         } catch (e: Exception) {

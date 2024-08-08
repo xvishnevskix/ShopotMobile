@@ -91,9 +91,9 @@ suspend fun handleConnectWebSocket(
                                         
                                         val commonViewModel: CommonViewModel =
                                             KoinPlatform.getKoin().get()
-                                        
-                                        
-                                        commonViewModel.toaster.show("chats size ${dataJson?.size}")
+
+
+//                                        commonViewModel.toaster.show("chats size ${dataJson?.size}")
                                         
                                         if (dataJson != null) {
                                             
@@ -111,12 +111,14 @@ suspend fun handleConnectWebSocket(
                                             println("sortChat $dataJson")
                                             
                                             for (chatItem in dataJson) {
+                                                println("chat $chatItem")
+                                                
                                                 val chat: ChatItem =
                                                     Json.decodeFromString(chatItem.toString())
+                                                println("chat $chat")
                                                 
                                                 
                                                 var newChat = chat
-                                                
                                                 
                                                 if (chat.lastMessage?.content?.isNotBlank() == true) {
                                                     val lastMessageContent = decupsMessage(
@@ -135,21 +137,25 @@ suspend fun handleConnectWebSocket(
                                                 }
                                                 
                                                 
-                                                val normalizedChatPhone =
-                                                    normalizePhoneNumber(newChat.phone)
-                                                
-                                                val contact = contactsMap[normalizedChatPhone]
-                                                
-                                                if (contact != null) {
-                                                    val sortChat = newChat.copy(
-                                                        firstName = "${contact.firstName}",
-                                                        lastName = "${contact.lastName}"
-                                                    )
-                                                    println("sortChat $sortChat")
-                                                    chats.add(sortChat)
+                                                if (chat.personal) {
+                                                    val normalizedChatPhone =
+                                                        newChat.phone?.let { normalizePhoneNumber(it) }
+                                                    
+                                                    val contact = contactsMap[normalizedChatPhone]
+                                                    
+                                                    if (contact != null) {
+                                                        val sortChat = newChat.copy(
+                                                            firstName = "${contact.firstName}",
+                                                            lastName = "${contact.lastName}"
+                                                        )
+                                                        println("sortChat $sortChat")
+                                                        chats.add(sortChat)
+                                                    } else {
+                                                        chats.add(newChat)
+                                                        
+                                                    }
                                                 } else {
                                                     chats.add(newChat)
-                                                    
                                                 }
                                                 
                                             }
@@ -421,9 +427,6 @@ suspend fun handleConnectWebSocket(
                                             }
                                             
                                             
-                                            
-                                       
-                                            
                                         }
                                         
                                     } catch (e: Exception) {
@@ -467,7 +470,7 @@ suspend fun handleConnectWebSocket(
                                             
                                             
                                             val normalizedChatPhone =
-                                                normalizePhoneNumber(chat.phone)
+                                                chat.phone?.let { normalizePhoneNumber(it) }
                                             
                                             val contact = contactsMap[normalizedChatPhone]
                                             

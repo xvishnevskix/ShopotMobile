@@ -83,13 +83,13 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader("Медиа")
+                    ProfileHeader("Группа", true)
                     Avatar(
                         icon = null,
                         size = 186.dp
                     )
                     Text(
-                        "${chat.firstName} ${chat.lastName}",
+                        "${chat.groupName}",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -102,16 +102,18 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier.padding(bottom = 24.dp),
                     ) {
-                        Text(
-                            chat.phone,
-                            textAlign = TextAlign.Center,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            modifier = Modifier.padding(end = 18.dp),
-                            color = Color(0xFF979797)
-                        )
+                        chat.phone?.let {
+                            Text(
+                                it,
+                                textAlign = TextAlign.Center,
+                                fontSize = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                modifier = Modifier.padding(end = 18.dp),
+                                color = Color(0xFF979797)
+                            )
+                        }
                         profile.login?.let {
                             Text(
                                 it,
@@ -146,30 +148,30 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                                 .fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            GroupShortButton(
-                                drawableRes = Res.drawable.video_icon,
-                                width = 22.5.dp,
-                                height = 15.dp,
-                                text = "Видеочат"
-                            )
-                            GroupShortButton(
-                                drawableRes = Res.drawable.call,
-                                width = 16.dp,
-                                height = 16.dp,
-                                text = "Звонок"
-                            )
-                            GroupShortButton(
-                                drawableRes = Res.drawable.notification,
-                                width = 18.dp,
-                                height = 15.dp,
-                                text = "Уведомления"
-                            )
-                            GroupShortButton(
-                                drawableRes = Res.drawable.search_icon,
-                                width = 16.85.dp,
-                                height = 16.85.dp,
-                                text = "Поиск"
-                            )
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.video_icon,
+//                                width = 22.5.dp,
+//                                height = 15.dp,
+//                                text = "Видеочат"
+//                            )
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.call,
+//                                width = 16.dp,
+//                                height = 16.dp,
+//                                text = "Звонок"
+//                            )
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.notification,
+//                                width = 18.dp,
+//                                height = 15.dp,
+//                                text = "Уведомления"
+//                            )
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.search_icon,
+//                                width = 16.85.dp,
+//                                height = 16.85.dp,
+//                                text = "Поиск"
+//                            )
                         }
                 }
 
@@ -211,50 +213,50 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                         horizontalAlignment = Alignment.CenterHorizontally
 
                     ) {
-                        TabRow(
-                            selectedTabIndex = selectedTabIndex.value,
-                            modifier = Modifier.fillMaxWidth(0.95F),
-                            indicator = @Composable { tabPositions ->
-                                TabRowDefaults.SecondaryIndicator(
-                                    modifier = Modifier
-                                        .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    height = 3.dp,
-                                    color = Color(0xFF29303C),
-
-                                    )
-                            }
-
-                        ) {
-                            ProfileMediaTabs.entries.forEachIndexed { index, currentTab ->
-                                Tab(
-                                    modifier = Modifier.fillMaxWidth().padding(0.dp).clip(
-                                        RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                                    selected = selectedTabIndex.value == index,
-                                    selectedContentColor = Color(0xFF29303C),
-                                    unselectedContentColor = Color(0xFFA9A8AA),
-
-                                    onClick = {
-                                        scope.launch {
-                                            pagerState.animateScrollToPage(currentTab.ordinal)
-                                        }
-                                    },
-
-                                    text = {
-                                        Text(
-                                            modifier = Modifier.wrapContentWidth(),
-                                            text = currentTab.title,
-                                            textAlign = TextAlign.Start,
-                                            fontSize = 15.sp,
-                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                                            letterSpacing = TextUnit(-1.3F, TextUnitType.Sp),
-                                            lineHeight = 15.sp,
-                                            softWrap = false
-                                        )
-                                    },
-                                )
-                            }
-                        }
+//                        TabRow(
+//                            selectedTabIndex = selectedTabIndex.value,
+//                            modifier = Modifier.fillMaxWidth(0.95F),
+//                            indicator = @Composable { tabPositions ->
+//                                TabRowDefaults.SecondaryIndicator(
+//                                    modifier = Modifier
+//                                        .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
+//                                        .clip(RoundedCornerShape(8.dp)),
+//                                    height = 3.dp,
+//                                    color = Color(0xFF29303C),
+//
+//                                    )
+//                            }
+//
+//                        ) {
+//                            ProfileMediaTabs.entries.forEachIndexed { index, currentTab ->
+//                                Tab(
+//                                    modifier = Modifier.fillMaxWidth().padding(0.dp).clip(
+//                                        RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+//                                    selected = selectedTabIndex.value == index,
+//                                    selectedContentColor = Color(0xFF29303C),
+//                                    unselectedContentColor = Color(0xFFA9A8AA),
+//
+//                                    onClick = {
+//                                        scope.launch {
+//                                            pagerState.animateScrollToPage(currentTab.ordinal)
+//                                        }
+//                                    },
+//
+//                                    text = {
+//                                        Text(
+//                                            modifier = Modifier.wrapContentWidth(),
+//                                            text = currentTab.title,
+//                                            textAlign = TextAlign.Start,
+//                                            fontSize = 15.sp,
+//                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+//                                            letterSpacing = TextUnit(-1.3F, TextUnitType.Sp),
+//                                            lineHeight = 15.sp,
+//                                            softWrap = false
+//                                        )
+//                                    },
+//                                )
+//                            }
+//                        }
 
                         HorizontalPager(
                             state = pagerState,

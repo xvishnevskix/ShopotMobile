@@ -7,14 +7,16 @@ data class ChatItem(
     val id: String,
     val personal: Boolean,
     var icon: String?,
-    var firstName: String,
-    var lastName: String,
-    var phone: String,
+    var firstName: String?,
+    var lastName: String?,
+    var phone: String?,
     var unread: Int,
     var notificationToken: String?,
     var lastMessage: MessageItem?,
     var chatId: String,
     var userId: String,
+    var groupName: String? = null,
+    
 )
 
 

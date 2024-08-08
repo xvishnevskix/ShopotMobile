@@ -135,7 +135,7 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                             )
                             
                             if (profileUpdate) {
-                                navigator.push(ProfileScreen())
+                                navigator.push(ProfileScreen(anotherUser = false))
                             }
                             
                         }
