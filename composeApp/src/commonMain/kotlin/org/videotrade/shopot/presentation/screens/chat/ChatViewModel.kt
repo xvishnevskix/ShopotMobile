@@ -20,9 +20,11 @@ import org.videotrade.shopot.api.getCurrentTimeList
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatUseCase
+import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
@@ -34,6 +36,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val chatUseCase: ChatUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
+    private val contactsUseCase: ContactsUseCase by inject()
     
     private val _messages = MutableStateFlow<List<MessageItem>>(listOf())
     
@@ -241,7 +244,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     fun getProfile() {
         viewModelScope.launch {
-            profile.value = profileUseCase.getProfile()!!
+            profile.value = profileUseCase.getProfile()
         }
     }
     
@@ -308,6 +311,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
             }
         }
         
+    }
+    
+    
+    fun findContactByPhone(phone: String): ContactDTO? {
+        return contactsUseCase.contacts.value.find { it.phone == phone }
     }
     
     

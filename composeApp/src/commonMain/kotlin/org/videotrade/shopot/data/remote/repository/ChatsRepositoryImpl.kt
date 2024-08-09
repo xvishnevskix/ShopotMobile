@@ -9,9 +9,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatsRepository
+import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
 class ChatsRepositoryImpl : ChatsRepository {
     
@@ -59,14 +62,23 @@ class ChatsRepositoryImpl : ChatsRepository {
     
     
     override fun updateLastMessageChat(messageItem: MessageItem) {
+        val profileUseCase: ProfileUseCase =
+            KoinPlatform.getKoin().get()
+        
         _chats.update { currentChats ->
             currentChats.map { chatItem ->
                 if (chatItem.chatId == messageItem.chatId) {
+                    println("11111")
                     if (currentChat.value == chatItem.chatId) {
+                        println("22222")
+                        
                         chatItem.copy(lastMessage = messageItem)
                     } else {
-                        if (chatItem.userId == messageItem.fromUser) {
+                        if (profileUseCase.getProfile().id !== messageItem.fromUser) {
+                            println("33333 ${chatItem.userId} ${messageItem.fromUser}")
+                            
                             chatItem.copy(lastMessage = messageItem, unread = chatItem.unread + 1)
+                            
                         } else {
                             chatItem.copy(lastMessage = messageItem)
                         }

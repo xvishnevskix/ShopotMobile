@@ -17,6 +17,7 @@ data class MessageItem(
     var anotherRead: Boolean,
     var iread: Boolean,
     var attachments: List<Attachment>?,
+    var phone: String? = null,
     var upload: Boolean? = null,
     var uploadId: String? = null,
 )

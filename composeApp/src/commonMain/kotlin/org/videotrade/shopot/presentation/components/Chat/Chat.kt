@@ -1,6 +1,5 @@
 package org.videotrade.shopot.presentation.components.Chat
 
-import FileMessage
 import androidx.compose.foundation.background
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -203,8 +202,8 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
-
+    
+    
     
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
@@ -229,10 +228,27 @@ fun Chat(
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
+            val messageSenderName = remember { mutableStateOf("") }
+            
+            
+            if (!chat.personal) {
+                if (message.fromUser != profile.id) {
+                    message.phone?.let {
+                        val findContact = viewModel.findContactByPhone(it)
+                        
+                        if (findContact != null) {
+                            messageSenderName.value =
+                                "${findContact.firstName} ${findContact.lastName}"
+                        }
+                    }
+                }
+            }
+            
             MessageBox(
                 viewModel = viewModel,
                 message = message,
                 profile = profile,
+                messageSenderName,
                 onClick = { onMessageClick(message, messageY) },
                 onPositioned = { coordinates ->
                     messageY = coordinates.positionInParent().y.toInt()

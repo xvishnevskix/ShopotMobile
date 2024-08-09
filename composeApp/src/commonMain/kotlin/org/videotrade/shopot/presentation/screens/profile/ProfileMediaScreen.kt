@@ -93,13 +93,13 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader(stringResource(MokoRes.strings.media))
+                    ProfileHeader(stringResource(MokoRes.strings.groupHeader), true)
                     Avatar(
                         icon = null,
                         size = 186.dp
                     )
                     Text(
-                        "${chat.firstName} ${chat.lastName}",
+                        "${chat.groupName}",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -112,16 +112,18 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                         horizontalArrangement = Arrangement.SpaceAround,
                         modifier = Modifier.padding(bottom = 24.dp),
                     ) {
-                        Text(
-                            chat.phone,
-                            textAlign = TextAlign.Center,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            modifier = Modifier.padding(end = 18.dp),
-                            color = Color(0xFF979797)
-                        )
+                        chat.phone?.let {
+                            Text(
+                                it,
+                                textAlign = TextAlign.Center,
+                                fontSize = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                modifier = Modifier.padding(end = 18.dp),
+                                color = Color(0xFF979797)
+                            )
+                        }
                         profile.login?.let {
                             Text(
                                 it,

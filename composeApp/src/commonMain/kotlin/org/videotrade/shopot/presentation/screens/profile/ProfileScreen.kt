@@ -75,6 +75,8 @@ class ProfileScreen(
                 initial = ProfileDTO()
             ).value
         
+        
+        println("sssssss ${profile.id}")
         val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
         
         val navigator = LocalNavigator.currentOrThrow

@@ -57,7 +57,8 @@
     <string name="add">Добавить</string>
 
     <string name="members">Участники</string>
-    <string name="media">Медиа</string>
+    <string name="groupHeader">Группа</string>
+    <string name="media">~Медиа</string>
     <string name="files">Файлы</string>
     <string name="voice">Голос</string>
     <string name="links">Ссылки</string>

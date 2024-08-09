@@ -29,7 +29,8 @@ fun MessageText(message: MessageItem, profile: ProfileDTO) {
         modifier = Modifier.padding(
             start = 25.dp,
             end = 25.dp,
-            top = if (message.fromUser == profile.id) 13.dp else 7.dp,
+//            top = if (message.fromUser == profile.id) 13.dp else 7.dp,
+            top = 12.dp,
             bottom = 12.dp
         ),
     )

@@ -8,9 +8,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.ZoneOffset
+import kotlinx.datetime.toInstant
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
@@ -169,12 +174,28 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    private fun parseDateTime(created: List<Int>): Instant? {
+        return if (created.size == 7) {
+            LocalDateTime(
+                created[0], created[1], created[2],
+                created[3], created[4], created[5], created[6]
+            ).toInstant(TimeZone.UTC)
+        } else {
+            null
+        }
+    }
     
+    private fun sortChatsByLastMessageCreated(chats: List<ChatItem>): List<ChatItem> {
+        return chats.sortedByDescending { chatItem ->
+            chatItem.lastMessage?.created?.let { parseDateTime(it)?.epochSeconds } ?: 0
+        }
+    }
     fun loadUsers() {
         viewModelScope.launch {
-            
             println("prrrr ${chatsUseCase.chats.value}")
-            _chats.value = chatsUseCase.chats.value
+            _chats.update { chatList ->
+                sortChatsByLastMessageCreated(chatList)
+            }
         }
     }
     

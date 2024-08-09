@@ -59,7 +59,8 @@
     <string name="add">Add</string>
 
     <string name="members">Members</string>
-    <string name="media">Media</string>
+    <string name="groupHeader">Group</string>
+    <string name="media">~Media</string>
     <string name="files">Files</string>
     <string name="voice">Voice</string>
     <string name="links">Links</string>

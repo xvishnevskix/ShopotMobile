@@ -17,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,12 +48,24 @@ fun MessageBox(
     viewModel: ChatViewModel,
     message: MessageItem,
     profile: ProfileDTO,
+    messageSenderName: MutableState<String>,
     onClick: () -> Unit,
     onPositioned: (LayoutCoordinates) -> Unit,
     isVisible: Boolean,
-     chat: ChatItem
+    chat: ChatItem
 ) {
     val isReadByMe = remember { mutableStateOf(false) }
+
+
+//    LaunchedEffect(Unit) {
+//        message.phone?.let {
+//            val findContact = viewModel.findContactByPhone(it)
+//
+//            if (findContact != null) {
+//                messageSenderName.value = "${findContact.firstName} ${findContact.lastName}"
+//            }
+//        }
+//    }
     
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
@@ -71,10 +84,8 @@ fun MessageBox(
             .onGloballyPositioned(onPositioned)
             .alpha(if (isVisible) 1f else 0f) // Manage visibility with alpha
     ) {
-
-
-
-
+        
+        
         Box(
             contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
@@ -97,31 +108,50 @@ fun MessageBox(
                 shadowElevation = 4.dp,
                 color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
             ) {
-
+                
                 Column(
-
+                
                 ) {
-                    if (chat.personal) {} else {
-                        if (message.fromUser == profile.id) {} else {
+//                    if (!chat.personal) {
+//                        if (message.fromUser != profile.id) {
+//                           Text(
+//                                text = messageSenderName.value,
+//                                style = TextStyle(
+//                                    color = Color.Gray,
+//                                    fontSize = 12.sp,
+//                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+//                                ),
+//                                modifier = Modifier.padding(
+//                                    start = 25.dp,
+//                                    end = 25.dp,
+//                                    top = 7.dp,
+//                                    bottom = 0.dp
+//                                ),
+//                            )
+//                        }
+//                    }
+                    
+                    
+                    if (messageSenderName.value.isNotBlank()) {
                             Text(
-                                text = chat.firstName + " " + chat.lastName,
+                                text = messageSenderName.value,
                                 style = TextStyle(
                                     color = Color.Gray,
                                     fontSize = 12.sp,
                                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                                 ),
-                                modifier = Modifier.padding(start = 25.dp,
+                                modifier = Modifier.padding(
+                                    start = 25.dp,
                                     end = 25.dp,
                                     top = 7.dp,
                                     bottom = 0.dp
                                 ),
                             )
-                        }
                     }
-
+                    
                     MessageFormat(message, profile, onClick)
                 }
-
+                
             }
         }
         
@@ -152,15 +182,15 @@ fun MessageBox(
             
             
             if (message.created.isNotEmpty())
-            Text(
-                text = formatTimestamp(message.created),
-                style = TextStyle(
-                    color = Color.Gray,
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                ),
-                modifier = Modifier.padding(),
-            )
+                Text(
+                    text = formatTimestamp(message.created),
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                    ),
+                    modifier = Modifier.padding(),
+                )
         }
     }
 }

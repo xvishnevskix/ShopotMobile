@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.components.ProfileComponents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +29,7 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
 @Composable
-fun ProfileHeader(text: String,isPopScreen:Boolean) {
+fun ProfileHeader(text: String, isPopScreen: Boolean) {
     val navigator = LocalNavigator.currentOrThrow
     
     Row(
@@ -39,16 +40,21 @@ fun ProfileHeader(text: String,isPopScreen:Boolean) {
         
         ) {
         
-        if(isPopScreen) {
-            BackIcon(Modifier.padding(start = 10.dp, end = 0.dp).width(25.dp).pointerInput(Unit) {
-                
-                
-                navigator.pop()
-                
-                
-            })
+        Column(
+            Modifier.padding(start = 10.dp, end = 0.dp).width(25.dp)
+        ) {
+            if (isPopScreen) {
+                BackIcon(
+                    Modifier.pointerInput(Unit) {
+                        
+                        
+                        navigator.pop()
+                        
+                        
+                    })
+            }
         }
-
+        
         Text(
             text = text,
             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
