@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.ZoneOffset
 import kotlinx.datetime.toInstant
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -120,9 +119,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     private fun observeUsers() {
         chatsUseCase.chats.onEach { newUsers ->
-            _chats.value = newUsers.sortedByDescending { chat ->
-                chat.lastMessage?.created?.toLocalDateTimeOrNull() ?: EARLY_DATE
-            }
+            _chats.value = sortChatsByLastMessageCreated(newUsers)
         }.launchIn(viewModelScope)
     }
     
@@ -184,12 +181,21 @@ class MainViewModel : ViewModel(), KoinComponent {
             null
         }
     }
+
+//    private fun sortChatsByLastMessageCreated(chats: List<ChatItem>): List<ChatItem> {
+//        return chats.sortedByDescending { chatItem ->
+//            chatItem.lastMessage?.created?.let { parseDateTime(it)?.epochSeconds } ?: 0
+//        }
+//    }
     
-    private fun sortChatsByLastMessageCreated(chats: List<ChatItem>): List<ChatItem> {
+    fun sortChatsByLastMessageCreated(chats: List<ChatItem>): List<ChatItem> {
         return chats.sortedByDescending { chatItem ->
-            chatItem.lastMessage?.created?.let { parseDateTime(it)?.epochSeconds } ?: 0
+            chatItem.sortedDate.let {
+                parseDateTime(it)?.epochSeconds
+            } ?: 0
         }
     }
+    
     fun loadUsers() {
         viewModelScope.launch {
             println("prrrr ${chatsUseCase.chats.value}")

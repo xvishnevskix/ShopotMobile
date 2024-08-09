@@ -25,6 +25,7 @@ import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.tabs.ChatsTab
 
 suspend fun handleConnectWebSocket(
     navigator: Navigator,
@@ -89,7 +90,7 @@ suspend fun handleConnectWebSocket(
                                         
                                         println("chatSize ${dataJson?.size}")
                                         
-                                        val commonViewModel: CommonViewModel =
+                                        val mainViewModel: MainViewModel =
                                             KoinPlatform.getKoin().get()
 
 
@@ -162,7 +163,13 @@ suspend fun handleConnectWebSocket(
                                             
                                             println("chats $chats")
                                             
-                                            chatsUseCase.addChats(chats) // Инициализация сообщений
+                                            
+                                            chatsUseCase.addChats(
+                                                mainViewModel.sortChatsByLastMessageCreated(
+                                                    chats
+                                                ).toMutableList()
+                                            ) // Инициализация сообщений
+                                            
                                         }
                                         
                                     } catch (e: Exception) {
@@ -496,22 +503,23 @@ suspend fun handleConnectWebSocket(
                                 }
                                 
                                 "createGroupChat" -> {
-                                    
                                     try {
-                                        
-                                        println("createGroupChat")
                                         val commonViewModel: CommonViewModel =
                                             KoinPlatform.getKoin().get()
                                         
-                                        
-                                        commonViewModel.toaster.show("createGroupChat success")
+                                        println("createGroupChat ${jsonElement}")
                                         
                                         val dataJson =
                                             jsonElement.jsonObject["data"]?.jsonObject
                                         
                                         
                                         if (dataJson != null) {
-                                        
+                                            val chat =
+                                                Json.decodeFromString<ChatItem>(dataJson.toString())
+                                            
+                                            chatsUseCase.addChat(chat)
+                                            
+                                            commonViewModel.tabNavigator.value?.current = ChatsTab
                                         }
                                         
                                     } catch (e: Exception) {

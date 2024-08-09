@@ -3,16 +3,18 @@ package org.videotrade.shopot.api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.intl.Locale
 import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
-
 @Composable
 fun formatTimestamp(timestamp: List<Int>): String {
-    var formattedDateTime = ""
-    try {
+    return try {
         val year = timestamp[0]
         val month = timestamp[1]
         val day = timestamp[2]
@@ -33,15 +35,40 @@ fun formatTimestamp(timestamp: List<Int>): String {
         // Преобразование Instant в LocalDateTime в текущем часовом поясе системы
         val dateTimeInCurrentZone = instant.toLocalDateTime(currentTimeZone)
         
-        // Форматирование даты и времени
-        formattedDateTime = "${
-            dateTimeInCurrentZone.hour.toString().padStart(2, '0')
-        }:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
+        // Получение текущей даты
+        val currentDate = Clock.System.now().toLocalDateTime(currentTimeZone).date
         
+        // Сравнение даты
+        when {
+            dateTimeInCurrentZone.date == currentDate -> {
+                // Сегодняшний день - выводим время
+                "${
+                    dateTimeInCurrentZone.hour.toString().padStart(2, '0')
+                }:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
+            }
+            
+            dateTimeInCurrentZone.date == currentDate.minus(1, DateTimeUnit.DAY) -> {
+                // Вчера - выводим "вчера"
+                "Вчера"
+            }
+            
+            dateTimeInCurrentZone.date >= currentDate.minus(6, DateTimeUnit.DAY) -> {
+                // Неделя назад - выводим день недели
+                val dayOfWeek = dateTimeInCurrentZone.dayOfWeek.name.lowercase()
+                    .replaceFirstChar { it.uppercase() }
+                dayOfWeek
+            }
+            
+            else -> {
+                // Дата дальше недели назад - выводим дату в формате дд.ММ
+                "${
+                    dateTimeInCurrentZone.dayOfMonth.toString().padStart(2, '0')
+                }.${dateTimeInCurrentZone.monthNumber.toString().padStart(2, '0')}"
+            }
+        }
     } catch (e: Exception) {
-    
+        ""
     }
-    return formattedDateTime
 }
 
 

@@ -16,6 +16,7 @@ data class ChatItem(
     var chatId: String,
     var userId: String,
     var groupName: String? = null,
+    var sortedDate: List<Int> = emptyList(),
     
 )
 

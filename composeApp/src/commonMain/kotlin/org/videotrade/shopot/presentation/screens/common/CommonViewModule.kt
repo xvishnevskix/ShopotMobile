@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.common
 
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.dokar.sonner.ToasterState
 import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
@@ -44,12 +45,17 @@ class CommonViewModel : ViewModel(), KoinComponent {
 //    val showButtonNav = MutableStateFlow(true)
     
     val mainNavigator = MutableStateFlow<Navigator?>(null)
+    val tabNavigator = MutableStateFlow<TabNavigator?>(null)
     
     
     fun setMainNavigator(value: Navigator) {
         mainNavigator.value = value
         println("dsadaasaaaa")
         commonUseCase.setNavigator(value)
+    }
+    
+    fun setTabNavigator(value: TabNavigator) {
+        tabNavigator.value = value
     }
     
     fun connectionWs(navigator: Navigator) {

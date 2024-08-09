@@ -157,19 +157,29 @@ fun UserComponentItem(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(top = 9.dp)
             ) {
-                chat.lastMessage?.let {
-                    
+                if (chat.lastMessage !== null) {
                     Text(
-                        formatTimestamp(it.created),
+                        formatTimestamp(chat.lastMessage!!.created),
                         textAlign = TextAlign.Center,
                         fontSize = 14.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                         lineHeight = 20.sp,
                         color = Color(0xFF979797),
-                        
+
                         )
                 }
+//                Text(
+//                    formatTimestamp(chat.sortedDate),
+//                    textAlign = TextAlign.Center,
+//                    fontSize = 14.sp,
+//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                    lineHeight = 20.sp,
+//                    color = Color(0xFF979797),
+//
+//                    )
+                
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
