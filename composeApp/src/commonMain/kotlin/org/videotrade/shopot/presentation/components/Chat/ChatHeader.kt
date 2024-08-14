@@ -41,7 +41,6 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileMediaScreen
-import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -133,55 +132,57 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             
         }
         
-        
-        Box {
-            Icon(
-                imageVector = Icons.Default.Call,
-                contentDescription = "Call",
-                tint = Color(0xFF000000),
-                modifier = Modifier.padding(end = 23.dp).size(20.dp).pointerInput(Unit) {
-                    
-                    scope.launch {
-                        try {
-                            val cameraPer =
-                                PermissionsProviderFactory.create().getPermission("microphone")
-                            
-                            if (!cameraPer) return@launch
+        Box(
+            modifier = Modifier.padding(end = 23.dp)
+        ) {
+            if (chat.personal)
+                Icon(
+                    imageVector = Icons.Default.Call,
+                    contentDescription = "Call",
+                    tint = Color(0xFF000000),
+                    modifier = Modifier.size(20.dp).pointerInput(Unit) {
+                        
+                        scope.launch {
+                            try {
+                                val cameraPer =
+                                    PermissionsProviderFactory.create().getPermission("microphone")
+                                
+                                if (!cameraPer) return@launch
 
 //                            viewModel.sendNotify(
 //                                "Звонок",
 //                                "от ${chat.firstName} ${chat.lastName}",
 //                                chat.notificationToken
 //                            )
-                            
-                            callViewModel.initWebrtc()
-                            
-                            if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
-                                navigator.push(
-                                    CallScreen(
-                                        chat.userId,
-                                        "Call",
-                                        ProfileDTO(
-                                            firstName = chat.firstName!!,
-                                            lastName = chat.lastName!!,
-                                            id = chat.userId,
-                                            phone = chat.phone!!,
+                                
+                                callViewModel.initWebrtc()
+                                
+                                if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
+                                    navigator.push(
+                                        CallScreen(
+                                            chat.userId,
+                                            "Call",
+                                            ProfileDTO(
+                                                firstName = chat.firstName!!,
+                                                lastName = chat.lastName!!,
+                                                id = chat.userId,
+                                                phone = chat.phone!!,
+                                            )
                                         )
                                     )
-                                )
+                                }
+                                
+                                
+                            } catch (e: Exception) {
+                                println("ERROR : $e")
+                                
                             }
-                            
-                            
-                        } catch (e: Exception) {
-                            println("ERROR : $e")
-                            
                         }
+                        println("userID : ${chat.userId}")
+                        
+                        
                     }
-                    println("userID : ${chat.userId}")
-                    
-                    
-                }
-            )
+                )
         }
         
     }

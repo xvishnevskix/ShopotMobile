@@ -33,6 +33,7 @@ import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
 
@@ -47,6 +48,14 @@ class CommonViewModel : ViewModel(), KoinComponent {
     val mainNavigator = MutableStateFlow<Navigator?>(null)
     val tabNavigator = MutableStateFlow<TabNavigator?>(null)
     
+    val isRestartApp = MutableStateFlow(false)
+    
+    
+    fun restartApp() {
+        isRestartApp.value = true
+        
+        mainNavigator.value?.push(IntroScreen())
+    }
     
     fun setMainNavigator(value: Navigator) {
         mainNavigator.value = value

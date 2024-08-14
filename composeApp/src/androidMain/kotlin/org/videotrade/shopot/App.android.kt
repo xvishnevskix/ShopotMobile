@@ -54,7 +54,7 @@ class AndroidApp : Application() {
     
     private fun initializeFactories(context: Context) {
         
-        getContextObj.initialize(context)
+        getContextObj.initializeContext(context)
         
         AudioFactory.initialize(context)
         FileProviderFactory.initialize(context)
@@ -80,6 +80,7 @@ class AppActivity : ComponentActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        getContextObj.initializeActivity(this)
         
         FileKit.init(this)
         

@@ -34,12 +34,14 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import dev.icerock.moko.resources.compose.stringResource
 import dev.icerock.moko.resources.desc.StringDesc
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -108,6 +110,7 @@ fun LanguageItem(language: String, translation: String, emoji: String, isSelecte
     val alpha = if (isSelected) 1f else 0.50f
     val tabNavigator: TabNavigator = LocalTabNavigator.current
     val navigator = LocalNavigator.currentOrThrow
+    val commonViewModel: CommonViewModel = koinInject()
     
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -120,7 +123,7 @@ fun LanguageItem(language: String, translation: String, emoji: String, isSelecte
                     StringDesc.localeType = StringDesc.LocaleType.Custom(letters)
                     addValueInStorage("selected_language", letters)
 //                    tabNavigator.current = ChatsTab
-                    navigator.pop()
+                    commonViewModel.restartApp()
                 },
             horizontalArrangement = Arrangement.SpaceBetween
         ) {

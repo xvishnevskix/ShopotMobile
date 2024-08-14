@@ -19,6 +19,7 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.logo
@@ -31,14 +32,20 @@ class IntroScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
-
-
+        
+        
+        LaunchedEffect(key1 = Unit) {
+            if (сommonViewModel.isRestartApp.value) {
+                navigator.push(MainScreen())
+            }
+        }
+        
         AppInitializer()
         
         LaunchedEffect(key1 = Unit) {
             try {
-
-
+                
+                
                 viewModel.navigator.value = navigator
                 
                 

@@ -20,8 +20,7 @@ internal fun App() = AppTheme {
         Navigator(
             IntroScreen()
 //            TestScreen()
-//            ChatScreen(
-//                ChatItem(
+//            ChatScreen(//                ChatItem(
 //                    "", true, "", "", "", "", 0, "", MessageItem(
 //                        "", "", "", "", "", 0,
 //                        listOf(), false, "", true, true, null

@@ -14,7 +14,6 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatsRepository
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
 class ChatsRepositoryImpl : ChatsRepository {
     
@@ -72,15 +71,22 @@ class ChatsRepositoryImpl : ChatsRepository {
                     if (currentChat.value == chatItem.chatId) {
                         println("22222")
                         
-                        chatItem.copy(lastMessage = messageItem)
+                        chatItem.copy(lastMessage = messageItem, sortedDate = messageItem.created)
                     } else {
                         if (profileUseCase.getProfile().id !== messageItem.fromUser) {
                             println("33333 ${chatItem.userId} ${messageItem.fromUser}")
                             
-                            chatItem.copy(lastMessage = messageItem, unread = chatItem.unread + 1)
+                            chatItem.copy(
+                                lastMessage = messageItem,
+                                unread = chatItem.unread + 1,
+                                sortedDate = messageItem.created
+                            )
                             
                         } else {
-                            chatItem.copy(lastMessage = messageItem)
+                            chatItem.copy(
+                                lastMessage = messageItem,
+                                sortedDate = messageItem.created
+                            )
                         }
                     }
                 } else {

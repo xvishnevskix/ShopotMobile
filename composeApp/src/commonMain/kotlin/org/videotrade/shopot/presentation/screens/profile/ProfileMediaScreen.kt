@@ -152,42 +152,42 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
                     }
 
 
-                        Row(
-                            modifier = Modifier
-                                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 20.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            GroupShortButton(
-                                drawableRes = Res.drawable.video_icon,
-                                width = 22.5.dp,
-                                height = 15.dp,
-                                text = stringResource(MokoRes.strings.video_call),
-                                onClick = {}
-
-                            )
-                            GroupShortButton(
-                                drawableRes = Res.drawable.call,
-                                width = 16.dp,
-                                height = 16.dp,
-                                text = stringResource(MokoRes.strings.call),
-                                onClick = {}
-                            )
-                            GroupShortButton(
-                                drawableRes = Res.drawable.notification,
-                                width = 18.dp,
-                                height = 15.dp,
-                                text = stringResource(MokoRes.strings.notifications),
-                                onClick = {}
-                            )
-                            GroupShortButton(
-                                drawableRes = Res.drawable.search_icon,
-                                width = 16.85.dp,
-                                height = 16.85.dp,
-                                text = stringResource(MokoRes.strings.search),
-                                onClick = {}
-                            )
-                        }
+//                        Row(
+//                            modifier = Modifier
+//                                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 20.dp)
+//                                .fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.SpaceBetween
+//                        ) {
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.video_icon,
+//                                width = 22.5.dp,
+//                                height = 15.dp,
+//                                text = stringResource(MokoRes.strings.video_call),
+//                                onClick = {}
+//
+//                            )
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.call,
+//                                width = 16.dp,
+//                                height = 16.dp,
+//                                text = stringResource(MokoRes.strings.call),
+//                                onClick = {}
+//                            )
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.notification,
+//                                width = 18.dp,
+//                                height = 15.dp,
+//                                text = stringResource(MokoRes.strings.notifications),
+//                                onClick = {}
+//                            )
+//                            GroupShortButton(
+//                                drawableRes = Res.drawable.search_icon,
+//                                width = 16.85.dp,
+//                                height = 16.85.dp,
+//                                text = stringResource(MokoRes.strings.search),
+//                                onClick = {}
+//                            )
+//                        }
                 }
 
                 Column(
@@ -218,110 +218,110 @@ class ProfileMediaScreen(private val profile: ProfileDTO, private val chat: Chat
 //                    )
                 }
 
-                Scaffold(
-
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = 5.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-
-                    ) {
-                        TabRow(
-                            selectedTabIndex = selectedTabIndex.value,
-                            modifier = Modifier.fillMaxWidth(0.95F),
-                            indicator = @Composable { tabPositions ->
-                                TabRowDefaults.SecondaryIndicator(
-                                    modifier = Modifier
-                                        .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
-                                        .clip(RoundedCornerShape(8.dp)),
-                                    height = 3.dp,
-                                    color = Color(0xFF29303C),
-
-                                    )
-                            }
-
-                        ) {
-                            ProfileMediaTabs.entries.forEachIndexed { index, currentTab ->
-
-                                val tabInfo = tabs[index]
-
-
-                                Tab(
-                                    modifier = Modifier.fillMaxWidth().padding(0.dp).clip(
-                                        RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-                                    selected = selectedTabIndex.value == index,
-                                    selectedContentColor = Color(0xFF29303C),
-                                    unselectedContentColor = Color(0xFFA9A8AA),
-
-                                    onClick = {
-                                        scope.launch {
-                                            pagerState.animateScrollToPage(currentTab.ordinal)
-                                        }
-                                    },
-
-                                    text = {
-                                        Text(
-                                            modifier = Modifier.wrapContentWidth(),
-                                            text = tabInfo.title,
-                                            textAlign = TextAlign.Start,
-                                            fontSize = 15.sp,
-                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                                            letterSpacing = TextUnit(-1.3F, TextUnitType.Sp),
-                                            lineHeight = 15.sp,
-                                            softWrap = false
-                                        )
-                                    },
-                                )
-                            }
-                        }
-
-                        HorizontalPager(
-                            state = pagerState,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .padding(top = 0.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-
-                                contentAlignment = Alignment.TopCenter,
-                            ) {
-                                val selectedTab = tabs[selectedTabIndex.value]
-//                                Text( text = Tabs.entries[selectedTabIndex.value].text)
-
-                                if (selectedTab.text == stringResource(MokoRes.strings.media)) {
-                                    LazyColumn(
-                                        verticalArrangement = Arrangement.Top,
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                        modifier = Modifier.fillMaxSize()
-                                    ) {
-                                        item {
-
-                                        }
-                                    }
-                                } else {
-                                    Box(
-                                        modifier = Modifier.fillMaxHeight(0.7F),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = selectedTab.text,
-                                            fontSize = 15.sp,
-                                            fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
-                                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                            lineHeight = 24.sp,
-                                            textDecoration = TextDecoration.Underline,
-                                            color = Color(0xFF808080)
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+//                Scaffold(
+//
+//                ) {
+//                    Column(
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .padding(top = 5.dp),
+//                        horizontalAlignment = Alignment.CenterHorizontally
+//
+//                    ) {
+//                        TabRow(
+//                            selectedTabIndex = selectedTabIndex.value,
+//                            modifier = Modifier.fillMaxWidth(0.95F),
+//                            indicator = @Composable { tabPositions ->
+//                                TabRowDefaults.SecondaryIndicator(
+//                                    modifier = Modifier
+//                                        .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
+//                                        .clip(RoundedCornerShape(8.dp)),
+//                                    height = 3.dp,
+//                                    color = Color(0xFF29303C),
+//
+//                                    )
+//                            }
+//
+//                        ) {
+//                            ProfileMediaTabs.entries.forEachIndexed { index, currentTab ->
+//
+//                                val tabInfo = tabs[index]
+//
+//
+//                                Tab(
+//                                    modifier = Modifier.fillMaxWidth().padding(0.dp).clip(
+//                                        RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
+//                                    selected = selectedTabIndex.value == index,
+//                                    selectedContentColor = Color(0xFF29303C),
+//                                    unselectedContentColor = Color(0xFFA9A8AA),
+//
+//                                    onClick = {
+//                                        scope.launch {
+//                                            pagerState.animateScrollToPage(currentTab.ordinal)
+//                                        }
+//                                    },
+//
+//                                    text = {
+//                                        Text(
+//                                            modifier = Modifier.wrapContentWidth(),
+//                                            text = tabInfo.title,
+//                                            textAlign = TextAlign.Start,
+//                                            fontSize = 15.sp,
+//                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+//                                            letterSpacing = TextUnit(-1.3F, TextUnitType.Sp),
+//                                            lineHeight = 15.sp,
+//                                            softWrap = false
+//                                        )
+//                                    },
+//                                )
+//                            }
+//                        }
+//
+//                        HorizontalPager(
+//                            state = pagerState,
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .weight(1f)
+//                                .padding(top = 0.dp)
+//                        ) {
+//                            Box(
+//                                modifier = Modifier.fillMaxSize(),
+//
+//                                contentAlignment = Alignment.TopCenter,
+//                            ) {
+//                                val selectedTab = tabs[selectedTabIndex.value]
+////                                Text( text = Tabs.entries[selectedTabIndex.value].text)
+//
+//                                if (selectedTab.text == stringResource(MokoRes.strings.media)) {
+//                                    LazyColumn(
+//                                        verticalArrangement = Arrangement.Top,
+//                                        horizontalAlignment = Alignment.CenterHorizontally,
+//                                        modifier = Modifier.fillMaxSize()
+//                                    ) {
+//                                        item {
+//
+//                                        }
+//                                    }
+//                                } else {
+//                                    Box(
+//                                        modifier = Modifier.fillMaxHeight(0.7F),
+//                                        contentAlignment = Alignment.Center
+//                                    ) {
+//                                        Text(
+//                                            text = selectedTab.text,
+//                                            fontSize = 15.sp,
+//                                            fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
+//                                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                                            lineHeight = 24.sp,
+//                                            textDecoration = TextDecoration.Underline,
+//                                            color = Color(0xFF808080)
+//                                        )
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
 
             }
         }

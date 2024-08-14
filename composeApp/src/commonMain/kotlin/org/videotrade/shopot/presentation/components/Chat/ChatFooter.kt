@@ -127,7 +127,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
-                delay(1000L)
+//                delay(1000L)
                 
                 recordingTime++
                 
@@ -573,19 +573,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                             
                                             if (fileDir !== null) {
                                                 isStartRecording = false
-
-//                                                viewModel.sendAttachments(
-//                                                    content = text,
-//                                                    fromUser = viewModel.profile.value.id,
-//                                                    chatId = chat.id,
-//                                                    "audio/mp4",
-//                                                    voiceName,
-//                                                    fileDir = fileDir,
-//                                                )
-                                                
                                                 
                                                 viewModel.sendVoice(fileDir, chat, voiceName)
-                                                
                                             }
                                         }
                                         viewModel.setIsRecording(false)

@@ -17,77 +17,97 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.restartApp
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import kotlin.random.Random
 
+//class TestScreen : Screen {
+//    @Composable
+//    override fun Content() {
+//        val scope = rememberCoroutineScope()
+//        val commonViewModel: CommonViewModel = koinInject()
+//        val audioRecorder = remember { AudioFactory.createAudioRecorder() }
+//        val audioPlayer = remember { AudioFactory.createAudioPlayer() }
+//
+//        var isRecording by remember { mutableStateOf(false) }
+//        var audioFilePath by remember { mutableStateOf("") }
+//
+//
+//
+//        MaterialTheme {
+//            SafeArea {
+//                Column {
+//                    Button(
+//                        onClick = {
+//                            scope.launch {
+//                                val microphonePer =
+//                                    PermissionsProviderFactory.create().getPermission("microphone")
+//
+//                                println("microphonePer ${microphonePer}")
+//                                if (microphonePer) {
+//                                    if (isRecording) {
+//                                        audioRecorder.stopRecording(false)
+//                                        isRecording = false
+//                                    } else {
+//                                        val audioFilePathNew = FileProviderFactory.create()
+//                                            .getFilePath(
+//                                                "audio_record${
+//                                                    Random.nextInt(
+//                                                        1,
+//                                                        501
+//                                                    )
+//                                                }.m4a", ""
+//                                            ) // Генерация пути к файлу
+//
+//                                        if (audioFilePathNew != null) {
+//                                            audioFilePath = audioFilePathNew
+//                                        }
+//
+//                                        println("audioFilePathNew $audioFilePathNew")
+//
+////                                return@Button
+//
+//                                        audioRecorder.startRecording(audioFilePath)
+//                                        isRecording = true
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    ) {
+//                        Text(
+//                            if (isRecording) "Stop Recording" else "Start Recording",
+//                            color = Color.White
+//                        )
+//                    }
+//
+//                    Button(
+//                        onClick = {
+//                            audioPlayer.startPlaying(audioFilePath)
+//                        }
+//                    ) {
+//                        Text("Play Audio")
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 class TestScreen : Screen {
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
-        val commonViewModel: CommonViewModel = koinInject()
-        val audioRecorder = remember { AudioFactory.createAudioRecorder() }
-        val audioPlayer = remember { AudioFactory.createAudioPlayer() }
-        
-        var isRecording by remember { mutableStateOf(false) }
-        var audioFilePath by remember { mutableStateOf("") }
+
         
         
         
         MaterialTheme {
             SafeArea {
-                Column {
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                val microphonePer =
-                                    PermissionsProviderFactory.create().getPermission("microphone")
-                                
-                                println("microphonePer ${microphonePer}")
-                                if (microphonePer) {
-                                    if (isRecording) {
-                                        audioRecorder.stopRecording(false)
-                                        isRecording = false
-                                    } else {
-                                        val audioFilePathNew = FileProviderFactory.create()
-                                            .getFilePath(
-                                                "audio_record${
-                                                    Random.nextInt(
-                                                        1,
-                                                        501
-                                                    )
-                                                }.m4a", ""
-                                            ) // Генерация пути к файлу
-                                        
-                                        if (audioFilePathNew != null) {
-                                            audioFilePath = audioFilePathNew
-                                        }
-                                        
-                                        println("audioFilePathNew $audioFilePathNew")
-
-//                                return@Button
-                                        
-                                        audioRecorder.startRecording(audioFilePath)
-                                        isRecording = true
-                                    }
-                                }
-                            }
-                        }
-                    ) {
-                        Text(
-                            if (isRecording) "Stop Recording" else "Start Recording",
-                            color = Color.White
-                        )
-                    }
-                    
-                    Button(
-                        onClick = {
-                            audioPlayer.startPlaying(audioFilePath)
-                        }
-                    ) {
-                        Text("Play Audio")
-                    }
-                }
+                Button(onClick = {
+                    restartApp()
+                }, content = {
+                    Text("aaaaaaaa")
+                })
             }
         }
     }

@@ -27,6 +27,7 @@ import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSURL
 import platform.darwin.DISPATCH_TIME_FOREVER
+import platform.darwin.NSThread
 import platform.darwin.dispatch_semaphore_create
 import platform.darwin.dispatch_semaphore_signal
 import platform.darwin.dispatch_semaphore_wait
@@ -116,6 +117,9 @@ actual class AudioRecorder {
             audioRecorder?.apply {
                 stop()
                 println("Recording stopped")
+                
+                // Добавляем задержку для завершения записи
+                NSThread.sleepForTimeInterval(0.5)
             }
             audioRecorder = null
             
@@ -142,7 +146,6 @@ actual class AudioRecorder {
         }
     }
 }
-
 
 actual class AudioPlayer {
     private var audioPlayer: AVAudioPlayer? = null
@@ -194,14 +197,12 @@ actual class AudioPlayer {
         }
     }
     
-    
     actual fun stopPlaying() {
         println("Stop playing")
         audioPlayer?.stop()
         println("Playing stopped")
         audioPlayer = null
     }
-    
     
     @OptIn(ExperimentalForeignApi::class)
     actual fun getAudioDuration(filePath: String, fileName: String): String? {
@@ -231,7 +232,6 @@ actual class AudioPlayer {
         val seconds = totalSeconds % 60
         return "${if (minutes < 10) "0" else ""}$minutes:${if (seconds < 10) "0" else ""}$seconds"
     }
-    
     
     companion object {
         private const val AVKeyValueStatusLoaded: Long = 2

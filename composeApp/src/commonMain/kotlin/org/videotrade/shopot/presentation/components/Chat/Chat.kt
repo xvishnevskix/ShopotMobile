@@ -228,27 +228,31 @@ fun Chat(
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
-            val messageSenderName = remember { mutableStateOf("") }
             
-            
-            if (!chat.personal) {
-                if (message.fromUser != profile.id) {
-                    message.phone?.let {
-                        val findContact = viewModel.findContactByPhone(it)
-                        
-                        if (findContact != null) {
-                            messageSenderName.value =
-                                "${findContact.firstName} ${findContact.lastName}"
-                        }
+            // Инициализируем messageSenderName внутри itemsIndexed
+            val messageSenderName = if (!chat.personal && message.fromUser != profile.id) {
+                println("messageSenderName1 ${message.content} ${message.phone}")
+                
+                message.phone?.let {
+                    
+                    
+                    val findContact = viewModel.findContactByPhone(it)
+                    if (findContact != null) {
+                        "${findContact.firstName} ${findContact.lastName}"
+                    } else {
+                        "+${message.phone}"
                     }
-                }
+                } ?: ""
+            } else {
+                ""
             }
-            
+
+//            println("messageSenderName $messageSenderName ${message.content}")
             MessageBox(
                 viewModel = viewModel,
                 message = message,
                 profile = profile,
-                messageSenderName,
+                messageSenderName = messageSenderName,  // Передаем значение напрямую
                 onClick = { onMessageClick(message, messageY) },
                 onPositioned = { coordinates ->
                     messageY = coordinates.positionInParent().y.toInt()
@@ -256,8 +260,6 @@ fun Chat(
                 isVisible = isVisible,
                 chat = chat
             )
-            
-            
         }
     }
 }
