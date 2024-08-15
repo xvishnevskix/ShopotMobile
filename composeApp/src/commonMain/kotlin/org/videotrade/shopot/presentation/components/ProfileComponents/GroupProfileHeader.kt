@@ -63,7 +63,10 @@ fun GroupProfileHeader(text: String) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
             contentDescription = "Back",
-            modifier = Modifier.padding(start = 0.dp,end = 1.dp)
+            modifier = Modifier.padding(start = 0.dp, end = 1.dp).clickable {
+                navigator.pop()
+            }
+            
         )
 
         Image(

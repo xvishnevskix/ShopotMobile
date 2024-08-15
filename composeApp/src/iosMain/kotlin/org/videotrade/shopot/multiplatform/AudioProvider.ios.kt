@@ -25,9 +25,9 @@ import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
 import platform.CoreMedia.CMTimeGetSeconds
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
+import platform.Foundation.NSThread
 import platform.Foundation.NSURL
 import platform.darwin.DISPATCH_TIME_FOREVER
-import platform.darwin.NSThread
 import platform.darwin.dispatch_semaphore_create
 import platform.darwin.dispatch_semaphore_signal
 import platform.darwin.dispatch_semaphore_wait
@@ -137,6 +137,7 @@ actual class AudioRecorder {
                     null
                 }
             } else {
+                val file = NSFileManager.defaultManager.removeItemAtPath(outputFile, null)
                 outputFile // Возвращаем абсолютный путь к файлу
             }
         } catch (e: Exception) {
@@ -146,7 +147,6 @@ actual class AudioRecorder {
         }
     }
 }
-
 actual class AudioPlayer {
     private var audioPlayer: AVAudioPlayer? = null
     

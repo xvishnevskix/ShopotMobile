@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -66,6 +67,7 @@ class ChatScreen(
                 mainViewModel.setCurrentChat("")
             }
         }
+        
         
         var selectedMessage by remember { mutableStateOf<MessageItem?>(null) }
         var selectedMessageY by remember { mutableStateOf(0) }

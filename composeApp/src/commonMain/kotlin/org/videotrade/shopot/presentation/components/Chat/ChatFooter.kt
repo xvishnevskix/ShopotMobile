@@ -118,6 +118,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var showMenu by remember { mutableStateOf(false) }
     var showFilePicker by remember { mutableStateOf(false) }
     var voiceName by remember { mutableStateOf("") }
+    var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
@@ -127,7 +128,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
-//                delay(1000L)
+                delay(1000L)
                 
                 recordingTime++
                 
@@ -152,6 +153,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 println("audioFilePathNew $audioFilePathNew")
                                 
                                 if (audioFilePathNew != null) {
+                                    voicePath = audioFilePathNew
+                                    
                                     audioRecorder.startRecording(audioFilePathNew)
                                 }
                                 isStartRecording = true
@@ -577,9 +580,14 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                 viewModel.sendVoice(fileDir, chat, voiceName)
                                             }
                                         }
+                                        
+                                        println("Drag isStop")
+                                        
                                         viewModel.setIsRecording(false)
                                         offset = Offset.Zero
                                     } else {
+                                        println("Drag stop")
+                                        
                                         // Если смещение больше чем -200f, завершаем запись
                                         viewModel.setIsRecording(false)
                                         
@@ -587,6 +595,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     }
                                 },
                                 onDrag = { change, dragAmount ->
+//                                    println("dragAmount ${dragAmount}")
                                     
                                     
                                     change.consume()
@@ -597,9 +606,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     )
                                     
                                     if (newOffset.x <= -200f) {
+                                        
                                         viewModel.setIsRecording(false)
                                         
                                         audioRecorder.stopRecording(false)
+                                        
                                         offset = Offset.Zero
                                     }
                                     
@@ -620,15 +631,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         if (fileDir !== null) {
                                             isStartRecording = false
 
-//                                            viewModel.sendAttachments(
-//                                                content = text,
-//                                                fromUser = viewModel.profile.value.id,
-//                                                chatId = chat.id,
-//                                                "audio/mp4",
-//                                                voiceName,
-//                                                fileDir = fileDir,
-//                                            )
-                                            
                                             viewModel.sendVoice(fileDir, chat, voiceName)
                                             
                                         }

@@ -165,10 +165,10 @@ class GroupEditScreen : Screen {
                             modifier = Modifier.fillMaxSize()
                         ) {
                             item {
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
-                                GroupUserCard(isEdit = true)
+//                                GroupUserCard(isEdit = true)
+//                                GroupUserCard(isEdit = true)
+//                                GroupUserCard(isEdit = true)
+//                                GroupUserCard(isEdit = true)
                             }
                         }
                 }

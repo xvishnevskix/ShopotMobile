@@ -36,7 +36,6 @@ import io.ktor.util.decodeBase64Bytes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.streams.asInput
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -194,11 +193,13 @@ actual class FileProvider(private val applicationContext: Context) {
                     filename
                 ), "cipher"
             ) ?: return null
+            println("1111111")
             
             val dectyptFilePath = getFilePath(
                 filename,
                 dirType
             ) ?: return null
+            println("222222")
             
             println("dectyptFilePath ${dectyptFilePath}")
             
@@ -257,7 +258,7 @@ actual class FileProvider(private val applicationContext: Context) {
                     
                     
                     if (result3 !== null) {
-
+                        
                         file.delete()
                         println("encupsChachaFileResult $result3")
                         
@@ -369,9 +370,9 @@ actual class FileProvider(private val applicationContext: Context) {
                 header(HttpHeaders.Authorization, "Bearer $token")
                 
                 onUpload { bytesSentTotal, contentLength ->
-                
-                
-                if (contentLength != -1L) { // -1 means that the content length is unknown
+                    
+                    
+                    if (contentLength != -1L) { // -1 means that the content length is unknown
                         val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
                         onProgress(progress)
                     }
@@ -590,6 +591,20 @@ actual class FileProvider(private val applicationContext: Context) {
             
             client.close()
             
+        }
+    }
+    
+    actual suspend fun delFile(fileDirectory: String): Boolean {
+        try {
+            val uri = Uri.parse(fileDirectory)
+            
+            val file = getFileFromUri(applicationContext, uri)
+            
+            
+            return file.delete()
+        } catch (e: Exception) {
+            println("error delFile: $e")
+            return false
         }
     }
     

@@ -40,7 +40,7 @@ import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.profile.ProfileMediaScreen
+import org.videotrade.shopot.presentation.screens.group.GroupProfileScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -86,7 +86,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                 if (chat.personal) {
 //                    navigator.push(ProfileScreen(profile, true))
                 } else {
-                    navigator.push(ProfileMediaScreen(profile, chat))
+                    
+                    viewModel.loadGroupUsers(chat.chatId)
+                    navigator.push(GroupProfileScreen(profile, chat))
                     
                 }
             }

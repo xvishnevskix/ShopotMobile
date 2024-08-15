@@ -792,6 +792,10 @@ actual class FileProvider {
         return getFileSize(url)
     }
     
+    actual suspend fun delFile(fileDirectory: String): Boolean {
+        TODO("Not yet implemented")
+    }
+    
     
 }
 

@@ -2,7 +2,6 @@ package org.videotrade.shopot.presentation.screens.group
 
 import Avatar
 import GroupLongButton
-import GroupShortButton
 import GroupUserCard
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -16,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +26,8 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -46,32 +48,34 @@ import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupProfileHeader
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.add_user
-import shopot.composeapp.generated.resources.call
-import shopot.composeapp.generated.resources.edit_pencil
-import shopot.composeapp.generated.resources.notification
-import shopot.composeapp.generated.resources.search_icon
-import shopot.composeapp.generated.resources.video_icon
 
 
-class GroupProfileScreen : Screen {
+class GroupProfileScreen(private val profile: ProfileDTO, private val chat: ChatItem) : Screen {
     
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
+        val viewModel: ChatViewModel = koinInject()
+        val groupUsers = viewModel.groupUsers.collectAsState().value
+        
         val pagerState = rememberPagerState(pageCount = { GroupProfileTabs.entries.size })
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
         }
-
+        
         val tabs = GroupProfileTabs.entries.map { tab ->
             TabInfo(
                 title = stringResource(tab.titleResId),
@@ -79,6 +83,10 @@ class GroupProfileScreen : Screen {
             )
         }
 
+
+//        LaunchedEffect(Unit) {
+//            viewModel.loadGroupUsers(chat.chatId)
+//        }
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopStart
@@ -99,7 +107,7 @@ class GroupProfileScreen : Screen {
                         size = 116.dp
                     )
                     Text(
-                        "Работа над проектом",
+                        "${chat.groupName}",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -109,7 +117,7 @@ class GroupProfileScreen : Screen {
                         color = Color(0xFF000000)
                     )
                     Text(
-                       "6" + " " + stringResource(MokoRes.strings.members),
+                        groupUsers.size.toString() + "  " + stringResource(MokoRes.strings.members),
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -117,65 +125,65 @@ class GroupProfileScreen : Screen {
                         lineHeight = 20.sp,
                         color = Color(0xFF979797)
                     )
-                    
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 5.dp, end = 5.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        GroupShortButton(
-                            drawableRes = Res.drawable.video_icon,
-                            width = 22.5.dp,
-                            height = 15.dp,
-                            text = stringResource(MokoRes.strings.video_call),
-                            onClick = {}
-                        )
-                        GroupShortButton(
-                            drawableRes = Res.drawable.call,
-                            width = 16.dp,
-                            height = 16.dp,
-                            text = stringResource(MokoRes.strings.call),
-                            onClick = {}
-                        )
-                        GroupShortButton(
-                            drawableRes = Res.drawable.notification,
-                            width = 18.dp,
-                            height = 15.dp,
-                            text = stringResource(MokoRes.strings.notifications),
-                            onClick = {}
-                        )
-                        GroupShortButton(
-                            drawableRes = Res.drawable.search_icon,
-                            width = 16.85.dp,
-                            height = 16.85.dp,
-                            text = stringResource(MokoRes.strings.search),
-                            onClick = {}
-                        )
-                    }
-                    Row(
-                        modifier = Modifier
-                            .padding(top = 15.dp, bottom = 20.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        GroupLongButton(
-                            drawableRes = Res.drawable.add_user,
-                            width = 13.dp,
-                            height = 10.dp,
-                            text = stringResource(MokoRes.strings.add),
-                            onClick = {}
-                        )
-                        GroupLongButton(
-                            drawableRes = Res.drawable.edit_pencil,
-                            width = 13.dp,
-                            height = 13.dp,
-                            text = stringResource(MokoRes.strings.edit),
-                            onClick = {
-                                navigator.push(GroupEditScreen())
-                            }
-                        )
-                    }
+
+//                    Row(
+//                        modifier = Modifier
+//                            .padding(start = 5.dp, end = 5.dp)
+//                            .fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        GroupShortButton(
+//                            drawableRes = Res.drawable.video_icon,
+//                            width = 22.5.dp,
+//                            height = 15.dp,
+//                            text = stringResource(MokoRes.strings.video_call),
+//                            onClick = {}
+//                        )
+//                        GroupShortButton(
+//                            drawableRes = Res.drawable.call,
+//                            width = 16.dp,
+//                            height = 16.dp,
+//                            text = stringResource(MokoRes.strings.call),
+//                            onClick = {}
+//                        )
+//                        GroupShortButton(
+//                            drawableRes = Res.drawable.notification,
+//                            width = 18.dp,
+//                            height = 15.dp,
+//                            text = stringResource(MokoRes.strings.notifications),
+//                            onClick = {}
+//                        )
+//                        GroupShortButton(
+//                            drawableRes = Res.drawable.search_icon,
+//                            width = 16.85.dp,
+//                            height = 16.85.dp,
+//                            text = stringResource(MokoRes.strings.search),
+//                            onClick = {}
+//                        )
+//                    }
+//                    Row(
+//                        modifier = Modifier
+//                            .padding(top = 15.dp, bottom = 20.dp)
+//                            .fillMaxWidth(),
+//                        horizontalArrangement = Arrangement.Center
+//                    ) {
+//                        GroupLongButton(
+//                            drawableRes = Res.drawable.add_user,
+//                            width = 13.dp,
+//                            height = 10.dp,
+//                            text = stringResource(MokoRes.strings.add),
+//                            onClick = {}
+//                        )
+//                        GroupLongButton(
+//                            drawableRes = Res.drawable.edit_pencil,
+//                            width = 13.dp,
+//                            height = 13.dp,
+//                            text = stringResource(MokoRes.strings.edit),
+//                            onClick = {
+//                                navigator.push(GroupEditScreen())
+//                            }
+//                        )
+//                    }
                     
                     
                 }
@@ -207,8 +215,9 @@ class GroupProfileScreen : Screen {
                         
                         ) {
                             GroupProfileTabs.entries.forEachIndexed { index, currentTab ->
-                                val tabInfo = tabs[index] // Получаем соответствующий TabInfo для текущего индекса
-
+                                val tabInfo =
+                                    tabs[index] // Получаем соответствующий TabInfo для текущего индекса
+                                
                                 Tab(
                                     modifier = Modifier
                                         .fillMaxWidth()
@@ -252,15 +261,15 @@ class GroupProfileScreen : Screen {
                                 contentAlignment = Alignment.TopCenter,
                             ) {
                                 val selectedTab = tabs[selectedTabIndex.value]
-
+                                
                                 if (selectedTab.text == stringResource(MokoRes.strings.members)) {
                                     LazyColumn(
                                         verticalArrangement = Arrangement.Top,
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         modifier = Modifier.fillMaxSize()
                                     ) {
-                                        items(5) {
-                                            GroupUserCard()
+                                        itemsIndexed(groupUsers) { _, groupUser ->
+                                            GroupUserCard(true, groupUser)
                                         }
                                     }
                                 } else {
@@ -315,24 +324,24 @@ enum class GroupProfileTabs(
     Users(
         titleResId = MokoRes.strings.members,
         textResId = MokoRes.strings.members
-    ),
-    Media(
-        titleResId = MokoRes.strings.media,
-        textResId = MokoRes.strings.your_media
-    ),
-    Files(
-        titleResId = MokoRes.strings.files,
-        textResId = MokoRes.strings.your_files
-    ),
-    Voice(
-        titleResId = MokoRes.strings.voice,
-        textResId = MokoRes.strings.your_voice
-    ),
-    Links(
-        titleResId = MokoRes.strings.links,
-        textResId = MokoRes.strings.your_links
     );
-
+//    Media(
+//        titleResId = MokoRes.strings.media,
+//        textResId = MokoRes.strings.your_media
+//    ),
+//    Files(
+//        titleResId = MokoRes.strings.files,
+//        textResId = MokoRes.strings.your_files
+//    ),
+//    Voice(
+//        titleResId = MokoRes.strings.voice,
+//        textResId = MokoRes.strings.your_voice
+//    ),
+//    Links(
+//        titleResId = MokoRes.strings.links,
+//        textResId = MokoRes.strings.your_links
+//    );
+    
     companion object {
         @Composable
         fun createTabs(): List<TabInfo> {

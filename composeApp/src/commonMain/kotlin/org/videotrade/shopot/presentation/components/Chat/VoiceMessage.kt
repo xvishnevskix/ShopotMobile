@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
@@ -72,19 +72,20 @@ fun VoiceMessage(
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     
-    var isPlaying by remember { mutableStateOf(false) }
-    val waveData = remember { generateRandomWaveData(50) }
-    var audioFilePath by remember { mutableStateOf("") }
+    // Состояния, уникальные для каждого сообщения
+    var isPlaying by remember(message.id) { mutableStateOf(false) }
+    val waveData = remember(message.id) { generateRandomWaveData(50) }
+    var audioFilePath by remember(message.id) { mutableStateOf("") }
     val audioPlayer = remember { AudioFactory.createAudioPlayer() }
-    var currentTime by remember { mutableStateOf(0) }
-    val duration = remember { mutableStateOf("00:00") }
-    var isLoading by remember { mutableStateOf(false) }
-    var isStartCipherLoading by remember { mutableStateOf(false) }
-    var progress by remember { mutableStateOf(0f) }
-    var downloadJob by remember { mutableStateOf<Job?>(null) }
-    var isUpload = remember { mutableStateOf(false) }
+    var currentTime by remember(message.id) { mutableStateOf(0) }
+    var duration by remember(message.id) { mutableStateOf("00:00") }
+    var isLoading by remember(message.id) { mutableStateOf(false) }
+    var isStartCipherLoading by remember(message.id) { mutableStateOf(false) }
+    var progress by remember(message.id) { mutableStateOf(0f) }
+    var downloadJob by remember(message.id) { mutableStateOf<Job?>(null) }
+    var isUpload by remember(message.id) { mutableStateOf(false) }
     
-    
+    // Эффект для обновления времени воспроизведения
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
             while (currentTime > 0 && isPlaying) {
@@ -93,42 +94,27 @@ fun VoiceMessage(
             }
             if (currentTime <= 0) {
                 stopVoice(audioPlayer)
-                
                 isPlaying = false
             }
         } else {
-            if (duration.value.isNotBlank()) {
-                
-                val durationToSecondsSort = durationToSeconds(duration.value)
-                
-                if (durationToSecondsSort != null) {
-                    currentTime = durationToSecondsSort
-                    
+            if (duration.isNotBlank()) {
+                durationToSeconds(duration)?.let {
+                    currentTime = it
                 }
             }
-            
         }
     }
     
-    
-    LaunchedEffect(Unit) {
-        
-        println("adasdada ${message.upload}")
-        
-        
-    }
-    
+    // Эффект для загрузки или скачивания файла
     LaunchedEffect(message) {
-        
-        if (!isUpload.value && message.upload !== null) {
-            
+        if (!isUpload && message.upload != null) {
             downloadJob = scope.launch {
                 isLoading = true
                 isStartCipherLoading = true
-                
-                message.attachments?.get(0)?.let { attachment ->
-                    
-                    println("sendFileaasa ${attachment.name} ${attachment.type}")
+                message.attachments?.firstOrNull()?.let { attachment ->
+
+
+//                    delay(4000)
                     val fileId = FileProviderFactory.create().uploadCipherFile(
                         "file/upload",
                         attachment.originalFileDir!!,
@@ -136,205 +122,115 @@ fun VoiceMessage(
                         attachment.name
                     ) {
                         isStartCipherLoading = false
-                        println("progress1 ${it / 100f}")
-                        
                         progress = it / 100f
                     }
                     
-                    
-                    if (fileId !== null) {
-                        println("uploadId ${message.uploadId!!}")
+                    fileId?.let {
                         viewModel.sendLargeFileAttachments(
                             message.content,
                             message.fromUser,
                             message.chatId,
                             message.uploadId!!,
-                            fileId
+                            it
                         )
-                        
                         audioFilePath = attachment.originalFileDir!!
                     }
-                    
-                    
                 }
-                
-                isUpload.value = true
+                isUpload = true
                 isLoading = false
                 progress = 1f
-                isLoading = false
             }
         } else {
-            println("existingFile ${attachments[0].name} ${attachments[0].type}")
-            
-            val existingFile =
-                FileProviderFactory.create().existingFile(attachments[0].name, attachments[0].type)
-            
-            println("existingFile $existingFile")
-            
-            
-            
+            val existingFile = FileProviderFactory.create()
+                .existingFile(attachments.first().name, attachments.first().type)
             if (!existingFile.isNullOrBlank()) {
-                
-                println("existingFile 3131")
-                
                 downloadJob?.cancel()
                 isLoading = false
                 progress = 1f
-                
-                
-                val audioDuration = audioPlayer.getAudioDuration(existingFile, attachments[0].name)
-                
-                println("audioDuration $audioDuration")
-                if (audioDuration !== null) {
-                    
-                    val durationToSecondsSort = durationToSeconds(audioDuration)
-                    
-                    if (durationToSecondsSort != null) {
-                        currentTime = durationToSecondsSort
-                    }
-                    
-                    duration.value = audioDuration
-                }
-                
-                
                 audioFilePath = existingFile
-                return@LaunchedEffect
-            }
-            
-            println("fileId ${message.attachments?.get(0)?.fileId}")
-            val audioFile = FileProviderFactory.create()
-            val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
-            val fileName = attachments[0].name
-            val fileType = attachments[0].type
-            
-            
-            scope.launch {
-                
-                val pathResult = audioFile.downloadCipherFile(
-                    url,
-                    fileType,
-                    fileName,
-                    "audio/mp4"
-                ) {
-                
+                audioPlayer.getAudioDuration(existingFile, attachments.first().name)?.let {
+                    currentTime = durationToSeconds(it) ?: 0
+                    duration = it
                 }
+            } else {
+                val audioFile = FileProviderFactory.create()
+                val url = "${EnvironmentConfig.serverUrl}file/id/${attachments.first().fileId}"
+                val fileName = attachments.first().name
+                val fileType = attachments.first().type
                 
-                if (pathResult !== null) {
-                    val audioDuration = audioPlayer.getAudioDuration(pathResult, fileName)
-                    
-                    println("audioDuration $audioDuration")
-                    
-                    if (audioDuration == null) return@launch
-                    val durationToSecondsSort = durationToSeconds(audioDuration)
-                    
-                    if (durationToSecondsSort != null) {
-                        currentTime = durationToSecondsSort
-                        
-                        duration.value = pathResult
-                        
+                scope.launch {
+                    isLoading = true
+                    isStartCipherLoading = true
+                    val pathResult =
+                        audioFile.downloadCipherFile(url, fileType, fileName, "audio/mp4") {
+                            isStartCipherLoading = false
+                            progress = it / 100f
+                        }
+                    pathResult?.let {
+                        audioFilePath = it
+                        audioPlayer.getAudioDuration(it, fileName)?.let { durationString ->
+                            currentTime = durationToSeconds(durationString) ?: 0
+                            duration = durationString
+                        }
                     }
-                    
-                    duration.value = audioDuration
-                    
-                    audioFilePath = pathResult
+                    isUpload = true
+                    isLoading = false
+                    progress = 1f
                 }
-                
-                
             }
         }
-        
     }
     
     Row(
         modifier = Modifier
             .widthIn(max = 204.dp)
-            .padding(start = 22.dp, end = 22.dp, top = if (message.fromUser == profile.id) 12.dp else 7.dp, bottom = 12.dp),
+            .padding(
+                start = 22.dp,
+                end = 22.dp,
+                top = if (message.fromUser == profile.id) 12.dp else 7.dp,
+                bottom = 12.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        
-        
         if (isStartCipherLoading) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.size(45.dp)
-            ) {
-                CircularProgressIndicator(
-                    color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
-                    strokeWidth = 2.dp,
-                    modifier = Modifier.fillMaxSize()
-                )
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Close",
-                    modifier = Modifier
-                        .padding()
-                        .pointerInput(Unit) {
-                            isStartCipherLoading = false
-                            viewModel.deleteMessage(message)
-                        },
-                    tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
-                )
-            }
+            LoadingBox(
+                isLoading = isStartCipherLoading,
+                color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                onCancel = {
+                    isStartCipherLoading = false
+                    viewModel.deleteMessage(message)
+                }
+            )
+        } else if (isLoading) {
+            LoadingBox(
+                isLoading = isLoading,
+                progress = progress,
+                color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                onCancel = {
+                    isLoading = false
+                }
+            )
         } else {
-            if (isLoading) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.size(45.dp)
-                ) {
-                    CircularProgressIndicator(
-                        progress = progress,  // Use animated progress
-                        color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                    Icon(
-                        imageVector = Icons.Default.Close,
-                        contentDescription = "Close",
-                        modifier = Modifier
-                            .padding()
-                            .pointerInput(Unit) {
-                                isLoading = false
-                                
-                            },
-                        tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
-                    )
-                }
-            } else {
-                IconButton(
-                    onClick = {
-                        isPlaying = !isPlaying
-                        println("isPlaying $isPlaying")
-                        
-                        if (isPlaying) {
-                            playVoice(audioPlayer, audioFilePath)
-                        } else {
-                            stopVoice(audioPlayer)
-                        }
-                    },
-                    modifier = Modifier.size(45.dp)
-                ) {
-                    Image(
-                        modifier = Modifier.size(45.dp),
-                        painter = if (!isPlaying) {
-                            if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_play_white)
-                            else painterResource(Res.drawable.voice_message_play_dark)
-                        } else {
-                            if (message.fromUser == profile.id) painterResource(Res.drawable.voice_message_pause_white)
-                            else painterResource(Res.drawable.voice_message_pause_dark)
-                        },
-                        contentDescription = null
-                    )
-                }
-            }
+            PlayPauseButton(
+                isPlaying = isPlaying,
+                onClick = {
+                    isPlaying = !isPlaying
+                    if (isPlaying) {
+                        playVoice(audioPlayer, audioFilePath)
+                    } else {
+                        stopVoice(audioPlayer)
+                    }
+                },
+                isFromUser = message.fromUser == profile.id
+            )
         }
-        
         
         Spacer(modifier = Modifier.width(16.dp))
         
         Column(verticalArrangement = Arrangement.SpaceBetween) {
             Waveform(waveData = waveData, message, profile)
             Text(
-                text = if (isPlaying) formatSecondsToDuration(currentTime) else duration.value,
+                text = if (isPlaying) formatSecondsToDuration(currentTime) else duration,
                 color = if (message.fromUser == profile.id) Color.White else Color(0xFF2A293C),
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
@@ -345,6 +241,69 @@ fun VoiceMessage(
         }
     }
 }
+
+@Composable
+fun LoadingBox(
+    isLoading: Boolean,
+    progress: Float? = null,
+    color: Color,
+    onCancel: () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier.size(45.dp)
+    ) {
+        if (progress !== null) {
+            CircularProgressIndicator(
+                progress =
+                if (isLoading) progress else 1f,
+                color = color,
+                strokeWidth = 2.dp,
+                modifier = Modifier.fillMaxSize()
+            )
+        } else {
+            CircularProgressIndicator(
+                color = color,
+                strokeWidth = 2.dp,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        Icon(
+            imageVector = Icons.Default.Close,
+            contentDescription = "Close",
+            modifier = Modifier
+                .padding()
+                .clickable(onClick = onCancel),
+            tint = color
+        )
+    }
+}
+
+@Composable
+fun PlayPauseButton(
+    isPlaying: Boolean,
+    onClick: () -> Unit,
+    isFromUser: Boolean
+) {
+    IconButton(
+        onClick = onClick,
+        modifier = Modifier.size(45.dp)
+    ) {
+        val icon = if (isPlaying) {
+            if (isFromUser) painterResource(Res.drawable.voice_message_pause_white)
+            else painterResource(Res.drawable.voice_message_pause_dark)
+        } else {
+            if (isFromUser) painterResource(Res.drawable.voice_message_play_white)
+            else painterResource(Res.drawable.voice_message_play_dark)
+        }
+        Image(
+            painter = icon,
+            contentDescription = null,
+            modifier = Modifier.size(45.dp)
+        )
+    }
+}
+
 
 fun playVoice(audioPlayer: AudioPlayer, audioFilePath: String) {
     audioPlayer.startPlaying(audioFilePath)

@@ -21,6 +21,7 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatUseCase
@@ -37,6 +38,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
+    
+    val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
     
     private val _messages = MutableStateFlow<List<MessageItem>>(listOf())
     
@@ -258,7 +261,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
 //        if(fileSize !== null)
         addMessage(
             MessageItem(
-                Random.nextInt(1, 501).toString(),
+                Random.nextInt(1, 2001).toString(),
                 profile.value.id,
                 "",
                 "",
@@ -316,6 +319,47 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     fun findContactByPhone(phone: String): ContactDTO? {
         return contactsUseCase.contacts.value.find { it.phone == phone }
+    }
+    
+    fun loadGroupUsers(chatId: String) {
+        
+        viewModelScope.launch {
+            try {
+                val groupUsersGet =
+                    origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId")
+                
+                val groupUsersFilter = mutableListOf<GroupUserDTO>()
+                
+                if (groupUsersGet != null) {
+                    for (groupUser in groupUsersGet) {
+                        fun normalizePhoneNumber(phone: String): String {
+                            return phone.replace(Regex("[^0-9]"), "")
+                        }
+                        
+                        val findInContacts = contactsUseCase.contacts.value.find {
+                            normalizePhoneNumber(it.phone) == normalizePhoneNumber(groupUser.phone)
+                        }
+                        
+                        if (findInContacts !== null && findInContacts.firstName !== null && findInContacts.lastName !== null) {
+                            groupUsersFilter.add(
+                                groupUser.copy(
+                                    firstName = findInContacts.firstName,
+                                    lastName = findInContacts.lastName
+                                )
+                            )
+                        } else {
+                            groupUsersFilter.add(groupUser)
+                        }
+                        
+                    }
+                }
+                
+                groupUsers.value = groupUsersFilter
+                
+            } catch (e: Exception) {
+            }
+        }
+        
     }
     
     

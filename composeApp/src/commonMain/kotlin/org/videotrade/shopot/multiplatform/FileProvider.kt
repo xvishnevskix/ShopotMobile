@@ -46,6 +46,7 @@ expect class FileProvider {
     
     fun existingFile(fileName: String, fileType: String): String?
     fun getFileSizeFromUri(fileDirectory: String): Long?
+    suspend fun delFile(fileDirectory: String): Boolean
     
     
 }
