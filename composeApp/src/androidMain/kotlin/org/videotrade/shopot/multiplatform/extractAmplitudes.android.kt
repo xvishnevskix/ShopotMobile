@@ -2,6 +2,13 @@ package org.videotrade.shopot.multiplatform
 
 import android.media.MediaExtractor
 import android.media.MediaFormat
+import android.provider.Settings
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeContent
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.debugInspectorInfo
 import java.nio.ByteBuffer
 
 actual fun extractAmplitudes(filePath: String): List<Float> {
@@ -28,3 +35,4 @@ actual fun extractAmplitudes(filePath: String): List<Float> {
     val maxAmplitude = filteredAmplitudes.maxOrNull() ?: 1f
     return filteredAmplitudes.map { it / maxAmplitude }
 }
+

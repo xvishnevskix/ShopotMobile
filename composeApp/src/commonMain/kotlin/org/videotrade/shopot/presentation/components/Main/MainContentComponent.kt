@@ -77,8 +77,9 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 //        mainViewModel.getChatsInBack()
 //    }
     
-    Box(modifier = Modifier.fillMaxSize()) {
         SafeArea {
+            Box(modifier = Modifier.fillMaxSize()) {
+            
             Column(modifier = Modifier.fillMaxSize()) {
                 HeaderMain()
                 
