@@ -83,7 +83,7 @@ fun UserComponentItem(
                         .joinToString(" ")
                         .takeIf { it.isNotBlank() }
                         ?.let {
-                            if (it.length > 27) "${it.take(24)}..." else it
+                            if (it.length > 25) "${it.take(22)}..." else it
                         } ?: ""
                 
                 if (chat.personal) {

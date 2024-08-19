@@ -220,12 +220,12 @@ class origin {
         fileDir: String? = null,
         contentType: String,
         filename: String,
+        isAuth: Boolean,
     ): String? {
 
-//        if (fileBytes == null) {
         return if (fileDir != null) {
             FileProviderFactory.create().uploadCipherFile(
-                "file/upload",
+                if (isAuth) "file/upload/no-auth" else "file/upload",
                 fileDir,
                 contentType,
                 filename
@@ -235,54 +235,6 @@ class origin {
         } else {
             null
         }
-//
-//        } else {
-//            val client =
-//                HttpClient(getHttpClientEngine())
-//            try {
-//                val token = getValueInStorage("accessToken")
-//
-//                println("contentType $contentType")
-//                val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-//                    setBody(MultiPartFormDataContent(
-//                        formData {
-//                            append("file", fileBytes, Headers.build {
-//                                append(HttpHeaders.ContentType, contentType)
-//                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-//                            })
-//                        }
-//                    ))
-//                    header(HttpHeaders.Authorization, "Bearer $token")
-//                }
-//
-//
-//
-//                println("response.Send ${response.status} ${response.bodyAsText()}")
-//
-//                if (response.status.isSuccess()) {
-//                    val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
-//
-//
-//                    return responseData
-//
-//                } else {
-//                    println("Failed to retrieve data: ${response.status.description} ${response.request}")
-//                    return null
-//
-//                }
-//            } catch (e: Exception) {
-//
-//                println("Error111: $e")
-//
-//                return null
-//
-//            } finally {
-//                client.close()
-//            }
-//
-//        }
-//
-//
     }
     
     

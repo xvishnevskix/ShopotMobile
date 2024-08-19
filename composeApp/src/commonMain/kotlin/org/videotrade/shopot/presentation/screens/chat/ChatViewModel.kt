@@ -147,7 +147,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 attachments
             )
             println("сообщениесообщениесообщениесообщение")
-            sendNotify("Новое сообщение от $login ", content, notificationToken)
+            sendNotify("$login", content, notificationToken)
         }
     }
     
@@ -165,6 +165,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 fileDir,
                 contentType,
                 fileName,
+                false,
             )
             
             if (fileId !== null)
@@ -334,6 +335,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     for (groupUser in groupUsersGet) {
                         fun normalizePhoneNumber(phone: String): String {
                             return phone.replace(Regex("[^0-9]"), "")
+                        }
+                        
+                        if (profile.value.phone == normalizePhoneNumber(groupUser.phone)) {
+                            groupUsersFilter.add(
+                                groupUser.copy(
+                                    firstName = "Вы",
+                                    lastName = ""
+                                )
+                            )
+                            continue
                         }
                         
                         val findInContacts = contactsUseCase.contacts.value.find {

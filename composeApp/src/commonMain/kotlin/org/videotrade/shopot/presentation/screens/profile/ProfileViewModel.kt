@@ -34,7 +34,7 @@ class ProfileViewModel : ViewModel(), KoinComponent {
         val fileId = imageArray.value?.let {
             origin().sendFile(
                 null,
-                "image", "profileImage",
+                "image", "profileImage", false,
             )
         }
         

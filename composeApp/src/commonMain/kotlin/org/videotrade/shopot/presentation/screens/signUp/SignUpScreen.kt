@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,10 +42,9 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.preat.peekaboo.image.picker.SelectionMode
-import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
-import com.preat.peekaboo.image.picker.toImageBitmap
+import coil3.compose.rememberAsyncImagePainter
 import dev.icerock.moko.resources.compose.stringResource
+import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -65,6 +67,8 @@ import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ReloadRes
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.CustomButton
@@ -96,19 +100,9 @@ class SignUpScreen(private val phone: String) : Screen {
         val byteArray = remember { mutableStateOf<ByteArray?>(null) }
         var images by remember { mutableStateOf<ImageBitmap?>(null) }
         val сommonViewModel: CommonViewModel = koinInject()
+        var image by remember { mutableStateOf<PlatformFilePick?>(null) }
         
-        val singleImagePicker = rememberImagePickerLauncher(
-            selectionMode = SelectionMode.Single,
-            scope = scope,
-            onResult = { byteArrays ->
-                byteArrays.firstOrNull()?.let {
-                    
-                    images = it.toImageBitmap()
-                    
-                    byteArray.value = it
-                }
-            }
-        )
+        
         
         
         SafeArea {
@@ -125,15 +119,36 @@ class SignUpScreen(private val phone: String) : Screen {
                 ) {
                     item {
                         Box(modifier = Modifier.clickable {
-                            singleImagePicker.launch()
+                            scope.launch {
+                                val filePick = FileProviderFactory.create()
+                                    .pickFile(PickerType.Image)
+                                
+                                
+                                image = filePick
+                                
+                            }
+                            
                             
                         }) {
                             
                             
-                            if (images !== null) {
-                                Avatar(bitmap = images, size = 140.dp)
+                            if (image !== null) {
+//                                Avatar(bitmap = images, size = 140.dp)
                                 
+                                val imagePainter =
+                                    rememberAsyncImagePainter(image?.fileAbsolutePath)
                                 
+                                Surface(
+                                    modifier = Modifier.size(140.dp),
+                                    shape = CircleShape,
+                                ) {
+                                    Image(
+                                        painter = imagePainter,
+                                        contentDescription = "Image",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.size(140.dp)
+                                    )
+                                }
                             } else {
                                 Avatar(icon = null, 140.dp)
                                 Image(
@@ -192,16 +207,17 @@ class SignUpScreen(private val phone: String) : Screen {
                                         val client = HttpClient(getHttpClientEngine())
                                         
                                         try {
-                                            
-                                            val icon = byteArray.value?.let {
+                                            val icon = image?.let {
                                                 origin().sendFile(
-                                                    null,
-                                                    "image/jpeg", "image",
+                                                    image!!.fileAbsolutePath,
+                                                    "image", image!!.fileName,
+                                                    true
                                                 )
-                                                
+
                                             }
                                             println("icon3131 ${icon}")
-                                            
+////
+//                                            return@launch
                                             val jsonContent = Json.encodeToString(
                                                 buildJsonObject {
                                                     put("phoneNumber", phone.drop(1))
