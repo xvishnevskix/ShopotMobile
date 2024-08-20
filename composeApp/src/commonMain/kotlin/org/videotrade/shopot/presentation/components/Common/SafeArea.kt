@@ -28,7 +28,7 @@ fun SafeArea(
         modifier = Modifier
             .fillMaxSize().background(Color.White)
             .blur(blurRadius)
-            .then(if (padding != null) Modifier.padding(padding) else Modifier.safeContentPadding())
+            .then(if (padding != null) Modifier.padding(padding) else Modifier.padding(15.dp))
     ) {
         Toaster(state = toasterViewModel.toaster)
         content()

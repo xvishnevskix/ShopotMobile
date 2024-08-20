@@ -128,6 +128,6 @@ private fun RowScope.TabNavigationItem(tab: Tab) {
         },
         modifier = Modifier.size(56.dp)
     )
-    Spacer(modifier = Modifier.height(70.dp))
+//    Spacer(modifier = Modifier.height(50.dp))
 }
 

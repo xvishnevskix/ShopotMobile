@@ -16,6 +16,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.clearAllNotifications
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
@@ -33,6 +34,10 @@ class IntroScreen : Screen {
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
         
+        
+        LaunchedEffect(key1 = Unit) {
+            clearAllNotifications()
+        }
         
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {

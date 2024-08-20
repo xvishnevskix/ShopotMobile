@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -60,7 +61,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
@@ -108,7 +108,7 @@ data class MenuItem(
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
-
+    
     var text by remember { mutableStateOf("") }
     
     var recordingTime by remember { mutableStateOf(0) }
@@ -242,18 +242,18 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = stringResource(MokoRes.strings.file),
             imagePath = Res.drawable.menu_file,
             onClick = {
-
+                
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
                             .pickFile(PickerType.File(listOf("pdf", "zip")))
-
+                        
                         if (filePick !== null) {
                             val fileData =
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
-
+                            
                             println("fileData $fileData ${Random.nextInt(1, 501)}")
-
+                            
                             if (fileData !== null) {
                                 viewModel.addMessage(
                                     MessageItem(
@@ -286,8 +286,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 )
                             }
                         }
-
-
+                        
+                        
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
@@ -302,90 +302,87 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //        }
 //    ),
     )
-    val editOptions =  getEditOptions()
-
-
+    val editOptions = getEditOptions()
+    
+    
     
     Box(
         modifier = Modifier
             .imePadding()
-            .padding(vertical = 15.dp)
+//            .padding(vertical = 15.dp)
+            .safeDrawingPadding()
             .background(Color.White)
             .height(60.dp)
     ) {
-
-
-
-
-                Popup(
-                    alignment = Alignment.TopStart,
-                    onDismissRequest = { showMenu = false },
+        Popup(
+            alignment = Alignment.TopStart,
+            onDismissRequest = { showMenu = false },
+        ) {
+            AnimatedVisibility(
+                visible = showMenu,
+                enter = fadeIn() + scaleIn(initialScale = 0.1f),
+                exit = fadeOut() + scaleOut(targetScale = 0.9f)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .pointerInput(Unit) { showMenu = false }
+                        .padding(bottom = 55.dp, start = 12.dp)
+                        .fillMaxWidth(0.5f)
+                        .shadow(
+                            elevation = 6.dp,
+                            shape = RoundedCornerShape(8.dp),
+                            clip = false,
+                            ambientColor = Color.Gray,
+                            spotColor = Color.Gray
+                        )
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(Color.White)
+                
                 ) {
-                    AnimatedVisibility(
-                        visible = showMenu,
-                        enter = fadeIn() + scaleIn(initialScale = 0.1f),
-                        exit = fadeOut() + scaleOut(targetScale = 0.9f)
-                    ) {
-                    Column(
-                        modifier = Modifier
-                            .pointerInput(Unit) { showMenu = false }
-                            .padding(bottom = 55.dp, start = 12.dp)
-                            .fillMaxWidth(0.5f)
-                            .shadow(
-                                elevation = 6.dp,
-                                shape = RoundedCornerShape(8.dp),
-                                clip = false,
-                                ambientColor = Color.Gray,
-                                spotColor = Color.Gray
+                    menuItems.forEachIndexed { index, editOption ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .padding(
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 9.dp,
+                                    bottom = 5.dp
+                                )
+                                .fillMaxWidth()
+                                .pointerInput(Unit) {
+                                    editOption.onClick()
+                                    showMenu = false
+                                }
+                        
+                        ) {
+                            Image(
+                                painter = painterResource(editOption.imagePath),
+                                contentDescription = null,
+                                modifier = Modifier.size(25.dp)
                             )
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color.White)
-
-                    ) {
-                        menuItems.forEachIndexed { index, editOption ->
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .padding(
-                                        start = 16.dp,
-                                        end = 16.dp,
-                                        top = 9.dp,
-                                        bottom = 5.dp
-                                    )
-                                    .fillMaxWidth()
-                                    .pointerInput(Unit) {
-                                        editOption.onClick()
-                                        showMenu = false
-                                    }
-
-                            ) {
-                                Image(
-                                    painter = painterResource(editOption.imagePath),
-                                    contentDescription = null,
-                                    modifier = Modifier.size(25.dp)
-                                )
-                                Spacer(modifier = Modifier.width(20.dp))
-                                Text(
-                                    text = editOption.text,
-                                    textAlign = TextAlign.Center,
-                                    fontSize = 15.sp,
-                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                    lineHeight = 20.sp,
-                                    color = Color(0xFF000000)
-                                )
-                            }
-                            if (index < menuItems.size - 1) {
-                                Divider(color = Color.Gray.copy(alpha = 0.12f))
-                            } else {
-                                Spacer(modifier = Modifier.height(4.dp))
-                            }
+                            Spacer(modifier = Modifier.width(20.dp))
+                            Text(
+                                text = editOption.text,
+                                textAlign = TextAlign.Center,
+                                fontSize = 15.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                color = Color(0xFF000000)
+                            )
+                        }
+                        if (index < menuItems.size - 1) {
+                            Divider(color = Color.Gray.copy(alpha = 0.12f))
+                        } else {
+                            Spacer(modifier = Modifier.height(4.dp))
                         }
                     }
                 }
             }
-
-
+        }
+        
+        
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -414,7 +411,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                            .clickable {
 //                                singleImagePicker.launch()
 //                            }
-
+                            
                             .clickable {
                                 showMenu = true
                             }
@@ -423,7 +420,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     
                 }
                 
-
+                
             } else {
                 Row(
                     modifier = Modifier.padding(start = 15.dp),
@@ -452,7 +449,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         color = Color(0xFF979797),
                     )
                 }
-
+                
                 Row(
                     modifier = Modifier
                         .padding(start = 50.dp)
@@ -481,7 +478,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     )
                 }
             }
-
+            
             BasicTextField(
                 value = text,
                 onValueChange = { newText ->
@@ -518,8 +515,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     }
                 },
             )
-
-
+            
+            
             if (text.isNotEmpty()) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
@@ -630,7 +627,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         
                                         if (fileDir !== null) {
                                             isStartRecording = false
-
+                                            
                                             viewModel.sendVoice(fileDir, chat, voiceName)
                                             
                                         }
@@ -640,8 +637,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     
                                     recordingTime = 0
                                     isDragging = false
-
-
+                                    
                                     
                                 },
                                 onPress = {
@@ -649,8 +645,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         viewModel.setIsRecording(!isRecording)
                                     }
                                     println("Press released")
-
-
+                                    
+                                    
                                 }
                             )
                         }
