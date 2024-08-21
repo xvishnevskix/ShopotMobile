@@ -61,8 +61,8 @@ class SignUpPhoneScreen : Screen {
             AuthHeader(stringResource(MokoRes.strings.create_account), 0.75F)
             
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize().padding(top = 220.dp),
+                contentAlignment = Alignment.TopCenter
             ) {
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                     item {

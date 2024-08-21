@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,36 +37,25 @@ fun Otp(otpFields: SnapshotStateList<String>) {
 
     Box(
         modifier = Modifier
-            .padding(top =45.dp, bottom = 45.dp) // Общий внешний отступ
-            .shadow(1.dp, RoundedCornerShape(10.dp)) // Тень с округлыми углами
-            .clip(RoundedCornerShape(10.dp)) // Округление углов элемента
-            .background(Color.White) // Фоновый цвет инпута
-        ,
+            .padding(top = 45.dp, bottom = 45.dp)
+            .shadow(1.dp, RoundedCornerShape(10.dp))
+            .clip(RoundedCornerShape(10.dp))
+            .background(Color.White),
         contentAlignment = Alignment.Center
-
-
     ) {
-
-
-
         val focusRequesters = List(4) { FocusRequester() }
 
-        Row (Modifier.padding(10.dp)) {
+        Row(Modifier.padding(10.dp)) {
             otpFields.forEachIndexed { index, _ ->
                 OutlinedTextField(
                     value = otpFields[index],
-//                    placeholder = {
-//                        Text(
-//                            "—", // Стиль плейсхолдера соответствующий вашему дизайну
-//                            fontSize = 18.sp,
-//                            color = Color.Gray
-//                        )
-//                    },
-                    onValueChange = {
-                        if (it.length <= 1) {
-                            otpFields[index] = it
+                    onValueChange = { input ->
+                        // Фильтруем ввод так, чтобы оставались только цифры от 0 до 9
+                        val filteredInput = input.filter { it.isDigit() }
+                        if (filteredInput.length <= 1) {
+                            otpFields[index] = filteredInput
 
-                            if (it.isNotEmpty() && index < focusRequesters.size - 1) {
+                            if (filteredInput.isNotEmpty() && index < focusRequesters.size - 1) {
                                 focusRequesters[index + 1].requestFocus()
                             }
                         }
@@ -73,8 +63,8 @@ fun Otp(otpFields: SnapshotStateList<String>) {
                     singleLine = true,
                     textStyle = TextStyle(textAlign = TextAlign.Center, fontSize = 18.sp),
                     keyboardOptions = KeyboardOptions.Default.copy(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Next
+                        keyboardType = KeyboardType.NumberPassword,
+                        imeAction = ImeAction.None // Отключаем кнопки "Далее" и т.п.
                     ),
                     modifier = Modifier
                         .focusRequester(focusRequesters[index])
@@ -83,7 +73,8 @@ fun Otp(otpFields: SnapshotStateList<String>) {
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color.Transparent
-                    )
+                    ),
+                    visualTransformation = VisualTransformation.None // Отключаем визуальную трансформацию
                 )
 
                 if (index < focusRequesters.size - 1) Spacer(modifier = Modifier.width(8.dp))
@@ -95,5 +86,4 @@ fun Otp(otpFields: SnapshotStateList<String>) {
             onDispose { }
         }
     }
-
 }

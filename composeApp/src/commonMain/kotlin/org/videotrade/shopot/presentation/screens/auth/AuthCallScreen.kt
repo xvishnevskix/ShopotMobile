@@ -138,8 +138,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
             
             Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxSize().padding(top = 220.dp),
+                contentAlignment = Alignment.TopCenter
             ) {
                 
                 
