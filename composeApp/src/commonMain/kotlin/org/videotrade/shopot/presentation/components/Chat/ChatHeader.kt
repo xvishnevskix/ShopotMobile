@@ -153,7 +153,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 
                             viewModel.sendNotify(
                                 "Звонок",
-                                "от ${chat.firstName} ${chat.lastName}",
+                                "от ${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
                                 chat.notificationToken
                             )
                                 
