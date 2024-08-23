@@ -194,16 +194,16 @@ class FAQ() : Screen {
                         loading = loading,
                         isSuccessfulSend = isSuccessfulSend,
                         onSubmit = {
-//                            if (email.value.isNotEmpty() && description.value.length >= 10) {
-//                                coroutineScope.launch {
-//                                    loading.value = true
-//                                    val response = sendEmail(email.value, description.value)
-//                                    loading.value = false
-//                                    isSuccessfulSend.value = response != null && response.status.isSuccess()
-//                                    isMessageSent.value = true
-//                                }
-//                            }
-                            isMessageSent.value = true
+                            if (email.value.isNotEmpty() && description.value.length >= 10) {
+                                coroutineScope.launch {
+                                    loading.value = true
+                                    val response = sendEmail(email.value, description.value)
+                                    loading.value = false
+                                    isSuccessfulSend.value = response != null && response.status.isSuccess()
+                                    isMessageSent.value = true
+                                }
+                            }
+//                            isMessageSent.value = true
                         }
 
                     )
@@ -266,7 +266,12 @@ class FAQ() : Screen {
                                 }
                             )
                         } else if (loading.value) {
-                            CircularProgressIndicator(color = Color.Red)
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 20.dp)
+                            ) {
+                                CircularProgressIndicator(color = Color(0xFF979797))
+                            }
                         } else {
                             Text(
                                 text = if (isSuccessfulSend.value) "✅ Ваше обращение успешно отправлено!" else "❌ Произошла ошибка, попробуйте снова",
