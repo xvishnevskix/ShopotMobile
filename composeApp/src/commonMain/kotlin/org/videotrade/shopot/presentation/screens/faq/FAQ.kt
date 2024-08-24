@@ -85,6 +85,7 @@ import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.presentation.components.Auth.BaseHeader
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 
 import shopot.composeapp.generated.resources.Res
@@ -151,14 +152,17 @@ class FAQ() : Screen {
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(modifier = Modifier.padding(10.dp)) {
-                AuthHeader("FAQ", 0.55F)
+                BaseHeader("FAQ")
 
                 Spacer(modifier = Modifier.fillMaxHeight(0.05F))
 
                 Text(
                     text = "Основные вопросы",
                     fontSize = 18.sp,
-                    modifier = Modifier.padding(start = 20.dp)
+                    modifier = Modifier.padding(start = 20.dp, bottom = 15.dp),
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                    lineHeight = 20.sp,
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                 )
 
                 Column(
@@ -166,12 +170,18 @@ class FAQ() : Screen {
                         .padding(start = 20.dp)
                         .fillMaxWidth()
                 ) {
-                    PolicyItem("Политика конфиденциальности") { /* Handle Click */ }
-                    PolicyItem("Пользовательское соглашение") { /* Handle Click */ }
-                    PolicyItem("Соглашение об обработке данных") { /* Handle Click */ }
+                    PolicyItem("Политика конфиденциальности") {
+                        navigator.push(PrivacyPolicy())
+                    }
+                    PolicyItem("Пользовательское соглашение") {
+                        navigator.push(UserAgreement())
+                    }
+                    PolicyItem("Соглашение об обработке данных") {
+                        navigator.push(DataProcessingAgreement())
+                    }
                 }
 
-                Spacer(modifier = Modifier.fillMaxHeight(0.75F))
+                Spacer(modifier = Modifier.fillMaxHeight(0.8F))
 
                 Box(
                     modifier = Modifier
@@ -188,7 +198,7 @@ class FAQ() : Screen {
                     ModalDialog(
                         onDismiss = {
                             modalVisible.value = false
-                            isMessageSent.value = !isMessageSent.value
+                            isMessageSent.value = false
                                     },
                         email = email,
                         description = description,
@@ -221,11 +231,14 @@ class FAQ() : Screen {
             modifier = Modifier
                 .clickable(onClick = onClick)
                 .padding(vertical = 7.dp)
-                .padding(start = 10.dp),
+                .padding(start = 5.dp, bottom = 5.dp),
             style = TextStyle(
                 textDecoration = TextDecoration.Underline,
-                fontSize = 16.sp,
-                letterSpacing = (-0.5).sp
+                fontSize = 17.sp,
+                letterSpacing = (-0.5).sp,
+                color = Color(0xFF979797),
+
+
             )
         )
     }
@@ -243,14 +256,16 @@ class FAQ() : Screen {
         var isEmailValid by remember { mutableStateOf(true) }
         var isDescValid by remember { mutableStateOf(true) }
 
-        Dialog(onDismissRequest = onDismiss) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.Black.copy(alpha = 0.6f))
-                    .clickable { onDismiss() },
-                contentAlignment = Alignment.Center
-            ) {
+        // Затемнение всего экрана
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.9f))
+                .clickable { onDismiss() },
+            contentAlignment = Alignment.Center
+        ) {
+            // Модальное окно
+            Dialog(onDismissRequest = onDismiss) {
                 Surface(
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.padding(16.dp)
@@ -268,7 +283,6 @@ class FAQ() : Screen {
 
                             CustomButton("Отправить",
                                 {
-
                                     isEmailValid = validateEmail(email.value)
                                     isDescValid = validateDescription(description.value)
                                     if (isEmailValid && isDescValid) {
