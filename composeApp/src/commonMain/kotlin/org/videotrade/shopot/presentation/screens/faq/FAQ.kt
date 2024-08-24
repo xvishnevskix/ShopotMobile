@@ -206,7 +206,7 @@ class FAQ() : Screen {
                         loading = loading,
                         isSuccessfulSend = isSuccessfulSend,
                         onSubmit = {
-                            if (email.value.isNotEmpty() && description.value.length >= 10) {
+                            if (email.value.isNotEmpty() && description.value.length >= 3) {
                                 coroutineScope.launch {
                                     loading.value = true
                                     val response = sendEmail(email.value, description.value)
@@ -256,7 +256,6 @@ class FAQ() : Screen {
         var isEmailValid by remember { mutableStateOf(true) }
         var isDescValid by remember { mutableStateOf(true) }
 
-        // Затемнение всего экрана
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -264,7 +263,6 @@ class FAQ() : Screen {
                 .clickable { onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            // Модальное окно
             Dialog(onDismissRequest = onDismiss) {
                 Surface(
                     shape = RoundedCornerShape(20.dp),
