@@ -46,11 +46,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.TextStyle
@@ -238,6 +240,9 @@ class FAQ() : Screen {
         isSuccessfulSend: MutableState<Boolean>,
         onSubmit: () -> Unit
     ) {
+        var isEmailValid by remember { mutableStateOf(true) }
+        var isDescValid by remember { mutableStateOf(true) }
+
         Dialog(onDismissRequest = onDismiss) {
             Box(
                 modifier = Modifier
@@ -256,19 +261,27 @@ class FAQ() : Screen {
                             .fillMaxWidth()
                     ) {
                         if (!isMessageSent.value) {
-                            EmailInput(email)
+                            EmailInput(email, isEmailValid)
                             Spacer(modifier = Modifier.height(10.dp))
-                            DescriptionInput(description)
+                            DescriptionInput(description, isDescValid)
                             Spacer(modifier = Modifier.height(20.dp))
 
                             CustomButton("Отправить",
-                                {   onSubmit()
+                                {
+
+                                    isEmailValid = validateEmail(email.value)
+                                    isDescValid = validateDescription(description.value)
+                                    if (isEmailValid && isDescValid) {
+                                        onSubmit()
+                                    }
                                 }
                             )
                         } else if (loading.value) {
                             Box(
                                 contentAlignment = Alignment.Center,
-                                modifier = Modifier.fillMaxWidth().padding(top = 20.dp, bottom = 20.dp)
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(top = 20.dp, bottom = 20.dp)
                             ) {
                                 CircularProgressIndicator(color = Color(0xFF979797))
                             }
@@ -286,7 +299,7 @@ class FAQ() : Screen {
     }
 
     @Composable
-    fun EmailInput(email: MutableState<String>) {
+    fun EmailInput(email: MutableState<String>, isEmailValid: Boolean) {
         Column {
             Text(
                 text = "Ваша электронная почта",
@@ -324,11 +337,19 @@ class FAQ() : Screen {
                     .background(Color(0xFFFFFFFF))
                     .padding(10.dp)
             )
+            if (!isEmailValid) {
+                Text(
+                    text = "Введите корректный email",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 5.dp)
+                )
+            }
         }
     }
 
     @Composable
-    fun DescriptionInput(description: MutableState<String>) {
+    fun DescriptionInput(description: MutableState<String>, isDescValid: Boolean) {
         Column {
             Text(
                 text = "Обращение",
@@ -367,7 +388,23 @@ class FAQ() : Screen {
                     .background(Color(0xFFFFFFFF))
                     .padding(10.dp)
             )
+            if (!isDescValid) {
+                Text(
+                    text = "Не забудьте описать проблему",
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(top = 5.dp)
+                )
+            }
         }
     }
 }
 
+fun validateEmail(email: String): Boolean {
+    val emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$".toRegex()
+    return emailRegex.matches(email)
+}
+
+fun validateDescription(description: String): Boolean {
+    return description.length >= 3
+}
