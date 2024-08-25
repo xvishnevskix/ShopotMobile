@@ -120,5 +120,20 @@
     <string name="enable_permissions">Enable Permissions</string>
     <string name="notification_and_contact_permissions">Notification and contact permissions let you know when messages arrive and help you find people you know.</string>
 
+    <string name="support">Support</string>
+    <string name="ask_question">Ask a question</string>
+    <string name="main_questions">Main questions</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="user_agreement">User Agreement</string>
+    <string name="data_processing_agreement">Data Processing Agreement</string>
+
+    <string name="your_email">Your email</string>
+    <string name="appeal">Appeal</string>
+    <string name="detailed_description_will_help_us_answer_you_as_soon_as_possible">A detailed description will help us answer you as soon as possible</string>
+    <string name="send">Send</string>
+    <string name="please_enter_a_valid_email">Please enter a valid email</string>
+    <string name="don_not_forget_to_describe_the_problem">Don't forget to describe the problem</string>
+    <string name="your_request_has_been_sent_successfully">✅ Your request has been sent successfully!</string>
+    <string name="an_error_occurred_please_try_again">❌ An error occurred, please try again</string>
 
 </resources>

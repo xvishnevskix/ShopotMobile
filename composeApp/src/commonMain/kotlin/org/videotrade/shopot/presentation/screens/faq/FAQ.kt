@@ -157,7 +157,7 @@ class FAQ() : Screen {
                 Spacer(modifier = Modifier.fillMaxHeight(0.05F))
 
                 Text(
-                    text = "Основные вопросы",
+                    stringResource(MokoRes.strings.main_questions),
                     fontSize = 18.sp,
                     modifier = Modifier.padding(start = 20.dp, bottom = 15.dp),
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -170,13 +170,13 @@ class FAQ() : Screen {
                         .padding(start = 20.dp)
                         .fillMaxWidth()
                 ) {
-                    PolicyItem("Политика конфиденциальности") {
+                    PolicyItem(stringResource(MokoRes.strings.privacy_policy)) {
                         navigator.push(PrivacyPolicy())
                     }
-                    PolicyItem("Пользовательское соглашение") {
+                    PolicyItem(stringResource(MokoRes.strings.user_agreement)) {
                         navigator.push(UserAgreement())
                     }
-                    PolicyItem("Соглашение об обработке данных") {
+                    PolicyItem(stringResource(MokoRes.strings.data_processing_agreement)) {
                         navigator.push(DataProcessingAgreement())
                     }
                 }
@@ -189,7 +189,7 @@ class FAQ() : Screen {
                         .padding(bottom = 80.dp),
                     contentAlignment = Alignment.BottomCenter
                 ) {
-                    CustomButton("Задать вопрос", {
+                    CustomButton(stringResource(MokoRes.strings.ask_question), {
                         modalVisible.value = true
                     })
                 }
@@ -279,7 +279,7 @@ class FAQ() : Screen {
                             DescriptionInput(description, isDescValid)
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            CustomButton("Отправить",
+                            CustomButton(stringResource(MokoRes.strings.send),
                                 {
                                     isEmailValid = validateEmail(email.value)
                                     isDescValid = validateDescription(description.value)
@@ -299,7 +299,7 @@ class FAQ() : Screen {
                             }
                         } else {
                             Text(
-                                text = if (isSuccessfulSend.value) "✅ Ваше обращение успешно отправлено!" else "❌ Произошла ошибка, попробуйте снова",
+                                text = if (isSuccessfulSend.value) stringResource(MokoRes.strings.your_request_has_been_sent_successfully) else stringResource(MokoRes.strings.an_error_occurred_please_try_again),
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(vertical = 15.dp)
                             )
@@ -314,7 +314,7 @@ class FAQ() : Screen {
     fun EmailInput(email: MutableState<String>, isEmailValid: Boolean) {
         Column {
             Text(
-                text = "Ваша электронная почта",
+                stringResource(MokoRes.strings.your_email),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(bottom = 11.dp)
             )
@@ -351,7 +351,7 @@ class FAQ() : Screen {
             )
             if (!isEmailValid) {
                 Text(
-                    text = "Введите корректный email",
+                    stringResource(MokoRes.strings.please_enter_a_valid_email),
                     color = Color.Red,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 5.dp)
@@ -364,7 +364,7 @@ class FAQ() : Screen {
     fun DescriptionInput(description: MutableState<String>, isDescValid: Boolean) {
         Column {
             Text(
-                text = "Обращение",
+                stringResource(MokoRes.strings.appeal),
                 fontSize = 14.sp,
                 modifier = Modifier.padding(bottom = 11.dp)
             )
@@ -375,7 +375,7 @@ class FAQ() : Screen {
                     Box(modifier = Modifier.fillMaxWidth()) {
                         if (description.value.isEmpty()) {
                             Text(
-                                "Подробное описание поможет ответить вам как можно скорее",
+                                stringResource(MokoRes.strings.detailed_description_will_help_us_answer_you_as_soon_as_possible),
                                 textAlign = TextAlign.Start,
                                 fontSize = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -402,7 +402,7 @@ class FAQ() : Screen {
             )
             if (!isDescValid) {
                 Text(
-                    text = "Не забудьте описать проблему",
+                    text = stringResource(MokoRes.strings.don_not_forget_to_describe_the_problem),
                     color = Color.Red,
                     fontSize = 12.sp,
                     modifier = Modifier.padding(top = 5.dp)
