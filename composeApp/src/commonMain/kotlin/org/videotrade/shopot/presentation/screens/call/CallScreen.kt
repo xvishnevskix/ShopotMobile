@@ -79,7 +79,7 @@ class CallScreen(
         val callState = remember { mutableStateOf("") }
         
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
-        
+        val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
         LaunchedEffect(Unit) {
             viewModel.initCall(callCase, userId)
@@ -248,16 +248,18 @@ class CallScreen(
                 horizontalArrangement = Arrangement.SpaceAround,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                microfonBtn {
+                microfonBtn(isSwitchToMicrophone.value) {
                     viewModel.setMicro()
+                    isSwitchToMicrophone.value = !isSwitchToMicrophone.value
                 }
 //                videoBtn { }
-                speakerBtn {
-                    CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
-                    
-                    
-                    isSwitchToSpeaker.value = !isSwitchToSpeaker.value
-                }
+
+                    speakerBtn(isSwitchToSpeaker.value) {
+                        CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
+
+
+                        isSwitchToSpeaker.value = !isSwitchToSpeaker.value
+                    }
             }
             Spacer(modifier = Modifier.height(56.dp))
             Row(

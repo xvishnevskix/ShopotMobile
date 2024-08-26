@@ -1,7 +1,9 @@
 package org.videotrade.shopot.presentation.components.Call
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -29,7 +31,11 @@ import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.acceptCall
 import shopot.composeapp.generated.resources.call_microphone
+import shopot.composeapp.generated.resources.call_microphone_disabled
+import shopot.composeapp.generated.resources.call_microphone_on
 import shopot.composeapp.generated.resources.call_speaker
+import shopot.composeapp.generated.resources.call_speaker_disabled
+import shopot.composeapp.generated.resources.call_speaker_on
 import shopot.composeapp.generated.resources.call_video
 import shopot.composeapp.generated.resources.microfon
 import shopot.composeapp.generated.resources.rejectCall
@@ -98,17 +104,22 @@ fun aceptBtn(onClick: () -> Unit) {
 }
 
 @Composable
-fun speakerBtn(onClick: () -> Unit) {
+fun speakerBtn(isActive: Boolean ,onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(Res.drawable.call_speaker),
-            contentDescription = "Video",
-            modifier = Modifier.size(80.dp).clip(CircleShape).clickable{
-                onClick()
-            }
-        )
+        Box(
+            modifier = Modifier.size(80.dp).clip(CircleShape).background(Color(0xff2A293C)),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = if (isActive) painterResource(Res.drawable.call_speaker_on) else painterResource(Res.drawable.call_speaker_disabled),
+                contentDescription = "Video",
+                modifier = Modifier.size(50.dp).clip(CircleShape).clickable{
+                    onClick()
+                }
+            )
+        }
         Text(
             modifier = Modifier.padding(top = 2.dp).align(Alignment.CenterHorizontally),
             text = stringResource(MokoRes.strings.speaker),
@@ -123,20 +134,25 @@ fun speakerBtn(onClick: () -> Unit) {
 }
 
 @Composable
-fun microfonBtn(onClick: () -> Unit) {
+fun microfonBtn(isActive: Boolean ,onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(Res.drawable.call_microphone),
-            contentDescription = "Video",
-            modifier = Modifier.size(80.dp).clip(CircleShape).clickable{
-                onClick()
-            }
-        )
+        Box(
+            modifier = Modifier.size(80.dp).clip(CircleShape).background(Color(0xff2A293C)),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = if (isActive) painterResource(Res.drawable.call_microphone_on) else painterResource(Res.drawable.call_microphone_disabled),
+                contentDescription = "Video",
+                modifier = Modifier.size(50.dp).clip(CircleShape).padding(end = if (!isActive) 2.dp else 0.dp).clickable{
+                    onClick()
+                }
+            )
+        }
         Text(
             modifier = Modifier.padding(top = 2.dp).align(Alignment.CenterHorizontally),
-            text = stringResource(MokoRes.strings.microphone),
+            text = stringResource(MokoRes.strings.speaker),
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
