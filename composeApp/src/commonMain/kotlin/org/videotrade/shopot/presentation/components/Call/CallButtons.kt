@@ -109,11 +109,11 @@ fun speakerBtn(isActive: Boolean ,onClick: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.size(80.dp).clip(CircleShape).background(Color(0xff2A293C)),
+            modifier = Modifier.size(80.dp).clip(CircleShape).background(Color(if (isActive) 0xff2A293C else 0xff2E8B57)),
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = if (isActive) painterResource(Res.drawable.call_speaker_on) else painterResource(Res.drawable.call_speaker_disabled),
+                painter = painterResource(Res.drawable.call_speaker_on),
                 contentDescription = "Video",
                 modifier = Modifier.size(50.dp).clip(CircleShape).clickable{
                     onClick()
