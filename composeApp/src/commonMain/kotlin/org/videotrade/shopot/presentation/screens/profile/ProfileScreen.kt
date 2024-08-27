@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -49,11 +50,14 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.edit_profile
 import shopot.composeapp.generated.resources.exit_profile
 import shopot.composeapp.generated.resources.language
+import shopot.composeapp.generated.resources.log_out
+import shopot.composeapp.generated.resources.wallpaper
 
 
 data class ProfileSettingsItem(
     val drawableRes: DrawableResource,
-    val size: Dp,
+    val with: Dp = 25.dp,
+    val height: Dp = 25.dp,
     val mainText: String,
 //    val boxText: String,
     val onClick: () -> Unit
@@ -84,6 +88,7 @@ class ProfileScreen(
             ProfileSettingsItem(
                 Res.drawable.edit_profile,
                 25.dp,
+                25.dp,
                 stringResource(MokoRes.strings.edit_profile)
             ) {
                 navigator.push(
@@ -96,10 +101,11 @@ class ProfileScreen(
 //                )
 //            },
 //            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
-//            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, "Обои", {}),
+//            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, 25.dp, "Обои", {}),
             
             ProfileSettingsItem(
                 Res.drawable.language,
+                25.dp,
                 25.dp,
                 stringResource(MokoRes.strings.language)
             ) {
@@ -110,8 +116,9 @@ class ProfileScreen(
             
             
             ProfileSettingsItem(
-                Res.drawable.exit_profile,
+                Res.drawable.log_out,
                 25.dp,
+                29.dp,
                 stringResource(MokoRes.strings.log_out)
             ) {
                 
@@ -254,7 +261,8 @@ class ProfileScreen(
                     items(items) { item ->
                         ProfileSettingsButton(
                             drawableRes = item.drawableRes,
-                            size = item.size,
+                            width = item.with,
+                            height = item.height,
                             mainText = item.mainText,
                             onClick = item.onClick
                         )

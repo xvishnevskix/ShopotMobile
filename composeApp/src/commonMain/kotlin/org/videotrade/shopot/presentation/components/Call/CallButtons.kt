@@ -33,8 +33,6 @@ import shopot.composeapp.generated.resources.acceptCall
 import shopot.composeapp.generated.resources.call_microphone
 import shopot.composeapp.generated.resources.call_microphone_disabled
 import shopot.composeapp.generated.resources.call_microphone_on
-import shopot.composeapp.generated.resources.call_speaker
-import shopot.composeapp.generated.resources.call_speaker_disabled
 import shopot.composeapp.generated.resources.call_speaker_on
 import shopot.composeapp.generated.resources.call_video
 import shopot.composeapp.generated.resources.microfon

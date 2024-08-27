@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -40,7 +41,8 @@ import shopot.composeapp.generated.resources.carbon_media_library
 @Composable
 fun ProfileSettingsButton(
     drawableRes: DrawableResource,
-    size: Dp = 22.dp,
+    width: Dp = 25.dp,
+    height: Dp = 25.dp,
     mainText: String,
 //    boxText: String,
     onClick: () -> Unit
@@ -73,10 +75,11 @@ fun ProfileSettingsButton(
                 Image(
                     modifier = Modifier
                         .padding(end = 18.dp)
-                        .size(size),
+                        .size(width = width, height = height),
                     painter = painterResource(drawableRes),
                     contentDescription = null,
-                    contentScale = ContentScale.FillBounds
+                    contentScale = ContentScale.FillBounds,
+//                    colorFilter = ColorFilter.tint(Color.Gray)
                 )
                 Text(
                     "${mainText}",
