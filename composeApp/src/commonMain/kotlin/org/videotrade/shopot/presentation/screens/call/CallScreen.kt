@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -64,7 +65,7 @@ class CallScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        
+
         
         var secondsElapsed by remember { mutableStateOf(0) }
         var isRunning by remember { mutableStateOf(false) }
@@ -225,7 +226,7 @@ class CallScreen(
                 lineHeight = 20.sp,
             )
             
-            Spacer(modifier = Modifier.height(159.dp))
+            Spacer(modifier = Modifier.fillMaxHeight(0.2F))
 
 //            Row(
 //                verticalAlignment = Alignment.CenterVertically,

@@ -50,7 +50,7 @@ fun HeaderMain() {
     val navigator = LocalNavigator.currentOrThrow
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
 
