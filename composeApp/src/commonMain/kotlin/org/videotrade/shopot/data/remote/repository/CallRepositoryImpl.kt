@@ -72,7 +72,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     // Создание конфигурации для PeerConnection
     val rtcConfiguration = RtcConfiguration(
         iceServers = listOf(
-//            IceServer(iceServers),
+            IceServer(iceServers),
             IceServer(
                 urls = turnServers, // URL TURN сервера
                 username = "andrew", // Имя пользователя
@@ -358,6 +358,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     try {
                         
                         Logger.d { "PC2213131:${jsonMessage}" }
+                        
+                        Logger.d { "wsSessionwsSessionwsSession:${wsSession.value}" }
                         
                         wsSession.value?.send(Frame.Text(jsonMessage))
                         println("Message sent successfully")
