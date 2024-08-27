@@ -63,7 +63,7 @@ fun HeaderMain() {
 
 
             Image(
-                modifier = Modifier.size(46.dp, height = 32.dp).pointerInput(Unit) {
+                modifier = Modifier.size(38.dp, height = 26.dp).pointerInput(Unit) {
                 
                 
                 },
