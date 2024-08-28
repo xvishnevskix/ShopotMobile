@@ -58,6 +58,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -91,6 +92,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
+import shopot.composeapp.generated.resources.file_message
 import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
 import kotlin.math.roundToInt
@@ -240,7 +242,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //    ),
         MenuItem(
             text = stringResource(MokoRes.strings.file),
-            imagePath = Res.drawable.menu_file,
+            imagePath = Res.drawable.file_message,
             onClick = {
                 
                 scope.launch {
@@ -359,7 +361,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             Image(
                                 painter = painterResource(editOption.imagePath),
                                 contentDescription = null,
-                                modifier = Modifier.size(25.dp)
+                                modifier = Modifier.size(25.dp),
+                                colorFilter = ColorFilter.tint(Color(0xff000000))
                             )
                             Spacer(modifier = Modifier.width(20.dp))
                             Text(
@@ -654,7 +657,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     val sizeModifier = if (isRecording) {
                         Modifier.size(width = 65.dp, height = 60.dp)
                     } else {
-                        Modifier.size(width = 16.dp, height = 26.dp)
+                        Modifier.size(width = 17.dp, height = 26.dp)
                     }
                     
                     Image(

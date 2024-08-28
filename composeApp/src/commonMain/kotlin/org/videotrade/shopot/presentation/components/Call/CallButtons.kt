@@ -30,13 +30,12 @@ import org.videotrade.shopot.MokoRes
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.acceptCall
-import shopot.composeapp.generated.resources.call_microphone
 import shopot.composeapp.generated.resources.call_microphone_disabled
 import shopot.composeapp.generated.resources.call_microphone_on
 import shopot.composeapp.generated.resources.call_speaker_on
 import shopot.composeapp.generated.resources.call_video
 import shopot.composeapp.generated.resources.microfon
-import shopot.composeapp.generated.resources.rejectCall
+import shopot.composeapp.generated.resources.reject_call
 import shopot.composeapp.generated.resources.svgviewer_png_output
 
 @Composable
@@ -51,10 +50,10 @@ fun rejectBtn(onClick: () -> Unit, text: String= "Отменить") {
             colors = ButtonDefaults.buttonColors(containerColor = Color(255, 255, 255))
         ) {
             Image(
-                painter = painterResource(Res.drawable.rejectCall),
+                painter = painterResource(Res.drawable.reject_call),
                 alignment = Alignment.Center,
                 contentDescription = "Reject Call",
-                modifier = Modifier.size(44.dp)
+                modifier = Modifier.size(70.dp)
             )
         }
         Text(

@@ -114,7 +114,7 @@ fun ProfileSettingsButton(
 //                }
                 Image(
                     modifier = Modifier
-                        .size(18.dp).padding(top = 5.dp),
+                        .size(width = 7.dp, height = 14.dp).padding(top = 5.dp),
                     painter = painterResource(Res.drawable.arrowleft),
                     contentDescription = null,
                     contentScale = ContentScale.Crop

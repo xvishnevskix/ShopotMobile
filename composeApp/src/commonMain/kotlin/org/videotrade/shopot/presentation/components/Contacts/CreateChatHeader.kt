@@ -27,6 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
@@ -146,11 +147,12 @@ fun CreateChatHeader(
                         painter = painterResource(Res.drawable.search_icon),
                         contentDescription = "Search",
                         modifier = Modifier
-                            .padding(end = 5.dp)
-                            .size(15.dp)
+                            .padding(end = 2.dp)
+                            .size(18.dp)
                             .pointerInput(Unit) {
                                 isSearching.value = true
-                            }
+                            },
+                        colorFilter = ColorFilter.tint(Color(0xff000000))
                     )
                 }
             }
