@@ -30,6 +30,8 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.chat_copy
+import shopot.composeapp.generated.resources.chat_delete
 import shopot.composeapp.generated.resources.edit_pencil
 
 
@@ -174,14 +176,14 @@ fun getEditOptions(): List<EditOption> {
     return listOf(
         EditOption(
             text = stringResource(MokoRes.strings.delete),
-            imagePath = Res.drawable.edit_pencil,
+            imagePath = Res.drawable.chat_delete,
             onClick = { viewModel, message, _ ->
                 viewModel.deleteMessage(message)
             }
         ),
         EditOption(
             text = stringResource(MokoRes.strings.copy),
-            imagePath = Res.drawable.edit_pencil,
+            imagePath = Res.drawable.chat_copy,
             onClick = { _, message, clipboardManager ->
                 message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
             }
