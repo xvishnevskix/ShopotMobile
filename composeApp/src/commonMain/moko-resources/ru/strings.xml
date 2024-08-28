@@ -112,4 +112,20 @@
     <string name="notification_and_contact_permissions">Разрешения уведомлений и контактов позволяют вам узнавать, когда приходят сообщения, и помогают найти людей, которых вы знаете.</string>
 
 
+    <string name="support">Поддержка</string>
+    <string name="ask_question">Задать вопрос</string>
+    <string name="main_questions">Основные вопросы</string>
+    <string name="privacy_policy">Политика конфиденциальности</string>
+    <string name="user_agreement">Пользовательское соглашение</string>
+    <string name="data_processing_agreement">Соглашение об обработке данных</string>
+
+    <string name="your_email">Ваша электронная почта</string>
+    <string name="appeal">Обращение</string>
+    <string name="detailed_description_will_help_us_answer_you_as_soon_as_possible">Подробное описание поможет ответить вам как можно скорее</string>
+    <string name="send">Отправить</string>
+    <string name="please_enter_a_valid_email">Введите корректный email</string>
+    <string name="don_not_forget_to_describe_the_problem">Не забудьте описать проблему</string>
+    <string name="your_request_has_been_sent_successfully">✅ Ваше обращение успешно отправлено!</string>
+    <string name="an_error_occurred_please_try_again">❌ Произошла ошибка, попробуйте снова</string>
+
 </resources>

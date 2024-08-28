@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.login
 
+import FAQ
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -154,6 +155,22 @@ class SignInScreen : Screen {
                                 textDecoration = TextDecoration.Underline
                             )
                             
+                        }
+                        Row(
+                            modifier = Modifier.padding().fillMaxWidth()
+                                .clickable { navigator.push(FAQ()) },
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                stringResource(MokoRes.strings.support),
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp,
+                                lineHeight = 15.sp,
+                                color = Color(0xFF000000),
+                                textDecoration = TextDecoration.Underline
+                            )
+
                         }
                     }
                     

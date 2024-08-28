@@ -178,7 +178,7 @@ private fun makeA_group(contacts: List<ContactDTO>) {
             Image(
                 painter = painterResource(Res.drawable.arrowleft),
                 contentDescription = "create group arrow",
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(width = 7.dp, height = 14.dp).padding(top = 2.dp)
             )
             
         }
@@ -259,7 +259,7 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                 Image(
                     painter = painterResource(Res.drawable.arrowleft),
                     contentDescription = "create group arrow",
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(width = 7.dp, height = 14.dp)
                 )
             }
             Divider(

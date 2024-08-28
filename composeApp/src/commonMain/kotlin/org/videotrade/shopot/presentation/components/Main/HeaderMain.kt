@@ -54,7 +54,7 @@ fun HeaderMain() {
     val navigator = LocalNavigator.currentOrThrow
 
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
 
@@ -67,7 +67,7 @@ fun HeaderMain() {
 
 
             Image(
-                modifier = Modifier.size(50.dp).pointerInput(Unit) {
+                modifier = Modifier.size(38.dp, height = 26.dp).pointerInput(Unit) {
                 
                 
                 },

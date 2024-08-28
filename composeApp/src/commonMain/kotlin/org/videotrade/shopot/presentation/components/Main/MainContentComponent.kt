@@ -51,6 +51,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.smart_encryption
+import shopot.composeapp.generated.resources.smart_lock
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -131,7 +132,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                         ) {
                                             Image(
                                                 modifier = Modifier.size(27.dp),
-                                                painter = painterResource(Res.drawable.smart_encryption),
+                                                painter = painterResource(Res.drawable.smart_lock),
                                                 contentDescription = null,
                                             )
                                         }
