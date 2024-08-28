@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -58,19 +59,19 @@ import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
-    
-    val iceServers = listOf(
+    private val iceServers = listOf(
         "stun:stun.l.google.com:19302",
         "stun:stun1.l.google.com:19302",
         "stun:stun2.l.google.com:19302",
     )
     
-    val turnServers = listOf(
-        "turn:89.221.60.156:3478",
+    private val turnServers = listOf(
+//        "turn:89.221.60.156:3478",
+        "turn:89.221.60.161:3478?transport=udp",
     )
     
     // Создание конфигурации для PeerConnection
-    val rtcConfiguration = RtcConfiguration(
+    private val rtcConfiguration = RtcConfiguration(
         iceServers = listOf(
             IceServer(iceServers),
             IceServer(
@@ -185,8 +186,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             
                                             if (cameraPer) {
                                                 rtcMessage?.let {
-                                                    
-                                                    
                                                     val userJson =
                                                         jsonElement.jsonObject["user"]?.jsonObject
                                                     
@@ -195,9 +194,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         Json.decodeFromString<ProfileDTO>(userJson.toString())
                                                     
                                                     
+                                                    println("return@launch newCall ${it["sdp"]?.jsonPrimitive?.content}")
+                                                    
                                                     val sdp =
                                                         it["sdp"]?.jsonPrimitive?.content
                                                             ?: return@launch
+                                                    
+
                                                     val callerId =
                                                         jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
                                                     
@@ -234,11 +237,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             println("Error newCall: $e")
                                         }
                                     }
-                                    
                                     "callAnswered" -> {
                                         rtcMessage?.let {
+                                            
+                                            println("return@launch callAnswered ${it["sdp"]?.jsonPrimitive?.content}")
+                                            
                                             val sdp =
                                                 it["sdp"]?.jsonPrimitive?.content ?: return@launch
+                                            
                                             val answer = SessionDescription(
                                                 SessionDescriptionType.Answer,
                                                 sdp
@@ -351,25 +357,28 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         ),
                     )
                     
-                    
-                    val jsonMessage =
-                        Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
+                    val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
                     
                     try {
+                        Logger.d { "PC2213131: $jsonMessage" }
+                        Logger.d { "wsSession: ${wsSession.value}" }
                         
-                        Logger.d { "PC2213131:${jsonMessage}" }
-                        
-                        Logger.d { "wsSessionwsSessionwsSession:${wsSession.value}" }
-                        
-                        wsSession.value?.send(Frame.Text(jsonMessage))
-                        println("Message sent successfully")
+                        // Проверяем, активна ли корутина и открыт ли WebSocket
+                        if (wsSession.value?.isActive == true) {
+                            wsSession.value?.send(Frame.Text(jsonMessage))
+                            println("Message sent successfully")
+                        } else {
+                            println("WebSocket session is not active")
+                        }
                     } catch (e: Exception) {
-                        println("Failed to send message: ${e.message}")
+                        e.printStackTrace()
+                        println("Failed to send message: onIceCandidate ${e.message}")
                     }
                     
                     peerConnection.value?.addIceCandidate(candidate)
                 }
-                .launchIn(this)
+                .launchIn(this) // или другой подходящий Scope
+
             
             // Следим за изменениями состояния сигнализации
             peerConnection.value!!.onSignalingStateChange
@@ -519,8 +528,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         peerConnection.value?.setLocalDescription(answer)
                     }
                     
-                    
                     if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                        println("wsSession.value?.outgoing?.isClosedForSend aaaa!!!!!!!")
+                        
                         return@coroutineScope
                     }
                     

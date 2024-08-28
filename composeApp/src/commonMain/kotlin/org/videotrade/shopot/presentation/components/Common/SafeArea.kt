@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -23,12 +23,17 @@ fun SafeArea(
 ) {
     val blurRadius = if (isBlurred) 20.dp else 0.dp
     val toasterViewModel: CommonViewModel = koinInject()
-
+    
     Box(
         modifier = Modifier
             .fillMaxSize().background(Color.White)
             .blur(blurRadius)
-            .then(if (padding != null) Modifier.padding(padding) else Modifier.padding(15.dp))
+            .then(
+                if (padding != null) Modifier.padding(padding) else Modifier.padding(
+                    start = 20.dp,
+                    end = 20.dp
+                ).statusBarsPadding()
+            )
     ) {
         Toaster(state = toasterViewModel.toaster)
         content()

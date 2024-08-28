@@ -101,20 +101,20 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         LaunchedEffect(Unit) {
             
             
-//            val response = sendRequestToBackend(phone, null, "2fa")
-//
-//            if (response != null) {
-//
-//                val jsonString = response.bodyAsText()
-//                val jsonElement = Json.parseToJsonElement(jsonString)
-//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//
-//
-//
-//
-//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//
-//            }
+            val response = sendRequestToBackend(phone, null, "2fa")
+
+            if (response != null) {
+
+                val jsonString = response.bodyAsText()
+                val jsonElement = Json.parseToJsonElement(jsonString)
+                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+
+
+
+
+                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+
+            }
             
         }
 
@@ -183,14 +183,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 coroutineScope.launch {
 
 
-//                                if (
-//                                    responseState.value != otpText && !isSuccessOtp.value
-//
-//                                ) {
-//
-//                                    return@launch
-//                                }
-//
+                                if (
+                                    responseState.value != otpText && !isSuccessOtp.value
+
+                                ) {
+
+                                    return@launch
+                                }
+
                                     when (authCase) {
                                         
                                         "SignIn" -> sendLogin(
