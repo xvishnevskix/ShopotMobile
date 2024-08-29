@@ -3,20 +3,11 @@ package org.videotrade.shopot.presentation.screens.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContent
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.safeGesturesPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -25,10 +16,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
@@ -44,7 +33,6 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
-import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import org.videotrade.shopot.presentation.tabs.ContactsTab
@@ -78,8 +66,7 @@ class MainScreen : Screen {
                             backgroundColor = Color(241, 238, 238),
                             modifier = Modifier
                                 .background(Color(241, 238, 238))
-                                .padding(bottom = 26.dp)
-                            ,
+                                .safeDrawingPadding(),
                             elevation = 0.dp // Убирает тень снизу
                         ) {
                             TabNavigationItem(ProfileTab)
@@ -95,7 +82,7 @@ class MainScreen : Screen {
                 )
             }
         }
-
+        
     }
     
 }
@@ -103,7 +90,7 @@ class MainScreen : Screen {
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
     val tabNavigator: TabNavigator = LocalTabNavigator.current
-
+    
     BottomNavigationItem(
         selected = tabNavigator.current == tab,
         onClick = { tabNavigator.current = tab },
