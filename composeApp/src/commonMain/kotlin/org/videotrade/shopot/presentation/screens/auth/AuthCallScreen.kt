@@ -69,15 +69,10 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
-
-
-        
         
         LaunchedEffect(key1 = Unit) {
-            
             viewModel.navigator.value = navigator
             
-   
             when (authCase) {
                 "SignIn" ->  {
                     if(phone == "+79990000000") {
@@ -98,25 +93,19 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         }
         
         
-        LaunchedEffect(Unit) {
-            
-            
-            val response = sendRequestToBackend(phone, null, "2fa")
-
-            if (response != null) {
-
-                val jsonString = response.bodyAsText()
-                val jsonElement = Json.parseToJsonElement(jsonString)
-                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-
-
-
-
-                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-
-            }
-            
-        }
+//        LaunchedEffect(Unit) {
+//            val response = sendRequestToBackend(phone, null, "2fa")
+//
+//            if (response != null) {
+//                val jsonString = response.bodyAsText()
+//                val jsonElement = Json.parseToJsonElement(jsonString)
+//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+//
+//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+//
+//            }
+//
+//        }
 
         
         
@@ -182,14 +171,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 
                                 coroutineScope.launch {
 
-
-                                if (
-                                    responseState.value != otpText && !isSuccessOtp.value
-
-                                ) {
-
-                                    return@launch
-                                }
+//
+//                                if (
+//                                    responseState.value != otpText && !isSuccessOtp.value
+//
+//                                ) {
+//
+//                                    return@launch
+//                                }
 
                                     when (authCase) {
                                         

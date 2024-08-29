@@ -47,12 +47,15 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
+import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
@@ -180,6 +183,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 when (type) {
                                     "newCall" -> {
                                         try {
+                                            val contactsUseCase: ContactsUseCase by inject()
                                             
                                             val cameraPer = PermissionsProviderFactory.create()
                                                 .getPermission("microphone")
@@ -190,7 +194,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         jsonElement.jsonObject["user"]?.jsonObject
                                                     
                                                     
-                                                    val user =
+                                                    var user =
                                                         Json.decodeFromString<ProfileDTO>(userJson.toString())
                                                     
                                                     
@@ -200,7 +204,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         it["sdp"]?.jsonPrimitive?.content
                                                             ?: return@launch
                                                     
-
+                                                    
                                                     val callerId =
                                                         jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
                                                     
@@ -217,6 +221,18 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         otherUserId.value = userId
                                                         
                                                         isIncomingCall.value = true
+                                                        val contact = findContactByPhone(
+                                                            user.phone,
+                                                            contactsUseCase.contacts.value
+                                                        )
+                                                        if (
+                                                            contact !== null && contact.firstName !== null && contact.lastName !== null
+                                                        ) {
+                                                            user = user.copy(
+                                                                firstName = contact.firstName,
+                                                                lastName = contact.lastName
+                                                            )
+                                                        }
                                                         
                                                         navigator.push(
                                                             IncomingCallScreen(
@@ -237,6 +253,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             println("Error newCall: $e")
                                         }
                                     }
+                                    
                                     "callAnswered" -> {
                                         rtcMessage?.let {
                                             
@@ -357,7 +374,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         ),
                     )
                     
-                    val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
+                    val jsonMessage =
+                        Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
                     
                     try {
                         Logger.d { "PC2213131: $jsonMessage" }
@@ -378,7 +396,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     peerConnection.value?.addIceCandidate(candidate)
                 }
                 .launchIn(this) // или другой подходящий Scope
-
+            
             
             // Следим за изменениями состояния сигнализации
             peerConnection.value!!.onSignalingStateChange

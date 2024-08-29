@@ -98,11 +98,6 @@ suspend fun handleConnectWebSocket(
                                         
                                         if (dataJson != null) {
                                             
-                                            
-                                            fun normalizePhoneNumber(phone: String): String {
-                                                return phone.replace(Regex("[^0-9]"), "")
-                                            }
-                                            
                                             val contactsMap =
                                                 contactsUseCase.contacts.value.associateBy {
                                                     normalizePhoneNumber(it.phone)
