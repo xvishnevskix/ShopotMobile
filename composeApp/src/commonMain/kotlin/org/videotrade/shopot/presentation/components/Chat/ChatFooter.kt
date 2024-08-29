@@ -24,15 +24,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -310,11 +313,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     
     Box(
         modifier = Modifier
-            .imePadding()
-//            .padding(vertical = 15.dp)
-            .safeDrawingPadding()
             .background(Color.White)
-            .height(60.dp)
+            .padding(top = 10.dp)
+            .height(100.dp)
+            .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
+    
     ) {
         Popup(
             alignment = Alignment.TopStart,

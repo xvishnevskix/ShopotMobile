@@ -3,11 +3,12 @@ package org.videotrade.shopot.presentation.screens.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -66,7 +67,8 @@ class MainScreen : Screen {
                             backgroundColor = Color(241, 238, 238),
                             modifier = Modifier
                                 .background(Color(241, 238, 238))
-                                .safeDrawingPadding(),
+                                .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
+                            ,
                             elevation = 0.dp // Убирает тень снизу
                         ) {
                             TabNavigationItem(ProfileTab)
