@@ -97,7 +97,7 @@ class CreateChatScreen() : Screen {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.95F)
+                    .fillMaxHeight()
                     .background(Color(255, 255, 255))
             ) {
                 SafeArea {
@@ -111,6 +111,7 @@ class CreateChatScreen() : Screen {
                         modifier = Modifier
                             .fillMaxSize()
                             .background(color = Color(255, 255, 255))
+                            .padding(bottom = 60.dp)
                     ) {
                         item {
                             makeA_group(contacts)
