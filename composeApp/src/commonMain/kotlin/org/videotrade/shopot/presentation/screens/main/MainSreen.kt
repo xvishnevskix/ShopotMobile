@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -75,7 +76,10 @@ class MainScreen : Screen {
                     bottomBar = {
                         BottomNavigation(
                             backgroundColor = Color(241, 238, 238),
-                            modifier = Modifier.safeDrawingPadding(),
+                            modifier = Modifier
+                                .background(Color(241, 238, 238))
+                                .padding(bottom = 26.dp)
+                            ,
                             elevation = 0.dp // Убирает тень снизу
                         ) {
                             TabNavigationItem(ProfileTab)
@@ -99,7 +103,7 @@ class MainScreen : Screen {
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab) {
     val tabNavigator: TabNavigator = LocalTabNavigator.current
-    
+
     BottomNavigationItem(
         selected = tabNavigator.current == tab,
         onClick = { tabNavigator.current = tab },
