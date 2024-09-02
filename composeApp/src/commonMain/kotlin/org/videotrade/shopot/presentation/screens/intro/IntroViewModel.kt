@@ -4,7 +4,6 @@ package org.videotrade.shopot.presentation.screens.intro
 import cafe.adriel.voyager.navigator.Navigator
 import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -84,19 +83,23 @@ class IntroViewModel : ViewModel(), KoinComponent {
     
     fun updateNotificationToken() {
         
-        viewModelScope.launch {
-            
-            
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                    put("notificationToken", NotifierManager.getPushNotifier().getToken())
-                }
-            )
-            
-            
-            println("jsonContent321323 $jsonContent")
-            
-            origin().put("user/profile/edit", jsonContent)
+        try {
+            viewModelScope.launch {
+                
+                
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("notificationToken", NotifierManager.getPushNotifier().getToken())
+                    }
+                )
+                
+                
+                println("jsonContent321323 $jsonContent")
+                
+                origin().put("user/profile/edit", jsonContent)
+            }
+        } catch (e: Exception) {
+        
         }
     }
     
