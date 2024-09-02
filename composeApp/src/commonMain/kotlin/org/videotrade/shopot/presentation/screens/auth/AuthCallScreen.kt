@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.auth
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -24,6 +26,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dokar.sonner.ToastType
+import com.dokar.sonner.ToasterDefaults
 import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
 import io.ktor.client.HttpClient
@@ -54,6 +58,7 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
+import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.SFProText_Semibold
@@ -69,7 +74,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
-        
+        val toasterViewModel: CommonViewModel = koinInject()
+        val isLoading = remember { mutableStateOf(false) }
+
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
             
@@ -160,7 +167,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         
                         
                         
-                        Otp(otpFields)
+                        Otp(otpFields, isLoading.value)
                         
                         
                         CustomButton(
@@ -170,13 +177,17 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 
                                 
                                 coroutineScope.launch {
-
-
-                                if (
+                                    isLoading.value = true
+                                    if (
                                     responseState.value != otpText && !isSuccessOtp.value
 
                                 ) {
-
+//                                        isLoading.value = false
+                                        toasterViewModel.toaster.show(
+                                            message = "Неверный код",
+                                            type = ToastType.Warning,
+                                            duration = ToasterDefaults.DurationDefault,
+                                        )
                                     return@launch
                                 }
 
@@ -190,22 +201,23 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                         )
                                         "SignUp" -> sendSignUp(phone, navigator)
                                     }
+
                                 }
-                                
-                                
+
+
                             })
 
-//                    Text(
-//                        "Отправить код по SMS",
-//                        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-//                        textAlign = TextAlign.Center,
-//                        fontSize = 15.sp,
-//                        lineHeight = 15.sp,
-//                        color = Color(0xFF000000),
-//                        textDecoration = TextDecoration.Underline,
-//                        modifier = Modifier.padding(top = 20.dp)
-//                            .clickable { navigator.push(AuthSMSScreen(phone)) }
-//                    )
+                    Text(
+                        "Отправить код по SMS",
+                        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                        textAlign = TextAlign.Center,
+                        fontSize = 15.sp,
+                        lineHeight = 15.sp,
+                        color = Color(0xFF000000),
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier.padding(top = 20.dp)
+                            .clickable { navigator.push(AuthSMSScreen(phone)) }
+                    )
                     }
                 }
                 

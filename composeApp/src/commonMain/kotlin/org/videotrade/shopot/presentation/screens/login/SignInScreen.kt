@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,15 +36,21 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dokar.sonner.ToastType
+import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
+import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
 import shopot.composeapp.generated.resources.LoginLogo
 import shopot.composeapp.generated.resources.Montserrat_Medium
@@ -57,8 +65,9 @@ class SignInScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        
-        
+        val toasterViewModel: CommonViewModel = koinInject()
+        val coroutineScope = rememberCoroutineScope()
+
         val textState =
             remember {
                 mutableStateOf(
@@ -67,7 +76,7 @@ class SignInScreen : Screen {
                     )
                 )
             }
-        
+
         
         SafeArea {
             
@@ -75,7 +84,7 @@ class SignInScreen : Screen {
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                
+
                 
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
                     item {
@@ -120,13 +129,28 @@ class SignInScreen : Screen {
                         CustomButton(
                             stringResource(MokoRes.strings.login),
                             {
-                                navigator.push(
-                                    AuthCallScreen(
-                                        textState.value.text,
-                                        
-                                        "SignIn"
+
+                                val countryCode = textState.value.text.takeWhile { it.isDigit() || it == '+' }
+                                val phoneNumberLength = getPhoneNumberLength(countryCode)
+                                if (textState.value.text.length < phoneNumberLength) {
+                                    coroutineScope.launch {
+                                        toasterViewModel.toaster.show(
+                                            "Необходимая длина номера телефона: $phoneNumberLength",
+                                            type = ToastType.Error,
+                                            duration = ToasterDefaults.DurationDefault
+                                        )
+                                    }
+                                }
+
+                                else {
+                                    navigator.push(
+                                        AuthCallScreen(
+                                            textState.value.text,
+
+                                            "SignIn"
+                                        )
                                     )
-                                )
+                                    }
                                 
                             })
 //                        LanguageSelector()
@@ -157,8 +181,10 @@ class SignInScreen : Screen {
                             
                         }
                         Row(
-                            modifier = Modifier.padding().fillMaxWidth()
-                                .clickable { navigator.push(FAQ()) },
+                            modifier = Modifier.padding().fillMaxWidth().safeDrawingPadding()
+                                .clickable {
+                                    navigator.push(FAQ())
+                                           },
                             horizontalArrangement = Arrangement.Center
                         ) {
                             Text(

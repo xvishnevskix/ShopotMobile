@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.Button
@@ -186,7 +187,8 @@ class FAQ() : Screen {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 80.dp),
+
+                        .safeDrawingPadding(),
                     contentAlignment = Alignment.BottomCenter
                 ) {
                     CustomButton(stringResource(MokoRes.strings.ask_question), {
