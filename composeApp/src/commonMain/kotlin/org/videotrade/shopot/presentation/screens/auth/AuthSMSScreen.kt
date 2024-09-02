@@ -93,7 +93,7 @@ class AuthSMSScreen(private val phone: String) : Screen {
         fun startTimer() {
             coroutineScope.launch {
                 isTimerRunning = true
-                timerValue = 5
+                timerValue = 60
                 while (timerValue > 0) {
                     delay(1000L)
                     timerValue--
@@ -112,7 +112,7 @@ class AuthSMSScreen(private val phone: String) : Screen {
         }
 
         SafeArea {
-            AuthHeader("Вход", 0.55F)
+            AuthHeader(stringResource(MokoRes.strings.login))
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -211,7 +211,7 @@ class AuthSMSScreen(private val phone: String) : Screen {
                         if (!isTimerRunning) "Отправить код ещё раз?" else "Повторно отправить код можно через $timerValue сек.",
                         fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                         textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
+                        fontSize = 14.sp,
                         lineHeight = 15.sp,
                         color = Color(0xFF000000),
                         textDecoration = TextDecoration.Underline,

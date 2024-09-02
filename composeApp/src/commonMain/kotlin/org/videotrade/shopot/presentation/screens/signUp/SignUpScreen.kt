@@ -43,6 +43,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.rememberAsyncImagePainter
+import com.dokar.sonner.ToastType
+import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
@@ -101,7 +103,7 @@ class SignUpScreen(private val phone: String) : Screen {
         var images by remember { mutableStateOf<ImageBitmap?>(null) }
         val сommonViewModel: CommonViewModel = koinInject()
         var image by remember { mutableStateOf<PlatformFilePick?>(null) }
-        
+        val toasterViewModel: CommonViewModel = koinInject()
         
         
         
@@ -232,13 +234,25 @@ class SignUpScreen(private val phone: String) : Screen {
                                             )
                                             
                                             println("jsonContent $jsonContent")
+
+
                                             
                                             val response: HttpResponse =
                                                 client.post("${serverUrl}auth/sign-up") {
                                                     contentType(ContentType.Application.Json)
                                                     setBody(jsonContent)
                                                 }
-                                            println("responseresponse ${response.content}")
+
+
+                                            println("responseresponse ${response.bodyAsText()}")
+
+                                            if (response.status.value == 500) {
+                                                toasterViewModel.toaster.show(
+                                                    "Номер телефона уже зарегистрирован",
+                                                    type = ToastType.Warning,
+                                                    duration = ToasterDefaults.DurationDefault
+                                                )
+                                            }
                                             
                                             if (response.status.isSuccess()) {
                                                 

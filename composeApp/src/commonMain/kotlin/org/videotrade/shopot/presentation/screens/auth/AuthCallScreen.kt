@@ -75,6 +75,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
+
         val isLoading = remember { mutableStateOf(false) }
 
         LaunchedEffect(key1 = Unit) {
@@ -87,7 +88,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             phone,
                             navigator,
                             viewModel,
-                            сommonViewModel
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel
                         )
                     }
                 }
@@ -101,7 +103,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         
         
         LaunchedEffect(Unit) {
-            val response = sendRequestToBackend(phone, null, "2fa")
+            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
 
             if (response != null) {
                 val jsonString = response.bodyAsText()
@@ -182,7 +184,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     responseState.value != otpText && !isSuccessOtp.value
 
                                 ) {
-//                                        isLoading.value = false
+                                        isLoading.value = false
                                         toasterViewModel.toaster.show(
                                             message = "Неверный код",
                                             type = ToastType.Warning,
@@ -197,7 +199,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                             phone,
                                             navigator,
                                             viewModel,
-                                            сommonViewModel
+                                            сommonViewModel,
+                                            toasterViewModel = toasterViewModel
                                         )
                                         "SignUp" -> sendSignUp(phone, navigator)
                                     }
@@ -235,12 +238,13 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 suspend fun sendRequestToBackend(
     phone: String,
     notificationToken: String?,
-    url: String
+    url: String,
+    toasterViewModel: CommonViewModel,
 ): HttpResponse? {
     val client = HttpClient(getHttpClientEngine()) { // или другой движок в зависимости от платформы
     
     }
-    
+
     
     try {
         val jsonContent = Json.encodeToString(
@@ -261,7 +265,7 @@ suspend fun sendRequestToBackend(
         }
         
         println("url ${response.bodyAsText()} ${jsonContent}")
-        
+
         
         if (response.status.isSuccess()) {
             
@@ -270,6 +274,15 @@ suspend fun sendRequestToBackend(
             
         } else {
             println("Failed to retrieve data: ${response.status.description}")
+
+            if (response.bodyAsText() == "User not found") {
+                toasterViewModel.toaster.show(
+                    "Номер телефона не зарегистрирован",
+                    type = ToastType.Warning,
+                    duration = ToasterDefaults.DurationDefault
+                )
+            }
+
         }
     } catch (e: Exception) {
         println("Error111: $e")
@@ -285,15 +298,17 @@ suspend fun sendLogin(
     phone: String,
     navigator: Navigator,
     viewModel: IntroViewModel,
-    сommonViewModel: CommonViewModel
+    сommonViewModel: CommonViewModel,
+    toasterViewModel: CommonViewModel,
 ) {
     
     
     val response =
-        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login")
+        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login", toasterViewModel)
     
     
-    println("sadada")
+    println("sadada ${response?.bodyAsText()}")
+    println("sadada ${response?.bodyAsText()}")
     
     if (response != null) {
         
