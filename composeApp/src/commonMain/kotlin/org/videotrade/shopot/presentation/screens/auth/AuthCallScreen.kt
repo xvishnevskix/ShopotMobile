@@ -249,15 +249,15 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         Spacer(modifier = Modifier.height(16.dp))
 
 
-                        if (reloadSend) {
+
                             Text(
-                                "Отправить код ещё раз?",
+                                if (!isRunning)"Отправить код ещё раз?" else "Повторно отправить код можно через: $time",
                                 fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                                 textAlign = TextAlign.Center,
                                 fontSize = 15.sp,
                                 lineHeight = 15.sp,
                                 color = Color(0xFF000000),
-                                textDecoration = TextDecoration.Underline,
+                                textDecoration = if (!isRunning) TextDecoration.Underline else TextDecoration.None,
                                 modifier = Modifier.padding(top = 10.dp)
                                     .clickable {
                                         if (!isRunning) {
@@ -279,21 +279,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                                 }
                                             }
                                         }
+                                        else {
+
+                                        }
 
 
                                     }
                             )
-                        } else {
-                            if (isRunning) Text(
-                                text = "Повторно отправить через: $time секунд",
-                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                textAlign = TextAlign.Center,
-                                fontSize = 15.sp,
-                                lineHeight = 15.sp,
-                                color = Color(0xFF000000),
-                                modifier = Modifier.padding(top = 10.dp)
-                            )
-                        }
+
                     }
                 }
 

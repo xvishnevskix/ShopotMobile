@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -70,7 +71,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
         var time by remember { mutableStateOf(60) }
         var reloadSend by remember { mutableStateOf(false) }
         val toasterViewModel: org.videotrade.shopot.presentation.screens.common.CommonViewModel = koinInject()
-
+        val isLoading = remember { mutableStateOf(false) }
 
         fun startTimer() {
             coroutineScope.launch {
@@ -131,117 +132,125 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
             ) {
 
 
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
 
 
-                    Text(
-                        "Введите код из СМС",
-                        modifier = Modifier.padding(bottom = 5.dp),
-                        fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
-                        fontSize = 20.sp,
-                        textAlign = TextAlign.Center,
-                        letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
-                        lineHeight = 24.sp,
+                    item {
+                        Text(
+                            "Введите код из СМС",
+                            modifier = Modifier.padding(bottom = 5.dp),
+                            fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
+                            fontSize = 20.sp,
+                            textAlign = TextAlign.Center,
+                            letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
+                            lineHeight = 24.sp,
 
+                            )
+                        Text(
+                            "На ваш номер $phone поступит SMS с кодом. Введите код в поле ниже ",
+                            textAlign = TextAlign.Center,
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                            lineHeight = 24.sp,
+                            modifier = Modifier.padding(bottom = 5.dp),
+                            color = Color(151, 151, 151)
                         )
-                    Text(
-                        "На ваш номер $phone поступит SMS с кодом. Введите код в поле ниже ",
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        lineHeight = 24.sp,
-                        modifier = Modifier.padding(bottom = 5.dp),
-                        color = Color(151, 151, 151)
-                    )
 
 
 
-                    Otp(otpFields)
+                        Otp(otpFields, isLoading.value)
 
 
-                    CustomButton(
-                        stringResource(MokoRes.strings.confirm),
-                        {
-                            val otpText = otpFields.joinToString("")
+                        CustomButton(
+                            stringResource(MokoRes.strings.confirm),
+                            {
+                                val otpText = otpFields.joinToString("")
 
 
-                            coroutineScope.launch {
-                                if (
-                                    responseState.value != otpText && !isSuccessOtp.value
+                                coroutineScope.launch {
+                                    isLoading.value = true
+                                    if (
+                                        responseState.value != otpText && !isSuccessOtp.value
 
-                                ) {
-
-                                    return@launch
-                                }
-
-
-                                when (authCase) {
-
-                                    "SignIn" -> sendLogin(
-                                        phone,
-                                        navigator,
-                                        viewModel,
-                                        сommonViewModel,
-                                        toasterViewModel
-                                    )
-
-                                    "SignUp" -> sendSignUp(phone, navigator)
-                                }
-
-                            }
-
-
-
-                        })
-
-                    Text(
-                        if (!isRunning) "Отправить код ещё раз?" else "Повторно отправить код можно через: $time",
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        lineHeight = 15.sp,
-                        color = Color(0xFF000000),
-                        textDecoration = if (!isRunning) TextDecoration.Underline else TextDecoration.None,
-                        modifier = Modifier.padding(top = 20.dp)
-                            .clickable {
-                                if (isRunning) {
-
-                                    toasterViewModel.toaster.show(
-                                        message = "Подождите $time сек. перед повторной отправкой",
-                                        type = ToastType.Error,
-                                        duration = ToasterDefaults.DurationDefault,
+                                    ) {
+                                        isLoading.value = false
+                                        toasterViewModel.toaster.show(
+                                            message = "Неверный код",
+                                            type = ToastType.Warning,
+                                            duration = ToasterDefaults.DurationDefault,
                                         )
-                                } else {
-                                    toasterViewModel.toaster.show(
-                                        message = "SMS с кодом отправлено",
-                                        type = ToastType.Success,
-                                        duration = ToasterDefaults.DurationDefault,
-                                    )
-                                    isRunning = true
-                                    reloadSend = false
-                                    startTimer()
-                                    coroutineScope.launch {
+                                        return@launch
+                                    }
 
-                                        val jsonContent = Json.encodeToString(
-                                            buildJsonObject {
-                                                put("phoneNumber", phone.drop(1))
-                                                put("is_sms", true)
-                                            }
+
+                                    when (authCase) {
+
+                                        "SignIn" -> sendLogin(
+                                            phone,
+                                            navigator,
+                                            viewModel,
+                                            сommonViewModel,
+                                            toasterViewModel
                                         )
-                                        val response = origin().post("2fa", jsonContent)
-                                        if (response != null) {
-                                            val jsonElement = Json.parseToJsonElement(response)
-                                            println("jsonElement41414 $jsonElement")
-                                            val messageObject =
-                                                jsonElement.jsonObject["message"]?.jsonObject
-                                            responseState.value =
-                                                messageObject?.get("code")?.jsonPrimitive?.content
-                                        }
+
+                                        "SignUp" -> sendSignUp(phone, navigator)
                                     }
 
                                 }
-                            }
-                    )
+
+
+
+                            })
+
+                        Text(
+                            if (!isRunning) "Отправить код ещё раз?" else "Повторно отправить код можно через: $time",
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                            textAlign = TextAlign.Center,
+                            fontSize = 14.sp,
+                            lineHeight = 15.sp,
+                            color = Color(0xFF000000),
+                            textDecoration = if (!isRunning) TextDecoration.Underline else TextDecoration.None,
+                            modifier = Modifier.padding(top = 20.dp)
+                                .clickable {
+                                    if (isRunning) {
+
+                                        toasterViewModel.toaster.show(
+                                            message = "Подождите $time сек. перед повторной отправкой",
+                                            type = ToastType.Error,
+                                            duration = ToasterDefaults.DurationDefault,
+                                        )
+                                    } else {
+                                        toasterViewModel.toaster.show(
+                                            message = "SMS с кодом отправлено",
+                                            type = ToastType.Success,
+                                            duration = ToasterDefaults.DurationDefault,
+                                        )
+                                        isRunning = true
+                                        reloadSend = false
+                                        startTimer()
+                                        coroutineScope.launch {
+
+                                            val jsonContent = Json.encodeToString(
+                                                buildJsonObject {
+                                                    put("phoneNumber", phone.drop(1))
+                                                    put("is_sms", true)
+                                                }
+                                            )
+                                            val response = origin().post("2fa", jsonContent)
+                                            if (response != null) {
+                                                val jsonElement = Json.parseToJsonElement(response)
+                                                println("jsonElement41414 $jsonElement")
+                                                val messageObject =
+                                                    jsonElement.jsonObject["message"]?.jsonObject
+                                                responseState.value =
+                                                    messageObject?.get("code")?.jsonPrimitive?.content
+                                            }
+                                        }
+
+                                    }
+                                }
+                        )
+                    }
                 }
 
             }
