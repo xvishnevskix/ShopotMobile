@@ -315,12 +315,14 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         modifier = Modifier
             .background(Color.White)
             .padding(top = 10.dp)
-            .height(100.dp)
             .then(
                 if (getPlatform() == "Ios") {
                     Modifier
+                        .padding(bottom = 15.dp)
                 } else {
-                    Modifier.windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
+                    Modifier
+                        .height(100.dp)
+                        .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                 }
             )
     
