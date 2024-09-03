@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.dokar.sonner.Toaster
 import org.koin.compose.koinInject
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
 @Composable
@@ -30,10 +31,14 @@ fun SafeArea(
             .fillMaxSize().background(Color.White)
             .blur(blurRadius)
             .then(
-                if (padding != null) Modifier.padding(padding) else Modifier.padding(
-                    start = 20.dp,
-                    end = 20.dp
-                ).statusBarsPadding()
+                if (getPlatform() == "Ios") {
+                    Modifier.safeContentPadding()
+                } else {
+                    if (padding != null) Modifier.padding(padding) else Modifier.padding(
+                        start = 20.dp,
+                        end = 20.dp
+                    ).statusBarsPadding()
+                }
             )
     ) {
         Toaster(state = toasterViewModel.toaster)

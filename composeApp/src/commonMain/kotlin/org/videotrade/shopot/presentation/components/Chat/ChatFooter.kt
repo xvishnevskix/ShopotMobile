@@ -89,6 +89,7 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -96,7 +97,6 @@ import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.file_message
-import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -316,7 +316,14 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             .background(Color.White)
             .padding(top = 10.dp)
             .height(100.dp)
-            .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
+            .then(
+                if (getPlatform() == "Ios") {
+                    Modifier
+                } else {
+                    Modifier.windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
+                }
+            )
+    
     
     ) {
         Popup(
