@@ -2,16 +2,20 @@ package org.videotrade.shopot.presentation.screens.auth
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,6 +42,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -75,6 +80,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
+        var time by remember { mutableStateOf(60) }
+        var isRunning by remember { mutableStateOf(false) }
+        var reloadSend by remember { mutableStateOf(false) }
 
         val isLoading = remember { mutableStateOf(false) }
 
@@ -100,20 +108,34 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 }
             }
         }
-        
-        
-        LaunchedEffect(Unit) {
-            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
 
+        fun startTimer() {
+            coroutineScope.launch {
+                while (isRunning && time > 0) {
+                    delay(1000) // Задержка в 1 секунду
+                    time -= 1 // Уменьшаем время на 1 секунду
+                }
+                if (time == 0) {
+                    isRunning = false // Останавливаем таймер, когда достигнет 0
+                    reloadSend = true
+                    time = 60 // Сбрасываем таймер обратно на 60 секунд
+                }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+
+            if (!isRunning) {
+                isRunning = true
+                startTimer()
+            }
+            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
             if (response != null) {
                 val jsonString = response.bodyAsText()
                 val jsonElement = Json.parseToJsonElement(jsonString)
                 val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-
                 responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-
             }
-
         }
 
         
@@ -139,11 +161,11 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 modifier = Modifier.fillMaxSize().padding(top = 220.dp),
                 contentAlignment = Alignment.TopCenter
             ) {
-                
-                
+
+
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-                    
-                    
+
+
                     item {
                         Text(
                             stringResource(MokoRes.strings.enter_last_4_digits_of_the_incoming_call),
@@ -154,9 +176,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
                             lineHeight = 24.sp,
                             color = Color.Black
-                            
-                            
-                            )
+
+
+                        )
                         Text(
                             stringResource(MokoRes.strings.you_will_receive_a_call_to_your_number_enter_the_last_4),
                             textAlign = TextAlign.Center,
@@ -166,35 +188,35 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             modifier = Modifier.padding(bottom = 5.dp),
                             color = Color(151, 151, 151)
                         )
-                        
-                        
-                        
+
+
+
                         Otp(otpFields, isLoading.value)
-                        
-                        
+
+
                         CustomButton(
                             stringResource(MokoRes.strings.confirm),
                             {
                                 val otpText = otpFields.joinToString("")
-                                
-                                
+
+
                                 coroutineScope.launch {
                                     isLoading.value = true
                                     if (
-                                    responseState.value != otpText && !isSuccessOtp.value
+                                        responseState.value != otpText && !isSuccessOtp.value
 
-                                ) {
+                                    ) {
                                         isLoading.value = false
                                         toasterViewModel.toaster.show(
                                             message = "Неверный код",
                                             type = ToastType.Warning,
                                             duration = ToasterDefaults.DurationDefault,
                                         )
-                                    return@launch
-                                }
+                                        return@launch
+                                    }
 
                                     when (authCase) {
-                                        
+
                                         "SignIn" -> sendLogin(
                                             phone,
                                             navigator,
@@ -202,6 +224,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                             сommonViewModel,
                                             toasterViewModel = toasterViewModel
                                         )
+
                                         "SignUp" -> sendSignUp(phone, navigator)
                                     }
 
@@ -210,20 +233,70 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
                             })
 
-                    Text(
-                        "Отправить код по SMS",
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                        textAlign = TextAlign.Center,
-                        fontSize = 15.sp,
-                        lineHeight = 15.sp,
-                        color = Color(0xFF000000),
-                        textDecoration = TextDecoration.Underline,
-                        modifier = Modifier.padding(top = 20.dp)
-                            .clickable { navigator.push(AuthSMSScreen(phone)) }
-                    )
+
+                        Text(
+                            "Отправить код по SMS",
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                            textAlign = TextAlign.Center,
+                            fontSize = 15.sp,
+                            lineHeight = 15.sp,
+                            color = Color(0xFF000000),
+                            textDecoration = TextDecoration.Underline,
+                            modifier = Modifier.padding(top = 20.dp)
+                                .clickable { navigator.push(AuthSMSScreen(phone, authCase)) }
+                        )
+
+                        Spacer(modifier = Modifier.height(16.dp))
+
+
+                        if (reloadSend) {
+                            Text(
+                                "Отправить код ещё раз?",
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 15.sp,
+                                lineHeight = 15.sp,
+                                color = Color(0xFF000000),
+                                textDecoration = TextDecoration.Underline,
+                                modifier = Modifier.padding(top = 10.dp)
+                                    .clickable {
+                                        if (!isRunning) {
+                                            isRunning = true
+                                            reloadSend = false
+                                            coroutineScope.launch {
+                                                startTimer()
+
+                                                val response =
+                                                    sendRequestToBackend(phone, null, "2fa", toasterViewModel)
+
+                                                if (response != null) {
+                                                    val jsonString = response.bodyAsText()
+                                                    val jsonElement = Json.parseToJsonElement(jsonString)
+                                                    val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                                                    responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+
+
+                                                }
+                                            }
+                                        }
+
+
+                                    }
+                            )
+                        } else {
+                            if (isRunning) Text(
+                                text = "Повторно отправить через: $time секунд",
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 15.sp,
+                                lineHeight = 15.sp,
+                                color = Color(0xFF000000),
+                                modifier = Modifier.padding(top = 10.dp)
+                            )
+                        }
                     }
                 }
-                
+
                 
             }
             
