@@ -104,7 +104,12 @@ class SignUpScreen(private val phone: String) : Screen {
         val сommonViewModel: CommonViewModel = koinInject()
         var image by remember { mutableStateOf<PlatformFilePick?>(null) }
         val toasterViewModel: CommonViewModel = koinInject()
-        
+
+        val firstNameError = remember { mutableStateOf<String?>("") }
+        val lastNameError = remember { mutableStateOf<String?>("") }
+        val nicknameError = remember { mutableStateOf<String?>("") }
+
+
         
         
         SafeArea {
@@ -174,26 +179,32 @@ class SignUpScreen(private val phone: String) : Screen {
                                 value = textState.value.firstName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(firstName = it)
+                                    firstNameError.value = validateFirstName(it) // Валидация имени
                                 },
-                                placeholder = stringResource(MokoRes.strings.name)
+                                placeholder = stringResource(MokoRes.strings.name),
+                                error = firstNameError.value
                             )
-                            
+
                             TextFieldWithTitle(
                                 title = stringResource(MokoRes.strings.lastname),
                                 value = textState.value.lastName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(lastName = it)
+                                    lastNameError.value = validateLastName(it) // Валидация фамилии
                                 },
-                                placeholder = stringResource(MokoRes.strings.lastname)
+                                placeholder = stringResource(MokoRes.strings.lastname),
+                                error = lastNameError.value
                             )
-                            
+
                             TextFieldWithTitle(
                                 title = stringResource(MokoRes.strings.come_up_nickname),
                                 value = textState.value.nickname,
                                 onValueChange = {
                                     textState.value = textState.value.copy(nickname = it)
+                                    nicknameError.value = validateNickname(it) // Валидация никнейма
                                 },
-                                placeholder = stringResource(MokoRes.strings.come_up_nickname)
+                                placeholder = stringResource(MokoRes.strings.come_up_nickname),
+                                error = nicknameError.value
                             )
                         }
                     }
@@ -205,88 +216,97 @@ class SignUpScreen(private val phone: String) : Screen {
                             CustomButton(
                                 stringResource(MokoRes.strings.create_account),
                                 { scope ->
-                                    scope.launch {
-                                        val client = HttpClient(getHttpClientEngine())
-                                        
-                                        try {
-                                            val icon = image?.let {
-                                                origin().sendFile(
-                                                    image!!.fileAbsolutePath,
-                                                    "image", image!!.fileName,
-                                                    true
-                                                )
+                                    if (firstNameError.value != null || lastNameError.value != null || nicknameError.value != null) {
+                                        toasterViewModel.toaster.show(
+                                            "Заполните все поля",
+                                            type = ToastType.Error,
+                                            duration = ToasterDefaults.DurationDefault
+                                        )
+                                    }
+                                    else {
+                                        scope.launch {
+                                            val client = HttpClient(getHttpClientEngine())
 
-                                            }
-                                            println("icon3131 ${icon}")
+                                            try {
+                                                val icon = image?.let {
+                                                    origin().sendFile(
+                                                        image!!.fileAbsolutePath,
+                                                        "image", image!!.fileName,
+                                                        true
+                                                    )
+
+                                                }
+                                                println("icon3131 ${icon}")
 ////
 //                                            return@launch
-                                            val jsonContent = Json.encodeToString(
-                                                buildJsonObject {
-                                                    put("phoneNumber", phone.drop(1))
-                                                    put("firstName", textState.value.firstName)
-                                                    put("lastName", textState.value.lastName)
-                                                    put("email", "admin.admin@gmail.com")
-                                                    put("description", textState.value.firstName)
-                                                    put("login", textState.value.nickname)
-                                                    put("status", "active")
-                                                    put("icon", icon)
+                                                val jsonContent = Json.encodeToString(
+                                                    buildJsonObject {
+                                                        put("phoneNumber", phone.drop(1))
+                                                        put("firstName", textState.value.firstName)
+                                                        put("lastName", textState.value.lastName)
+                                                        put("email", "admin.admin@gmail.com")
+                                                        put("description", textState.value.firstName)
+                                                        put("login", textState.value.nickname)
+                                                        put("status", "active")
+                                                        put("icon", icon)
+                                                    }
+                                                )
+
+                                                println("jsonContent $jsonContent")
+
+
+
+                                                val response: HttpResponse =
+                                                    client.post("${serverUrl}auth/sign-up") {
+                                                        contentType(ContentType.Application.Json)
+                                                        setBody(jsonContent)
+                                                    }
+
+
+                                                println("responseresponse ${response.bodyAsText()}")
+
+                                                if (response.status.value == 500) {
+                                                    toasterViewModel.toaster.show(
+                                                        "Номер телефона уже зарегистрирован",
+                                                        type = ToastType.Warning,
+                                                        duration = ToasterDefaults.DurationDefault
+                                                    )
                                                 }
-                                            )
-                                            
-                                            println("jsonContent $jsonContent")
+
+                                                if (response.status.isSuccess()) {
+
+                                                    val responseData: ReloadRes =
+                                                        Json.decodeFromString(response.bodyAsText())
 
 
-                                            
-                                            val response: HttpResponse =
-                                                client.post("${serverUrl}auth/sign-up") {
-                                                    contentType(ContentType.Application.Json)
-                                                    setBody(jsonContent)
+                                                    addValueInStorage(
+                                                        "accessToken",
+                                                        responseData.accessToken
+                                                    )
+
+
+                                                    addValueInStorage(
+                                                        "refreshToken",
+                                                        responseData.refreshToken
+                                                    )
+
+
+
+                                                    viewModel.updateNotificationToken()
+
+                                                    viewModel.startObserving()
+
+                                                    сommonViewModel.cipherShared(
+                                                        responseData.userId,
+                                                        navigator
+                                                    )
+
                                                 }
-
-
-                                            println("responseresponse ${response.bodyAsText()}")
-
-                                            if (response.status.value == 500) {
-                                                toasterViewModel.toaster.show(
-                                                    "Номер телефона уже зарегистрирован",
-                                                    type = ToastType.Warning,
-                                                    duration = ToasterDefaults.DurationDefault
-                                                )
+                                            } catch (e: Exception) {
+                                                e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
+                                            } finally {
+                                                client.close()
                                             }
-                                            
-                                            if (response.status.isSuccess()) {
-                                                
-                                                val responseData: ReloadRes =
-                                                    Json.decodeFromString(response.bodyAsText())
-                                                
-                                                
-                                                addValueInStorage(
-                                                    "accessToken",
-                                                    responseData.accessToken
-                                                )
-                                                
-                                                
-                                                addValueInStorage(
-                                                    "refreshToken",
-                                                    responseData.refreshToken
-                                                )
-                                                
-                                                
-                                                
-                                                viewModel.updateNotificationToken()
-                                                
-                                                viewModel.startObserving()
-                                                
-                                                сommonViewModel.cipherShared(
-                                                    responseData.userId,
-                                                    navigator
-                                                )
-                                                
-                                            }
-                                        } catch (e: Exception) {
-                                            e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
-                                        } finally {
-                                            client.close()
                                         }
                                     }
                                 }
@@ -303,7 +323,8 @@ class SignUpScreen(private val phone: String) : Screen {
         title: String,
         value: String,
         onValueChange: (String) -> Unit,
-        placeholder: String
+        placeholder: String,
+        error: String? = null
     ) {
         Column(
             modifier = Modifier.padding(top = 7.dp),
@@ -354,9 +375,44 @@ class SignUpScreen(private val phone: String) : Screen {
                     .fillMaxWidth(0.9f).background(Color(0xFFFFFFFF))
                     .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
             )
+
+            error?.let {
+                Text(
+                    text = it,
+                    color = Color.Red,
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                )
+            }
         }
     }
 }
 
 
 
+fun validateFirstName(name: String): String? {
+    return when {
+        name.isEmpty() -> "Имя обязательно для заполнения"
+        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> "Имя должно содержать только буквы"
+        name.length > 20 -> "Имя не должно содержать больше 20 символов"
+        else -> null
+    }
+}
+
+fun validateLastName(name: String): String? {
+    return when {
+        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> "Фамилия должна содержать только буквы"
+        name.length > 20 -> "Фамилия не должна содержать больше 20 символов"
+        else -> null
+    }
+}
+
+fun validateNickname(nickname: String): String? {
+    return when {
+        nickname.isEmpty() -> "Ник обязателен для заполнения"
+        nickname.length < 6 -> "Ник должен содержать не менее 6 символов"
+        nickname.length > 30 -> "Ник не должен превышать 30 символов"
+        !nickname.matches(Regex("^[a-zA-Z0-9]+$")) -> "Логин может содержать только буквы и числа"
+        else -> null
+    }
+}
