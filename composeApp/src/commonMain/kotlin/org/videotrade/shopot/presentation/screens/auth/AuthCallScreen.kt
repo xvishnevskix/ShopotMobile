@@ -105,35 +105,35 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         }
         
         
-        LaunchedEffect(Unit) {
-            
-            if (!isRunning) {
-                isRunning = true
-                coroutineScope.launch {
-                    while (isRunning && time > 0) {
-                        delay(1000) // Задержка в 1 секунду
-                        time -= 1 // Уменьшаем время на 1 секунду
-                    }
-                    if (time == 0) {
-                        isRunning = false // Останавливаем таймер, когда достигнет 0
-                        reloadSend = true
-                        time = 60 // Сбрасываем таймер обратно на 60 секунд
-                    }
-                }
-            }
-
-
-            val response = sendRequestToBackend(phone, null, "2fa")
-
-            if (response != null) {
-                val jsonString = response.bodyAsText()
-                val jsonElement = Json.parseToJsonElement(jsonString)
-                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-
-                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-
-            }
-        }
+//        LaunchedEffect(Unit) {
+//
+//            if (!isRunning) {
+//                isRunning = true
+//                coroutineScope.launch {
+//                    while (isRunning && time > 0) {
+//                        delay(1000) // Задержка в 1 секунду
+//                        time -= 1 // Уменьшаем время на 1 секунду
+//                    }
+//                    if (time == 0) {
+//                        isRunning = false // Останавливаем таймер, когда достигнет 0
+//                        reloadSend = true
+//                        time = 60 // Сбрасываем таймер обратно на 60 секунд
+//                    }
+//                }
+//            }
+//
+//
+//            val response = sendRequestToBackend(phone, null, "2fa")
+//
+//            if (response != null) {
+//                val jsonString = response.bodyAsText()
+//                val jsonElement = Json.parseToJsonElement(jsonString)
+//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+//
+//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+//
+//            }
+//        }
         
         
         val isError = remember { mutableStateOf(false) }
@@ -198,14 +198,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 
                                 coroutineScope.launch {
 
-
-                                if (
-                                    responseState.value != otpText && !isSuccessOtp.value
-
-                                ) {
-
-                                    return@launch
-                                }
+//
+//                                if (
+//                                    responseState.value != otpText && !isSuccessOtp.value
+//
+//                                ) {
+//
+//                                    return@launch
+//                                }
                                     
                                     when (authCase) {
                                         

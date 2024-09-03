@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
@@ -48,10 +47,8 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.edit_profile
-import shopot.composeapp.generated.resources.exit_profile
 import shopot.composeapp.generated.resources.language
 import shopot.composeapp.generated.resources.log_out
-import shopot.composeapp.generated.resources.wallpaper
 
 
 data class ProfileSettingsItem(
@@ -72,15 +69,12 @@ class ProfileScreen(
     @Composable
     override fun Content() {
         val mainViewModel: MainViewModel = koinInject()
+        val profileViewModel: ProfileViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
         
-        val profile =
-            if (profile !== null && anotherUser) profile else mainViewModel.profile.collectAsState(
-                initial = ProfileDTO()
-            ).value
+        val profile = profileViewModel.profile.collectAsState().value
         
-        
-        println("sssssss ${profile.id}")
+        println("sssssss ${profile}")
         val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
         
         val navigator = LocalNavigator.currentOrThrow

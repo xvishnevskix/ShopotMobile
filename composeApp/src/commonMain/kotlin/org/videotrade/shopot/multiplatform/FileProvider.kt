@@ -1,5 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
+import androidx.compose.ui.graphics.ImageBitmap
 import io.github.vinceglb.filekit.core.PickerType
 import org.videotrade.shopot.domain.model.FileDTO
 
@@ -48,7 +49,7 @@ expect class FileProvider {
     fun getFileSizeFromUri(fileDirectory: String): Long?
     suspend fun delFile(fileDirectory: String): Boolean
     
-    
+    suspend fun loadBitmapFromFile(filePath: String): ImageBitmap?
 }
 
 expect object FileProviderFactory {

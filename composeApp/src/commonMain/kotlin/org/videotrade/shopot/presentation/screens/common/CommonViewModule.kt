@@ -5,6 +5,7 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.dokar.sonner.ToasterState
 import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
@@ -33,6 +34,7 @@ import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
+import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
@@ -196,5 +198,19 @@ class CommonViewModel : ViewModel(), KoinComponent {
                 
             }
         }
+        
+        
+        
     }
+    
+    fun sendImage() {
+        viewModelScope.launch {
+            val filePick = FileProviderFactory.create()
+                .pickFile(PickerType.Image)
+            if (filePick !== null) {
+            
+            }
+        }
+    }
+    
 }

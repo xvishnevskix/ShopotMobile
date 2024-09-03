@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -11,6 +12,8 @@ import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -179,29 +182,23 @@ actual class FileProvider(private val applicationContext: Context) {
     ): String? {
         val client = HttpClient()
         
-        
         println("starting decrypt")
         
         try {
-            
             val token = getValueInStorage("accessToken")
+                ?: throw IllegalStateException("Access token is missing")
             println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
             
             val fileDirectory = getFilePath(
-                filename.substringBeforeLast(
-                    ".",
-                    filename
-                ), "cipher"
+                filename.substringBeforeLast(".", filename),
+                "cipher"
             ) ?: return null
             println("1111111")
             
-            val dectyptFilePath = getFilePath(
-                filename,
-                dirType
-            ) ?: return null
+            val decryptFilePath = getFilePath(filename, dirType) ?: return null
             println("222222")
             
-            println("dectyptFilePath ${dectyptFilePath}")
+            println("decryptFilePath $decryptFilePath")
             
             var filePath = ""
             
@@ -210,13 +207,12 @@ actual class FileProvider(private val applicationContext: Context) {
                     
                     println("httpResponse")
                     
-                    val block = httpResponse.headers["block"]
-                    val authTag = httpResponse.headers["authTag"]
+                    val block = httpResponse.headers["block"]?.decodeBase64Bytes()
+                    val authTag = httpResponse.headers["authTag"]?.decodeBase64Bytes()
                     val channel: ByteReadChannel = httpResponse.body()
                     val totalBytes = httpResponse.contentLength() ?: -1L
                     
                     println("totalBytes $totalBytes")
-                    
                     
                     val file = File(fileDirectory)
                     
@@ -240,49 +236,46 @@ actual class FileProvider(private val applicationContext: Context) {
                         }
                     }
                     
-                    val sharedSecret = getValueInStorage("sharedSecret")
-                    
+                    val sharedSecret = getValueInStorage("sharedSecret")?.decodeBase64Bytes()
                     val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
                     
-                    println("filenameDown ${filename}")
+                    println("filenameDown $filename")
                     
-                    
-                    val result3 =
-                        cipherWrapper.decupsChachaFileCommon(
+                    // Проверяем, что block, authTag и sharedSecret не равны null
+                    if (block != null && authTag != null && sharedSecret != null) {
+                        val result3 = cipherWrapper.decupsChachaFileCommon(
                             fileDirectory,
-                            dectyptFilePath,
-                            block?.decodeBase64Bytes()!!,
-                            authTag?.decodeBase64Bytes()!!,
-                            sharedSecret?.decodeBase64Bytes()!!
+                            decryptFilePath,
+                            block,
+                            authTag,
+                            sharedSecret
                         )
-                    
-                    
-                    if (result3 !== null) {
                         
-                        file.delete()
-                        println("encupsChachaFileResult $result3")
-                        
-                        filePath = result3
+                        if (result3 != null) {
+                            file.delete()
+                            println("encupsChachaFileResult $result3")
+                            
+                            filePath = result3
+                        }
+                    } else {
+                        println("Decryption parameters are missing: block=$block, authTag=$authTag, sharedSecret=$sharedSecret")
                     }
-                    
-                    
                     
                     onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
                     println("A file saved to ${file.path}")
                 }
             
-            
             return filePath
             
         } catch (e: Exception) {
-            
-            println("Error file ${e}")
+            println("Error file ${e.message}")
+            e.printStackTrace()
         } finally {
             client.close()
         }
         return null
-        
     }
+    
     
     actual suspend fun uploadCipherFile(
         url: String,
@@ -605,6 +598,23 @@ actual class FileProvider(private val applicationContext: Context) {
         } catch (e: Exception) {
             println("error delFile: $e")
             return false
+        }
+    }
+    
+    actual suspend fun loadBitmapFromFile(filePath: String): ImageBitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val file = File(filePath)
+                if (file.exists()) {
+                    val bitmap = BitmapFactory.decodeStream(FileInputStream(file))
+                    bitmap?.asImageBitmap()
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                println("Error loading image from file: ${e.message}")
+                null
+            }
         }
     }
     

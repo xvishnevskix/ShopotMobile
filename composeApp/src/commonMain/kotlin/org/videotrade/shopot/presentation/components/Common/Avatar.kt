@@ -31,7 +31,7 @@ fun Avatar(
     val imagePainter = if (icon.isNullOrBlank()) {
         painterResource(Res.drawable.person)
     } else {
-        rememberImagePainter("${serverUrl}file/id/$icon")
+        rememberImagePainter("${serverUrl}file/plain/$icon")
     }
     
     Surface(

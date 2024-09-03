@@ -29,6 +29,8 @@ import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.multiplatform.FileData
+import org.videotrade.shopot.multiplatform.hideKeyboardOnTap
 
 
 class ChatScreen(
@@ -93,8 +95,10 @@ class ChatScreen(
                             viewModel,
                             profile,
                             chat,
-                            Modifier.fillMaxSize().background(Color.White)
-                                .padding(innerPadding),
+                            Modifier.fillMaxSize().hideKeyboardOnTap().background(Color.White)
+                                .padding(innerPadding)
+                               
+                            ,
                             onMessageClick = { message, y ->
                                 
                                 selectedMessage = message

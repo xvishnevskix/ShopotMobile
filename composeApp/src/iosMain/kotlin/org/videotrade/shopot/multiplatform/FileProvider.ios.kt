@@ -1,6 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
 
+import androidx.compose.ui.graphics.ImageBitmap
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -793,6 +794,10 @@ actual class FileProvider {
     }
     
     actual suspend fun delFile(fileDirectory: String): Boolean {
+        TODO("Not yet implemented")
+    }
+    
+    actual suspend fun loadBitmapFromFile(filePath: String): ImageBitmap? {
         TODO("Not yet implemented")
     }
     

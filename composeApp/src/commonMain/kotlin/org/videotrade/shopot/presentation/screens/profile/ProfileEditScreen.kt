@@ -47,16 +47,17 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.preat.peekaboo.image.picker.SelectionMode
-import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
-import com.preat.peekaboo.image.picker.toImageBitmap
+import coil3.compose.rememberAsyncImagePainter
 import dev.icerock.moko.resources.compose.stringResource
+import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditHeader
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -91,28 +92,29 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
         val scope = rememberCoroutineScope()
         val byteArray = remember { mutableStateOf<ByteArray?>(null) }
         var images by remember { mutableStateOf<ImageBitmap?>(null) }
-        
-        val singleImagePicker = rememberImagePickerLauncher(
-            selectionMode = SelectionMode.Single,
-            scope = scope,
-            onResult = { byteArrays ->
-                byteArrays.firstOrNull()?.let {
-                    
-                    images = it.toImageBitmap()
-                    
-                    byteArray.value = it
-                }
-            }
-        )
+        var image by remember { mutableStateOf<PlatformFilePick?>(null) }
+
+//        val singleImagePicker = rememberImagePickerLauncher(
+//            selectionMode = SelectionMode.Single,
+//            scope = scope,
+//            onResult = { byteArrays ->
+//                byteArrays.firstOrNull()?.let {
+//
+//                    images = it.toImageBitmap()
+//
+//                    byteArray.value = it
+//                }
+//            }
+//        )
         
         Box(
             modifier = Modifier.fillMaxSize().background(
                 color = Color(255, 255, 255)
             ),
             contentAlignment = Alignment.TopStart,
-         
             
-        ) {
+            
+            ) {
             
             Column(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(0.87F),
@@ -131,7 +133,8 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                         scope.launch {
                             val profileUpdate = profileViewModel.sendNewProfile(
                                 textState.value,
-                                byteArray
+                                image,
+                                navigator
                             )
                             
                             if (profileUpdate) {
@@ -146,20 +149,23 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (images !== null) {
+                        if (image !== null) {
+                            val imagePainter =
+                                rememberAsyncImagePainter(image?.fileAbsolutePath)
+                            
                             Surface(
                                 modifier = Modifier.size(70.dp),
                                 shape = CircleShape,
                             ) {
                                 Image(
-                                    bitmap = images!!,
-                                    contentDescription = "Avatar",
+                                    painter = imagePainter,
+                                    contentDescription = "Image",
                                     contentScale = ContentScale.Crop,
-                                    modifier = Modifier.size(70.dp),
+                                    modifier = Modifier.size(70.dp)
                                 )
                             }
                         } else {
-                            Avatar(icon = profile.icon, size = 70.dp)
+                            Avatar(icon = profile.icon, 70.dp)
                         }
                         
                         println("profile.icon ${profile.icon}")
@@ -251,7 +257,14 @@ class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
                             .padding(top = 25.dp, bottom = 10.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .clickable {
-                                singleImagePicker.launch()
+                                scope.launch {
+                                    val filePick = FileProviderFactory.create()
+                                        .pickFile(PickerType.Image)
+                                    
+                                    
+                                    image = filePick
+                                    
+                                }
                             },
                         contentAlignment = Alignment.Center
                     ) {
