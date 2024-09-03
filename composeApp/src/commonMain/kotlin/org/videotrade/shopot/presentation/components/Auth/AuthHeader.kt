@@ -73,7 +73,7 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
 
             text = {
                 Text(
-                    "Вы действительно хотите выйти?\nВас вернёт на начальный экран входа",
+                    "${stringResource(MokoRes.strings.are_you_sure_you_want_to_go_out)}\n${stringResource(MokoRes.strings.you_will_be_returned_to_the_initial_login_screen)}",
                     fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
@@ -86,7 +86,7 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
 
             dismissButton = {
                 CustomButton(
-                   "Нет",
+                    stringResource(MokoRes.strings.no),
                     { scope ->
                         scope.launch {
                             showDialog = false
@@ -98,7 +98,7 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
             },
             confirmButton = {
                 CustomButton(
-                    "Да",
+                    stringResource(MokoRes.strings.yes),
                     { scope ->
                         scope.launch {
                             showDialog = false

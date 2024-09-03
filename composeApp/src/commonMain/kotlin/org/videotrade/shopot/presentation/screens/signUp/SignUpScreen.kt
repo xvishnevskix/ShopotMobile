@@ -109,8 +109,17 @@ class SignUpScreen(private val phone: String) : Screen {
         val lastNameError = remember { mutableStateOf<String?>("") }
         val nicknameError = remember { mutableStateOf<String?>("") }
 
-
-        
+        val phoneIsRegistered = stringResource(MokoRes.strings.phone_number_is_already_registered)
+        val fillInputs = stringResource(MokoRes.strings.please_fill_in_all_input_fields)
+        val nameValidate1 = stringResource(MokoRes.strings.name_is_required)
+        val nameValidate2 = stringResource(MokoRes.strings.name_must_contain_only_letters)
+        val nameValidate3 = stringResource(MokoRes.strings.name_must_not_contain_more_than_20_characters)
+        val lastnameValidate1 = stringResource(MokoRes.strings.lastname_must_contain_only_letters)
+        val lastnameValidate2 = stringResource(MokoRes.strings.lastname_must_not_contain_more_than_20_characters)
+        val nickValidate1 = stringResource(MokoRes.strings.nickname_is_required)
+        val nickValidate2 = stringResource(MokoRes.strings.nickname_must_contain_at_least_6_characters)
+        val nickValidate3 = stringResource(MokoRes.strings.nickname_should_not_exceed_30_characters)
+        val nickValidate4 = stringResource(MokoRes.strings.nickname_can_contain_only_letters_and_numbers)
         
         SafeArea {
             AuthHeader(stringResource(MokoRes.strings.create_account), 0.75F)
@@ -160,7 +169,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 Avatar(icon = null, 140.dp)
                                 Image(
                                     painter = painterResource(Res.drawable.pencil_in_circle),
-                                    contentDescription = "Редактировать",
+                                    contentDescription = "Edit",
                                     modifier = Modifier.size(28.dp).align(Alignment.BottomEnd)
                                 )
                             }
@@ -179,7 +188,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 value = textState.value.firstName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(firstName = it)
-                                    firstNameError.value = validateFirstName(it) // Валидация имени
+                                    firstNameError.value = validateFirstName(it, nameValidate1, nameValidate2, nameValidate3) // Валидация имени
                                 },
                                 placeholder = stringResource(MokoRes.strings.name),
                                 error = firstNameError.value
@@ -190,7 +199,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 value = textState.value.lastName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(lastName = it)
-                                    lastNameError.value = validateLastName(it) // Валидация фамилии
+                                    lastNameError.value = validateLastName(it, lastnameValidate1, lastnameValidate2) // Валидация фамилии
                                 },
                                 placeholder = stringResource(MokoRes.strings.lastname),
                                 error = lastNameError.value
@@ -201,7 +210,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 value = textState.value.nickname,
                                 onValueChange = {
                                     textState.value = textState.value.copy(nickname = it)
-                                    nicknameError.value = validateNickname(it) // Валидация никнейма
+                                    nicknameError.value = validateNickname(it, nickValidate1, nickValidate2, nickValidate3, nickValidate4) // Валидация никнейма
                                 },
                                 placeholder = stringResource(MokoRes.strings.come_up_nickname),
                                 error = nicknameError.value
@@ -218,7 +227,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 { scope ->
                                     if (firstNameError.value != null || lastNameError.value != null || nicknameError.value != null) {
                                         toasterViewModel.toaster.show(
-                                            "Заполните все поля",
+                                            fillInputs,
                                             type = ToastType.Error,
                                             duration = ToasterDefaults.DurationDefault
                                         )
@@ -267,7 +276,7 @@ class SignUpScreen(private val phone: String) : Screen {
 
                                                 if (response.status.value == 500) {
                                                     toasterViewModel.toaster.show(
-                                                        "Номер телефона уже зарегистрирован",
+                                                        phoneIsRegistered,
                                                         type = ToastType.Warning,
                                                         duration = ToasterDefaults.DurationDefault
                                                     )
@@ -390,29 +399,29 @@ class SignUpScreen(private val phone: String) : Screen {
 
 
 
-fun validateFirstName(name: String): String? {
+fun validateFirstName(name: String, nameValidate1: String, nameValidate2: String, nameValidate3: String): String? {
     return when {
-        name.isEmpty() -> "Имя обязательно для заполнения"
-        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> "Имя должно содержать только буквы"
-        name.length > 20 -> "Имя не должно содержать больше 20 символов"
+        name.isEmpty() -> nameValidate1
+        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> nameValidate2
+        name.length > 20 -> nameValidate3
         else -> null
     }
 }
 
-fun validateLastName(name: String): String? {
+fun validateLastName(name: String, lastnameValidate1: String, lastnameValidate2: String): String? {
     return when {
-        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> "Фамилия должна содержать только буквы"
-        name.length > 20 -> "Фамилия не должна содержать больше 20 символов"
+        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> lastnameValidate1
+        name.length > 20 -> lastnameValidate2
         else -> null
     }
 }
 
-fun validateNickname(nickname: String): String? {
+fun validateNickname(nickname: String, nickValidate1: String, nickValidate2: String, nickValidate3: String, nickValidate4: String): String? {
     return when {
-        nickname.isEmpty() -> "Ник обязателен для заполнения"
-        nickname.length < 6 -> "Ник должен содержать не менее 6 символов"
-        nickname.length > 30 -> "Ник не должен превышать 30 символов"
-        !nickname.matches(Regex("^[a-zA-Z0-9]+$")) -> "Логин может содержать только буквы и числа"
+        nickname.isEmpty() -> nickValidate1
+        nickname.length < 6 -> nickValidate2
+        nickname.length > 30 -> nickValidate3
+        !nickname.matches(Regex("^[a-zA-Z0-9]+$")) -> nickValidate4
         else -> null
     }
 }

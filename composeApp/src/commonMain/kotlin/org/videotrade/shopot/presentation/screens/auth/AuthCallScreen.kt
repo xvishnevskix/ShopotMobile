@@ -86,6 +86,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
         val isLoading = remember { mutableStateOf(false) }
 
+        val phoneNotRegistered = stringResource(MokoRes.strings.enter_the_code_from_the_sms)
+
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
             
@@ -97,7 +99,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             navigator,
                             viewModel,
                             сommonViewModel,
-                            toasterViewModel = toasterViewModel
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
                         )
                     }
                 }
@@ -222,7 +225,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                             navigator,
                                             viewModel,
                                             сommonViewModel,
-                                            toasterViewModel = toasterViewModel
+                                            toasterViewModel = toasterViewModel,
+                                            phoneNotRegistered
                                         )
 
                                         "SignUp" -> sendSignUp(phone, navigator)
@@ -235,7 +239,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
 
                         Text(
-                            "Отправить код по SMS",
+                            stringResource(MokoRes.strings.send_code_via_sms),
                             fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                             textAlign = TextAlign.Center,
                             fontSize = 15.sp,
@@ -251,7 +255,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
 
                             Text(
-                                if (!isRunning)"Отправить код ещё раз?" else "Повторно отправить код можно через: $time",
+                                if (!isRunning) stringResource(MokoRes.strings.send_code_again) else "${stringResource(MokoRes.strings.you_can_resend_the_code_after)} $time",
                                 fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                                 textAlign = TextAlign.Center,
                                 fontSize = 15.sp,
@@ -267,7 +271,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                                 startTimer()
 
                                                 val response =
-                                                    sendRequestToBackend(phone, null, "2fa", toasterViewModel)
+                                                    sendRequestToBackend(phone, null, "2fa", toasterViewModel, "")
 
                                                 if (response != null) {
                                                     val jsonString = response.bodyAsText()
@@ -306,6 +310,8 @@ suspend fun sendRequestToBackend(
     notificationToken: String?,
     url: String,
     toasterViewModel: CommonViewModel,
+    phoneNotRegistered: String = "Номер телефона не зарегистрирован"
+
 ): HttpResponse? {
     val client = HttpClient(getHttpClientEngine()) { // или другой движок в зависимости от платформы
     
@@ -343,7 +349,7 @@ suspend fun sendRequestToBackend(
 
             if (response.bodyAsText() == "User not found") {
                 toasterViewModel.toaster.show(
-                    "Номер телефона не зарегистрирован",
+                    phoneNotRegistered,
                     type = ToastType.Warning,
                     duration = ToasterDefaults.DurationDefault
                 )
@@ -366,11 +372,12 @@ suspend fun sendLogin(
     viewModel: IntroViewModel,
     сommonViewModel: CommonViewModel,
     toasterViewModel: CommonViewModel,
+    phoneNotRegistered: String = ""
 ) {
     
     
     val response =
-        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login", toasterViewModel)
+        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login", toasterViewModel, phoneNotRegistered)
     
     
     println("sadada ${response?.bodyAsText()}")

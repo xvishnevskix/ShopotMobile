@@ -38,7 +38,6 @@
     <string name="delete">Delete</string>
     <string name="copy">Copy</string>
 
-
     <string name="call_incoming">Call incoming...</string>
     <string name="connection_establishment_in_progress">The connection establishment process is in
         progress.
@@ -75,10 +74,7 @@
     <string name="online">online</string>
     <string name="owner">owner</string>
 
-
-
     <string name="edit_members">Edit members</string>
-
 
     <string name="incoming_call">Incoming call...</string>
 
@@ -136,4 +132,32 @@
     <string name="your_request_has_been_sent_successfully">✅ Your request has been sent successfully!</string>
     <string name="an_error_occurred_please_try_again">❌ An error occurred, please try again</string>
 
+    <string name="enter_the_code_from_the_sms">Enter the code from the SMS</string>
+    <string name="an_sms_with_code_will_be_sent_to_your_number_enter_the_code_in_the_field_below">An SMS with a code will be sent to your number. Enter the code in the field below</string>
+    <string name="invalid_code">Invalid code</string>
+    <string name="send_code_again">Send code again?</string>
+    <string name="you_can_resend_the_code_after">You can resend the code after:</string>
+    <string name="wait">Please wait</string>
+    <string name="seconds_before_resending">seconds before resending</string>
+    <string name="sms_with_code_sent">SMS with code sent</string>
+    <string name="send_code_via_sms">Send code via SMS</string>
+    <string name="phone_number_is_not_registered">The phone number is not registered</string>
+    <string name="please_fill_in_all_input_fields">Please fill in all input fields</string>
+    <string name="phone_number_is_already_registered">The phone number is already registered</string>
+    <string name="required_phone_number_length">Required phone number length: </string>
+
+    <string name="name_is_required">Name is required</string>
+    <string name="name_must_contain_only_letters">The name must contain only letters</string>
+    <string name="name_must_not_contain_more_than_20_characters">The name must not contain more than 20 characters</string>
+    <string name="lastname_must_contain_only_letters">The last name must contain only letters</string>
+    <string name="lastname_must_not_contain_more_than_20_characters">The last name must not contain more than 20 characters</string>
+    <string name="nickname_is_required">Nickname is required</string>
+    <string name="nickname_must_contain_at_least_6_characters">Nickname must contain at least 6 characters</string>
+    <string name="nickname_should_not_exceed_30_characters">Nickname should not exceed 30 characters</string>
+    <string name="nickname_can_contain_only_letters_and_numbers">Nickname can contain only letters and numbers</string>
+
+    <string name="are_you_sure_you_want_to_go_out">Are you sure you want to go out?</string>
+    <string name="you_will_be_returned_to_the_initial_login_screen">You will be returned to the initial login screen</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

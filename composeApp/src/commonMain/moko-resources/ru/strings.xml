@@ -128,4 +128,32 @@
     <string name="your_request_has_been_sent_successfully">✅ Ваше обращение успешно отправлено!</string>
     <string name="an_error_occurred_please_try_again">❌ Произошла ошибка, попробуйте снова</string>
 
+    <string name="enter_the_code_from_the_sms">Введите код из СМС</string>
+    <string name="an_sms_with_code_will_be_sent_to_your_number_enter_the_code_in_the_field_below">На ваш номер поступит SMS с кодом. Введите код в поле ниже</string>
+    <string name="invalid_code">Неверный код</string>
+    <string name="send_code_again">Отправить код ещё раз?</string>
+    <string name="you_can_resend_the_code_after">Повторно отправить код можно через:</string>
+    <string name="wait">Подождите</string>
+    <string name="seconds_before_resending">секунд перед повторной отправкой</string>
+    <string name="sms_with_code_sent">SMS с кодом отправлено</string>
+    <string name="send_code_via_sms">Отправить код по SMS</string>
+    <string name="phone_number_is_not_registered">Номер телефона не зарегистрирован</string>
+    <string name="please_fill_in_all_input_fields">Заполните все поля</string>
+    <string name="phone_number_is_already_registered">Номер телефона уже зарегистрирован</string>
+    <string name="required_phone_number_length">Необходимая длина номера телефона: </string>
+
+    <string name="name_is_required">Имя обязательно для заполнения</string>
+    <string name="name_must_contain_only_letters">Имя должно содержать только буквы</string>
+    <string name="name_must_not_contain_more_than_20_characters">Имя не должно содержать больше 20 символов</string>
+    <string name="lastname_must_contain_only_letters">Фамилия должна содержать только буквы</string>
+    <string name="lastname_must_not_contain_more_than_20_characters">Фамилия не должна содержать больше 20 символов</string>
+    <string name="nickname_is_required">Ник обязателен для заполнения</string>
+    <string name="nickname_must_contain_at_least_6_characters">Ник должен содержать не менее 6 символов</string>
+    <string name="nickname_should_not_exceed_30_characters">Ник не должен превышать 30 символов</string>
+    <string name="nickname_can_contain_only_letters_and_numbers">Ник может содержать только буквы и числа</string>
+
+    <string name="are_you_sure_you_want_to_go_out">Вы действительно хотите выйти?</string>
+    <string name="you_will_be_returned_to_the_initial_login_screen">Вас вернёт на начальный экран входа</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>

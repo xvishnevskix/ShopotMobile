@@ -73,6 +73,11 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
         val toasterViewModel: org.videotrade.shopot.presentation.screens.common.CommonViewModel = koinInject()
         val isLoading = remember { mutableStateOf(false) }
 
+        val sentSMSCode = stringResource(MokoRes.strings.sms_with_code_sent)
+        val invalidCode = stringResource(MokoRes.strings.invalid_code)
+        val wait = stringResource(MokoRes.strings.wait)
+        val secondsBeforeResending = stringResource(MokoRes.strings.seconds_before_resending)
+
         fun startTimer() {
             coroutineScope.launch {
                 while (isRunning && time > 0) {
@@ -86,6 +91,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                 }
             }
         }
+
 
         LaunchedEffect(Unit) {
             if (!isRunning) {
@@ -106,7 +112,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                 responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
 
                 toasterViewModel.toaster.show(
-                    message = "SMS с кодом отправлено",
+                    message = sentSMSCode,
                     type = ToastType.Success,
                     duration = ToasterDefaults.DurationDefault,
                 )
@@ -137,7 +143,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
 
                     item {
                         Text(
-                            "Введите код из СМС",
+                            stringResource(MokoRes.strings.enter_the_code_from_the_sms),
                             modifier = Modifier.padding(bottom = 5.dp),
                             fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
                             fontSize = 20.sp,
@@ -147,7 +153,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
 
                             )
                         Text(
-                            "На ваш номер $phone поступит SMS с кодом. Введите код в поле ниже ",
+                            stringResource(MokoRes.strings.an_sms_with_code_will_be_sent_to_your_number_enter_the_code_in_the_field_below),
                             textAlign = TextAlign.Center,
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -175,7 +181,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                                     ) {
                                         isLoading.value = false
                                         toasterViewModel.toaster.show(
-                                            message = "Неверный код",
+                                            message = invalidCode,
                                             type = ToastType.Warning,
                                             duration = ToasterDefaults.DurationDefault,
                                         )
@@ -203,7 +209,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                             })
 
                         Text(
-                            if (!isRunning) "Отправить код ещё раз?" else "Повторно отправить код можно через: $time",
+                            if (!isRunning) stringResource(MokoRes.strings.send_code_again) else "${stringResource(MokoRes.strings.you_can_resend_the_code_after)} $time",
                             fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                             textAlign = TextAlign.Center,
                             fontSize = 14.sp,
@@ -215,13 +221,13 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                                     if (isRunning) {
 
                                         toasterViewModel.toaster.show(
-                                            message = "Подождите $time сек. перед повторной отправкой",
+                                            message = "${wait} $time ${secondsBeforeResending}",
                                             type = ToastType.Error,
                                             duration = ToasterDefaults.DurationDefault,
                                         )
                                     } else {
                                         toasterViewModel.toaster.show(
-                                            message = "SMS с кодом отправлено",
+                                            message = sentSMSCode,
                                             type = ToastType.Success,
                                             duration = ToasterDefaults.DurationDefault,
                                         )

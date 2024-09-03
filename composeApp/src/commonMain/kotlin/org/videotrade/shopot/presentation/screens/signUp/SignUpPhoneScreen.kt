@@ -91,6 +91,7 @@ class SignUpPhoneScreen : Screen {
                         Box(
                             modifier = Modifier.padding(top = 20.dp)
                         ) {
+                            val requiredPhoneLength = stringResource(MokoRes.strings.required_phone_number_length)
                             CustomButton(
                                 stringResource(MokoRes.strings.send_code),
                                 {
@@ -99,7 +100,7 @@ class SignUpPhoneScreen : Screen {
                                     if (phone.value.text.length < phoneNumberLength) {
                                         coroutineScope.launch {
                                             toasterViewModel.toaster.show(
-                                                "Необходимая длина номера телефона: $phoneNumberLength",
+                                                "${requiredPhoneLength} $phoneNumberLength",
                                                 type = ToastType.Error,
                                                 duration = ToasterDefaults.DurationDefault
                                             )
