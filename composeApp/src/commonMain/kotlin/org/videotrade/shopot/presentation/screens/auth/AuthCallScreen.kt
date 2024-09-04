@@ -30,6 +30,8 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dokar.sonner.ToastType
+import com.dokar.sonner.ToasterDefaults
 import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
 import io.ktor.client.HttpClient
@@ -77,63 +79,68 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
+        val toasterViewModel: CommonViewModel = koinInject()
         var time by remember { mutableStateOf(60) }
         var isRunning by remember { mutableStateOf(false) }
         var reloadSend by remember { mutableStateOf(false) }
-        
+
+        val isLoading = remember { mutableStateOf(false) }
+
+        val phoneNotRegistered = stringResource(MokoRes.strings.enter_the_code_from_the_sms)
+
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
             
             when (authCase) {
-                "SignIn" -> {
-                    if (phone == "+79990000000") {
+                "SignIn" ->  {
+                    if(phone == "+79990000000") {
                         sendLogin(
                             phone,
                             navigator,
                             viewModel,
-                            сommonViewModel
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
                         )
                     }
                 }
-                
                 "SignUp" -> {
-                    if (phone == "+79990000000") {
+                    if(phone ==  "+79990000000") {
                         sendSignUp(phone, navigator)
                     }
                 }
             }
         }
-        
-        
-//        LaunchedEffect(Unit) {
-//
-//            if (!isRunning) {
-//                isRunning = true
-//                coroutineScope.launch {
-//                    while (isRunning && time > 0) {
-//                        delay(1000) // Задержка в 1 секунду
-//                        time -= 1 // Уменьшаем время на 1 секунду
-//                    }
-//                    if (time == 0) {
-//                        isRunning = false // Останавливаем таймер, когда достигнет 0
-//                        reloadSend = true
-//                        time = 60 // Сбрасываем таймер обратно на 60 секунд
-//                    }
-//                }
-//            }
-//
-//
-//            val response = sendRequestToBackend(phone, null, "2fa")
-//
-//            if (response != null) {
-//                val jsonString = response.bodyAsText()
-//                val jsonElement = Json.parseToJsonElement(jsonString)
-//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//
-//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//
-//            }
-//        }
+
+        fun startTimer() {
+            coroutineScope.launch {
+                while (isRunning && time > 0) {
+                    delay(1000) // Задержка в 1 секунду
+                    time -= 1 // Уменьшаем время на 1 секунду
+                }
+                if (time == 0) {
+                    isRunning = false // Останавливаем таймер, когда достигнет 0
+                    reloadSend = true
+                    time = 60 // Сбрасываем таймер обратно на 60 секунд
+                }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+
+            if (!isRunning) {
+                isRunning = true
+                startTimer()
+            }
+            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
+            if (response != null) {
+                val jsonString = response.bodyAsText()
+                val jsonElement = Json.parseToJsonElement(jsonString)
+                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+            }
+        }
+
         
         
         val isError = remember { mutableStateOf(false) }
@@ -157,11 +164,11 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 modifier = Modifier.fillMaxSize().padding(top = 220.dp),
                 contentAlignment = Alignment.TopCenter
             ) {
-                
-                
+
+
                 LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-                    
-                    
+
+
                     item {
                         Text(
                             stringResource(MokoRes.strings.enter_last_4_digits_of_the_incoming_call),
@@ -172,8 +179,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
                             lineHeight = 24.sp,
                             color = Color.Black
-                        
-                        
+
+
                         )
                         Text(
                             stringResource(MokoRes.strings.you_will_receive_a_call_to_your_number_enter_the_last_4),
@@ -184,47 +191,55 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             modifier = Modifier.padding(bottom = 5.dp),
                             color = Color(151, 151, 151)
                         )
-                        
-                        
-                        
-                        Otp(otpFields)
-                        
-                        
+
+
+
+                        Otp(otpFields, isLoading.value)
+
+
                         CustomButton(
                             stringResource(MokoRes.strings.confirm),
                             {
                                 val otpText = otpFields.joinToString("")
-                                
-                                
-                                coroutineScope.launch {
 
-//
-//                                if (
-//                                    responseState.value != otpText && !isSuccessOtp.value
-//
-//                                ) {
-//
-//                                    return@launch
-//                                }
-                                    
+
+                                coroutineScope.launch {
+                                    isLoading.value = true
+                                    if (
+                                        responseState.value != otpText && !isSuccessOtp.value
+
+                                    ) {
+                                        isLoading.value = false
+                                        toasterViewModel.toaster.show(
+                                            message = "Неверный код",
+                                            type = ToastType.Warning,
+                                            duration = ToasterDefaults.DurationDefault,
+                                        )
+                                        return@launch
+                                    }
+
                                     when (authCase) {
-                                        
+
                                         "SignIn" -> sendLogin(
                                             phone,
                                             navigator,
                                             viewModel,
-                                            сommonViewModel
+                                            сommonViewModel,
+                                            toasterViewModel = toasterViewModel,
+                                            phoneNotRegistered
                                         )
-                                        
+
                                         "SignUp" -> sendSignUp(phone, navigator)
                                     }
+
                                 }
-                                
-                                
+
+
                             })
-                        
+
+
                         Text(
-                            "Отправить код по SMS",
+                            stringResource(MokoRes.strings.send_code_via_sms),
                             fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                             textAlign = TextAlign.Center,
                             fontSize = 15.sp,
@@ -234,70 +249,51 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             modifier = Modifier.padding(top = 20.dp)
                                 .clickable { navigator.push(AuthSMSScreen(phone, authCase)) }
                         )
-                        
+
                         Spacer(modifier = Modifier.height(16.dp))
-                        
-                        
-                        if (reloadSend) {
+
+
+
                             Text(
-                                "Отправить",
+                                if (!isRunning) stringResource(MokoRes.strings.send_code_again) else "${stringResource(MokoRes.strings.you_can_resend_the_code_after)} $time",
                                 fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                                 textAlign = TextAlign.Center,
                                 fontSize = 15.sp,
                                 lineHeight = 15.sp,
                                 color = Color(0xFF000000),
-                                textDecoration = TextDecoration.Underline,
+                                textDecoration = if (!isRunning) TextDecoration.Underline else TextDecoration.None,
                                 modifier = Modifier.padding(top = 10.dp)
                                     .clickable {
                                         if (!isRunning) {
                                             isRunning = true
                                             reloadSend = false
                                             coroutineScope.launch {
-                                                while (isRunning && time > 0) {
-                                                    delay(1000) // Задержка в 1 секунду
-                                                    time -= 1 // Уменьшаем время на 1 секунду
-                                                }
-                                                if (time == 0) {
-                                                    isRunning =
-                                                        false // Останавливаем таймер, когда достигнет 0
-                                                    reloadSend = true
-                                                    time =
-                                                        60 // Сбрасываем таймер обратно на 60 секунд
-                                                }
-                                                
-                                                val response = sendRequestToBackend(phone, null, "2fa")
-                                                
+                                                startTimer()
+
+                                                val response =
+                                                    sendRequestToBackend(phone, null, "2fa", toasterViewModel, "")
+
                                                 if (response != null) {
                                                     val jsonString = response.bodyAsText()
                                                     val jsonElement = Json.parseToJsonElement(jsonString)
                                                     val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-                                                    
                                                     responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-                                                    
+
+
                                                 }
                                             }
                                         }
-                                        
-                                        
-                                        
+                                        else {
+
+                                        }
+
+
                                     }
                             )
-                        } else {
-                            if (isRunning) Text(
-                                text = "Повторно отправить через: $time секунд",
-                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                                textAlign = TextAlign.Center,
-                                fontSize = 15.sp,
-                                lineHeight = 15.sp,
-                                color = Color(0xFF000000),
-                                modifier = Modifier.padding(top = 10.dp)
-                            )
-                        }
-                        
+
                     }
-                    
-                    
                 }
+
                 
             }
             
@@ -312,12 +308,15 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 suspend fun sendRequestToBackend(
     phone: String,
     notificationToken: String?,
-    url: String
+    url: String,
+    toasterViewModel: CommonViewModel,
+    phoneNotRegistered: String = "Номер телефона не зарегистрирован"
+
 ): HttpResponse? {
     val client = HttpClient(getHttpClientEngine()) { // или другой движок в зависимости от платформы
     
     }
-    
+
     
     try {
         val jsonContent = Json.encodeToString(
@@ -338,7 +337,7 @@ suspend fun sendRequestToBackend(
         }
         
         println("url ${response.bodyAsText()} ${jsonContent}")
-        
+
         
         if (response.status.isSuccess()) {
             
@@ -347,6 +346,15 @@ suspend fun sendRequestToBackend(
             
         } else {
             println("Failed to retrieve data: ${response.status.description}")
+
+            if (response.bodyAsText() == "User not found") {
+                toasterViewModel.toaster.show(
+                    phoneNotRegistered,
+                    type = ToastType.Warning,
+                    duration = ToasterDefaults.DurationDefault
+                )
+            }
+
         }
     } catch (e: Exception) {
         println("Error111: $e")
@@ -362,15 +370,18 @@ suspend fun sendLogin(
     phone: String,
     navigator: Navigator,
     viewModel: IntroViewModel,
-    сommonViewModel: CommonViewModel
+    сommonViewModel: CommonViewModel,
+    toasterViewModel: CommonViewModel,
+    phoneNotRegistered: String = ""
 ) {
     
     
     val response =
-        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login")
+        sendRequestToBackend(phone, NotifierManager.getPushNotifier().getToken(), "auth/login", toasterViewModel, phoneNotRegistered)
     
     
-    println("sadada")
+    println("sadada ${response?.bodyAsText()}")
+    println("sadada ${response?.bodyAsText()}")
     
     if (response != null) {
         
@@ -399,15 +410,16 @@ suspend fun sendLogin(
                 refreshToken
             )
         }
-        
-        
-        
+
+
+
         viewModel.updateNotificationToken()
 //        navigator.push(MainScreen())
         
         viewModel.startObserving()
         
         сommonViewModel.cipherShared(userId, navigator)
+
         
         
     }

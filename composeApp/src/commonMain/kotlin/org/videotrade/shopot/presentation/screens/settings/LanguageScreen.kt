@@ -63,10 +63,11 @@ class LanguageScreen : Screen {
 
         val storedLanguage = getValueInStorage("selected_language")
 
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
-        ) {
-            SafeArea {
+        SafeArea {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 20.dp)
+            ) {
+
                 LanguageHeader(stringResource(MokoRes.strings.language))
 
                 val languages = listOf(
@@ -99,6 +100,7 @@ class LanguageScreen : Screen {
                         )
                     }
                 }
+
             }
         }
     }

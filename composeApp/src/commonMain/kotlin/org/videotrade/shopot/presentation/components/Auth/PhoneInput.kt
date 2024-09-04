@@ -64,13 +64,7 @@ fun PhoneInput(
         "+63" to "\uD83C\uDDF5\uD83C\uDDED   ${stringResource(MokoRes.strings.ph)}"
     )
 
-    val getPhoneNumberLength = { code: String ->
-        when (code) {
-            "+7", "+374", "+371" -> 12
-            "+63", "+996", "+375", "+995", "+992", "+998" -> 13
-            else -> 12
-        }
-    }
+
 
     val phoneNumberLength = getPhoneNumberLength(countryCode)
 
@@ -208,6 +202,13 @@ fun CountryPicker(
     }
 }
 
+val getPhoneNumberLength = { code: String ->
+    when (code) {
+        "+7", "+374", "+371" -> 12
+        "+63", "+996", "+375", "+995", "+992", "+998" -> 13
+        else -> 12
+    }
+}
 
 //@Composable
 //fun PhoneInput(textState : MutableState<String>) {

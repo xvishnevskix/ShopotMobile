@@ -26,14 +26,20 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dokar.sonner.ToastType
+import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
+import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFProText_Semibold
 
@@ -46,6 +52,7 @@ class SignUpPhoneScreen : Screen {
         val responseState = remember { mutableStateOf<String?>(null) }
         val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
         val coroutineScope = rememberCoroutineScope()
+        val toasterViewModel: CommonViewModel = koinInject()
 
         val phone =  remember {
             mutableStateOf(
@@ -84,17 +91,30 @@ class SignUpPhoneScreen : Screen {
                         Box(
                             modifier = Modifier.padding(top = 20.dp)
                         ) {
+                            val requiredPhoneLength = stringResource(MokoRes.strings.required_phone_number_length)
                             CustomButton(
                                 stringResource(MokoRes.strings.send_code),
                                 {
-
-
-                                    navigator.push(
-                                        AuthCallScreen(
-                                            phone.value.text,
-                                            "SignUp"
+                                    val countryCode = phone.value.text.takeWhile { it.isDigit() || it == '+' }
+                                    val phoneNumberLength = getPhoneNumberLength(countryCode)
+                                    if (phone.value.text.length < phoneNumberLength) {
+                                        coroutineScope.launch {
+                                            toasterViewModel.toaster.show(
+                                                "${requiredPhoneLength} $phoneNumberLength",
+                                                type = ToastType.Error,
+                                                duration = ToasterDefaults.DurationDefault
+                                            )
+                                        }
+                                    }
+                                    else {
+                                        navigator.push(
+                                            AuthCallScreen(
+                                                phone.value.text,
+                                                "SignUp"
+                                            )
                                         )
-                                    )
+                                    }
+
 
 
                                 }

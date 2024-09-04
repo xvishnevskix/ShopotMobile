@@ -97,12 +97,12 @@ class AppActivity : ComponentActivity() {
             App()
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) {
-                view, insets ->
-            val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-            view.updatePadding(bottom = bottom)
-            insets
-        }
+//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) {
+//                view, insets ->
+//            val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+//            view.updatePadding(bottom = bottom)
+//            insets
+//        }
     }
     
     private fun initializeProviders() {

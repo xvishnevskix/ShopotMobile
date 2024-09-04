@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -43,6 +45,7 @@ import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.chat_group
 import shopot.composeapp.generated.resources.double_message_check
 import shopot.composeapp.generated.resources.single_message_check
 
@@ -86,30 +89,40 @@ fun UserComponentItem(
                             if (it.length > 25) "${it.take(22)}..." else it
                         } ?: ""
                 
-                if (chat.personal) {
-                    val displayName = fullName.ifBlank { chat.phone!! }
-                    
-                    Text(
-                        text = displayName,
-                        textAlign = TextAlign.Start,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF000000)
-                    )
-                } else {
-                    Text(
-                        text = fullName,
-                        textAlign = TextAlign.Start,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF000000)
-                    )
+                Row() {
+                    if (chat.personal) {
+                        val displayName = fullName.ifBlank { chat.phone!! }
+
+                        Text(
+                            text = displayName,
+                            textAlign = TextAlign.Start,
+                            fontSize = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                            lineHeight = 20.sp,
+                            color = Color(0xFF000000)
+                        )
+                    } else {
+                        Text(
+                            text = fullName,
+                            textAlign = TextAlign.Start,
+                            fontSize = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                            lineHeight = 20.sp,
+                            color = Color(0xFF000000)
+                        )
+                    }
+                    if (!chat.personal) {
+                        Spacer(modifier = Modifier.width(7.dp))
+                        Image(
+                            painter = painterResource(Res.drawable.chat_group),
+                            contentDescription = "Avatar",
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
                 }
-                
+
                 
                 
                 Text(

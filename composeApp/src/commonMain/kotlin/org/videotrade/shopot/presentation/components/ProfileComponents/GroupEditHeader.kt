@@ -29,6 +29,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.presentation.screens.group.GroupEditScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.check_mark
@@ -50,8 +51,8 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
                 navigator.pop()
             },
             tint = Color.Black
-            
         )
+
         Text(
             text = text,
             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -65,7 +66,7 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
         )
         Image(
             painter = painterResource(Res.drawable.check_mark),
-            contentDescription = "Avatar",
+            contentDescription = "Checkmark",
             modifier = Modifier.padding(start = 0.dp, end = 6.dp)
                 .size(width = 16.dp, height = 12.dp).pointerInput(Unit) {
                 if (onClick != null) {
