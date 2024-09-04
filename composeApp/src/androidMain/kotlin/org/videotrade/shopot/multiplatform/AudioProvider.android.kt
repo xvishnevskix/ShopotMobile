@@ -9,6 +9,9 @@ import android.media.MediaRecorder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.videotrade.shopot.R
+import org.videotrade.shopot.androidSpecificApi.getContextObj
+import shopot.composeapp.generated.resources.Res
 import java.io.File
 import java.io.FileInputStream
 
@@ -149,4 +152,31 @@ actual object AudioFactory {
     actual fun createAudioPlayer(): AudioPlayer {
         return AudioPlayer(applicationContext)
     }
+}
+
+actual class MusicPlayer {
+    private var mediaPlayer: MediaPlayer? = null
+    
+    actual fun play() {
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(getContextObj.getContext(), Res.music.caller).apply {
+                isLooping = true
+                start()
+            }
+        } else {
+            mediaPlayer?.start()
+        }
+    }
+    
+    actual  fun stop() {
+        mediaPlayer?.stop()
+        mediaPlayer?.reset()
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+    
+    actual   fun isPlaying(): Boolean {
+        return mediaPlayer?.isPlaying ?: false
+    }
+    
 }

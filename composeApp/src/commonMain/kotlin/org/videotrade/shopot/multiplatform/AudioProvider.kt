@@ -14,6 +14,14 @@ expect class AudioPlayer {
     
 }
 
+
+expect class MusicPlayer {
+    fun play()
+    fun stop()
+    fun isPlaying(): Boolean
+    
+}
+
 expect object AudioFactory {
     fun createAudioRecorder(): AudioRecorder
     fun createAudioPlayer(): AudioPlayer
