@@ -321,7 +321,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .padding(bottom = 15.dp)
                 } else {
                     Modifier
-                        .height(100.dp)
+                        .imePadding()
+                        .padding(bottom = 5.dp)
                         .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                 }
             )
