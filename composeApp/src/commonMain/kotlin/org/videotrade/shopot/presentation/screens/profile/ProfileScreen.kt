@@ -162,7 +162,7 @@ class ProfileScreen(
                     )
                     Row(
                         horizontalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier.padding(bottom = 15.dp),
+                        modifier = Modifier.padding(bottom = 24.dp),
                     ) {
                         Text(
                             profile.phone,
@@ -191,11 +191,11 @@ class ProfileScreen(
                         Text(
                             it,
                             textAlign = TextAlign.Start,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                            fontSize = 14.sp,
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
-                            color = Color(0xFF979797),
+                            color = Color(0xFF000000),
                             modifier = Modifier.padding(bottom = 15.dp),
                             
                             )
