@@ -41,6 +41,7 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.group.GroupProfileScreen
+import org.videotrade.shopot.presentation.screens.profile.ProfileChatScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -84,7 +85,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             modifier = Modifier.fillMaxWidth(0.85f).padding(end = 5.dp).pointerInput(Unit) {
                 
                 if (chat.personal) {
-//                    navigator.push(ProfileScreen(profile, true))
+                    navigator.push(ProfileChatScreen(profile, chat))
                 } else {
                     
                     viewModel.loadGroupUsers(chat.chatId)
