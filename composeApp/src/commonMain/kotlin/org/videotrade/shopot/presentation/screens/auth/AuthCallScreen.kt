@@ -86,7 +86,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
         val isLoading = remember { mutableStateOf(false) }
 
-        val phoneNotRegistered = stringResource(MokoRes.strings.enter_the_code_from_the_sms)
+        val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
+        val invalidCode = stringResource(MokoRes.strings.invalid_code)
 
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
@@ -211,7 +212,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     ) {
                                         isLoading.value = false
                                         toasterViewModel.toaster.show(
-                                            message = "Неверный код",
+                                            message = invalidCode,
                                             type = ToastType.Warning,
                                             duration = ToasterDefaults.DurationDefault,
                                         )
@@ -350,7 +351,7 @@ suspend fun sendRequestToBackend(
             if (response.bodyAsText() == "User not found") {
                 toasterViewModel.toaster.show(
                     phoneNotRegistered,
-                    type = ToastType.Warning,
+                    type = ToastType.Error,
                     duration = ToasterDefaults.DurationDefault
                 )
             }

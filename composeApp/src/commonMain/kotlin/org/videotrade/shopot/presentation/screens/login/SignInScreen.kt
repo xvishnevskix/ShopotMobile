@@ -38,6 +38,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
+import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -50,6 +51,7 @@ import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
 import shopot.composeapp.generated.resources.LoginLogo
@@ -76,6 +78,9 @@ class SignInScreen : Screen {
                     )
                 )
             }
+
+        val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
+
 
         
         SafeArea {
@@ -129,28 +134,31 @@ class SignInScreen : Screen {
                         CustomButton(
                             stringResource(MokoRes.strings.login),
                             {
+                                coroutineScope.launch {
+                                    val response =
+                                        sendRequestToBackend(textState.value.text, NotifierManager.getPushNotifier().getToken(), "auth/login", toasterViewModel, phoneNotRegistered)
 
-                                val countryCode = textState.value.text.takeWhile { it.isDigit() || it == '+' }
-                                val phoneNumberLength = getPhoneNumberLength(countryCode)
-                                if (textState.value.text.length < phoneNumberLength) {
-                                    coroutineScope.launch {
-                                        toasterViewModel.toaster.show(
-                                            "${requiredPhoneLength} $phoneNumberLength",
-                                            type = ToastType.Error,
-                                            duration = ToasterDefaults.DurationDefault
+                                    val countryCode = textState.value.text.takeWhile { it.isDigit() || it == '+' }
+                                    val phoneNumberLength = getPhoneNumberLength(countryCode)
+                                    if (textState.value.text.length < phoneNumberLength) {
+                                            toasterViewModel.toaster.show(
+                                                "$requiredPhoneLength $phoneNumberLength",
+                                                type = ToastType.Error,
+                                                duration = ToasterDefaults.DurationDefault
+                                            )
+                                    }
+
+                                    else if (response != null) {
+                                        navigator.push(
+                                            AuthCallScreen(
+                                                textState.value.text,
+
+                                                "SignIn"
+                                            )
                                         )
                                     }
                                 }
 
-                                else {
-                                    navigator.push(
-                                        AuthCallScreen(
-                                            textState.value.text,
-
-                                            "SignIn"
-                                        )
-                                    )
-                                    }
                                 
                             })
 //                        LanguageSelector()

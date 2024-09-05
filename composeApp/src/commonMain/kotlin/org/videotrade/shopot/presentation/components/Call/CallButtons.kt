@@ -149,7 +149,7 @@ fun microfonBtn(isActive: Boolean ,onClick: () -> Unit) {
         }
         Text(
             modifier = Modifier.padding(top = 2.dp).align(Alignment.CenterHorizontally),
-            text = stringResource(MokoRes.strings.speaker),
+            text = stringResource(MokoRes.strings.microphone),
             fontSize = 12.sp,
             textAlign = TextAlign.Center,
             fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
