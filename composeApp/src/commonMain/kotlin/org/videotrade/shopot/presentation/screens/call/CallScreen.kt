@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,6 +51,7 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.CallProviderFactory
+import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
@@ -84,11 +86,46 @@ class CallScreen(
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
+        val musicPlayer = remember { MusicPlayer() }
+        
+        var isPlaying by remember { mutableStateOf(false) }
+        
         
         val imagePainter = if (user.icon.isNullOrBlank()) {
             painterResource(Res.drawable.person)
         } else {
             rememberImagePainter("${serverUrl}file/plain/${user.icon}")
+        }
+        
+        
+        
+        LaunchedEffect(Unit) {
+            
+            when (callCase) {
+                "Call" -> {
+                    musicPlayer.play("caller")
+                    isPlaying = true
+                }
+            }
+            
+        }
+        
+        DisposableEffect(Unit) {
+            onDispose {
+                
+                when (callCase) {
+                    "Call" -> {
+                        if (
+                            isPlaying
+                        ) {
+                            musicPlayer.stop()
+                            isPlaying = false
+                        }
+                    }
+                }
+             
+                
+            }
         }
         
         LaunchedEffect(Unit) {

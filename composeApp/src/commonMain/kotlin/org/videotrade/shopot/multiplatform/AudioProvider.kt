@@ -15,12 +15,11 @@ expect class AudioPlayer {
 }
 
 
-//expect class MusicPlayer {
-//    fun play()
-//    fun stop()
-//    fun isPlaying(): Boolean
-//
-//}
+expect class MusicPlayer {
+    fun play(musicName: String)
+    fun stop()
+    fun isPlaying(): Boolean
+}
 
 expect object AudioFactory {
     fun createAudioRecorder(): AudioRecorder

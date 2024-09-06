@@ -17,10 +17,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -40,6 +43,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.screens.main.MainScreen
@@ -56,11 +60,33 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
         
         val viewModel: CallViewModel = koinInject()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
+        val musicPlayer = remember { MusicPlayer() }
+        
+        // Используем состояние для отслеживания, играет ли музыка
+        var isPlaying by remember { mutableStateOf(false) }
         
         val imagePainter = if (user.icon.isNullOrBlank()) {
             painterResource(Res.drawable.person)
         } else {
             rememberImagePainter("${serverUrl}file/plain/${user.icon}")
+        }
+        
+        LaunchedEffect(Unit) {
+            musicPlayer.play("callee")
+            isPlaying = true
+        }
+        
+        DisposableEffect(Unit) {
+            onDispose {
+                if (
+                    isPlaying
+                ) {
+                    musicPlayer.stop()
+                    isPlaying = false
+                    
+                }
+                
+            }
         }
         
         LaunchedEffect(isConnectedWebrtc) {

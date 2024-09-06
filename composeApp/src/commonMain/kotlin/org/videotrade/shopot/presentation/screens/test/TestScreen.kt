@@ -1,7 +1,9 @@
 package org.videotrade.shopot.presentation.screens.test
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -25,51 +27,45 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.AudioFactory
+import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
+
 class TestScreen : Screen {
+    
     @Composable
     override fun Content() {
+        // Создаем экземпляр MusicPlayer
+        val musicPlayer = remember { MusicPlayer() }
+        
+        // Используем состояние для отслеживания, играет ли музыка
+        var isPlaying by remember { mutableStateOf(false) }
+        
         val scope = rememberCoroutineScope()
-        val commonViewModel: CommonViewModel = koinInject()
-        val audioRecorder = remember { AudioFactory.createAudioRecorder() }
-        val audioPlayer = remember { AudioFactory.createAudioPlayer() }
-        
-        var isRecording by remember { mutableStateOf(false) }
-        var audioFilePath by remember { mutableStateOf("") }
-        
-        var text by remember { mutableStateOf(TextFieldValue("Text")) }
-        val keyboardController = LocalSoftwareKeyboardController.current
-   
-
         
         MaterialTheme {
             SafeArea {
-                Column {
-                    Button(content = {
-                        Text("BUTTON")
-                        
-                    }, onClick = {
-                    },
-                        )
-                    
-                    TextField(
-                        value = text,
-                        onValueChange = {
-                            text = it
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    // Кнопка для управления воспроизведением музыки
+                    Button(
+                        onClick = {
+                  
                         },
-                        label = { Text("Label") },
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(
-                            onDone = {keyboardController?.hide()})
-                    )
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        // Меняем текст кнопки в зависимости от состояния
+                        Text(if (isPlaying) "STOP" else "PLAY")
+                    }
                 }
             }
         }
     }
 }
-
 

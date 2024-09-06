@@ -6,14 +6,10 @@ import android.media.AudioManager
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import org.videotrade.shopot.R
 import org.videotrade.shopot.androidSpecificApi.getContextObj
-import shopot.composeapp.generated.resources.Res
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 
 actual class AudioRecorder(private val context: Context) {
     private var mediaRecorder: MediaRecorder? = null
@@ -89,6 +85,7 @@ actual class AudioRecorder(private val context: Context) {
         audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false)
     }
 }
+
 actual class AudioPlayer(private val applicationContext: Context) {
     private var mediaPlayer: MediaPlayer? = null
     
@@ -154,29 +151,55 @@ actual object AudioFactory {
     }
 }
 
-//actual class MusicPlayer {
-//    private var mediaPlayer: MediaPlayer? = null
-//
-//    actual fun play() {
-//        if (mediaPlayer == null) {
-//            mediaPlayer = MediaPlayer.create(getContextObj.getContext(), Res.music.caller).apply {
-//                isLooping = true
-//                start()
-//            }
-//        } else {
-//            mediaPlayer?.start()
-//        }
-//    }
-//
-//    actual  fun stop() {
-//        mediaPlayer?.stop()
-//        mediaPlayer?.reset()
-//        mediaPlayer?.release()
-//        mediaPlayer = null
-//    }
-//
-//    actual   fun isPlaying(): Boolean {
-//        return mediaPlayer?.isPlaying ?: false
-//    }
-//
-//}
+
+actual class MusicPlayer {
+    
+    private var mediaPlayer: MediaPlayer? = null
+    
+    // Метод для воспроизведения музыки
+    actual fun play(musicName: String) {
+        try {
+            val context = getContextObj.getContext()
+            
+            if (mediaPlayer == null) {
+                // Получаем AssetManager для доступа к ресурсам assets
+                val assetManager = context.assets
+                
+                // Открываем файл из assets
+                val inputStream = assetManager.open("${musicName}.mp3")
+                
+                // Создаем временный файл для проигрывания (т.к. MediaPlayer не работает напрямую с InputStream)
+                val tempFile = File.createTempFile("music", ".mp3", context.cacheDir)
+                val outputStream = FileOutputStream(tempFile)
+                inputStream.copyTo(outputStream)
+                inputStream.close()
+                outputStream.close()
+                
+                // Инициализация MediaPlayer с временным файлом
+                mediaPlayer = MediaPlayer().apply {
+                    setDataSource(tempFile.absolutePath)
+                    isLooping = true // Устанавливаем цикличное проигрывание
+                    prepare() // Подготовка MediaPlayer
+                    start() // Начинаем воспроизведение
+                }
+            } else {
+                mediaPlayer?.start() // Продолжаем проигрывание, если оно было приостановлено
+            }
+        } catch (e: Exception) {
+        println("e: $e")
+        }
+    }
+    
+    // Метод для остановки воспроизведения музыки
+    actual fun stop() {
+        mediaPlayer?.stop()
+        mediaPlayer?.reset()
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+    
+    // Проверка, воспроизводится ли музыка
+    actual fun isPlaying(): Boolean {
+        return mediaPlayer?.isPlaying ?: false
+    }
+}

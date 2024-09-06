@@ -23,6 +23,7 @@ import platform.AVFAudio.setActive
 import platform.AVFoundation.AVAsset
 import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
 import platform.CoreMedia.CMTimeGetSeconds
+import platform.Foundation.NSBundle
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSThread
@@ -250,15 +251,50 @@ actual object AudioFactory {
     }
 }
 
-//actual class MusicPlayer {
-//    actual fun play() {
-//    }
-//
-//    actual fun stop() {
-//    }
-//
-//    actual fun isPlaying(): Boolean {
-//        TODO("Not yet implemented")
-//    }
-//
-//}
+actual class MusicPlayer {
+    
+    private var audioPlayer: AVAudioPlayer? = null
+    
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun play(musicName: String) {
+        // Получаем путь к файлу из бандла приложения
+        val filePath = NSBundle.mainBundle.pathForResource(name = musicName, ofType = "mp3")
+        
+        if (filePath == null) {
+            println("Ошибка: Файл $musicName.mp3 не найден в бандле.")
+            return
+        }
+        
+        val fileUrl = NSURL.fileURLWithPath(filePath)
+        
+        // Проверяем, что URL файла корректен
+        if (fileUrl == null) {
+            println("Ошибка: Невозможно создать URL для файла $musicName.mp3.")
+            return
+        }
+        
+        try {
+            // Инициализация AVAudioPlayer
+            audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
+                numberOfLoops = -1 // Цикличное воспроизведение
+                prepareToPlay()    // Подготовка к воспроизведению
+                play()             // Начало воспроизведения
+            }
+            
+            if (audioPlayer == null) {
+                println("Ошибка: Не удалось инициализировать AVAudioPlayer для файла $musicName.mp3.")
+            }
+        } catch (e: Exception) {
+            println("Ошибка при попытке воспроизведения: ${e.message}")
+        }
+    }
+    
+    actual fun stop() {
+        audioPlayer?.stop()
+        audioPlayer = null
+    }
+    
+    actual fun isPlaying(): Boolean {
+        return audioPlayer?.playing ?: false
+    }
+}
