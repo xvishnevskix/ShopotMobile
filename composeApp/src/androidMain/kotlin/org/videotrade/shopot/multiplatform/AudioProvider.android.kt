@@ -154,29 +154,29 @@ actual object AudioFactory {
     }
 }
 
-actual class MusicPlayer {
-    private var mediaPlayer: MediaPlayer? = null
-    
-    actual fun play() {
-        if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(getContextObj.getContext(), Res.music.caller).apply {
-                isLooping = true
-                start()
-            }
-        } else {
-            mediaPlayer?.start()
-        }
-    }
-    
-    actual  fun stop() {
-        mediaPlayer?.stop()
-        mediaPlayer?.reset()
-        mediaPlayer?.release()
-        mediaPlayer = null
-    }
-    
-    actual   fun isPlaying(): Boolean {
-        return mediaPlayer?.isPlaying ?: false
-    }
-    
-}
+//actual class MusicPlayer {
+//    private var mediaPlayer: MediaPlayer? = null
+//
+//    actual fun play() {
+//        if (mediaPlayer == null) {
+//            mediaPlayer = MediaPlayer.create(getContextObj.getContext(), Res.music.caller).apply {
+//                isLooping = true
+//                start()
+//            }
+//        } else {
+//            mediaPlayer?.start()
+//        }
+//    }
+//
+//    actual  fun stop() {
+//        mediaPlayer?.stop()
+//        mediaPlayer?.reset()
+//        mediaPlayer?.release()
+//        mediaPlayer = null
+//    }
+//
+//    actual   fun isPlaying(): Boolean {
+//        return mediaPlayer?.isPlaying ?: false
+//    }
+//
+//}

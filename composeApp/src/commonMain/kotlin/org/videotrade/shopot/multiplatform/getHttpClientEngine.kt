@@ -7,4 +7,3 @@ import io.ktor.client.engine.HttpClientEngineFactory
 expect fun getHttpClientEngine(): HttpClientEngineFactory<HttpClientEngineConfig>
 
 
-expect fun Modifier.hideKeyboardOnTap(): Modifier

@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,14 +39,15 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.seiko.imageloader.rememberImagePainter
 import com.shepeliev.webrtckmp.PeerConnectionState
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
@@ -65,7 +67,7 @@ class CallScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-
+        
         
         var secondsElapsed by remember { mutableStateOf(0) }
         var isRunning by remember { mutableStateOf(false) }
@@ -82,11 +84,18 @@ class CallScreen(
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
+        
+        val imagePainter = if (user.icon.isNullOrBlank()) {
+            painterResource(Res.drawable.person)
+        } else {
+            rememberImagePainter("${serverUrl}file/plain/${user.icon}")
+        }
+        
         LaunchedEffect(Unit) {
             viewModel.initCall(callCase, userId)
         }
-
-
+        
+        
         
         LaunchedEffect(isRunning) {
             while (isRunning) {
@@ -103,7 +112,7 @@ class CallScreen(
         val errorOccurredWhileEstablishingConnection: String =
             stringResource(MokoRes.strings.error_occurred_while_establishing_connection)
         val connectionWasClosed: String = stringResource(MokoRes.strings.connection_was_closed)
-
+        
         
         LaunchedEffect(callStateView) {
             when (callStateView) {
@@ -125,10 +134,8 @@ class CallScreen(
             }
         }
         
-        var Photo: DrawableResource = Res.drawable.person
-        
         Image(
-            painter = painterResource(Photo),
+            painter = imagePainter,
             contentDescription = "image",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -148,24 +155,15 @@ class CallScreen(
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .width(200.dp)
-                    .height(200.dp)
+                    .width(190.dp)
+                    .height(190.dp)
                     .background(
                         color = Color(255, 255, 255),
                         shape = RoundedCornerShape(100.dp)
                     )
                     .clip(CircleShape)
             ) {
-                Image(
-                    painter = painterResource(Photo),
-                    contentDescription = "image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .width(190.dp)
-                        .height(190.dp)
-                        .clip(RoundedCornerShape(100.dp))
-                )
+                Avatar(user.icon, 190.dp)
             }
             
             
@@ -254,13 +252,13 @@ class CallScreen(
                     isSwitchToMicrophone.value = !isSwitchToMicrophone.value
                 }
 //                videoBtn { }
-
-                    speakerBtn(isSwitchToSpeaker.value) {
-                        CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
-
-
-                        isSwitchToSpeaker.value = !isSwitchToSpeaker.value
-                    }
+                
+                speakerBtn(isSwitchToSpeaker.value) {
+                    CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
+                    
+                    
+                    isSwitchToSpeaker.value = !isSwitchToSpeaker.value
+                }
             }
             Spacer(modifier = Modifier.height(56.dp))
             Row(
@@ -269,8 +267,8 @@ class CallScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 rejectBtn({
-                
-                println("rejectBtn")
+                    
+                    println("rejectBtn")
                     viewModel.rejectCall(navigator, userId)
                     
                     

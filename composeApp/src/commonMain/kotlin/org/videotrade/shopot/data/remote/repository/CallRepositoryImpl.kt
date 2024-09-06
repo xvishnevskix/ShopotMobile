@@ -198,7 +198,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         Json.decodeFromString<ProfileDTO>(userJson.toString())
                                                     
                                                     
-                                                    println("return@launch newCall ${it["sdp"]?.jsonPrimitive?.content}")
+                                                    println("aadauser $user")
                                                     
                                                     val sdp =
                                                         it["sdp"]?.jsonPrimitive?.content

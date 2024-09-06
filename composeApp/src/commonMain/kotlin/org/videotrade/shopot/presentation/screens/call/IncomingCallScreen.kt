@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,11 +32,13 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -54,6 +57,12 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
         val viewModel: CallViewModel = koinInject()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
         
+        val imagePainter = if (user.icon.isNullOrBlank()) {
+            painterResource(Res.drawable.person)
+        } else {
+            rememberImagePainter("${serverUrl}file/plain/${user.icon}")
+        }
+        
         LaunchedEffect(isConnectedWebrtc) {
             
             if (isConnectedWebrtc)
@@ -70,8 +79,8 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
         
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
-                painter = painterResource(photo),
-                contentDescription = "background image",
+                painter = imagePainter,
+                contentDescription = "image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
@@ -85,24 +94,16 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
             ) {
                 Box(
                     modifier = Modifier
-                        .width(200.dp)
-                        .height(200.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .width(190.dp)
+                        .height(190.dp)
                         .background(
-                            color = Color.White,
+                            color = Color(255, 255, 255),
                             shape = RoundedCornerShape(100.dp)
                         )
                         .clip(CircleShape)
                 ) {
-                    Image(
-                        painter = painterResource(photo),
-                        contentDescription = "profile image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .width(190.dp)
-                            .height(190.dp)
-                            .clip(CircleShape)
-                    )
+                    Avatar(user.icon, 190.dp)
                 }
                 
                 Text(

@@ -160,6 +160,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                 callViewModel.initWebrtc()
                                 
                                 if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
+                                    println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
                                     navigator.push(
                                         CallScreen(
                                             chat.userId,
@@ -169,6 +170,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                                 lastName = chat.lastName!!,
                                                 id = chat.userId,
                                                 phone = chat.phone!!,
+                                                icon = chat.icon,
                                             )
                                         )
                                     )

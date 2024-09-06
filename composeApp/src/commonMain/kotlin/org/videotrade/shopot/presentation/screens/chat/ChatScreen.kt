@@ -30,11 +30,9 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.multiplatform.FileData
-import org.videotrade.shopot.multiplatform.hideKeyboardOnTap
 
 
 class ChatScreen(
-//    private val chat: ChatItem
 ) : Screen {
     
     @Composable
@@ -78,7 +76,6 @@ class ChatScreen(
         Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
             SafeArea(isBlurred = selectedMessage != null, 7.dp) {
                 Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-                    
                     Scaffold(
                         topBar = {
                             ChatHeader(chat, viewModel, profile)
@@ -95,7 +92,7 @@ class ChatScreen(
                             viewModel,
                             profile,
                             chat,
-                            Modifier.fillMaxSize().hideKeyboardOnTap().background(Color.White)
+                            Modifier.fillMaxSize().background(Color.White)
                                 .padding(innerPadding)
                                
                             ,

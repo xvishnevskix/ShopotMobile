@@ -21,6 +21,3 @@ actual fun getHttpClientEngine(): HttpClientEngineFactory<HttpClientEngineConfig
     return OkHttp
 }
 
-actual fun Modifier.hideKeyboardOnTap(): Modifier {
-    return this.then(Modifier)
-}

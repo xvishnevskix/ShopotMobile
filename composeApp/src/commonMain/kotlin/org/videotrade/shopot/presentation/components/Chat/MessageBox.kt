@@ -2,7 +2,9 @@ package org.videotrade.shopot.presentation.components.Chat
 
 import FileMessage
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -65,6 +68,7 @@ fun MessageBox(
 //            }
 //        }
 //    }
+    val focusManager = LocalFocusManager.current
     
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
@@ -81,7 +85,13 @@ fun MessageBox(
     Column(
         modifier = Modifier
             .onGloballyPositioned(onPositioned)
-            .alpha(if (isVisible) 1f else 0f) // Manage visibility with alpha
+            .alpha(if (isVisible) 1f else 0f).pointerInput(Unit) {
+                detectTapGestures(
+                    onTap = {
+                        println("AAAAAAAAA")
+                    }
+                )
+            }
     ) {
         
         
@@ -94,6 +104,11 @@ fun MessageBox(
                     detectTapGestures(
                         onLongPress = { onClick() }
                     )
+                }.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null // Убирает эффект нажатия
+                ) {
+                    focusManager.clearFocus() // Ваше действие при нажатии
                 }
         ) {
             Surface(
@@ -132,20 +147,20 @@ fun MessageBox(
                     
                     
                     if (messageSenderName.isNotBlank()) {
-                            Text(
-                                text = messageSenderName,
-                                style = TextStyle(
-                                    color = Color.Gray,
-                                    fontSize = 12.sp,
-                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                ),
-                                modifier = Modifier.padding(
-                                    start = 25.dp,
-                                    end = 25.dp,
-                                    top = 7.dp,
-                                    bottom = 0.dp
-                                ),
-                            )
+                        Text(
+                            text = messageSenderName,
+                            style = TextStyle(
+                                color = Color.Gray,
+                                fontSize = 12.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                            ),
+                            modifier = Modifier.padding(
+                                start = 25.dp,
+                                end = 25.dp,
+                                top = 7.dp,
+                                bottom = 0.dp
+                            ),
+                        )
                     }
                     
                     MessageFormat(message, profile, onClick)
@@ -158,7 +173,12 @@ fun MessageBox(
             horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
             modifier = Modifier
                 .padding(start = 2.dp, end = 2.dp)
-                .fillMaxWidth()
+                .fillMaxWidth().clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null // Убирает эффект нажатия
+                ) {
+                    focusManager.clearFocus() // Ваше действие при нажатии
+                }
         ) {
             if (message.fromUser == profile.id)
                 if (message.anotherRead) {

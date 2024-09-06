@@ -126,20 +126,20 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
 
-        LaunchedEffect(Unit) {
-
-            if (!isRunning) {
-                isRunning = true
-                startTimer()
-            }
-            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
-            if (response != null) {
-                val jsonString = response.bodyAsText()
-                val jsonElement = Json.parseToJsonElement(jsonString)
-                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-            }
-        }
+//        LaunchedEffect(Unit) {
+//
+//            if (!isRunning) {
+//                isRunning = true
+//                startTimer()
+//            }
+//            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
+//            if (response != null) {
+//                val jsonString = response.bodyAsText()
+//                val jsonElement = Json.parseToJsonElement(jsonString)
+//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+//            }
+//        }
 
         
         
@@ -205,18 +205,18 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
                                 coroutineScope.launch {
                                     isLoading.value = true
-                                    if (
-                                        responseState.value != otpText && !isSuccessOtp.value
-
-                                    ) {
-                                        isLoading.value = false
-                                        toasterViewModel.toaster.show(
-                                            message = "Неверный код",
-                                            type = ToastType.Warning,
-                                            duration = ToasterDefaults.DurationDefault,
-                                        )
-                                        return@launch
-                                    }
+//                                    if (
+//                                        responseState.value != otpText && !isSuccessOtp.value
+//
+//                                    ) {
+//                                        isLoading.value = false
+//                                        toasterViewModel.toaster.show(
+//                                            message = "Неверный код",
+//                                            type = ToastType.Warning,
+//                                            duration = ToasterDefaults.DurationDefault,
+//                                        )
+//                                        return@launch
+//                                    }
 
                                     when (authCase) {
 
