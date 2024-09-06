@@ -140,6 +140,7 @@
     <string name="wait">Please wait</string>
     <string name="seconds_before_resending">seconds before resending</string>
     <string name="sms_with_code_sent">SMS with code sent</string>
+    <string name="code_sent">Code sent</string>
     <string name="send_code_via_sms">Send code via SMS</string>
     <string name="phone_number_is_not_registered">The phone number is not registered</string>
     <string name="please_fill_in_all_input_fields">Please fill in all input fields</string>

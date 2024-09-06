@@ -136,6 +136,7 @@
     <string name="wait">Подождите</string>
     <string name="seconds_before_resending">секунд перед повторной отправкой</string>
     <string name="sms_with_code_sent">SMS с кодом отправлено</string>
+    <string name="code_sent">Код отправлен</string>
     <string name="send_code_via_sms">Отправить код по SMS</string>
     <string name="phone_number_is_not_registered">Номер телефона не зарегистрирован</string>
     <string name="please_fill_in_all_input_fields">Заполните все поля</string>

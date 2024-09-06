@@ -86,7 +86,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
         val isLoading = remember { mutableStateOf(false) }
 
-        val phoneNotRegistered = stringResource(MokoRes.strings.enter_the_code_from_the_sms)
+        val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
+        val invalidCode = stringResource(MokoRes.strings.invalid_code)
 
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
@@ -126,20 +127,20 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
 
-//        LaunchedEffect(Unit) {
-//
-//            if (!isRunning) {
-//                isRunning = true
-//                startTimer()
-//            }
-//            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
-//            if (response != null) {
-//                val jsonString = response.bodyAsText()
-//                val jsonElement = Json.parseToJsonElement(jsonString)
-//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//            }
-//        }
+        LaunchedEffect(Unit) {
+
+            if (!isRunning) {
+                isRunning = true
+                startTimer()
+            }
+            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
+            if (response != null) {
+                val jsonString = response.bodyAsText()
+                val jsonElement = Json.parseToJsonElement(jsonString)
+                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+            }
+        }
 
         
         
@@ -205,18 +206,18 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
                                 coroutineScope.launch {
                                     isLoading.value = true
-//                                    if (
-//                                        responseState.value != otpText && !isSuccessOtp.value
-//
-//                                    ) {
-//                                        isLoading.value = false
-//                                        toasterViewModel.toaster.show(
-//                                            message = "Неверный код",
-//                                            type = ToastType.Warning,
-//                                            duration = ToasterDefaults.DurationDefault,
-//                                        )
-//                                        return@launch
-//                                    }
+                                    if (
+                                        responseState.value != otpText && !isSuccessOtp.value
+
+                                    ) {
+                                        isLoading.value = false
+                                        toasterViewModel.toaster.show(
+                                            message = invalidCode,
+                                            type = ToastType.Warning,
+                                            duration = ToasterDefaults.DurationDefault,
+                                        )
+                                        return@launch
+                                    }
 
                                     when (authCase) {
 
@@ -350,7 +351,7 @@ suspend fun sendRequestToBackend(
             if (response.bodyAsText() == "User not found") {
                 toasterViewModel.toaster.show(
                     phoneNotRegistered,
-                    type = ToastType.Warning,
+                    type = ToastType.Error,
                     duration = ToasterDefaults.DurationDefault
                 )
             }

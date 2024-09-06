@@ -28,6 +28,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
+import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -39,6 +40,7 @@ import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFProText_Semibold
@@ -61,7 +63,9 @@ class SignUpPhoneScreen : Screen {
                 )
             )
         }
-        
+
+        val sendCode = stringResource(MokoRes.strings.code_sent)
+        val phoneRegistered = stringResource(MokoRes.strings.phone_number_is_already_registered)
         
         SafeArea {
             
@@ -95,28 +99,39 @@ class SignUpPhoneScreen : Screen {
                             CustomButton(
                                 stringResource(MokoRes.strings.send_code),
                                 {
-                                    val countryCode = phone.value.text.takeWhile { it.isDigit() || it == '+' }
-                                    val phoneNumberLength = getPhoneNumberLength(countryCode)
-                                    if (phone.value.text.length < phoneNumberLength) {
-                                        coroutineScope.launch {
+                                    coroutineScope.launch {
+                                        val response =
+                                            sendRequestToBackend(phone.value.text, NotifierManager.getPushNotifier().getToken(), "auth/login", toasterViewModel, sendCode)
+
+                                        val countryCode = phone.value.text.takeWhile { it.isDigit() || it == '+' }
+                                        val phoneNumberLength = getPhoneNumberLength(countryCode)
+                                        if (phone.value.text.length < phoneNumberLength) {
+                                            coroutineScope.launch {
+                                                toasterViewModel.toaster.show(
+                                                    "${requiredPhoneLength} $phoneNumberLength",
+                                                    type = ToastType.Error,
+                                                    duration = ToasterDefaults.DurationDefault
+                                                )
+                                            }
+                                        }
+                                        else if (response == null) {
+                                            navigator.push(
+                                                AuthCallScreen(
+                                                    phone.value.text,
+                                                    "SignUp"
+                                                )
+                                            )
+                                        }
+                                        else if (response != null) {
                                             toasterViewModel.toaster.show(
-                                                "${requiredPhoneLength} $phoneNumberLength",
+                                                phoneRegistered,
                                                 type = ToastType.Error,
                                                 duration = ToasterDefaults.DurationDefault
                                             )
                                         }
+
+
                                     }
-                                    else {
-                                        navigator.push(
-                                            AuthCallScreen(
-                                                phone.value.text,
-                                                "SignUp"
-                                            )
-                                        )
-                                    }
-
-
-
                                 }
 
                             )
