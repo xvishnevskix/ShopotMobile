@@ -15,10 +15,15 @@ import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.delValueInStorage
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
@@ -220,6 +225,12 @@ class MainViewModel : ViewModel(), KoinComponent {
             delValueInStorage("accessToken")
             delValueInStorage("refreshToken")
             
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                }
+            )
+            
+            origin().post("user/removeNotificationToken", jsonContent)
             navigator.replace(SignInScreen())
             
         }

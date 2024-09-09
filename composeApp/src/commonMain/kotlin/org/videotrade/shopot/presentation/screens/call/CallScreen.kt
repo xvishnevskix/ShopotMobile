@@ -115,6 +115,8 @@ class CallScreen(
                 
                 when (callCase) {
                     "Call" -> {
+                        
+//                        viewModel.rejectCall(navigator, userId)
                         if (
                             isPlaying
                         ) {
