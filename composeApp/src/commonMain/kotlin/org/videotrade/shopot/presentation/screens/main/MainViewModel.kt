@@ -213,6 +213,13 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     fun leaveApp(navigator: Navigator) {
         viewModelScope.launch {
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                }
+            )
+            
+            
+            origin().post("user/removeNotificationToken", jsonContent)
             
             _chats.value = emptyList()
             _wsSession.value = null
@@ -225,12 +232,8 @@ class MainViewModel : ViewModel(), KoinComponent {
             delValueInStorage("accessToken")
             delValueInStorage("refreshToken")
             
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                }
-            )
+  
             
-            origin().post("user/removeNotificationToken", jsonContent)
             navigator.replace(SignInScreen())
             
         }

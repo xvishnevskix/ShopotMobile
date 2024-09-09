@@ -93,33 +93,33 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
         }
 
 
-//        LaunchedEffect(Unit) {
-//            if (!isRunning) {
-//                isRunning = true
-//                startTimer()
-//            }
-//            val jsonContent = Json.encodeToString(
-//                buildJsonObject {
-//                    put("phoneNumber", phone.drop(1))
-//                    put("is_sms", true)
-//                }
-//            )
-//            val response = origin().post("2fa", jsonContent)
-//            if (response != null) {
-//                val jsonElement = Json.parseToJsonElement(response)
-//                println("jsonElement41414 $jsonElement")
-//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//
-//                toasterViewModel.toaster.show(
-//                    message = sentSMSCode,
-//                    type = ToastType.Success,
-//                    duration = ToasterDefaults.DurationDefault,
-//                )
-//            }
-//
-//
-//        }
+        LaunchedEffect(Unit) {
+            if (!isRunning) {
+                isRunning = true
+                startTimer()
+            }
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("phoneNumber", phone.drop(1))
+                    put("is_sms", true)
+                }
+            )
+            val response = origin().post("2fa", jsonContent)
+            if (response != null) {
+                val jsonElement = Json.parseToJsonElement(response)
+                println("jsonElement41414 $jsonElement")
+                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+
+                toasterViewModel.toaster.show(
+                    message = sentSMSCode,
+                    type = ToastType.Success,
+                    duration = ToasterDefaults.DurationDefault,
+                )
+            }
+
+
+        }
 
 
         val isError = remember { mutableStateOf(false) }
@@ -175,18 +175,18 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
 
                                 coroutineScope.launch {
                                     isLoading.value = true
-//                                    if (
-//                                        responseState.value != otpText && !isSuccessOtp.value
-//
-//                                    ) {
-//                                        isLoading.value = false
-//                                        toasterViewModel.toaster.show(
-//                                            message = invalidCode,
-//                                            type = ToastType.Warning,
-//                                            duration = ToasterDefaults.DurationDefault,
-//                                        )
-//                                        return@launch
-//                                    }
+                                    if (
+                                        responseState.value != otpText && !isSuccessOtp.value
+
+                                    ) {
+                                        isLoading.value = false
+                                        toasterViewModel.toaster.show(
+                                            message = invalidCode,
+                                            type = ToastType.Warning,
+                                            duration = ToasterDefaults.DurationDefault,
+                                        )
+                                        return@launch
+                                    }
 
 
                                     when (authCase) {
