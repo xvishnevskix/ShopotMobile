@@ -107,31 +107,30 @@ class ProfileChatScreen(private val profile: ProfileDTO, private val chat: ChatI
                                 color = Color(0xFF979797)
                             )
                         }
-                        //заменить
-                        profile.login?.let {
+
+                        if (chat.chatUser[0].login != null) {
                             Text(
-                                it,
+                                chat.chatUser[0].login!!,
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                 lineHeight = 20.sp,
-
                                 color = Color(0xFF979797)
                             )
                         }
                     }
 
-                  //заменить
-                    profile.description?.let {
+
+                    if (chat.chatUser[0].description != null) {
                         Text(
-                            it,
+                            chat.chatUser[0].description!!,
                             textAlign = TextAlign.Center,
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
-                            modifier = Modifier.padding(),
+                            modifier = Modifier.padding(bottom = 10.dp),
                             color = Color(0xFF000000)
                         )
                     }

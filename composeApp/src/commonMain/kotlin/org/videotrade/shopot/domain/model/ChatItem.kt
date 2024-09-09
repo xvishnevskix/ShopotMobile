@@ -2,6 +2,16 @@ package org.videotrade.shopot.domain.model
 
 import kotlinx.serialization.Serializable
 
+
+@Serializable
+data class ChatUser(
+    val id: String,
+    val firstName: String?,
+    val lastName: String?,
+    val login: String?,
+    val description: String?
+)
+
 @Serializable
 data class ChatItem(
     val id: String,
@@ -17,7 +27,7 @@ data class ChatItem(
     var userId: String,
     var groupName: String? = null,
     var sortedDate: List<Int> = emptyList(),
-    
+    var chatUser: List<ChatUser> = emptyList()
 )
 
 
