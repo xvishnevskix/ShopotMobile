@@ -74,12 +74,12 @@ fun PhotoViewerHeader(name: String, time: String) {
                 fontSize = 16.sp,
                 color = Color.White
             )
-            Text(
-                text = time,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                fontSize = 14.sp,
-                color = Color.White
-            )
+//            Text(
+//                text = time,
+//                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+//                fontSize = 14.sp,
+//                color = Color.White
+//            )
         }
     }
 }

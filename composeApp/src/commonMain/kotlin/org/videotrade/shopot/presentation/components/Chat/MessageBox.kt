@@ -146,7 +146,7 @@ fun MessageBox(
 //                    }
                     
                     
-                    if (messageSenderName.isNotBlank()) {
+                    if (!chat.personal && messageSenderName.isNotBlank()) {
                         Text(
                             text = messageSenderName,
                             style = TextStyle(
@@ -163,7 +163,7 @@ fun MessageBox(
                         )
                     }
                     
-                    MessageFormat(message, profile, onClick)
+                    MessageFormat(message, profile, onClick, messageSenderName)
                 }
                 
             }
@@ -217,7 +217,10 @@ fun MessageBox(
 
 @Composable
 fun MessageFormat(
-    message: MessageItem, profile: ProfileDTO, onMessageClick: () -> Unit,
+    message: MessageItem,
+    profile: ProfileDTO,
+    onMessageClick: () -> Unit,
+    messageSenderName: String? = null,
 ) {
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
         MessageText(message, profile)
@@ -236,7 +239,8 @@ fun MessageFormat(
             "image" -> {
                 MessageImage(
                     message, profile,
-                    message.attachments!!
+                    message.attachments!!,
+                    messageSenderName
                 )
                 
             }

@@ -112,12 +112,25 @@ fun Chat(
             val isVisible = message.id != hiddenMessageId
             
             // Инициализируем messageSenderName внутри itemsIndexed
-            val messageSenderName = if (!chat.personal && message.fromUser != profile.id) {
+//            val messageSenderName = if (!chat.personal && message.fromUser != profile.id) {
+//                println("messageSenderName1 ${message.content} ${message.phone}")
+//
+//                message.phone?.let {
+//                    val findContact = viewModel.findContactByPhone(it)
+//                    if (findContact != null) {
+//                        "${findContact.firstName} ${findContact.lastName}"
+//                    } else {
+//                        "+${message.phone}"
+//                    }
+//                } ?: ""
+//            } else {
+//                ""
+//            }
+            
+            val messageSenderName = if (message.fromUser != profile.id) {
                 println("messageSenderName1 ${message.content} ${message.phone}")
                 
                 message.phone?.let {
-                    
-                    
                     val findContact = viewModel.findContactByPhone(it)
                     if (findContact != null) {
                         "${findContact.firstName} ${findContact.lastName}"

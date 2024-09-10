@@ -1,6 +1,8 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,19 +16,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.rememberAsyncImagePainter
-import com.seiko.imageloader.rememberImagePainter
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 
 
 @Composable
 fun MessageImage(
     message: MessageItem, profile: ProfileDTO,
-    attachments: List<Attachment>
+    attachments: List<Attachment>,
+    messageSenderName: String? = null
 ) {
     var imageFilePath by remember { mutableStateOf("") }
 
@@ -34,7 +38,9 @@ fun MessageImage(
 //        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
     
     val imagePainter = rememberAsyncImagePainter(imageFilePath)
-    
+    val navigator = LocalNavigator.current
+    val url =
+        "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
     
     LaunchedEffect(Unit) {
         val fileName = attachments[0].name
@@ -48,8 +54,7 @@ fun MessageImage(
             imageFilePath = existingFile
             println("existingFile ${existingFile}")
         } else {
-            val url =
-                "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+            
             
             val filePath = fileProvider.downloadCipherFile(
                 url,
@@ -86,6 +91,12 @@ fun MessageImage(
                     bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                 )
             
-            )
+            ).clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null // Убирает эффект нажатия
+            ) {
+                if (imageFilePath.isNotBlank())
+                    navigator?.push(PhotoViewerScreen(imageFilePath, messageSenderName))
+            }
     )
 }
