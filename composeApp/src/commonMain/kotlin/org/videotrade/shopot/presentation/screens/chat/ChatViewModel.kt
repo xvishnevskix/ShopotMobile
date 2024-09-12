@@ -4,6 +4,7 @@ package org.videotrade.shopot.presentation.screens.chat
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import co.touchlab.kermit.Message
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -133,6 +134,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
         attachments: List<String>? = null,
         login: String? = null,
         isCipher: Boolean,
+        forwardMessage: Boolean = false
     ) {
         viewModelScope.launch {
             var contentSort = ""
@@ -155,9 +157,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     chatId = chatId,
                     anotherRead = false,
                     iread = false,
-                    attachments = null
+                    attachments = null,
                 ),
-                attachments
+                attachments,
+                forwardMessage
             )
             println("сообщениесообщениесообщениесообщение")
             sendNotify("$login", content, notificationToken)

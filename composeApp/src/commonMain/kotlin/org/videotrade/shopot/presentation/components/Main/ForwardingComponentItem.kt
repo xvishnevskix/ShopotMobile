@@ -63,6 +63,7 @@ fun ForwardingComponentItem(
                 notificationToken = chat.notificationToken,
                 attachments = emptyList(),
                 login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
+                true,
                 true
             )
             viewModel.getProfile()

@@ -21,7 +21,6 @@ class ChatUseCase : KoinComponent {
     }
     
     
-    
     fun getMessages(): StateFlow<List<MessageItem>> {
         return repository.getMessages()
     }
@@ -64,8 +63,12 @@ class ChatUseCase : KoinComponent {
     }
     
     
-    suspend fun sendMessage(message: MessageItem, attachments: List<String>?) {
-        return repository.sendMessage(message, attachments = attachments)
+    suspend fun sendMessage(
+        message: MessageItem,
+        attachments: List<String>?,
+        forwardMessage: Boolean
+    ) {
+        return repository.sendMessage(message, attachments = attachments, forwardMessage)
     }
     
     suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?) {
