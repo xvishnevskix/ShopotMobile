@@ -60,7 +60,6 @@ fun UserComponentItem(
     
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
-            
             mainViewModel.setCurrentChat(chat.id)
             mainViewModel.setZeroUnread(chat)
             viewModel.setCurrentChat(chat)

@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -43,10 +42,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -109,12 +110,11 @@ data class MenuItem(
 )
 
 
-@OptIn(ExperimentalAnimationApi::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
     
-    var text by remember { mutableStateOf("") }
     
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
@@ -125,6 +125,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var voiceName by remember { mutableStateOf("") }
     var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
+    val text = remember { mutableStateOf("") }
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
@@ -228,7 +229,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             imagePath = Res.drawable.menu_gallery,
             onClick = {
                 viewModel.sendImage(
-                    text,
+                    text.value,
                     viewModel.profile.value.id,
                     chat.id,
                     "image",
@@ -496,10 +497,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             }
             
             BasicTextField(
-                value = text,
+                value = text.value,
                 onValueChange = { newText ->
                     if (!isRecording) {
-                        text = newText
+                        text.value = newText
                     }
                 },
                 modifier = Modifier
@@ -516,7 +517,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 visualTransformation = VisualTransformation.None,
                 decorationBox = { innerTextField ->
                     Box {
-                        if (text.isEmpty()) {
+                        if (text.value.isEmpty()) {
                             Text(
                                 stringResource(MokoRes.strings.write_message),
                                 textAlign = TextAlign.Center,
@@ -533,7 +534,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             )
             
             
-            if (text.isNotEmpty()) {
+            if (text.value.isNotEmpty()) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
@@ -543,9 +544,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .padding(end = 15.dp)
                         .pointerInput(Unit) {
                             detectTapGestures(onTap = {
-                                if (text.isNotBlank()) {
+                                if (text.value.isNotBlank()) {
                                     viewModel.sendMessage(
-                                        content = text,
+                                        content = text.value,
                                         fromUser = viewModel.profile.value.id,
                                         chatId = chat.id,
                                         notificationToken = chat.notificationToken,
@@ -553,7 +554,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
                                         true
                                     )
-                                    text = ""
+                                    text.value = ""
                                 }
                             })
                         }

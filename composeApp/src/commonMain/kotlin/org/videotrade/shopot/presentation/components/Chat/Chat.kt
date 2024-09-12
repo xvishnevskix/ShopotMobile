@@ -1,10 +1,11 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -18,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.ClipboardManager
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.AnnotatedString
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.FlowPreview
@@ -42,8 +42,12 @@ data class EditOption(
     val onClick: (viewModule: ChatViewModel, message: MessageItem, clipboardManager: ClipboardManager) -> Unit,
 )
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun getEditOptions(): List<EditOption> {
+fun getEditOptions(scaffoldState: BottomSheetScaffoldState? = null): List<EditOption> {
+    
+    val coroutineScope = rememberCoroutineScope()
+    
     return listOf(
         EditOption(
             text = stringResource(MokoRes.strings.delete),
@@ -57,6 +61,16 @@ fun getEditOptions(): List<EditOption> {
             imagePath = Res.drawable.chat_copy,
             onClick = { _, message, clipboardManager ->
                 message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
+            }
+        ),
+        EditOption(
+            text = "Переслать",
+            imagePath = Res.drawable.chat_copy,
+            onClick = { viewModel, message, clipboardManager ->
+                coroutineScope.launch {
+                    viewModel.setForwardMessage(message)
+                    viewModel.setScaffoldState(true)
+                }
             }
         )
     )
@@ -75,7 +89,7 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
+    
     
     
     
@@ -105,7 +119,7 @@ fun Chat(
         state = listState,
         reverseLayout = true,
         modifier = modifier.background(Color.White)
-
+    
     ) {
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }

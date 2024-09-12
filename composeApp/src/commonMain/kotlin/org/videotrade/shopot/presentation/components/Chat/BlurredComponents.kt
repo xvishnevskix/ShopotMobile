@@ -21,7 +21,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,13 +56,14 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.double_message_check
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlurredMessageOverlay(
     profile: ProfileDTO,
     viewModel: ChatViewModel,
     selectedMessage: MessageItem?,
     selectedMessageY: Int,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     selectedMessage?.let { message ->
         var visible by remember { mutableStateOf(false) }
@@ -94,7 +97,7 @@ fun BlurredMessageOverlay(
                         viewModel = viewModel,
                         onClick = {},
                         visible = visible,
-                        onDismiss
+                        onDismiss,
                     )
                 }
             }
@@ -102,6 +105,7 @@ fun BlurredMessageOverlay(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageBlurBox(
     message: MessageItem,
@@ -109,7 +113,7 @@ fun MessageBlurBox(
     viewModel: ChatViewModel,
     onClick: () -> Unit,
     visible: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val clipboardManager = LocalClipboardManager.current
     

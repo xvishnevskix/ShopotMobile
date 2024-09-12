@@ -1,6 +1,9 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -61,6 +64,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     var downloadProgress = MutableStateFlow(0f)
     
+    
+    val isScaffoldState = MutableStateFlow(false)
+    
+    val forwardMessage = MutableStateFlow<MessageItem?>(null)
+    
     init {
         
         
@@ -76,8 +84,13 @@ class ChatViewModel : ViewModel(), KoinComponent {
             
         }
     }
+    fun setForwardMessage(message: MessageItem) {
+        forwardMessage.value = message
+    }
     
-    
+    fun setScaffoldState(state: Boolean) {
+        isScaffoldState.value = state
+    }
     fun setCurrentChat(chat: ChatItem) {
         _currentChat.value = chat
     }
