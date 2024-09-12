@@ -10,6 +10,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.formatTimestamp
@@ -96,7 +98,7 @@ fun MessageBox(
             }
         }
     }
-    
+
     Column(
         modifier = Modifier
             .onGloballyPositioned(onPositioned)
@@ -127,21 +129,20 @@ fun MessageBox(
     ) {
         
         
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
+        BoxWithConstraints(
+            contentAlignment = Alignment.CenterStart
         ) {
-
             if (animatedOffset > 0) {
                 Box(
                     modifier = Modifier
+                        .zIndex(2f)
                         .offset(x = animatedOffset.dp/4)
                         .padding()
                         .alpha(iconOpacity)
                         .clip(RoundedCornerShape(50.dp))
                         .size(35.dp).background(Color(0xFF2A293C)
                             .copy(alpha = 0.1f))
-                        ,
+                    ,
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -152,39 +153,45 @@ fun MessageBox(
                     )
                 }
             }
-
-            Box(
-                contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
-                modifier = Modifier
-                    .offset(x = animatedOffset.dp)
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onLongPress = { onClick() }
-                        )
-                    }.clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null // Убирает эффект нажатия
-                    ) {
-                        focusManager.clearFocus() // Ваше действие при нажатии
-                    }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Surface(
-                    modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
-                    shape = RoundedCornerShape(
-                        topStart = 20.dp,
-                        topEnd = 20.dp,
-                        bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                        bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
-                    ),
-                    shadowElevation = 4.dp,
-                    color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
+
+
+
+                Box(
+                    contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
+                    modifier = Modifier
+                        .offset(x = animatedOffset.dp)
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onLongPress = { onClick() }
+                            )
+                        }.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null // Убирает эффект нажатия
+                        ) {
+                            focusManager.clearFocus() // Ваше действие при нажатии
+                        }
                 ) {
-
-                    Column(
-
+                    Surface(
+                        modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 20.dp,
+                            topEnd = 20.dp,
+                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
+                            bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                        ),
+                        shadowElevation = 4.dp,
+                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
                     ) {
+
+                        Column(
+
+                        ) {
 //                    if (!chat.personal) {
 //                        if (message.fromUser != profile.id) {
 //                           Text(
@@ -205,71 +212,74 @@ fun MessageBox(
 //                    }
 
 
-                        if (!chat.personal && messageSenderName.isNotBlank()) {
-                            Text(
-                                text = messageSenderName,
-                                style = TextStyle(
-                                    color = Color.Gray,
-                                    fontSize = 12.sp,
-                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                ),
-                                modifier = Modifier.padding(
-                                    start = 25.dp,
-                                    end = 25.dp,
-                                    top = 7.dp,
-                                    bottom = 0.dp
-                                ),
-                            )
+                            if (!chat.personal && messageSenderName.isNotBlank()) {
+                                Text(
+                                    text = messageSenderName,
+                                    style = TextStyle(
+                                        color = Color.Gray,
+                                        fontSize = 12.sp,
+                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                    ),
+                                    modifier = Modifier.padding(
+                                        start = 25.dp,
+                                        end = 25.dp,
+                                        top = 7.dp,
+                                        bottom = 0.dp
+                                    ),
+                                )
+                            }
+
+                            MessageFormat(message, profile, onClick, messageSenderName)
                         }
 
-                        MessageFormat(message, profile, onClick, messageSenderName)
                     }
-
                 }
+
+
             }
+        }
 
-            Row(
-                horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
-                modifier = Modifier
-                    .padding(start = 2.dp, end = 2.dp)
-                    .fillMaxWidth().clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null // Убирает эффект нажатия
-                    ) {
-                        focusManager.clearFocus() // Ваше действие при нажатии
-                    }
-            ) {
-                if (message.fromUser == profile.id)
-                    if (message.anotherRead) {
-                        Image(
-                            modifier = Modifier
-                                .padding(top = 2.dp, end = 4.dp)
-                                .size(14.dp),
-                            painter = painterResource(Res.drawable.double_message_check),
-                            contentDescription = null,
-                        )
-                    } else {
-                        Image(
-                            modifier = Modifier
-                                .padding(top = 2.dp, end = 4.dp)
-                                .size(14.dp),
-                            painter = painterResource(Res.drawable.single_message_check),
-                            contentDescription = null,
-                        )
-                    }
-
-
-                if (message.created.isNotEmpty())
-                    Text(
-                        text = formatTimestamp(message.created),
-                        style = TextStyle(
-                            color = Color.Gray,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        ),
-                        modifier = Modifier.padding(),
+        Row(
+            horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
+            modifier = Modifier
+                .padding(start = 2.dp, end = 2.dp)
+                .fillMaxWidth().clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null // Убирает эффект нажатия
+                ) {
+                    focusManager.clearFocus() // Ваше действие при нажатии
+                }
+        ) {
+            if (message.fromUser == profile.id)
+                if (message.anotherRead) {
+                    Image(
+                        modifier = Modifier
+                            .padding(top = 2.dp, end = 4.dp)
+                            .size(14.dp),
+                        painter = painterResource(Res.drawable.double_message_check),
+                        contentDescription = null,
                     )
-            }
+                } else {
+                    Image(
+                        modifier = Modifier
+                            .padding(top = 2.dp, end = 4.dp)
+                            .size(14.dp),
+                        painter = painterResource(Res.drawable.single_message_check),
+                        contentDescription = null,
+                    )
+                }
+
+
+            if (message.created.isNotEmpty())
+                Text(
+                    text = formatTimestamp(message.created),
+                    style = TextStyle(
+                        color = Color.Gray,
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                    ),
+                    modifier = Modifier.padding(),
+                )
         }
     }
 }
