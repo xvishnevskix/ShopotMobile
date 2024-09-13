@@ -46,7 +46,6 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         forwardMessage: Boolean
     ) {
         println("forwardMessage141141 $forwardMessage")
-        return
         try {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {

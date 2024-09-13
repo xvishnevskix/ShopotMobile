@@ -266,7 +266,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         Random.nextInt(1, 501).toString(),
                                         viewModel.profile.value.id,
                                         "",
-                                        "",
+                                        false,
                                         "",
                                         0,
                                         getCurrentTimeList(),

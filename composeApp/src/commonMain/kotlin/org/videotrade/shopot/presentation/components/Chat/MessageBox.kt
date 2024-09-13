@@ -31,6 +31,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
@@ -69,7 +72,7 @@ fun MessageBox(
 //        }
 //    }
     val focusManager = LocalFocusManager.current
-    
+
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
             if (message.anotherRead) {
@@ -81,7 +84,7 @@ fun MessageBox(
             }
         }
     }
-    
+
     Column(
         modifier = Modifier
             .onGloballyPositioned(onPositioned)
@@ -93,8 +96,8 @@ fun MessageBox(
                 )
             }
     ) {
-        
-        
+
+
         Box(
             contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
             modifier = Modifier
@@ -112,6 +115,8 @@ fun MessageBox(
 //                    focusManager.clearFocus() // Ваше действие при нажатии
 //                }
         ) {
+
+
             Surface(
                 modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
                 shape = RoundedCornerShape(
@@ -121,11 +126,13 @@ fun MessageBox(
                     bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                 ),
                 shadowElevation = 4.dp,
-                color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
+                color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(
+                    0xFFF3F4F6
+                )
             ) {
-                
+
                 Column(
-                
+
                 ) {
 //                    if (!chat.personal) {
 //                        if (message.fromUser != profile.id) {
@@ -145,8 +152,25 @@ fun MessageBox(
 //                            )
 //                        }
 //                    }
-                    
-                    
+
+                    println("message.forwardMessage ${message.forwardMessage}")
+                  if(message.forwardMessage == true) {
+                      Text(
+                          "Пересланное сообщение",
+                          style = TextStyle(
+                              color = Color.Gray,
+                              fontSize = 12.sp,
+                              fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                          ),
+                          modifier = Modifier.padding(
+                              start = 25.dp,
+                              end = 25.dp,
+                              top = 7.dp,
+                              bottom = 0.dp
+                          ),
+                      )
+                  }
+
                     if (!chat.personal && messageSenderName.isNotBlank()) {
                         Text(
                             text = messageSenderName,
@@ -163,13 +187,14 @@ fun MessageBox(
                             ),
                         )
                     }
-                    
-                    MessageFormat(message, profile, onClick, messageSenderName)
+
+                    MessageFormat(message, profile, onClick, messageSenderName, chat)
                 }
-                
+
+
             }
         }
-        
+
         Row(
             horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
             modifier = Modifier
@@ -199,8 +224,8 @@ fun MessageBox(
                         contentDescription = null,
                     )
                 }
-            
-            
+
+
             if (message.created.isNotEmpty())
                 Text(
                     text = formatTimestamp(message.created),
@@ -222,39 +247,36 @@ fun MessageFormat(
     profile: ProfileDTO,
     onMessageClick: () -> Unit,
     messageSenderName: String? = null,
+    chat: ChatItem? = null,
 ) {
-    if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        MessageText(message, profile)
-//        FileMessage(message, )
-    } else {
-        
-        when (message.attachments!![0].type) {
-            
-            "audio/mp4" -> {
-                VoiceMessage(
-                    message,
-                    message.attachments!!
-                )
-            }
-            
-            "image" -> {
-                MessageImage(
-                    message, profile,
-                    message.attachments!!,
-                    messageSenderName
-                )
-                
-            }
-            
-            else -> {
-                FileMessage(
-                    message,
-                    message.attachments!!
-                )
+        if (message.attachments == null || message.attachments?.isEmpty() == true) {
+            MessageText(message, profile, chat)
+        } else {
+
+            when (message.attachments!![0].type) {
+
+                "audio/mp4" -> {
+                    VoiceMessage(
+                        message,
+                        message.attachments!!
+                    )
+                }
+
+                "image" -> {
+                    MessageImage(
+                        message, profile,
+                        message.attachments!!,
+                        messageSenderName
+                    )
+
+                }
+
+                else -> {
+                    FileMessage(
+                        message,
+                        message.attachments!!
+                    )
+                }
             }
         }
-        
-        
-    }
-    
 }

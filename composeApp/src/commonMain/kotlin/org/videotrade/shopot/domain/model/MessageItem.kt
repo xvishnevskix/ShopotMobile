@@ -8,7 +8,7 @@ data class MessageItem(
     val id: String = "",
     val fromUser: String = "",
     val content: String?,
-    val forwardMessage: String? = "",
+    val forwardMessage: Boolean? = false,
     var answerMessage: String? = "",
     var replaces: Int? = null,
     var created: List<Int> = emptyList(),
@@ -33,7 +33,7 @@ data class Attachment(
     var name: String,
     var originalFileDir: String? = null,
     var size: Long? = null,
-    )
+)
 
 
 

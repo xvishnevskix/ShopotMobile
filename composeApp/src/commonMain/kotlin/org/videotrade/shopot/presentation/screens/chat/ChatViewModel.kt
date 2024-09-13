@@ -35,6 +35,9 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.presentation.components.Chat.MessageImage
+import org.videotrade.shopot.presentation.components.Chat.MessageText
+import org.videotrade.shopot.presentation.components.Chat.VoiceMessage
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
@@ -42,90 +45,92 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
-    
+
     val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
-    
+
     private val _messages = MutableStateFlow<List<MessageItem>>(listOf())
-    
+
     val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
-    
+
     val profile = MutableStateFlow(ProfileDTO())
-    
-    
+
+
     val _currentChat = MutableStateFlow<ChatItem?>(null)
     val currentChat: StateFlow<ChatItem?> get() = _currentChat.asStateFlow()
-    
+
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-    
-    
+
+
     val audioRecorder = MutableStateFlow(AudioFactory.createAudioRecorder())
-    
+
     var isRecording = MutableStateFlow(false)
-    
-    
+
+
     var downloadProgress = MutableStateFlow(0f)
-    
-    
+
+
     val isScaffoldState = MutableStateFlow(false)
-    
+
     val forwardMessage = MutableStateFlow<MessageItem?>(null)
-    
+
     init {
-        
-        
+
+
         viewModelScope.launch {
-            
-            
+
+
             chatUseCase.getMessages().collect {
-                
+
                 println("it313123131 $it")
                 _messages.value = it
             }
-            
-            
+
+
         }
     }
+
     fun setForwardMessage(message: MessageItem) {
         forwardMessage.value = message
     }
-    
+
     fun setScaffoldState(state: Boolean) {
         isScaffoldState.value = state
     }
+
     fun setCurrentChat(chat: ChatItem) {
         _currentChat.value = chat
     }
-    
+
     fun setIsRecording(isRecordingNew: Boolean) {
         isRecording.value = isRecordingNew
     }
-    
+
     fun sendReadMessage(messageId: String) {
         viewModelScope.launch {
             chatUseCase.sendReadMessage(messageId, profile.value.id)
         }
     }
-    
-    
+
+
     fun getMessagesBack(chatId: String) {
         viewModelScope.launch {
             chatUseCase.getMessagesBack(chatId)
         }
     }
-    
+
     fun setCount(count: Int) {
         viewModelScope.launch {
             chatUseCase.setCount(count)
         }
     }
-    
+
     fun implementCount() {
         viewModelScope.launch {
             chatUseCase.implementCount()
         }
     }
-    
-    
+
+
     fun sendMessage(
         content: String? = null,
         fromUser: String,
@@ -138,18 +143,18 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ) {
         viewModelScope.launch {
             var contentSort = ""
-            
-            
+
+
             if (content !== null && isCipher) {
                 val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                
+
                 val resEncups = encupsMessage(content, cipherWrapper)
-                
+
                 contentSort = Json.encodeToString(resEncups)
             } else {
                 contentSort = content!!
             }
-            
+
             chatUseCase.sendMessage(
                 MessageItem(
                     content = contentSort,
@@ -166,8 +171,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
             sendNotify("$login", content, notificationToken)
         }
     }
-    
-    
+
+
     fun sendAttachments(
         content: String?,
         fromUser: String,
@@ -183,7 +188,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 fileName,
                 false,
             )
-            
+
             if (fileId !== null)
                 sendMessage(
                     content = content,
@@ -195,7 +200,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 )
         }
     }
-    
+
     fun sendLargeFileAttachments(
         content: String? = null,
         fromUser: String,
@@ -218,8 +223,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
             )
         }
     }
-    
-    
+
+
     fun sendNotify(
         title: String,
         content: String? = "Уведомление",
@@ -227,52 +232,76 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ) {
         viewModelScope.launch {
             println("Уведомление ${notificationToken}")
-            
+
             if (notificationToken !== null) {
                 val jsonContent = Json.encodeToString(
                     buildJsonObject {
                         put("title", title)
                         put("body", content)
                         put("notificationToken", notificationToken)
-                        
+
                     }
                 )
-                
+
                 println("Уведомление ${jsonContent}")
-                
+
                 origin().post("notification/notify", jsonContent)
             }
         }
     }
-    
+
+    fun sendForwardMessage(
+        message: MessageItem
+    ) {
+        if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        } else {
+
+            when (message.attachments!![0].type) {
+
+                "audio/mp4" -> {
+
+                }
+
+                "image" -> {
+
+
+                }
+
+                else -> {
+
+                }
+            }
+        }
+    }
+
     fun addMessage(message: MessageItem) {
-        
+
         chatUseCase.addMessage(message)
     }
-    
+
     fun deleteMessage(message: MessageItem) {
         viewModelScope.launch {
             chatUseCase.delMessage(message)
         }
     }
-    
+
     fun clearMessages() {
         viewModelScope.launch {
             chatUseCase.clearMessages()
         }
     }
-    
+
     fun getProfile() {
         viewModelScope.launch {
             profile.value = profileUseCase.getProfile()
         }
     }
-    
-    
+
+
     fun sendVoice(fileDir: String, chat: ChatItem, voiceName: String) {
         val fileSize =
             FileProviderFactory.create().getFileSizeFromUri(fileDir)
-        
+
         println("fileSize ${fileSize}")
 
 //        if(fileSize !== null)
@@ -281,7 +310,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 Random.nextInt(1, 2001).toString(),
                 profile.value.id,
                 "",
-                "",
+                false,
                 "",
                 0,
                 getCurrentTimeList(),
@@ -306,8 +335,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
             )
         )
     }
-    
-    
+
+
     fun sendImage(
         content: String? = null,
         fromUser: String,
@@ -327,32 +356,32 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     filePick.fileName,
                     filePick.fileAbsolutePath,
                 )
-                
+
             }
         }
-        
+
     }
-    
-    
+
+
     fun findContactByPhone(phone: String): ContactDTO? {
         return contactsUseCase.contacts.value.find { it.phone == phone }
     }
-    
+
     fun loadGroupUsers(chatId: String) {
-        
+
         viewModelScope.launch {
             try {
                 val groupUsersGet =
                     origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId")
-                
+
                 val groupUsersFilter = mutableListOf<GroupUserDTO>()
-                
+
                 if (groupUsersGet != null) {
                     for (groupUser in groupUsersGet) {
                         fun normalizePhoneNumber(phone: String): String {
                             return phone.replace(Regex("[^0-9]"), "")
                         }
-                        
+
                         if (profile.value.phone == normalizePhoneNumber(groupUser.phone)) {
                             groupUsersFilter.add(
                                 groupUser.copy(
@@ -362,11 +391,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
                             )
                             continue
                         }
-                        
+
                         val findInContacts = contactsUseCase.contacts.value.find {
                             normalizePhoneNumber(it.phone) == normalizePhoneNumber(groupUser.phone)
                         }
-                        
+
                         if (findInContacts !== null && findInContacts.firstName !== null && findInContacts.lastName !== null) {
                             groupUsersFilter.add(
                                 groupUser.copy(
@@ -377,18 +406,18 @@ class ChatViewModel : ViewModel(), KoinComponent {
                         } else {
                             groupUsersFilter.add(groupUser)
                         }
-                        
+
                     }
                 }
-                
+
                 groupUsers.value = groupUsersFilter
-                
+
             } catch (e: Exception) {
             }
         }
-        
+
     }
-    
-    
+
+
 }
 

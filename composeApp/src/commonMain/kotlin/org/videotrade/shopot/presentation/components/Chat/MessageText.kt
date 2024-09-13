@@ -10,6 +10,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import shopot.composeapp.generated.resources.Res
@@ -17,7 +18,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
 @Composable
-fun MessageText(message: MessageItem, profile: ProfileDTO) {
+fun MessageText(message: MessageItem, profile: ProfileDTO, chat: ChatItem? = null,) {
     message.content?.let {
       Text(
         text = it,
@@ -26,13 +27,14 @@ fun MessageText(message: MessageItem, profile: ProfileDTO) {
             fontSize = 16.sp,
             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
         ),
-        modifier = Modifier.padding(
-            start = 25.dp,
-            end = 25.dp,
+          modifier = Modifier.padding(
+              start = 25.dp,
+              end = 25.dp,
 //            top = if (message.fromUser == profile.id) 13.dp else 7.dp,
-            top = 12.dp,
-            bottom = 12.dp
-        ),
+//              top = if (chat?.personal == true && message.forwardMessage == false) 12.dp else 6.dp,
+              top = 12.dp,
+              bottom = 12.dp
+          ),
     )
     }
 }
