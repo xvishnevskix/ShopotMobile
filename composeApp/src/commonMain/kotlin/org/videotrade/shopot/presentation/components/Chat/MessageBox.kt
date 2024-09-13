@@ -89,7 +89,7 @@ fun MessageBox(
 //        }
 //    }
     val focusManager = LocalFocusManager.current
-    
+
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
             if (message.anotherRead) {
@@ -122,13 +122,14 @@ fun MessageBox(
                     },
                     onHorizontalDrag = { change, dragAmount ->
                         change.consume() // Поглощение жеста
-                        swipeOffset = (swipeOffset + dragAmount / 2).coerceIn(0f, 75f) // изменение скорости
+                        swipeOffset =
+                            (swipeOffset + dragAmount / 2).coerceIn(0f, 75f) // изменение скорости
                     }
                 )
             }
     ) {
-        
-        
+
+
         BoxWithConstraints(
             contentAlignment = Alignment.CenterStart
         ) {
@@ -136,13 +137,14 @@ fun MessageBox(
                 Box(
                     modifier = Modifier
                         .zIndex(2f)
-                        .offset(x = animatedOffset.dp/4)
+                        .offset(x = animatedOffset.dp / 4)
                         .padding()
                         .alpha(iconOpacity)
                         .clip(RoundedCornerShape(50.dp))
-                        .size(35.dp).background(Color(0xFF2A293C)
-                            .copy(alpha = 0.1f))
-                    ,
+                        .size(35.dp).background(
+                            Color(0xFF2A293C)
+                                .copy(alpha = 0.1f)
+                        ),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
@@ -157,7 +159,6 @@ fun MessageBox(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-
 
 
                 Box(
@@ -186,7 +187,9 @@ fun MessageBox(
                             bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                         ),
                         shadowElevation = 4.dp,
-                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
+                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(
+                            0xFFF3F4F6
+                        )
                     ) {
 
                         Column(
@@ -295,25 +298,25 @@ fun MessageFormat(
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
         MessageText(message, profile)
     } else {
-        
+
         when (message.attachments!![0].type) {
-            
+
             "audio/mp4" -> {
                 VoiceMessage(
                     message,
                     message.attachments!!
                 )
             }
-            
+
             "image" -> {
                 MessageImage(
                     message, profile,
                     message.attachments!!,
                     messageSenderName
                 )
-                
+
             }
-            
+
             else -> {
                 FileMessage(
                     message,
@@ -321,10 +324,10 @@ fun MessageFormat(
                 )
             }
         }
-        
-        
+
+
     }
-    
+
 }
 
 
@@ -335,7 +338,7 @@ fun SelectedMessageFormat(
 ) {
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
         if (messageSenderName != null) {
-            SelectedMessageText(message,messageSenderName)
+            SelectedMessageText(message, messageSenderName)
         }
     } else {
 
@@ -343,7 +346,7 @@ fun SelectedMessageFormat(
 
             "audio/mp4" -> {
                 if (messageSenderName != null) {
-                    SelectedVoiceMessage(message,messageSenderName)
+                    SelectedVoiceMessage(message, messageSenderName)
                 }
             }
 
@@ -356,7 +359,7 @@ fun SelectedMessageFormat(
 
             else -> {
                 if (messageSenderName != null) {
-                    SelectedFileMessage(message,messageSenderName)
+                    SelectedFileMessage(message, messageSenderName)
                 }
             }
         }

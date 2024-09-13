@@ -32,9 +32,6 @@ import shopot.composeapp.generated.resources.menu_gallery
 fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName: String) {
 
 
-
-
-
     Column(
         modifier = Modifier
             .padding(top = 5.dp, start = 16.dp, end = 8.dp, bottom = 2.dp)

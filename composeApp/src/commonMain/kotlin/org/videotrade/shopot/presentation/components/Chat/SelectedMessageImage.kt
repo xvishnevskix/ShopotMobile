@@ -48,10 +48,6 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
 
 
     var imageFilePath by remember { mutableStateOf("") }
-
-//    val imagePainter =
-//        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
-
     val imagePainter = rememberAsyncImagePainter(imageFilePath)
 
     val url =
