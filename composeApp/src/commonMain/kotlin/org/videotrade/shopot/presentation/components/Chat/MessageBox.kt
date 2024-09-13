@@ -1,6 +1,10 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import FileMessage
+import SelectedFileMessage
+import SelectedMessageImage
+import SelectedMessageText
+import SelectedVoiceMessage
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -321,4 +325,43 @@ fun MessageFormat(
         
     }
     
+}
+
+
+@Composable
+fun SelectedMessageFormat(
+    message: MessageItem,
+    messageSenderName: String? = null,
+) {
+    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        if (messageSenderName != null) {
+            SelectedMessageText(message,messageSenderName)
+        }
+    } else {
+
+        when (message.attachments!![0].type) {
+
+            "audio/mp4" -> {
+                if (messageSenderName != null) {
+                    SelectedVoiceMessage(message,messageSenderName)
+                }
+            }
+
+            "image" -> {
+                if (messageSenderName != null) {
+                    SelectedMessageImage(message.attachments!!, messageSenderName)
+                }
+
+            }
+
+            else -> {
+                if (messageSenderName != null) {
+                    SelectedFileMessage(message,messageSenderName)
+                }
+            }
+        }
+
+
+    }
+
 }

@@ -1,11 +1,13 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import SelectedMessageText
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -315,9 +317,15 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //    ),
     )
     val editOptions = getEditOptions()
-    
-    
-    
+
+    val expandedHeight = 125.dp
+    val collapsedHeight = if (selectedMessage != null) 125.dp else 65.dp
+    val collapsedselectedHeight = if (selectedMessage != null) 40.dp else 0.dp
+    // Анимация высоты Row
+    val height by animateDpAsState(targetValue = collapsedHeight)
+    val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
+
+
     Box(
         modifier = Modifier
             .background(Color.White)
@@ -348,6 +356,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                     .padding(horizontal = 10.dp)
                     .fillMaxWidth()
                     .heightIn(max = 125.dp, min = 65.dp)
+                    .height(height)
                     .clip(RoundedCornerShape(20.dp))
                     .background(Color(0xFFF3F4F6))
 
@@ -361,7 +370,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             .padding(top = 10.dp, start = 1.dp, end = 1.dp)
                             .clip(RoundedCornerShape(10.dp))
                             .fillMaxWidth(0.95f)
-                            .height(40.dp)
+                            .height(selectedHeight)
                             .background(Color.White)
                             ,
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -379,31 +388,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
                                 }
 
-                                Column(
-                                    modifier = Modifier
-                                        .padding(top = 5.dp, start = 16.dp, end = 8.dp, bottom = 2.dp)
-                                ) {
-                                    Text(
-                                        text = if (selectedMessageSenderName == "") "Вы" else selectedMessageSenderName!!,
-                                        style = TextStyle(
-                                            color = Color(0xff000000),
-                                            fontSize = 12.sp,
-                                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                                        ),
-
-                                        )
-                                    selectedMessage!!.content?.let {
-                                        Text(
-                                            text = it,
-                                            style = TextStyle(
-                                                color = Color(0xff979797),
-                                                fontSize = 12.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                            ),
-
-                                            )
-                                    }
-                                }
+                                SelectedMessageFormat(selectedMessage!!, selectedMessageSenderName!!)
                             }
 
                             Box(modifier = Modifier.padding(end = 4.dp).fillMaxHeight().width(60.dp).pointerInput(Unit) {
@@ -412,7 +397,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Close",
-                                    tint = Color(0xFF2A293C),
+                                    tint = Color(0xFF979797),
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
