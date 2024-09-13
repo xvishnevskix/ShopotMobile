@@ -62,13 +62,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     var downloadProgress = MutableStateFlow(0f)
 
 
-    private val _selectedMessage = MutableStateFlow<MessageItem?>(null)
-    val selectedMessage: StateFlow<MessageItem?> = _selectedMessage.asStateFlow()
+    private val _selectedMessagesByChat = MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
+    val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> = _selectedMessagesByChat.asStateFlow()
 
 
-    private val _selectedMessageSenderName = MutableStateFlow<String?>(null)
-    val selectedMessageSenderName: StateFlow<String?> = _selectedMessageSenderName.asStateFlow()
-    
     init {
         
         
@@ -381,14 +378,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
         
     }
 
-    fun selectMessageProfileAndSenderName(message: MessageItem, senderName: String) {
-        _selectedMessage.value = message
-        _selectedMessageSenderName.value = senderName
+    fun selectMessage(chatId: String, message: MessageItem, senderName: String) {
+        _selectedMessagesByChat.value = _selectedMessagesByChat.value.toMutableMap().apply {
+            this[chatId] = Pair(message, senderName)
+        }
     }
 
-    fun clearSelection() {
-        _selectedMessage.value = null
-        _selectedMessageSenderName.value = null
+    fun clearSelection(chatId: String) {
+        _selectedMessagesByChat.value = _selectedMessagesByChat.value.toMutableMap().apply {
+            this[chatId] = Pair(null, null)
+        }
     }
     
     

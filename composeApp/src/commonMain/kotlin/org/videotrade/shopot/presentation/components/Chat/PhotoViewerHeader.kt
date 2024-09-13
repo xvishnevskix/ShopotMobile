@@ -50,7 +50,7 @@ fun PhotoViewerHeader(name: String, time: String) {
         modifier = Modifier
             .background(Color(0xFF29303C).copy(alpha = 0.8f))
             .fillMaxWidth()
-            .padding(top = 30.dp, start = 15.dp, end = 15.dp),
+            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -69,13 +69,13 @@ fun PhotoViewerHeader(name: String, time: String) {
 
         Column {
             Text(
-                text = name,
+                text = if (name == "") "Вы" else name,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 fontSize = 16.sp,
                 color = Color.White
             )
 //            Text(
-//                text = time,
+//                text = "",
 //                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
 //                fontSize = 14.sp,
 //                color = Color.White

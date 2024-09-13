@@ -116,7 +116,7 @@ fun MessageBox(
                 detectHorizontalDragGestures(
                     onDragEnd = {
                         if (swipeOffset > 60) {
-                            viewModel.selectMessageProfileAndSenderName(message, messageSenderName)
+                            viewModel.selectMessage(chat.chatId, message, messageSenderName)
                         }
                         swipeOffset = 0f
                     },

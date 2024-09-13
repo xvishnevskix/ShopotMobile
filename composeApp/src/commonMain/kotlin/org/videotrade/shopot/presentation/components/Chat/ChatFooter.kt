@@ -135,9 +135,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
 
-    val selectedMessage by viewModel.selectedMessage.collectAsState()
-    val selectedMessageSenderName by viewModel.selectedMessageSenderName.collectAsState()
-    
+    val selectedMessagePair = viewModel.selectedMessagesByChat.collectAsState().value[chat.chatId]
+    val selectedMessage = selectedMessagePair?.first
+    val selectedMessageSenderName = selectedMessagePair?.second
     
     LaunchedEffect(isRecording) {
         if (isRecording) {
@@ -392,7 +392,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             }
 
                             Box(modifier = Modifier.padding(end = 4.dp).fillMaxHeight().width(60.dp).pointerInput(Unit) {
-                                viewModel.clearSelection()
+                                viewModel.clearSelection(chatId = chat.chatId)
                             }, contentAlignment = Alignment.CenterEnd) {
                                 Icon(
                                     imageVector = Icons.Default.Close,
