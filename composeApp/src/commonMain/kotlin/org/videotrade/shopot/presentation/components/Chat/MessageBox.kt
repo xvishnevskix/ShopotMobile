@@ -6,6 +6,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -70,9 +71,7 @@ fun MessageBox(
 ) {
     val isReadByMe = remember { mutableStateOf(false) }
     var swipeOffset by remember { mutableStateOf(0f) }
-    // Анимация прозрачности иконки
     val iconOpacity by animateFloatAsState(targetValue = if (swipeOffset > 0) swipeOffset / 75f else 0f)
-    // Анимация смещения для плавного движения
     val animatedOffset by animateFloatAsState(targetValue = swipeOffset)
 
 
@@ -110,19 +109,16 @@ fun MessageBox(
                 )
             }
             .pointerInput(Unit) {
-                detectDragGestures(
+                detectHorizontalDragGestures(
                     onDragEnd = {
-                        // Проверяем, достаточно ли было свайпа для выполнения действия
-                        if (swipeOffset > 50) { // Порог для выполнения действия
-//                            viewModel.triggerReplyAction(message) // Вызов метода для изменения состояния в ViewModel
+                        if (swipeOffset > 60) {
+                            viewModel.selectMessageProfileAndSenderName(message, messageSenderName)
                         }
-                        // Сбрасываем смещение
                         swipeOffset = 0f
                     },
-                    onDrag = { change, dragAmount ->
-                        change.consume() // Поглощаем жест
-                        // Обновляем смещение свайпа, замедляя его для плавности
-                        swipeOffset = (swipeOffset + dragAmount.x / 2).coerceIn(0f, 75f) // Регулируйте значение делителя для изменения скорости
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume() // Поглощение жеста
+                        swipeOffset = (swipeOffset + dragAmount / 2).coerceIn(0f, 75f) // изменение скорости
                     }
                 )
             }
@@ -146,7 +142,7 @@ fun MessageBox(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(Res.drawable.chat_reply), // Replace with your icon resource
+                        painter = painterResource(Res.drawable.chat_reply),
                         contentDescription = null,
                         modifier = Modifier
                             .size(23.dp)
@@ -294,7 +290,6 @@ fun MessageFormat(
 ) {
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
         MessageText(message, profile)
-//        FileMessage(message, )
     } else {
         
         when (message.attachments!![0].type) {

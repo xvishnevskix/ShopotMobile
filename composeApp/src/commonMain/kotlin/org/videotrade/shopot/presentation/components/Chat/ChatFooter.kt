@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -42,6 +43,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -57,6 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
@@ -91,6 +94,7 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
@@ -128,6 +132,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
+
+    val selectedMessage by viewModel.selectedMessage.collectAsState()
+    val selectedMessageSenderName by viewModel.selectedMessageSenderName.collectAsState()
     
     
     LaunchedEffect(isRecording) {
@@ -329,375 +336,452 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     
     
     ) {
-        Popup(
-            alignment = Alignment.TopStart,
-            onDismissRequest = { showMenu = false },
-        ) {
-            AnimatedVisibility(
-                visible = showMenu,
-                enter = fadeIn() + scaleIn(initialScale = 0.1f),
-                exit = fadeOut() + scaleOut(targetScale = 0.9f)
+
+        
+        
+
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth()
+                    .heightIn(max = 125.dp, min = 65.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color(0xFFF3F4F6))
+
             ) {
                 Column(
-                    modifier = Modifier
-                        .pointerInput(Unit) { showMenu = false }
-                        .padding(bottom = 55.dp, start = 12.dp)
-                        .fillMaxWidth(0.5f)
-                        .shadow(
-                            elevation = 6.dp,
-                            shape = RoundedCornerShape(8.dp),
-                            clip = false,
-                            ambientColor = Color.Gray,
-                            spotColor = Color.Gray
-                        )
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White)
-                
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    menuItems.forEachIndexed { index, editOption ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .padding(
-                                    start = 16.dp,
-                                    end = 16.dp,
-                                    top = 9.dp,
-                                    bottom = 5.dp
-                                )
-                                .fillMaxWidth()
-                                .pointerInput(Unit) {
-                                    editOption.onClick()
-                                    showMenu = false
+
+                    if (selectedMessage != null && selectedMessageSenderName != null) {
+                        Row(modifier = Modifier
+                            .padding(top = 10.dp, start = 1.dp, end = 1.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .fillMaxWidth(0.95f)
+                            .height(40.dp)
+                            .background(Color.White)
+                            ,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        )
+
+                        {
+
+                            Box() {
+                                Box(modifier = Modifier
+                                    .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
+                                    .width(6.dp)
+                                    .fillMaxHeight()
+                                    .background(Color(0xff2A293C))) {
+
                                 }
-                        
-                        ) {
-                            Image(
-                                painter = painterResource(editOption.imagePath),
-                                contentDescription = null,
-                                modifier = Modifier.size(25.dp),
-                                colorFilter = ColorFilter.tint(Color(0xff000000))
-                            )
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Text(
-                                text = editOption.text,
-                                textAlign = TextAlign.Center,
-                                fontSize = 15.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF000000)
-                            )
-                        }
-                        if (index < menuItems.size - 1) {
-                            Divider(color = Color.Gray.copy(alpha = 0.12f))
-                        } else {
-                            Spacer(modifier = Modifier.height(4.dp))
+
+                                Column(
+                                    modifier = Modifier
+                                        .padding(top = 5.dp, start = 16.dp, end = 8.dp, bottom = 2.dp)
+                                ) {
+                                    Text(
+                                        text = if (selectedMessageSenderName == "") "Вы" else selectedMessageSenderName!!,
+                                        style = TextStyle(
+                                            color = Color(0xff000000),
+                                            fontSize = 12.sp,
+                                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                                        ),
+
+                                        )
+                                    selectedMessage!!.content?.let {
+                                        Text(
+                                            text = it,
+                                            style = TextStyle(
+                                                color = Color(0xff979797),
+                                                fontSize = 12.sp,
+                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                            ),
+
+                                            )
+                                    }
+                                }
+                            }
+
+                            Box(modifier = Modifier.padding(end = 4.dp).fillMaxHeight().width(60.dp).pointerInput(Unit) {
+                                viewModel.clearSelection()
+                            }, contentAlignment = Alignment.CenterEnd) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
+                                    tint = Color(0xFF2A293C),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
-                }
-            }
-        }
-        
-        
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth()
-                .heightIn(max = 125.dp, min = 60.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color(0xFFF3F4F6))
-        
-        ) {
-            if (!isRecording) {
-                Box(
-                    modifier = Modifier
-                        .padding(start = 15.dp, end = 15.dp)
-                        .size(37.dp)
-                        .background(color = Color(0xFF2A293C), shape = CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Add",
-                        tint = Color.White,
+
+
+                    Popup(
+                        alignment = Alignment.TopStart,
+                        onDismissRequest = { showMenu = false },
+                    ) {
+                        AnimatedVisibility(
+                            visible = showMenu,
+                            enter = scaleIn(initialScale = 0.1f),
+                            exit = fadeOut() + scaleOut(targetScale = 0.9f)
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .pointerInput(Unit) { showMenu = false }
+                                    .padding(bottom = 55.dp, start = 12.dp)
+                                    .fillMaxWidth(0.5f)
+                                    .shadow(
+                                        elevation = 6.dp,
+                                        shape = RoundedCornerShape(8.dp),
+                                        clip = false,
+                                        ambientColor = Color.Gray,
+                                        spotColor = Color.Gray
+                                    )
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.White)
+
+                            ) {
+                                menuItems.forEachIndexed { index, editOption ->
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        modifier = Modifier
+                                            .padding(
+                                                start = 16.dp,
+                                                end = 16.dp,
+                                                top = 9.dp,
+                                                bottom = 5.dp
+                                            )
+                                            .fillMaxWidth()
+                                            .pointerInput(Unit) {
+                                                editOption.onClick()
+                                                showMenu = false
+                                            }
+
+                                    ) {
+                                        Image(
+                                            painter = painterResource(editOption.imagePath),
+                                            contentDescription = null,
+                                            modifier = Modifier.size(25.dp),
+                                            colorFilter = ColorFilter.tint(Color(0xff000000))
+                                        )
+                                        Spacer(modifier = Modifier.width(20.dp))
+                                        Text(
+                                            text = editOption.text,
+                                            textAlign = TextAlign.Center,
+                                            fontSize = 15.sp,
+                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                            lineHeight = 20.sp,
+                                            color = Color(0xFF000000)
+                                        )
+                                    }
+                                    if (index < menuItems.size - 1) {
+                                        Divider(color = Color.Gray.copy(alpha = 0.12f))
+                                    } else {
+                                        Spacer(modifier = Modifier.height(4.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
-                            .size(20.dp)
+                            .heightIn(max = 125.dp, min = 60.dp)
+                    ) {
+                        if (!isRecording) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(start = 15.dp, end = 15.dp)
+                                    .size(37.dp)
+                                    .background(color = Color(0xFF2A293C), shape = CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Menu",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .size(20.dp)
 //                            .clickable {
 //                                singleImagePicker.launch()
 //                            }
-                            
-                            .clickable {
-                                showMenu = true
-                            }
-                    )
-                    
-                    
-                }
-                
-                
-            } else {
-                Row(
-                    modifier = Modifier.padding(start = 15.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .background(
-                                Color.Red.copy(alpha = recordingCircleAlpha),
-                                shape = CircleShape
-                            )
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
-                    val hours = recordingTime / 3600
-                    val minutes = (recordingTime % 3600) / 60
-                    val seconds = recordingTime % 60
-                    Text(
-                        text = "$hours:${minutes.toString().padStart(2, '0')}:${
-                            seconds.toString().padStart(2, '0')
-                        }",
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797),
-                    )
-                }
-                
-                Row(
-                    modifier = Modifier
-                        .padding(start = 50.dp)
-                        .fillMaxWidth(0.45f)
-                        .offset(x = (textOffset + swipeOffset.value).dp)
-                        .alpha(1f + (swipeOffset.value / 100f))
-                        .animateContentSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .padding(end = 3.dp)
-                            .size(width = 7.dp, height = 14.dp),
-                        painter = painterResource(Res.drawable.chat_arrow_left),
-                        contentDescription = null,
-                    )
-                    Text(
-                        text = stringResource(MokoRes.strings.left_cancel),
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797),
-                        modifier = Modifier
-                    )
-                }
-            }
-            
-            BasicTextField(
-                value = text,
-                onValueChange = { newText ->
-                    if (!isRecording) {
-                        text = newText
-                    }
-                },
-                modifier = Modifier
-                    .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
-                    .weight(1f)
-                    .padding(3.dp)
-                    .alpha(if (isRecording) 0f else 1f)
-                    .then(if (isRecording) Modifier.height(0.dp) else Modifier),
-                textStyle = TextStyle(
-                    color = Color.Black,
-                    fontSize = 16.sp
-                ),
-                cursorBrush = SolidColor(Color.Black),
-                visualTransformation = VisualTransformation.None,
-                decorationBox = { innerTextField ->
-                    Box {
-                        if (text.isEmpty()) {
-                            Text(
-                                stringResource(MokoRes.strings.write_message),
-                                textAlign = TextAlign.Center,
-                                fontSize = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF979797),
-                            )
-                        }
-                        innerTextField()
-                    }
-                },
-            )
-            
-            
-            if (text.isNotEmpty()) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send",
-                    tint = Color(0xFF29303C),
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .padding(end = 15.dp)
-                        .pointerInput(Unit) {
-                            detectTapGestures(onTap = {
-                                if (text.isNotBlank()) {
-                                    viewModel.sendMessage(
-                                        content = text,
-                                        fromUser = viewModel.profile.value.id,
-                                        chatId = chat.id,
-                                        notificationToken = chat.notificationToken,
-                                        attachments = emptyList(),
-                                        login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
-                                        true
-                                    )
-                                    text = ""
-                                }
-                            })
-                        }
-                )
-            } else {
 
-//                val alpha = (105f + offset.x) / 20f
-                val scale = 1f + (offset.x / 850f)
-                
-                Box(
-                    contentAlignment = Alignment.CenterEnd,
-                    modifier = Modifier
-                        .padding(end = if (!isRecording) 15.dp else 0.dp)
-                        .size(height = 65.dp, width = if (isRecording) 150.dp else 20.dp)
-                        .clip(RoundedCornerShape(50))
-                        .pointerInput(Unit) {
-                            detectDragGestures(
-                                onDragStart = {
-                                    println("Drag started")
-                                    isDragging = true
-                                },
-                                onDragEnd = {
-                                    println("Drag ended")
-                                    isDragging = false
-                                    // Проверяем, если смещение больше -200f, то сбрасываем смещение
-                                    if (offset.x > -200f) {
-                                        println("Drag send")
-                                        
-                                        val seconds = recordingTime % 60
-                                        
-                                        if (seconds > 1) {
-                                            val fileDir = audioRecorder.stopRecording(true)
-                                            
-                                            if (fileDir !== null) {
-                                                isStartRecording = false
-                                                
-                                                viewModel.sendVoice(fileDir, chat, voiceName)
-                                            }
+                                        .clickable {
+                                            showMenu = true
                                         }
-                                        
-                                        println("Drag isStop")
-                                        
-                                        viewModel.setIsRecording(false)
-                                        offset = Offset.Zero
-                                    } else {
-                                        println("Drag stop")
-                                        
-                                        // Если смещение больше чем -200f, завершаем запись
-                                        viewModel.setIsRecording(false)
-                                        
-                                        offset = Offset.Zero
-                                    }
-                                },
-                                onDrag = { change, dragAmount ->
-//                                    println("dragAmount ${dragAmount}")
-                                    
-                                    
-                                    change.consume()
-                                    val newOffset = Offset(
-                                        x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
-                                            .coerceAtMost(0f),
-                                        y = offset.y
-                                    )
-                                    
-                                    if (newOffset.x <= -200f) {
-                                        
-                                        viewModel.setIsRecording(false)
-                                        
-                                        audioRecorder.stopRecording(false)
-                                        
-                                        offset = Offset.Zero
-                                    }
-                                    
-                                    offset = newOffset
-                                }
-                            )
-                        }
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = {
-                                    println("Tap detected")
-                                    
-                                    val seconds = recordingTime % 60
-                                    
-                                    if (seconds > 1) {
-                                        val fileDir = audioRecorder.stopRecording(true)
-                                        
-                                        if (fileDir !== null) {
-                                            isStartRecording = false
-                                            
-                                            viewModel.sendVoice(fileDir, chat, voiceName)
-                                            
-                                        }
-                                    }
-                                    
-                                    viewModel.setIsRecording(false)
-                                    
-                                    recordingTime = 0
-                                    isDragging = false
-                                    
-                                    
-                                },
-                                onPress = {
-                                    if (!isDragging) {
-                                        viewModel.setIsRecording(!isRecording)
-                                    }
-                                    println("Press released")
-                                    
-                                    
-                                }
-                            )
-                        }
-                ) {
-                    val sizeModifier = if (isRecording) {
-                        Modifier.size(width = 65.dp, height = 60.dp)
-                    } else {
-                        Modifier.size(width = 17.dp, height = 26.dp)
-                    }
-                    
-                    Image(
-                        modifier = sizeModifier
-                            .offset {
-                                IntOffset(
-                                    offset.x.roundToInt(),
-                                    offset.y.roundToInt()
+                                )
+
+
+                            }
+
+
+                        } else {
+                            Row(
+                                modifier = Modifier.padding(start = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(10.dp)
+                                        .background(
+                                            Color.Red.copy(alpha = recordingCircleAlpha),
+                                            shape = CircleShape
+                                        )
+                                )
+                                Spacer(modifier = Modifier.width(15.dp))
+                                val hours = recordingTime / 3600
+                                val minutes = (recordingTime % 3600) / 60
+                                val seconds = recordingTime % 60
+                                Text(
+                                    text = "$hours:${minutes.toString().padStart(2, '0')}:${
+                                        seconds.toString().padStart(2, '0')
+                                    }",
+                                    fontSize = 13.sp,
+                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                    lineHeight = 20.sp,
+                                    color = Color(0xFF979797),
                                 )
                             }
-                            .scale(1f + (offset.x / 850f)),
-                        painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(
-                            Res.drawable.chat_micro_active
-                        ),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+
+                            Row(
+                                modifier = Modifier
+                                    .padding(start = 50.dp)
+                                    .fillMaxWidth(0.45f)
+                                    .offset(x = (textOffset + swipeOffset.value).dp)
+                                    .alpha(1f + (swipeOffset.value / 100f))
+                                    .animateContentSize(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.Center
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .padding(end = 3.dp)
+                                        .size(width = 7.dp, height = 14.dp),
+                                    painter = painterResource(Res.drawable.chat_arrow_left),
+                                    contentDescription = null,
+                                )
+                                Text(
+                                    text = stringResource(MokoRes.strings.left_cancel),
+                                    fontSize = 13.sp,
+                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                    lineHeight = 20.sp,
+                                    color = Color(0xFF979797),
+                                    modifier = Modifier
+                                )
+                            }
+                        }
+
+                        BasicTextField(
+                            value = text,
+                            onValueChange = { newText ->
+                                if (!isRecording) {
+                                    text = newText
+                                }
+                            },
+                            modifier = Modifier
+                                .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
+                                .weight(1f)
+                                .padding(3.dp)
+                                .alpha(if (isRecording) 0f else 1f)
+                                .then(if (isRecording) Modifier.height(0.dp) else Modifier),
+                            textStyle = TextStyle(
+                                color = Color.Black,
+                                fontSize = 16.sp
+                            ),
+                            cursorBrush = SolidColor(Color.Black),
+                            visualTransformation = VisualTransformation.None,
+                            decorationBox = { innerTextField ->
+                                Box {
+                                    if (text.isEmpty()) {
+                                        Text(
+                                            stringResource(MokoRes.strings.write_message),
+                                            textAlign = TextAlign.Center,
+                                            fontSize = 16.sp,
+                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                            lineHeight = 20.sp,
+                                            color = Color(0xFF979797),
+                                        )
+                                    }
+                                    innerTextField()
+                                }
+                            },
+                        )
+
+
+                        if (text.isNotEmpty()) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Send,
+                                contentDescription = "Send",
+                                tint = Color(0xFF29303C),
+                                modifier = Modifier
+                                    .padding(2.dp)
+                                    .padding(end = 15.dp)
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(onTap = {
+                                            if (text.isNotBlank()) {
+                                                viewModel.sendMessage(
+                                                    content = text,
+                                                    fromUser = viewModel.profile.value.id,
+                                                    chatId = chat.id,
+                                                    notificationToken = chat.notificationToken,
+                                                    attachments = emptyList(),
+                                                    login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
+                                                    true
+                                                )
+                                                text = ""
+                                            }
+                                        })
+                                    }
+                            )
+                        } else {
+
+//                val alpha = (105f + offset.x) / 20f
+                            val scale = 1f + (offset.x / 850f)
+
+                            Box(
+                                contentAlignment = Alignment.CenterEnd,
+                                modifier = Modifier
+                                    .padding(end = if (!isRecording) 15.dp else 0.dp)
+                                    .size(height = 65.dp, width = if (isRecording) 150.dp else 20.dp)
+                                    .clip(RoundedCornerShape(50))
+                                    .pointerInput(Unit) {
+                                        detectDragGestures(
+                                            onDragStart = {
+                                                println("Drag started")
+                                                isDragging = true
+                                            },
+                                            onDragEnd = {
+                                                println("Drag ended")
+                                                isDragging = false
+                                                // Проверяем, если смещение больше -200f, то сбрасываем смещение
+                                                if (offset.x > -200f) {
+                                                    println("Drag send")
+
+                                                    val seconds = recordingTime % 60
+
+                                                    if (seconds > 1) {
+                                                        val fileDir = audioRecorder.stopRecording(true)
+
+                                                        if (fileDir !== null) {
+                                                            isStartRecording = false
+
+                                                            viewModel.sendVoice(fileDir, chat, voiceName)
+                                                        }
+                                                    }
+
+                                                    println("Drag isStop")
+
+                                                    viewModel.setIsRecording(false)
+                                                    offset = Offset.Zero
+                                                } else {
+                                                    println("Drag stop")
+
+                                                    // Если смещение больше чем -200f, завершаем запись
+                                                    viewModel.setIsRecording(false)
+
+                                                    offset = Offset.Zero
+                                                }
+                                            },
+                                            onDrag = { change, dragAmount ->
+//                                    println("dragAmount ${dragAmount}")
+
+
+                                                change.consume()
+                                                val newOffset = Offset(
+                                                    x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
+                                                        .coerceAtMost(0f),
+                                                    y = offset.y
+                                                )
+
+                                                if (newOffset.x <= -200f) {
+
+                                                    viewModel.setIsRecording(false)
+
+                                                    audioRecorder.stopRecording(false)
+
+                                                    offset = Offset.Zero
+                                                }
+
+                                                offset = newOffset
+                                            }
+                                        )
+                                    }
+                                    .pointerInput(Unit) {
+                                        detectTapGestures(
+                                            onTap = {
+                                                println("Tap detected")
+
+                                                val seconds = recordingTime % 60
+
+                                                if (seconds > 1) {
+                                                    val fileDir = audioRecorder.stopRecording(true)
+
+                                                    if (fileDir !== null) {
+                                                        isStartRecording = false
+
+                                                        viewModel.sendVoice(fileDir, chat, voiceName)
+
+                                                    }
+                                                }
+
+                                                viewModel.setIsRecording(false)
+
+                                                recordingTime = 0
+                                                isDragging = false
+
+
+                                            },
+                                            onPress = {
+                                                if (!isDragging) {
+                                                    viewModel.setIsRecording(!isRecording)
+                                                }
+                                                println("Press released")
+
+
+                                            }
+                                        )
+                                    }
+                            ) {
+                                val sizeModifier = if (isRecording) {
+                                    Modifier.size(width = 65.dp, height = 60.dp)
+                                } else {
+                                    Modifier.size(width = 17.dp, height = 26.dp)
+                                }
+
+                                Image(
+                                    modifier = sizeModifier
+                                        .offset {
+                                            IntOffset(
+                                                offset.x.roundToInt(),
+                                                offset.y.roundToInt()
+                                            )
+                                        }
+                                        .scale(1f + (offset.x / 850f)),
+                                    painter = if (!isRecording) painterResource(Res.drawable.chat_microphone) else painterResource(
+                                        Res.drawable.chat_micro_active
+                                    ),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
 //                        colorFilter = ColorFilter.tint(Color(0xFF29303C))
-                    )
+                                )
+                            }
+
+                        }
+                    }
                 }
-                
+
             }
         }
     }
-}
 
 
-fun sendVoiceMessage() {
-
-
-}

@@ -60,6 +60,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     
     var downloadProgress = MutableStateFlow(0f)
+
+
+    private val _selectedMessage = MutableStateFlow<MessageItem?>(null)
+    val selectedMessage: StateFlow<MessageItem?> = _selectedMessage.asStateFlow()
+
+
+    private val _selectedMessageSenderName = MutableStateFlow<String?>(null)
+    val selectedMessageSenderName: StateFlow<String?> = _selectedMessageSenderName.asStateFlow()
     
     init {
         
@@ -371,6 +379,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
             }
         }
         
+    }
+
+    fun selectMessageProfileAndSenderName(message: MessageItem, senderName: String) {
+        _selectedMessage.value = message
+        _selectedMessageSenderName.value = senderName
+    }
+
+    fun clearSelection() {
+        _selectedMessage.value = null
+        _selectedMessageSenderName.value = null
     }
     
     
