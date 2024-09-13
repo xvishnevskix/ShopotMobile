@@ -93,3 +93,18 @@ fun getCurrentTimeList(): List<Int> {
     )
 }
 
+fun formatDateOnly(dateOnly: List<Int>): String {
+    return try {
+        // Преобразуем список в дату
+
+        val month = dateOnly[1]
+        val day = dateOnly[2]
+
+        // Форматируем дату в нужном виде, например, "13.09.2024"
+        "${
+            day.toString().padStart(2, '0')
+        }.${month.toString().padStart(2, '0')}"
+    } catch (e: Exception) {
+        ""
+    }
+}
