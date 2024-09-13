@@ -16,8 +16,10 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -38,7 +40,7 @@ fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName
             .padding(top = 5.dp, start = 16.dp, end = 8.dp, bottom = 2.dp)
     ) {
         Text(
-            text = if (selectedMessageSenderName == "") "Вы" else selectedMessageSenderName,
+            text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
             style = TextStyle(
                 color = Color(0xff000000),
                 fontSize = 12.sp,
@@ -58,7 +60,7 @@ fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName
             )
             Spacer(modifier = Modifier.width(2.dp))
             Text(
-                text = "Голосовое сообщение",
+                text = stringResource(MokoRes.strings.voice_message),
                 style = TextStyle(
                     color = Color(0xff979797),
                     fontSize = 12.sp,

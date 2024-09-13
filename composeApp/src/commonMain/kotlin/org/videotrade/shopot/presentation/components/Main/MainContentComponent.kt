@@ -174,7 +174,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                     ) {
                                         Row {
                                             Text(
-                                                "Создайте новый чат",
+                                                stringResource(MokoRes.strings.create_new_chat),
                                                 modifier = Modifier,
                                                 textAlign = TextAlign.Center,
                                                 fontSize = 20.sp,

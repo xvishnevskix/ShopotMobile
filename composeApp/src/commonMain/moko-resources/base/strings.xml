@@ -161,4 +161,9 @@
     <string name="you_will_be_returned_to_the_initial_login_screen">You will be returned to the initial login screen</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+
+    <string name="you">You</string>
+    <string name="voice_message">Voice message</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="create_new_chat">Create a new chat</string>
 </resources>

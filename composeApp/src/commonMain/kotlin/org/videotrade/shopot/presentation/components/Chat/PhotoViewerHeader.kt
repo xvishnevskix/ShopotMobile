@@ -69,7 +69,7 @@ fun PhotoViewerHeader(name: String, time: String) {
 
         Column {
             Text(
-                text = if (name == "") "Вы" else name,
+                text = if (name == "") stringResource(MokoRes.strings.you) else name,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 fontSize = 16.sp,
                 color = Color.White

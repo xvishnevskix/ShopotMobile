@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.intl.Locale
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.LocalDateTime
@@ -12,8 +13,13 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import org.videotrade.shopot.MokoRes
+
 @Composable
 fun formatTimestamp(timestamp: List<Int>): String {
+
+    val yesterday = stringResource(MokoRes.strings.yesterday)
+
     return try {
         val year = timestamp[0]
         val month = timestamp[1]
@@ -49,7 +55,9 @@ fun formatTimestamp(timestamp: List<Int>): String {
             
             dateTimeInCurrentZone.date == currentDate.minus(1, DateTimeUnit.DAY) -> {
                 // Вчера - выводим "вчера"
-                "Вчера"
+                yesterday + " ${
+                    dateTimeInCurrentZone.hour.toString().padStart(2, '0')
+                }:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
             }
             
             dateTimeInCurrentZone.date >= currentDate.minus(6, DateTimeUnit.DAY) -> {

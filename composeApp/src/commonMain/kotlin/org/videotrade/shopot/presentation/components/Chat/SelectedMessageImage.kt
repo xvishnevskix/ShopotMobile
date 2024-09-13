@@ -29,8 +29,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.rememberAsyncImagePainter
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
@@ -113,7 +115,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
 
 
             Text(
-                text = if (selectedMessageSenderName == "") "Вы" else selectedMessageSenderName,
+                text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
                 style = TextStyle(
                     color = Color(0xff000000),
                     fontSize = 12.sp,
@@ -134,7 +136,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = "Фото",
+                        text = stringResource(MokoRes.strings.photo),
                         style = TextStyle(
                             color = Color(0xff979797),
                             fontSize = 12.sp,
