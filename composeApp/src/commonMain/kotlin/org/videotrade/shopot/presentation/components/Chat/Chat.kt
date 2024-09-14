@@ -77,8 +77,7 @@ fun Chat(
     val coroutineScope = rememberCoroutineScope()
 
     
-
-
+    
     
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
