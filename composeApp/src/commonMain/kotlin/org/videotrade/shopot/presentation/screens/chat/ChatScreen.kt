@@ -79,13 +79,13 @@ class ChatScreen(
         }
         
         
-        var selectedMessage by remember { mutableStateOf<MessageItem?>(null) }
+        val selectedMessage = remember { mutableStateOf<MessageItem?>(null) }
         var selectedMessageY by remember { mutableStateOf(0) }
         var hiddenMessageId by remember { mutableStateOf<String?>(null) }
         
         
         Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
-            SafeArea(isBlurred = selectedMessage != null, 7.dp) {
+            SafeArea(isBlurred = selectedMessage.value != null, 7.dp) {
                 Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
                     Scaffold(
                         topBar = {
@@ -108,8 +108,8 @@ class ChatScreen(
                                
                             ,
                             onMessageClick = { message, y ->
-                                
-                                selectedMessage = message
+                                println("message4124141 ${message}")
+                                selectedMessage.value  = message
                                 selectedMessageY = y + 150
                                 hiddenMessageId = message.id
                             },
@@ -125,10 +125,10 @@ class ChatScreen(
             BlurredMessageOverlay(
                 profile,
                 viewModel,
-                selectedMessage = selectedMessage,
+                selectedMessage = selectedMessage.value ,
                 selectedMessageY = selectedMessageY,
                 onDismiss = {
-                    selectedMessage = null
+                    selectedMessage.value  = null
                     hiddenMessageId = null
                 },
             )

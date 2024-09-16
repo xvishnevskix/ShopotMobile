@@ -48,10 +48,18 @@ class TestScreen : Screen {
     @Composable
     override fun Content() {
 
-        
+        val coroutineScope = rememberCoroutineScope()
+        val commonViewModel: CommonViewModel = koinInject()
+
 
         MaterialTheme {
             SafeArea {
+                Button(onClick = {
+
+                    commonViewModel.sendSocket()
+                }, content = {
+                  Text("Отправить Сокет")
+                })
             }
         }
     }

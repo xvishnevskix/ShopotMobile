@@ -1,13 +1,10 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
-import androidx.compose.material3.BottomSheetScaffoldState
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberBottomSheetScaffoldState
-import co.touchlab.kermit.Message
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,9 +32,6 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
-import org.videotrade.shopot.presentation.components.Chat.MessageImage
-import org.videotrade.shopot.presentation.components.Chat.MessageText
-import org.videotrade.shopot.presentation.components.Chat.VoiceMessage
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
@@ -251,25 +245,24 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
 
     fun sendForwardMessage(
-        message: MessageItem
+        messageId: String,
+        chatId:String,
     ) {
-        if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        } else {
+        viewModelScope.launch {
+            try {
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("action", "forwardMessage")
+                        put("chatId",chatId)
+                        put("messageId", messageId)
+                        put("userId", profileUseCase.getProfile().id)
+                    }
+                )
+                println("jsonContent $jsonContent")
+                wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
 
-            when (message.attachments!![0].type) {
-
-                "audio/mp4" -> {
-
-                }
-
-                "image" -> {
-
-
-                }
-
-                else -> {
-
-                }
+            } catch (e: Exception) {
+                println("Failed to send message: ${e.message}")
             }
         }
     }

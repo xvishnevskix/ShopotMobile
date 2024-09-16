@@ -19,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
@@ -31,6 +32,7 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.usecase.CommonUseCase
+import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
@@ -41,59 +43,60 @@ import org.videotrade.shopot.presentation.screens.test.TestScreen
 
 class CommonViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()
+    private val profileUseCase: ProfileUseCase by inject()
     private val commonUseCase: CommonUseCase by inject()
-    
+
     val toaster = ToasterState(viewModelScope)
 
 //    val showButtonNav = MutableStateFlow(true)
-    
+
     val mainNavigator = MutableStateFlow<Navigator?>(null)
     val tabNavigator = MutableStateFlow<TabNavigator?>(null)
-    
+
     val isRestartApp = MutableStateFlow(false)
-    
-    
+
+
     fun restartApp() {
         isRestartApp.value = true
-        
+
         mainNavigator.value?.push(IntroScreen())
     }
-    
+
     fun setMainNavigator(value: Navigator) {
         mainNavigator.value = value
         println("dsadaasaaaa")
         commonUseCase.setNavigator(value)
     }
-    
+
     fun setTabNavigator(value: TabNavigator) {
         tabNavigator.value = value
     }
-    
+
     fun connectionWs(navigator: Navigator) {
         viewModelScope.launch {
             wsUseCase.connectionWs("11111", navigator)
         }
     }
-    
+
     private fun updateNotificationToken() {
-        
+
         viewModelScope.launch {
-            
-            
+
+
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("notificationToken", NotifierManager.getPushNotifier().getToken())
                 }
             )
-            
-            
+
+
             println("jsonContent321323 $jsonContent")
-            
+
             origin().put("user/profile/edit", jsonContent)
         }
     }
-    
-    
+
+
     fun cipherShared(userId: String?, navigator: Navigator) {
         viewModelScope.launch {
             val httpClient = HttpClient {
@@ -105,51 +108,51 @@ class CommonViewModel : ViewModel(), KoinComponent {
                     host = webSocketsUrl,
                     port = 3050,
                     path = "/crypto?userId=$userId",
-                    
+
                     ) {
-                    
+
                     println("jsonElement$userId")
-                    
+
                     val jsonContent = Json.encodeToString(
                         buildJsonObject {
                             put("action", "getKeys")
                         }
                     )
-                    
+
                     send(Frame.Text(jsonContent))
-                    
+
                     for (frame in incoming) {
                         if (frame is Frame.Text) {
                             val text = frame.readText()
-                            
+
                             val jsonElement = Json.parseToJsonElement(text)
-                            
+
                             println("jsonElement $jsonElement")
-                            
+
                             val action =
                                 jsonElement.jsonObject["action"]?.jsonPrimitive?.content
-                            
-                            
+
+
                             when (action) {
                                 "answerPublicKey" -> {
                                     val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                                    
+
                                     val publicKeyString =
                                         jsonElement.jsonObject["publicKey"]?.jsonPrimitive?.content
-                                    
+
                                     val publicKeyBytes =
                                         publicKeyString?.decodeBase64()?.toByteArray()
-                                    
+
                                     println("publicKeyBytes ${publicKeyBytes?.encodeBase64()}")
-                                    
-                                    
+
+
                                     val result = publicKeyBytes?.let {
                                         cipherWrapper.getSharedSecretCommon(
                                             it
                                         )
                                     }
-                                    
-                                    
+
+
                                     if (result !== null) {
                                         val answerPublicKeyJsonContent = Json.encodeToString(
                                             buildJsonObject {
@@ -157,7 +160,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                                 put("cipherText", result.ciphertext.encodeBase64())
                                             }
                                         )
-                                        
+
                                         println(
                                             "successSharedSecret111 ${
                                                 EncapsulationFileResult(
@@ -166,7 +169,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                                 )
                                             }"
                                         )
-                                        
+
 
                                         addValueInStorage(
                                             "sharedSecret",
@@ -175,42 +178,64 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
                                         send(Frame.Text(answerPublicKeyJsonContent))
                                     }
-                                    
-                                    
+
+
                                 }
-                                
+
                                 "successSharedSecret" -> {
                                     val introViewModel: IntroViewModel =
                                         KoinPlatform.getKoin().get()
-                                    
+
                                     updateNotificationToken()
 
 //                                    navigator.push(TestScreen())
                                     introViewModel.fetchContacts(navigator)
-                                    
+
                                 }
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                
-                
+
+
             }
         }
-        
-        
-        
+
+
     }
-    
+
     fun sendImage() {
         viewModelScope.launch {
             val filePick = FileProviderFactory.create()
                 .pickFile(PickerType.Image)
             if (filePick !== null) {
-            
+
             }
         }
     }
-    
+
+
+    fun sendSocket() {
+        viewModelScope.launch {
+            try {
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("action", "forwardMessage")
+                        put("chatId", "a5800a2f-6637-4095-bbe2-327298b04bd6")
+                        put("messageId", "97c35b59-a131-41e3-866a-dc34721b7b22")
+                        put("userId", profileUseCase.getProfile().id)
+
+
+                    }
+                )
+                println("jsonContent $jsonContent")
+                wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+
+            } catch (e: Exception) {
+                println("Failed to send message: ${e.message}")
+            }
+        }
+    }
+
 }

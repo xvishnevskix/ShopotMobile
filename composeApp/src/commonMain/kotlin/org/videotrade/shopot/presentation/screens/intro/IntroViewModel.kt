@@ -24,6 +24,7 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.presentation.screens.test.TestScreen
 
 class IntroViewModel : ViewModel(), KoinComponent {
     
@@ -192,9 +193,11 @@ class IntroViewModel : ViewModel(), KoinComponent {
 //                        }
 //
                         chatsUseCase.getChatsInBack(wsSessionNew, profile.value!!.id)
-                        
+
                         navigator.value?.replace(MainScreen())
-                        
+//                        navigator.value?.replace(TestScreen())
+
+
                     }
                 }
                 

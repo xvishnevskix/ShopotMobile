@@ -153,7 +153,6 @@ fun MessageBox(
 //                        }
 //                    }
 
-                    println("message.forwardMessage ${message.forwardMessage}")
                   if(message.forwardMessage == true) {
                       Text(
                           "Пересланное сообщение",

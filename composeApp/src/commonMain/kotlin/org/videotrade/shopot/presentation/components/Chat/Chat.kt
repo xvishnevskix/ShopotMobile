@@ -45,9 +45,9 @@ data class EditOption(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun getEditOptions(scaffoldState: BottomSheetScaffoldState? = null): List<EditOption> {
-    
+
     val coroutineScope = rememberCoroutineScope()
-    
+
     return listOf(
         EditOption(
             text = stringResource(MokoRes.strings.delete),
@@ -89,10 +89,10 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    
-    
-    
-    
+
+
+
+
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
             .debounce(100) // добавляем задержку в 1 секунду
@@ -114,17 +114,17 @@ fun Chat(
 //            println("LLLL")
 //            focusManager.clearFocus() // Ваше действие при нажатии
 //        }
-    
+
     LazyColumn(
         state = listState,
         reverseLayout = true,
         modifier = modifier.background(Color.White)
-    
+
     ) {
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
-            
+
             // Инициализируем messageSenderName внутри itemsIndexed
 //            val messageSenderName = if (!chat.personal && message.fromUser != profile.id) {
 //                println("messageSenderName1 ${message.content} ${message.phone}")
@@ -140,10 +140,10 @@ fun Chat(
 //            } else {
 //                ""
 //            }
-            
+
             val messageSenderName = if (message.fromUser != profile.id) {
                 println("messageSenderName1 ${message.content} ${message.phone}")
-                
+
                 message.phone?.let {
                     val findContact = viewModel.findContactByPhone(it)
                     if (findContact != null) {
@@ -162,7 +162,10 @@ fun Chat(
                 message = message,
                 profile = profile,
                 messageSenderName = messageSenderName,  // Передаем значение напрямую
-                onClick = { onMessageClick(message, messageY) },
+                onClick = {
+                    println("message4124141 ${message}")
+                    onMessageClick(message, messageY)
+                },
                 onPositioned = { coordinates ->
                     messageY = coordinates.positionInParent().y.toInt()
                 },
