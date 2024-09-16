@@ -240,6 +240,7 @@ multiplatformResources {
 
 dependencies {
     implementation(libs.androidx.animation.core.android)
+    implementation(libs.androidx.core.i18n)
 }
 
 buildConfig {

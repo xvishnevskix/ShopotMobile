@@ -1,20 +1,29 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import FileMessage
+import SelectedFileMessage
+import SelectedMessageImage
+import SelectedMessageText
+import SelectedVoiceMessage
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
@@ -33,6 +43,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
+import androidx.core.i18n.MessageFormat
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.formatTimestamp
@@ -249,7 +261,7 @@ fun MessageBox(
                         )
                     }
 
-                    MessageFormat(message, profile, onClick, messageSenderName, chat)
+                            MessageFormat(message, profile, onClick, messageSenderName, chat)
                 }
 
 
@@ -299,7 +311,7 @@ fun MessageBox(
                 )
         }
     }
-}
+}}}
 
 
 @Composable
@@ -308,6 +320,7 @@ fun MessageFormat(
     profile: ProfileDTO,
     onMessageClick: () -> Unit,
     messageSenderName: String? = null,
+    chat: ChatItem? = null
 ) {
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
         MessageText(message, profile)
