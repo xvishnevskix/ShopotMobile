@@ -90,7 +90,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
 
     Row(
         modifier = Modifier
-            .padding(start = 10.dp, top = 2.dp),
+            .padding(start = 10.dp, end = 10.dp, top = 2.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -100,13 +100,13 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .size(35.dp, 35.dp)
+                .size(40.dp, 40.dp)
         )
 
 
         Column(
             modifier = Modifier
-                .padding(top = 3.dp, start = 8.dp, end = 8.dp, bottom = 2.dp)
+                .padding(top = 0.dp, start = 8.dp, end = 8.dp, bottom = 2.dp)
         ) {
 
 
@@ -114,7 +114,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
                 text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
                 style = TextStyle(
                     color = Color(0xff000000),
-                    fontSize = 12.sp,
+                    fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                 ),
 
@@ -127,7 +127,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
 
-                            .size(17.dp),
+                            .size(20.dp),
                         colorFilter = ColorFilter.tint(Color(0xFF979797))
                     )
                     Spacer(modifier = Modifier.width(2.dp))
@@ -135,7 +135,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
                         text = stringResource(MokoRes.strings.photo),
                         style = TextStyle(
                             color = Color(0xff979797),
-                            fontSize = 12.sp,
+                            fontSize = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                         ),
                     )

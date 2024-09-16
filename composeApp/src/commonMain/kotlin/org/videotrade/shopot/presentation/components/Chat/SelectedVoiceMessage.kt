@@ -34,13 +34,13 @@ fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName
 
     Column(
         modifier = Modifier
-            .padding(top = 5.dp, start = 16.dp, end = 8.dp, bottom = 2.dp)
+            .padding(top = 5.dp, start = 16.dp, end = 16.dp, bottom = 2.dp)
     ) {
         Text(
             text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
             style = TextStyle(
                 color = Color(0xff000000),
-                fontSize = 12.sp,
+                fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
             ),
 
@@ -60,7 +60,7 @@ fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName
                 text = stringResource(MokoRes.strings.voice_message),
                 style = TextStyle(
                     color = Color(0xff979797),
-                    fontSize = 12.sp,
+                    fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                 ),
             )

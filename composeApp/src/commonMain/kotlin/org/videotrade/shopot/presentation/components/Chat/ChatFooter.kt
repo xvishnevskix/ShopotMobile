@@ -38,6 +38,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -320,7 +321,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
     val expandedHeight = 125.dp
     val collapsedHeight = if (selectedMessage != null) 125.dp else 65.dp
-    val collapsedselectedHeight = if (selectedMessage != null) 40.dp else 0.dp
+    val collapsedselectedHeight = if (selectedMessage != null) 45.dp else 0.dp
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
@@ -376,7 +377,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
                     {
 
-                        Box() {
+                        Box(modifier = Modifier.widthIn(max = 320.dp)) {
                             Box(
                                 modifier = Modifier
                                     .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))

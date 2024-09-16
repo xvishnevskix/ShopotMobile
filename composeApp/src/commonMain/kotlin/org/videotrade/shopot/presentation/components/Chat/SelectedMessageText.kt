@@ -1,4 +1,5 @@
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,13 +22,13 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName: String) {
     Column(
         modifier = Modifier
-            .padding(top = 5.dp, start = 16.dp, end = 8.dp, bottom = 2.dp)
+            .padding(top = 5.dp, start = 22.dp, end = 22.dp, bottom = 2.dp)
     ) {
         Text(
             text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
             style = TextStyle(
                 color = Color(0xff000000),
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
             ),
 
@@ -37,7 +38,7 @@ fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName:
                 text = it,
                 style = TextStyle(
                     color = Color(0xff979797),
-                    fontSize = 12.sp,
+                    fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                 ),
 

@@ -18,13 +18,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -46,6 +54,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import org.jetbrains.compose.resources.Font
@@ -193,8 +203,29 @@ fun MessageBox(
                     ) {
 
                         Column(
-
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
+                            // ответ на сообщение
+//                            Row(
+//                                modifier = Modifier
+//                                    .padding(top = 4.dp, start = 4.dp, end = 4.dp)
+//                                    .clip(RoundedCornerShape(14.dp))
+//                                    .background(Color.White)
+//                                    .wrapContentHeight()
+//
+//                                ,
+//                                verticalAlignment = Alignment.Top,
+//                                horizontalArrangement = Arrangement.Start
+//                            )
+//                            {
+//                                SelectedMessageFormat(message, messageSenderName)
+//                            }
+
+
+
+
+
+
 //                    if (!chat.personal) {
 //                        if (message.fromUser != profile.id) {
 //                           Text(
@@ -283,6 +314,8 @@ fun MessageBox(
                     ),
                     modifier = Modifier.padding(),
                 )
+
+            println("ДАТАААА${message.created}")
         }
     }
 }
