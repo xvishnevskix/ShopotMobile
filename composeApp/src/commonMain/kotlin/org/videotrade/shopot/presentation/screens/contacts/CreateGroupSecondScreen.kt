@@ -38,6 +38,8 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dokar.sonner.ToastType
+import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
@@ -47,6 +49,10 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
+import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -59,10 +65,14 @@ class CreateGroupSecondScreen() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
+        val commonViewModel: CommonViewModel = koinInject()
+        val toasterViewModel: CommonViewModel = koinInject()
         val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
         val groupName = remember { mutableStateOf("") }
+        val fillInput = stringResource(MokoRes.strings.please_fill_in_the_group_name_input_field)
+        val groupNameError = remember { mutableStateOf<String?>("") }
         
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             selectedContacts
@@ -81,7 +91,8 @@ class CreateGroupSecondScreen() : Screen {
                 }
             }
         }
-        
+
+
 
             Box(
                 modifier = Modifier
@@ -107,7 +118,7 @@ class CreateGroupSecondScreen() : Screen {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
-                            CreateGroupInput(groupName)
+                            CreateGroupInput(groupName, groupNameError)
                             ParticipantCountText(selectedContacts.size)
                         }
                         itemsIndexed(filteredContacts) { _, item ->
@@ -121,8 +132,17 @@ class CreateGroupSecondScreen() : Screen {
                         CustomButton(
                             stringResource(MokoRes.strings.next),
                             {
-                                
-                                viewModel.createGroupChat(groupName.value)
+
+                                if (groupNameError.value != null) {
+                                    toasterViewModel.toaster.show(
+                                        fillInput,
+                                        type = ToastType.Error,
+                                        duration = ToasterDefaults.DurationDefault
+                                    )
+                                } else {
+                                    viewModel.createGroupChat(groupName.value)
+                                    commonViewModel.restartApp()
+                                }
 
                             })
                     }
@@ -208,55 +228,75 @@ private fun ChatItem(item: ContactDTO) {
 
 
 @Composable
-fun CreateGroupInput(groupName: MutableState<String>) {
-    
-    Row(
-        modifier = Modifier
-            .padding(start = 9.dp).fillMaxWidth(),
-        horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableState<String?>) {
+
+    val nameValidate1 = stringResource(MokoRes.strings.group_name_is_required)
+    val nameValidate2 = stringResource(MokoRes.strings.group_name_should_not_exceed_40_characters)
+    val nameValidate3 = stringResource(MokoRes.strings.group_name_can_contain_only_letters_and_numbers)
+
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier.background(Color(0xFF2A293C), shape = CircleShape).size(56.dp),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier
+                .padding(start = 9.dp).fillMaxWidth(),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(Res.drawable.edit_group_name),
-                contentDescription = "create group",
-                modifier = Modifier.padding(start = 6.dp).size(22.dp)
+            Box(
+                modifier = Modifier.background(Color(0xFF2A293C), shape = CircleShape).size(56.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource(Res.drawable.edit_group_name),
+                    contentDescription = "create group",
+                    modifier = Modifier.padding(start = 6.dp).size(22.dp)
+                )
+            }
+
+            TextField(
+                modifier = Modifier
+                    .width(232.dp)
+                    .padding(bottom = 15.dp, start = 25.dp)
+                    .background(Color(255, 255, 255)),
+
+                label = { Text(stringResource(MokoRes.strings.enter_group_name)) },
+                value = groupName.value,
+                singleLine = true,
+                textStyle = androidx.compose.ui.text.TextStyle(
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                    textAlign = TextAlign.Center,
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                    color = Color(0xFF000000),
+                ),
+                onValueChange = {
+                        newText -> groupName.value = newText
+                    groupNameError.value = validateGroupName(newText, nameValidate1, nameValidate2, nameValidate3) // Валидация никнейма
+                },
+                colors = TextFieldDefaults.colors(
+                    disabledLabelColor = Color(0xff979797),
+                    focusedLabelColor = Color.Transparent,
+                    focusedContainerColor = Color(255, 255, 255),
+                    disabledContainerColor = Color(255, 255, 255),
+                    unfocusedContainerColor = Color(255, 255, 255),
+                    focusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.9f),
+                    unfocusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.43f),
+                    disabledIndicatorColor = Color(0xffc5c7c6)
+                ),
+
+                )
+        }
+        groupNameError.value?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
             )
         }
-        
-        TextField(
-            modifier = Modifier
-                .width(232.dp)
-                .padding(bottom = 15.dp, start = 25.dp)
-                .background(Color(255, 255, 255)),
-            
-            label = { Text(stringResource(MokoRes.strings.enter_group_name)) },
-            value = groupName.value,
-            singleLine = true,
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                textAlign = TextAlign.Center,
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-                color = Color(0xFF000000),
-            ),
-            onValueChange = { newText -> groupName.value = newText },
-            colors = TextFieldDefaults.colors(
-                disabledLabelColor = Color(0xff979797),
-                focusedLabelColor = Color.Transparent,
-                focusedContainerColor = Color(255, 255, 255),
-                disabledContainerColor = Color(255, 255, 255),
-                unfocusedContainerColor = Color(255, 255, 255),
-                focusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.9f),
-                unfocusedIndicatorColor = Color(0xFFD9D9D9).copy(alpha = 0.43f),
-                disabledIndicatorColor = Color(0xffc5c7c6)
-            ),
-            
-            )
     }
 }
 
@@ -289,5 +329,14 @@ fun getPluralForm(number: Int, forms: Array<String>): String {
         n1 == 1 -> forms[0]
         n1 in 2..4 -> forms[1]
         else -> forms[2]
+    }
+}
+
+private fun validateGroupName(name: String, nameValidate1: String, nameValidate2: String, nameValidate4: String): String? {
+    return when {
+        name.isEmpty() -> nameValidate1
+        name.length > 40 -> nameValidate2
+        !name.matches(Regex("^[\\p{L}\\p{N}\\p{S}\\s]+$")) -> nameValidate4 // Добавлено поддержка эмодзи
+        else -> null
     }
 }

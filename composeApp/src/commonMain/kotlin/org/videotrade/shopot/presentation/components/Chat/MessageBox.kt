@@ -31,9 +31,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
@@ -72,7 +69,7 @@ fun MessageBox(
 //        }
 //    }
     val focusManager = LocalFocusManager.current
-
+    
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
             if (message.anotherRead) {
@@ -84,7 +81,7 @@ fun MessageBox(
             }
         }
     }
-
+    
     Column(
         modifier = Modifier
             .onGloballyPositioned(onPositioned)
@@ -95,45 +92,110 @@ fun MessageBox(
                     }
                 )
             }
+            .pointerInput(Unit) {
+                detectHorizontalDragGestures(
+                    onDragEnd = {
+                        if (swipeOffset > 60) {
+                            viewModel.selectMessage(chat.chatId, message, messageSenderName)
+                        }
+                        swipeOffset = 0f
+                    },
+                    onHorizontalDrag = { change, dragAmount ->
+                        change.consume() // Поглощение жеста
+                        swipeOffset =
+                            (swipeOffset + dragAmount / 2).coerceIn(0f, 75f) // изменение скорости
+                    }
+                )
+            }
     ) {
 
 
-        Box(
-            contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onLongPress = { onClick() }
+        BoxWithConstraints(
+            contentAlignment = Alignment.CenterStart
+        ) {
+            if (animatedOffset > 0) {
+                Box(
+                    modifier = Modifier
+                        .zIndex(2f)
+                        .offset(x = animatedOffset.dp / 4)
+                        .padding()
+                        .alpha(iconOpacity)
+                        .clip(RoundedCornerShape(50.dp))
+                        .size(35.dp).background(
+                            Color(0xFF2A293C)
+                                .copy(alpha = 0.1f)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.chat_reply),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(23.dp)
                     )
                 }
-//                    .clickable(
-//                    interactionSource = remember { MutableInteractionSource() },
-//                    indication = null // Убирает эффект нажатия
-//                ) {
-//                    focusManager.clearFocus() // Ваше действие при нажатии
-//                }
-        ) {
-
-
-            Surface(
-                modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
-                shape = RoundedCornerShape(
-                    topStart = 20.dp,
-                    topEnd = 20.dp,
-                    bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                    bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
-                ),
-                shadowElevation = 4.dp,
-                color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(
-                    0xFFF3F4F6
-                )
+            }
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
             ) {
 
-                Column(
 
+                Box(
+                    contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
+                    modifier = Modifier
+                        .offset(x = animatedOffset.dp)
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onLongPress = { onClick() }
+                            )
+                        }.clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null // Убирает эффект нажатия
+                        ) {
+                            focusManager.clearFocus() // Ваше действие при нажатии
+                        }
                 ) {
+                    Surface(
+                        modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
+                        shape = RoundedCornerShape(
+                            topStart = 20.dp,
+                            topEnd = 20.dp,
+                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
+                            bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                        ),
+                        shadowElevation = 4.dp,
+                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(
+                            0xFFF3F4F6
+                        )
+                    ) {
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            // ответ на сообщение
+//                            Row(
+//                                modifier = Modifier
+//                                    .padding(top = 4.dp, start = 4.dp, end = 4.dp)
+//                                    .clip(RoundedCornerShape(14.dp))
+//                                    .background(Color.White)
+//                                    .wrapContentHeight()
+//
+//                                ,
+//                                verticalAlignment = Alignment.Top,
+//                                horizontalArrangement = Arrangement.Start
+//                            )
+//                            {
+//                                SelectedMessageFormat(message, messageSenderName)
+//                            }
+
+
+
+
+
+
 //                    if (!chat.personal) {
 //                        if (message.fromUser != profile.id) {
 //                           Text(
@@ -223,8 +285,8 @@ fun MessageBox(
                         contentDescription = null,
                     )
                 }
-
-
+            
+            
             if (message.created.isNotEmpty())
                 Text(
                     text = formatTimestamp(message.created),
@@ -246,36 +308,78 @@ fun MessageFormat(
     profile: ProfileDTO,
     onMessageClick: () -> Unit,
     messageSenderName: String? = null,
-    chat: ChatItem? = null,
 ) {
-        if (message.attachments == null || message.attachments?.isEmpty() == true) {
-            MessageText(message, profile, chat)
-        } else {
+    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        MessageText(message, profile)
+//        FileMessage(message, )
+    } else {
+        
+        when (message.attachments!![0].type) {
+            
+            "audio/mp4" -> {
+                VoiceMessage(
+                    message,
+                    message.attachments!!
+                )
+            }
+            
+            "image" -> {
+                MessageImage(
+                    message, profile,
+                    message.attachments!!,
+                    messageSenderName
+                )
+                
+            }
+            
+            else -> {
+                FileMessage(
+                    message,
+                    message.attachments!!
+                )
+            }
+        }
+        
+        
+    }
+    
+}
 
-            when (message.attachments!![0].type) {
 
-                "audio/mp4" -> {
-                    VoiceMessage(
-                        message,
-                        message.attachments!!
-                    )
+@Composable
+fun SelectedMessageFormat(
+    message: MessageItem,
+    messageSenderName: String? = null,
+) {
+    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+        if (messageSenderName != null) {
+            SelectedMessageText(message, messageSenderName)
+        }
+    } else {
+
+        when (message.attachments!![0].type) {
+
+            "audio/mp4" -> {
+                if (messageSenderName != null) {
+                    SelectedVoiceMessage(message, messageSenderName)
+                }
+            }
+
+            "image" -> {
+                if (messageSenderName != null) {
+                    SelectedMessageImage(message.attachments!!, messageSenderName)
                 }
 
-                "image" -> {
-                    MessageImage(
-                        message, profile,
-                        message.attachments!!,
-                        messageSenderName
-                    )
+            }
 
-                }
-
-                else -> {
-                    FileMessage(
-                        message,
-                        message.attachments!!
-                    )
+            else -> {
+                if (messageSenderName != null) {
+                    SelectedFileMessage(message, messageSenderName)
                 }
             }
         }
+
+
+    }
+
 }
