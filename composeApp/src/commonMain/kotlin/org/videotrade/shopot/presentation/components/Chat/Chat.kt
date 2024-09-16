@@ -90,12 +90,9 @@ fun Chat(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
-
-
-
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
-            .debounce(100) // добавляем задержку в 1 секунду
+            .debounce(100) // задержка в 100 миллисекунд
             .distinctUntilChanged()
             .collect { visibleItems ->
                 if (viewModel.messages.value.size > 23) {
@@ -107,43 +104,18 @@ fun Chat(
                 }
             }
     }
-//        .clickable(
-////                    interactionSource = remember { MutableInteractionSource() },
-////                    indication = null // Убирает эффект нажатия
-//        ) {
-//            println("LLLL")
-//            focusManager.clearFocus() // Ваше действие при нажатии
-//        }
 
     LazyColumn(
         state = listState,
         reverseLayout = true,
         modifier = modifier.background(Color.White)
-
     ) {
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
 
-            // Инициализируем messageSenderName внутри itemsIndexed
-//            val messageSenderName = if (!chat.personal && message.fromUser != profile.id) {
-//                println("messageSenderName1 ${message.content} ${message.phone}")
-//
-//                message.phone?.let {
-//                    val findContact = viewModel.findContactByPhone(it)
-//                    if (findContact != null) {
-//                        "${findContact.firstName} ${findContact.lastName}"
-//                    } else {
-//                        "+${message.phone}"
-//                    }
-//                } ?: ""
-//            } else {
-//                ""
-//            }
-
+            // Определяем имя отправителя сообщения
             val messageSenderName = if (message.fromUser != profile.id) {
-                println("messageSenderName1 ${message.content} ${message.phone}")
-
                 message.phone?.let {
                     val findContact = viewModel.findContactByPhone(it)
                     if (findContact != null) {
@@ -156,14 +128,13 @@ fun Chat(
                 ""
             }
 
-//            println("messageSenderName $messageSenderName ${message.content}")
             MessageBox(
                 viewModel = viewModel,
                 message = message,
                 profile = profile,
                 messageSenderName = messageSenderName,  // Передаем значение напрямую
                 onClick = {
-                    println("message4124141 ${message}")
+                    println("message: ${message.content}")
                     onMessageClick(message, messageY)
                 },
                 onPositioned = { coordinates ->
@@ -175,6 +146,7 @@ fun Chat(
         }
     }
 }
+
 
 
 
