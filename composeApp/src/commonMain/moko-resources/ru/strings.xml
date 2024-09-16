@@ -162,4 +162,9 @@
     <string name="voice_message">Voice message</string>
     <string name="yesterday">Yesterday</string>
     <string name="create_new_chat">Создайте новый чат</string>
+
+    <string name="group_name_is_required">Название группы обязательно для заполнения</string>
+    <string name="group_name_should_not_exceed_40_characters">Название группы не должно превышать 40 символов</string>
+    <string name="group_name_can_contain_only_letters_and_numbers">Название группы может содержать только буквы и числа</string>
+    <string name="please_fill_in_the_group_name_input_field">Введите название группы</string>
 </resources>

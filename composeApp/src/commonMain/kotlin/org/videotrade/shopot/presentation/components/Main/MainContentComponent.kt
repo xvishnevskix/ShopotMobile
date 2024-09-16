@@ -59,7 +59,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val chatState = mainViewModel.chats.collectAsState(initial = listOf()).value
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
-    
+
     var refreshing by remember { mutableStateOf(false) }
     
     val refreshState = rememberPullRefreshState(
@@ -139,7 +139,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                         
                                         Row (
                                             horizontalArrangement = Arrangement.Center,
-                                            modifier = Modifier.fillMaxWidth()
+                                            modifier = Modifier.padding(bottom = 50.dp).fillMaxWidth().padding(bottom = 50.dp)
                                         ) {
                                             Text(
                                                 stringResource(MokoRes.strings.encryption_info_1),
