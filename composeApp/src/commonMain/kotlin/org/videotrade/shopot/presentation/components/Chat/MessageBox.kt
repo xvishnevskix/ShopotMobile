@@ -274,6 +274,9 @@ fun MessageBox(
             }
         }
 
+
+    }
+}
         Row(
             horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
             modifier = Modifier
@@ -303,8 +306,8 @@ fun MessageBox(
                         contentDescription = null,
                     )
                 }
-            
-            
+
+
             if (message.created.isNotEmpty())
                 Text(
                     text = formatTimestamp(message.created),
@@ -317,7 +320,7 @@ fun MessageBox(
                 )
         }
     }
-}}}
+}
 
 
 @Composable
