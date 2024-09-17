@@ -135,7 +135,7 @@ fun MessageBox(
                     modifier = Modifier
                         .zIndex(2f)
                         .offset(x = animatedOffset.dp / 4)
-                        .padding()
+                        .padding(5.dp)
                         .alpha(iconOpacity)
                         .clip(RoundedCornerShape(50.dp))
                         .size(35.dp).background(

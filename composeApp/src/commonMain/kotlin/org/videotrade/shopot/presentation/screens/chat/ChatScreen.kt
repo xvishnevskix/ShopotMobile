@@ -108,6 +108,8 @@ class ChatScreen(
                                
                             ,
                             onMessageClick = { message, y ->
+
+
                                 selectedMessage.value  = message
                                 selectedMessageY = y + 150
                                 hiddenMessageId = message.id
