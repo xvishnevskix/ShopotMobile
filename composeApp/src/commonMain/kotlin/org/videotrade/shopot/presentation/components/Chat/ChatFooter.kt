@@ -236,7 +236,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             imagePath = Res.drawable.menu_gallery,
             onClick = {
                 viewModel.sendImage(
-                    text,
+                    text.value,
                     viewModel.profile.value.id,
                     chat.id,
                     "image",
@@ -273,7 +273,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         Random.nextInt(1, 501).toString(),
                                         viewModel.profile.value.id,
                                         "",
-                                        "",
+                                        false,
                                         "",
                                         0,
                                         getCurrentTimeList(),
@@ -567,10 +567,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             }
             
             BasicTextField(
-                value = text,
+                value =  text.value,
                 onValueChange = { newText ->
                     if (!isRecording) {
-                        text = newText
+                        text.value = newText
                     }
                 },
                 modifier = Modifier
@@ -587,7 +587,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 visualTransformation = VisualTransformation.None,
                 decorationBox = { innerTextField ->
                     Box {
-                        if (text.isEmpty()) {
+                        if (text.value.isEmpty()) {
                             Text(
                                 stringResource(MokoRes.strings.write_message),
                                 textAlign = TextAlign.Center,
@@ -604,7 +604,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             )
             
             
-            if (text.isNotEmpty()) {
+            if (text.value.isNotEmpty()) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Send,
                     contentDescription = "Send",
@@ -614,9 +614,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .padding(end = 15.dp)
                         .pointerInput(Unit) {
                             detectTapGestures(onTap = {
-                                if (text.isNotBlank()) {
+                                if (text.value.isNotBlank()) {
                                     viewModel.sendMessage(
-                                        content = text,
+                                        content = text.value,
                                         fromUser = viewModel.profile.value.id,
                                         chatId = chat.id,
                                         notificationToken = chat.notificationToken,
@@ -624,7 +624,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
                                         true
                                     )
-                                    text = ""
+                                    text.value = ""
                                 }
                             })
                         }

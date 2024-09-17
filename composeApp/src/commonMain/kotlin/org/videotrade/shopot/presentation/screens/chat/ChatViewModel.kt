@@ -276,7 +276,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 Random.nextInt(1, 2001).toString(),
                 profile.value.id,
                 "",
-                "",
+                false,
                 "",
                 0,
                 getCurrentTimeList(),
