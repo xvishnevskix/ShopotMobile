@@ -191,7 +191,7 @@ fun MessageBox(
                     ) {
 
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             // ответ на сообщение
 //                            Row(

@@ -105,11 +105,8 @@ class ChatScreen(
                             chat,
                             Modifier.fillMaxSize().background(Color.White)
                                 .padding(innerPadding)
-                               
                             ,
                             onMessageClick = { message, y ->
-
-
                                 selectedMessage.value  = message
                                 selectedMessageY = y + 150
                                 hiddenMessageId = message.id

@@ -113,6 +113,8 @@ fun Chat(
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
+            println("messagexxaxaaxxaax $message")
+            var messageYas = mutableStateOf(message)
 
             // Определяем имя отправителя сообщения
             val messageSenderName = if (message.fromUser != profile.id) {
@@ -134,7 +136,7 @@ fun Chat(
                 profile = profile,
                 messageSenderName = messageSenderName,  // Передаем значение напрямую
                 onClick = {
-                    println("message: ${message.content}")
+                    println("message: ${messageYas.value}")
                     onMessageClick(message, messageY)
                 },
                 onPositioned = { coordinates ->
