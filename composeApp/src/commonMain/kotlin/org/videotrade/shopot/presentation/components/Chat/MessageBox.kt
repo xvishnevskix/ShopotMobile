@@ -168,12 +168,13 @@ fun MessageBox(
                             detectTapGestures(
                                 onLongPress = { onClick() }
                             )
-                        }.clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null // Убирает эффект нажатия
-                        ) {
-                            focusManager.clearFocus() // Ваше действие при нажатии
                         }
+//                            .clickable(
+//                            interactionSource = remember { MutableInteractionSource() },
+//                            indication = null // Убирает эффект нажатия
+//                        ) {
+//                            focusManager.clearFocus() // Ваше действие при нажатии
+//                        }
                 ) {
                     Surface(
                         modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
