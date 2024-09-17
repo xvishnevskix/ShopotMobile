@@ -136,7 +136,6 @@ fun Chat(
                 profile = profile,
                 messageSenderName = messageSenderName,  // Передаем значение напрямую
                 onClick = {
-                    println("message: ${messageYas.value}")
                     onMessageClick(message, messageY)
                 },
                 onPositioned = { coordinates ->

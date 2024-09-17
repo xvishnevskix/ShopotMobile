@@ -86,7 +86,7 @@ fun MessageBox(
 //        }
 //    }
     val focusManager = LocalFocusManager.current
-    
+
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
             if (message.anotherRead) {
@@ -98,7 +98,7 @@ fun MessageBox(
             }
         }
     }
-    
+
     Column(
         modifier = Modifier
             .onGloballyPositioned(onPositioned)
@@ -164,15 +164,26 @@ fun MessageBox(
                         .offset(x = animatedOffset.dp)
                         .fillMaxWidth()
                         .padding(vertical = 4.dp)
-                        .pointerInput(Unit) {
+                        .pointerInput(message) {
                             detectTapGestures(
-                                onLongPress = { onClick() }
+                                onTap = {
+                                    // Action for normal tap
+                                    println("onTap")
+
+                                    focusManager.clearFocus() // Your action on tap
+                                },
+                                onLongPress = {
+                                    println("onLongPress")
+
+                                    onClick()
+                                }
                             )
                         }
-//                            .clickable(
+//                        .clickable(
 //                            interactionSource = remember { MutableInteractionSource() },
 //                            indication = null // Убирает эффект нажатия
 //                        ) {
+//
 //                            focusManager.clearFocus() // Ваше действие при нажатии
 //                        }
                 ) {
@@ -210,10 +221,6 @@ fun MessageBox(
 //                            }
 
 
-
-
-
-
 //                    if (!chat.personal) {
 //                        if (message.fromUser != profile.id) {
 //                           Text(
@@ -233,50 +240,50 @@ fun MessageBox(
 //                        }
 //                    }
 
-                  if(message.forwardMessage == true) {
-                      Text(
-                          "Пересланное сообщение",
-                          style = TextStyle(
-                              color = Color.Gray,
-                              fontSize = 12.sp,
-                              fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                          ),
-                          modifier = Modifier.padding(
-                              start = 25.dp,
-                              end = 25.dp,
-                              top = 7.dp,
-                              bottom = 0.dp
-                          ),
-                      )
-                  }
+                            if (message.forwardMessage == true) {
+                                Text(
+                                    "Пересланное сообщение",
+                                    style = TextStyle(
+                                        color = Color.Gray,
+                                        fontSize = 12.sp,
+                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                    ),
+                                    modifier = Modifier.padding(
+                                        start = 25.dp,
+                                        end = 25.dp,
+                                        top = 7.dp,
+                                        bottom = 0.dp
+                                    ),
+                                )
+                            }
 
-                    if (!chat.personal && messageSenderName.isNotBlank()) {
-                        Text(
-                            text = messageSenderName,
-                            style = TextStyle(
-                                color = Color.Gray,
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            ),
-                            modifier = Modifier.padding(
-                                start = 25.dp,
-                                end = 25.dp,
-                                top = 7.dp,
-                                bottom = 0.dp
-                            ),
-                        )
-                    }
+                            if (!chat.personal && messageSenderName.isNotBlank()) {
+                                Text(
+                                    text = messageSenderName,
+                                    style = TextStyle(
+                                        color = Color.Gray,
+                                        fontSize = 12.sp,
+                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                    ),
+                                    modifier = Modifier.padding(
+                                        start = 25.dp,
+                                        end = 25.dp,
+                                        top = 7.dp,
+                                        bottom = 0.dp
+                                    ),
+                                )
+                            }
 
                             MessageFormat(message, profile, onClick, messageSenderName, chat)
+                        }
+
+
+                    }
                 }
 
 
             }
         }
-
-
-    }
-}
         Row(
             horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
             modifier = Modifier
@@ -335,25 +342,25 @@ fun MessageFormat(
         MessageText(message, profile)
 //        FileMessage(message, )
     } else {
-        
+
         when (message.attachments!![0].type) {
-            
+
             "audio/mp4" -> {
                 VoiceMessage(
                     message,
                     message.attachments!!
                 )
             }
-            
+
             "image" -> {
                 MessageImage(
                     message, profile,
                     message.attachments!!,
                     messageSenderName
                 )
-                
+
             }
-            
+
             else -> {
                 FileMessage(
                     message,
@@ -361,12 +368,11 @@ fun MessageFormat(
                 )
             }
         }
-        
-        
-    }
-    
-}
 
+
+    }
+
+}
 
 
 @Composable
