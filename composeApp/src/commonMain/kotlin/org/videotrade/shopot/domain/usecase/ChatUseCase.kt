@@ -66,9 +66,8 @@ class ChatUseCase : KoinComponent {
     suspend fun sendMessage(
         message: MessageItem,
         attachments: List<String>?,
-        forwardMessage: Boolean
     ) {
-        return repository.sendMessage(message, attachments = attachments, forwardMessage)
+        return repository.sendMessage(message, attachments = attachments)
     }
     
     suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?) {

@@ -162,9 +162,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     anotherRead = false,
                     iread = false,
                     attachments = null,
+                    answerMessage = selectedMessagesByChat.value[chatId]?.first?.id,
+                    forwardMessage = forwardMessage,
                 ),
-                attachments,
-                forwardMessage
+                attachments
             )
             println("сообщениесообщениесообщениесообщение")
             sendNotify("$login", content, notificationToken)

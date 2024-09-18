@@ -29,7 +29,7 @@ interface ChatRepository {
     fun updateUploadMessage(message: MessageItem)
     
     
-     suspend fun sendMessage(message: MessageItem, attachments: List<String>?,forwardMessage:Boolean)
+     suspend fun sendMessage(message: MessageItem, attachments: List<String>?)
     suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?)
     
     fun clearData()

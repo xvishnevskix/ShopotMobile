@@ -67,6 +67,7 @@ class ChatScreen(
         
         DisposableEffect(Unit) {
             onDispose {
+                viewModel.clearSelection(chatId = chat.chatId)
                 
                 if (
                     viewModel.isRecording.value
