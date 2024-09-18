@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import cafe.adriel.voyager.core.screen.Screen
 import coil3.compose.rememberAsyncImagePainter
+import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class PhotoViewerScreen(private val imageFilePath: String,private val messageSenderName: String? = null) : Screen {
     @Composable
@@ -36,61 +37,64 @@ class PhotoViewerScreen(private val imageFilePath: String,private val messageSen
         var isHeaderVisible by remember { mutableStateOf(true) }
         
         val imagePainter = rememberAsyncImagePainter(imageFilePath)
-        
-        
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color(0xFF29303c))
-        ) {
 
-            Image(
-                painter = imagePainter,
-                contentDescription = null,
-                contentScale = ContentScale.Fit,
+
+        SafeArea{
+            BoxWithConstraints(
                 modifier = Modifier
-                    .graphicsLayer(
-                        scaleX = scale,
-                        scaleY = scale,
-                        translationX = offset.x,
-                        translationY = offset.y
-                    )
                     .fillMaxSize()
-                    .onGloballyPositioned { layoutCoordinates ->
-                        imageSize = layoutCoordinates.size
-                    }
-                    .pointerInput(Unit) {
-                        detectTapGestures(
-                            onTap = {
-                                isHeaderVisible = !isHeaderVisible
-                            }
+                    .background(Color(0xFF29303c))
+            ) {
+
+                Image(
+                    painter = imagePainter,
+                    contentDescription = null,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier
+                        .graphicsLayer(
+                            scaleX = scale,
+                            scaleY = scale,
+                            translationX = offset.x,
+                            translationY = offset.y
                         )
-                    }
-                    .pointerInput(Unit) {
-                        detectTransformGestures { _, pan, zoom, _ ->
-                            scale = (scale * zoom).coerceIn(1f, 5f)
-
-
-                            val maxX = (imageSize.width * (scale - 1)) / 2f
-                            val maxY = (imageSize.height * (scale - 1)) / 2f
-
-                            offset = Offset(
-                                x = (offset.x + pan.x).coerceIn(-maxX, maxX),
-                                y = (offset.y + pan.y).coerceIn(-maxY, maxY)
+                        .fillMaxSize()
+                        .onGloballyPositioned { layoutCoordinates ->
+                            imageSize = layoutCoordinates.size
+                        }
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = {
+                                    isHeaderVisible = !isHeaderVisible
+                                }
                             )
                         }
-                    }
-            )
+                        .pointerInput(Unit) {
+                            detectTransformGestures { _, pan, zoom, _ ->
+                                scale = (scale * zoom).coerceIn(1f, 5f)
 
-            // Хэдер, который отображается поверх изображения
-            AnimatedVisibility(
-                visible = isHeaderVisible,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.TopCenter) // Размещаем хэдер поверх изображения
-            ) {
-                PhotoViewerHeader("$messageSenderName", "")
+
+                                val maxX = (imageSize.width * (scale - 1)) / 2f
+                                val maxY = (imageSize.height * (scale - 1)) / 2f
+
+                                offset = Offset(
+                                    x = (offset.x + pan.x).coerceIn(-maxX, maxX),
+                                    y = (offset.y + pan.y).coerceIn(-maxY, maxY)
+                                )
+                            }
+                        }
+                )
+
+                // Хэдер, который отображается поверх изображения
+                AnimatedVisibility(
+                    visible = isHeaderVisible,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.align(Alignment.TopCenter) // Размещаем хэдер поверх изображения
+                ) {
+                    PhotoViewerHeader("$messageSenderName", "")
+                }
             }
         }
+
     }
 }
