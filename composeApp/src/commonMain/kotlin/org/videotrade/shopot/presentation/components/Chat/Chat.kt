@@ -34,6 +34,7 @@ import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chat_copy
 import shopot.composeapp.generated.resources.chat_delete
+import shopot.composeapp.generated.resources.chat_forward
 
 
 data class EditOption(
@@ -49,13 +50,7 @@ fun getEditOptions(scaffoldState: BottomSheetScaffoldState? = null): List<EditOp
     val coroutineScope = rememberCoroutineScope()
 
     return listOf(
-        EditOption(
-            text = stringResource(MokoRes.strings.delete),
-            imagePath = Res.drawable.chat_delete,
-            onClick = { viewModel, message, _ ->
-                viewModel.deleteMessage(message)
-            }
-        ),
+
         EditOption(
             text = stringResource(MokoRes.strings.copy),
             imagePath = Res.drawable.chat_copy,
@@ -64,15 +59,22 @@ fun getEditOptions(scaffoldState: BottomSheetScaffoldState? = null): List<EditOp
             }
         ),
         EditOption(
-            text = "Переслать",
-            imagePath = Res.drawable.chat_copy,
+            text = stringResource(MokoRes.strings.forward),
+            imagePath = Res.drawable.chat_forward,
             onClick = { viewModel, message, clipboardManager ->
                 coroutineScope.launch {
                     viewModel.setForwardMessage(message)
                     viewModel.setScaffoldState(true)
                 }
             }
-        )
+        ),
+        EditOption(
+            text = stringResource(MokoRes.strings.delete),
+            imagePath = Res.drawable.chat_delete,
+            onClick = { viewModel, message, _ ->
+                viewModel.deleteMessage(message)
+            }
+        ),
     )
 }
 

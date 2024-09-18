@@ -36,6 +36,7 @@
     <string name="left_cancel">Влево - отмена</string>
     <string name="delete">Удалить</string>
     <string name="copy">Копировать</string>
+    <string name="forward">Переслать</string>
 
     <string name="call_incoming">Идет вызов...</string>
     <string name="connection_establishment_in_progress">Идет процесс установления соединения.

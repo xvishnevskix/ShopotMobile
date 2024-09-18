@@ -37,6 +37,7 @@
     <string name="left_cancel">Left - cancel</string>
     <string name="delete">Delete</string>
     <string name="copy">Copy</string>
+    <string name="forward">Forward</string>
 
     <string name="call_incoming">Call incoming...</string>
     <string name="connection_establishment_in_progress">The connection establishment process is in
