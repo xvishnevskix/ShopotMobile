@@ -115,7 +115,6 @@ fun Chat(
         itemsIndexed(messagesState) { _, message ->
             var messageY by remember { mutableStateOf(0) }
             val isVisible = message.id != hiddenMessageId
-            println("messagexxaxaaxxaax $message")
             var messageYas = mutableStateOf(message)
 
             // Определяем имя отправителя сообщения

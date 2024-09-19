@@ -197,8 +197,29 @@ suspend fun handleConnectWebSocket(
                                                         cipherWrapper
                                                     )
 
+
+                                                    var answerMessage = ""
+
+                                                    if (message.answerMessage?.content?.isNotBlank() == true) {
+
+
+                                                        val decupsAnswerMessage = decupsMessage(
+                                                            message.answerMessage?.content!!,
+                                                            cipherWrapper
+                                                        )
+
+                                                        if (decupsAnswerMessage != null) {
+                                                            answerMessage = decupsAnswerMessage
+                                                        }
+
+                                                    }
+
                                                     messageNew = message.copy(
-                                                        content = decups
+                                                        content = decups,
+                                                        answerMessage = if (message.answerMessage !== null)
+                                                            message.answerMessage!!.copy(
+                                                                content = answerMessage
+                                                            ) else null
                                                     )
 
                                                     if (decups == null) {
@@ -244,12 +265,37 @@ suspend fun handleConnectWebSocket(
                                             var messageNew = message
 
                                             if (message.content?.isNotBlank() == true) {
-                                                messageNew = message.copy(
-                                                    content = decupsMessage(
-                                                        message.content,
+
+                                                val decups = decupsMessage(
+                                                    message.content,
+                                                    cipherWrapper
+                                                )
+
+                                                var answerMessage = ""
+
+                                                if (message.answerMessage?.content?.isNotBlank() == true) {
+                                                    val decupsAnswerMessage = decupsMessage(
+                                                        message.answerMessage?.content!!,
                                                         cipherWrapper
                                                     )
+
+                                                    if (decupsAnswerMessage != null) {
+                                                        answerMessage = decupsAnswerMessage
+                                                    }
+
+                                                }
+
+                                                messageNew = message.copy(
+                                                    content = decups,
+                                                    answerMessage = if (message.answerMessage !== null)
+                                                        message.answerMessage!!.copy(
+                                                            content = answerMessage
+                                                        ) else null
                                                 )
+
+
+
+
                                             }
 
                                             if (chatsUseCase.currentChat.value == message.chatId) {
@@ -438,9 +484,7 @@ suspend fun handleConnectWebSocket(
                                 }
 
                                 "createChat" -> {
-
                                     try {
-
                                         println("createChat")
 
                                         val dataJson =
@@ -563,8 +607,6 @@ suspend fun handleConnectWebSocket(
                                     }
 
                                 }
-
-
 
 
 //                                    {

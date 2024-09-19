@@ -162,10 +162,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     anotherRead = false,
                     iread = false,
                     attachments = null,
-                    answerMessage = selectedMessagesByChat.value[chatId]?.first?.id,
                     forwardMessage = forwardMessage,
                 ),
-                attachments
+                attachments,
+                selectedMessagesByChat.value[chatId]?.first?.id
             )
             println("сообщениесообщениесообщениесообщение")
             sendNotify("$login", content, notificationToken)
@@ -310,7 +310,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 profile.value.id,
                 "",
                 false,
-                "",
+                null,
                 0,
                 getCurrentTimeList(),
                 false,

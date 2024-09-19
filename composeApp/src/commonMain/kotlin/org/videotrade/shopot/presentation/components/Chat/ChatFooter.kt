@@ -274,7 +274,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         viewModel.profile.value.id,
                                         "",
                                         false,
-                                        "",
+                                        null,
                                         0,
                                         getCurrentTimeList(),
                                         false,

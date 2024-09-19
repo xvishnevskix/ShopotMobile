@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -205,40 +206,40 @@ fun MessageBox(
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             // ответ на сообщение
-//                            Row(
-//                                modifier = Modifier
-//                                    .padding(top = 4.dp, start = 4.dp, end = 4.dp)
-//                                    .clip(RoundedCornerShape(14.dp))
-//                                    .background(Color.White)
-//                                    .wrapContentHeight()
-//
-//                                ,
-//                                verticalAlignment = Alignment.Top,
-//                                horizontalArrangement = Arrangement.Start
-//                            )
-//                            {
-//                                SelectedMessageFormat(message, messageSenderName)
-//                            }
+                            message.answerMessage?.let {
+                                Row(
+                                    modifier = Modifier
+                                        .padding(top = 4.dp, start = 4.dp, end = 4.dp)
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(Color.White)
+                                        .wrapContentHeight(),
+                                    verticalAlignment = Alignment.Top,
+                                    horizontalArrangement = Arrangement.Start
+                                )
+                                {
+                                    SelectedMessageFormat(it, messageSenderName)
+                                }
+                            }
 
 
-//                    if (!chat.personal) {
-//                        if (message.fromUser != profile.id) {
-//                           Text(
-//                                text = messageSenderName.value,
-//                                style = TextStyle(
-//                                    color = Color.Gray,
-//                                    fontSize = 12.sp,
-//                                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                                ),
-//                                modifier = Modifier.padding(
-//                                    start = 25.dp,
-//                                    end = 25.dp,
-//                                    top = 7.dp,
-//                                    bottom = 0.dp
-//                                ),
-//                            )
-//                        }
-//                    }
+                            if (!chat.personal) {
+                                if (message.fromUser != profile.id) {
+                                    Text(
+                                        text = messageSenderName,
+                                        style = TextStyle(
+                                            color = Color.Gray,
+                                            fontSize = 12.sp,
+                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                        ),
+                                        modifier = Modifier.padding(
+                                            start = 25.dp,
+                                            end = 25.dp,
+                                            top = 7.dp,
+                                            bottom = 0.dp
+                                        ),
+                                    )
+                                }
+                            }
 
                             if (message.forwardMessage == true) {
                                 Text(

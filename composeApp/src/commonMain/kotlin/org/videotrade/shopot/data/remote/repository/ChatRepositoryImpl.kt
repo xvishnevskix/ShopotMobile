@@ -37,12 +37,13 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     }
     
     override fun initMessages(messages: List<MessageItem>) {
-        _messages.value = _messages.value + messages
+        _messages.value += messages
     }
     
     
     override suspend fun sendMessage(
         message: MessageItem, attachments: List<String>?,
+        answerMessageId: String?,
     ) {
         try {
             val jsonContent = Json.encodeToString(
@@ -51,7 +52,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
                     put("content", message.content)
                     put("fromUser", message.fromUser)
                     put("chatId", message.chatId)
-                    put("answerMessage", message.answerMessage)
+                    put("answerMessage", answerMessageId)
                     put("forwardMessage", message.forwardMessage)
                     put(
                         "attachments",

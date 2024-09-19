@@ -9,7 +9,7 @@ data class MessageItem(
     val fromUser: String = "",
     val content: String?,
     val forwardMessage: Boolean? = false,
-    var answerMessage: String? = "",
+    var answerMessage: MessageItem? = null,
     var replaces: Int? = null,
     var created: List<Int> = emptyList(),
     var isDeleted: Boolean = false,
