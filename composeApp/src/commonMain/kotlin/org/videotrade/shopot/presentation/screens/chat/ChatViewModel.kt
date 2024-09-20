@@ -171,6 +171,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             )
             println("сообщениесообщениесообщениесообщение")
             sendNotify("$login", content, notificationToken)
+            clearSelection(chatId)
         }
     }
 
