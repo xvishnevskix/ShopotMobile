@@ -321,6 +321,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val expandedHeight = 125.dp
     val collapsedHeight = if (selectedMessage != null) 125.dp else 65.dp
     val collapsedselectedHeight = if (selectedMessage != null) 45.dp else 0.dp
+
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
@@ -344,8 +345,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
 
     ) {
-
-
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -386,7 +385,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             ) {
 
                             }
-
                             SelectedMessageFormat(
                                 selectedMessage,
                                 profile,
