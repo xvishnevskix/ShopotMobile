@@ -38,10 +38,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -191,7 +193,9 @@ fun MessageBox(
 //                        }
                 ) {
                     Surface(
-                        modifier = Modifier.wrapContentSize().widthIn(max = 340.dp),
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .widthIn(max = 340.dp),
                         shape = RoundedCornerShape(
                             topStart = 20.dp,
                             topEnd = 20.dp,
@@ -199,26 +203,33 @@ fun MessageBox(
                             bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                         ),
                         shadowElevation = 4.dp,
-                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(
-                            0xFFF3F4F6
-                        )
+                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
                     ) {
+                        var messageFormatWidth by remember { mutableStateOf(0) }
+//                        var selectedMessageWidth by remember { mutableStateOf(0) }
 
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
+                            horizontalAlignment = if (message.fromUser == profile.id) Alignment.End else Alignment.Start,
                         ) {
-                            // ответ на сообщение
+                            // Ответ на сообщение
                             message.answerMessage?.let {
+
                                 Row(
                                     modifier = Modifier
+//                                        .onGloballyPositioned { coordinates ->
+//                                            selectedMessageWidth = coordinates.size.width
+//                                        }
+                                        .widthIn(
+                                            min = (messageFormatWidth * 0.38f).dp,
+
+                                        )
                                         .padding(top = 4.dp, start = 4.dp, end = 4.dp)
                                         .clip(RoundedCornerShape(14.dp))
                                         .background(Color.White)
                                         .wrapContentHeight(),
                                     verticalAlignment = Alignment.Top,
-                                    horizontalArrangement = Arrangement.Start
-                                )
-                                {
+                                    horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start
+                                ) {
                                     SelectedMessageFormat(
                                         it,
                                         profile,
@@ -227,7 +238,7 @@ fun MessageBox(
                                 }
                             }
 
-
+                            // Проверка на персональный чат
                             if (!chat.personal) {
                                 if (message.fromUser != profile.id) {
                                     Text(
@@ -247,6 +258,7 @@ fun MessageBox(
                                 }
                             }
 
+                            // Пересланное сообщение
                             if (message.forwardMessage == true) {
                                 Text(
                                     "Пересланное сообщение",
@@ -264,6 +276,7 @@ fun MessageBox(
                                 )
                             }
 
+                            // Проверка на персональный чат и наличие имени отправителя
                             if (!chat.personal && messageSenderName.isNotBlank()) {
                                 Text(
                                     text = messageSenderName,
@@ -281,10 +294,17 @@ fun MessageBox(
                                 )
                             }
 
-                            MessageFormat(message, profile, onClick, messageSenderName, chat)
+
+                            Box(
+                                modifier = Modifier
+                                    .onGloballyPositioned { coordinates ->
+                                        messageFormatWidth = coordinates.size.width
+                                    }
+                                    .wrapContentSize()
+                            ) {
+                                MessageFormat(message, profile, onClick, messageSenderName, chat)
+                            }
                         }
-
-
                     }
                 }
 
