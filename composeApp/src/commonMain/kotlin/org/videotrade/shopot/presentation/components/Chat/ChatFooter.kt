@@ -118,7 +118,7 @@ data class MenuItem(
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
-    
+
 
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
@@ -135,6 +135,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val isRecording = viewModel.isRecording.collectAsState().value
 
     val selectedMessagePair = viewModel.selectedMessagesByChat.collectAsState().value[chat.chatId]
+    val profile = viewModel.profile.collectAsState().value
     val selectedMessage = selectedMessagePair?.first
     val selectedMessageSenderName = selectedMessagePair?.second
 
@@ -142,12 +143,12 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
         if (isRecording) {
             while (isRecording) {
                 delay(1000L)
-                
+
                 recordingTime++
-                
+
                 var seconds = recordingTime
                 seconds++
-                
+
                 if (seconds > 1) {
                     if (!isStartRecording) {
                         scope.launch {
@@ -162,35 +163,35 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         voiceName,
                                         "audio/mp4"
                                     ) // Генерация пути к файлу
-                                
+
                                 println("audioFilePathNew $audioFilePathNew")
-                                
+
                                 if (audioFilePathNew != null) {
                                     voicePath = audioFilePathNew
-                                    
+
                                     audioRecorder.startRecording(audioFilePathNew)
                                 }
                                 isStartRecording = true
                             } else {
-                                
+
                                 println("perStop")
-                                
+
                                 viewModel.setIsRecording(false)
-                                
+
                                 audioRecorder.stopRecording(false)
                                 offset = Offset.Zero
                             }
                         }
                     }
-                    
+
                 }
             }
         } else {
             recordingTime = 0
         }
     }
-    
-    
+
+
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -200,7 +201,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             repeatMode = RepeatMode.Reverse
         )
     )
-    
+
     val textOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -10f,
@@ -229,7 +230,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //            }
 //        }
 //    )
-    
+
     val menuItems = listOf(
         MenuItem(
             text = stringResource(MokoRes.strings.gallery),
@@ -255,18 +256,18 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = stringResource(MokoRes.strings.file),
             imagePath = Res.drawable.file_message,
             onClick = {
-                
+
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
                             .pickFile(PickerType.File(listOf("pdf", "zip")))
-                        
+
                         if (filePick !== null) {
                             val fileData =
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
-                            
+
                             println("fileData $fileData ${Random.nextInt(1, 501)}")
-                            
+
                             if (fileData !== null) {
                                 viewModel.addMessage(
                                     MessageItem(
@@ -299,8 +300,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 )
                             }
                         }
-                        
-                        
+
+
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
@@ -340,8 +341,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                 }
             )
-    
-    
+
+
     ) {
 
 
@@ -386,7 +387,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
                             }
 
-                            SelectedMessageFormat(selectedMessage!!, selectedMessageSenderName!!)
+                            SelectedMessageFormat(
+                                selectedMessage,
+                                profile,
+                                viewModel
+                            )
                         }
 
                         Box(
@@ -498,138 +503,138 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                            .clickable {
 //                                singleImagePicker.launch()
 //                            }
-                            
-                            .clickable {
-                                showMenu = true
-                            }
-                    )
-                    
-                    
-                }
-                
-                
-            } else {
-                Row(
-                    modifier = Modifier.padding(start = 15.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(10.dp)
-                            .background(
-                                Color.Red.copy(alpha = recordingCircleAlpha),
-                                shape = CircleShape
+
+                                    .clickable {
+                                        showMenu = true
+                                    }
                             )
-                    )
-                    Spacer(modifier = Modifier.width(15.dp))
-                    val hours = recordingTime / 3600
-                    val minutes = (recordingTime % 3600) / 60
-                    val seconds = recordingTime % 60
-                    Text(
-                        text = "$hours:${minutes.toString().padStart(2, '0')}:${
-                            seconds.toString().padStart(2, '0')
-                        }",
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797),
-                    )
-                }
-                
-                Row(
-                    modifier = Modifier
-                        .padding(start = 50.dp)
-                        .fillMaxWidth(0.45f)
-                        .offset(x = (textOffset + swipeOffset.value).dp)
-                        .alpha(1f + (swipeOffset.value / 100f))
-                        .animateContentSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Image(
-                        modifier = Modifier
-                            .padding(end = 3.dp)
-                            .size(width = 7.dp, height = 14.dp),
-                        painter = painterResource(Res.drawable.chat_arrow_left),
-                        contentDescription = null,
-                    )
-                    Text(
-                        text = stringResource(MokoRes.strings.left_cancel),
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797),
-                        modifier = Modifier
-                    )
-                }
-            }
-            
-            BasicTextField(
-                value =  text.value,
-                onValueChange = { newText ->
-                    if (!isRecording) {
-                        text.value = newText
-                    }
-                },
-                modifier = Modifier
-                    .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
-                    .weight(1f)
-                    .padding(3.dp)
-                    .alpha(if (isRecording) 0f else 1f)
-                    .then(if (isRecording) Modifier.height(0.dp) else Modifier),
-                textStyle = TextStyle(
-                    color = Color.Black,
-                    fontSize = 16.sp
-                ),
-                cursorBrush = SolidColor(Color.Black),
-                visualTransformation = VisualTransformation.None,
-                decorationBox = { innerTextField ->
-                    Box {
-                        if (text.value.isEmpty()) {
+
+
+                        }
+
+
+                    } else {
+                        Row(
+                            modifier = Modifier.padding(start = 15.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(10.dp)
+                                    .background(
+                                        Color.Red.copy(alpha = recordingCircleAlpha),
+                                        shape = CircleShape
+                                    )
+                            )
+                            Spacer(modifier = Modifier.width(15.dp))
+                            val hours = recordingTime / 3600
+                            val minutes = (recordingTime % 3600) / 60
+                            val seconds = recordingTime % 60
                             Text(
-                                stringResource(MokoRes.strings.write_message),
-                                textAlign = TextAlign.Center,
-                                fontSize = 16.sp,
+                                text = "$hours:${minutes.toString().padStart(2, '0')}:${
+                                    seconds.toString().padStart(2, '0')
+                                }",
+                                fontSize = 13.sp,
                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                 lineHeight = 20.sp,
                                 color = Color(0xFF979797),
                             )
                         }
-                        innerTextField()
-                    }
-                },
-            )
-            
-            
-            if (text.value.isNotEmpty()) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.Send,
-                    contentDescription = "Send",
-                    tint = Color(0xFF29303C),
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .padding(end = 15.dp)
-                        .pointerInput(Unit) {
-                            detectTapGestures(onTap = {
-                                if (text.value.isNotBlank()) {
-                                    viewModel.sendMessage(
-                                        content = text.value,
-                                        fromUser = viewModel.profile.value.id,
-                                        chatId = chat.id,
-                                        notificationToken = chat.notificationToken,
-                                        attachments = emptyList(),
-                                        login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
-                                        true
-                                    )
-                                    text.value = ""
-                                }
-                            })
+
+                        Row(
+                            modifier = Modifier
+                                .padding(start = 50.dp)
+                                .fillMaxWidth(0.45f)
+                                .offset(x = (textOffset + swipeOffset.value).dp)
+                                .alpha(1f + (swipeOffset.value / 100f))
+                                .animateContentSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                modifier = Modifier
+                                    .padding(end = 3.dp)
+                                    .size(width = 7.dp, height = 14.dp),
+                                painter = painterResource(Res.drawable.chat_arrow_left),
+                                contentDescription = null,
+                            )
+                            Text(
+                                text = stringResource(MokoRes.strings.left_cancel),
+                                fontSize = 13.sp,
+                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                lineHeight = 20.sp,
+                                color = Color(0xFF979797),
+                                modifier = Modifier
+                            )
                         }
-                )
-            } else {
+                    }
+
+                    BasicTextField(
+                        value = text.value,
+                        onValueChange = { newText ->
+                            if (!isRecording) {
+                                text.value = newText
+                            }
+                        },
+                        modifier = Modifier
+                            .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
+                            .weight(1f)
+                            .padding(3.dp)
+                            .alpha(if (isRecording) 0f else 1f)
+                            .then(if (isRecording) Modifier.height(0.dp) else Modifier),
+                        textStyle = TextStyle(
+                            color = Color.Black,
+                            fontSize = 16.sp
+                        ),
+                        cursorBrush = SolidColor(Color.Black),
+                        visualTransformation = VisualTransformation.None,
+                        decorationBox = { innerTextField ->
+                            Box {
+                                if (text.value.isEmpty()) {
+                                    Text(
+                                        stringResource(MokoRes.strings.write_message),
+                                        textAlign = TextAlign.Center,
+                                        fontSize = 16.sp,
+                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                        lineHeight = 20.sp,
+                                        color = Color(0xFF979797),
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        },
+                    )
+
+
+                    if (text.value.isNotEmpty()) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Send,
+                            contentDescription = "Send",
+                            tint = Color(0xFF29303C),
+                            modifier = Modifier
+                                .padding(2.dp)
+                                .padding(end = 15.dp)
+                                .pointerInput(Unit) {
+                                    detectTapGestures(onTap = {
+                                        if (text.value.isNotBlank()) {
+                                            viewModel.sendMessage(
+                                                content = text.value,
+                                                fromUser = viewModel.profile.value.id,
+                                                chatId = chat.id,
+                                                notificationToken = chat.notificationToken,
+                                                attachments = emptyList(),
+                                                login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
+                                                true
+                                            )
+                                            text.value = ""
+                                        }
+                                    })
+                                }
+                        )
+                    } else {
 
 //                val alpha = (105f + offset.x) / 20f
                         val scale = 1f + (offset.x / 850f)

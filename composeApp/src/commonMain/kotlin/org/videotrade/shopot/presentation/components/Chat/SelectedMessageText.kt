@@ -25,7 +25,7 @@ fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName:
             .padding(top = 5.dp, start = 22.dp, end = 22.dp, bottom = 2.dp)
     ) {
         Text(
-            text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
+            text = selectedMessageSenderName,
             style = TextStyle(
                 color = Color(0xff000000),
                 fontSize = 14.sp,

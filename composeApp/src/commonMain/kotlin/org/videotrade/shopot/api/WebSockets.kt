@@ -190,43 +190,23 @@ suspend fun handleConnectWebSocket(
 
                                                 var messageNew = message
 
-                                                if (message.content?.isNotBlank() == true) {
-                                                    println("attachments11 ${message.content}")
-                                                    val decups = decupsMessage(
-                                                        message.content,
-                                                        cipherWrapper
-                                                    )
-
-
-                                                    var answerMessage = ""
-
-                                                    if (message.answerMessage?.content?.isNotBlank() == true) {
-
-
-                                                        val decupsAnswerMessage = decupsMessage(
-                                                            message.answerMessage?.content!!,
-                                                            cipherWrapper
-                                                        )
-
-                                                        if (decupsAnswerMessage != null) {
-                                                            answerMessage = decupsAnswerMessage
-                                                        }
-
-                                                    }
-
-                                                    messageNew = message.copy(
-                                                        content = decups,
-                                                        answerMessage = if (message.answerMessage !== null)
-                                                            message.answerMessage!!.copy(
-                                                                content = answerMessage
-                                                            ) else null
-                                                    )
-
-                                                    if (decups == null) {
-                                                        continue
-                                                    }
+                                                // Декодируем content, если оно не пустое
+                                                if (!message.content.isNullOrBlank()) {
+                                                    val decups = decupsMessage(message.content, cipherWrapper)
+                                                    messageNew = messageNew.copy(content = decups)
                                                 }
 
+                                                // Декодируем answerMessage.content, если оно не пустое
+                                                message.answerMessage?.let { answerMessage ->
+                                                    if (!answerMessage.content.isNullOrBlank()) {
+                                                        val decupsAnswerMessage = decupsMessage(answerMessage.content, cipherWrapper)
+                                                        if (decupsAnswerMessage != null) {
+                                                            val updatedAnswerMessage = answerMessage.copy(content = decupsAnswerMessage)
+                                                            messageNew = messageNew.copy(answerMessage = updatedAnswerMessage)
+                                                        }
+                                                    }
+                                                }
+8
                                                 messages.add(messageNew)
 
                                             }
@@ -245,73 +225,46 @@ suspend fun handleConnectWebSocket(
 
                                 "messageSent" -> {
                                     try {
-                                        val messageJson =
-                                            jsonElement.jsonObject["message"]?.jsonObject
-
-
+                                        val messageJson = jsonElement.jsonObject["message"]?.jsonObject
 
                                         if (messageJson != null) {
-
-
-                                            println("ttttaaaaa ${messageJson}")
-
+                                            println("ttttaaaaa $messageJson")
                                             println("currentChat ${chatsUseCase.currentChat.value}")
 
-
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
-
-
+                                            val message: MessageItem = Json.decodeFromString(messageJson.toString())
                                             var messageNew = message
 
-                                            if (message.content?.isNotBlank() == true) {
-
-                                                val decups = decupsMessage(
-                                                    message.content,
-                                                    cipherWrapper
-                                                )
-
-                                                var answerMessage = ""
-
-                                                if (message.answerMessage?.content?.isNotBlank() == true) {
-                                                    val decupsAnswerMessage = decupsMessage(
-                                                        message.answerMessage?.content!!,
-                                                        cipherWrapper
-                                                    )
-
-                                                    if (decupsAnswerMessage != null) {
-                                                        answerMessage = decupsAnswerMessage
-                                                    }
-
-                                                }
-
-                                                messageNew = message.copy(
-                                                    content = decups,
-                                                    answerMessage = if (message.answerMessage !== null)
-                                                        message.answerMessage!!.copy(
-                                                            content = answerMessage
-                                                        ) else null
-                                                )
-
-
-
-
+                                            // Декодируем content, если оно не пустое
+                                            if (!message.content.isNullOrBlank()) {
+                                                val decups = decupsMessage(message.content, cipherWrapper)
+                                                messageNew = messageNew.copy(content = decups)
                                             }
 
+                                            // Декодируем answerMessage.content, если оно не пустое
+                                            message.answerMessage?.let { answerMessage ->
+                                                if (!answerMessage.content.isNullOrBlank()) {
+                                                    val decupsAnswerMessage = decupsMessage(answerMessage.content, cipherWrapper)
+                                                    if (decupsAnswerMessage != null) {
+                                                        val updatedAnswerMessage = answerMessage.copy(content = decupsAnswerMessage)
+                                                        messageNew = messageNew.copy(answerMessage = updatedAnswerMessage)
+                                                    }
+                                                }
+                                            }
+
+                                            // Проверяем, совпадает ли currentChat с message.chatId
                                             if (chatsUseCase.currentChat.value == message.chatId) {
                                                 chatUseCase.addMessage(messageNew)
                                             }
 
-                                            chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
-
+                                            // Обновляем последнее сообщение в чате
+                                            chatsUseCase.updateLastMessageChat(messageNew)
                                         }
 
                                     } catch (e: Exception) {
-
                                         Logger.d("Error228: $e")
                                     }
-
                                 }
+
 
                                 "sendUploadMessage" -> {
                                     try {
@@ -331,7 +284,33 @@ suspend fun handleConnectWebSocket(
 
                                             println("message ${userId} ${message.fromUser}")
 
-                                            if (userId == message.fromUser) {
+
+                                            var messageNew = message
+
+
+                                            var answerMessage = ""
+
+                                            if (message.answerMessage?.content?.isNotBlank() == true) {
+                                                val decupsAnswerMessage = decupsMessage(
+                                                    message.answerMessage?.content!!,
+                                                    cipherWrapper
+                                                )
+
+                                                if (decupsAnswerMessage != null) {
+                                                    answerMessage = decupsAnswerMessage
+                                                }
+
+                                            }
+
+                                            messageNew = message.copy(
+                                                answerMessage = if (message.answerMessage !== null)
+                                                    message.answerMessage!!.copy(
+                                                        content = answerMessage
+                                                    ) else null
+                                            )
+
+
+                                            if (userId == messageNew.fromUser) {
 
                                                 val uploadId =
                                                     jsonElement.jsonObject["uploadId"]?.jsonPrimitive?.content
@@ -340,7 +319,7 @@ suspend fun handleConnectWebSocket(
 
 
                                                 chatUseCase.updateUploadMessage(
-                                                    message.copy(
+                                                    messageNew.copy(
                                                         uploadId = uploadId
                                                     )
                                                 )// Инициализация сообщений
@@ -349,13 +328,13 @@ suspend fun handleConnectWebSocket(
                                                 println("message2 ${message}")
 
 
-                                                if (chatsUseCase.currentChat.value == message.chatId) {
+                                                if (chatsUseCase.currentChat.value == messageNew.chatId) {
 
-                                                    chatUseCase.addMessage(message)// Инициализация сообщений
+                                                    chatUseCase.addMessage(messageNew)// Инициализация сообщений
                                                 }
                                             }
 
-                                            chatsUseCase.updateLastMessageChat(message)// Инициализация сообщений
+                                            chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
 
                                         }
 

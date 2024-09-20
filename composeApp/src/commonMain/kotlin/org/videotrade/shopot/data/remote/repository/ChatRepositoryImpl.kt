@@ -68,7 +68,11 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         }
     }
     
-    override suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?) {
+    override suspend fun sendUploadMessage(
+        message: MessageItem,
+        attachments: List<String>?,
+        answerMessageId: String?
+    ) {
         try {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
@@ -77,6 +81,7 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
                     put("fromUser", message.fromUser)
                     put("uploadId", message.uploadId)
                     put("chatId", message.chatId)
+                    put("answerMessage", answerMessageId)
 //                    put("action", "sendMessage")
 //                    put("content", message.content)
 //                    put("fromUser", message.fromUser)

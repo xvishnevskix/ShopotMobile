@@ -48,8 +48,10 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -103,14 +105,14 @@ fun MessageBox(
     Column(
         modifier = Modifier
             .onGloballyPositioned(onPositioned)
-            .alpha(if (isVisible) 1f else 0f).pointerInput(Unit) {
+            .alpha(if (isVisible) 1f else 0f).pointerInput(message) {
                 detectTapGestures(
                     onTap = {
                         println("AAAAAAAAA")
                     }
                 )
             }
-            .pointerInput(Unit) {
+            .pointerInput(message) {
                 detectHorizontalDragGestures(
                     onDragEnd = {
                         if (swipeOffset > 60) {
@@ -217,7 +219,11 @@ fun MessageBox(
                                     horizontalArrangement = Arrangement.Start
                                 )
                                 {
-                                    SelectedMessageFormat(it, messageSenderName)
+                                    SelectedMessageFormat(
+                                        it,
+                                        profile,
+                                        viewModel
+                                    )
                                 }
                             }
 
@@ -379,33 +385,40 @@ fun MessageFormat(
 @Composable
 fun SelectedMessageFormat(
     message: MessageItem,
-    messageSenderName: String? = null,
+    profile: ProfileDTO? = null,
+    viewModel: ChatViewModel,
 ) {
+
+    val messageAnswerName =
+        message.phone?.let { phone ->
+            if (message.fromUser == profile?.id) {
+                stringResource(MokoRes.strings.you)
+            } else {
+                val findContact = viewModel.findContactByPhone(phone)
+                if (findContact != null) {
+                    "${findContact.firstName} ${findContact.lastName}"
+                } else {
+                    "+$phone"
+                }
+            }
+        } ?: ""
+
     if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        if (messageSenderName != null) {
-            SelectedMessageText(message, messageSenderName)
-        }
+        SelectedMessageText(message, messageAnswerName)
     } else {
 
         when (message.attachments!![0].type) {
-
             "audio/mp4" -> {
-                if (messageSenderName != null) {
-                    SelectedVoiceMessage(message, messageSenderName)
-                }
+                SelectedVoiceMessage(message, messageAnswerName)
             }
 
             "image" -> {
-                if (messageSenderName != null) {
-                    SelectedMessageImage(message.attachments!!, messageSenderName)
-                }
+                SelectedMessageImage(message.attachments!!, messageAnswerName)
 
             }
 
             else -> {
-                if (messageSenderName != null) {
-                    SelectedFileMessage(message, messageSenderName)
-                }
+                SelectedFileMessage(message, messageAnswerName)
             }
         }
 

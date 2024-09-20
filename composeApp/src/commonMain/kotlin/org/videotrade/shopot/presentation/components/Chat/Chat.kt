@@ -118,7 +118,9 @@ fun Chat(
             var messageYas = mutableStateOf(message)
 
             // Определяем имя отправителя сообщения
-            val messageSenderName = if (message.fromUser != profile.id) {
+            val messageSenderName = if (message.fromUser == profile.id) {
+                stringResource(MokoRes.strings.you)
+            } else {
                 message.phone?.let {
                     val findContact = viewModel.findContactByPhone(it)
                     if (findContact != null) {
@@ -127,9 +129,8 @@ fun Chat(
                         "+${message.phone}"
                     }
                 } ?: ""
-            } else {
-                ""
             }
+
 
             MessageBox(
                 viewModel = viewModel,

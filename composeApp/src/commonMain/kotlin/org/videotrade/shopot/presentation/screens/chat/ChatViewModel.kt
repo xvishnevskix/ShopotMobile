@@ -68,8 +68,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val forwardMessage = MutableStateFlow<MessageItem?>(null)
 
 
-    private val _selectedMessagesByChat = MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
-    val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> = _selectedMessagesByChat.asStateFlow()
+    private val _selectedMessagesByChat =
+        MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
+    val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
+        _selectedMessagesByChat.asStateFlow()
 
 
     init {
@@ -219,7 +221,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     iread = false,
                     attachments = null
                 ),
-                listOf(fileId)
+                listOf(fileId),
+                selectedMessagesByChat.value[chatId]?.first?.id
+
             )
         }
     }
@@ -252,14 +256,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
 
     fun sendForwardMessage(
         messageId: String,
-        chatId:String,
+        chatId: String,
     ) {
         viewModelScope.launch {
             try {
                 val jsonContent = Json.encodeToString(
                     buildJsonObject {
                         put("action", "forwardMessage")
-                        put("chatId",chatId)
+                        put("chatId", chatId)
                         put("messageId", messageId)
                         put("userId", profileUseCase.getProfile().id)
                     }
