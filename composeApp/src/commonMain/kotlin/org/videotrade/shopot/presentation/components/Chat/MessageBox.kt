@@ -261,7 +261,7 @@ fun MessageBox(
                             // Пересланное сообщение
                             if (message.forwardMessage == true) {
                                 Text(
-                                    "Пересланное сообщение",
+                                    stringResource(MokoRes.strings.forwarded_message),
                                     style = TextStyle(
                                         color = Color.Gray,
                                         fontSize = 12.sp,

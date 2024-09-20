@@ -168,4 +168,6 @@
     <string name="group_name_should_not_exceed_40_characters">Название группы не должно превышать 40 символов</string>
     <string name="group_name_can_contain_only_letters_and_numbers">Название группы может содержать только буквы и числа</string>
     <string name="please_fill_in_the_group_name_input_field">Введите название группы</string>
+    <string name="forwarded_message">Пересланное сообщение</string>
+
 </resources>

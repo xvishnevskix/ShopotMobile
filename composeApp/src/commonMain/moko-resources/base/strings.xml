@@ -172,5 +172,5 @@
     <string name="group_name_should_not_exceed_40_characters">Group name should not exceed 40 characters</string>
     <string name="group_name_can_contain_only_letters_and_numbers">Group name can contain only letters and numbers</string>
     <string name="please_fill_in_the_group_name_input_field">Please fill in the group name input field</string>
-
+    <string name="forwarded_message">Forwarded message</string>
 </resources>
