@@ -170,4 +170,17 @@
     <string name="please_fill_in_the_group_name_input_field">Введите название группы</string>
     <string name="forwarded_message">Пересланное сообщение</string>
 
+    <string name="january">Января</string>
+    <string name="february">Февраля</string>
+    <string name="march">Марта</string>
+    <string name="april">Апреля</string>
+    <string name="may">Мая</string>
+    <string name="june">Июня</string>
+    <string name="july">Июля</string>
+    <string name="august">Августа</string>
+    <string name="september">Сентября</string>
+    <string name="october">Октября</string>
+    <string name="november">Ноября</string>
+    <string name="december">Декабря</string>
+
 </resources>

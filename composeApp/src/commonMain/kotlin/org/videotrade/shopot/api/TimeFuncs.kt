@@ -93,18 +93,28 @@ fun getCurrentTimeList(): List<Int> {
     )
 }
 
+@Composable
 fun formatDateOnly(dateOnly: List<Int>): String {
-    return try {
-        // Преобразуем список в дату
 
-        val month = dateOnly[1]
         val day = dateOnly[2]
 
-        // Форматируем дату в нужном виде, например, "13.09.2024"
-        "${
-            day.toString().padStart(2, '0')
-        }.${month.toString().padStart(2, '0')}"
-    } catch (e: Exception) {
-        ""
-    }
+
+        val monthName = when (dateOnly[1]) {
+            1 -> stringResource(MokoRes.strings.january)
+            2 -> stringResource(MokoRes.strings.february)
+            3 -> stringResource(MokoRes.strings.march)
+            4 -> stringResource(MokoRes.strings.april)
+            5 -> stringResource(MokoRes.strings.may)
+            6 -> stringResource(MokoRes.strings.june)
+            7 -> stringResource(MokoRes.strings.july)
+            8 -> stringResource(MokoRes.strings.august)
+            9 -> stringResource(MokoRes.strings.september)
+            10 -> stringResource(MokoRes.strings.october)
+            11 -> stringResource(MokoRes.strings.november)
+            12 -> stringResource(MokoRes.strings.december)
+            else -> ""
+        }
+
+      return  "$day $monthName"
+
 }

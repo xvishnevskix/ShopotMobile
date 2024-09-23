@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -33,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,13 +47,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
@@ -61,9 +68,55 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.chat_copy
+import shopot.composeapp.generated.resources.chat_delete
+import shopot.composeapp.generated.resources.chat_forward
 import shopot.composeapp.generated.resources.chat_reply
 import shopot.composeapp.generated.resources.double_message_check
 import shopot.composeapp.generated.resources.single_message_check
+
+
+data class EditOption(
+    val text: String,
+    val imagePath: DrawableResource,
+    val onClick: (viewModule: ChatViewModel, message: MessageItem, clipboardManager: ClipboardManager) -> Unit,
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun getEditOptions(scaffoldState: BottomSheetScaffoldState? = null): List<EditOption> {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    return listOf(
+
+        EditOption(
+            text = stringResource(MokoRes.strings.copy),
+            imagePath = Res.drawable.chat_copy,
+            onClick = { _, message, clipboardManager ->
+                message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
+            }
+        ),
+        EditOption(
+            text = stringResource(MokoRes.strings.forward),
+            imagePath = Res.drawable.chat_forward,
+            onClick = { viewModel, message, clipboardManager ->
+                coroutineScope.launch {
+                    viewModel.setForwardMessage(message)
+                    viewModel.setScaffoldState(true)
+                }
+            }
+        ),
+        EditOption(
+            text = stringResource(MokoRes.strings.delete),
+            imagePath = Res.drawable.chat_delete,
+            onClick = { viewModel, message, _ ->
+                viewModel.deleteMessage(message)
+            }
+        ),
+    )
+}
+
 
 @Composable
 fun MessageBox(
@@ -352,6 +405,7 @@ fun MessageBox(
                     ),
                     modifier = Modifier.padding(),
                 )
+            println("создано ${message.created}")
         }
     }
 }
