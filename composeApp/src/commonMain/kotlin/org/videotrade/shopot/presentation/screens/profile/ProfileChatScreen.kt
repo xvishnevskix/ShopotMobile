@@ -30,13 +30,16 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
+import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -79,10 +82,19 @@ class ProfileChatScreen(private val profile: ProfileDTO, private val chat: ChatI
                     ProfileHeader(stringResource(MokoRes.strings.profile), true)
                     Avatar(
                         icon = chat.icon,
-                        size = 186.dp
+                        size = 186.dp,
+                        onClick = {
+                            navigator.push(
+                                PhotoViewerScreen(
+                                    imageFilePath = null,
+                                    messageSenderName = "${chat.firstName} ${chat.lastName}",
+                                    icon = chat.icon,
+                                )
+                            )
+                        }
                     )
                     Text(
-                        "${chat.firstName} ${chat.lastName} ",
+                        "${chat.firstName} ${chat.lastName}",
                         textAlign = TextAlign.Center,
                         fontSize = 20.sp,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
@@ -312,7 +324,6 @@ class ProfileChatScreen(private val profile: ProfileDTO, private val chat: ChatI
 
     }
 }
-
 
 
 enum class ProfileMediaTabs(

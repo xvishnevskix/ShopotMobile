@@ -74,7 +74,7 @@ class ChatScreen(
                 ) {
                     viewModel.audioRecorder.value.stopRecording(false)
                 }
-                viewModel.clearMessages()
+
                 mainViewModel.setCurrentChat("")
             }
         }

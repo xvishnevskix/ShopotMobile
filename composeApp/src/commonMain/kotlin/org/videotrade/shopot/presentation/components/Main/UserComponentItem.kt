@@ -57,11 +57,12 @@ fun UserComponentItem(
 ) {
     val viewModel: ChatViewModel = koinInject()
     val profile = mainViewModel.profile.collectAsState().value
-    
+
     Row(
         modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
             mainViewModel.setCurrentChat(chat.id)
             mainViewModel.setZeroUnread(chat)
+            viewModel.clearMessages()
             viewModel.setCurrentChat(chat)
             commonViewModel.mainNavigator.value?.push(ChatScreen())
         },
@@ -70,12 +71,12 @@ fun UserComponentItem(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            
+
             Avatar(
                 icon = chat.icon,
                 size = 60.dp
             )
-            
+
             Column(
                 modifier = Modifier.padding(start = 10.dp),
                 verticalArrangement = Arrangement.Center
@@ -87,7 +88,7 @@ fun UserComponentItem(
                         ?.let {
                             if (it.length > 25) "${it.take(22)}..." else it
                         } ?: ""
-                
+
                 Row() {
                     if (chat.personal) {
                         val displayName = fullName.ifBlank { chat.phone!! }
@@ -122,8 +123,8 @@ fun UserComponentItem(
                     }
                 }
 
-                
-                
+
+
                 Text(
                     text = chat.lastMessage?.let {
                         MessageContent(message = it)
@@ -138,12 +139,12 @@ fun UserComponentItem(
                     color = Color(0xFF979797),
                     modifier = Modifier.padding(top = 5.dp)
                 )
-                
-                
+
+
             }
-            
+
         }
-        
+
         Row {
             Column(
                 modifier = Modifier.padding(top = 12.dp, end = 5.dp)
@@ -163,7 +164,7 @@ fun UserComponentItem(
                         )
                     }
                 }
-                
+
             }
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -191,7 +192,7 @@ fun UserComponentItem(
 //                    color = Color(0xFF979797),
 //
 //                    )
-                
+
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(6.dp))
@@ -209,17 +210,17 @@ fun UserComponentItem(
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
                             color = Color(0xFFFFFFFF),
-                            
+
                             )
                     }
                 }
             }
-            
+
         }
-        
-        
+
+
     }
-    
+
 }
 
 
@@ -228,13 +229,13 @@ fun MessageContent(message: MessageItem): String {
     return if (message.attachments == null || message.attachments?.isEmpty() == true) {
         message.content ?: stringResource(MokoRes.strings.start_conversation)
     } else {
-        
+
         when (message.attachments!![0].type) {
             "audio/mp4" -> stringResource(MokoRes.strings.audio)
             "image" -> stringResource(MokoRes.strings.photo)
             else -> stringResource(MokoRes.strings.file)
         }
-        
-        
+
+
     }
 }

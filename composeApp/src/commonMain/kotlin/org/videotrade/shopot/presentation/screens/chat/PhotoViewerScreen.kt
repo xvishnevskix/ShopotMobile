@@ -20,26 +20,40 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import cafe.adriel.voyager.core.screen.Screen
+import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
+import com.seiko.imageloader.rememberImagePainter
+import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.person
 
-class PhotoViewerScreen(private val imageFilePath: String,private val messageSenderName: String? = null) : Screen {
+class PhotoViewerScreen(
+    private val imageFilePath: String?,
+    private val messageSenderName: String? = null,
+    private val icon: String? = null
+) : Screen {
     @Composable
     override fun Content() {
         var scale by remember { mutableStateOf(1f) }
         var offset by remember { mutableStateOf(Offset.Zero) }
         var imageSize by remember { mutableStateOf(IntSize.Zero) }
         var isHeaderVisible by remember { mutableStateOf(true) }
-        
-        val imagePainter = rememberAsyncImagePainter(imageFilePath)
+
+        val imagePainter = if (imageFilePath != null) {
+            rememberAsyncImagePainter(imageFilePath)
+        } else {
+            rememberImagePainter("${serverUrl}file/plain/$icon")
+        }
 
 
-        SafeArea{
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
@@ -94,7 +108,5 @@ class PhotoViewerScreen(private val imageFilePath: String,private val messageSen
                     PhotoViewerHeader("$messageSenderName", "")
                 }
             }
-        }
-
     }
 }

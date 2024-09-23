@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -50,7 +51,9 @@ fun PhotoViewerHeader(name: String, time: String) {
         modifier = Modifier
             .background(Color(0xFF29303C).copy(alpha = 0.8f))
             .fillMaxWidth()
-            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
+            .statusBarsPadding()
+//            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
+        .padding(top = 5.dp,start = 15.dp, end = 15.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

@@ -36,26 +36,26 @@ fun MessageImage(
 
 //    val imagePainter =
 //        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
-    
+
     val imagePainter = rememberAsyncImagePainter(imageFilePath)
     val navigator = LocalNavigator.current
     val url =
         "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
-    
+
     LaunchedEffect(Unit) {
         val fileName = attachments[0].name
         val fileType = attachments[0].type
-        
+
         val fileProvider = FileProviderFactory.create()
         val existingFile =
             fileProvider.existingFile(fileName, fileType)
-        
+
         if (!existingFile.isNullOrBlank()) {
             imageFilePath = existingFile
             println("existingFile ${existingFile}")
         } else {
-            
-            
+
+
             val filePath = fileProvider.downloadCipherFile(
                 url,
                 "image",
@@ -64,18 +64,18 @@ fun MessageImage(
             ) { newProgress ->
                 println("newProgress $newProgress")
             }
-            
-            
+
+
             if (filePath != null) {
                 imageFilePath = filePath
             }
-            
+
             println("filePath $filePath")
         }
-        
-        
+
+
     }
-    
+
     Image(
         painter = imagePainter,
         contentDescription = "Image",
@@ -90,7 +90,7 @@ fun MessageImage(
                     bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
                     bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                 )
-            
+
             ).clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null // Убирает эффект нажатия
