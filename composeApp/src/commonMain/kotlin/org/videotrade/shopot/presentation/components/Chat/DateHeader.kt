@@ -23,9 +23,9 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
-fun DateHeader(date: List<Int>) {
+fun DateHeader(date: List<Int>, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 2.dp)
             .fillMaxWidth()
         ,// Применение анимации видимости

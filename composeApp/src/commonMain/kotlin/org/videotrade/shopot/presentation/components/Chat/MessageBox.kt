@@ -405,7 +405,6 @@ fun MessageBox(
                     ),
                     modifier = Modifier.padding(),
                 )
-            println("создано ${message.created}")
         }
     }
 }

@@ -1,5 +1,10 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,6 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.positionInParent
@@ -37,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -69,13 +76,27 @@ fun Chat(
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
 
+    var isScrolling by remember { mutableStateOf(false) }
+    var shouldShowHeader by remember { mutableStateOf(false) }
+
     if (messagesState.isNotEmpty()) {
         val groupedMessages = messagesState.groupBy { message ->
             message.created.subList(0, 3)
         }
-
         val numberOfDays = groupedMessages.size
-        println("Количество уникальных дней: $numberOfDays")
+
+        LaunchedEffect(listState) {
+            snapshotFlow { listState.isScrollInProgress }
+                .collect { scrolling ->
+                    isScrolling = scrolling
+                    if (scrolling) {
+                        shouldShowHeader = true
+                        delay(1000)
+                    } else {
+                            shouldShowHeader = false
+                    }
+                }
+        }
 
         LaunchedEffect(listState) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo }
@@ -83,9 +104,7 @@ fun Chat(
                 .distinctUntilChanged()
                 .collect { visibleItems ->
                     if (viewModel.messages.value.size > 23) {
-                        println("hfpvth ${visibleItems.last().index}")
-                        println("hfpvth последний ${viewModel.messages.value.size - 1}")
-                        println("hfpvth groupedMessages.size ${viewModel.messages.value.size - 1 + numberOfDays}")
+
                         if (visibleItems.isNotEmpty() && visibleItems.last().index == viewModel.messages.value.size - 1 + numberOfDays) {
                             coroutineScope.launch {
                                 viewModel.getMessagesBack(chat.chatId)
@@ -103,13 +122,18 @@ fun Chat(
             modifier = modifier.background(Color.White)
         ) {
 
-            println("hfpvth ${viewModel.messages.value.size}")
-            // Добавляем заголовки с датами и сообщения
             groupedMessages.forEach { (date, messages) ->
 
-                stickyHeader() {
-                    // Отображение заголовка с датой
-                    DateHeader(date = date)
+                stickyHeader {
+                    val alpha by animateFloatAsState(
+                        targetValue = if (isScrolling) 1f else 0f,
+                        animationSpec = tween(durationMillis = 500)
+                    )
+
+                    DateHeader(
+                        date = date,
+                        modifier = Modifier.alpha(alpha)
+                    )
                 }
 
                 items(messages) { message ->
