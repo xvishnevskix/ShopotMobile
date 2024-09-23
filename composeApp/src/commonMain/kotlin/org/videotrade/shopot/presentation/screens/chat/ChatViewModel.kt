@@ -119,9 +119,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun setCount(count: Int) {
+    fun setMessagePage(page: Int) {
         viewModelScope.launch {
-            chatUseCase.setCount(count)
+            chatUseCase.setMessagePage(page)
         }
     }
 

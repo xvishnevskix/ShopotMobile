@@ -72,7 +72,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             BackIcon(Modifier.padding(start = 23.dp, end = 8.dp).pointerInput(Unit) {
                 
                 viewModel.clearMessages()
-                viewModel.setCount(0)
+                viewModel.setMessagePage(0)
                 navigator.pop()
                 
                 

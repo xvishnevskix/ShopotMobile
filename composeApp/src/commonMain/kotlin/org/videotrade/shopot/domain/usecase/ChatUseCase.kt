@@ -10,8 +10,8 @@ class ChatUseCase : KoinComponent {
     private val repository: ChatRepository by inject()
     
     
-    fun setCount(count: Int) {
-        return repository.setCount(count)
+    fun setMessagePage(page: Int) {
+        return repository.setMessagePage(page)
         
     }
     

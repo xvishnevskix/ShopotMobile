@@ -21,26 +21,26 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         emptyList()
     )
     val wsUseCase: WsUseCase by inject()
-    
-    private val messageCount = MutableStateFlow(0)
-    
-    
-    override fun setCount(count: Int) {
-        messageCount.value = count
-        
+
+    private val messagePage = MutableStateFlow(0)
+
+
+    override fun setMessagePage(page: Int) {
+        messagePage.value = page
+
     }
-    
-    
+
+
     override fun implementCount() {
-        messageCount.value += 1
-        
+        messagePage.value += 1
+
     }
-    
+
     override fun initMessages(messages: List<MessageItem>) {
         _messages.value += messages
     }
-    
-    
+
+
     override suspend fun sendMessage(
         message: MessageItem, attachments: List<String>?,
         answerMessageId: String?,
@@ -62,12 +62,12 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
             )
             println("jsonContent $jsonContent")
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-            
+
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }
     }
-    
+
     override suspend fun sendUploadMessage(
         message: MessageItem,
         attachments: List<String>?,
@@ -94,30 +94,30 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
             )
             println("jsonContent $jsonContent")
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-            
+
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }
     }
-    
-    
+
+
     override fun addMessage(message: MessageItem) {
         _messages.value = listOf(message) + _messages.value
-        
-        
+
+
         println(
             "_messages_messages ${
                 _messages.value.size
-                
+
             }"
         )
     }
-    
+
     override fun updateUploadMessage(message: MessageItem) {
         _messages.update { currentChat ->
             currentChat.map { messageItem ->
                 println("messageItem.id == message.uploadId ${messageItem.uploadId} ${message.uploadId}")
-                
+
                 if (messageItem.uploadId == message.uploadId) {
                     messageItem.copy(
                         id = message.id,
@@ -140,18 +140,18 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
                 }
             }
         }
-        
-        
+
+
     }
-    
-    
+
+
     override fun getMessages(): StateFlow<List<MessageItem>> = _messages.asStateFlow()
-    
-    
+
+
     override suspend fun sendReadMessage(messageId: String, userId: String) {
-        
+
         try {
-            
+
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("action", "readMessage")
@@ -159,82 +159,83 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
                     put("readerId", userId)
                 }
             )
-            
+
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-            
+
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }
     }
-    
-    
+
+
     override fun readMessage(messageId: String) {
-        
+
         println("messageId!!!!!!  $messageId")
-        
+
         _messages.update { currentChat ->
             currentChat.map { messageItem ->
-                
+
                 if (messageItem.id == messageId) {
                     println("messageId!!!!!! ${messageItem.id} $messageId")
-                    
+
                     messageItem.copy(anotherRead = true)
                 } else {
                     messageItem
                 }
             }
         }
-        
+
     }
-    
-    
+
+
     override suspend fun getMessagesBack(chatId: String) {
         try {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("action", "getMessages")
                     put("chatId", chatId)
-                    put("page", messageCount.value)
+                    put("page", messagePage.value)
                 }
             )
             println("jsonContent4144141 ${jsonContent}")
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-            
-            
+
+
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }
-        
+
     }
-    
-    
+
+
     override suspend fun delMessage(message: MessageItem) {
         _messages.value = _messages.value.filter { it.id != message.id }
-        
+
         try {
-            
+
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("action", "removeMessage")
                     put("messageId", message.id)
                 }
             )
-            
-            
+
+
             println("jsonContent $jsonContent")
-            
+
             wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-            
+
         } catch (e: Exception) {
             println("Failed to send message: ${e.message}")
         }
     }
-    
+
     override fun clearMessages() {
+        setMessagePage(0)
         _messages.value = emptyList()
-        
+
     }
-    
+
     override fun clearData() {
         _messages.value = emptyList()
     }

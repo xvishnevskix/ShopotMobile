@@ -7,7 +7,8 @@ interface ChatRepository {
     
     
     
-    fun setCount(count: Int)
+    fun setMessagePage(page: Int)
+
     fun implementCount()
     
     

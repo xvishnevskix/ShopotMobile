@@ -55,7 +55,7 @@ fun ForwardingComponentItem(
             mainViewModel.setZeroUnread(chat)
             viewModel.setCurrentChat(chat)
             chatViewModel.clearMessages()
-            chatViewModel.setCount(0)
+            chatViewModel.setMessagePage(0)
 //            viewModel.sendMessage(
 //                content = viewModel.forwardMessage.value?.content,
 //                fromUser = viewModel.profile.value.id,
