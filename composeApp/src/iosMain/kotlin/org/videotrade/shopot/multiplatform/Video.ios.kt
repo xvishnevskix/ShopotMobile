@@ -1,6 +1,5 @@
 package org.videotrade.shopot.multiplatform
 
-import androidx.compose.ui.graphics.ImageBitmap
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -17,10 +16,9 @@ import platform.Foundation.getBytes
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 
-
 @OptIn(ExperimentalForeignApi::class)
-actual fun getImageFromVideo(url: String, completion: (ByteArray?) -> Unit) {
-    val asset = AVAsset.assetWithURL(NSURL.fileURLWithPath(url))
+actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (ByteArray?) -> Unit) {
+    val asset = AVAsset.assetWithURL(NSURL.fileURLWithPath(videoFilePath))
     val imageGenerator = AVAssetImageGenerator(asset)
     imageGenerator.appliesPreferredTrackTransform = true
     val time = CMTimeMake(0, 600) // Первый кадр
@@ -55,15 +53,4 @@ fun NSData.toByteArray(): ByteArray {
         this.getBytes(it.addressOf(0), NSMakeRange(0.toULong(), length.toULong()))
     }
     return byteArray
-}
-
-actual fun getFirstFrameAsBitmap(videoFilePath: String): Bitmap? {
-    TODO("Not yet implemented")
-}
-
-actual fun saveBitmapToFile(
-    bitmap: ImageBitmap,
-    fileName: String
-): ByteArray? {
-    TODO("Not yet implemented")
 }
