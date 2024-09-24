@@ -91,7 +91,7 @@ fun Chat(
                     isScrolling = scrolling
                     if (scrolling) {
                         shouldShowHeader = true
-                        delay(1000)
+                        delay(2000)
                     } else {
                             shouldShowHeader = false
                     }

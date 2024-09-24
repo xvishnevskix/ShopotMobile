@@ -61,6 +61,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.formatTimeOnly
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
@@ -397,7 +398,7 @@ fun MessageBox(
 
             if (message.created.isNotEmpty())
                 Text(
-                    text = formatTimestamp(message.created),
+                    text = formatTimeOnly(message.created),
                     style = TextStyle(
                         color = Color.Gray,
                         fontSize = 16.sp,
