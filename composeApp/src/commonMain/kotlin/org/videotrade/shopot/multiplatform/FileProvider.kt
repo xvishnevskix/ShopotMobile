@@ -40,6 +40,15 @@ expect class FileProvider {
         onProgress: (Float) -> Unit
     ): String?
     
+    suspend fun uploadVideoFile(
+        url: String,
+        videoFileDirectory: String,
+        photoByteArray: ByteArray,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String?
+    
     fun getFileBytesForDir(fileDirectory: String): ByteArray?
     
     fun getFileData(fileDirectory: String): FileData?

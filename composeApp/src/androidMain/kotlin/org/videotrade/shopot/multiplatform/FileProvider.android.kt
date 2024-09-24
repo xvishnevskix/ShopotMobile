@@ -618,6 +618,146 @@ actual class FileProvider(private val applicationContext: Context) {
         }
     }
     
+    actual suspend fun uploadVideoFile(
+        url: String,
+        videoFileDirectory: String,
+        photoByteArray: ByteArray,
+        contentType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String? {
+        println("111111111313123123131")
+        val client = HttpClient() {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 600_000
+                connectTimeoutMillis = 600_000
+                socketTimeoutMillis = 600_000
+            }
+        }
+        
+        val sharedSecret = getValueInStorage("sharedSecret")
+        
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+
+        
+        val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
+        
+        
+        val cipherFilePath = FileProviderFactory.create()
+            .getFilePath(
+                fileNameCipher,
+                "cipher"
+            )
+        
+        if (cipherFilePath == null) return null
+        
+        
+        val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+            videoFileDirectory,
+            cipherFilePath,
+            sharedSecret?.decodeBase64Bytes()!!
+        )
+        
+        println("444444")
+        
+        if (encupsChachaFileResult == null) {
+            
+            return null
+        }
+        println("result2 $encupsChachaFileResult")
+        
+        val file = File(cipherFilePath)
+        if (!file.exists()) {
+            println("File not found: ${file.absolutePath}")
+            return null
+        }
+        println("11111111 ${file.inputStream().asInput()}")
+        
+        println("Local file path: ${file.absolutePath}")
+        
+        try {
+            val token = getValueInStorage("accessToken")
+            
+            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                setBody(MultiPartFormDataContent(
+                    formData {
+                        append(
+                            "file",
+                            InputProvider(file.length()) { file.inputStream().asInput() },
+                            Headers.build {
+                                append(HttpHeaders.ContentType, contentType)
+                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+                            }
+                        )
+                        // Добавляем block и authTag как дополнительные поля
+                        append(
+                            "encupsFile",
+                            Json.encodeToString(
+                                EncapsulationFileResult.serializer(),
+                                encupsChachaFileResult
+                            )
+                        )
+                    }
+                ))
+                header(HttpHeaders.Authorization, "Bearer $token")
+                
+                onUpload { bytesSentTotal, contentLength ->
+                    
+                    
+                    if (contentLength != -1L) { // -1 means that the content length is unknown
+                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
+                        onProgress(progress)
+                    }
+                }
+            }
+            
+            
+            println("11111111 ${response.status} ${response.toString()}")
+            
+            if (response.status.isSuccess()) {
+                println("11111111")
+                
+                val jsonElement = Json.parseToJsonElement(response.bodyAsText())
+                
+                println("jsonElementFile ${jsonElement}")
+                
+                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                
+                println("id $id")
+                
+                file.delete()
+
+//                val fileCopy = File(fileDirectory)
+//
+//                fileCopy.delete()
+                
+                return id
+                
+            } else {
+
+//                commonViewModel.toaster.show("Filed")
+                
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                return null
+            }
+            
+        } catch (e: Exception) {
+//            commonViewModel.toaster.show("Filed")
+            
+            println("File upload failed: ${e.message}")
+            return null
+            
+        } finally {
+            
+            client.close()
+            
+            
+        }
+        
+        return null
+        
+    }
+    
     
 }
 

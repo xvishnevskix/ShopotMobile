@@ -94,16 +94,6 @@ fun FileMessage(
             downloadJob = scope.launch {
                 isLoading = true
                 isStartCipherLoading = true
-//                delay(2000)
-//
-//                isStartCipherLoading = false
-//                isLoading = true
-//
-//                // Начинаем анимировать прогресс
-//                progress = 1f
-//                delay(4000)
-//
-//                isLoading = false
                 message.attachments?.get(0)?.let { attachment ->
                     
                     println("adasdada ${attachment.name} ${attachment.type}")

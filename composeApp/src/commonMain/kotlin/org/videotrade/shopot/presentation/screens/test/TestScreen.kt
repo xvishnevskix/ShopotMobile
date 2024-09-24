@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import com.preat.peekaboo.image.picker.toImageBitmap
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -36,18 +35,32 @@ class TestScreen : Screen {
                 
                 Button(onClick = {
                     scope.launch {
-                        val filePick = FileProviderFactory.create()
+                        val fileProvider = FileProviderFactory.create()
+                        
+                        val filePick = fileProvider
                             .pickFile(PickerType.File(listOf("mp4")))
                         
-                        
-                        println("${filePick?.fileAbsolutePath} filePath")
-
-                        
                         filePick?.fileAbsolutePath?.let {
-                            getAndSaveFirstFrame(it) { byteArray ->
-                                println("byteArray $byteArray")
+                            getAndSaveFirstFrame(it) { photoByteArray ->
+                                println("byteArray $photoByteArray")
                                 
-                                imageBitmap = byteArray?.toImageBitmap()
+                                if (photoByteArray !== null) {
+                                    scope.launch {
+                                        
+                                        val fileId = fileProvider.uploadVideoFile(
+                                            "file/upload",
+                                            filePick.fileAbsolutePath,
+                                            photoByteArray,
+                                            "video",
+                                            " attachment.name"
+                                        ) {
+                                            
+                                            println("progress1 ${it / 100f}")
+                                            
+                                        }
+                                    }
+                                }
+                                
                             }
                         }
                         
