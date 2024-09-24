@@ -93,18 +93,49 @@ fun getCurrentTimeList(): List<Int> {
     )
 }
 
+@Composable
 fun formatDateOnly(dateOnly: List<Int>): String {
-    return try {
-        // Преобразуем список в дату
+    // Получаем текущую дату и вчерашнюю дату
+    val currentDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+    val currentDate = currentDateTime.date
+    val yesterdayDate = currentDate.minus(1, DateTimeUnit.DAY)
 
-        val month = dateOnly[1]
-        val day = dateOnly[2]
+    // Создаем LocalDateTime на основе входящих данных
+    val year = dateOnly[0]
+    val month = dateOnly[1]
+    val day = dateOnly[2]
+    val localDate = LocalDateTime(year, month, day, 0, 0).date
 
-        // Форматируем дату в нужном виде, например, "13.09.2024"
-        "${
-            day.toString().padStart(2, '0')
-        }.${month.toString().padStart(2, '0')}"
-    } catch (e: Exception) {
-        ""
+    // Определяем день (сегодня, вчера или другая дата)
+    return when {
+        localDate == currentDate -> stringResource(MokoRes.strings.today)
+        localDate == yesterdayDate -> stringResource(MokoRes.strings.yesterday)
+        else -> {
+            // Определяем название месяца
+            val monthName = when (month) {
+                1 -> stringResource(MokoRes.strings.january)
+                2 -> stringResource(MokoRes.strings.february)
+                3 -> stringResource(MokoRes.strings.march)
+                4 -> stringResource(MokoRes.strings.april)
+                5 -> stringResource(MokoRes.strings.may)
+                6 -> stringResource(MokoRes.strings.june)
+                7 -> stringResource(MokoRes.strings.july)
+                8 -> stringResource(MokoRes.strings.august)
+                9 -> stringResource(MokoRes.strings.september)
+                10 -> stringResource(MokoRes.strings.october)
+                11 -> stringResource(MokoRes.strings.november)
+                12 -> stringResource(MokoRes.strings.december)
+                else -> ""
+            }
+            "$day $monthName"
+        }
     }
+}
+
+@Composable
+fun formatTimeOnly(timestamp: List<Int>): String {
+    val hour = timestamp[3]
+    val minute = timestamp[4]
+
+    return "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
 }
