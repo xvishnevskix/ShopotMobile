@@ -28,6 +28,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalFocusManager
@@ -48,15 +50,23 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import com.seiko.imageloader.asImageBitmap
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorSpace
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.ImageInfo
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.getFirstFrameAsBitmap
+import org.videotrade.shopot.multiplatform.getImageFromVideo
+import org.videotrade.shopot.multiplatform.saveBitmapToFile
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.LoginLogo
@@ -69,6 +79,7 @@ class TestScreen : Screen {
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
+        var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
         MaterialTheme {
             SafeArea {
@@ -76,23 +87,46 @@ class TestScreen : Screen {
                 Button(onClick = {
                     scope.launch {
                         val filePick = FileProviderFactory.create()
-                            .pickFile(PickerType.File(listOf("pdf", "zip")))
+                            .pickFile(PickerType.File(listOf("mp4")))
 
 
                         println("${filePick?.fileAbsolutePath} filePath")
-//                        getFirstFrameAsBitmap()
-                    }
+//                        filePick?.fileAbsolutePath?.let {
+//
+//                            val imageBitmap = getFirstFrameAsBitmap(it)
+//
+//                            imageBitmap?.let {
+//                                val savedImage = saveBitmapToFile(it, "first_frame")
+//                                savedImage?.let { savedBitmap ->
+//
+//                                }
+//                            }
+//                        }
+                        
+                        filePick?.fileAbsolutePath?.let {
+                            getImageFromVideo(it) { byteArray ->
+                                println("byteArray $byteArray")
+                                
+                                byteArray
+                            }
+                        }
+                        
+                        
+            }
 
                 }, content = {
                     Text("AAAAAA")
                 })
-//                Image(
-//                    modifier = Modifier
-//                        .size(220.dp),
-//                    painter = painterResource(Res.drawable.LoginLogo),
-//                    contentDescription = null,
-//                    contentScale = ContentScale.Crop
-//                )
+                imageBitmap?.let {
+                    Image(
+                        modifier = Modifier
+                            .size(220.dp),
+                        bitmap = it,
+                        contentDescription = null,
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                
 
             }
         }
