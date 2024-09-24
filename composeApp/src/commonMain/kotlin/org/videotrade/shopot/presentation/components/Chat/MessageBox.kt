@@ -5,6 +5,7 @@ import SelectedFileMessage
 import SelectedMessageImage
 import SelectedMessageText
 import SelectedVoiceMessage
+import VideoMessage
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -447,6 +448,10 @@ fun MessageFormat(
                     message,
                     message.attachments!!
                 )
+//                VideoMessage(
+//                    message,
+//                    message.attachments!!
+//                )
             }
         }
 
