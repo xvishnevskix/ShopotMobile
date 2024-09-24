@@ -41,18 +41,19 @@ class TestScreen : Screen {
                             .pickFile(PickerType.File(listOf("mp4")))
                         
                         filePick?.fileAbsolutePath?.let {
-                            getAndSaveFirstFrame(it) { photoByteArray ->
+                            getAndSaveFirstFrame(it) { photoName, photoPath, photoByteArray ->
                                 println("byteArray $photoByteArray")
                                 
-                                if (photoByteArray !== null) {
+                                if (photoByteArray !== null && photoPath !== null && photoName !== null) {
                                     scope.launch {
                                         
                                         val fileId = fileProvider.uploadVideoFile(
-                                            "file/upload",
+                                            "file/upload/video",
                                             filePick.fileAbsolutePath,
-                                            photoByteArray,
+                                            photoPath,
                                             "video",
-                                            " attachment.name"
+                                            filePick.fileName,
+                                            photoName
                                         ) {
                                             
                                             println("progress1 ${it / 100f}")

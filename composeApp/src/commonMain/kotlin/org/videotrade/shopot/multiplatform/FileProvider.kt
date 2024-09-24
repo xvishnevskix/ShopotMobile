@@ -42,10 +42,11 @@ expect class FileProvider {
     
     suspend fun uploadVideoFile(
         url: String,
-        videoFileDirectory: String,
-        photoByteArray: ByteArray,
+        videoPath: String,
+        photoPath: String,
         contentType: String,
-        filename: String,
+        videoName: String,
+        photoName: String,
         onProgress: (Float) -> Unit
     ): String?
     

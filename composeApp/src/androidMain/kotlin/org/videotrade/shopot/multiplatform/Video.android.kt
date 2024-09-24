@@ -3,27 +3,26 @@ package org.videotrade.shopot.multiplatform
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.os.Environment
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import org.videotrade.shopot.androidSpecificApi.getContextObj
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.random.Random
 
 
-
-actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (ByteArray?) -> Unit) {
+actual fun getAndSaveFirstFrame(
+    videoFilePath: String,
+    completion: (String?, String?, ByteArray?) -> Unit
+) {
     val retriever = MediaMetadataRetriever()
     return try {
         retriever.setDataSource(videoFilePath)
         val bitmap = retriever.getFrameAtTime(0) // Получаем первый кадр (на временной отметке 0)
-        
+        val fileName = "${Random.nextInt(1, 2001)}_frame.png"
         bitmap?.let {
             // Указываем папку "Загрузки"
-            val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-            val file = File(downloadsDir, "${Random.nextInt(1, 2001)}_frame.png")
+            val downloadsDir =
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val file = File(downloadsDir, fileName)
             
             // Сохраняем Bitmap в файл
             FileOutputStream(file).use { out ->
@@ -33,11 +32,16 @@ actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (ByteArray?) 
             // Получаем массив байтов из Bitmap
             val stream = ByteArrayOutputStream()
             it.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            completion(stream.toByteArray()) // Возвращаем массив байтов
-        } ?: completion(null)
+            
+            completion(
+                fileName,
+                file.absolutePath,
+                stream.toByteArray()
+            ) // Возвращаем путь к файлу и массив байтов
+        } ?: completion(null, null, null)
     } catch (e: Exception) {
         e.printStackTrace()
-        completion(null)
+        completion(null, null, null)
     } finally {
         retriever.release()
     }

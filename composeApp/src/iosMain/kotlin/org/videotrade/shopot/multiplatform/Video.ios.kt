@@ -8,16 +8,14 @@ import platform.AVFoundation.AVAsset
 import platform.AVFoundation.AVAssetImageGenerator
 import platform.AVFoundation.valueWithCMTime
 import platform.CoreMedia.CMTimeMake
-import platform.Foundation.NSData
-import platform.Foundation.NSMakeRange
-import platform.Foundation.NSURL
-import platform.Foundation.NSValue
-import platform.Foundation.getBytes
+import platform.Foundation.*
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
+import kotlin.random.Random
+import kotlinx.coroutines.*
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (ByteArray?) -> Unit) {
+actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (String?, ByteArray?) -> Unit) {
     val asset = AVAsset.assetWithURL(NSURL.fileURLWithPath(videoFilePath))
     val imageGenerator = AVAssetImageGenerator(asset)
     imageGenerator.appliesPreferredTrackTransform = true
@@ -28,7 +26,7 @@ actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (ByteArray?) 
     ) { _, cgImagePointer, _, result, error ->
         if (error != null) {
             println("Ошибка извлечения изображения: ${error.localizedDescription}")
-            completion(null)
+            completion(null, null)
             return@generateCGImagesAsynchronouslyForTimes
         }
         
@@ -37,12 +35,33 @@ actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (ByteArray?) 
             val jpegData = UIImageJPEGRepresentation(uiImage, 1.0) // Получение JPEG данных
             
             jpegData?.let {
-                completion(jpegData.toByteArray()) // Возврат ImageBitmap
-            } ?: completion(null) // Если jpegData пустое
+                // Указываем папку "Документы"
+                val documentsDir = NSSearchPathForDirectoriesInDomains(
+                    NSDocumentDirectory, NSUserDomainMask, true
+                ).firstOrNull() as? String ?: run {
+                    completion(null, null)
+                    return@let
+                }
+                
+                // Генерация уникального имени файла
+                val fileName = "${Random.nextInt(1, 2001)}_frame.jpg"
+                val filePath = documentsDir + "/" + fileName
+                val fileUrl = NSURL.fileURLWithPath(filePath)
+                
+                // Сохранение файла
+                if (it.writeToURL(fileUrl, true)) {
+                    // Преобразование данных в ByteArray
+                    val byteArray = it.toByteArray()
+                    completion(filePath, byteArray) // Возврат пути к файлу и ByteArray
+                } else {
+                    completion(null, null) // Если файл не удалось сохранить
+                }
+            } ?: completion(null, null) // Если jpegData пустое
+        } else {
+            completion(null, null) // Если cgImagePointer пустое
         }
     }
 }
-
 
 // Helper function to convert NSData to ByteArray
 @OptIn(ExperimentalForeignApi::class)

@@ -281,16 +281,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             imagePath = Res.drawable.edit_pencil,
             onClick = {
                 scope.launch {
-                    val filePick = FileProviderFactory.create()
-                        .pickFile(PickerType.File(listOf("mp4")))
-                    
-                    filePick?.fileAbsolutePath?.let {
-                        getAndSaveFirstFrame(it) { byteArray ->
-                            println("byteArray $byteArray")
-                            
-                            byteArray?.toImageBitmap()
-                        }
-                    }
+//                    val filePick = FileProviderFactory.create()
+//                        .pickFile(PickerType.File(listOf("mp4")))
+//
+//                    filePick?.fileAbsolutePath?.let {
+//                        getAndSaveFirstFrame(it) {_, byteArray ->
+//                            println("byteArray $byteArray")
+//
+//                            byteArray?.toImageBitmap()
+//                        }
+//                    }
                     
                 }
             }

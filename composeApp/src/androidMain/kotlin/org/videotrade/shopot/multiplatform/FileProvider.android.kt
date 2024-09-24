@@ -620,10 +620,11 @@ actual class FileProvider(private val applicationContext: Context) {
     
     actual suspend fun uploadVideoFile(
         url: String,
-        videoFileDirectory: String,
-        photoByteArray: ByteArray,
+        videoPath: String,
+        photoPath: String,
         contentType: String,
-        filename: String,
+        videoName: String,
+        photoName: String,
         onProgress: (Float) -> Unit
     ): String? {
         println("111111111313123123131")
@@ -638,124 +639,165 @@ actual class FileProvider(private val applicationContext: Context) {
         val sharedSecret = getValueInStorage("sharedSecret")
         
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-
-        
-        val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
         
         
-        val cipherFilePath = FileProviderFactory.create()
+        val videoNameCipher = "videoCipherFile${Random.nextInt(0, 100000)}"
+        val photoNameCipher = "photoCipherFile${Random.nextInt(0, 100000)}"
+        
+        
+        val cipherVideoPath = FileProviderFactory.create()
             .getFilePath(
-                fileNameCipher,
+                videoNameCipher,
                 "cipher"
             )
         
-        if (cipherFilePath == null) return null
+        val cipherPhotoPath = FileProviderFactory.create()
+            .getFilePath(
+                photoNameCipher,
+                "cipher"
+            )
+        
+        if (cipherVideoPath == null) return null
+        if (cipherPhotoPath == null) return null
         
         
-        val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
-            videoFileDirectory,
-            cipherFilePath,
+        val encupsChachaVideoResult = cipherWrapper.encupsChachaFileCommon(
+            videoPath,
+            cipherVideoPath,
             sharedSecret?.decodeBase64Bytes()!!
+        )
+        
+        
+        val encupsChachaPhotoResult = cipherWrapper.encupsChachaFileCommon(
+            videoPath,
+            cipherPhotoPath,
+            sharedSecret.decodeBase64Bytes()
         )
         
         println("444444")
         
-        if (encupsChachaFileResult == null) {
-            
-            return null
-        }
-        println("result2 $encupsChachaFileResult")
-        
-        val file = File(cipherFilePath)
-        if (!file.exists()) {
-            println("File not found: ${file.absolutePath}")
-            return null
-        }
-        println("11111111 ${file.inputStream().asInput()}")
-        
-        println("Local file path: ${file.absolutePath}")
-        
-        try {
-            val token = getValueInStorage("accessToken")
-            
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-                setBody(MultiPartFormDataContent(
-                    formData {
-                        append(
-                            "file",
-                            InputProvider(file.length()) { file.inputStream().asInput() },
-                            Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
-                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                            }
-                        )
-                        // Добавляем block и authTag как дополнительные поля
-                        append(
-                            "encupsFile",
-                            Json.encodeToString(
-                                EncapsulationFileResult.serializer(),
-                                encupsChachaFileResult
-                            )
-                        )
-                    }
-                ))
-                header(HttpHeaders.Authorization, "Bearer $token")
-                
-                onUpload { bytesSentTotal, contentLength ->
-                    
-                    
-                    if (contentLength != -1L) { // -1 means that the content length is unknown
-                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
-                        onProgress(progress)
-                    }
-                }
-            }
+        if (encupsChachaVideoResult !== null && encupsChachaPhotoResult !== null) {
+            println("result2 $encupsChachaVideoResult $encupsChachaPhotoResult")
             
             
-            println("11111111 ${response.status} ${response.toString()}")
             
-            if (response.status.isSuccess()) {
-                println("11111111")
-                
-                val jsonElement = Json.parseToJsonElement(response.bodyAsText())
-                
-                println("jsonElementFile ${jsonElement}")
-                
-                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
-                
-                println("id $id")
-                
-                file.delete()
-
-//                val fileCopy = File(fileDirectory)
-//
-//                fileCopy.delete()
-                
-                return id
-                
-            } else {
-
-//                commonViewModel.toaster.show("Filed")
-                
-                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+            println("55555555")
+            
+            val videoFile = File(videoPath)
+            val photoFile = File(cipherPhotoPath)
+            
+            if (!videoFile.exists() && !photoFile.exists()) {
                 return null
             }
+//        println("11111111 ${file.inputStream().asInput()}")
+//
+//        println("Local file path: ${file.absolutePath}")
             
-        } catch (e: Exception) {
+            try {
+                val token = getValueInStorage("accessToken")
+                
+                val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                    setBody(MultiPartFormDataContent(
+                        formData {
+                            // Первый файл
+                            append(
+                                "videoFile",
+                                InputProvider(videoFile.length()) {
+                                    videoFile.inputStream().asInput()
+                                },
+                                Headers.build {
+                                    append(HttpHeaders.ContentType, "mp4")
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=\"${videoName}\""
+                                    )
+                                }
+                            )
+                            
+                            // Второй файл
+                            append(
+                                "preloadFile",
+                                InputProvider(photoFile.length()) {
+                                    photoFile.inputStream().asInput()
+                                },
+                                Headers.build {
+                                    append(HttpHeaders.ContentType, "image")
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=\"${photoName}\""
+                                    )
+                                }
+                            )
+                            
+                            // Дополнительные поля, такие как block и authTag
+                            append(
+                                "encupsFileVideo",
+                                Json.encodeToString(
+                                    EncapsulationFileResult.serializer(),
+                                    encupsChachaVideoResult
+                                )
+                            )
+                            
+                            append(
+                                "encupsFilePreload",
+                                Json.encodeToString(
+                                    EncapsulationFileResult.serializer(),
+                                    encupsChachaPhotoResult
+                                )
+                            )
+                        }
+                    ))
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    
+                    onUpload { bytesSentTotal, contentLength ->
+                        if (contentLength != -1L) { // -1 means that the content length is unknown
+                            val progress =
+                                (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
+                            onProgress(progress)
+                        }
+                    }
+                }
+                
+                
+                println("11111111 ${response.status} ${response.toString()}")
+                
+                if (response.status.isSuccess()) {
+                    println("11111111")
+                    
+                    val jsonElement = Json.parseToJsonElement(response.bodyAsText())
+                    
+                    println("jsonElementFile ${jsonElement}")
+                    
+                    val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                    
+                    println("id $id")
+                    
+                    videoFile.delete()
+                    photoFile.delete()
+                    
+                    return id
+                } else {
+
+//                commonViewModel.toaster.show("Filed")
+                    
+                    println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                    return null
+                }
+                
+            } catch (e: Exception) {
 //            commonViewModel.toaster.show("Filed")
-            
-            println("File upload failed: ${e.message}")
-            return null
-            
-        } finally {
-            
-            client.close()
-            
-            
+                
+                println("File upload failed: ${e.message}")
+                return null
+                
+            } finally {
+                
+                client.close()
+                
+                
+            }
         }
-        
         return null
-        
     }
     
     
