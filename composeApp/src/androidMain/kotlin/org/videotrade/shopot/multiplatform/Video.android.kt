@@ -3,6 +3,11 @@ package org.videotrade.shopot.multiplatform
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.os.Environment
+import android.widget.MediaController
+import android.widget.VideoView
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -45,4 +50,20 @@ actual fun getAndSaveFirstFrame(
     } finally {
         retriever.release()
     }
+}
+
+@Composable
+actual fun VideoPlayer(modifier: Modifier, url: String){
+    AndroidView(
+        modifier = modifier,
+        factory = { context ->
+            VideoView(context).apply {
+                setVideoPath(url)
+                val mediaController = MediaController(context)
+                mediaController.setAnchorView(this)
+                setMediaController(mediaController)
+                start()
+            }
+        },
+        update = {})
 }
