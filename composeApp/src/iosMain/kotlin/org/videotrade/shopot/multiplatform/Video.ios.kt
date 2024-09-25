@@ -1,5 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
@@ -81,4 +83,8 @@ fun NSData.toByteArray(): ByteArray {
         this.getBytes(it.addressOf(0), NSMakeRange(0.toULong(), length.toULong()))
     }
     return byteArray
+}
+
+@Composable
+actual fun VideoPlayer(modifier: Modifier, url: String) {
 }
