@@ -16,6 +16,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import com.preat.peekaboo.image.picker.toImageBitmap
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -43,7 +44,6 @@ class TestScreen : Screen {
                         filePick?.fileAbsolutePath?.let {
                             getAndSaveFirstFrame(it) { photoName, photoPath, photoByteArray ->
                                 println("byteArray $photoByteArray")
-                                
                                 if (photoByteArray !== null && photoPath !== null && photoName !== null) {
                                     scope.launch {
                                         

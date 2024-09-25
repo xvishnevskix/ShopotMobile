@@ -48,7 +48,7 @@ expect class FileProvider {
         videoName: String,
         photoName: String,
         onProgress: (Float) -> Unit
-    ): String?
+    ): List<String>?
     
     fun getFileBytesForDir(fileDirectory: String): ByteArray?
     

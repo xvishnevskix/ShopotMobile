@@ -32,7 +32,11 @@ data class Attachment(
     var type: String,
     var name: String,
     var originalFileDir: String? = null,
+    var photoPath: String? = null,
+    var photoName: String? = null,
+    var photoByteArray: ByteArray? = null,
     var size: Long? = null,
+
 )
 
 

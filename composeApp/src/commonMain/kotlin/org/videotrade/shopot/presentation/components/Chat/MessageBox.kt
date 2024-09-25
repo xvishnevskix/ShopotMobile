@@ -442,16 +442,19 @@ fun MessageFormat(
                 )
 
             }
+            
+            "video" -> {
+                VideoMessage(
+                    message,
+                    message.attachments!!
+                )
+            }
 
             else -> {
                 FileMessage(
                     message,
                     message.attachments!!
                 )
-//                VideoMessage(
-//                    message,
-//                    message.attachments!!
-//                )
             }
         }
 

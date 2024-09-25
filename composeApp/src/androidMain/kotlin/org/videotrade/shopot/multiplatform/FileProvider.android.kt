@@ -626,7 +626,7 @@ actual class FileProvider(private val applicationContext: Context) {
         videoName: String,
         photoName: String,
         onProgress: (Float) -> Unit
-    ): String? {
+    ): List<String>? {
         println("111111111313123123131")
         val client = HttpClient() {
             install(HttpTimeout) {
@@ -768,14 +768,15 @@ actual class FileProvider(private val applicationContext: Context) {
                     
                     println("jsonElementFile ${jsonElement}")
                     
-                    val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                    val ids: List<String> =
+                        Json.decodeFromString(jsonElement.toString())
                     
-                    println("id $id")
+                    println("id $ids")
                     
                     videoFile.delete()
                     photoFile.delete()
                     
-                    return id
+                    return ids
                 } else {
 
 //                commonViewModel.toaster.show("Filed")

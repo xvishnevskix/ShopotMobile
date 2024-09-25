@@ -131,7 +131,7 @@ fun VoiceMessage(
                             message.fromUser,
                             message.chatId,
                             message.uploadId!!,
-                            it
+                            listOf(it)
                         )
                         audioFilePath = attachment.originalFileDir!!
                     }

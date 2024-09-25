@@ -265,7 +265,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
                             
                             if (fileData !== null) {
-                                viewModel.addFileMessage(chat, fileData, filePick)
+                                viewModel.addFileMessage(chat, fileData.fileType, filePick)
                             }
                         }
                         
@@ -281,17 +281,26 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             imagePath = Res.drawable.edit_pencil,
             onClick = {
                 scope.launch {
-//                    val filePick = FileProviderFactory.create()
-//                        .pickFile(PickerType.File(listOf("mp4")))
-//
-//                    filePick?.fileAbsolutePath?.let {
-//                        getAndSaveFirstFrame(it) {_, byteArray ->
-//                            println("byteArray $byteArray")
-//
-//                            byteArray?.toImageBitmap()
-//                        }
-//                    }
-                    
+                    try {
+                        val filePick = FileProviderFactory.create()
+                            .pickFile(PickerType.File(listOf("mp4")))
+                        
+                        if (filePick != null) {
+                            getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
+                                viewModel.addFileMessage(
+                                    chat,
+                                    "video",
+                                    filePick,
+                                    photoPath,
+                                    photoName,
+                                    photoByteArray
+                                )
+                            }
+                        }
+                        
+                    } catch (e: Exception) {
+                        println("Error: ${e.message}")
+                    }
                 }
             }
         ),

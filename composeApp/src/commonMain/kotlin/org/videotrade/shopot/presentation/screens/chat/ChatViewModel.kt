@@ -31,7 +31,6 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
-import org.videotrade.shopot.multiplatform.FileData
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
 import kotlin.random.Random
@@ -206,10 +205,17 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun addFileMessage(chat: ChatItem, fileData: FileData, filePick: PlatformFilePick) {
+    fun addFileMessage(
+        chat: ChatItem,
+        fileType: String,
+        filePick: PlatformFilePick,
+        photoPath: String? = null,
+        photoName: String? = null,
+        photoByteArray: ByteArray? = null,
+    ) {
         addMessage(
             MessageItem(
-                Random.nextInt(1, 501).toString(),
+                Random.nextInt(1, 1501).toString(),
                 profile.value.id,
                 "",
                 false,
@@ -224,16 +230,19 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     Attachment(
                         Random.nextInt(1, 501).toString(),
                         Random.nextInt(1, 501).toString(),
-                       profile.value.id,
+                        profile.value.id,
                         Random.nextInt(1, 501).toString(),
-                        fileData.fileType,
+                        fileType,
                         filePick.fileName,
                         originalFileDir = filePick.fileAbsolutePath,
-                        filePick.fileSize
+                        size = filePick.fileSize,
+                        photoPath = photoPath,
+                        photoName = photoName,
+                        photoByteArray = photoByteArray
                     )
                 ),
                 upload = true,
-                uploadId = Random.nextInt(1, 501).toString()
+                uploadId = Random.nextInt(1, 1501).toString()
             )
         )
     }
@@ -244,7 +253,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
         fromUser: String,
         chatId: String,
         uploadId: String,
-        fileId: String
+        fileIds: List<String>
     ) {
         viewModelScope.launch {
             chatUseCase.sendUploadMessage(
@@ -257,7 +266,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     iread = false,
                     attachments = null
                 ),
-                listOf(fileId),
+                fileIds,
                 selectedMessagesByChat.value[chatId]?.first?.id
             
             )

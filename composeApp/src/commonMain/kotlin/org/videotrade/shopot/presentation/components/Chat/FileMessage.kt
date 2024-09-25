@@ -118,7 +118,7 @@ fun FileMessage(
                             message.fromUser,
                             message.chatId,
                             message.uploadId!!,
-                            fileId
+                            listOf(fileId)
                         )
                     }
                     
@@ -154,7 +154,12 @@ fun FileMessage(
     Row(
         modifier = Modifier
             .widthIn(max = 204.dp)
-            .padding(start = 22.dp, end = 22.dp, top = if (message.fromUser == profile.id) 12.dp else 7.dp, bottom = 12.dp),
+            .padding(
+                start = 22.dp,
+                end = 22.dp,
+                top = if (message.fromUser == profile.id) 12.dp else 7.dp,
+                bottom = 12.dp
+            ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

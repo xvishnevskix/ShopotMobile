@@ -3,23 +3,15 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -34,38 +26,22 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.preat.peekaboo.image.picker.toImageBitmap
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.api.EnvironmentConfig
-import org.videotrade.shopot.api.formatSize
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
-import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_download
 import shopot.composeapp.generated.resources.chat_play
-import shopot.composeapp.generated.resources.file_message_dark
-import shopot.composeapp.generated.resources.file_message_download_dark
-import shopot.composeapp.generated.resources.file_message_download_white
-import shopot.composeapp.generated.resources.file_message_white
-import shopot.composeapp.generated.resources.pepe
 
 
 @Composable
@@ -74,25 +50,98 @@ fun VideoMessage(
     attachments: List<Attachment>,
 ) {
     val scope = rememberCoroutineScope()
-
+    
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
-
+    
     var isLoading by remember { mutableStateOf(false) }
     var isLoadingSuccess by remember { mutableStateOf(false) }
     var progress by remember { mutableStateOf(0f) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var filePath by remember { mutableStateOf("") }
     var isBlurred by remember { mutableStateOf(true) }
-
+    var isStartCipherLoading by remember { mutableStateOf(false) }
+    
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
         animationSpec = tween(durationMillis = 30)
     )
+    
+    
+    LaunchedEffect(message) {
+        
+        if (message.upload !== null) {
+            downloadJob?.cancel()
+            progress = 0f
+            isLoading = true
+            
+            
+            downloadJob = scope.launch {
+                isLoading = true
+                isStartCipherLoading = true
+                message.attachments?.get(0)?.let { attachment ->
+                    
+                    println("adasdada ${attachment.name} ${attachment.type}")
+                    
+                    val fileId = FileProviderFactory.create().uploadVideoFile(
+                        "file/upload/video",
+                        attachment.originalFileDir!!,
+                        attachment.photoPath!!,
+                        attachment.type,
+                        attachment.name,
+                        attachment.photoName!!
+                    ) {
+                        isStartCipherLoading = false
+                        
+                        println("progress1 ${it / 100f}")
+                        
+                        progress = it / 100f
+                    }
+                    
+                    
+                    if (fileId !== null) {
+                        println("fileId ${fileId}")
+                        viewModel.sendLargeFileAttachments(
+                            message.content,
+                            message.fromUser,
+                            message.chatId,
+                            message.uploadId!!,
+                            fileId
+                        )
+                    }
+                    
+                    
+                }
+                
+                isLoading = false
+                progress = 1f
+                isLoading = false
+                isLoadingSuccess = true
+                isBlurred = false
+            }
+            
+            return@LaunchedEffect
+        }
 
 
-
+//        println("fileId ${message.attachments?.get(0)?.fileId}")
+//        val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+//        val fileName = attachments[0].name
+//        println("fileName $fileName")
+//
+//        val existingFile = audioFile.existingFile(fileName, attachments[0].type)
+//
+//        if (!existingFile.isNullOrBlank()) {
+//            isLoadingSuccess = true
+//            downloadJob?.cancel()
+//            isLoading = false
+//            progress = 1f
+//            filePath = existingFile
+//        }
+    }
+    
+    
     Box(
         modifier = Modifier
             .size(250.dp, 350.dp)
@@ -110,10 +159,10 @@ fun VideoMessage(
                 indication = null // Remove click effect
             ) {
                 if (!isLoading && !isLoadingSuccess) {
-
+                    
                     isLoading = true
                     isBlurred = true
-
+                    
                     downloadJob = scope.launch {
                         for (i in 1..100) {
                             delay(40)
@@ -126,15 +175,17 @@ fun VideoMessage(
                 }
             }
     ) {
-        Image(
-            painter = painterResource(Res.drawable.pepe),
-            contentDescription = "Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(if (isBlurred) 16.dp else 0.dp)
-        )
-
+        attachments[0].photoByteArray?.toImageBitmap()?.let {
+            Image(
+                bitmap = it,
+                contentDescription = "Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .blur(if (isBlurred) 16.dp else 0.dp)
+            )
+        }
+        
         if (isLoading) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -142,7 +193,7 @@ fun VideoMessage(
             ) {
                 CircularProgressIndicator(
                     progress = animatedProgress,
-                    color = Color.White ,
+                    color = Color.White,
                     strokeWidth = 2.dp,
                     modifier = Modifier.fillMaxSize(),
                     strokeCap = StrokeCap.Round
@@ -153,14 +204,14 @@ fun VideoMessage(
                     modifier = Modifier
                         .padding()
                         .clickable {
-
+                            
                             downloadJob?.cancel()
                             isLoading = false
                             isLoadingSuccess = false
                             isBlurred = true
                             progress = 0f
                         },
-                    tint =  Color.White
+                    tint = Color.White
                 )
             }
         } else if (isLoadingSuccess) {
