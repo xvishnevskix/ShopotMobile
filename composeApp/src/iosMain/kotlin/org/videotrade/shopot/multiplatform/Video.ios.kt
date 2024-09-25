@@ -3,19 +3,28 @@ package org.videotrade.shopot.multiplatform
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import org.jetbrains.skia.Bitmap
 import platform.AVFoundation.AVAsset
 import platform.AVFoundation.AVAssetImageGenerator
 import platform.AVFoundation.valueWithCMTime
 import platform.CoreMedia.CMTimeMake
-import platform.Foundation.*
+import platform.Foundation.NSData
+import platform.Foundation.NSDocumentDirectory
+import platform.Foundation.NSMakeRange
+import platform.Foundation.NSSearchPathForDirectoriesInDomains
+import platform.Foundation.NSURL
+import platform.Foundation.NSUserDomainMask
+import platform.Foundation.NSValue
+import platform.Foundation.getBytes
+import platform.Foundation.writeToURL
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import kotlin.random.Random
-import kotlinx.coroutines.*
 
 @OptIn(ExperimentalForeignApi::class)
-actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (String?, ByteArray?) -> Unit) {
+actual fun getAndSaveFirstFrame(
+    videoFilePath: String,
+    completion: (String?, String?, ByteArray?) -> Unit
+) {
     val asset = AVAsset.assetWithURL(NSURL.fileURLWithPath(videoFilePath))
     val imageGenerator = AVAssetImageGenerator(asset)
     imageGenerator.appliesPreferredTrackTransform = true
@@ -26,7 +35,7 @@ actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (String?, Byt
     ) { _, cgImagePointer, _, result, error ->
         if (error != null) {
             println("Ошибка извлечения изображения: ${error.localizedDescription}")
-            completion(null, null)
+            completion(null, null, null)
             return@generateCGImagesAsynchronouslyForTimes
         }
         
@@ -39,7 +48,7 @@ actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (String?, Byt
                 val documentsDir = NSSearchPathForDirectoriesInDomains(
                     NSDocumentDirectory, NSUserDomainMask, true
                 ).firstOrNull() as? String ?: run {
-                    completion(null, null)
+                    completion(null, null, null)
                     return@let
                 }
                 
@@ -52,13 +61,13 @@ actual fun getAndSaveFirstFrame(videoFilePath: String, completion: (String?, Byt
                 if (it.writeToURL(fileUrl, true)) {
                     // Преобразование данных в ByteArray
                     val byteArray = it.toByteArray()
-                    completion(filePath, byteArray) // Возврат пути к файлу и ByteArray
+                    completion(fileName, filePath, byteArray) // Возврат пути к файлу и ByteArray
                 } else {
-                    completion(null, null) // Если файл не удалось сохранить
+                    completion(null, null, null) // Если файл не удалось сохранить
                 }
-            } ?: completion(null, null) // Если jpegData пустое
+            } ?: completion(null, null, null) // Если jpegData пустое
         } else {
-            completion(null, null) // Если cgImagePointer пустое
+            completion(null, null, null) // Если cgImagePointer пустое
         }
     }
 }
