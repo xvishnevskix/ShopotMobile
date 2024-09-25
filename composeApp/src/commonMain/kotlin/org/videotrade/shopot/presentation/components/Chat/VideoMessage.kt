@@ -55,16 +55,16 @@ fun VideoMessage(
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
     
-    var isLoading by remember { mutableStateOf(false) }
-    var isLoadingSuccess by remember { mutableStateOf(false) }
-    var progress by remember { mutableStateOf(0f) }
-    var downloadJob by remember { mutableStateOf<Job?>(null) }
-    var filePath by remember { mutableStateOf("") }
-    var isBlurred by remember { mutableStateOf(true) }
-    var isStartCipherLoading by remember { mutableStateOf(false) }
+    val isLoading = remember { mutableStateOf(false) }
+    val isLoadingSuccess = remember { mutableStateOf(false) }
+    val progress = remember { mutableStateOf(0f) }
+    val downloadJob = remember { mutableStateOf<Job?>(null) }
+    var filePath = remember { mutableStateOf("") }
+    val isBlurred = remember { mutableStateOf(true) }
+    val isStartCipherLoading = remember { mutableStateOf(false) }
     
-    val animatedProgress by animateFloatAsState(
-        targetValue = progress,
+    val animatedProgress = animateFloatAsState(
+        targetValue = progress.value,
         animationSpec = tween(durationMillis = 30)
     )
     
@@ -72,14 +72,14 @@ fun VideoMessage(
     LaunchedEffect(message) {
         
         if (message.upload !== null) {
-            downloadJob?.cancel()
-            progress = 0f
-            isLoading = true
+            downloadJob.value?.cancel()
+            progress.value = 0f
+            isLoading.value = true
             
             
-            downloadJob = scope.launch {
-                isLoading = true
-                isStartCipherLoading = true
+            downloadJob.value = scope.launch {
+                isLoading.value = true
+                isStartCipherLoading.value = true
                 message.attachments?.get(0)?.let { attachment ->
                     
                     println("adasdada ${attachment.name} ${attachment.type}")
@@ -92,11 +92,11 @@ fun VideoMessage(
                         attachment.name,
                         attachment.photoName!!
                     ) {
-                        isStartCipherLoading = false
+                        isStartCipherLoading.value = false
                         
                         println("progress1 ${it / 100f}")
                         
-                        progress = it / 100f
+                        progress.value = it / 100f
                     }
                     
                     
@@ -114,11 +114,11 @@ fun VideoMessage(
                     
                 }
                 
-                isLoading = false
-                progress = 1f
-                isLoading = false
-                isLoadingSuccess = true
-                isBlurred = false
+                isLoading.value = false
+                progress.value = 1f
+                isLoading.value = false
+                isLoadingSuccess.value = true
+                isBlurred.value = false
             }
             
             return@LaunchedEffect
@@ -158,19 +158,19 @@ fun VideoMessage(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null // Remove click effect
             ) {
-                if (!isLoading && !isLoadingSuccess) {
+                if (!isLoading.value && !isLoadingSuccess.value) {
                     
-                    isLoading = true
-                    isBlurred = true
+                    isLoading.value = true
+                    isBlurred.value = true
                     
-                    downloadJob = scope.launch {
+                    downloadJob.value = scope.launch {
                         for (i in 1..100) {
                             delay(40)
-                            progress = i / 99f
+                            progress.value = i / 99f
                         }
-                        isLoading = false
-                        isLoadingSuccess = true
-                        isBlurred = false
+                        isLoading.value = false
+                        isLoadingSuccess.value = true
+                        isBlurred.value = false
                     }
                 }
             }
@@ -182,17 +182,17 @@ fun VideoMessage(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxSize()
-                    .blur(if (isBlurred) 16.dp else 0.dp)
+                    .blur(if (isBlurred.value) 16.dp else 0.dp)
             )
         }
         
-        if (isLoading) {
+        if (isLoading.value) {
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(45.dp).align(Alignment.Center)
             ) {
                 CircularProgressIndicator(
-                    progress = animatedProgress,
+                    progress = animatedProgress.value,
                     color = Color.White,
                     strokeWidth = 2.dp,
                     modifier = Modifier.fillMaxSize(),
@@ -205,16 +205,16 @@ fun VideoMessage(
                         .padding()
                         .clickable {
                             
-                            downloadJob?.cancel()
-                            isLoading = false
-                            isLoadingSuccess = false
-                            isBlurred = true
-                            progress = 0f
+                            downloadJob.value?.cancel()
+                            isLoading.value = false
+                            isLoadingSuccess.value = false
+                            isBlurred.value = true
+                            progress.value = 0f
                         },
                     tint = Color.White
                 )
             }
-        } else if (isLoadingSuccess) {
+        } else if (isLoadingSuccess.value) {
             Icon(
                 painter = painterResource(Res.drawable.chat_play),
                 contentDescription = "Play",
