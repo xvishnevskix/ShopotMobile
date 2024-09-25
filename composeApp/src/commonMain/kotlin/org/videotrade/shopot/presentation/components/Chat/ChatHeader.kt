@@ -85,7 +85,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             modifier = Modifier.fillMaxWidth(0.85f).padding(end = 5.dp).pointerInput(Unit) {
                 
                 if (chat.personal) {
-                    navigator.push(ProfileChatScreen(profile, chat))
+                    navigator.push(ProfileChatScreen(chat))
                 } else {
                     
                     viewModel.loadGroupUsers(chat.chatId)

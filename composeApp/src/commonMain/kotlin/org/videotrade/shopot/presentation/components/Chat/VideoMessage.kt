@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.LocalNavigator
 import com.preat.peekaboo.image.picker.toImageBitmap
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -39,6 +40,7 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import org.videotrade.shopot.presentation.screens.chat.VideoViewerScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chat_download
 import shopot.composeapp.generated.resources.chat_play
@@ -48,13 +50,14 @@ import shopot.composeapp.generated.resources.chat_play
 fun VideoMessage(
     message: MessageItem,
     attachments: List<Attachment>,
+    messageSenderName: String? = null
 ) {
     val scope = rememberCoroutineScope()
-    
+    val navigator = LocalNavigator.current
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
-    
+
     val isLoading = remember { mutableStateOf(false) }
     val isLoadingSuccess = remember { mutableStateOf(false) }
     val progress = remember { mutableStateOf(0f) }
@@ -173,7 +176,11 @@ fun VideoMessage(
                         isBlurred.value = false
                     }
                 }
-            }
+
+                if (isLoadingSuccess.value) {
+                    navigator?.push(VideoViewerScreen(messageSenderName, message))
+                }
+             }
     ) {
         attachments[0].photoByteArray?.toImageBitmap()?.let {
             Image(
@@ -185,6 +192,7 @@ fun VideoMessage(
                     .blur(if (isBlurred.value) 16.dp else 0.dp)
             )
         }
+
         
         if (isLoading.value) {
             Box(

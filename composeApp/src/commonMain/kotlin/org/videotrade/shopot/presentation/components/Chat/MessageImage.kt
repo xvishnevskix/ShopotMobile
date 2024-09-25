@@ -96,7 +96,7 @@ fun MessageImage(
                 indication = null // Убирает эффект нажатия
             ) {
                 if (imageFilePath.isNotBlank())
-                    navigator?.push(PhotoViewerScreen(imageFilePath, messageSenderName))
+                    navigator?.push(PhotoViewerScreen(imageFilePath, messageSenderName, message = message))
             }
     )
 }

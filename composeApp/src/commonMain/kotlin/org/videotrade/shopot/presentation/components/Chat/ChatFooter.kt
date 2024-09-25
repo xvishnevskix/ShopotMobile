@@ -101,6 +101,7 @@ import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.file_message
 import shopot.composeapp.generated.resources.menu_gallery
+import shopot.composeapp.generated.resources.menu_video
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -243,13 +244,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 )
             }
         ),
-//    MenuItem(
-//        text = "Фото",
-//        imagePath = Res.drawable.edit_pencil,
-//        onClick = {
-//
-//        }
-//    ),
         MenuItem(
             text = stringResource(MokoRes.strings.file),
             imagePath = Res.drawable.file_message,
@@ -277,8 +271,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             }
         ),
         MenuItem(
-            text = "Видео",
-            imagePath = Res.drawable.edit_pencil,
+            text = stringResource(MokoRes.strings.video),
+            imagePath = Res.drawable.menu_video,
             onClick = {
                 scope.launch {
                     try {

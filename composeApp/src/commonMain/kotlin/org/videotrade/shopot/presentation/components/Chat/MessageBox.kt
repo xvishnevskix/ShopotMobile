@@ -4,6 +4,7 @@ import FileMessage
 import SelectedFileMessage
 import SelectedMessageImage
 import SelectedMessageText
+import SelectedVideoMessage
 import SelectedVoiceMessage
 import VideoMessage
 import androidx.compose.animation.core.animateFloatAsState
@@ -446,7 +447,8 @@ fun MessageFormat(
             "video" -> {
                 VideoMessage(
                     message,
-                    message.attachments!!
+                    message.attachments!!,
+                    messageSenderName
                 )
             }
 
@@ -496,6 +498,11 @@ fun SelectedMessageFormat(
 
             "image" -> {
                 SelectedMessageImage(message.attachments!!, messageAnswerName)
+
+            }
+
+            "video" -> {
+                SelectedVideoMessage(message.attachments!!, messageAnswerName)
 
             }
 
