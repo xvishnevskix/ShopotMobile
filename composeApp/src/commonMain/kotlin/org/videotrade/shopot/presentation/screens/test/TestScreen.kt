@@ -33,25 +33,51 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 
 class TestScreen : Screen {
-    
+
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
-        var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-        
+        var imagePath by remember { mutableStateOf<String?>(null) }
+
         MaterialTheme {
             SafeArea {
 
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.SpaceAround) {
-                        VideoPlayer(
+                        verticalArrangement = Arrangement.SpaceAround
+                    ) {
+                        if (imagePath !== null) VideoPlayer(
                             modifier = Modifier.fillMaxWidth().height(400.dp),
-                            url =
-                            "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+                            filePath =
+                            imagePath!!
+                        )
 
-                        androidx.compose.material.Button(onClick = {  "Hello" }) { androidx.compose.material.Text("") }
+                        Button(onClick = {
+                            scope.launch {
+                                val fileProvider = FileProviderFactory.create()
+
+                                val filePick = fileProvider
+                                    .pickFile(PickerType.File(listOf("mp4")))
+
+                                filePick?.fileAbsolutePath?.let {
+                                    getAndSaveFirstFrame(it) { photoName, photoPath, photoByteArray ->
+                                        println("byteArray $photoByteArray")
+                                        if (photoByteArray !== null && photoPath !== null && photoName !== null) {
+                                            scope.launch {
+                                                imagePath = filePick.fileAbsolutePath
+                                            }
+                                        }
+
+                                    }
+                                }
+
+
+                            }
+
+                        }, content = {
+                            Text("AAAAAA")
+                        })
                     }
                 }
             }
