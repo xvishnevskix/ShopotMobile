@@ -500,6 +500,7 @@ actual class FileProvider(private val applicationContext: Context) {
             "audio/mp4" -> applicationContext.cacheDir
 //            "audio/mp4" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             "image" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            "video" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         } ?: return null
         

@@ -49,6 +49,7 @@ import shopot.composeapp.generated.resources.person
 class VideoViewerScreen(
     private val messageSenderName: String? = null,
     private val message: MessageItem,
+    private val filePath: String,
 ) : Screen {
     @Composable
     override fun Content() {
@@ -62,25 +63,27 @@ class VideoViewerScreen(
                 .background(Color(0xFF29303c))
         ) {
 
-            Box(modifier = Modifier
-                .fillMaxSize()
-                .pointerInput(Unit) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(Unit) {
                         detectTapGestures(
                             onTap = {
                                 isHeaderVisible.value = !isHeaderVisible.value
                             }
                         )
                     },
-                contentAlignment = Alignment.Center) {
+                contentAlignment = Alignment.Center
+            ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceAround) {
+                    verticalArrangement = Arrangement.SpaceAround
+                ) {
                     VideoPlayer(
                         modifier = Modifier.fillMaxWidth().height(400.dp),
                         filePath =
-                        "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
-
-                    androidx.compose.material.Button(onClick = {  "Hello" }) { androidx.compose.material.Text("") }
+                        filePath,
+                    )
                 }
             }
 
