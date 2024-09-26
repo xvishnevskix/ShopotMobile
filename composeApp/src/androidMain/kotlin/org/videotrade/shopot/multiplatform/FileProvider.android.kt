@@ -627,7 +627,6 @@ actual class FileProvider(private val applicationContext: Context) {
         photoName: String,
         onProgress: (Float) -> Unit
     ): List<String>? {
-        println("111111111313123123131")
         val client = HttpClient() {
             install(HttpTimeout) {
                 requestTimeoutMillis = 600_000
@@ -669,30 +668,20 @@ actual class FileProvider(private val applicationContext: Context) {
         
         
         val encupsChachaPhotoResult = cipherWrapper.encupsChachaFileCommon(
-            videoPath,
+            photoPath,
             cipherPhotoPath,
             sharedSecret.decodeBase64Bytes()
         )
         
-        println("444444")
-        
         if (encupsChachaVideoResult !== null && encupsChachaPhotoResult !== null) {
-            println("result2 $encupsChachaVideoResult $encupsChachaPhotoResult")
-            
-            
-            
-            println("55555555")
-            
-            val videoFile = File(videoPath)
+
+            val videoFile = File(cipherVideoPath)
             val photoFile = File(cipherPhotoPath)
             
             if (!videoFile.exists() && !photoFile.exists()) {
                 return null
             }
-//        println("11111111 ${file.inputStream().asInput()}")
-//
-//        println("Local file path: ${file.absolutePath}")
-            
+
             try {
                 val token = getValueInStorage("accessToken")
                 

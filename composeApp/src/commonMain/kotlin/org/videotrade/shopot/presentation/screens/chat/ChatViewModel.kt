@@ -253,7 +253,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         fromUser: String,
         chatId: String,
         uploadId: String,
-        fileIds: List<String>
+        fileIds: List<String>,
+        fileType: String
     ) {
         viewModelScope.launch {
             chatUseCase.sendUploadMessage(
@@ -267,7 +268,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     attachments = null
                 ),
                 fileIds,
-                selectedMessagesByChat.value[chatId]?.first?.id
+                selectedMessagesByChat.value[chatId]?.first?.id,
+                fileType
             
             )
         }

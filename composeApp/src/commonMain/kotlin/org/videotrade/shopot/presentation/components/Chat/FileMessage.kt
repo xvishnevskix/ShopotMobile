@@ -118,7 +118,8 @@ fun FileMessage(
                             message.fromUser,
                             message.chatId,
                             message.uploadId!!,
-                            listOf(fileId)
+                            listOf(fileId),
+                            fileType = message.attachments!![0].type
                         )
                     }
                     

@@ -8,74 +8,84 @@ import org.videotrade.shopot.domain.repository.ChatRepository
 
 class ChatUseCase : KoinComponent {
     private val repository: ChatRepository by inject()
-    
-    
+
+
     fun setMessagePage(page: Int) {
         return repository.setMessagePage(page)
-        
+
     }
-    
+
     fun implementCount() {
         return repository.implementCount()
-        
+
     }
-    
-    
+
+
     fun getMessages(): StateFlow<List<MessageItem>> {
         return repository.getMessages()
     }
-    
-    
+
+
     suspend fun sendReadMessage(messageId: String, userId: String) {
         return repository.sendReadMessage(messageId, userId)
     }
-    
-    
+
+
     suspend fun getMessagesBack(chatId: String) {
         return repository.getMessagesBack(chatId)
     }
-    
-    
+
+
     fun initMessages(messages: List<MessageItem>) {
         return repository.initMessages(messages)
     }
-    
+
     suspend fun delMessage(message: MessageItem) {
         return repository.delMessage(message)
     }
-    
-    
+
+
     fun readMessage(messageId: String) {
         return repository.readMessage(messageId)
     }
-    
+
     fun clearMessages() {
         return repository.clearMessages()
     }
-    
-    
+
+
     fun addMessage(message: MessageItem) {
         return repository.addMessage(message)
     }
-    
+
     fun updateUploadMessage(message: MessageItem) {
         return repository.updateUploadMessage(message)
     }
-    
-    
+
+
     suspend fun sendMessage(
         message: MessageItem,
         attachments: List<String>?,
         answerMessageId: String?
     ) {
-        return repository.sendMessage(message, attachments = attachments,answerMessageId)
+        return repository.sendMessage(message, attachments = attachments, answerMessageId)
     }
-    
-    suspend fun sendUploadMessage(message: MessageItem, attachments: List<String>?, answerMessageId: String?) {
-        return repository.sendUploadMessage(message, attachments = attachments,answerMessageId)
+
+    suspend fun sendUploadMessage(
+        message: MessageItem,
+        attachments: List<String>?,
+        answerMessageId: String?,
+        fileType: String
+    ) {
+        return repository.sendUploadMessage(
+            message,
+            attachments = attachments,
+            answerMessageId,
+            fileType
+        )
     }
-    
-    
+
+
     fun clearData() {
         repository.clearData()
     }

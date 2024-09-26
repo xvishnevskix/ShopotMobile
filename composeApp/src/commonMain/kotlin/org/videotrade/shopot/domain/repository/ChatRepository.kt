@@ -34,7 +34,8 @@ interface ChatRepository {
     suspend fun sendUploadMessage(
         message: MessageItem,
         attachments: List<String>?,
-        answerMessageId: String?
+        answerMessageId: String?,
+        fileType: String
     )
     
     fun clearData()

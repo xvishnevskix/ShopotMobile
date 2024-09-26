@@ -107,7 +107,8 @@ fun VideoMessage(
                             message.fromUser,
                             message.chatId,
                             message.uploadId!!,
-                            fileId
+                            fileId,
+                            fileType = message.attachments!![0].type
                         )
                     }
                     
