@@ -21,6 +21,20 @@ import platform.Foundation.writeToURL
 import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import kotlin.random.Random
+import androidx.compose.runtime.remember
+import androidx.compose.ui.interop.UIKitView
+import io.ktor.client.engine.darwin.*
+import kotlinx.cinterop.CValue
+import org.koin.dsl.module
+import platform.AVFoundation.AVPlayer
+import platform.AVFoundation.AVPlayerLayer
+import platform.AVFoundation.play
+import platform.AVKit.AVPlayerViewController
+import platform.CoreGraphics.CGRect
+import platform.QuartzCore.CATransaction
+import platform.QuartzCore.kCATransactionDisableActions
+import platform.UIKit.UIView
+
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun getAndSaveFirstFrame(
@@ -85,6 +99,46 @@ fun NSData.toByteArray(): ByteArray {
     return byteArray
 }
 
+
+
+
+
+
+@OptIn(ExperimentalForeignApi::class)
 @Composable
-actual fun VideoPlayer(modifier: Modifier, url: String) {
+actual fun VideoPlayer(modifier: Modifier, filePath: String) {
+    // Преобразуем абсолютный путь в URL для iOS
+    val nsUrl = NSURL.fileURLWithPath(filePath) // Используем fileURLWithPath для локальных файлов
+    
+    val player = remember { AVPlayer(uRL = nsUrl) }
+    val playerLayer = remember { AVPlayerLayer() }
+    val avPlayerViewController = remember { AVPlayerViewController() }
+    avPlayerViewController.player = player
+    avPlayerViewController.showsPlaybackControls = true
+    
+    playerLayer.player = player
+    
+    // Используем UIKitView для интеграции с существующими представлениями UIKit
+    UIKitView(
+        factory = {
+            // Создаем UIView для удержания AVPlayerLayer
+            val playerContainer = UIView()
+            playerContainer.addSubview(avPlayerViewController.view)
+            // Возвращаем playerContainer как корневой UIView
+            playerContainer
+        },
+        onResize = { view: UIView, rect: CValue<CGRect> ->
+            CATransaction.begin()
+            CATransaction.setValue(true, kCATransactionDisableActions)
+            view.layer.setFrame(rect)
+            playerLayer.setFrame(rect)
+            avPlayerViewController.view.layer.frame = rect
+            CATransaction.commit()
+        },
+        update = { view ->
+            player.play()
+            avPlayerViewController.player!!.play()
+        },
+        modifier = modifier
+    )
 }

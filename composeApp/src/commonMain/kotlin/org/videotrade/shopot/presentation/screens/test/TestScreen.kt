@@ -58,11 +58,11 @@ class TestScreen : Screen {
                                 val fileProvider = FileProviderFactory.create()
 
                                 val filePick = fileProvider
-                                    .pickFile(PickerType.File(listOf("mp4")))
+                                    .pickFile(PickerType.File(listOf("mp4","H.264", "MOV", "MPEG-4")))
 
                                 filePick?.fileAbsolutePath?.let {
                                     getAndSaveFirstFrame(it) { photoName, photoPath, photoByteArray ->
-                                        println("byteArray $photoByteArray")
+                                        println("filePick.fileAbsolutePath ${filePick.fileAbsolutePath}")
                                         if (photoByteArray !== null && photoPath !== null && photoName !== null) {
                                             scope.launch {
                                                 imagePath = filePick.fileAbsolutePath

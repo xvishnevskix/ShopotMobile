@@ -77,7 +77,7 @@ class VideoViewerScreen(
                     verticalArrangement = Arrangement.SpaceAround) {
                     VideoPlayer(
                         modifier = Modifier.fillMaxWidth().height(400.dp),
-                        url =
+                        filePath =
                         "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
 
                     androidx.compose.material.Button(onClick = {  "Hello" }) { androidx.compose.material.Text("") }
