@@ -104,6 +104,7 @@ actual class FileProvider(private val applicationContext: Context) {
                 mode = PickerMode.Single,
             )
 
+            println("filePick $filePick")
             var filePathNew = ""
 
             if (filePick?.uri !== null) {

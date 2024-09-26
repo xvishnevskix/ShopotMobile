@@ -105,17 +105,17 @@ fun VideoMessage(
                     }
 
 
-                    if (fileId !== null) {
-                        println("fileId ${fileId}")
-                        viewModel.sendLargeFileAttachments(
-                            message.content,
-                            message.fromUser,
-                            message.chatId,
-                            message.uploadId!!,
-                            fileId,
-                            fileType = message.attachments!![0].type
-                        )
-                    }
+//                    if (fileId !== null) {
+//                        println("fileId ${fileId}")
+//                        viewModel.sendLargeFileAttachments(
+//                            message.content,
+//                            message.fromUser,
+//                            message.chatId,
+//                            message.uploadId!!,
+//                            fileId,
+//                            fileType = message.attachments!![0].type
+//                        )
+//                    }
 
 
                 }
