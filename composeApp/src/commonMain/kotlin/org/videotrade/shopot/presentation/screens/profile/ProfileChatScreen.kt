@@ -37,6 +37,7 @@ import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
@@ -45,7 +46,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
-class ProfileChatScreen(private val profile: ProfileDTO, private val chat: ChatItem) : Screen {
+class ProfileChatScreen(private val chat: ChatItem) : Screen {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Composable

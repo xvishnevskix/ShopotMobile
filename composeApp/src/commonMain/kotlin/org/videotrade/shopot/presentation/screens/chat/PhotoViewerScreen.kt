@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.chat
 
-import PhotoViewerHeader
+
+import ViewerHeader
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -31,6 +32,8 @@ import coil3.compose.rememberAsyncImagePainter
 import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.formatTimeOnly
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
@@ -38,7 +41,8 @@ import shopot.composeapp.generated.resources.person
 class PhotoViewerScreen(
     private val imageFilePath: String?,
     private val messageSenderName: String? = null,
-    private val icon: String? = null
+    private val icon: String? = null,
+    private val message: MessageItem? = null,
 ) : Screen {
     @Composable
     override fun Content() {
@@ -98,14 +102,14 @@ class PhotoViewerScreen(
                         }
                 )
 
-                // Хэдер, который отображается поверх изображения
                 AnimatedVisibility(
                     visible = isHeaderVisible,
                     enter = fadeIn(),
                     exit = fadeOut(),
-                    modifier = Modifier.align(Alignment.TopCenter) // Размещаем хэдер поверх изображения
+                    modifier = Modifier.align(Alignment.TopCenter)
                 ) {
-                    PhotoViewerHeader("$messageSenderName", "")
+                    message?.let { formatTimeOnly(it.created) }
+                        ?.let { ViewerHeader("$messageSenderName", it) }
                 }
             }
     }
