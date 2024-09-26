@@ -40,6 +40,7 @@ import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.value
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -187,6 +188,106 @@ actual class FileProvider {
             return null
         }
     }
+    
+    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    actual suspend fun pickGallery(): PlatformFilePick? {
+        val imageAndVideoType = PickerType.ImageAndVideo
+        
+        
+        try {
+            val filePick = FileKit.pickFile(
+                type = imageAndVideoType,
+                mode = PickerMode.Single,
+            )
+            
+            if (filePick?.nsUrl != null) {
+                val filePath = filePick.nsUrl.path
+                val fileManager = NSFileManager.defaultManager
+                
+                if (filePath != null) {
+                    val fileURL = NSURL.fileURLWithPath(filePath)
+                    
+                    // Начинаем доступ к файлу
+                    val securityScoped = fileURL.startAccessingSecurityScopedResource()
+                    
+                    // Проверяем существование файла
+                    val fileExists = fileManager.fileExistsAtPath(filePath)
+                    println("fileExists at path $filePath: $fileExists")
+                    
+                    if (fileExists) {
+                        println("file exists at path: $filePath")
+                        
+                        // Копируем файл в директорию Documents
+                        val documentsDirectories =
+                            fileManager.URLsForDirectory(NSDocumentDirectory, NSUserDomainMask)
+                        val documentsDirectory = documentsDirectories[0] as? NSURL
+                        if (documentsDirectory != null) {
+                            val destinationURL =
+                                documentsDirectory.URLByAppendingPathComponent(filePick.name)
+                            
+                            // Проверка и удаление существующего файла
+                            if (fileManager.fileExistsAtPath(destinationURL?.path!!)) {
+                                val deleteErrorPtr = nativeHeap.alloc<ObjCObjectVar<NSError?>>()
+                                fileManager.removeItemAtURL(destinationURL, deleteErrorPtr.ptr)
+                                if (deleteErrorPtr.value != null) {
+                                    println("Error deleting existing file: ${deleteErrorPtr.value}")
+                                    return null
+                                }
+                            }
+                            
+                            val success = copyFile(fileURL, destinationURL)
+                            if (success) {
+                                println("file copied to: ${destinationURL.path}")
+                                
+                                // Заканчиваем доступ к файлу
+                                if (securityScoped) {
+                                    fileURL.stopAccessingSecurityScopedResource()
+                                }
+                                
+                                // Проверка значений для PlatformFilePick
+                                val originalPath = filePick.path
+                                val destinationPath = destinationURL.path
+                                val fileSize = getFileSize(destinationURL)
+                                val fileName = filePick.name
+                                
+                                if (originalPath == null || destinationPath == null || fileSize == null) {
+                                    println("Null value detected: originalPath=$originalPath, destinationPath=$destinationPath, fileSize=$fileSize, fileName=$fileName")
+                                    throw NullPointerException("One or more values are null")
+                                }
+                                
+                                return PlatformFilePick(
+                                    originalPath,
+                                    destinationPath,
+                                    fileSize,
+                                    fileName
+                                )
+                            } else {
+                                println("Failed to copy file to: ${destinationURL.path}")
+                            }
+                        } else {
+                            println("Could not find documents directory")
+                        }
+                    } else {
+                        println("file does not exist at path: $filePath")
+                    }
+                    
+                    // Заканчиваем доступ к файлу
+                    if (securityScoped) {
+                        fileURL.stopAccessingSecurityScopedResource()
+                    }
+                } else {
+                    println("filePath is null")
+                }
+            } else {
+                println("filePick is null or nsUrl is null")
+            }
+            return null
+        } catch (e: Exception) {
+            println("Exception occurred: ${e}")
+            return null
+        }
+    }
+    
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     private fun copyFile(sourceURL: NSURL, destinationURL: NSURL): Boolean {
