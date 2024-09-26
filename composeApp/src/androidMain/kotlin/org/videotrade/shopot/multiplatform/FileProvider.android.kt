@@ -3,6 +3,7 @@ package org.videotrade.shopot.multiplatform
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -14,6 +15,7 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.app.ActivityCompat.startActivityForResult
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -90,6 +92,42 @@ actual class FileProvider(private val applicationContext: Context) {
             return null
         }
     }
+
+
+    actual suspend fun pickGallery(): PlatformFilePick? {
+        val imageAndVideoType = PickerType.ImageAndVideo
+
+
+        try {
+            val filePick = FileKit.pickFile(
+                type = imageAndVideoType,
+                mode = PickerMode.Single,
+            )
+
+            var filePathNew = ""
+
+            if (filePick?.uri !== null) {
+
+                runBlocking {
+                    val file = getFileFromUri(getContextObj.getContext(), filePick.uri)
+                    filePathNew = file.absoluteFile.toString()
+                }
+
+                return PlatformFilePick(
+                    filePick.uri.toString(),
+                    filePathNew,
+                    filePick.getSize(),
+                    filePick.name
+                )
+
+            }
+            return null
+        } catch (e: Exception) {
+            return null
+        }
+    }
+
+
     
     
     actual fun getFilePath(fileName: String, fileType: String): String? {

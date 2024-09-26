@@ -57,21 +57,24 @@ class TestScreen : Screen {
                             scope.launch {
                                 val fileProvider = FileProviderFactory.create()
 
-                                val filePick = fileProvider
-                                    .pickFile(PickerType.File(listOf("mp4","H.264", "MOV", "MPEG-4")))
 
-                                filePick?.fileAbsolutePath?.let {
-                                    getAndSaveFirstFrame(it) { photoName, photoPath, photoByteArray ->
-                                        println("filePick.fileAbsolutePath ${filePick.fileAbsolutePath}")
-                                        if (photoByteArray !== null && photoPath !== null && photoName !== null) {
-                                            scope.launch {
-                                                imagePath = filePick.fileAbsolutePath
-                                            }
-                                        }
+                                fileProvider.pickGallery()
 
-                                    }
-                                }
-
+//                                val filePick = fileProvider
+//                                    .pickFile(PickerType.File(listOf("mp4","H.264", "MOV", "MPEG-4")))
+//
+//                                filePick?.fileAbsolutePath?.let {
+//                                    getAndSaveFirstFrame(it) { photoName, photoPath, photoByteArray ->
+//                                        println("filePick.fileAbsolutePath ${filePick.fileAbsolutePath}")
+//                                        if (photoByteArray !== null && photoPath !== null && photoName !== null) {
+//                                            scope.launch {
+//                                                imagePath = filePick.fileAbsolutePath
+//                                            }
+//                                        }
+//
+//                                    }
+//                                }
+//
 
                             }
 

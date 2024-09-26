@@ -5,9 +5,11 @@ import io.github.vinceglb.filekit.core.PickerType
 import org.videotrade.shopot.domain.model.FileDTO
 
 expect class FileProvider {
-    
+
     suspend fun pickFile(pickerType: PickerType): PlatformFilePick?
-    
+
+    suspend fun pickGallery(): PlatformFilePick?
+
     fun getFilePath(fileName: String, fileType: String): String?
     
     suspend fun downloadFileToDirectory(
