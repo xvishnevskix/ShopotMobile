@@ -8,6 +8,7 @@ import androidx.compose.ui.text.intl.Locale
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
@@ -20,6 +21,14 @@ fun formatTimestamp(timestamp: List<Int>): String {
 
     val yesterday = stringResource(MokoRes.strings.yesterday)
 
+    val monday = stringResource(MokoRes.strings.monday)
+    val tuesday = stringResource(MokoRes.strings.tuesday)
+    val wednesday = stringResource(MokoRes.strings.wednesday)
+    val thursday = stringResource(MokoRes.strings.thursday)
+    val friday = stringResource(MokoRes.strings.friday)
+    val saturday = stringResource(MokoRes.strings.saturday)
+    val sunday = stringResource(MokoRes.strings.sunday)
+
     return try {
         val year = timestamp[0]
         val month = timestamp[1]
@@ -28,22 +37,36 @@ fun formatTimestamp(timestamp: List<Int>): String {
         val minute = timestamp[4]
         val second = timestamp[5]
         val nanosecond = timestamp[6]
-        
+
         // Создание LocalDateTime на основе входящих данных
         val localDateTime = LocalDateTime(year, month, day, hour, minute, second, nanosecond)
-        
+
         // Преобразование LocalDateTime в Instant в часовом поясе UTC (GMT+0)
         val instant = localDateTime.toInstant(TimeZone.UTC)
-        
+
         // Получение текущего часового пояса системы
         val currentTimeZone = TimeZone.currentSystemDefault()
-        
+
         // Преобразование Instant в LocalDateTime в текущем часовом поясе системы
         val dateTimeInCurrentZone = instant.toLocalDateTime(currentTimeZone)
-        
+
         // Получение текущей даты
         val currentDate = Clock.System.now().toLocalDateTime(currentTimeZone).date
-        
+
+
+        fun getLocalizedDayOfWeek(dayOfWeek: DayOfWeek): String {
+            return when (dayOfWeek) {
+                DayOfWeek.MONDAY -> monday
+                DayOfWeek.TUESDAY -> tuesday
+                DayOfWeek.WEDNESDAY -> wednesday
+                DayOfWeek.THURSDAY -> thursday
+                DayOfWeek.FRIDAY -> friday
+                DayOfWeek.SATURDAY -> saturday
+                DayOfWeek.SUNDAY -> sunday
+                else -> TODO()
+            }
+        }
+
         // Сравнение даты
         when {
             dateTimeInCurrentZone.date == currentDate -> {
@@ -52,21 +75,19 @@ fun formatTimestamp(timestamp: List<Int>): String {
                     dateTimeInCurrentZone.hour.toString().padStart(2, '0')
                 }:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
             }
-            
+
             dateTimeInCurrentZone.date == currentDate.minus(1, DateTimeUnit.DAY) -> {
                 // Вчера - выводим "вчера"
                 yesterday + " ${
                     dateTimeInCurrentZone.hour.toString().padStart(2, '0')
                 }:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
             }
-            
+
             dateTimeInCurrentZone.date >= currentDate.minus(6, DateTimeUnit.DAY) -> {
                 // Неделя назад - выводим день недели
-                val dayOfWeek = dateTimeInCurrentZone.dayOfWeek.name.lowercase()
-                    .replaceFirstChar { it.uppercase() }
-                dayOfWeek
+                getLocalizedDayOfWeek(dateTimeInCurrentZone.dayOfWeek)
             }
-            
+
             else -> {
                 // Дата дальше недели назад - выводим дату в формате дд.ММ
                 "${
