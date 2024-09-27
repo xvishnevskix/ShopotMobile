@@ -211,7 +211,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
         filePick: PlatformFilePick,
         photoPath: String? = null,
         photoName: String? = null,
-        photoByteArray: ByteArray? = null,
     ) {
         addMessage(
             MessageItem(
@@ -238,7 +237,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
                         size = filePick.fileSize,
                         photoPath = photoPath,
                         photoName = photoName,
-                        photoByteArray = photoByteArray
                     )
                 ),
                 upload = true,

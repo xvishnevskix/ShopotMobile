@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -29,9 +28,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
-import com.preat.peekaboo.image.picker.toImageBitmap
+import coil3.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -58,38 +56,75 @@ fun VideoMessage(
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
-
+    
     val isLoading = remember { mutableStateOf(false) }
     val isLoadingSuccess = remember { mutableStateOf(false) }
     val progress = remember { mutableStateOf(0f) }
     val downloadJob = remember { mutableStateOf<Job?>(null) }
     var filePath = remember { mutableStateOf("") }
+    var photoFilePath = remember { mutableStateOf("") }
     val isBlurred = remember { mutableStateOf(true) }
     val isStartCipherLoading = remember { mutableStateOf(false) }
     val fileProvider by remember { mutableStateOf(FileProviderFactory.create()) }
-
+    
+    val imagePainter = rememberAsyncImagePainter(photoFilePath.value)
+    
     val animatedProgress = animateFloatAsState(
         targetValue = progress.value,
         animationSpec = tween(durationMillis = 30)
     )
-
-
+    
+    
     LaunchedEffect(message) {
-
+        
+        val photoFileName = attachments[0].photoName
+        
+        
+        if (photoFileName !== null) {
+            val existingPhotoFile = fileProvider.existingFile(photoFileName, "imageCache")
+            
+            val url =
+                "${EnvironmentConfig.serverUrl}file/id/${attachments[0].photoId}"
+            
+            if (!existingPhotoFile.isNullOrBlank()) {
+                photoFilePath.value = existingPhotoFile
+            } else {
+                
+                val downloadFilePath = fileProvider.downloadCipherFile(
+                    url,
+                    "image",
+                    photoFileName,
+                    "image"
+                ) { newProgress ->
+                    println("newProgress $newProgress")
+                }
+                
+                
+                if (downloadFilePath != null) {
+                    photoFilePath.value = downloadFilePath
+                }
+                
+                println("filePath $filePath")
+            }
+        }
+        
+        
+        
+        
         if (message.upload !== null) {
             downloadJob.value?.cancel()
             progress.value = 0f
             isLoading.value = true
-
-
+            
+            
             downloadJob.value = scope.launch {
                 isLoading.value = true
                 isStartCipherLoading.value = true
                 message.attachments?.get(0)?.let { attachment ->
-
+                    
                     println("adasdada ${attachment.name} ${attachment.type}")
-
-                    val fileId = fileProvider.uploadVideoFile(
+                    
+                    val fileIds = fileProvider.uploadVideoFile(
                         "file/upload/video",
                         attachment.originalFileDir!!,
                         attachment.photoPath!!,
@@ -98,48 +133,47 @@ fun VideoMessage(
                         attachment.photoName!!
                     ) {
                         isStartCipherLoading.value = false
-
+                        
                         println("progress1 ${it / 100f}")
-
+                        
                         progress.value = it / 100f
                     }
-
-
-//                    if (fileId !== null) {
-//                        println("fileId ${fileId}")
-//                        viewModel.sendLargeFileAttachments(
-//                            message.content,
-//                            message.fromUser,
-//                            message.chatId,
-//                            message.uploadId!!,
-//                            fileId,
-//                            fileType = message.attachments!![0].type
-//                        )
-//                    }
-
-
+                    
+                    
+                    if (fileIds !== null) {
+                        println("fileId ${fileIds}")
+                        viewModel.sendLargeFileAttachments(
+                            message.content,
+                            message.fromUser,
+                            message.chatId,
+                            message.uploadId!!,
+                            fileIds,
+                            fileType = message.attachments!![0].type
+                        )
+                    }
+                    
+                    
                 }
-
+                
                 isLoading.value = false
                 progress.value = 1f
                 isLoading.value = false
                 isLoadingSuccess.value = true
                 isBlurred.value = false
-
+                
             }
-
+            
             return@LaunchedEffect
         }
-
-
+        
+        
         val fileName = attachments[0].name
-        val photoFileName = attachments[0].photoName
         println("fileName $fileName")
-
+        
         val existingFile = fileName.let {
             fileProvider.existingFile(it, "video")
         }
-
+        
         if (!existingFile.isNullOrBlank()) {
             isLoading.value = false
             progress.value = 1f
@@ -149,8 +183,8 @@ fun VideoMessage(
             filePath.value = existingFile
         }
     }
-
-
+    
+    
     Box(
         modifier = Modifier
             .size(250.dp, 350.dp)
@@ -177,22 +211,22 @@ fun VideoMessage(
                     )
                     return@clickable
                 }
-
+                
                 message.attachments?.get(0)?.let { attachment ->
                     if (!isLoading.value && !isLoadingSuccess.value) {
-
+                        
                         downloadJob.value = scope.launch {
 //                        for (i in 1..100) {
 //                            delay(40)
 //                            progress.value = i / 99f
 //                        }
-
+                            
                             val url =
                                 "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
-
+                            
                             isLoading.value = true
                             isBlurred.value = true
-
+                            
                             fileProvider.downloadCipherFile(
                                 url,
                                 attachment.type,
@@ -202,30 +236,27 @@ fun VideoMessage(
                                 isStartCipherLoading.value = false
                                 progress.value = newProgress
                             }
-
+                            
                             isLoading.value = false
                             isLoadingSuccess.value = true
                             isBlurred.value = false
                         }
                     }
-
-
-
+                    
+                    
                 }
             }
     ) {
-        attachments[0].photoByteArray?.toImageBitmap()?.let {
-            Image(
-                bitmap = it,
-                contentDescription = "Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .blur(if (isBlurred.value) 16.dp else 0.dp)
-            )
-        }
-
-
+        
+        Image(
+            painter = imagePainter,
+            contentDescription = "Image",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .blur(if (isBlurred.value) 16.dp else 0.dp)
+        )
+        
         if (isLoading.value) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -244,7 +275,7 @@ fun VideoMessage(
                     modifier = Modifier
                         .padding()
                         .clickable {
-
+                            
                             downloadJob.value?.cancel()
                             isLoading.value = false
                             isLoadingSuccess.value = false
@@ -260,13 +291,13 @@ fun VideoMessage(
                 contentDescription = "Play",
                 tint = Color.White,
                 modifier = Modifier.align(Alignment.Center).size(30.dp).clickable {
-                        navigator?.push(
-                            VideoViewerScreen(
-                                messageSenderName = messageSenderName,
-                                message = message,
-                                filePath = filePath.value
-                            )
+                    navigator?.push(
+                        VideoViewerScreen(
+                            messageSenderName = messageSenderName,
+                            message = message,
+                            filePath = filePath.value
                         )
+                    )
                 }
             )
         } else {

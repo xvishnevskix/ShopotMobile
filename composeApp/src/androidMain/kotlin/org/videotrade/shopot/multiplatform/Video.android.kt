@@ -9,6 +9,7 @@ import android.widget.VideoView
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
+import org.videotrade.shopot.androidSpecificApi.getContextObj
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -26,8 +27,8 @@ actual fun getAndSaveFirstFrame(
         val fileName = "${Random.nextInt(1, 2001)}_frame.png"
         bitmap?.let {
             // Указываем папку "Загрузки"
-            val downloadsDir =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+            val downloadsDir = getContextObj.getContext().cacheDir
+            
             val file = File(downloadsDir, fileName)
 
             // Сохраняем Bitmap в файл

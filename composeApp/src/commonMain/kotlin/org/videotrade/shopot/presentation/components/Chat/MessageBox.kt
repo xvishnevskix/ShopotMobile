@@ -444,7 +444,7 @@ fun MessageFormat(
 
             }
             
-            "mp4" -> {
+            "video" -> {
                 VideoMessage(
                     message,
                     message.attachments!!,

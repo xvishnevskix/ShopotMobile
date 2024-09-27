@@ -54,8 +54,6 @@ fun MessageImage(
             imageFilePath = existingFile
             println("existingFile ${existingFile}")
         } else {
-
-
             val filePath = fileProvider.downloadCipherFile(
                 url,
                 "image",

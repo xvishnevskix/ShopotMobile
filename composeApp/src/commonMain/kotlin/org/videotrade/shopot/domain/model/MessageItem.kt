@@ -35,7 +35,6 @@ data class Attachment(
     var photoPath: String? = null,
     var photoName: String? = null,
     var photoId: String? = null,
-    var photoByteArray: ByteArray? = null,
     var size: Long? = null,
 
 )

@@ -254,11 +254,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
                                     viewModel.addFileMessage(
                                         chat,
-                                        "mp4",
+                                        "video",
                                         filePick,
                                         photoPath,
                                         photoName,
-                                        photoByteArray
                                     )
                                 }
                             }
