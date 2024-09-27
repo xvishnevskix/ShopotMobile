@@ -78,7 +78,6 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
-import com.preat.peekaboo.image.picker.toImageBitmap
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
@@ -98,10 +97,8 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
-import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.file_message
 import shopot.composeapp.generated.resources.menu_gallery
-import shopot.composeapp.generated.resources.menu_video
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -117,8 +114,8 @@ data class MenuItem(
 @Composable
 fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     val scope = rememberCoroutineScope()
-
-
+    
+    
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
@@ -129,25 +126,25 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
     var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
     val text = remember { mutableStateOf("") }
-
+    
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
-
+    
     val selectedMessagePair = viewModel.selectedMessagesByChat.collectAsState().value[chat.chatId]
     val profile = viewModel.profile.collectAsState().value
     val selectedMessage = selectedMessagePair?.first
     val selectedMessageSenderName = selectedMessagePair?.second
-
+    
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
                 delay(1000L)
-
+                
                 recordingTime++
-
+                
                 var seconds = recordingTime
                 seconds++
-
+                
                 if (seconds > 1) {
                     if (!isStartRecording) {
                         scope.launch {
@@ -162,35 +159,35 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                         voiceName,
                                         "audio/mp4"
                                     ) // Генерация пути к файлу
-
+                                
                                 println("audioFilePathNew $audioFilePathNew")
-
+                                
                                 if (audioFilePathNew != null) {
                                     voicePath = audioFilePathNew
-
+                                    
                                     audioRecorder.startRecording(audioFilePathNew)
                                 }
                                 isStartRecording = true
                             } else {
-
+                                
                                 println("perStop")
-
+                                
                                 viewModel.setIsRecording(false)
-
+                                
                                 audioRecorder.stopRecording(false)
                                 offset = Offset.Zero
                             }
                         }
                     }
-
+                    
                 }
             }
         } else {
             recordingTime = 0
         }
     }
-
-
+    
+    
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -200,7 +197,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             repeatMode = RepeatMode.Reverse
         )
     )
-
+    
     val textOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -10f,
@@ -229,54 +226,50 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //            }
 //        }
 //    )
-
+    
     val menuItems = listOf(
         MenuItem(
             text = stringResource(MokoRes.strings.gallery),
             imagePath = Res.drawable.menu_gallery,
             onClick = {
-
+                
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
                             .pickGallery()
-
+                        
                         if (filePick !== null) {
-
                             val fileData =
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
-
-                            println("fileData ${fileData?.fileType}")
-//                            if(fileData.fileType == "") {
-//
-//                            }
-
-
+                            
+                            if (fileData?.fileType?.substringBefore("/") == "image") {
+                                viewModel.sendImage(
+                                    text.value,
+                                    viewModel.profile.value.id,
+                                    chat.id,
+                                    "image",
+                                    "jpg",
+                                )
+                            } else {
+                                getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
+                                    viewModel.addFileMessage(
+                                        chat,
+                                        "mp4",
+                                        filePick,
+                                        photoPath,
+                                        photoName,
+                                        photoByteArray
+                                    )
+                                }
+                            }
+                            
                         }
-
-//                        if (filePick != null) {
-//                            getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
-//                                viewModel.addFileMessage(
-//                                    chat,
-//                                    "mp4",
-//                                    filePick,
-//                                    photoPath,
-//                                    photoName,
-//                                    photoByteArray
-//                                )
-//                            }
-//                        }
-
+                        
+                        
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
-//                viewModel.sendImage(
-//                    text.value,
-//                    viewModel.profile.value.id,
-//                    chat.id,
-//                    "image",
-//                    "jpg",
-//                )
+                    
                 }
             }
         ),
@@ -284,22 +277,22 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
             text = stringResource(MokoRes.strings.file),
             imagePath = Res.drawable.file_message,
             onClick = {
-
+                
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
                             .pickFile(PickerType.File(listOf("pdf", "zip")))
-
+                        
                         if (filePick !== null) {
                             val fileData =
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
-
+                            
                             if (fileData !== null) {
                                 viewModel.addFileMessage(chat, fileData.fileType, filePick)
                             }
                         }
-
-
+                        
+                        
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
@@ -336,16 +329,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //        ),
     )
     val editOptions = getEditOptions()
-
+    
     val expandedHeight = 125.dp
     val collapsedHeight = if (selectedMessage != null) 125.dp else 65.dp
     val collapsedselectedHeight = if (selectedMessage != null) 45.dp else 0.dp
-
+    
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
-
-
+    
+    
     Box(
         modifier = Modifier
             .background(Color.White)
@@ -361,8 +354,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                 }
             )
-
-
+    
+    
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -374,12 +367,12 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                 .height(height)
                 .clip(RoundedCornerShape(20.dp))
                 .background(Color(0xFFF3F4F6))
-
+        
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
+                
                 if (selectedMessage != null && selectedMessageSenderName != null) {
                     Row(
                         modifier = Modifier
@@ -391,9 +384,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     )
-
+                    
                     {
-
+                        
                         Box(modifier = Modifier.widthIn(max = 320.dp)) {
                             Box(
                                 modifier = Modifier
@@ -402,7 +395,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     .fillMaxHeight()
                                     .background(Color(0xff2A293C))
                             ) {
-
+                            
                             }
                             SelectedMessageFormat(
                                 selectedMessage,
@@ -410,7 +403,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 viewModel
                             )
                         }
-
+                        
                         Box(
                             modifier = Modifier.padding(end = 4.dp).fillMaxHeight().width(60.dp)
                                 .pointerInput(Unit) {
@@ -426,8 +419,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                     }
                 }
-
-
+                
+                
                 Popup(
                     alignment = Alignment.TopStart,
                     onDismissRequest = { showMenu = false },
@@ -451,7 +444,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 )
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(Color.White)
-
+                        
                         ) {
                             menuItems.forEachIndexed { index, editOption ->
                                 Row(
@@ -468,7 +461,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                             editOption.onClick()
                                             showMenu = false
                                         }
-
+                                
                                 ) {
                                     Image(
                                         painter = painterResource(editOption.imagePath),
@@ -496,7 +489,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         }
                     }
                 }
-
+                
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -520,16 +513,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                            .clickable {
 //                                singleImagePicker.launch()
 //                            }
-
+                                    
                                     .clickable {
                                         showMenu = true
                                     }
                             )
-
-
+                            
+                            
                         }
-
-
+                        
+                        
                     } else {
                         Row(
                             modifier = Modifier.padding(start = 15.dp),
@@ -558,7 +551,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                 color = Color(0xFF979797),
                             )
                         }
-
+                        
                         Row(
                             modifier = Modifier
                                 .padding(start = 50.dp)
@@ -587,7 +580,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             )
                         }
                     }
-
+                    
                     BasicTextField(
                         value = text.value,
                         onValueChange = { newText ->
@@ -624,8 +617,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             }
                         },
                     )
-
-
+                    
+                    
                     if (text.value.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
@@ -655,7 +648,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 
 //                val alpha = (105f + offset.x) / 20f
                         val scale = 1f + (offset.x / 850f)
-
+                        
                         Box(
                             contentAlignment = Alignment.CenterEnd,
                             modifier = Modifier
@@ -674,15 +667,15 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                             // Проверяем, если смещение больше -200f, то сбрасываем смещение
                                             if (offset.x > -200f) {
                                                 println("Drag send")
-
+                                                
                                                 val seconds = recordingTime % 60
-
+                                                
                                                 if (seconds > 1) {
                                                     val fileDir = audioRecorder.stopRecording(true)
-
+                                                    
                                                     if (fileDir !== null) {
                                                         isStartRecording = false
-
+                                                        
                                                         viewModel.sendVoice(
                                                             fileDir,
                                                             chat,
@@ -690,40 +683,40 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                                         )
                                                     }
                                                 }
-
+                                                
                                                 println("Drag isStop")
-
+                                                
                                                 viewModel.setIsRecording(false)
                                                 offset = Offset.Zero
                                             } else {
                                                 println("Drag stop")
-
+                                                
                                                 // Если смещение больше чем -200f, завершаем запись
                                                 viewModel.setIsRecording(false)
-
+                                                
                                                 offset = Offset.Zero
                                             }
                                         },
                                         onDrag = { change, dragAmount ->
 //                                    println("dragAmount ${dragAmount}")
-
-
+                                            
+                                            
                                             change.consume()
                                             val newOffset = Offset(
                                                 x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
                                                     .coerceAtMost(0f),
                                                 y = offset.y
                                             )
-
+                                            
                                             if (newOffset.x <= -200f) {
-
+                                                
                                                 viewModel.setIsRecording(false)
-
+                                                
                                                 audioRecorder.stopRecording(false)
-
+                                                
                                                 offset = Offset.Zero
                                             }
-
+                                            
                                             offset = newOffset
                                         }
                                     )
@@ -732,34 +725,34 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                                     detectTapGestures(
                                         onTap = {
                                             println("Tap detected")
-
+                                            
                                             val seconds = recordingTime % 60
-
+                                            
                                             if (seconds > 1) {
                                                 val fileDir = audioRecorder.stopRecording(true)
-
+                                                
                                                 if (fileDir !== null) {
                                                     isStartRecording = false
-
+                                                    
                                                     viewModel.sendVoice(fileDir, chat, voiceName)
-
+                                                    
                                                 }
                                             }
-
+                                            
                                             viewModel.setIsRecording(false)
-
+                                            
                                             recordingTime = 0
                                             isDragging = false
-
-
+                                            
+                                            
                                         },
                                         onPress = {
                                             if (!isDragging) {
                                                 viewModel.setIsRecording(!isRecording)
                                             }
                                             println("Press released")
-
-
+                                            
+                                            
                                         }
                                     )
                                 }
@@ -769,7 +762,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                             } else {
                                 Modifier.size(width = 17.dp, height = 26.dp)
                             }
-
+                            
                             Image(
                                 modifier = sizeModifier
                                     .offset {
@@ -787,11 +780,11 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
 //                        colorFilter = ColorFilter.tint(Color(0xFF29303C))
                             )
                         }
-
+                        
                     }
                 }
             }
-
+            
         }
     }
 }

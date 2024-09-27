@@ -914,7 +914,7 @@ actual class FileProvider {
         photoName: String,
         onProgress: (Float) -> Unit
     ): List<String>? {
-        val client = HttpClient() {
+        val client = HttpClient(Darwin) {
             install(HttpTimeout) {
                 requestTimeoutMillis = 600_000
                 connectTimeoutMillis = 600_000
