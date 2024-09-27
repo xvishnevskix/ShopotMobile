@@ -241,18 +241,31 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel) {
                         val filePick = FileProviderFactory.create()
                             .pickGallery()
 
-                        if (filePick != null) {
-                            getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
-                                viewModel.addFileMessage(
-                                    chat,
-                                    "mp4",
-                                    filePick,
-                                    photoPath,
-                                    photoName,
-                                    photoByteArray
-                                )
-                            }
+                        if (filePick !== null) {
+
+                            val fileData =
+                                FileProviderFactory.create().getFileData(filePick.fileContentPath)
+
+                            println("fileData ${fileData?.fileType}")
+//                            if(fileData.fileType == "") {
+//
+//                            }
+
+
                         }
+
+//                        if (filePick != null) {
+//                            getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
+//                                viewModel.addFileMessage(
+//                                    chat,
+//                                    "mp4",
+//                                    filePick,
+//                                    photoPath,
+//                                    photoName,
+//                                    photoByteArray
+//                                )
+//                            }
+//                        }
 
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
