@@ -212,6 +212,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         photoPath: String? = null,
         photoName: String? = null,
     ) {
+
+        println("filePick.fileName ${filePick.fileName}")
         addMessage(
             MessageItem(
                 Random.nextInt(1, 1501).toString(),
@@ -311,6 +313,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                         put("chatId", chatId)
                         put("messageId", messageId)
                         put("userId", profileUseCase.getProfile().id)
+                        put("fileType", forwardMessage.value?.attachments?.get(0)?.type)
                     }
                 )
                 println("jsonContent $jsonContent")

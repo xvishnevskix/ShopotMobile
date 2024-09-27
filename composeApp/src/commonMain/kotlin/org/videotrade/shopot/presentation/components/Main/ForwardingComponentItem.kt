@@ -56,17 +56,6 @@ fun ForwardingComponentItem(
             viewModel.setCurrentChat(chat)
             chatViewModel.clearMessages()
             chatViewModel.setMessagePage(0)
-//            viewModel.sendMessage(
-//                content = viewModel.forwardMessage.value?.content,
-//                fromUser = viewModel.profile.value.id,
-//                chatId = chat.id,
-//                notificationToken = chat.notificationToken,
-//                attachments = emptyList(),
-//                login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
-//                true,
-//                true
-//            )
-//            viewModel.getProfile()
             viewModel.getMessagesBack(chat.id)
 
             viewModel.sendForwardMessage(viewModel.forwardMessage.value?.id!!, chat.chatId)
