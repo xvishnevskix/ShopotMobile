@@ -7,7 +7,9 @@ import SelectedMessageText
 import SelectedVideoMessage
 import SelectedVoiceMessage
 import VideoMessage
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
@@ -130,12 +136,22 @@ fun MessageBox(
     onClick: () -> Unit,
     onPositioned: (LayoutCoordinates) -> Unit,
     isVisible: Boolean,
-    chat: ChatItem
+    chat: ChatItem,
+    answerMessageId: MutableState<String?>,
+    coroutineScope: CoroutineScope,
+    listState: LazyListState,
+    messagesState: List<MessageItem>
 ) {
     val isReadByMe = remember { mutableStateOf(false) }
     var swipeOffset by remember { mutableStateOf(0f) }
     val iconOpacity by animateFloatAsState(targetValue = if (swipeOffset > 0) swipeOffset / 75f else 0f)
     val animatedOffset by animateFloatAsState(targetValue = swipeOffset)
+    val isHighlighted = message.id == answerMessageId.value
+    val backgroundColor = animateColorAsState(
+        targetValue = if (isHighlighted) Color(0xFF2A293C).copy(alpha = 0.2f) else Color.Transparent,
+        animationSpec = tween(durationMillis = 500)
+    )
+    val focusManager = LocalFocusManager.current
 
 //    LaunchedEffect(Unit) {
 //        message.phone?.let {
@@ -146,7 +162,7 @@ fun MessageBox(
 //            }
 //        }
 //    }
-    val focusManager = LocalFocusManager.current
+
 
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
@@ -160,8 +176,18 @@ fun MessageBox(
         }
     }
 
+    //покраска сообщенния при переходе на него
+    LaunchedEffect(answerMessageId.value) {
+        if (isHighlighted) {
+            delay(2000)
+            answerMessageId.value = null
+        }
+    }
+
     Column(
         modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(color = backgroundColor.value )
             .onGloballyPositioned(onPositioned)
             .alpha(if (isVisible) 1f else 0f).pointerInput(message) {
                 detectTapGestures(
@@ -281,8 +307,15 @@ fun MessageBox(
                                         )
                                         .padding(top = 4.dp, start = 4.dp, end = 4.dp)
                                         .clip(RoundedCornerShape(14.dp))
-                                        .background(Color.White)
-                                        .wrapContentHeight(),
+                                        .background(color = Color.White)
+                                        .wrapContentHeight()
+                                        .clickable {
+                                            answerMessageId.value = it.id // Устанавливаем ID выделенного сообщения
+                                            coroutineScope.launch {
+                                                listState.animateScrollToItem(messagesState.indexOfFirst { msg -> msg.id == it.id })
+                                            }
+                                        },
+
                                     verticalAlignment = Alignment.Top,
                                     horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start
                                 ) {

@@ -129,7 +129,7 @@ fun UserComponentItem(
                     text = chat.lastMessage?.let {
                         MessageContent(message = it)
                     }?.takeIf { it.isNotEmpty() }?.let {
-                        if (it.length > 35) "${it.take(32)}..." else it
+                        if (it.length > 32) "${it.take(29)}..." else it
                     } ?: stringResource(MokoRes.strings.start_conversation),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,

@@ -78,9 +78,10 @@ fun formatTimestamp(timestamp: List<Int>): String {
 
             dateTimeInCurrentZone.date == currentDate.minus(1, DateTimeUnit.DAY) -> {
                 // Вчера - выводим "вчера"
-                yesterday + " ${
-                    dateTimeInCurrentZone.hour.toString().padStart(2, '0')
-                }:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
+                yesterday
+//                + " ${
+//                    dateTimeInCurrentZone.hour.toString().padStart(2, '0')
+//                }:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
             }
 
             dateTimeInCurrentZone.date >= currentDate.minus(6, DateTimeUnit.DAY) -> {
