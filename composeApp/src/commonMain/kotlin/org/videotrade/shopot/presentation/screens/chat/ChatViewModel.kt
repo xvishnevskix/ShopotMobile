@@ -64,7 +64,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     var downloadProgress = MutableStateFlow(0f)
     
     
-    val isScaffoldState = MutableStateFlow(false)
+    val isScaffoldForwardState = MutableStateFlow(false)
+    val isScaffoldStickerState = MutableStateFlow(false)
     
     val forwardMessage = MutableStateFlow<MessageItem?>(null)
     
@@ -96,7 +97,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     fun setScaffoldState(state: Boolean) {
-        isScaffoldState.value = state
+        isScaffoldForwardState.value = state
+    }
+
+    fun setScaffoldStickerState(state: Boolean) {
+        isScaffoldForwardState.value = state
     }
     
     fun setCurrentChat(chat: ChatItem) {

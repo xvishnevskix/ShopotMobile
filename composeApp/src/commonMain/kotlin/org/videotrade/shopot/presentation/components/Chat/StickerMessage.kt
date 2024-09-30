@@ -31,76 +31,27 @@ import shopot.composeapp.generated.resources.sticker1
 
 
 @Composable
-fun MessageImage(
-    message: MessageItem, profile: ProfileDTO,
-    attachments: List<Attachment>,
-    messageSenderName: String? = null
+fun StickerMessage(
+    message: MessageItem,
+    profile: ProfileDTO,
+//    attachments: List<Attachment>,
 ) {
-    var imageFilePath by remember { mutableStateOf("") }
 
-//    val imagePainter =
-//        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
 
     val imagePainter = rememberAsyncImagePainter(Res.drawable.sticker1)
-    val navigator = LocalNavigator.current
-    val url =
-        "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
 
-    LaunchedEffect(Unit) {
-        val fileName = attachments[0].name
-        val fileType = attachments[0].type
-
-        val fileProvider = FileProviderFactory.create()
-        val existingFile =
-            fileProvider.existingFile(fileName, fileType)
-
-        if (!existingFile.isNullOrBlank()) {
-            imageFilePath = existingFile
-            println("existingFile ${existingFile}")
-        } else {
-
-
-            val filePath = fileProvider.downloadCipherFile(
-                url,
-                "image",
-                fileName,
-                "image"
-            ) { newProgress ->
-                println("newProgress $newProgress")
-            }
-
-
-            if (filePath != null) {
-                imageFilePath = filePath
-            }
-
-            println("filePath $filePath")
-        }
-
-
-    }
 
     Image(
-        painter = painterResource(Res.drawable.AnimatedSticker1),
+        painter = painterResource(Res.drawable.sticker1),
         contentDescription = "Image",
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .size(150.dp, 150.dp)
             .padding(7.dp)
-            .clip(
-                RoundedCornerShape(
-                    topStart = 20.dp,
-                    topEnd = 20.dp,
-                    bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                    bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
-                )
-
-            ).clickable(
+            .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null // Убирает эффект нажатия
             ) {
-                if (imageFilePath.isNotBlank())
-                    navigator?.push(PhotoViewerScreen(imageFilePath, messageSenderName, message = message))
             }
     )
 }

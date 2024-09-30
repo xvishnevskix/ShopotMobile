@@ -504,12 +504,13 @@ fun MessageFormat(
             }
 
             "image" -> {
-                MessageImage(
-                    message, profile,
-                    message.attachments!!,
-                    messageSenderName
-                )
+//                MessageImage(
+//                    message, profile,
+//                    message.attachments!!,
+//                    messageSenderName
+//                )
 
+                StickerMessage(message, profile)
             }
             
             "video" -> {
