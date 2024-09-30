@@ -19,6 +19,7 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.clearAllNotifications
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.common.UpdateScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
@@ -27,77 +28,83 @@ import shopot.composeapp.generated.resources.logo
 
 
 class IntroScreen : Screen {
-    
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
-        
-        
+
+
         LaunchedEffect(key1 = Unit) {
             clearAllNotifications()
         }
-        
+
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {
                 navigator.push(MainScreen())
             }
         }
-        
+
         AppInitializer()
-        
+
         LaunchedEffect(key1 = Unit) {
             try {
-                
-                
-                viewModel.navigator.value = navigator
-                
-                
-                val contactsNative = PermissionsProviderFactory.create().checkPermission("contacts")
-                PermissionsProviderFactory.create().getPermission("notifications")
-                
-                
-                
-                
-                if (!contactsNative) {
-//                    toasterViewModel.toaster.show("Добавьте все разрешения")
-                    
-                    navigator.replace(PermissionsScreen())
-                    return@LaunchedEffect
+
+                val isCheckVersion =
+                    viewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
+
+                if (isCheckVersion) {
+                    navigator.push(UpdateScreen())
+                } else {
+
+                    viewModel.navigator.value = navigator
+
+
+                    val contactsNative =
+                        PermissionsProviderFactory.create().checkPermission("contacts")
+                    PermissionsProviderFactory.create().getPermission("notifications")
+
+
+
+
+                    if (!contactsNative) {
+                        navigator.replace(PermissionsScreen())
+                        return@LaunchedEffect
+                    }
+
+
+                    val response = origin().reloadTokens()
+
+
+
+
+                    if (response != null) {
+
+                        сommonViewModel.setMainNavigator(navigator)
+
+                        сommonViewModel.cipherShared(response, navigator)
+
+
+                        return@LaunchedEffect
+
+
+                    }
+
+
+                    navigator.replace(SignInScreen())
                 }
-                
-                
-                val response = origin().reloadTokens()
-                
-                
-                
-                
-                if (response != null) {
-                    
-                    сommonViewModel.setMainNavigator(navigator)
-                    
-                    сommonViewModel.cipherShared(response, navigator)
-                    
-                    
-                    return@LaunchedEffect
-                    
-                    
-                }
-                
-                
-                navigator.replace(SignInScreen())
-                
+
             } catch (e: Exception) {
-                
+
                 navigator.replace(SignInScreen())
-                
+
             }
-            
+
         }
-        
-        
-        
+
+
+
         Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
             SafeArea {
                 Image(
@@ -105,12 +112,12 @@ class IntroScreen : Screen {
                         .fillMaxSize(),
                     painter = painterResource(Res.drawable.logo),
                     contentDescription = null,
-                    
+
                     )
             }
         }
-        
+
     }
-    
-    
+
+
 }

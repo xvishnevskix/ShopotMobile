@@ -39,7 +39,7 @@ class origin {
             val token = getValueInStorage("accessToken")
             
             
-            println("url $url")
+            println("url ${EnvironmentConfig.serverUrl}$url")
             
             val response: HttpResponse = client.get("${EnvironmentConfig.serverUrl}$url") {
                 contentType(ContentType.Application.Json)

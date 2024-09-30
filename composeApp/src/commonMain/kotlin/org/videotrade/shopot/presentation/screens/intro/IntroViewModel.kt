@@ -22,12 +22,14 @@ import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.getBuildVersion
+import org.videotrade.shopot.presentation.screens.common.UpdateScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.test.TestScreen
 
 class IntroViewModel : ViewModel(), KoinComponent {
-    
+
     private val contactsUseCase: ContactsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
@@ -36,15 +38,15 @@ class IntroViewModel : ViewModel(), KoinComponent {
 //
 //    val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
 //    val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession.asStateFlow()
-    
-    
+
+
     val profile = MutableStateFlow<ProfileDTO?>(null)
-    
+
     private var isObserving = MutableStateFlow(true)
-    
+
     val navigator = MutableStateFlow<Navigator?>(null)
-    
-    
+
+
     init {
         viewModelScope.launch {
 //            profile.onEach { _ ->
@@ -66,110 +68,110 @@ class IntroViewModel : ViewModel(), KoinComponent {
 //
 //
 //            }.launchIn(viewModelScope)
-            
+
             observeWsConnection()
-            
-            
+
+
         }
     }
-    
+
     private fun chatsInit(navigator: Navigator) {
-        
+
         viewModelScope.launch {
-            
+
             downloadProfile(navigator)
-            
+
         }
     }
-    
+
     fun updateNotificationToken() {
-        
+
         try {
             viewModelScope.launch {
-                
-                
+
+
                 val jsonContent = Json.encodeToString(
                     buildJsonObject {
                         put("notificationToken", NotifierManager.getPushNotifier().getToken())
                     }
                 )
-                
-                
+
+
                 println("jsonContent321323 $jsonContent")
-                
+
                 origin().put("user/profile/edit", jsonContent)
             }
         } catch (e: Exception) {
-        
+
         }
     }
-    
-    
+
+
     fun fetchContacts(navigator: Navigator) {
         viewModelScope.launch {
-            
-            
+
+
             val contacts = contactsUseCase.fetchContacts()
             println("response3131 $contacts")
-            
-            
+
+
             if (contacts != null) {
-                
+
                 chatsInit(navigator)
-                
+
             } else {
                 navigator.push(SignInScreen())
-                
-                
+
+
             }
-            
+
         }
     }
-    
+
     private fun connectionWs(userId: String, navigator: Navigator) {
         viewModelScope.launch {
             wsUseCase.connectionWs(userId, navigator)
         }
     }
-    
-    
+
+
     private fun downloadProfile(navigator: Navigator) {
         viewModelScope.launch {
             val profileCase = profileUseCase.downloadProfile()
-            
+
             println("profileCase $profileCase")
-            
+
             if (profileCase == null) {
                 delValueInStorage("accessToken")
                 delValueInStorage("refreshToken")
-                
+
                 return@launch
-                
+
             } else {
                 addValueInStorage("profileId", profileCase.id)
-                
+
                 println("profileCase $profileCase")
-                
+
                 profile.value = profileCase
-                
+
                 connectionWs(profileCase.id, navigator)
             }
-            
+
         }
     }
-    
+
     private fun observeWsConnection() {
         println("wsSessionIntrowsUseCase.wsSession ${wsUseCase.wsSession.value}")
         wsUseCase.wsSession
             .onEach { wsSessionNew ->
                 println("wsSessionNew ${wsUseCase.wsSession.value} ${profile.value?.id} ${isObserving.value}")
-                
-                
+
+
                 if (profile.value?.id !== null && isObserving.value) {
-                    
+
                     if (wsSessionNew != null) {
                         println("wsSessionIntro $wsSessionNew")
-                        
+
                         stopObserving()
 
 //                        val jsonContent = Json.encodeToString(
@@ -200,20 +202,30 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
                     }
                 }
-                
+
             }
             .launchIn(viewModelScope)
-        
-        
+
+
     }
-    
-    
+
+
     fun stopObserving() {
         isObserving.value = false
     }
-    
+
     fun startObserving() {
         isObserving.value = true
+    }
+
+
+    suspend fun checkVersion(): Boolean {
+//            val getVersion = origin().get<String>("auth/createVersion")
+        val getVersion = 13
+
+        val op = getBuildVersion()
+
+        return getVersion > op
     }
 }
 

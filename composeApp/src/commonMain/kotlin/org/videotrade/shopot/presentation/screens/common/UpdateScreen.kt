@@ -1,4 +1,4 @@
-package org.videotrade.shopot.presentation.screens.test
+package org.videotrade.shopot.presentation.screens.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +49,7 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
 
-class TestScreen : Screen {
+class UpdateScreen : Screen {
 
     @Composable
     override fun Content() {
