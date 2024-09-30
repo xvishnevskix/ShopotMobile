@@ -293,6 +293,11 @@ fun MessageBox(
                         Column(
                             horizontalAlignment = if (message.fromUser == profile.id) Alignment.End else Alignment.Start,
                         ) {
+                            println("id answerMessageId ${answerMessageId.value}")
+
+                            println("id answerMessageId 2 ${message.answerMessage?.id}")
+
+
                             // Ответ на сообщение
                             message.answerMessage?.let {
 
@@ -310,9 +315,39 @@ fun MessageBox(
                                         .background(color = Color.White)
                                         .wrapContentHeight()
                                         .clickable {
-                                            answerMessageId.value = it.id // Устанавливаем ID выделенного сообщения
+//                                            answerMessageId.value = it.id // Устанавливаем ID выделенного сообщения
+
                                             coroutineScope.launch {
-                                                listState.animateScrollToItem(messagesState.indexOfFirst { msg -> msg.id == it.id })
+
+
+//                                                listState.animateScrollToItem(messagesState.indexOfFirst { msg -> msg.id == it.id })
+
+//                                                var messageIndex: Int
+//                                                var attemptCount = 0
+//                                                val maxAttempts = 5
+//
+//                                                do {
+//
+//                                                    messageIndex = messagesState.indexOfFirst { msg -> msg.id == it.id }
+//                                                    if (messageIndex == -1 && attemptCount < maxAttempts) {
+//
+//                                                        viewModel.getMessagesBack(chat.chatId)
+//                                                        attemptCount++
+//                                                        delay(500)
+//
+//                                                        messageIndex = messagesState.indexOfFirst { msg -> msg.id == it.id }
+//                                                        println("messageIndex = ${messageIndex}")
+//                                                    }
+//                                                } while (messageIndex == -1 && attemptCount < maxAttempts)
+//                                                println("messageIndex ${messageIndex != -1}")
+//                                                println("messageIndex = ${messageIndex}")
+//
+//
+//
+//                                                if (messageIndex != -1) {
+//                                                    listState.animateScrollToItem(messageIndex)
+//                                                    println("messageIndex = ${messageIndex}")
+//                                                }
                                             }
                                         },
 
