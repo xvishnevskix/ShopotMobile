@@ -152,7 +152,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                 
                                 if (!cameraPer) return@launch
 
-                            viewModel.sendNotify(
+                            commonViewModel.sendNotify(
                                 "Звонок",
                                 "от ${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
                                 chat.notificationToken

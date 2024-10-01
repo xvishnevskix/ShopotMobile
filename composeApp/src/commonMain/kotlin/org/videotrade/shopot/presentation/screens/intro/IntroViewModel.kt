@@ -221,7 +221,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
     suspend fun checkVersion(): Boolean {
 //            val getVersion = origin().get<String>("auth/createVersion")
-        val getVersion = 13
+        val getVersion = 12
 
         val op = getBuildVersion()
 

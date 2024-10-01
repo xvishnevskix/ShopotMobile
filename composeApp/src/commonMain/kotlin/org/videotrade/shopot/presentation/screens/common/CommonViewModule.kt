@@ -238,4 +238,28 @@ class CommonViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun sendNotify(
+        title: String,
+        content: String? = "Уведомление",
+        notificationToken: String?
+    ) {
+        viewModelScope.launch {
+            println("Уведомление ${notificationToken}")
+
+            if (notificationToken !== null) {
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("title", title)
+                        put("body", content)
+                        put("notificationToken", notificationToken)
+
+                    }
+                )
+
+                println("Уведомление ${jsonContent}")
+
+                origin().post("notification/notify", jsonContent)
+            }
+        }
+    }
 }

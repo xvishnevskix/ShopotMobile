@@ -33,6 +33,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
@@ -145,7 +146,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ) {
         viewModelScope.launch {
             var contentSort = ""
-            
+
+            val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+
             
             if (content !== null && isCipher) {
                 val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
@@ -171,7 +174,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 selectedMessagesByChat.value[chatId]?.first?.id
             )
             println("сообщениесообщениесообщениесообщение")
-            sendNotify("$login", content, notificationToken)
+
+
+            commonViewModel.sendNotify("$login", content, notificationToken)
+
             clearSelection(chatId)
         }
     }
@@ -276,30 +282,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun sendNotify(
-        title: String,
-        content: String? = "Уведомление",
-        notificationToken: String?
-    ) {
-        viewModelScope.launch {
-            println("Уведомление ${notificationToken}")
-            
-            if (notificationToken !== null) {
-                val jsonContent = Json.encodeToString(
-                    buildJsonObject {
-                        put("title", title)
-                        put("body", content)
-                        put("notificationToken", notificationToken)
-                        
-                    }
-                )
-                
-                println("Уведомление ${jsonContent}")
-                
-                origin().post("notification/notify", jsonContent)
-            }
-        }
-    }
+
     
     fun sendForwardMessage(
         messageId: String,

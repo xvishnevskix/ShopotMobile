@@ -2,8 +2,11 @@ package org.videotrade.shopot
 
 //import org.videotrade.shopot.multiplatform.MediaProviderFactory
 import android.app.Application
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -97,12 +100,18 @@ class AppActivity : ComponentActivity() {
             App()
         }
 
-//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(android.R.id.content)) {
-//                view, insets ->
-//            val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-//            view.updatePadding(bottom = bottom)
-//            insets
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "default_channel_id"
+            val channelName = "Default Channel"
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val notificationChannel = NotificationChannel(channelId, channelName, importance).apply {
+                description = "Default notification channel"
+            }
+
+            // Регистрируем канал уведомлений
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
     
     private fun initializeProviders() {

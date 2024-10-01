@@ -60,22 +60,21 @@ actual fun startOutgoingCall() {
 @RequiresApi(Build.VERSION_CODES.O)
 actual fun simulateIncomingCall() {
     val context = getContextObj.getContext()
-    val activity = getContextObj.getActivity()
 
-    // Проверяем и запрашиваем разрешения, если они не предоставлены
-    if (!checkAndRequestPhoneNumbersPermission(activity)) {
+    // Проверяем разрешения с использованием Context
+    if (!checkAndRequestPhoneNumbersPermission(context)) {
         return
     }
 
-    // Создаем инстанцию CallManager
+    // Создаем инстанцию CallManager с использованием Context
     val callManager = CallManager(context)
 
     // Проверяем регистрацию PhoneAccount
     if (!callManager.isPhoneAccountRegistered()) {
         callManager.registerPhoneAccount()
-        // После регистрации можно попросить пользователя включить аккаунт в настройках
-        val intent = Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS)
-        activity.startActivity(intent)
+
+        // Показать уведомление или уведомить пользователя, чтобы он включил аккаунт позже
+//        showNotificationToEnableAccount(context)
         return
     }
 

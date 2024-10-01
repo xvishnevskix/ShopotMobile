@@ -2,6 +2,7 @@ package org.videotrade.shopot.androidSpecificApi
 
 import android.Manifest
 import android.app.Activity
+import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.pm.PackageManager
@@ -17,9 +18,12 @@ import android.telecom.TelecomManager
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import org.videotrade.shopot.R
+import org.videotrade.shopot.multiplatform.simulateIncomingCall
 
 class WebRtcCallService : ConnectionService() {
 
@@ -195,27 +199,44 @@ fun checkAndRequestPhoneNumbersPermission(context: Context): Boolean {
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        // Проверяем, содержит ли сообщение данные
-        remoteMessage.data.isNotEmpty().let {
-            Log.d("FCM", "Message data payload: ${remoteMessage.data}")
+        Log.d("FCM", "remoteMessage ${remoteMessage.data}")
 
-            // Здесь вы можете вызвать нужный код на устройстве
+        // Симулируем входящий вызов, например
+        simulateIncomingCall()
+
+        // Обрабатываем данные сообщения
+        if (remoteMessage.data.isNotEmpty()) {
+            Log.d("FCM", "Message data payload: ${remoteMessage.data}")
             triggerActionBasedOnData(remoteMessage.data)
         }
 
-        // Если сообщение содержит уведомление, вы можете также обработать его
+        // Если сообщение содержит уведомление, создаём и показываем уведомление
         remoteMessage.notification?.let {
-            Log.d("FCM", "Message Notification Body: ${it.body}")
+            showNotification(it.title, it.body)
         }
     }
 
+    private fun showNotification(title: String?, message: String?) {
+        val channelId = "default_channel_id" // Указываем ID канала, который был создан
+
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT) // Приоритет для устройств ниже Android O
+            .setAutoCancel(true) // Уведомление закрывается при нажатии
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(0, notificationBuilder.build()) // Показать уведомление
+    }
+
     private fun triggerActionBasedOnData(data: Map<String, String>) {
-        // Например, в зависимости от данных можно выполнить определённые действия
+        // Например, в зависимости от данных выполняем действия
+        Log.d("FCM", "remoteMessage")
         if (data["action"] == "trigger_code") {
-            // Выполняем нужный код
             Log.d("FCM", "Executing triggered code!")
-            // Здесь вызовите ваш код
+            // Ваш код, например, инициирование звонка
         }
     }
 }

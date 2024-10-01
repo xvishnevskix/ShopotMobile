@@ -38,7 +38,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.preat.peekaboo.image.picker.toImageBitmap
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.VideoPlayer
@@ -46,6 +51,7 @@ import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getBuildVersion
 import org.videotrade.shopot.multiplatform.simulateIncomingCall
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -55,11 +61,32 @@ class TestScreen : Screen {
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
+        val commonViewModel: CommonViewModel = koinInject()
 
         MaterialTheme {
             SafeArea {
                 Button(onClick = {
+                    scope.launch {
+                        val jsonContent = Json.encodeToString(
+                            buildJsonObject {
+                                put("title", "title")
+                                put("body", "Privet")
+                                put(
+                                    "notificationToken",
+                                    "fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK"
+                                )
 
+                            }
+                        )
+
+                        println("Уведомление ${jsonContent}")
+
+                        origin().post("notification/notifyTrigger", jsonContent)
+
+//                        commonViewModel.sendNotify("Privet","","fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK" )
+
+
+                    }
                 }, content = {
                     Text("SendNotific")
                 })
