@@ -13,6 +13,7 @@ class StickerRepositoryImpl : StickerRepository {
 
     override suspend fun downloadStickerPacks(): List<StickerPack>? {
         val originInstance = origin()
+        println("Sticker get")
 
         val stickerPacksRes = originInstance.get<List<StickerPack>>("stickers/package/all") ?: return null
 

@@ -84,10 +84,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
 
-    init {
-        downloadStickerPacks()
-    }
-
     fun downloadStickerPacks() {
         viewModelScope.launch {
             val packs = stickerUseCase.downloadStickerPacks() ?: return@launch

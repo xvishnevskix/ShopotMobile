@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.BottomSheetScaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -125,55 +126,60 @@ class ChatScreen(
 
                     }
             ) {
-                SafeArea(isBlurred = selectedMessage.value != null, 7.dp) {
-                    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-                        Scaffold(
-                            topBar = {
-                                ChatHeader(chat, viewModel, profile)
-
-                            },
-                            bottomBar = {
-                                ChatFooter(chat, viewModel, onStickerButtonClick = {
-                                    showStickerMenu.value = true
-                                    scope.launch {
-                                        scaffoldStickerState.bottomSheetState.expand()
-                                    }
-                                })
-                            },
-
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) { innerPadding ->
-                            Chat(
-                                viewModel,
-                                profile,
-                                chat,
-                                Modifier.fillMaxSize().background(Color.White)
-                                    .padding(innerPadding),
-                                onMessageClick = { message, y ->
-                                    selectedMessage.value = message
-                                    selectedMessageY = y + 150
-                                    hiddenMessageId = message.id
-                                },
-                                hiddenMessageId = hiddenMessageId
-                            )
-                        }
-
-
-                    }
-                    BottomSheetModal(scaffoldForwardState)
-                }
-
-                BlurredMessageOverlay(
-                    profile,
-                    viewModel,
-                    selectedMessage = selectedMessage.value,
-                    selectedMessageY = selectedMessageY,
-                    onDismiss = {
-                        selectedMessage.value = null
-                        hiddenMessageId = null
-                    },
-                )
+                Button(onClick = {
+                    viewModel.downloadStickerPacks()
+                }, content = {
+                    Text("Sen")
+                })
+//                SafeArea(isBlurred = selectedMessage.value != null, 7.dp) {
+//                    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+//                        Scaffold(
+//                            topBar = {
+//                                ChatHeader(chat, viewModel, profile)
+//
+//                            },
+//                            bottomBar = {
+//                                ChatFooter(chat, viewModel, onStickerButtonClick = {
+//                                    showStickerMenu.value = true
+//                                    scope.launch {
+//                                        scaffoldStickerState.bottomSheetState.expand()
+//                                    }
+//                                })
+//                            },
+//
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                        ) { innerPadding ->
+//                            Chat(
+//                                viewModel,
+//                                profile,
+//                                chat,
+//                                Modifier.fillMaxSize().background(Color.White)
+//                                    .padding(innerPadding),
+//                                onMessageClick = { message, y ->
+//                                    selectedMessage.value = message
+//                                    selectedMessageY = y + 150
+//                                    hiddenMessageId = message.id
+//                                },
+//                                hiddenMessageId = hiddenMessageId
+//                            )
+//                        }
+//
+//
+//                    }
+//                    BottomSheetModal(scaffoldForwardState)
+//                }
+//
+//                BlurredMessageOverlay(
+//                    profile,
+//                    viewModel,
+//                    selectedMessage = selectedMessage.value,
+//                    selectedMessageY = selectedMessageY,
+//                    onDismiss = {
+//                        selectedMessage.value = null
+//                        hiddenMessageId = null
+//                    },
+//                )
             }
         }
     }
