@@ -3,7 +3,6 @@ package org.videotrade.shopot.multiplatform
 import android.Manifest
 import android.content.ComponentName
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
@@ -68,11 +67,13 @@ actual fun simulateIncomingCall() {
     }
 
     // Создаем инстанцию CallManager с использованием Context
-    val callManager = CallManager(context)
+    val callManager = CallManager(context, getActivity)
+
 
     // Проверяем регистрацию PhoneAccount
     if (!callManager.isPhoneAccountRegistered()) {
         callManager.registerPhoneAccount()
+
 
         // Показать уведомление или уведомить пользователя, чтобы он включил аккаунт позже
 //        showNotificationToEnableAccount(context)

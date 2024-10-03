@@ -5,9 +5,9 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Bundle
 import android.telecom.Connection
 import android.telecom.ConnectionRequest
 import android.telecom.ConnectionService
@@ -22,98 +22,29 @@ import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
-import com.shepeliev.webrtckmp.SessionDescription
-import com.shepeliev.webrtckmp.SessionDescriptionType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.api.findContactByPhone
-import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
-import org.videotrade.shopot.domain.usecase.ContactsUseCase
-import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.simulateIncomingCall
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
-
-class WebRtcCallService : ConnectionService() {
-
-    override fun onCreateIncomingConnection(
-        connectionManagerPhoneAccount: PhoneAccountHandle?,
-        request: ConnectionRequest?
-    ): Connection? {
-//        val connection = WebRtcConnection()
-//        connection.setDialing()
-//        // Настройте соединение WebRTC здесь
-//        return connection
-        return null
-    }
-
-    override fun onCreateOutgoingConnection(
-        connectionManagerPhoneAccount: PhoneAccountHandle?,
-        request: ConnectionRequest?
-    ): Connection? {
-//        val connection = WebRtcConnection()
-//        connection.setDialing()
-//        // Настройте исходящее соединение WebRTC здесь
-//        return connection
-
-        return null
-
-    }
-}
-
-
-class MyPhoneAccountRegistration() {
-    private val context = getContextObj.getContext()
-
-
-    private val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-
-    fun registerPhoneAccount() {
-        val phoneAccountHandle = PhoneAccountHandle(
-            ComponentName(context, WebRtcCallService::class.java),
-            "MyWebRtcPhoneAccount"
-        )
-        val phoneAccount = PhoneAccount.builder(phoneAccountHandle, "WebRTC Calls")
-            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
-            .build()
-
-        telecomManager.registerPhoneAccount(phoneAccount)
-    }
-}
-
-
-fun CallO(
-
-) {
-    val context = getContextObj.getContext()
-
-    val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-    val phoneAccountHandle = PhoneAccountHandle(
-        ComponentName(context, WebRtcCallService::class.java),
-        "MyWebRtcPhoneAccount"
-    )
-
-    val bundle = Bundle()
-    telecomManager.addNewIncomingCall(phoneAccountHandle, bundle)
-
-}
 
 
 class MockCallService : ConnectionService() {
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateIncomingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle?,
         request: ConnectionRequest?
     ): Connection {
+        if (connectionManagerPhoneAccount == null) {
+            // Обработка ошибки
+            return Connection.createFailedConnection(
+                DisconnectCause(DisconnectCause.ERROR, "No PhoneAccountHandle")
+            )
+        }
+
         val connection = MockConnection()
         connection.setRinging()  // Имитация входящего вызова
+        connection.onShowIncomingCallUi()
         return connection
     }
 
@@ -154,7 +85,7 @@ class MockConnection : Connection() {
 }
 
 
-class CallManager(private val context: Context) {
+class CallManager(private val context: Context,private val getActivity: Context) {
     private val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
 
     fun registerPhoneAccount() {
@@ -162,11 +93,28 @@ class CallManager(private val context: Context) {
             ComponentName(context, MockCallService::class.java),
             "MyMockPhoneAccount"
         )
+
         val phoneAccount = PhoneAccount.builder(phoneAccountHandle, "Mock Call")
             .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
             .build()
 
-        telecomManager.registerPhoneAccount(phoneAccount)
+        try {
+            telecomManager.registerPhoneAccount(phoneAccount)
+            println("PhoneAccount зарегистрирован успешно")
+
+            // Проверка на активацию
+            val phoneAccountList = telecomManager.callCapablePhoneAccounts
+            if (!phoneAccountList.contains(phoneAccountHandle)) {
+                // Если аккаунт не активен, направить пользователя в настройки
+                val intent = Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS)
+                getActivity.startActivity(intent)
+                println("PhoneAccount не активен. Переход в настройки для активации.")
+            }
+
+        } catch (e: SecurityException) {
+            e.printStackTrace()
+            println("Ошибка при регистрации PhoneAccount: ${e.message}")
+        }
     }
 
     fun isPhoneAccountRegistered(): Boolean {
@@ -183,30 +131,60 @@ class CallManager(private val context: Context) {
 @RequiresApi(Build.VERSION_CODES.O)
 fun checkAndRequestPhoneNumbersPermission(context: Context): Boolean {
     val READ_PHONE_NUMBERS_REQUEST_CODE = 1001
+    val MANAGE_OWN_CALLS_REQUEST_CODE = 1002
+    val READ_PHONE_STATE_REQUEST_CODE = 1003
 
-    // Проверяем наличие разрешения
-    return if (ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.READ_PHONE_NUMBERS
-        ) != PackageManager.PERMISSION_GRANTED
-    ) {
-        // Проверяем, является ли контекст Activity
-        if (context is Activity) {
+    // Проверяем, что версия Android соответствует требованиям (READ_PHONE_NUMBERS доступно с Android O)
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        Log.e("Permission", "READ_PHONE_NUMBERS permission is not supported on devices below Android O")
+        return false
+    }
+
+    // Проверяем, является ли контекст Activity
+    if (context is Activity) {
+        // Проверяем наличие разрешения на чтение номеров телефонов
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_NUMBERS)
+            != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
                 context,
                 arrayOf(Manifest.permission.READ_PHONE_NUMBERS),
                 READ_PHONE_NUMBERS_REQUEST_CODE
             )
-        } else {
-            // Выводим лог или обрабатываем ситуацию, если context не является Activity
-            Log.e("Permission", "Context is not an Activity, cannot request permissions")
+            return false
         }
-        false
+
+        // Проверяем наличие разрешения на управление собственными звонками
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.MANAGE_OWN_CALLS)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                context,
+                arrayOf(Manifest.permission.MANAGE_OWN_CALLS),
+                MANAGE_OWN_CALLS_REQUEST_CODE
+            )
+            return false
+        }
+
+        // Проверяем наличие разрешения READ_PHONE_STATE
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                context,
+                arrayOf(Manifest.permission.READ_PHONE_STATE),
+                READ_PHONE_STATE_REQUEST_CODE
+            )
+            return false
+        }
+
+        // Все разрешения уже предоставлены
+        return true
     } else {
-        // Разрешение уже предоставлено
-        true
+        // Выводим лог, если контекст не является Activity
+        Log.e("Permission", "Context is not an Activity, cannot request permissions")
+        return false
     }
 }
+
+
 
 class MyFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -252,23 +230,23 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             println("profileId")
 
 
-            val profileId = getValueInStorage("profileId")
-
-            println("profileId $profileId")
-
-            if (profileId != null) {
-                val callData = data["callData"]
-
-                val parseCallData = callData?.let { Json.parseToJsonElement(it) }
-
-                if (parseCallData !== null) {
-
-                    println("callData41412412 $callData")
-                        callViewModel.setAnswerData(parseCallData)
-                        callViewModel.initWebrtc()
-                        callViewModel.connectionBackgroundWs(profileId)
-                }
-            }
+//            val profileId = getValueInStorage("profileId")
+//
+//            println("profileId $profileId")
+//
+//            if (profileId != null) {
+//                val callData = data["callData"]
+//
+//                val parseCallData = callData?.let { Json.parseToJsonElement(it) }
+//
+//                if (parseCallData !== null) {
+//
+//                    println("callData41412412 $callData")
+//                        callViewModel.setAnswerData(parseCallData)
+//                        callViewModel.initWebrtc()
+//                        callViewModel.connectionBackgroundWs(profileId)
+//                }
+//            }
             // Ваш код, например, инициирование звонка
         }
     }
