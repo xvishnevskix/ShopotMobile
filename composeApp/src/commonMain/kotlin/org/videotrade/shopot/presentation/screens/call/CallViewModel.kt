@@ -3,26 +3,21 @@ package org.videotrade.shopot.presentation.screens.call
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
-import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import io.ktor.websocket.Frame
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.domain.model.SessionDescriptionDTO
-import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
-import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class CallViewModel() : ViewModel(), KoinComponent {
@@ -47,8 +42,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     // Флаг для управления наблюдением
     private var isObserving = MutableStateFlow(true)
 
-    var answerData = MutableStateFlow("")
-
+    var answerData = MutableStateFlow<JsonElement?>(null)
 
     val localStreamm = callUseCase.localStream
 
@@ -56,8 +50,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
 //        startObserving()
 //    }
 
-    private fun setAnswerData() {
-        answerData.value = ""
+    fun setAnswerData(JsonElement: JsonElement?) {
+        answerData.value = JsonElement
     }
 
 
@@ -173,6 +167,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
     @OptIn(DelicateCoroutinesApi::class)
     suspend fun answerCall() {
         callUseCase.answerCall()
+    }
+
+     fun answerCallBackground() {
+        callUseCase.answerCallBackground()
     }
 
     fun rejectCall(navigator: Navigator, userId: String) {

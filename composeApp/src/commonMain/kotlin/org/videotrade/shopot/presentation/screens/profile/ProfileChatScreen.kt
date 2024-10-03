@@ -57,6 +57,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
         }
+        println("sssssss ${chat.userId}")
 
         val tabs = ProfileMediaTabs.entries.map { tab ->
             org.videotrade.shopot.presentation.screens.group.TabInfo(

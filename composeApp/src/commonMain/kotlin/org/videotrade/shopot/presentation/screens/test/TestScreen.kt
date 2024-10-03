@@ -44,6 +44,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.VideoPlayer
@@ -67,12 +68,22 @@ class TestScreen : Screen {
 
 
 
+        LaunchedEffect(Unit) {
+            val profileId = getValueInStorage("profileId")
+
+            println("profileId $profileId")
+            if (profileId != null) {
+                callViewModel.connectionBackgroundWs(profileId)
+            }
+
+            callViewModel.initWebrtc()
+        }
+
+
         MaterialTheme {
             SafeArea {
                 Button(onClick = {
                     scope.launch {
-
-
                         callViewModel.makeCallBackground(
                             "fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK",
                             "eb2f7045-592b-4304-bc8a-d14234777550"

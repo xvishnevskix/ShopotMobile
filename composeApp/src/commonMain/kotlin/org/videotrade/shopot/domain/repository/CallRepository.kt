@@ -57,7 +57,9 @@ interface CallRepository {
     suspend fun makeCallBackground(notificToken: String, calleeId: String)
 
     suspend fun answerCall()
-    
+
+     fun answerCallBackground()
+
    suspend fun rejectCall(navigator: Navigator, userId: String): Boolean
 //    fun rejectCallAnswer()
     

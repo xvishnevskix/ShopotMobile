@@ -136,77 +136,10 @@ class MockConnection : Connection() {
 
         val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
 
+        println("answerCallBackground")
 
-//        CoroutineScope(Dispatchers.IO).launch {
-//            try {
-//                val contactsUseCase: ContactsUseCase = KoinPlatform.getKoin().get()
-//
-//                val cameraPer = PermissionsProviderFactory.create()
-//                    .getPermission("microphone")
-//
-//                if (cameraPer) {
-//                    callViewModel.answerData.rtcMessage?.let {
-//                        val userJson =
-//                            jsonElement.jsonObject["user"]?.jsonObject
-//
-//
-//                        var user =
-//                            Json.decodeFromString<ProfileDTO>(userJson.toString())
-//
-//
-//                        println("aadauser $user")
-//
-//                        val sdp =
-//                            it["sdp"]?.jsonPrimitive?.content
-//                                ?: return@launch
-//
-//
-//                        val callerId =
-//                            jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-//
-//                        offer.value = SessionDescription(
-//                            SessionDescriptionType.Offer,
-//                            sdp
-//                        )
-//
-//
-//
-//                        callerId?.let { userId ->
-//
-//
-//                            otherUserId.value = userId
-//
-//                            isIncomingCall.value = true
-//                            val contact = findContactByPhone(
-//                                user.phone,
-//                                contactsUseCase.contacts.value
-//                            )
-//                            if (
-//                                contact !== null && contact.firstName !== null && contact.lastName !== null
-//                            ) {
-//                                user = user.copy(
-//                                    firstName = contact.firstName,
-//                                    lastName = contact.lastName
-//                                )
-//                            }
-//
-//                        }
-//
-//
-//                    }
-//                }
-//
-//
-//            } catch (e: Exception) {
-//
-//                println("Error newCall: $e")
-//            }
-//        }
+        callViewModel.answerCallBackground()
 
-
-//        println("onAnswer ${callViewModel.answerData.value}")
-
-        // Изменяем состояние на активный звонок
         setActive()
     }
 
@@ -279,7 +212,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        Log.d("FCM", "remoteMessage ${remoteMessage.data}")
 
         // Обрабатываем данные сообщения
         if (remoteMessage.data.isNotEmpty()) {
@@ -310,8 +242,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun triggerActionBasedOnData(data: Map<String, String>) {
         // Например, в зависимости от данных выполняем действия
-        Log.d("FCM", "remoteMessage")
-        if (data["action"] == "trigger_code") {
+        if (data["action"] == "callBackground") {
             val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
             val callUseCase: CallUseCase = KoinPlatform.getKoin().get()
 
@@ -326,11 +257,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             println("profileId $profileId")
 
             if (profileId != null) {
-//                callViewModel.answerData.value = "fasafsafsafasf"
-                callViewModel.connectionBackgroundWs(profileId)
-            }
-            callViewModel.initWebrtc()
+                val callData = data["callData"]
 
+                val parseCallData = callData?.let { Json.parseToJsonElement(it) }
+
+                if (parseCallData !== null) {
+
+                    println("callData41412412 $callData")
+                        callViewModel.setAnswerData(parseCallData)
+                        callViewModel.initWebrtc()
+                        callViewModel.connectionBackgroundWs(profileId)
+                }
+            }
             // Ваш код, например, инициирование звонка
         }
     }

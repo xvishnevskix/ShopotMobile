@@ -87,7 +87,8 @@ class origin {
         try {
             val token = getValueInStorage("accessToken")
             println("url ${EnvironmentConfig.serverUrl}$url}")
-            
+            println("data ${data}")
+
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.serverUrl}$url") {
                     contentType(ContentType.Application.Json)
