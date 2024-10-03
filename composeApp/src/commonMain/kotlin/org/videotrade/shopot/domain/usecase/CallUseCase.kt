@@ -32,6 +32,11 @@ class CallUseCase : KoinComponent {
         
         return repository.connectionWs(userId, navigator)
     }
+
+    suspend fun connectionBackgroundWs(userId: String) {
+
+        return repository.connectionBackgroundWs(userId)
+    }
     
     suspend fun setOffer() {
         
@@ -73,6 +78,12 @@ class CallUseCase : KoinComponent {
     suspend fun makeCall(userId: String, calleeId: String){
         repository.makeCall(userId, calleeId)
     }
+
+    suspend fun makeCallBackground(notificToken: String, calleeId: String){
+        repository.makeCallBackground(notificToken, calleeId)
+    }
+
+
     
     suspend fun answerCall() {
         repository.answerCall()

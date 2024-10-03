@@ -27,9 +27,13 @@ interface CallRepository {
     val callState: StateFlow<PeerConnectionState>
     
     val iseState: StateFlow<IceConnectionState>
-    
-    
+
+
     suspend fun connectionWs(userId: String, navigator: Navigator)
+
+    suspend fun connectionBackgroundWs(userId: String)
+
+
     suspend fun reconnectPeerConnection()
     suspend fun setOffer()
     
@@ -46,9 +50,12 @@ interface CallRepository {
     
     fun updateOtherUserId(userId: String)
     suspend fun initWebrtc(): Nothing
-    
-    
+
+
     suspend fun makeCall(userId: String, calleeId: String)
+
+    suspend fun makeCallBackground(notificToken: String, calleeId: String)
+
     suspend fun answerCall()
     
    suspend fun rejectCall(navigator: Navigator, userId: String): Boolean

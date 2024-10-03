@@ -51,6 +51,7 @@ import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getBuildVersion
 import org.videotrade.shopot.multiplatform.simulateIncomingCall
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -62,26 +63,20 @@ class TestScreen : Screen {
     override fun Content() {
         val scope = rememberCoroutineScope()
         val commonViewModel: CommonViewModel = koinInject()
+        val callViewModel: CallViewModel = koinInject()
+
+
 
         MaterialTheme {
             SafeArea {
                 Button(onClick = {
                     scope.launch {
-                        val jsonContent = Json.encodeToString(
-                            buildJsonObject {
-                                put("title", "title")
-                                put("body", "Privet")
-                                put(
-                                    "notificationToken",
-                                    "fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK"
-                                )
 
-                            }
+
+                        callViewModel.makeCallBackground(
+                            "fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK",
+                            "eb2f7045-592b-4304-bc8a-d14234777550"
                         )
-
-                        println("Уведомление ${jsonContent}")
-
-                        origin().post("notification/notifyTrigger", jsonContent)
 
 //                        commonViewModel.sendNotify("Privet","","fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK" )
 

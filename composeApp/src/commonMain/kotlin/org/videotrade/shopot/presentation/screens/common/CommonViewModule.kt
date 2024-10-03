@@ -186,6 +186,8 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                     val introViewModel: IntroViewModel =
                                         KoinPlatform.getKoin().get()
 
+                                    addValueInStorage("profileId", userId!!)
+
                                     updateNotificationToken()
 
 //                                    navigator.push(TestScreen())
