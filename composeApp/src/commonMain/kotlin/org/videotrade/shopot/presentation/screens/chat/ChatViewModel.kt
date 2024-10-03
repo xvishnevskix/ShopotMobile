@@ -28,11 +28,13 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
+import org.videotrade.shopot.presentation.components.Chat.StickerPack
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
@@ -74,6 +76,25 @@ class ChatViewModel : ViewModel(), KoinComponent {
         MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
     val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
         _selectedMessagesByChat.asStateFlow()
+
+    //////////////////
+
+    private val stickerUseCase = StickerUseCase()
+
+    private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
+    val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
+
+    init {
+        downloadStickerPacks()
+    }
+
+    fun downloadStickerPacks() {
+        viewModelScope.launch {
+            val packs = stickerUseCase.downloadStickerPacks() ?: return@launch
+            _stickerPacks.value = packs
+        }
+    }
+
     
     
     init {

@@ -28,6 +28,8 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,146 +46,170 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import io.ktor.client.HttpClient
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.utils.EmptyContent.contentType
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
-import shopot.composeapp.generated.resources.sticker1
 
+
+
+//data class StickerPack(
+//    val packName: String,
+//    val stickers: List<Sticker>
+//)
+
+//val stickerPacks = listOf(
+//    StickerPack(
+//        packName = "Набор стикеров 1",
+//        stickers = listOf(
+//            Sticker(
+//                name = "Стикер 1",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker.webp",
+//                emoji = listOf("😊", "😎")
+//            ),
+//            Sticker(
+//                name = "Стикер 2",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker2.webp",
+//                emoji = listOf("😂", "😜")
+//            ),
+//            Sticker(
+//                name = "Стикер 3",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker3.webp",
+//                emoji = listOf("😉", "😍")
+//            ),
+//            Sticker(
+//                name = "Стикер 4",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker4.webp",
+//                emoji = listOf("😇", "🤓")
+//            )
+//            ,
+//            Sticker(
+//                name = "Стикер 1",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker.webp",
+//                emoji = listOf("😊", "😎")
+//            ),
+//            Sticker(
+//                name = "Стикер 2",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker2.webp",
+//                emoji = listOf("😂", "😜")
+//            ),
+//            Sticker(
+//                name = "Стикер 3",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker3.webp",
+//                emoji = listOf("😉", "😍")
+//            ),
+//            Sticker(
+//                name = "Стикер 4",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker4.webp",
+//                emoji = listOf("😇", "🤓")
+//            )
+//        )
+//    ),
+//    StickerPack(
+//        packName = "Набор стикеров 1",
+//        stickers = listOf(
+//            Sticker(
+//                name = "Стикер 1",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker.webp",
+//                emoji = listOf("😊", "😎")
+//            ),
+//            Sticker(
+//                name = "Стикер 2",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker2.webp",
+//                emoji = listOf("😂", "😜")
+//            ),
+//            Sticker(
+//                name = "Стикер 3",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker3.webp",
+//                emoji = listOf("😉", "😍")
+//            ),
+//            Sticker(
+//                name = "Стикер 4",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker4.webp",
+//                emoji = listOf("😇", "🤓")
+//            )
+//            ,
+//            Sticker(
+//                name = "Стикер 1",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker.webp",
+//                emoji = listOf("😊", "😎")
+//            ),
+//            Sticker(
+//                name = "Стикер 2",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker2.webp",
+//                emoji = listOf("😂", "😜")
+//            ),
+//            Sticker(
+//                name = "Стикер 3",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker3.webp",
+//                emoji = listOf("😉", "😍")
+//            ),
+//            Sticker(
+//                name = "Стикер 4",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker4.webp",
+//                emoji = listOf("😇", "🤓")
+//            )
+//        )
+//    ),
+//    StickerPack(
+//        packName = "Набор стикеров 2",
+//        stickers = listOf(
+//            Sticker(
+//                name = "Стикер 1",
+//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
+//                path = "sticker5.webp",
+//                emoji = listOf("😉", "😅")
+//            )
+//        )
+//    )
+//)
+
+@Serializable
 data class Sticker(
-    val name: String,
-    val imageRes: DrawableResource,
-    val path: String,
+    val name: String?,
+//    val imageRes: DrawableResource,
+    val path: String?,
     val emoji: List<String>
 )
 
+@Serializable
 data class StickerPack(
-    val packName: String,
-    val stickers: List<Sticker>
-)
-
-val stickerPacks = listOf(
-    StickerPack(
-        packName = "Набор стикеров 1",
-        stickers = listOf(
-            Sticker(
-                name = "Стикер 1",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker.webp",
-                emoji = listOf("😊", "😎")
-            ),
-            Sticker(
-                name = "Стикер 2",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker2.webp",
-                emoji = listOf("😂", "😜")
-            ),
-            Sticker(
-                name = "Стикер 3",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker3.webp",
-                emoji = listOf("😉", "😍")
-            ),
-            Sticker(
-                name = "Стикер 4",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker4.webp",
-                emoji = listOf("😇", "🤓")
-            )
-            ,
-            Sticker(
-                name = "Стикер 1",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker.webp",
-                emoji = listOf("😊", "😎")
-            ),
-            Sticker(
-                name = "Стикер 2",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker2.webp",
-                emoji = listOf("😂", "😜")
-            ),
-            Sticker(
-                name = "Стикер 3",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker3.webp",
-                emoji = listOf("😉", "😍")
-            ),
-            Sticker(
-                name = "Стикер 4",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker4.webp",
-                emoji = listOf("😇", "🤓")
-            )
-        )
-    ),
-    StickerPack(
-        packName = "Набор стикеров 1",
-        stickers = listOf(
-            Sticker(
-                name = "Стикер 1",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker.webp",
-                emoji = listOf("😊", "😎")
-            ),
-            Sticker(
-                name = "Стикер 2",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker2.webp",
-                emoji = listOf("😂", "😜")
-            ),
-            Sticker(
-                name = "Стикер 3",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker3.webp",
-                emoji = listOf("😉", "😍")
-            ),
-            Sticker(
-                name = "Стикер 4",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker4.webp",
-                emoji = listOf("😇", "🤓")
-            )
-            ,
-            Sticker(
-                name = "Стикер 1",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker.webp",
-                emoji = listOf("😊", "😎")
-            ),
-            Sticker(
-                name = "Стикер 2",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker2.webp",
-                emoji = listOf("😂", "😜")
-            ),
-            Sticker(
-                name = "Стикер 3",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker3.webp",
-                emoji = listOf("😉", "😍")
-            ),
-            Sticker(
-                name = "Стикер 4",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker4.webp",
-                emoji = listOf("😇", "🤓")
-            )
-        )
-    ),
-    StickerPack(
-        packName = "Набор стикеров 2",
-        stickers = listOf(
-            Sticker(
-                name = "Стикер 1",
-                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-                path = "sticker5.webp",
-                emoji = listOf("😉", "😅")
-            )
-        )
-    )
+    val packId: String?,
+    val packName: String?,
+    val stickers: List<Sticker>? = null // Если есть список стикеров внутри
 )
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -195,8 +221,36 @@ fun StickerMenuContent() {
         derivedStateOf { pagerState.currentPage }
     }
 
+    val viewModel: ChatViewModel = koinInject()
+
+    val stickerPacks by viewModel.stickerPacks.collectAsState()
+
+    LaunchedEffect(Unit) {
+
+        viewModel.downloadStickerPacks()
+
+        if (stickerPacks.isNotEmpty()) {
+            println("ПАКИИИИ ${stickerPacks[0].packId}")
+        }
+    }
+
+
+
     Column(modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth()) {
         val coroutineScope = rememberCoroutineScope()
+
+        Column {
+            if (stickerPacks.isEmpty()) {
+                Text("Загрузка стикеров...")
+            } else {
+                LazyColumn {
+                    items(stickerPacks) { stickerPack ->
+                        Text("Pack Name: ${stickerPack.packName}")
+                    }
+                }
+            }
+        }
+
 
         // TabRow для переключателя
         TabRow(
@@ -264,13 +318,13 @@ fun StickerItem(sticker: Sticker) {
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(4.dp)
     ) {
-        Image(
-            painter = painterResource(sticker.imageRes),
-            contentDescription = null,
-            modifier = Modifier
-                .size(64.dp) // Установите нужный размер стикера
-        )
-        Text(text = sticker.name, style = androidx.compose.material.MaterialTheme.typography.body2)
+//        Image(
+//            painter = painterResource(sticker.imageRes),
+//            contentDescription = null,
+//            modifier = Modifier
+//                .size(64.dp) // Установите нужный размер стикера
+//        )
+        sticker.name?.let { Text(text = it, style = androidx.compose.material.MaterialTheme.typography.body2) }
     }
 }
 
@@ -279,34 +333,34 @@ fun RecentStickersContent() {
     // Здесь можно отобразить "Недавние" стикеры
 //    Text(text = "Здесь будут показаны недавние стикеры.")
 
-        LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(16.dp)
-    ) {
-        items(stickerPacks) { pack ->
-            Text(
-                text = pack.packName,
-                modifier = Modifier.padding(vertical = 8.dp),
-                style = androidx.compose.material.MaterialTheme.typography.h6
-            )
-
-            // Отображение стикеров
-            pack.stickers.chunked(5).forEach { rowStickers ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp),
-                    horizontalArrangement = Arrangement.Start
-                ) {
-                    rowStickers.forEach { sticker ->
-                        StickerItem(sticker)
-                    }
-                }
-            }
-        }
-    }
+//        LazyColumn(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .fillMaxHeight()
+//            .padding(16.dp)
+//    ) {
+//        items(stickerPacks) { pack ->
+//            Text(
+//                text = pack.packName,
+//                modifier = Modifier.padding(vertical = 8.dp),
+//                style = androidx.compose.material.MaterialTheme.typography.h6
+//            )
+//
+//            // Отображение стикеров
+//            pack.stickers.chunked(5).forEach { rowStickers ->
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(vertical = 8.dp),
+//                    horizontalArrangement = Arrangement.Start
+//                ) {
+//                    rowStickers.forEach { sticker ->
+//                        StickerItem(sticker)
+//                    }
+//                }
+//            }
+//        }
+//    }
 }
 
 @Composable
