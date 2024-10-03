@@ -212,10 +212,10 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
+      println("AAAAAAAAAAAAAAA")
 
         // Обрабатываем данные сообщения
         if (remoteMessage.data.isNotEmpty()) {
-            Log.d("FCM", "Message data payload: ${remoteMessage.data}")
             triggerActionBasedOnData(remoteMessage.data)
         }
 

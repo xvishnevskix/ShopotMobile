@@ -60,9 +60,10 @@ actual fun startOutgoingCall() {
 @RequiresApi(Build.VERSION_CODES.O)
 actual fun simulateIncomingCall() {
     val context = getContextObj.getContext()
+    val getActivity = getContextObj.getActivity()
 
     // Проверяем разрешения с использованием Context
-    if (!checkAndRequestPhoneNumbersPermission(context)) {
+    if (!checkAndRequestPhoneNumbersPermission(getActivity)) {
         return
     }
 

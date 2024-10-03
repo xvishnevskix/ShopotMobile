@@ -516,15 +516,23 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 
         if (peerConnection.value !== null) {
 
-            val stream = MediaDevices.getUserMedia(audio = true)
 
-            localStream.value = stream
+            val cameraPer = PermissionsProviderFactory.create()
+                .getPermission("microphone")
+//
+//            if (cameraPer) {
+                val stream = MediaDevices.getUserMedia(audio = true)
+
+                localStream.value = stream
+
+                stream.tracks.forEach { track ->
+                    println("addtrack ${track}")
+                    peerConnection.value!!.addTrack(track, localStream.value!!)
+                }
+
+//            }
 
 
-            stream.tracks.forEach { track ->
-                println("addtrack ${track}")
-                peerConnection.value!!.addTrack(track, localStream.value!!)
-            }
 
 
 
@@ -814,79 +822,81 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //                    .getPermission("microphone")
 //
 //                if (cameraPer) {
-                    callViewModel.answerData.value?.let { answerData ->
+                callViewModel.answerData.value?.let { answerData ->
 
-                        val rtcMessage = answerData.jsonObject["rtcMessage"]?.jsonObject
+                    val rtcMessage = answerData.jsonObject["rtcMessage"]?.jsonObject
 
-                        rtcMessage.let {
-                            val sdp =
-                                it?.get("sdp")?.jsonPrimitive?.content
-                                    ?: return@launch
+                    rtcMessage.let {
+                        val sdp =
+                            it?.get("sdp")?.jsonPrimitive?.content
+                                ?: return@launch
 
 
-                            val callerId =
-                                answerData.jsonObject["userId"]?.jsonPrimitive?.content
+                        val callerId =
+                            answerData.jsonObject["userId"]?.jsonPrimitive?.content
 
-                            _peerConnection.value?.setRemoteDescription(SessionDescription(
+                        _peerConnection.value?.setRemoteDescription(
+                            SessionDescription(
                                 SessionDescriptionType.Offer,
                                 sdp
-                            ))
+                            )
+                        )
 
-                            if (callerId != null) {
-                                otherUserId.value = callerId
+                        if (callerId != null) {
+                            otherUserId.value = callerId
 
-                                println("111111")
+                            println("111111")
 
-                                val answer = peerConnection.value?.createAnswer(
-                                    options = OfferAnswerOptions(
-                                        offerToReceiveAudio = true
-                                    )
+                            val answer = peerConnection.value?.createAnswer(
+                                options = OfferAnswerOptions(
+                                    offerToReceiveAudio = true
                                 )
-                                println("22222")
+                            )
+                            println("22222")
 
 
-                                if (answer != null) {
-                                    peerConnection.value?.setLocalDescription(answer)
+                            if (answer != null) {
+                                peerConnection.value?.setLocalDescription(answer)
+                            }
+                            println("3333")
+
+                            if (wsSession.value?.outgoing?.isClosedForSend == true) {
+
+                                return@launch
+                            }
+                            println("44444")
+
+                            val answerCallMessage = WebRTCMessage(
+                                type = "answerCall",
+                                callerId = callerId,
+                                rtcMessage = answer?.let {
+                                    SessionDescriptionDTO(
+                                        it.type,
+                                        answer.sdp
+                                    )
                                 }
-                                println("3333")
+                            )
 
-                                if (wsSession.value?.outgoing?.isClosedForSend == true) {
 
-                                    return@launch
-                                }
-                                println("44444")
-
-                                val answerCallMessage = WebRTCMessage(
-                                    type = "answerCall",
-                                    callerId = callerId,
-                                    rtcMessage = answer?.let {
-                                        SessionDescriptionDTO(
-                                            it.type,
-                                            answer.sdp
-                                        )
-                                    }
+                            val jsonMessage =
+                                Json.encodeToString(
+                                    WebRTCMessage.serializer(),
+                                    answerCallMessage
                                 )
 
-
-                                val jsonMessage =
-                                    Json.encodeToString(
-                                        WebRTCMessage.serializer(),
-                                        answerCallMessage
-                                    )
-
-                                setIsIncomingCall(false)
+                            setIsIncomingCall(false)
 
 
-                                Logger.d {
-                                    "answerCallMessage $jsonMessage"
-                                }
-
-                                wsSession.value?.send(Frame.Text(jsonMessage))
-
+                            Logger.d {
+                                "answerCallMessage $jsonMessage"
                             }
 
+                            wsSession.value?.send(Frame.Text(jsonMessage))
+
                         }
+
                     }
+                }
 //                }
 
 

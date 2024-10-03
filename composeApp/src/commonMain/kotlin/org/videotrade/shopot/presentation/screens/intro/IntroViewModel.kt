@@ -196,8 +196,8 @@ class IntroViewModel : ViewModel(), KoinComponent {
 //
                         chatsUseCase.getChatsInBack(wsSessionNew, profile.value!!.id)
 
-                        navigator.value?.replace(MainScreen())
-//                        navigator.value?.replace(TestScreen())
+//                        navigator.value?.replace(MainScreen())
+                        navigator.value?.replace(TestScreen())
 
 
                     }
