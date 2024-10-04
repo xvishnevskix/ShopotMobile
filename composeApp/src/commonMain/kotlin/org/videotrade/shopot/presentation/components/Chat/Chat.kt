@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -84,6 +85,7 @@ fun Chat(
             message.created.subList(0, 3)
         }
         val numberOfDays = groupedMessages.size
+
 
         LaunchedEffect(listState) {
             snapshotFlow { listState.isScrollInProgress }

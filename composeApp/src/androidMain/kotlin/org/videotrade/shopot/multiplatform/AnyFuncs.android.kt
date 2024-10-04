@@ -1,19 +1,28 @@
 package org.videotrade.shopot.multiplatform
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.telecom.PhoneAccountHandle
 import android.telecom.TelecomManager
+import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import org.videotrade.shopot.androidSpecificApi.CallManager
-import org.videotrade.shopot.androidSpecificApi.MockCallService
-import org.videotrade.shopot.androidSpecificApi.checkAndRequestPhoneNumbersPermission
+import org.videotrade.shopot.AppActivity
+import org.videotrade.shopot.R
+import org.videotrade.shopot.androidSpecificApi.MyBroadcastReceiver
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 
 actual fun getPlatform(): String {
@@ -30,66 +39,108 @@ actual fun getBuildVersion(): Long {
 
 
 actual fun startOutgoingCall() {
-    val context = getContextObj.getContext()
-    
-    // Проверка разрешений перед использованием API
-    if (ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.CALL_PHONE
-        ) == PackageManager.PERMISSION_GRANTED
-    ) {
-        try {
-            val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            val phoneAccountHandle = PhoneAccountHandle(
-                ComponentName(context, MockCallService::class.java),
-                "MyMockPhoneAccount"
-            )
-            
-            val uri = Uri.fromParts("tel", "1234567890", null)  // Пример номера для теста
-            val extras = Bundle().apply {
-                putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
-            }
-            
-            // Попытка сделать звонок
-            telecomManager.placeCall(uri, extras)
-        } catch (e: SecurityException) {
-            // Обработка ситуации, если возникло исключение
-            e.printStackTrace()
-        }
-    } else {
-    
-    }
+    TODO()
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+//@RequiresApi(Build.VERSION_CODES.O)
+//actual fun simulateIncomingCall() {
+//    val context = getContextObj.getContext()
+//    val getActivity = getContextObj.getActivity()
+//
+//    if (!checkAndRequestPhoneNumbersPermission(getActivity)) {
+//        return
+//    }
+//
+//    val callManager = CallManager(context, getActivity)
+//    if (!callManager.isPhoneAccountRegistered()) {
+//        callManager.registerPhoneAccount()
+//        return
+//    }
+//
+//    val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
+//    val phoneAccountHandle = PhoneAccountHandle(
+//        ComponentName(context, MockCallService::class.java), "MyMockPhoneAccount"
+//    )
+//
+//    val extras = Bundle().apply {
+//        putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
+//        putString(TelecomManager.EXTRA_CALL_SUBJECT, "Mock Incoming Call from MyApp")
+//    }
+//
+//    try {
+//        telecomManager.addNewIncomingCall(phoneAccountHandle, extras)
+//    } catch (e: SecurityException) {
+//        e.printStackTrace()
+//    }
+//}
+
+
 actual fun simulateIncomingCall() {
     val context = getContextObj.getContext()
-    val getActivity = getContextObj.getActivity()
+    val channelId = "incoming_call_channel"
+    val channelName = "Incoming Call"
     
-    if (!checkAndRequestPhoneNumbersPermission(getActivity)) {
-        return
+    // Создание NotificationChannel для Android 8.0 и выше
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val notificationChannel =
+            NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
+        notificationChannel.enableLights(true)
+        notificationChannel.lightColor = Color.RED
+        notificationChannel.enableVibration(true)
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(notificationChannel)
     }
     
-    val callManager = CallManager(context, getActivity)
-    if (!callManager.isPhoneAccountRegistered()) {
-        callManager.registerPhoneAccount()
-        return
+    // Intent для принятия вызова, который запускает основное Activity приложения
+    val acceptIntent = Intent(context, AppActivity::class.java).apply {
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        action = "ACTION_ACCEPT_CALL"
     }
-    
-    val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-    val phoneAccountHandle = PhoneAccountHandle(
-        ComponentName(context, MockCallService::class.java), "MyMockPhoneAccount"
+
+    val acceptPendingIntent = PendingIntent.getActivity(
+        context,
+        0,
+        acceptIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE // Добавлен флаг FLAG_IMMUTABLE
     )
     
-    val extras = Bundle().apply {
-        putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
-        putString(TelecomManager.EXTRA_CALL_SUBJECT, "Mock Incoming Call from MyApp")
+    // Intent для отклонения вызова (можно оставить как `BroadcastReceiver` для выполнения соответствующих действий)
+    val declineIntent = Intent(context, MyBroadcastReceiver::class.java).apply {
+        action = "ACTION_DECLINE_CALL"
+    }
+    val declinePendingIntent = PendingIntent.getBroadcast(
+        context,
+        0,
+        declineIntent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE // Добавлен флаг FLAG_IMMUTABLE
+    )
+    
+    // Создание уведомления о входящем вызове
+    val notification = NotificationCompat.Builder(context, channelId)
+        .setSmallIcon(R.drawable.home_black) // Поставь свой значок
+        .setContentTitle("Входящий звонок")
+        .setContentText("Звонок от вашего приложения")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setCategory(NotificationCompat.CATEGORY_CALL)
+        .addAction(R.drawable.home_black, "Принять", acceptPendingIntent) // Кнопка принятия запускает MainActivity
+        .addAction(R.drawable.home_black, "Отклонить", declinePendingIntent)
+        .setAutoCancel(true)
+        .build()
+    
+    // Показ уведомления
+    with(NotificationManagerCompat.from(context)) {
+        if (ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            // Нужно запросить разрешение на показ уведомлений
+            return
+        }
+        notify(1, notification)
     }
     
-    try {
-        telecomManager.addNewIncomingCall(phoneAccountHandle, extras)
-    } catch (e: SecurityException) {
-        e.printStackTrace()
-    }
 }
+
