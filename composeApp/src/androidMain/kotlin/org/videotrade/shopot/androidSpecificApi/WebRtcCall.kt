@@ -30,6 +30,7 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 
 
 class MockCallService : ConnectionService() {
+    
     override fun onCreateIncomingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle?,
         request: ConnectionRequest?
@@ -38,18 +39,28 @@ class MockCallService : ConnectionService() {
         connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
         connection.setCallerDisplayName("Mock Incoming Call", TelecomManager.PRESENTATION_ALLOWED)
         connection.setRinging() // Устанавливаем состояние вызова как звонящий
-        
-        connection.setConnectionCapabilities(Connection.CAPABILITY_MUTE or Connection.CAPABILITY_SUPPORT_HOLD)
-        
-        connection.setInitializing() // Звонок начался
-        connection.setActive() // Звонок активный, можно управлять состояниями
+        // Событие при принятии вызова
+        connection.setConnectionAcceptedListener {
+            // Запуск активности вашего приложения
+            val intent = Intent(applicationContext, Activity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            startActivity(intent)
+        }
         
         return connection
     }
 }
 
-class MockConnection : Connection() {
 
+class MockConnection : Connection() {
+    
+    private var connectionAcceptedListener: (() -> Unit)? = null
+    
+    fun setConnectionAcceptedListener(listener: () -> Unit) {
+        connectionAcceptedListener = listener
+    }
+    
+    
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onAnswer() {
         super.onAnswer()
@@ -83,7 +94,7 @@ class MockConnection : Connection() {
 }
 
 
-class CallManager(private val context: Context,private val getActivity: Context) {
+class CallManager(private val context: Context,private val getActivity: Context? = null) {
     private val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
     
     @RequiresApi(Build.VERSION_CODES.O)
@@ -94,12 +105,11 @@ class CallManager(private val context: Context,private val getActivity: Context)
         )
         
         val phoneAccount = PhoneAccount.builder(phoneAccountHandle, "Mock Call")
-            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER or PhoneAccount.CAPABILITY_SELF_MANAGED)
+            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER) // Используем только CAPABILITY_CALL_PROVIDER
             .setHighlightColor(Color.BLUE)
             .setShortDescription("Incoming Mock Call")
             .setSupportedUriSchemes(listOf(PhoneAccount.SCHEME_TEL))
             .build()
-
         
         try {
             telecomManager.registerPhoneAccount(phoneAccount)
@@ -110,15 +120,15 @@ class CallManager(private val context: Context,private val getActivity: Context)
             if (!phoneAccountList.contains(phoneAccountHandle)) {
                 // Если аккаунт не активен, направить пользователя в настройки
                 val intent = Intent(TelecomManager.ACTION_CHANGE_PHONE_ACCOUNTS)
-                getActivity.startActivity(intent)
+                getActivity?.startActivity(intent)
                 println("PhoneAccount не активен. Переход в настройки для активации.")
             }
-            
         } catch (e: SecurityException) {
             e.printStackTrace()
             println("Ошибка при регистрации PhoneAccount: ${e.message}")
         }
     }
+
 
 
     fun isPhoneAccountRegistered(): Boolean {

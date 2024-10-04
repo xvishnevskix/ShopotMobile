@@ -84,17 +84,19 @@ class TestScreen : Screen {
             SafeArea {
                 Button(onClick = {
                     scope.launch {
-                        callViewModel.makeCallBackground(
-                            "f3EP52CNTCm_KFSHvYyYX8:APA91bFQRqmrayn5fnQq35ILuTpN5Bx6vwUYbAlxSUyTtcTQ0w9EV6gyKEFpOb1NrFgFdkzjRvaNrhQeWcE_HFSavl0WadZpsFlsOCMDVkqFB-dCyB_mztKuq5SkKFMJ3HILx4oZMMcU",
-                            "eb2f7045-592b-4304-bc8a-d14234777550"
-                        )
+//                        callViewModel.makeCallBackground(
+//                            "f3EP52CNTCm_KFSHvYyYX8:APA91bFQRqmrayn5fnQq35ILuTpN5Bx6vwUYbAlxSUyTtcTQ0w9EV6gyKEFpOb1NrFgFdkzjRvaNrhQeWcE_HFSavl0WadZpsFlsOCMDVkqFB-dCyB_mztKuq5SkKFMJ3HILx4oZMMcU",
+//                            "eb2f7045-592b-4304-bc8a-d14234777550"
+//                        )
+                        
+                        simulateIncomingCall()
 
 //                        commonViewModel.sendNotify("Privet","","fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK" )
 
 
                     }
                 }, content = {
-                    Text("SendNotific")
+                    Text("SendCall")
                 })
             }
         }

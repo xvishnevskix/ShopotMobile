@@ -29,21 +29,27 @@ actual fun getBuildVersion(): Long {
 }
 
 
-
 actual fun startOutgoingCall() {
     val context = getContextObj.getContext()
-
+    
     // Проверка разрешений перед использованием API
-    if (ContextCompat.checkSelfPermission(context, Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CALL_PHONE
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
         try {
             val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-            val phoneAccountHandle = PhoneAccountHandle(ComponentName(context, MockCallService::class.java), "MyMockPhoneAccount")
-
+            val phoneAccountHandle = PhoneAccountHandle(
+                ComponentName(context, MockCallService::class.java),
+                "MyMockPhoneAccount"
+            )
+            
             val uri = Uri.fromParts("tel", "1234567890", null)  // Пример номера для теста
             val extras = Bundle().apply {
                 putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
             }
-
+            
             // Попытка сделать звонок
             telecomManager.placeCall(uri, extras)
         } catch (e: SecurityException) {
@@ -51,7 +57,7 @@ actual fun startOutgoingCall() {
             e.printStackTrace()
         }
     } else {
-
+    
     }
 }
 
@@ -60,38 +66,30 @@ actual fun startOutgoingCall() {
 actual fun simulateIncomingCall() {
     val context = getContextObj.getContext()
     val getActivity = getContextObj.getActivity()
-
-    // Проверяем разрешения с использованием Context
+    
     if (!checkAndRequestPhoneNumbersPermission(getActivity)) {
         return
     }
-
-    // Создаем инстанцию CallManager с использованием Context
+    
     val callManager = CallManager(context, getActivity)
-
-    // Проверяем регистрацию PhoneAccount
     if (!callManager.isPhoneAccountRegistered()) {
         callManager.registerPhoneAccount()
-
-
-        // Показать уведомление или уведомить пользователя, чтобы он включил аккаунт позже
-//        showNotificationToEnableAccount(context)
         return
     }
-
-    // Если PhoneAccount зарегистрирован и активен, симулируем входящий звонок
+    
     val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-    val phoneAccountHandle = PhoneAccountHandle(ComponentName(context, MockCallService::class.java), "MyMockPhoneAccount")
-
+    val phoneAccountHandle = PhoneAccountHandle(
+        ComponentName(context, MockCallService::class.java), "MyMockPhoneAccount"
+    )
+    
     val extras = Bundle().apply {
         putParcelable(TelecomManager.EXTRA_PHONE_ACCOUNT_HANDLE, phoneAccountHandle)
+        putString(TelecomManager.EXTRA_CALL_SUBJECT, "Mock Incoming Call from MyApp")
     }
-
+    
     try {
         telecomManager.addNewIncomingCall(phoneAccountHandle, extras)
     } catch (e: SecurityException) {
         e.printStackTrace()
-        // Обработка исключений
     }
 }
-
