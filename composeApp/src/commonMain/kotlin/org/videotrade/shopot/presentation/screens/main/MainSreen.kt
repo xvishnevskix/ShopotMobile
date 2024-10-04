@@ -34,6 +34,8 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import org.videotrade.shopot.presentation.tabs.ContactsTab
@@ -48,7 +50,20 @@ class MainScreen : Screen {
     override fun Content() {
         val commonViewModel: CommonViewModel = koinInject()
         val navigator = LocalNavigator.currentOrThrow
+        val callViewModel: CallViewModel = koinInject()
         
+        
+        
+        LaunchedEffect(Unit) {
+            val profileId = getValueInStorage("profileId")
+            
+            println("profileId $profileId")
+            if (profileId != null) {
+                callViewModel.connectionBackgroundWs(profileId)
+            }
+            
+            callViewModel.initWebrtc()
+        }
         
         LaunchedEffect(Unit) {
             commonViewModel.setMainNavigator(navigator)

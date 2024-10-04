@@ -7,6 +7,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.os.Build
 import android.telecom.Connection
 import android.telecom.ConnectionRequest
@@ -29,35 +30,23 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 
 
 class MockCallService : ConnectionService() {
-
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreateIncomingConnection(
         connectionManagerPhoneAccount: PhoneAccountHandle?,
         request: ConnectionRequest?
     ): Connection {
-        if (connectionManagerPhoneAccount == null) {
-            // Обработка ошибки
-            return Connection.createFailedConnection(
-                DisconnectCause(DisconnectCause.ERROR, "No PhoneAccountHandle")
-            )
-        }
-
         val connection = MockConnection()
-        connection.setRinging()  // Имитация входящего вызова
-        connection.onShowIncomingCallUi()
-        return connection
-    }
-
-    override fun onCreateOutgoingConnection(
-        connectionManagerPhoneAccount: PhoneAccountHandle?,
-        request: ConnectionRequest?
-    ): Connection {
-        val connection = MockConnection()
-        connection.setDialing()  // Имитация исходящего звонка
+        connection.setAddress(request?.address, TelecomManager.PRESENTATION_ALLOWED)
+        connection.setCallerDisplayName("Mock Incoming Call", TelecomManager.PRESENTATION_ALLOWED)
+        connection.setRinging() // Устанавливаем состояние вызова как звонящий
+        
+        connection.setConnectionCapabilities(Connection.CAPABILITY_MUTE or Connection.CAPABILITY_SUPPORT_HOLD)
+        
+        connection.setInitializing() // Звонок начался
+        connection.setActive() // Звонок активный, можно управлять состояниями
+        
         return connection
     }
 }
-
 
 class MockConnection : Connection() {
 
@@ -73,6 +62,15 @@ class MockConnection : Connection() {
 
         setActive()
     }
+    
+    override fun onReject() {
+        super.onReject()
+        // Логика для отклонения вызова
+        println("answerCallBackground")
+        
+        setDisconnected(DisconnectCause(DisconnectCause.REJECTED))
+        destroy()
+    }
 
     override fun onDisconnect() {
         super.onDisconnect()
@@ -87,21 +85,26 @@ class MockConnection : Connection() {
 
 class CallManager(private val context: Context,private val getActivity: Context) {
     private val telecomManager = context.getSystemService(Context.TELECOM_SERVICE) as TelecomManager
-
+    
+    @RequiresApi(Build.VERSION_CODES.O)
     fun registerPhoneAccount() {
         val phoneAccountHandle = PhoneAccountHandle(
             ComponentName(context, MockCallService::class.java),
             "MyMockPhoneAccount"
         )
-
+        
         val phoneAccount = PhoneAccount.builder(phoneAccountHandle, "Mock Call")
-            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER)
+            .setCapabilities(PhoneAccount.CAPABILITY_CALL_PROVIDER or PhoneAccount.CAPABILITY_SELF_MANAGED)
+            .setHighlightColor(Color.BLUE)
+            .setShortDescription("Incoming Mock Call")
+            .setSupportedUriSchemes(listOf(PhoneAccount.SCHEME_TEL))
             .build()
 
+        
         try {
             telecomManager.registerPhoneAccount(phoneAccount)
             println("PhoneAccount зарегистрирован успешно")
-
+            
             // Проверка на активацию
             val phoneAccountList = telecomManager.callCapablePhoneAccounts
             if (!phoneAccountList.contains(phoneAccountHandle)) {
@@ -110,12 +113,13 @@ class CallManager(private val context: Context,private val getActivity: Context)
                 getActivity.startActivity(intent)
                 println("PhoneAccount не активен. Переход в настройки для активации.")
             }
-
+            
         } catch (e: SecurityException) {
             e.printStackTrace()
             println("Ошибка при регистрации PhoneAccount: ${e.message}")
         }
     }
+
 
     fun isPhoneAccountRegistered(): Boolean {
         val phoneAccountHandle = PhoneAccountHandle(

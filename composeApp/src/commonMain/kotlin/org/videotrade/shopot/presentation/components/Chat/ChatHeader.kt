@@ -36,7 +36,6 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.BackIcon
-import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -151,6 +150,12 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                     PermissionsProviderFactory.create().getPermission("microphone")
                                 
                                 if (!cameraPer) return@launch
+                                
+                                callViewModel.makeCallBackground(
+                                    chat.notificationToken!!,
+                                    chat.userId
+                                )
+
 
 //                            commonViewModel.sendNotify(
 //                                "Звонок",
@@ -158,25 +163,25 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 //                                chat.notificationToken
 //                            )
 //
-                                callViewModel.initWebrtc()
-                                
-                                if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
-                                    println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
-                                    navigator.push(
-                                        CallScreen(
-                                            chat.userId,
-                                            "Call",
-                                            ProfileDTO(
-                                                firstName = chat.firstName!!,
-                                                lastName = chat.lastName!!,
-                                                id = chat.userId,
-                                                phone = chat.phone!!,
-                                                icon = chat.icon,
-                                            )
-                                        )
-                                    )
-                                }
-                                
+//                                callViewModel.initWebrtc()
+//
+//                                if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
+//                                    println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
+//                                    navigator.push(
+//                                        CallScreen(
+//                                            chat.userId,
+//                                            "Call",
+//                                            ProfileDTO(
+//                                                firstName = chat.firstName!!,
+//                                                lastName = chat.lastName!!,
+//                                                id = chat.userId,
+//                                                phone = chat.phone!!,
+//                                                icon = chat.icon,
+//                                            )
+//                                        )
+//                                    )
+//                                }
+//
                                 
                             } catch (e: Exception) {
                                 println("ERROR : $e")

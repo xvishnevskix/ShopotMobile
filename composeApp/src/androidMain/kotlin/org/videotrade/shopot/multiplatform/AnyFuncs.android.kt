@@ -69,7 +69,6 @@ actual fun simulateIncomingCall() {
     // Создаем инстанцию CallManager с использованием Context
     val callManager = CallManager(context, getActivity)
 
-
     // Проверяем регистрацию PhoneAccount
     if (!callManager.isPhoneAccountRegistered()) {
         callManager.registerPhoneAccount()
