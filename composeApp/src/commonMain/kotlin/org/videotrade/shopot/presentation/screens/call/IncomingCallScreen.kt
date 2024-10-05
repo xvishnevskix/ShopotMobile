@@ -65,11 +65,14 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
         // Используем состояние для отслеживания, играет ли музыка
         var isPlaying by remember { mutableStateOf(false) }
         
-        val imagePainter = if (user.icon.isNullOrBlank()) {
-            painterResource(Res.drawable.person)
-        } else {
-            rememberImagePainter("${serverUrl}file/plain/${user.icon}")
-        }
+//        val imagePainter = if (user.icon.isNullOrBlank()) {
+//            painterResource(Res.drawable.person)
+//        } else {
+//            rememberImagePainter("${serverUrl}file/plain/${user.icon}")
+//        }
+        
+        val imagePainter = painterResource(Res.drawable.person)
+        
         
         LaunchedEffect(Unit) {
             musicPlayer.play("callee")
@@ -90,7 +93,6 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
         }
         
         LaunchedEffect(isConnectedWebrtc) {
-            
             if (isConnectedWebrtc)
                 navigator.push(
                     CallScreen(
@@ -129,7 +131,7 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
                         )
                         .clip(CircleShape)
                 ) {
-                    Avatar(user.icon, 190.dp)
+                    Avatar(null, 190.dp)
                 }
                 
                 Text(

@@ -50,20 +50,20 @@ class MainScreen : Screen {
     override fun Content() {
         val commonViewModel: CommonViewModel = koinInject()
         val navigator = LocalNavigator.currentOrThrow
-        val callViewModel: CallViewModel = koinInject()
-        
-        
-        
-        LaunchedEffect(Unit) {
-            val profileId = getValueInStorage("profileId")
-            
-            println("profileId $profileId")
-            if (profileId != null) {
-                callViewModel.connectionBackgroundWs(profileId)
-            }
-            
-            callViewModel.initWebrtc()
-        }
+//        val callViewModel: CallViewModel = koinInject()
+//
+//
+//
+//        LaunchedEffect(Unit) {
+//            val profileId = getValueInStorage("profileId")
+//
+//            println("profileId $profileId")
+//            if (profileId != null) {
+//                callViewModel.connectionBackgroundWs(profileId)
+//            }
+//
+//            callViewModel.initWebrtc()
+//        }
         
         LaunchedEffect(Unit) {
             commonViewModel.setMainNavigator(navigator)

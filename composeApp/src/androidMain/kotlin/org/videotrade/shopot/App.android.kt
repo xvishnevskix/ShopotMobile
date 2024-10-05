@@ -5,13 +5,18 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -34,6 +39,7 @@ import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.DeviceIdProviderFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.NotificationHelper.createNotificationChannel
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
 
@@ -51,11 +57,35 @@ class AndroidApp : Application() {
     override fun onCreate() {
         super.onCreate()
         
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+                val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+                intent.data = Uri.parse("package:$packageName")
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+            }
+        }
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !Settings.canDrawOverlays(this)) {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        }
+
+        
+        
         initializeFactories(this)
         startKoin {
             modules(getSharedModules() + provideEncapsulateChecker())
         }
         INSTANCE = this
+        
+        // Создаем канал уведомлений
+        createNotificationChannel()
     }
     
     private fun initializeFactories(context: Context) {
@@ -70,9 +100,29 @@ class AndroidApp : Application() {
         CallProviderFactory.initialize(context)
         
     }
+    
+    // Метод для создания канала уведомлений
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channelId = "default_channel_id"
+            val channel = NotificationChannel(
+                channelId,
+                "Incoming Call Channel",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Канал для входящих вызовов"
+                setShowBadge(true)
+            }
+            
+            val notificationManager = getSystemService(NotificationManager::class.java)
+            notificationManager?.createNotificationChannel(channel)
+        }
+
+
+    }
 }
 
-class AppActivity : ComponentActivity() {
+open class AppActivity : ComponentActivity() {
     private var permissionResultCallback: ((Int, Boolean) -> Unit)? = null
     
     
@@ -84,9 +134,11 @@ class AppActivity : ComponentActivity() {
     
     private var lastRequestCode: Int = -1
     
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getContextObj.initializeActivity(this)
+        createNotificationChannel(this)
         
         FileKit.init(this)
         
@@ -99,19 +151,21 @@ class AppActivity : ComponentActivity() {
         setContent {
             App()
         }
-
+        
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channelId = "default_channel_id"
-            val channelName = "Default Channel"
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val notificationChannel = NotificationChannel(channelId, channelName, importance).apply {
-                description = "Default notification channel"
+            val channel = NotificationChannel(
+                channelId,
+                "Incoming Call Channel",
+                NotificationManager.IMPORTANCE_HIGH
+            ).apply {
+                description = "Канал для входящих вызовов"
             }
-
-            // Регистрируем канал уведомлений
+            
             val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(notificationChannel)
+            notificationManager?.createNotificationChannel(channel)
         }
+
     }
     
     private fun initializeProviders() {
