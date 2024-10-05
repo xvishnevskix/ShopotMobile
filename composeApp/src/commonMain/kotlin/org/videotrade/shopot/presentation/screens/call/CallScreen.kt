@@ -99,36 +99,36 @@ class CallScreen(
         
         
         
-        LaunchedEffect(Unit) {
-            
-            when (callCase) {
-                "Call" -> {
-                    musicPlayer.play("caller")
-                    isPlaying = true
-                }
-            }
-            
-        }
-        
-        DisposableEffect(Unit) {
-            onDispose {
-                
-                when (callCase) {
-                    "Call" -> {
-                        
-//                        viewModel.rejectCall(navigator, userId)
-                        if (
-                            isPlaying
-                        ) {
-                            musicPlayer.stop()
-                            isPlaying = false
-                        }
-                    }
-                }
-             
-                
-            }
-        }
+//        LaunchedEffect(Unit) {
+//
+//            when (callCase) {
+//                "Call" -> {
+//                    musicPlayer.play("caller")
+//                    isPlaying = true
+//                }
+//            }
+//
+//        }
+//
+//        DisposableEffect(Unit) {
+//            onDispose {
+//
+//                when (callCase) {
+//                    "Call" -> {
+//
+////                        viewModel.rejectCall(navigator, userId)
+//                        if (
+//                            isPlaying
+//                        ) {
+//                            musicPlayer.stop()
+//                            isPlaying = false
+//                        }
+//                    }
+//                }
+//
+//
+//            }
+//        }
         
         LaunchedEffect(Unit) {
             viewModel.initCall(callCase, userId)
