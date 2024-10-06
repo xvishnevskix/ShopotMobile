@@ -49,7 +49,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
-import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
@@ -63,8 +62,12 @@ import shopot.composeapp.generated.resources.person
 class CallScreen(
     private val userId: String,
     private val callCase: String,
-    private val user: ProfileDTO,
-) : Screen {
+    private val userIcon: String? = null,
+    private val userFirstName: String,
+    private val userLastName: String,
+    private val userPhone: String,
+    
+    ) : Screen {
     
     @Composable
     override fun Content() {
@@ -91,10 +94,10 @@ class CallScreen(
         var isPlaying by remember { mutableStateOf(false) }
         
         
-        val imagePainter = if (user.icon.isNullOrBlank()) {
+        val imagePainter = if (userIcon.isNullOrBlank()) {
             painterResource(Res.drawable.person)
         } else {
-            rememberImagePainter("${serverUrl}file/plain/${user.icon}")
+            rememberImagePainter("${serverUrl}file/plain/${userIcon}")
         }
         
         
@@ -111,7 +114,7 @@ class CallScreen(
         }
         
         LaunchedEffect(isRunning) {
-            if(isRunning) {
+            if (isRunning) {
                 musicPlayer.stop()
                 isPlaying = false
             }
@@ -122,7 +125,7 @@ class CallScreen(
                 
                 when (callCase) {
                     "Call" -> {
-                        
+
 //                        viewModel.rejectCall(navigator, userId)
                         if (
                             isPlaying
@@ -132,7 +135,7 @@ class CallScreen(
                         }
                     }
                 }
-             
+                
                 
             }
         }
@@ -209,7 +212,7 @@ class CallScreen(
                     )
                     .clip(CircleShape)
             ) {
-                Avatar(user.icon, 190.dp)
+                Avatar(userIcon, 190.dp)
             }
             
             
@@ -248,7 +251,7 @@ class CallScreen(
                 modifier = Modifier
                     .padding(top = 12.5.dp)
                     .align(Alignment.CenterHorizontally),
-                text = "${user.firstName} ${user.lastName}",
+                text = "$userFirstName $userLastName",
                 fontSize = 26.sp,
                 color = Color(255, 255, 255),
                 textAlign = TextAlign.Center,
@@ -261,7 +264,7 @@ class CallScreen(
                 modifier = Modifier
                     .padding(top = 12.5.dp)
                     .align(Alignment.CenterHorizontally),
-                text = "+${user.phone}",
+                text = "+${userPhone}",
                 fontSize = 20.sp,
                 color = Color(255, 255, 255),
                 textAlign = TextAlign.Center,

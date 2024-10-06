@@ -172,13 +172,10 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                         CallScreen(
                                             chat.userId,
                                             "Call",
-                                            ProfileDTO(
-                                                firstName = chat.firstName!!,
-                                                lastName = chat.lastName!!,
-                                                id = chat.userId,
-                                                phone = chat.phone!!,
-                                                icon = chat.icon,
-                                            )
+                                            chat.icon,
+                                            chat.firstName!!,
+                                            chat.lastName!!,
+                                            chat.phone!!,
                                         )
                                     )
                                 }

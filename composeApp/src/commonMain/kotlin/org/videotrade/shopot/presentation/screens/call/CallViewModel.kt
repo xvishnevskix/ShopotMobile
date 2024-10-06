@@ -42,7 +42,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
     // Флаг для управления наблюдением
     private var isObserving = MutableStateFlow(true)
 
-    var answerData = MutableStateFlow<JsonElement?>(null)
+    var answerData = MutableStateFlow<JsonObject?>(null)
+    
+     val isScreenOn = MutableStateFlow(false)
+    
 
     val localStreamm = callUseCase.localStream
 
@@ -50,8 +53,12 @@ class CallViewModel() : ViewModel(), KoinComponent {
 //        startObserving()
 //    }
 
-    fun setAnswerData(JsonElement: JsonElement?) {
-        answerData.value = JsonElement
+    fun setAnswerData(JsonObject: JsonObject?) {
+        answerData.value = JsonObject
+    }
+    
+    fun setIsScreenOn(isScreenOnNew: Boolean) {
+        isScreenOn.value = isScreenOnNew
     }
 
 
@@ -183,6 +190,15 @@ class CallViewModel() : ViewModel(), KoinComponent {
             }
         }
 
+    }
+    
+    
+    fun rejectCallBackground( userId: String) {
+        viewModelScope.launch {
+            val isRejectCall = callUseCase.rejectCallBackground(userId)
+
+        }
+        
     }
 
     fun rejectCallAnswer(): Boolean {

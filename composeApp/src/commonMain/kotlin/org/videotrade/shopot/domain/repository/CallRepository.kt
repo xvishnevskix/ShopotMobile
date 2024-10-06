@@ -59,8 +59,9 @@ interface CallRepository {
     suspend fun answerCall()
 
      fun answerCallBackground()
-
-   suspend fun rejectCall(navigator: Navigator, userId: String): Boolean
+    
+    suspend fun rejectCall(navigator: Navigator, userId: String): Boolean
+    suspend fun rejectCallBackground(userId: String): Boolean
 //    fun rejectCallAnswer()
     
     fun clearData()

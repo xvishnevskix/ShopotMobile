@@ -1,67 +1,51 @@
 package org.videotrade.shopot.androidSpecificApi
 
-import android.Manifest
+import android.app.ActivityManager
+import android.app.ActivityOptions
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.graphics.Color
-import android.graphics.drawable.Icon
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
 import android.provider.Settings
-import android.telecom.Connection
-import android.telecom.ConnectionRequest
-import android.telecom.ConnectionService
-import android.telecom.DisconnectCause
-import android.telecom.PhoneAccount
-import android.telecom.PhoneAccountHandle
-import android.telecom.StatusHints
-import android.telecom.TelecomManager
-import android.view.WindowManager
-import android.app.ActivityOptions
 import android.view.Display
-import androidx.activity.ComponentActivity
+import android.view.WindowManager
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.material.Text
-import androidx.core.app.ActivityCompat
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat.startForegroundService
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.App
 import org.videotrade.shopot.AppActivity
 import org.videotrade.shopot.R
 import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.domain.usecase.CallUseCase
-import org.videotrade.shopot.multiplatform.simulateIncomingCall
-import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
-import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 
 // MyFirebaseMessagingService
 class MyFirebaseMessagingService : FirebaseMessagingService() {
     
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        println("AAAAAAAAAAAAAAA  ${remoteMessage.data}")
+        println("AAAAAAAAAAAAAAA ${remoteMessage.data}")
         
         // Проверка и запрос исключения из оптимизации батареи
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -78,7 +62,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             } else {
                 println("Приложение уже исключено из оптимизации батареи")
             }
-
         }
         
         // Выполняем действия на основе данных сообщения
@@ -98,8 +81,30 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun triggerActionBasedOnData(data: Map<String, String>) {
         if (data["action"] == "callBackground") {
-            println("Triggered action based on data")
+            val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+            val profileId = getValueInStorage("profileId")
+            
+            println("profileId $profileId")
+            
+            if (profileId != null) {
+                val callData = data["callData"]
+                
+                if (callData != null) {
+                    try {
+                        val parseCallData = Json.parseToJsonElement(callData).jsonObject
+                        println("callData41412412 $callData")
+                        
+                        
+                        // Устанавливаем данные вызова в callViewModel
+                        callViewModel.setAnswerData(parseCallData)
+                    } catch (e: Exception) {
+                        println("Ошибка парсинга callData: ${e.message}")
+                    }
+                }
+            }
+            // Ваш код, например, инициирование звонка
         }
+        
     }
 }
 
@@ -112,15 +117,36 @@ class FullscreenNotificationActivity : AppActivity() {
         setContent {
             KoinContext {
                 val callViewModel: CallViewModel = koinInject()
+                val isConnectedWebrtc by callViewModel.isConnectedWebrtc.collectAsState()
+                val isScreenOn by callViewModel.isScreenOn.collectAsState()
                 
                 val profileId = getValueInStorage("profileId")
                 
-                if (profileId != null) {
-                    callViewModel.connectionBackgroundWs(profileId)
+                
+                val answerData = callViewModel.answerData.value
+                
+                LaunchedEffect(Unit) {
+                    if (profileId != null) {
+                        callViewModel.initWebrtc()
+                        
+                        callViewModel.connectionBackgroundWs(profileId)
+                    }
+                }
+                
+                
+                val userId = answerData?.get("userId")?.jsonPrimitive?.content
+                println("userId: $userId")
+                
+                
+                val navScreen = if (isScreenOn) {
+                    CallScreen(userId!!, "IncomingCall", "", "", "", "")
+                } else {
+                    IncomingCallScreen(userId!!, "", "", "", "")
+                    
                 }
                 
                 Navigator(
-                    IncomingCallScreen("", ProfileDTO())
+                    navScreen
                 ) { navigator ->
                     SlideTransition(navigator)
                 }
@@ -149,6 +175,17 @@ class CallForegroundService : Service() {
     override fun onCreate() {
         super.onCreate()
         
+        // Проверяем состояние экрана
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val isScreenOn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            powerManager.isInteractive
+        } else {
+            powerManager.isScreenOn
+        }
+        val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+        
+        callViewModel.setIsScreenOn(isScreenOn)
+        
         // Создаем Intent для FullscreenNotificationActivity
         val fullScreenIntent = Intent(this, FullscreenNotificationActivity::class.java)
         val fullScreenPendingIntent = PendingIntent.getActivity(
@@ -158,14 +195,48 @@ class CallForegroundService : Service() {
         
         // Создаем уведомление
         val channelId = "foreground_service_channel"
-        val notification = NotificationCompat.Builder(this, channelId)
+        val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Входящий звонок")
             .setContentText("Входящий вызов")
             .setSmallIcon(R.drawable.home_black)
-            .setPriority(NotificationCompat.PRIORITY_HIGH) // Высокий приоритет
-            .setCategory(NotificationCompat.CATEGORY_CALL) // Категория вызова
-            .setFullScreenIntent(fullScreenPendingIntent, true) // FullScreenIntent
-            .build()
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setCategory(NotificationCompat.CATEGORY_CALL)
+        
+        // Если экран выключен — используем FullScreenIntent
+        if (!isScreenOn) {
+            notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
+        } else {
+            // Добавляем действия для принятия и отклонения вызова
+            val acceptIntent = Intent(this, CallActionReceiver::class.java).apply {
+                action = "ACTION_ACCEPT_CALL"
+            }
+            val acceptPendingIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                acceptIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            
+            val declineIntent = Intent(this, CallActionReceiver::class.java).apply {
+                action = "ACTION_DECLINE_CALL"
+            }
+            val declinePendingIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                declineIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+            
+            notificationBuilder.addAction(
+                R.drawable.accept_call_button, "Принять", acceptPendingIntent
+            )
+            notificationBuilder.addAction(
+                R.drawable.decline_call_button, "Отклонить", declinePendingIntent
+            )
+        }
+        
+        
+        val notification = notificationBuilder.build()
         
         // Создаем канал уведомлений для Android 8.0 и выше
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -179,7 +250,7 @@ class CallForegroundService : Service() {
         }
         
         // Запускаем Foreground Service
-        startForeground(1, notification)
+        startForeground(1, notification) // Используйте один и тот же ID для уведомления
     }
     
     @RequiresApi(Build.VERSION_CODES.O)
@@ -189,12 +260,18 @@ class CallForegroundService : Service() {
         // Пробуждаем устройство
         wakeDevice()
         
-        // Запускаем FullscreenNotificationActivity с использованием ActivityOptions
-        val activityIntent = Intent(this, FullscreenNotificationActivity::class.java)
-        activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        val options = ActivityOptions.makeBasic()
-        options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
-        startActivity(activityIntent, options.toBundle())
+        // Если экран выключен, запускаем FullscreenNotificationActivity
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        val isScreenOn =
+            powerManager.isInteractive
+        
+        if (!isScreenOn) {
+            val activityIntent = Intent(this, FullscreenNotificationActivity::class.java)
+            activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            val options = ActivityOptions.makeBasic()
+            options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
+            startActivity(activityIntent, options.toBundle())
+        }
         
         return START_NOT_STICKY
     }
@@ -208,6 +285,124 @@ class CallForegroundService : Service() {
             "MyApp::WakeLock"
         )
         wakeLock.acquire(5000) // Держим WakeLock на 5 секунд для пробуждения устройства
+    }
+}
+
+// BroadcastReceiver для обработки действий при входящем вызове
+class CallActionReceiver : BroadcastReceiver() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onReceive(context: Context, intent: Intent) {
+        println("Вызов принят $intent")
+        val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+        
+        when (intent.action) {
+            
+            
+            "ACTION_ACCEPT_CALL" -> {
+                println("Вызов принят")
+                
+                val serviceIntent = Intent(context, CallForegroundService::class.java)
+                context.stopService(serviceIntent)
+                // Закрытие уведомления с кнопками "Принять" и "Отклонить"
+                val notificationManager =
+                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(1) // ID уведомления, используемого для Foreground Service
+                
+                // Запуск FullscreenNotificationActivity
+                val activityIntent = Intent(context, FullscreenNotificationActivity::class.java)
+                activityIntent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                val options = ActivityOptions.makeBasic()
+                options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
+                context.startActivity(activityIntent, options.toBundle())
+                
+                // Создание нового уведомления, которое будет висеть
+                val channelId = "ongoing_call_channel"
+                
+                // PendingIntent для запуска активности при нажатии на уведомление
+                val ongoingIntent = Intent(context, FullscreenNotificationActivity::class.java)
+                ongoingIntent.flags =
+                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                val ongoingPendingIntent = PendingIntent.getActivity(
+                    context, 0, ongoingIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                
+                // Добавляем действие "Завершить" в уведомление
+                val endCallIntent = Intent(context, CallActionReceiver::class.java).apply {
+                    action = "ACTION_END_CALL"
+                }
+                val endCallPendingIntent = PendingIntent.getBroadcast(
+                    context,
+                    1,
+                    endCallIntent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
+                
+                val ongoingNotification = NotificationCompat.Builder(context, channelId)
+                    .setContentTitle("Звонок в процессе")
+                    .setContentText("Идет звонок")
+                    .setSmallIcon(R.drawable.home_black)
+                    .setPriority(NotificationCompat.PRIORITY_LOW) // Низкий приоритет, чтобы не мешать пользователю
+                    .setOngoing(true) // Устанавливаем уведомление как постоянно отображаемое
+                    .setContentIntent(ongoingPendingIntent) // Добавляем PendingIntent для клика по уведомлению
+                    .addAction(
+                        R.drawable.decline_call_button,
+                        "Завершить",
+                        endCallPendingIntent
+                    ) // Кнопка "Завершить"
+                    .build()
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channel = NotificationChannel(
+                        channelId,
+                        "Ongoing Call Channel",
+                        NotificationManager.IMPORTANCE_LOW
+                    )
+                    notificationManager.createNotificationChannel(channel)
+                }
+                
+                notificationManager.notify(
+                    2,
+                    ongoingNotification
+                ) // Устанавливаем ID 2 для нового уведомления
+            }
+            
+            "ACTION_DECLINE_CALL" -> {
+                println("Вызов отклонен")
+                
+                // Остановка Foreground Service
+                val serviceIntent = Intent(context, CallForegroundService::class.java)
+                context.stopService(serviceIntent)
+                
+                // Закрытие уведомления
+                val notificationManager =
+                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(1) // Закрываем уведомление Foreground Service
+            }
+            
+            "ACTION_END_CALL" -> {
+                println("Звонок завершен")
+                
+                // Завершение активности
+                val activityManager =
+                    context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+                
+                activityManager.appTasks.forEach { task ->
+                    if (task.taskInfo.baseActivity?.className == FullscreenNotificationActivity::class.java.name) {
+                        task.finishAndRemoveTask()
+                    }
+                }
+                
+                val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+                
+                callViewModel.rejectCallBackground("")
+                // Закрытие уведомления
+                val notificationManager =
+                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.cancel(2) // Закрываем уведомление с ID 2
+            }
+        }
     }
 }
 
