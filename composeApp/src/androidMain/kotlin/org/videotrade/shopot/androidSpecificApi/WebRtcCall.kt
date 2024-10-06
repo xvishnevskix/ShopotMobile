@@ -61,7 +61,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
-        println("AAAAAAAAAAAAAAA ${remoteMessage.data}")
+        println("AAAAAAAAAAAAAAA  ${remoteMessage.data}")
         
         // Проверка и запрос исключения из оптимизации батареи
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
