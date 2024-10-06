@@ -110,6 +110,13 @@ class CallScreen(
             
         }
         
+        LaunchedEffect(isRunning) {
+            if(isRunning) {
+                musicPlayer.stop()
+                isPlaying = false
+            }
+        }
+        
         DisposableEffect(Unit) {
             onDispose {
                 
