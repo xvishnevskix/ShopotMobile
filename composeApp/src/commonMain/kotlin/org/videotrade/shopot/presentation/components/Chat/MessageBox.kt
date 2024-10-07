@@ -566,8 +566,8 @@ fun SelectedMessageFormat(
             }
 
             "image" -> {
-//                SelectedMessageImage(message.attachments!!, messageAnswerName)
-                SelectedStickerMessage(message.attachments!!, messageAnswerName)
+                SelectedMessageImage(message.attachments!!, messageAnswerName)
+//                SelectedStickerMessage(message.attachments!!, messageAnswerName)
 
             }
 
