@@ -63,7 +63,7 @@ class PhotoViewerScreen(
                     .fillMaxSize()
                     .background(Color(0xFF29303c))
             ) {
-
+                println("iconiconicon ${icon}")
                 Image(
                     painter = imagePainter,
                     contentDescription = null,

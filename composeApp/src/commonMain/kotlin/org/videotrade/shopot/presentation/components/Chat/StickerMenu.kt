@@ -1,27 +1,28 @@
 package org.videotrade.shopot.presentation.components.Chat
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -32,190 +33,91 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import io.ktor.client.HttpClient
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.client.utils.EmptyContent.contentType
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.Montserrat_Medium
+import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
+import shopot.composeapp.generated.resources.check_mark
+import shopot.composeapp.generated.resources.sticker1
 
 
 
-//data class StickerPack(
-//    val packName: String,
-//    val stickers: List<Sticker>
-//)
 
-//val stickerPacks = listOf(
-//    StickerPack(
-//        packName = "Набор стикеров 1",
-//        stickers = listOf(
-//            Sticker(
-//                name = "Стикер 1",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker.webp",
-//                emoji = listOf("😊", "😎")
-//            ),
-//            Sticker(
-//                name = "Стикер 2",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker2.webp",
-//                emoji = listOf("😂", "😜")
-//            ),
-//            Sticker(
-//                name = "Стикер 3",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker3.webp",
-//                emoji = listOf("😉", "😍")
-//            ),
-//            Sticker(
-//                name = "Стикер 4",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker4.webp",
-//                emoji = listOf("😇", "🤓")
-//            )
-//            ,
-//            Sticker(
-//                name = "Стикер 1",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker.webp",
-//                emoji = listOf("😊", "😎")
-//            ),
-//            Sticker(
-//                name = "Стикер 2",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker2.webp",
-//                emoji = listOf("😂", "😜")
-//            ),
-//            Sticker(
-//                name = "Стикер 3",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker3.webp",
-//                emoji = listOf("😉", "😍")
-//            ),
-//            Sticker(
-//                name = "Стикер 4",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker4.webp",
-//                emoji = listOf("😇", "🤓")
-//            )
-//        )
-//    ),
-//    StickerPack(
-//        packName = "Набор стикеров 1",
-//        stickers = listOf(
-//            Sticker(
-//                name = "Стикер 1",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker.webp",
-//                emoji = listOf("😊", "😎")
-//            ),
-//            Sticker(
-//                name = "Стикер 2",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker2.webp",
-//                emoji = listOf("😂", "😜")
-//            ),
-//            Sticker(
-//                name = "Стикер 3",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker3.webp",
-//                emoji = listOf("😉", "😍")
-//            ),
-//            Sticker(
-//                name = "Стикер 4",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker4.webp",
-//                emoji = listOf("😇", "🤓")
-//            )
-//            ,
-//            Sticker(
-//                name = "Стикер 1",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker.webp",
-//                emoji = listOf("😊", "😎")
-//            ),
-//            Sticker(
-//                name = "Стикер 2",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker2.webp",
-//                emoji = listOf("😂", "😜")
-//            ),
-//            Sticker(
-//                name = "Стикер 3",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker3.webp",
-//                emoji = listOf("😉", "😍")
-//            ),
-//            Sticker(
-//                name = "Стикер 4",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker4.webp",
-//                emoji = listOf("😇", "🤓")
-//            )
-//        )
-//    ),
-//    StickerPack(
-//        packName = "Набор стикеров 2",
-//        stickers = listOf(
-//            Sticker(
-//                name = "Стикер 1",
-//                imageRes = Res.drawable.sticker1, // Убедитесь, что изображение добавлено в drawable
-//                path = "sticker5.webp",
-//                emoji = listOf("😉", "😅")
-//            )
-//        )
-//    )
-//)
+val stickerPacksTest = listOf(
+    StickerPackTest(
+        name = "Набор стикеров 1",
+        id = "",
+        favorite = false,
+        stickers = listOf(
+            Sticker(
+                name = "Стикер 1",
+            ),
+            Sticker(
+                name = "Стикер 1",
+            ),
+            Sticker(
+                name = "Стикер 1",
+            ),
+            Sticker(
+                name = "Стикер 1",
+            ),
+            Sticker(
+                name = "Стикер 1",
+            ),
+            Sticker(
+                name = "Стикер 1",
+            ),
+
+            )
+    ),
+)
+
+data class StickerPackTest(
+    val id: String,
+    val favorite: Boolean,
+    val name: String,
+    val stickers: List<Sticker>,
+
+    )
 
 @Serializable
 data class Sticker(
     val name: String?,
-//    val imageRes: DrawableResource,
-    val path: String?,
-    val emoji: List<String>
 )
 
 @Serializable
 data class StickerPack(
-    val packId: String?,
-    val packName: String?,
-    val stickers: List<Sticker>? = null // Если есть список стикеров внутри
+    val id: String,
+    val name: String,
+    val favorite: Boolean,
+
 )
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StickerMenuContent() {
-    val tabTitles = listOf("Недавние", "Избранное", "Магазин")
+    val tabTitles = listOf(stringResource(MokoRes.strings.recent), stringResource(MokoRes.strings.favorite), stringResource(MokoRes.strings.store))
     val pagerState = rememberPagerState(pageCount = { tabTitles.size })
     val selectedTabIndex = remember {
         derivedStateOf { pagerState.currentPage }
@@ -229,9 +131,9 @@ fun StickerMenuContent() {
 
         viewModel.downloadStickerPacks()
 
-        if (stickerPacks.isNotEmpty()) {
-            println("ПАКИИИИ ${stickerPacks[0].packId}")
-        }
+
+            println("ПАКИИИИ ${stickerPacks}")
+
     }
 
 
@@ -239,20 +141,7 @@ fun StickerMenuContent() {
     Column(modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth()) {
         val coroutineScope = rememberCoroutineScope()
 
-        Column {
-            if (stickerPacks.isEmpty()) {
-                Text("Загрузка стикеров...")
-            } else {
-                LazyColumn {
-                    items(stickerPacks) { stickerPack ->
-                        Text("Pack Name: ${stickerPack.packName}")
-                    }
-                }
-            }
-        }
 
-
-        // TabRow для переключателя
         TabRow(
             selectedTabIndex = selectedTabIndex.value,
             modifier = Modifier.fillMaxWidth(),
@@ -262,9 +151,8 @@ fun StickerMenuContent() {
                         .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
                         .clip(RoundedCornerShape(8.dp)),
                     height = 3.dp,
-                    color = Color(0xFF29303C),
-
-                    )
+                    color = Color(0xFF2A293C)
+                )
             }
         ) {
             tabTitles.forEachIndexed { index, title ->
@@ -280,109 +168,228 @@ fun StickerMenuContent() {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
-                        .clip(
-                            RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-                        ),
+                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                 ) {
-                    Text(text = title,
+                    Text(
+                        text = title,
                         modifier = Modifier,
                         textAlign = TextAlign.Center,
                         fontSize = 18.sp,
                         fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
                         letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        )
+                        lineHeight = 20.sp
+                    )
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // HorizontalPager для свайпинга между вкладками
+
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxWidth().fillMaxHeight()
         ) { page ->
             when (page) {
-                0 -> RecentStickersContent()
-                1 -> FavoriteStickersContent()
-                2 -> StoreStickersContent()
+                0 -> RecentStickersContent(stickerPacks)
+                1 -> FavoriteStickersContent(stickerPacks.filter { it.favorite })
+                2 -> StoreStickersContent(stickerPacks, viewModel)
             }
         }
     }
 }
 
 @Composable
-fun StickerItem(sticker: Sticker) {
+fun StickerItem() {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(4.dp)
     ) {
-//        Image(
-//            painter = painterResource(sticker.imageRes),
-//            contentDescription = null,
-//            modifier = Modifier
-//                .size(64.dp) // Установите нужный размер стикера
-//        )
-        sticker.name?.let { Text(text = it, style = androidx.compose.material.MaterialTheme.typography.body2) }
+        Image(
+            painter = painterResource(Res.drawable.sticker1),
+            contentDescription = null,
+            modifier = Modifier
+                .size(64.dp) // Установите нужный размер стикера
+        )
     }
 }
 
 @Composable
-fun RecentStickersContent() {
-    // Здесь можно отобразить "Недавние" стикеры
-//    Text(text = "Здесь будут показаны недавние стикеры.")
-
-//        LazyColumn(
-//        modifier = Modifier
-//            .fillMaxWidth()
-//            .fillMaxHeight()
-//            .padding(16.dp)
-//    ) {
-//        items(stickerPacks) { pack ->
-//            Text(
-//                text = pack.packName,
-//                modifier = Modifier.padding(vertical = 8.dp),
-//                style = androidx.compose.material.MaterialTheme.typography.h6
-//            )
-//
-//            // Отображение стикеров
-//            pack.stickers.chunked(5).forEach { rowStickers ->
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(vertical = 8.dp),
-//                    horizontalArrangement = Arrangement.Start
-//                ) {
-//                    rowStickers.forEach { sticker ->
-//                        StickerItem(sticker)
-//                    }
-//                }
-//            }
-//        }
-//    }
-}
-
-@Composable
-fun FavoriteStickersContent() {
-    // Здесь можно отобразить "Избранные" стикеры
-    Box(
+fun RecentStickersContent(stickerPacks: List<StickerPack>) {
+    LazyColumn(
         modifier = Modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(vertical = 4.dp, horizontal = 16.dp)
     ) {
-        Text(text = "Здесь будут показаны избранные стикеры.")
+        items(stickerPacks) { pack ->
+            Column {
+                Text(
+                    text = "${pack.name}",
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                    textAlign = TextAlign.Center,
+                    fontSize = 19.sp,
+                    lineHeight = 20.sp,
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    color = Color(0xFF000000),
+                    modifier = Modifier
+                        .padding(horizontal = 5.dp)
+                        .padding(bottom = 10.dp)
+                )
+                stickerPacksTest.forEach { pack ->
+                    pack.stickers.chunked(5).forEach { rowStickers ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            rowStickers.forEach { sticker ->
+                                StickerItem()
+                            }
+                        }
+                    }
+                }
+//                StickerItem()
+            }
+        }
     }
 }
 
 @Composable
-fun StoreStickersContent() {
+fun FavoriteStickersContent(favoritePacks: List<StickerPack>) {
 
-    Box(
+
+    if (favoritePacks.isNotEmpty()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(vertical = 4.dp, horizontal = 16.dp)
+        ) {
+            items(favoritePacks) { pack ->
+                Column {
+                    Text(
+                        text = "${pack.name}",
+                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                        textAlign = TextAlign.Center,
+                        fontSize = 19.sp,
+                        lineHeight = 20.sp,
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        color = Color(0xFF000000),
+                        modifier = Modifier
+                            .padding(horizontal = 5.dp)
+                            .padding(bottom = 10.dp)
+                    )
+                    stickerPacksTest.forEach { pack ->
+                        pack.stickers.chunked(5).forEach { rowStickers ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                rowStickers.forEach { sticker ->
+                                    StickerItem()
+                                }
+                            }
+                        }
+                    }
+//                    StickerItem()
+                }
+            }
+        }
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store))
+        }
+    }
+}
+
+@Composable
+fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject()) {
+    LazyColumn(
         modifier = Modifier
-            .fillMaxWidth(),
-        contentAlignment = Alignment.Center
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(vertical = 4.dp, horizontal = 16.dp)
     ) {
-    Text(text = "Здесь будет магазин стикеров.")
+        items(stickerPacks) { pack ->
+            Column {
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                    ,
+
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 5.dp)
+                        .padding(bottom = 10.dp)
+                ) {
+                    Text(
+                        text = "${pack.name}",
+                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                        textAlign = TextAlign.Center,
+                        fontSize = 19.sp,
+                        lineHeight = 20.sp,
+                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                        color = Color(0xFF000000)
+                    )
+
+
+                    Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).size(20.dp).background(Color(0xFF2A293C)),
+                        contentAlignment = Alignment.Center
+                    ){
+
+                        if (pack.favorite) {
+                            Image(
+                                painter = painterResource(Res.drawable.check_mark),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(15.dp),
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Add",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .clickable {
+                                        viewModel.addPackToFavorites(pack.id)
+                                    }
+                            )
+                        }
+
+
+
+
+
+                    }
+                }
+
+                stickerPacksTest.forEach { pack ->
+                    pack.stickers.chunked(5).forEach { rowStickers ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            rowStickers.forEach { sticker ->
+                                StickerItem()
+                            }
+                        }
+                    }
+                }
+                //                    StickerItem()
+            }
+        }
+
     }
 }

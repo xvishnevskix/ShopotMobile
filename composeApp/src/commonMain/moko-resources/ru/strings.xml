@@ -193,4 +193,9 @@
     <string name="saturday">Суббота</string>
     <string name="sunday">Воскресенье</string>
 
+    <string name="recent">Недавние</string>
+    <string name="favorite">Избранное</string>
+    <string name="store">Магазин</string>
+    <string name="sticker">Стикер</string>
+    <string name="add_stickers_from_the_store">Добавьте стикеры из магазина 🛒</string>
 </resources>

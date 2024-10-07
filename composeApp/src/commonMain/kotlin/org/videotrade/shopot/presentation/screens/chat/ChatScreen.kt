@@ -3,6 +3,7 @@ package org.videotrade.shopot.presentation.screens.chat
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +12,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.BottomSheetValue
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
@@ -32,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
@@ -50,7 +55,7 @@ import org.videotrade.shopot.presentation.components.Common.BottomSheetModal
 class ChatScreen(
 ) : Screen {
 
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
         val viewModel: ChatViewModel = koinInject()
@@ -109,79 +114,77 @@ class ChatScreen(
         var selectedMessageY by remember { mutableStateOf(0) }
         var hiddenMessageId by remember { mutableStateOf<String?>(null) }
 
-        BottomSheetScaffold(
-            scaffoldState = scaffoldStickerState,
-            sheetContent = {
-                if (showStickerMenu.value) {
-                    StickerMenuContent() // Контент меню стикеров
-                }
-            },
-            sheetPeekHeight = 0.dp // Панель по умолчанию скрыта
-        ) {
+
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White)
                     .pointerInput(Unit) {
-
+                        showStickerMenu.value = false
                     }
             ) {
-                Button(onClick = {
-                    viewModel.downloadStickerPacks()
-                }, content = {
-                    Text("Sen")
-                })
-//                SafeArea(isBlurred = selectedMessage.value != null, 7.dp) {
-//                    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-//                        Scaffold(
-//                            topBar = {
-//                                ChatHeader(chat, viewModel, profile)
-//
-//                            },
-//                            bottomBar = {
-//                                ChatFooter(chat, viewModel, onStickerButtonClick = {
-//                                    showStickerMenu.value = true
-//                                    scope.launch {
-//                                        scaffoldStickerState.bottomSheetState.expand()
-//                                    }
-//                                })
-//                            },
-//
-//                            modifier = Modifier
-//                                .fillMaxSize()
-//                        ) { innerPadding ->
-//                            Chat(
-//                                viewModel,
-//                                profile,
-//                                chat,
-//                                Modifier.fillMaxSize().background(Color.White)
-//                                    .padding(innerPadding),
-//                                onMessageClick = { message, y ->
-//                                    selectedMessage.value = message
-//                                    selectedMessageY = y + 150
-//                                    hiddenMessageId = message.id
-//                                },
-//                                hiddenMessageId = hiddenMessageId
-//                            )
-//                        }
-//
-//
-//                    }
-//                    BottomSheetModal(scaffoldForwardState)
-//                }
-//
-//                BlurredMessageOverlay(
-//                    profile,
-//                    viewModel,
-//                    selectedMessage = selectedMessage.value,
-//                    selectedMessageY = selectedMessageY,
-//                    onDismiss = {
-//                        selectedMessage.value = null
-//                        hiddenMessageId = null
-//                    },
-//                )
+                SafeArea(isBlurred = selectedMessage.value != null, 7.dp) {
+                    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+                        Scaffold(
+                            topBar = {
+                                ChatHeader(chat, viewModel, profile)
+
+                            },
+                            bottomBar = {
+                                ChatFooter(chat, viewModel, onStickerButtonClick = {
+                                    showStickerMenu.value = true
+                                    scope.launch {
+                                        scaffoldStickerState.bottomSheetState.expand()
+                                    }
+                                })
+                            },
+
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) { innerPadding ->
+                            Chat(
+                                viewModel,
+                                profile,
+                                chat,
+                                Modifier.fillMaxSize().background(Color.White)
+                                    .padding(innerPadding),
+                                onMessageClick = { message, y ->
+                                    selectedMessage.value = message
+                                    selectedMessageY = y + 150
+                                    hiddenMessageId = message.id
+                                },
+                                hiddenMessageId = hiddenMessageId
+                            )
+                        }
+
+
+                    }
+                    //пересылка сообщений
+                    BottomSheetModal(scaffoldForwardState)
+                    //стикеры
+                    BottomSheetScaffold(
+                        scaffoldState = scaffoldStickerState,
+                        sheetContent = {
+                            if (showStickerMenu.value) {
+                                StickerMenuContent()
+                            }
+                        },
+                        sheetPeekHeight = 0.dp
+                    ) {}
+                }
+
+                BlurredMessageOverlay(
+                    profile,
+                    viewModel,
+                    selectedMessage = selectedMessage.value,
+                    selectedMessageY = selectedMessageY,
+                    onDismiss = {
+                        selectedMessage.value = null
+                        hiddenMessageId = null
+                    },
+                )
             }
         }
     }
-}
+
 

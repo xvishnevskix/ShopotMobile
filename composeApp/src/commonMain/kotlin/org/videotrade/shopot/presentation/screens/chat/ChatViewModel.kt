@@ -91,7 +91,28 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    
+    fun addPackToFavorites(packId: String) {
+        viewModelScope.launch {
+            try {
+
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("packageId", packId)
+                    }
+                )
+
+                println("Отправка запроса на добавление в избранное: $jsonContent")
+
+//                val response = origin().post("stickers/package/favorite", jsonContent)
+                val response = origin().post("stickers/package/favorite?packageId=$packId", jsonContent)
+                response?.let {
+                    println("Ответ от сервера: $it")
+                } ?: println("Не удалось добавить пак в избранное")
+            } catch (e: Exception) {
+                println("Ошибка при добавлении пака в избранное: ${e.message}")
+            }
+        }
+    }
     
     init {
         

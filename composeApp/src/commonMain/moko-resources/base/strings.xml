@@ -196,4 +196,11 @@
     <string name="friday">Friday</string>
     <string name="saturday">Saturday</string>
     <string name="sunday">Sunday</string>
+
+    <string name="recent">Recent</string>
+    <string name="favorite">Favorite</string>
+    <string name="store">Store</string>
+    <string name="sticker">Sticker</string>
+    <string name="add_stickers_from_the_store">Add stickers from the store 🛒</string>
+
 </resources>

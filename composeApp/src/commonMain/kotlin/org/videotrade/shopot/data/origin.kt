@@ -86,20 +86,20 @@ class origin {
         
         try {
             val token = getValueInStorage("accessToken")
-            println("url ${EnvironmentConfig.serverUrl}$url}")
-            
+            println("url ${EnvironmentConfig.serverUrl}$url")
+
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.serverUrl}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
                 }
-            
-            
+
+            println("Отправляем данные: $data")
             println("response.bodyAsText() ${response.bodyAsText()}")
             
             if (response.status.isSuccess()) {
-                
+
                 
                 return response.bodyAsText()
             } else {
