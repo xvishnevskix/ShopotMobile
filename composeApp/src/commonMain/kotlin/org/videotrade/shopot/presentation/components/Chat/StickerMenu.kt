@@ -114,6 +114,38 @@ data class StickerPack(
 
 )
 
+@Serializable
+data class StickerPackResponse(
+    val content: List<StickerPack>,
+    val pageable: StickerPageable,
+    val last: Boolean,
+    val totalElements: Int,
+    val totalPages: Int,
+    val size: Int,
+    val number: Int,
+    val sort: StickerSort,
+    val first: Boolean,
+    val numberOfElements: Int,
+    val empty: Boolean
+)
+
+@Serializable
+data class StickerPageable(
+    val pageNumber: Int,
+    val pageSize: Int,
+    val offset: Long,
+    val paged: Boolean,
+    val unpaged: Boolean,
+    val sort: StickerSort
+)
+
+@Serializable
+data class StickerSort(
+    val empty: Boolean,
+    val sorted: Boolean,
+    val unsorted: Boolean
+)
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StickerMenuContent() {

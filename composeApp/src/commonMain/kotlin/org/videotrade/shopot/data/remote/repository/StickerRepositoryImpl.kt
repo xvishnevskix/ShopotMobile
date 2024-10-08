@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.repository.StickerRepository
 import org.videotrade.shopot.presentation.components.Chat.StickerPack
+import org.videotrade.shopot.presentation.components.Chat.StickerPackResponse
 
 class StickerRepositoryImpl : StickerRepository {
 
@@ -15,13 +16,15 @@ class StickerRepositoryImpl : StickerRepository {
         val originInstance = origin()
         println("Sticker get")
 
-        val stickerPacksRes = originInstance.get<List<StickerPack>>("stickers/package/all") ?: return null
+        // Изменение: получение объекта StickerPackResponse вместо List<StickerPack>
+        val stickerPackResponse = originInstance.get<StickerPackResponse>("packs") ?: return null
 
-        println("Sticker Packs Result: $stickerPacksRes")
+        println("Sticker Packs Result: ${stickerPackResponse.content}")
 
-        stickerPacks.value = stickerPacksRes
+        // Извлечение стикерпаков из поля content
+        stickerPacks.value = stickerPackResponse.content
 
-        return stickerPacksRes
+        return stickerPackResponse.content
     }
 
     override fun getStickerPacksState(): StateFlow<List<StickerPack>> = stickerPacks.asStateFlow()
