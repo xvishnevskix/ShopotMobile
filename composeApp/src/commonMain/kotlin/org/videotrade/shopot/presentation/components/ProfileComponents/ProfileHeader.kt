@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.components.ProfileComponents
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +25,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -32,41 +34,47 @@ import shopot.composeapp.generated.resources.Res
 fun ProfileHeader(text: String, isPopScreen: Boolean) {
     val navigator = LocalNavigator.currentOrThrow
     
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 23.dp)
-            .background(Color(0xFFF3F4F6)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-        
-        ) {
-        
-        Column(
-            Modifier.padding(start = 10.dp, end = 0.dp).width(25.dp)
-        ) {
-            if (isPopScreen) {
-                BackIcon(
-                    Modifier.pointerInput(Unit) {
-                        
-                        
-                        navigator.pop()
-                        
-                        
-                    })
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 40.dp, )
+                .background(Color(0xFFF3F4F6)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+
+            ) {
+
+            Column(
+                Modifier.padding(start = 10.dp, end = 0.dp).width(25.dp)
+            ) {
+                if (isPopScreen) {
+                    BackIcon(
+                        Modifier.pointerInput(Unit) {
+
+
+                            navigator.pop()
+
+
+                        })
+                }
             }
-        }
-        
-        Text(
-            text = text,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.W600,
-            textAlign = TextAlign.Center,
-            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-            lineHeight = 24.sp,
-            color = androidx.compose.ui.graphics.Color.Black,
+
+            Text(
+                text = text,
+                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.W600,
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 24.sp,
+                color = androidx.compose.ui.graphics.Color.Black,
 //            modifier = Modifier.padding(start = 10.dp)
-        )
-        Spacer(modifier = Modifier.width(35.dp))
+            )
+            Spacer(modifier = Modifier.width(35.dp))
+        }
+
+        Box(Modifier.padding(bottom = 23.dp)) {
+            CallBar()
+        }
     }
     
 }

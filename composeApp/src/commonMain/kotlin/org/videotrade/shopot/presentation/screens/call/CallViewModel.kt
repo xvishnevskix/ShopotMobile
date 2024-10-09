@@ -7,6 +7,8 @@ import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -55,6 +57,51 @@ class CallViewModel() : ViewModel(), KoinComponent {
 //    init {
 //        startObserving()
 //    }
+
+    // Таймер
+    private val _timer = MutableStateFlow("00:00:00")
+    val timer: StateFlow<String> get() = _timer
+
+    private var timerJob: Job? = null
+    private var elapsedSeconds = 0L
+
+    val isTimerRunning = MutableStateFlow(false)
+
+    private val _userIcon = MutableStateFlow<String?>(null)
+    val userIcon: StateFlow<String?> get() = _userIcon
+
+
+    fun updateUserIcon(icon: String?) {
+        _userIcon.value = icon
+    }
+
+    fun startTimer(icon: String?) {
+        updateUserIcon(icon)
+        elapsedSeconds = 0L
+        isTimerRunning.value = true
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (true) {
+                delay(1000L)
+                elapsedSeconds++
+                _timer.value = formatTime(elapsedSeconds)
+            }
+        }
+    }
+
+    fun stopTimer() {
+        timerJob?.cancel()
+        isTimerRunning.value = false
+        timerJob = null
+    }
+
+
+    private fun formatTime(seconds: Long): String {
+        val hours = (seconds / 3600).toInt().toString().padStart(2, '0')
+        val minutes = ((seconds % 3600) / 60).toInt().toString().padStart(2, '0')
+        val secs = (seconds % 60).toInt().toString().padStart(2, '0')
+        return "$hours:$minutes:$secs"
+    }
     
     fun setAnswerData(JsonObject: JsonObject?) {
         answerData.value = JsonObject

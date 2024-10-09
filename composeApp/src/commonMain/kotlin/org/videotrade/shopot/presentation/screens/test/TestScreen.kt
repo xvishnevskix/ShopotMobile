@@ -50,7 +50,6 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.VideoPlayer
 import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getBuildVersion
-import org.videotrade.shopot.multiplatform.simulateIncomingCall
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -89,7 +88,7 @@ class TestScreen : Screen {
 //                            "eb2f7045-592b-4304-bc8a-d14234777550"
 //                        )
                         
-                        simulateIncomingCall()
+//                        simulateIncomingCall()
 
 //                        commonViewModel.sendNotify("Privet","","fPlJ64fZSxKSYZ4KgH5xdq:APA91bFtPyi8uPj5F0P3Bn6rwLuIhKCKKfz1JhgIA1AysC7x4irg2cTQ996xu15sArQDyN0XAeFhyN-KZm7pBCmyOpEgaSE714BLfMxSnytGR9Gcqtprx1nOEDs69IP6ifevGYn0ONXK" )
 

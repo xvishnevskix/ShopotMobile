@@ -2,6 +2,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -29,6 +30,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
@@ -36,12 +38,15 @@ import shopot.composeapp.generated.resources.Res
 @Composable
 fun LanguageHeader(text: String) {
     val navigator = LocalNavigator.currentOrThrow
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
 
-        ) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+
+            )
+        {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
@@ -51,19 +56,21 @@ fun LanguageHeader(text: String) {
                 tint = Color.Black
             )
 
-        Text(
-            text = text,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.W600,
-            textAlign = TextAlign.Center,
-            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-            lineHeight = 24.sp,
-            color = Color.Black
+            Text(
+                text = text,
+                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+                fontSize = 20.sp,
+                fontWeight = FontWeight.W600,
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 24.sp,
+                color = Color.Black
 
-        )
+            )
 
-        Spacer(modifier = Modifier)
+            Spacer(modifier = Modifier.width(15.dp))
+        }
+        CallBar()
     }
 
 }
