@@ -63,6 +63,8 @@ class IncomingCallScreen(
         
         val viewModel: CallViewModel = koinInject()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
+        val isCallBackground by viewModel.isCallBackground.collectAsState()
+        
         val musicPlayer = remember { MusicPlayer() }
         
         // Используем состояние для отслеживания, играет ли музыка
@@ -100,7 +102,7 @@ class IncomingCallScreen(
                 navigator.push(
                     CallScreen(
                         userId,
-                        "IncomingCall",
+                        if (isCallBackground) "IncomingBackgroundCall" else "IncomingCall",
                         userIcon,
                         userFirstName,
                         userLastName,
@@ -173,9 +175,16 @@ class IncomingCallScreen(
                 ) {
                     rejectBtn({
                         
-                        viewModel.rejectCall(navigator, userId)
+                        if (!isCallBackground) {
+                            viewModel.rejectCall(navigator, userId)
+                            
+                            navigator.push(MainScreen())
+                            
+                        } else {
+                            viewModel.rejectCallBackground(userId)
+                        }
                         
-                        navigator.push(MainScreen())
+                        
                     })
                     aceptBtn {
                         

@@ -16,9 +16,10 @@ interface CallRepository {
     
     val peerConnection: StateFlow<PeerConnection?>
     
-    
     val isConnectedWebrtc: StateFlow<Boolean>
     
+    val isConnectedWs: StateFlow<Boolean>
+    val isCallBackground: StateFlow<Boolean>
     
     val localStream: StateFlow<MediaStream?>
     
@@ -27,13 +28,13 @@ interface CallRepository {
     val callState: StateFlow<PeerConnectionState>
     
     val iseState: StateFlow<IceConnectionState>
-
-
+    
+    
     suspend fun connectionWs(userId: String, navigator: Navigator)
-
+    
     suspend fun connectionBackgroundWs(userId: String)
-
-
+    
+    
     suspend fun reconnectPeerConnection()
     suspend fun setOffer()
     
@@ -50,15 +51,15 @@ interface CallRepository {
     
     fun updateOtherUserId(userId: String)
     suspend fun initWebrtc(): Nothing
-
-
+    
+    
     suspend fun makeCall(userId: String, calleeId: String)
-
+    
     suspend fun makeCallBackground(notificToken: String, calleeId: String)
-
+    
     suspend fun answerCall()
-
-     fun answerCallBackground()
+    
+    fun answerCallBackground()
     
     suspend fun rejectCall(navigator: Navigator, userId: String): Boolean
     suspend fun rejectCallBackground(userId: String): Boolean
@@ -66,6 +67,10 @@ interface CallRepository {
     
     fun clearData()
     fun setIsIncomingCall(isIncomingCallValue: Boolean)
+    
+    fun setIsCallBackground(isCallBackground: Boolean)
+    
+    
     
     
 }

@@ -54,6 +54,7 @@ import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -79,7 +80,9 @@ class CallScreen(
         
         val viewModel: CallViewModel = koinInject()
         val callStateView by viewModel.callState.collectAsState()
+        val isConnectedWs by viewModel.isConnectedWs.collectAsState()
         val localStream by viewModel.localStreamm.collectAsState()
+        val isCallBackground by viewModel.isCallBackground.collectAsState()
         
         
         val hasExecuted = remember { mutableStateOf(false) }
@@ -125,8 +128,6 @@ class CallScreen(
                 
                 when (callCase) {
                     "Call" -> {
-
-//                        viewModel.rejectCall(navigator, userId)
                         if (
                             isPlaying
                         ) {
@@ -140,8 +141,12 @@ class CallScreen(
             }
         }
         
-        LaunchedEffect(Unit) {
-            viewModel.initCall(callCase, userId)
+        LaunchedEffect(isConnectedWs) {
+            println("isConnectedWs $isConnectedWs")
+            
+            if(isConnectedWs) {
+                viewModel.initCall(callCase, userId)
+            }
         }
         
         
@@ -318,7 +323,14 @@ class CallScreen(
                 rejectBtn({
                     
                     println("rejectBtn")
-                    viewModel.rejectCall(navigator, userId)
+                    if (!isCallBackground) {
+                        viewModel.rejectCall(navigator, userId)
+                        
+                        navigator.push(MainScreen())
+                        
+                    } else {
+                        viewModel.rejectCallBackground(userId)
+                    }
                     
                     
                 }, stringResource(MokoRes.strings.end_call))

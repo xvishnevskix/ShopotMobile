@@ -9,3 +9,6 @@ expect fun startOutgoingCall()
 expect fun simulateIncomingCall()
 
 
+expect fun closeApp()
+
+

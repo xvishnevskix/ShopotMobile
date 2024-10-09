@@ -152,10 +152,10 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                 
                                 if (!cameraPer) return@launch
 //
-                                callViewModel.makeCallBackground(
-                                    chat.notificationToken!!,
-                                    chat.userId
-                                )
+//                                callViewModel.makeCallBackground(
+//                                    chat.notificationToken!!,
+//                                    chat.userId
+//                                )
 
 
 //                            commonViewModel.sendNotify(

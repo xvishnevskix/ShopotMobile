@@ -18,6 +18,8 @@ class CallUseCase : KoinComponent {
     
     val peerConnection: StateFlow<PeerConnection?> get() = repository.peerConnection
     val isConnectedWebrtc: StateFlow<Boolean> get() = repository.isConnectedWebrtc
+    val isConnectedWs: StateFlow<Boolean> get() = repository.isConnectedWs
+    val isCallBackground: StateFlow<Boolean> get() = repository.isCallBackground
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
     val callState: StateFlow<PeerConnectionState> get() = repository.callState
@@ -32,9 +34,9 @@ class CallUseCase : KoinComponent {
         
         return repository.connectionWs(userId, navigator)
     }
-
+    
     suspend fun connectionBackgroundWs(userId: String) {
-
+        
         return repository.connectionBackgroundWs(userId)
     }
     
@@ -43,6 +45,7 @@ class CallUseCase : KoinComponent {
         return repository.setOffer()
     }
     
+
     
     suspend fun getWsSession(): DefaultClientWebSocketSession? {
         return repository.getWsSession()
@@ -75,22 +78,21 @@ class CallUseCase : KoinComponent {
     }
     
     
-    suspend fun makeCall(userId: String, calleeId: String){
+    suspend fun makeCall(userId: String, calleeId: String) {
         repository.makeCall(userId, calleeId)
     }
-
-    suspend fun makeCallBackground(notificToken: String, calleeId: String){
+    
+    suspend fun makeCallBackground(notificToken: String, calleeId: String) {
         repository.makeCallBackground(notificToken, calleeId)
     }
-
-
+    
     
     suspend fun answerCall() {
         repository.answerCall()
     }
-
-
-     fun answerCallBackground() {
+    
+    
+    fun answerCallBackground() {
         repository.answerCallBackground()
     }
     
@@ -99,8 +101,8 @@ class CallUseCase : KoinComponent {
         return repository.rejectCall(navigator, userId)
     }
     
-    suspend  fun rejectCallBackground(userId: String): Boolean {
-        return   repository.rejectCallBackground(userId)
+    suspend fun rejectCallBackground(userId: String): Boolean {
+        return repository.rejectCallBackground(userId)
     }
     
     fun rejectCallAnswer() {
@@ -113,6 +115,10 @@ class CallUseCase : KoinComponent {
     
     fun setIsIncomingCall(isIncomingCallValue: Boolean) {
         repository.setIsIncomingCall(isIncomingCallValue)
+    }
+    
+    fun setIsCallBackground(isCallBackground: Boolean) {
+        return repository.setIsCallBackground(isCallBackground)
     }
     
     

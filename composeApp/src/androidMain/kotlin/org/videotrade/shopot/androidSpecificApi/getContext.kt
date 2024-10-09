@@ -20,8 +20,12 @@ object getContextObj {
         return applicationContext
     }
     
-    fun getActivity(): Context {
-        return applicationActivity
+    fun getActivity(): Context? {
+        return try {
+            applicationActivity
+        } catch (e: Exception) {
+            null
+        }
     }
     
 }

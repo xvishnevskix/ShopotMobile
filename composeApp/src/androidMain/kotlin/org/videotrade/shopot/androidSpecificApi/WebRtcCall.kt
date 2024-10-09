@@ -43,7 +43,6 @@ import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
 // MyFirebaseMessagingService
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -99,7 +98,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         val parseCallData = Json.parseToJsonElement(callData).jsonObject
                         println("callData41412412 $callData")
                         
-                        
+                        callViewModel.setIsCallBackground(true)
                         // Устанавливаем данные вызова в callViewModel
                         callViewModel.setAnswerData(parseCallData)
                     } catch (e: Exception) {
@@ -131,7 +130,13 @@ class FullscreenNotificationActivity : AppActivity() {
                 val answerData = callViewModel.answerData.value
                 
                 LaunchedEffect(Unit) {
+                    val profileId = getValueInStorage("profileId")
+                    
                     if (profileId != null) {
+                        
+                        if(isScreenOn) {
+                            callViewModel.initWebrtc()
+                        }
                         
                         callViewModel.connectionBackgroundWs(profileId)
                     }
@@ -303,18 +308,10 @@ class CallActionReceiver : BroadcastReceiver() {
             
             
             "ACTION_ACCEPT_CALL" -> {
-               
+                
                 CoroutineScope(Dispatchers.IO).launch {
                     println("Вызов принят")
-                    val profileId = getValueInStorage("profileId")
-                    
-                    if (profileId != null) {
-                        callViewModel.initWebrtc()
-                        
-                        callViewModel.connectionBackgroundWs(profileId)
-                    }
-                    
-                    delay(5000)
+
                     val serviceIntent = Intent(context, CallForegroundService::class.java)
                     context.stopService(serviceIntent)
                     // Закрытие уведомления с кнопками "Принять" и "Отклонить"
@@ -382,7 +379,7 @@ class CallActionReceiver : BroadcastReceiver() {
                     ) // Устанавливаем ID 2 для нового уведомления
                 }
                 
-
+                
             }
             
             "ACTION_DECLINE_CALL" -> {
