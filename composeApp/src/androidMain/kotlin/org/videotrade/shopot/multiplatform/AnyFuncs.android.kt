@@ -19,16 +19,6 @@ actual fun getBuildVersion(): Long {
     return packageInfo.longVersionCode
 }
 
-
-actual fun startOutgoingCall() {
-    TODO()
-}
-
-
-actual fun simulateIncomingCall() {
-    TODO()
-}
-
 actual fun closeApp() {
     
     val context = getContextObj.getActivity()
