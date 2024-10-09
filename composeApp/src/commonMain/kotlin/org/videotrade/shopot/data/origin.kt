@@ -2,6 +2,7 @@ package org.videotrade.shopot.data
 
 import androidx.compose.runtime.MutableState
 import io.ktor.client.HttpClient
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -37,7 +38,9 @@ class origin {
         
         try {
             val token = getValueInStorage("accessToken")
-            
+
+
+            println("tokentokentoken ${token}")
             
             println("url ${EnvironmentConfig.serverUrl}$url")
             
@@ -250,6 +253,37 @@ class origin {
         }
         
         return null
+    }
+
+    suspend inline fun delete(
+        url: String,
+        headers: Map<String, String> = emptyMap()
+    ): Boolean {
+        return try {
+            val token = getValueInStorage("accessToken")
+            println("url ${EnvironmentConfig.serverUrl}$url")
+
+            val response: HttpResponse = client.delete("${EnvironmentConfig.serverUrl}$url") {
+                contentType(ContentType.Application.Json)
+                header(HttpHeaders.Authorization, "Bearer $token")
+                headers.forEach { (key, value) ->
+                    header(key, value)
+                }
+            }
+
+            if (response.status == HttpStatusCode.NoContent) {
+                // Успешное удаление, сервер возвращает 204 No Content
+                true
+            } else {
+                println("Failed to delete: ${response.status.description} ${response.request}")
+                false
+            }
+        } catch (e: Exception) {
+            println("Error while deleting data: $e")
+            false
+        } finally {
+            client.close()
+        }
     }
     
     

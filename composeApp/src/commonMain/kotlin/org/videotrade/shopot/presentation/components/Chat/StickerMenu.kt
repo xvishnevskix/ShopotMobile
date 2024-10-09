@@ -33,8 +33,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,6 +48,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import coil3.compose.rememberAsyncImagePainter
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -53,6 +57,9 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -72,8 +79,6 @@ val stickerPacksTest = listOf(
         stickers = listOf(
             Sticker(
                 id = "Стикер 1",
-                fileUrl = "",
-                fileName = "",
             ),
 
 
@@ -91,10 +96,8 @@ data class StickerPackTest(
 
 @Serializable
 data class Sticker(
-    val id: String,         // UUID, представленный как String
-    val fileUrl: String,     // URL файла (это поле нужно извлечь из объекта File)
-    val fileName: String?,   // Название файла (может быть nullable)
-//    val data: ByteArray?
+    val id: String,
+
 )
 
 @Serializable
@@ -146,7 +149,7 @@ data class StickerSort(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun StickerMenuContent() {
+fun StickerMenuContent(profile: ProfileDTO? = null) {
     val tabTitles = listOf(stringResource(MokoRes.strings.recent), stringResource(MokoRes.strings.favorite), stringResource(MokoRes.strings.store))
     val pagerState = rememberPagerState(pageCount = { tabTitles.size })
     val selectedTabIndex = remember {
@@ -158,16 +161,25 @@ fun StickerMenuContent() {
 
     val stickerPacks by viewModel.stickerPacks.collectAsState()
     val stickers by viewModel.stickers.collectAsState()
+    val favoritePacks by viewModel.favoritePacks.collectAsState()
 
     LaunchedEffect(Unit) {
 
         viewModel.downloadStickerPacks()
-        viewModel.getStickersForPack("9f48cc7d-d215-429f-9dd8-d719a426835e")
+
+        if (profile != null) {
+            viewModel.getFavoritePacks(profile.id)
+        }
+
+
 
         println("ПАКИИИИ ${stickerPacks}")
         println("СТИИКИИИИИ ${stickers}")
 
     }
+
+
+
 
 
 
@@ -224,16 +236,49 @@ fun StickerMenuContent() {
             modifier = Modifier.fillMaxWidth().fillMaxHeight()
         ) { page ->
             when (page) {
-                0 -> RecentStickersContent(stickerPacks)
-                1 -> FavoriteStickersContent(stickerPacks.filter { it.favorite })
-                2 -> StoreStickersContent(stickerPacks, viewModel)
+                0 -> RecentStickersContent(stickerPacks, viewModel, stickers)
+                1 -> FavoriteStickersContent(favoritePacks, profile)
+                2 -> StoreStickersContent(stickerPacks, viewModel, profile)
             }
         }
     }
 }
 
 @Composable
-fun StickerItem() {
+fun StickerItem(sticker: Sticker) {
+
+
+    var imageFilePath by remember { mutableStateOf("") }
+    val imagePainter = rememberAsyncImagePainter(imageFilePath)
+
+    val url =
+        "${EnvironmentConfig.serverUrl}file/id/${sticker.id}"
+    LaunchedEffect(Unit) {
+//        val fileName = attachments[0].name
+//        val fileType = attachments[0].type
+//        val fileProvider = FileProviderFactory.create()
+//        val existingFile =
+//            fileProvider.existingFile(fileName, fileType)
+//        if (!existingFile.isNullOrBlank()) {
+//            imageFilePath = existingFile
+//            println("existingFile ${existingFile}")
+//        } else {
+//            val filePath = fileProvider.downloadCipherFile(
+//                url,
+//                "image",
+//                fileName,
+//                "image"
+//            ) { newProgress ->
+//                println("newProgress $newProgress")
+//            }
+//            if (filePath != null) {
+//                imageFilePath = filePath
+//            }
+//            println("filePath $filePath")
+//        }
+    }
+
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(4.dp)
@@ -242,13 +287,13 @@ fun StickerItem() {
             painter = painterResource(Res.drawable.sticker1),
             contentDescription = null,
             modifier = Modifier
-                .size(64.dp) // Установите нужный размер стикера
+                .size(64.dp)
         )
     }
 }
 
 @Composable
-fun RecentStickersContent(stickerPacks: List<StickerPack>) {
+fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject(), stickers: List<Sticker>) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -256,6 +301,10 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>) {
             .padding(vertical = 4.dp, horizontal = 16.dp)
     ) {
         items(stickerPacks) { pack ->
+
+            viewModel.getStickersForPack(pack.id)
+
+
             Column {
                 Text(
                     text = "${pack.name}",
@@ -269,6 +318,7 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>) {
                         .padding(horizontal = 5.dp)
                         .padding(bottom = 10.dp)
                 )
+
                 stickerPacksTest.forEach { pack ->
                     pack.stickers.chunked(5).forEach { rowStickers ->
                         Row(
@@ -278,7 +328,7 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>) {
                             horizontalArrangement = Arrangement.Start
                         ) {
                             rowStickers.forEach { sticker ->
-                                StickerItem()
+                                StickerItem(sticker)
                             }
                         }
                     }
@@ -290,7 +340,7 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>) {
 }
 
 @Composable
-fun FavoriteStickersContent(favoritePacks: List<StickerPack>) {
+fun FavoriteStickersContent(favoritePacks: List<FavoritePack>, profile: ProfileDTO? = null) {
 
 
     if (favoritePacks.isNotEmpty()) {
@@ -301,9 +351,13 @@ fun FavoriteStickersContent(favoritePacks: List<StickerPack>) {
                 .padding(vertical = 4.dp, horizontal = 16.dp)
         ) {
             items(favoritePacks) { pack ->
+
+
+
+
                 Column {
                     Text(
-                        text = "${pack.name}",
+                        text = "${pack.packId}",
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                         textAlign = TextAlign.Center,
                         fontSize = 19.sp,
@@ -323,7 +377,7 @@ fun FavoriteStickersContent(favoritePacks: List<StickerPack>) {
                                 horizontalArrangement = Arrangement.Start
                             ) {
                                 rowStickers.forEach { sticker ->
-                                    StickerItem()
+                                    StickerItem(sticker)
                                 }
                             }
                         }
@@ -344,8 +398,7 @@ fun FavoriteStickersContent(favoritePacks: List<StickerPack>) {
 }
 
 @Composable
-fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject()) {
-    val profile = viewModel.profile.collectAsState().value
+fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject(), profile: ProfileDTO? = null) {
 
     LazyColumn(
         modifier = Modifier
@@ -354,6 +407,10 @@ fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMod
             .padding(vertical = 4.dp, horizontal = 16.dp)
     ) {
         items(stickerPacks) { pack ->
+
+            viewModel.getStickersForPack(pack.id)
+
+
             Column {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -380,32 +437,63 @@ fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMod
                         contentAlignment = Alignment.Center
                     ){
 
-                        if (pack.favorite) {
-                            Image(
-                                painter = painterResource(Res.drawable.check_mark),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(15.dp),
-                                colorFilter = ColorFilter.tint(Color.White)
-                            )
-                        } else {
-                            Icon(
+//                        if (pack.favorite) {
+//                            Image(
+//                                painter = painterResource(Res.drawable.check_mark),
+//                                contentDescription = null,
+//                                modifier = Modifier
+//                                    .size(15.dp),
+//                                colorFilter = ColorFilter.tint(Color.White)
+//                            )
+//                        } else {
+//                            Icon(
+//                                imageVector = Icons.Default.Add,
+//                                contentDescription = "Add",
+//                                tint = Color.White,
+//                                modifier = Modifier
+//                                    .size(20.dp)
+//                                    .clickable {
+//                                        if (profile != null) {
+//                                            viewModel.addPackToFavorites(pack.id, profile.id)
+//                                        }
+//                                    }
+//                            )
+//                        }
+
+                        Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Add",
                                 tint = Color.White,
                                 modifier = Modifier
                                     .size(20.dp)
                                     .clickable {
-                                        viewModel.addPackToFavorites(pack.id, profile.id)
+                                        if (profile != null) {
+                                            viewModel.addPackToFavorites(pack.id, profile.id)
+                                        }
                                     }
                             )
-                        }
-
-
 
 
 
                     }
+////////////////////////////
+                    Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).size(20.dp).background(Color(0xFF2A293C)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.check_mark),
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(15.dp)
+                                .clickable {
+                                    if (profile != null) {
+                                        viewModel.removePackFromFavorites(pack.id, profile.id)
+                                    }
+                                },
+                            colorFilter = ColorFilter.tint(Color.White)
+                        )
+                    }
+                    //////////////
                 }
 
                 stickerPacksTest.forEach { pack ->
@@ -417,7 +505,7 @@ fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMod
                             horizontalArrangement = Arrangement.Start
                         ) {
                             rowStickers.forEach { sticker ->
-                                StickerItem()
+                                StickerItem(sticker)
                             }
                         }
                     }

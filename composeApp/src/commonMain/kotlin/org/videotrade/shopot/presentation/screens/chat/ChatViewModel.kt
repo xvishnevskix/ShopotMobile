@@ -34,6 +34,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
+import org.videotrade.shopot.presentation.components.Chat.FavoritePack
 import org.videotrade.shopot.presentation.components.Chat.Sticker
 import org.videotrade.shopot.presentation.components.Chat.StickerPack
 import kotlin.random.Random
@@ -88,6 +89,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val _stickers = MutableStateFlow<List<Sticker>>(emptyList())
     val stickers: StateFlow<List<Sticker>> get() = _stickers
 
+    private val _favoritePacks = MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
+    val favoritePacks: StateFlow<List<FavoritePack>> get() = _favoritePacks
+
     fun downloadStickerPacks() {
         viewModelScope.launch {
             val packs = stickerUseCase.downloadStickerPacks() ?: return@launch
@@ -117,6 +121,27 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 } ?: println("Не удалось добавить пак в избранное")
             } catch (e: Exception) {
                 println("Ошибка при добавлении пака в избранное: ${e.message}")
+            }
+        }
+    }
+
+    fun getFavoritePacks(userId: String) {
+        viewModelScope.launch {
+            val favoritePackList = stickerUseCase.getFavoritePacks(userId) // Предполагается, что UseCase реализован для получения избранных паков
+            _favoritePacks.value = favoritePackList ?: emptyList()
+        }
+    }
+
+    fun removePackFromFavorites(packId: String, userId: String) {
+        viewModelScope.launch {
+            val success = stickerUseCase.removePackFromFavorites(packId, userId)
+            if (success) {
+                // Обновляем список избранных паков после удаления
+                val updatedFavoritePacks = _favoritePacks.value.filter { it.packId != packId }
+                _favoritePacks.value = updatedFavoritePacks
+                println("Pack successfully removed from favorites")
+            } else {
+                println("Failed to remove pack from favorites")
             }
         }
     }
