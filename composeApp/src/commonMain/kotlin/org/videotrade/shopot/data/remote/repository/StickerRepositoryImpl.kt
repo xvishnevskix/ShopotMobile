@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.repository.StickerRepository
+import org.videotrade.shopot.presentation.components.Chat.Sticker
 import org.videotrade.shopot.presentation.components.Chat.StickerPack
 import org.videotrade.shopot.presentation.components.Chat.StickerPackResponse
 
@@ -31,5 +32,17 @@ class StickerRepositoryImpl : StickerRepository {
 
     override fun clearData() {
         stickerPacks.value = emptyList()
+    }
+
+    // Метод для получения списка стикеров для указанного пака
+    override suspend fun getStickersForPack(packId: String): List<Sticker>? {
+        val originInstance = origin()
+        println("Fetching stickers for packId: $packId")
+
+        // Используем originInstance.get для запроса стикеров
+        val stickers = originInstance.get<List<Sticker>>("stickers/package/$packId/stickers") ?: return null
+        println("Stickersssssssss: $stickers")
+
+        return stickers
     }
 }

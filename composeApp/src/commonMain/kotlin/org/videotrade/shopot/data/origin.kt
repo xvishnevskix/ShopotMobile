@@ -117,6 +117,43 @@ class origin {
         
         return null
     }
+
+    // Новый метод post с поддержкой заголовков
+    suspend inline fun post(
+        url: String,
+        data: String,
+        headers: Map<String, String> = emptyMap()
+    ): String? {
+        return try {
+            val token = getValueInStorage("accessToken")
+            println("url ${EnvironmentConfig.serverUrl}$url")
+
+            val response: HttpResponse =
+                client.post("${EnvironmentConfig.serverUrl}$url") {
+                    contentType(ContentType.Application.Json)
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    headers.forEach { (key, value) ->
+                        header(key, value)
+                    }
+                    setBody(data)
+                }
+
+            println("Отправляем данные: $data")
+            println("response.bodyAsText() ${response.bodyAsText()}")
+
+            if (response.status.isSuccess()) {
+                return response.bodyAsText()
+            } else {
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+            }
+            null
+        } catch (e: Exception) {
+            println("Error1111: $e")
+            null
+        } finally {
+            client.close()
+        }
+    }
     
     
     suspend inline fun put(

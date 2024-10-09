@@ -34,6 +34,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
+import org.videotrade.shopot.presentation.components.Chat.Sticker
 import org.videotrade.shopot.presentation.components.Chat.StickerPack
 import kotlin.random.Random
 
@@ -84,6 +85,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
 
+    private val _stickers = MutableStateFlow<List<Sticker>>(emptyList())
+    val stickers: StateFlow<List<Sticker>> get() = _stickers
+
     fun downloadStickerPacks() {
         viewModelScope.launch {
             val packs = stickerUseCase.downloadStickerPacks() ?: return@launch
@@ -91,20 +95,23 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun addPackToFavorites(packId: String) {
+    fun getStickersForPack(packId: String) {
+        viewModelScope.launch {
+            val stickersList = stickerUseCase.getStickersForPack(packId) ?: return@launch
+            _stickers.value = stickersList
+        }
+    }
+
+    fun addPackToFavorites(packId: String, userId: String) {
         viewModelScope.launch {
             try {
+                val url = "packs/$packId/favorite"
+                val headers = mapOf("X-User-Id" to userId)
 
-                val jsonContent = Json.encodeToString(
-                    buildJsonObject {
-                        put("packageId", packId)
-                    }
-                )
+                println("Отправка запроса на добавление пака в избранное: $url")
 
-                println("Отправка запроса на добавление в избранное: $jsonContent")
+                val response = origin().post(url, "", headers)
 
-//                val response = origin().post("stickers/package/favorite", jsonContent)
-                val response = origin().post("stickers/package/favorite?packageId=$packId", jsonContent)
                 response?.let {
                     println("Ответ от сервера: $it")
                 } ?: println("Не удалось добавить пак в избранное")
@@ -113,6 +120,29 @@ class ChatViewModel : ViewModel(), KoinComponent {
             }
         }
     }
+
+//    fun addPackToFavorites(packId: String) {
+//        viewModelScope.launch {
+//            try {
+//
+//                val jsonContent = Json.encodeToString(
+//                    buildJsonObject {
+//                        put("packageId", packId)
+//                    }
+//                )
+//
+//                println("Отправка запроса на добавление в избранное: $jsonContent")
+//
+////                val response = origin().post("stickers/package/favorite", jsonContent)
+//                val response = origin().post("stickers/package/favorite?packageId=$packId", jsonContent)
+//                response?.let {
+//                    println("Ответ от сервера: $it")
+//                } ?: println("Не удалось добавить пак в избранное")
+//            } catch (e: Exception) {
+//                println("Ошибка при добавлении пака в избранное: ${e.message}")
+//            }
+//        }
+//    }
     
     init {
         

@@ -71,23 +71,11 @@ val stickerPacksTest = listOf(
         favorite = false,
         stickers = listOf(
             Sticker(
-                name = "Стикер 1",
+                id = "Стикер 1",
+                fileUrl = "",
+                fileName = "",
             ),
-            Sticker(
-                name = "Стикер 1",
-            ),
-            Sticker(
-                name = "Стикер 1",
-            ),
-            Sticker(
-                name = "Стикер 1",
-            ),
-            Sticker(
-                name = "Стикер 1",
-            ),
-            Sticker(
-                name = "Стикер 1",
-            ),
+
 
             )
     ),
@@ -103,7 +91,10 @@ data class StickerPackTest(
 
 @Serializable
 data class Sticker(
-    val name: String?,
+    val id: String,         // UUID, представленный как String
+    val fileUrl: String,     // URL файла (это поле нужно извлечь из объекта File)
+    val fileName: String?,   // Название файла (может быть nullable)
+//    val data: ByteArray?
 )
 
 @Serializable
@@ -111,6 +102,13 @@ data class StickerPack(
     val id: String,
     val name: String,
     val favorite: Boolean,
+
+)
+
+@Serializable
+data class FavoritePack(
+    val userId: String,
+    val packId: String
 
 )
 
@@ -157,14 +155,17 @@ fun StickerMenuContent() {
 
     val viewModel: ChatViewModel = koinInject()
 
+
     val stickerPacks by viewModel.stickerPacks.collectAsState()
+    val stickers by viewModel.stickers.collectAsState()
 
     LaunchedEffect(Unit) {
 
         viewModel.downloadStickerPacks()
+        viewModel.getStickersForPack("9f48cc7d-d215-429f-9dd8-d719a426835e")
 
-
-            println("ПАКИИИИ ${stickerPacks}")
+        println("ПАКИИИИ ${stickerPacks}")
+        println("СТИИКИИИИИ ${stickers}")
 
     }
 
@@ -344,6 +345,8 @@ fun FavoriteStickersContent(favoritePacks: List<StickerPack>) {
 
 @Composable
 fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject()) {
+    val profile = viewModel.profile.collectAsState().value
+
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -393,7 +396,7 @@ fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMod
                                 modifier = Modifier
                                     .size(20.dp)
                                     .clickable {
-                                        viewModel.addPackToFavorites(pack.id)
+                                        viewModel.addPackToFavorites(pack.id, profile.id)
                                     }
                             )
                         }
