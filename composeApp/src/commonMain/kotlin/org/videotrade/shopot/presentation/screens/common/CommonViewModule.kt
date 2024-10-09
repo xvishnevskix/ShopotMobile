@@ -52,9 +52,15 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
     val mainNavigator = MutableStateFlow<Navigator?>(null)
     val tabNavigator = MutableStateFlow<TabNavigator?>(null)
-
+    
     val isRestartApp = MutableStateFlow(false)
-
+    
+    val appIsActive = MutableStateFlow(false)
+    
+    
+    fun setAppIsActive(activeValue: Boolean) {
+        appIsActive.value = activeValue
+    }
 
     fun restartApp() {
         isRestartApp.value = true

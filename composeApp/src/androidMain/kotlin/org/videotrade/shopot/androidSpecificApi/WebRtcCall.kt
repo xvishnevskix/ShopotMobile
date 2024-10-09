@@ -27,6 +27,10 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -39,6 +43,7 @@ import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
 // MyFirebaseMessagingService
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -127,7 +132,6 @@ class FullscreenNotificationActivity : AppActivity() {
                 
                 LaunchedEffect(Unit) {
                     if (profileId != null) {
-                        callViewModel.initWebrtc()
                         
                         callViewModel.connectionBackgroundWs(profileId)
                     }
@@ -139,7 +143,7 @@ class FullscreenNotificationActivity : AppActivity() {
                 
                 
                 val navScreen = if (isScreenOn) {
-                    CallScreen(userId!!, "IncomingCall", "", "", "", "")
+                    CallScreen(userId!!, "IncomingBackgroundCall", "", "", "", "")
                 } else {
                     IncomingCallScreen(userId!!, "", "", "", "")
                     
@@ -299,73 +303,86 @@ class CallActionReceiver : BroadcastReceiver() {
             
             
             "ACTION_ACCEPT_CALL" -> {
-                println("Вызов принят")
-                
-                val serviceIntent = Intent(context, CallForegroundService::class.java)
-                context.stopService(serviceIntent)
-                // Закрытие уведомления с кнопками "Принять" и "Отклонить"
-                val notificationManager =
-                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.cancel(1) // ID уведомления, используемого для Foreground Service
-                
-                // Запуск FullscreenNotificationActivity
-                val activityIntent = Intent(context, FullscreenNotificationActivity::class.java)
-                activityIntent.flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                val options = ActivityOptions.makeBasic()
-                options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
-                context.startActivity(activityIntent, options.toBundle())
-                
-                // Создание нового уведомления, которое будет висеть
-                val channelId = "ongoing_call_channel"
-                
-                // PendingIntent для запуска активности при нажатии на уведомление
-                val ongoingIntent = Intent(context, FullscreenNotificationActivity::class.java)
-                ongoingIntent.flags =
-                    Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                val ongoingPendingIntent = PendingIntent.getActivity(
-                    context, 0, ongoingIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-                
-                // Добавляем действие "Завершить" в уведомление
-                val endCallIntent = Intent(context, CallActionReceiver::class.java).apply {
-                    action = "ACTION_END_CALL"
-                }
-                val endCallPendingIntent = PendingIntent.getBroadcast(
-                    context,
-                    1,
-                    endCallIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-                
-                val ongoingNotification = NotificationCompat.Builder(context, channelId)
-                    .setContentTitle("Звонок в процессе")
-                    .setContentText("Идет звонок")
-                    .setSmallIcon(R.drawable.home_black)
-                    .setPriority(NotificationCompat.PRIORITY_LOW) // Низкий приоритет, чтобы не мешать пользователю
-                    .setOngoing(true) // Устанавливаем уведомление как постоянно отображаемое
-                    .setContentIntent(ongoingPendingIntent) // Добавляем PendingIntent для клика по уведомлению
-                    .addAction(
-                        R.drawable.decline_call_button,
-                        "Завершить",
-                        endCallPendingIntent
-                    ) // Кнопка "Завершить"
-                    .build()
-                
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    val channel = NotificationChannel(
-                        channelId,
-                        "Ongoing Call Channel",
-                        NotificationManager.IMPORTANCE_LOW
+               
+                CoroutineScope(Dispatchers.IO).launch {
+                    println("Вызов принят")
+                    val profileId = getValueInStorage("profileId")
+                    
+                    if (profileId != null) {
+                        callViewModel.initWebrtc()
+                        
+                        callViewModel.connectionBackgroundWs(profileId)
+                    }
+                    
+                    delay(5000)
+                    val serviceIntent = Intent(context, CallForegroundService::class.java)
+                    context.stopService(serviceIntent)
+                    // Закрытие уведомления с кнопками "Принять" и "Отклонить"
+                    val notificationManager =
+                        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.cancel(1) // ID уведомления, используемого для Foreground Service
+                    
+                    // Запуск FullscreenNotificationActivity
+                    val activityIntent = Intent(context, FullscreenNotificationActivity::class.java)
+                    activityIntent.flags =
+                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    val options = ActivityOptions.makeBasic()
+                    options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
+                    context.startActivity(activityIntent, options.toBundle())
+                    
+                    // Создание нового уведомления, которое будет висеть
+                    val channelId = "ongoing_call_channel"
+                    
+                    // PendingIntent для запуска активности при нажатии на уведомление
+                    val ongoingIntent = Intent(context, FullscreenNotificationActivity::class.java)
+                    ongoingIntent.flags =
+                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    val ongoingPendingIntent = PendingIntent.getActivity(
+                        context, 0, ongoingIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
-                    notificationManager.createNotificationChannel(channel)
+                    
+                    // Добавляем действие "Завершить" в уведомление
+                    val endCallIntent = Intent(context, CallActionReceiver::class.java).apply {
+                        action = "ACTION_END_CALL"
+                    }
+                    val endCallPendingIntent = PendingIntent.getBroadcast(
+                        context,
+                        1,
+                        endCallIntent,
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    )
+                    
+                    val ongoingNotification = NotificationCompat.Builder(context, channelId)
+                        .setContentTitle("Звонок в процессе")
+                        .setContentText("Идет звонок")
+                        .setSmallIcon(R.drawable.home_black)
+                        .setPriority(NotificationCompat.PRIORITY_LOW) // Низкий приоритет, чтобы не мешать пользователю
+                        .setOngoing(true) // Устанавливаем уведомление как постоянно отображаемое
+                        .setContentIntent(ongoingPendingIntent) // Добавляем PendingIntent для клика по уведомлению
+                        .addAction(
+                            R.drawable.decline_call_button,
+                            "Завершить",
+                            endCallPendingIntent
+                        ) // Кнопка "Завершить"
+                        .build()
+                    
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        val channel = NotificationChannel(
+                            channelId,
+                            "Ongoing Call Channel",
+                            NotificationManager.IMPORTANCE_LOW
+                        )
+                        notificationManager.createNotificationChannel(channel)
+                    }
+                    
+                    notificationManager.notify(
+                        2,
+                        ongoingNotification
+                    ) // Устанавливаем ID 2 для нового уведомления
                 }
                 
-                notificationManager.notify(
-                    2,
-                    ongoingNotification
-                ) // Устанавливаем ID 2 для нового уведомления
+
             }
             
             "ACTION_DECLINE_CALL" -> {

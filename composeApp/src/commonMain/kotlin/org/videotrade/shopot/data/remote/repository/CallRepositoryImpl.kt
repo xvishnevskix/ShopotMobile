@@ -520,8 +520,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         if (peerConnection.value !== null) {
             
             
-            val cameraPer = PermissionsProviderFactory.create()
-                .getPermission("microphone")
+//            val cameraPer = PermissionsProviderFactory.create()
+//                .getPermission("microphone")
 //
 //            if (cameraPer) {
             val stream = MediaDevices.getUserMedia(audio = true)
@@ -658,45 +658,45 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override suspend fun makeCall(userId: String, calleeId: String) {
         println("makeCall31313131 ${wsSession.value}")
         
-        coroutineScope {
-            if (wsSession.value != null) {
-                try {
-                    println("makeCall")
-                    
-                    val offer = peerConnection.value?.createOffer(
-                        OfferAnswerOptions(
-                            offerToReceiveAudio = true
-                        )
-                    )
-                    if (offer != null) {
-                        peerConnection.value?.setLocalDescription(offer)
-                    }
-                    
-                    
-                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
-                        return@coroutineScope
-                    }
-                    
-                    val newCallMessage = WebRTCMessage(
-                        type = "call",
-                        calleeId = calleeId,
-                        userId = userId,
-                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
-                    )
-                    
-                    
-                    val jsonMessage =
-                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-                    
-                    wsSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully Call")
-                    
-                    
-                } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
-                }
-            }
-        }
+//        coroutineScope {
+//            if (wsSession.value != null) {
+//                try {
+//                    println("makeCall")
+//
+//                    val offer = peerConnection.value?.createOffer(
+//                        OfferAnswerOptions(
+//                            offerToReceiveAudio = true
+//                        )
+//                    )
+//                    if (offer != null) {
+//                        peerConnection.value?.setLocalDescription(offer)
+//                    }
+//
+//
+//                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
+//                        return@coroutineScope
+//                    }
+//
+//                    val newCallMessage = WebRTCMessage(
+//                        type = "call",
+//                        calleeId = calleeId,
+//                        userId = userId,
+//                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
+//                    )
+//
+//
+//                    val jsonMessage =
+//                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
+//
+//                    wsSession.value?.send(Frame.Text(jsonMessage))
+//                    println("Message sent successfully Call")
+//
+//
+//                } catch (e: Exception) {
+//                    println("Failed to send message: ${e.message}")
+//                }
+//            }
+//        }
         
     }
     

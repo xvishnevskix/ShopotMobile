@@ -230,8 +230,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
                         updateOtherUserId(userId)
                         makeCall(userId)
                     }
-
+                    
                     "IncomingCall" -> answerCall()
+                    "IncomingBackgroundCall" -> answerCallBackground()
                 }
             }
         }
