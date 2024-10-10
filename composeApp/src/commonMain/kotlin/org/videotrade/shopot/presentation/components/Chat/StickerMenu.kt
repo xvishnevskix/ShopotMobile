@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import Avatar
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -21,6 +22,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
@@ -40,8 +42,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
@@ -50,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.rememberAsyncImagePainter
+import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
@@ -58,6 +64,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -66,119 +73,70 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.check_mark
+import shopot.composeapp.generated.resources.person
 import shopot.composeapp.generated.resources.sticker1
 
 
 
+//
+//val stickerPacksTest = listOf(
+//    StickerPackTest(
+//        name = "Набор стикеров 1",
+//        id = "",
+//        favorite = false,
+//        stickers = listOf(
+//            Sticker(
+//                id = "Стикер 1",
+//            ),
+//
+//
+//            )
+//    ),
+//)
+//
+//data class StickerPackTest(
+//    val id: String,
+//    val favorite: Boolean,
+//    val name: String,
+//    val stickers: List<Sticker>,
+//
+//    )
 
-val stickerPacksTest = listOf(
-    StickerPackTest(
-        name = "Набор стикеров 1",
-        id = "",
-        favorite = false,
-        stickers = listOf(
-            Sticker(
-                id = "Стикер 1",
-            ),
-
-
-            )
-    ),
-)
-
-data class StickerPackTest(
-    val id: String,
-    val favorite: Boolean,
-    val name: String,
-    val stickers: List<Sticker>,
-
-    )
-
-@Serializable
-data class Sticker(
-    val id: String,
-
-)
+//@Serializable
+//data class Sticker(
+//    val id: String,
+//
+//)
 
 @Serializable
 data class StickerPack(
-    val id: String,
     val name: String,
+    val packId: String,
     val favorite: Boolean,
-
+    val fileIds: List<String?>
 )
 
 @Serializable
 data class FavoritePack(
+    val id: String,
     val userId: String,
     val packId: String
-
-)
-
-@Serializable
-data class StickerPackResponse(
-    val content: List<StickerPack>,
-    val pageable: StickerPageable,
-    val last: Boolean,
-    val totalElements: Int,
-    val totalPages: Int,
-    val size: Int,
-    val number: Int,
-    val sort: StickerSort,
-    val first: Boolean,
-    val numberOfElements: Int,
-    val empty: Boolean
-)
-
-@Serializable
-data class StickerPageable(
-    val pageNumber: Int,
-    val pageSize: Int,
-    val offset: Long,
-    val paged: Boolean,
-    val unpaged: Boolean,
-    val sort: StickerSort
-)
-
-@Serializable
-data class StickerSort(
-    val empty: Boolean,
-    val sorted: Boolean,
-    val unsorted: Boolean
 )
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun StickerMenuContent(profile: ProfileDTO? = null) {
-    val tabTitles = listOf(stringResource(MokoRes.strings.recent), stringResource(MokoRes.strings.favorite), stringResource(MokoRes.strings.store))
+fun StickerMenuContent() {
+    val tabTitles = listOf(
+//        stringResource(MokoRes.strings.recent),
+        stringResource(MokoRes.strings.favorite),
+        stringResource(MokoRes.strings.store)
+
+    )
     val pagerState = rememberPagerState(pageCount = { tabTitles.size })
     val selectedTabIndex = remember {
         derivedStateOf { pagerState.currentPage }
     }
-
     val viewModel: ChatViewModel = koinInject()
-
-
-    val stickerPacks by viewModel.stickerPacks.collectAsState()
-    val stickers by viewModel.stickers.collectAsState()
-    val favoritePacks by viewModel.favoritePacks.collectAsState()
-
-    LaunchedEffect(Unit) {
-
-        viewModel.downloadStickerPacks()
-
-        if (profile != null) {
-            viewModel.getFavoritePacks(profile.id)
-        }
-
-
-
-        println("ПАКИИИИ ${stickerPacks}")
-        println("СТИИКИИИИИ ${stickers}")
-
-    }
-
-
 
 
 
@@ -236,56 +194,34 @@ fun StickerMenuContent(profile: ProfileDTO? = null) {
             modifier = Modifier.fillMaxWidth().fillMaxHeight()
         ) { page ->
             when (page) {
-                0 -> RecentStickersContent(stickerPacks, viewModel, stickers)
-                1 -> FavoriteStickersContent(favoritePacks, profile)
-                2 -> StoreStickersContent(stickerPacks, viewModel, profile)
+//                0 -> RecentStickersContent(stickerPacks, viewModel)
+                0 -> FavoriteStickersContent(viewModel)
+                1 -> StoreStickersContent(viewModel)
             }
         }
     }
 }
 
 @Composable
-fun StickerItem(sticker: Sticker) {
+fun StickerItem(stickerId: String?) {
 
-
-    var imageFilePath by remember { mutableStateOf("") }
-    val imagePainter = rememberAsyncImagePainter(imageFilePath)
-
-    val url =
-        "${EnvironmentConfig.serverUrl}file/id/${sticker.id}"
-    LaunchedEffect(Unit) {
-//        val fileName = attachments[0].name
-//        val fileType = attachments[0].type
-//        val fileProvider = FileProviderFactory.create()
-//        val existingFile =
-//            fileProvider.existingFile(fileName, fileType)
-//        if (!existingFile.isNullOrBlank()) {
-//            imageFilePath = existingFile
-//            println("existingFile ${existingFile}")
-//        } else {
-//            val filePath = fileProvider.downloadCipherFile(
-//                url,
-//                "image",
-//                fileName,
-//                "image"
-//            ) { newProgress ->
-//                println("newProgress $newProgress")
-//            }
-//            if (filePath != null) {
-//                imageFilePath = filePath
-//            }
-//            println("filePath $filePath")
-//        }
+    val imagePainter = if (stickerId.isNullOrBlank()) {
+        painterResource(Res.drawable.sticker1)
+    } else {
+        rememberImagePainter("${serverUrl}file/plain/$stickerId")
     }
-
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(4.dp)
     ) {
+        println("Я СТИКЕР $stickerId")
+        println("Я СТИКЕР $imagePainter")
+        println("Я СТИКЕР ${serverUrl}file/plain/$stickerId")
         Image(
-            painter = painterResource(Res.drawable.sticker1),
+            painter = imagePainter,
             contentDescription = null,
+            contentScale = ContentScale.Fit,
             modifier = Modifier
                 .size(64.dp)
         )
@@ -293,7 +229,7 @@ fun StickerItem(sticker: Sticker) {
 }
 
 @Composable
-fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject(), stickers: List<Sticker>) {
+fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject()) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -302,12 +238,9 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMo
     ) {
         items(stickerPacks) { pack ->
 
-            viewModel.getStickersForPack(pack.id)
-
-
             Column {
                 Text(
-                    text = "${pack.name}",
+                    text = pack.name,
                     fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                     textAlign = TextAlign.Center,
                     fontSize = 19.sp,
@@ -319,28 +252,37 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMo
                         .padding(bottom = 10.dp)
                 )
 
-                stickerPacksTest.forEach { pack ->
-                    pack.stickers.chunked(5).forEach { rowStickers ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            rowStickers.forEach { sticker ->
+                pack.fileIds.chunked(5).forEach { rowStickers ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        rowStickers.forEach { sticker ->
                                 StickerItem(sticker)
-                            }
                         }
                     }
                 }
-//                StickerItem()
+
             }
         }
     }
 }
 
 @Composable
-fun FavoriteStickersContent(favoritePacks: List<FavoritePack>, profile: ProfileDTO? = null) {
+fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject()) {
+
+    val stickerPacks = viewModel.stickerPacks.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+        viewModel.downloadStickerPacks()
+        println("ПАКИИИИ ${stickerPacks.value}")
+    }
+
+
+    val favoritePacks = stickerPacks.value.filter { it.favorite }
 
 
     if (favoritePacks.isNotEmpty()) {
@@ -350,14 +292,19 @@ fun FavoriteStickersContent(favoritePacks: List<FavoritePack>, profile: ProfileD
                 .fillMaxHeight()
                 .padding(vertical = 4.dp, horizontal = 16.dp)
         ) {
+
             items(favoritePacks) { pack ->
-
-
-
-
                 Column {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 5.dp)
+                            .padding(bottom = 10.dp)
+                    ) {
                     Text(
-                        text = "${pack.packId}",
+                        text = pack.name,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                         textAlign = TextAlign.Center,
                         fontSize = 19.sp,
@@ -368,28 +315,47 @@ fun FavoriteStickersContent(favoritePacks: List<FavoritePack>, profile: ProfileD
                             .padding(horizontal = 5.dp)
                             .padding(bottom = 10.dp)
                     )
-                    stickerPacksTest.forEach { pack ->
-                        pack.stickers.chunked(5).forEach { rowStickers ->
-                            Row(
+
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp),
+                            contentAlignment = Alignment.TopCenter
+                        ) {
+
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                tint = Color(0xFF979797),
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.Start
-                            ) {
-                                rowStickers.forEach { sticker ->
+                                    .padding()
+                                    .clickable {
+                                        viewModel.removePackFromFavorites(pack.packId)
+                                    },
+
+                            )
+                        }
+                }
+                    pack.fileIds.chunked(5).forEach { rowStickers ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            rowStickers.forEach { sticker ->
+                                if (sticker != null) {
                                     StickerItem(sticker)
                                 }
                             }
                         }
                     }
-//                    StickerItem()
                 }
             }
         }
     } else {
+
         Box(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
         ) {
             Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store))
@@ -398,7 +364,18 @@ fun FavoriteStickersContent(favoritePacks: List<FavoritePack>, profile: ProfileD
 }
 
 @Composable
-fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject(), profile: ProfileDTO? = null) {
+fun StoreStickersContent(viewModel: ChatViewModel = koinInject()) {
+
+    val stickerPacks = viewModel.stickerPacks.collectAsState()
+
+
+    LaunchedEffect(Unit) {
+
+        viewModel.downloadStickerPacks()
+        println("ПАКИИИИ ${stickerPacks}")
+    }
+
+
 
     LazyColumn(
         modifier = Modifier
@@ -406,24 +383,18 @@ fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMod
             .fillMaxHeight()
             .padding(vertical = 4.dp, horizontal = 16.dp)
     ) {
-        items(stickerPacks) { pack ->
-
-            viewModel.getStickersForPack(pack.id)
-
-
+        items(stickerPacks.value) { pack ->
             Column {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                    ,
-
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 5.dp)
                         .padding(bottom = 10.dp)
                 ) {
                     Text(
-                        text = "${pack.name}",
+                        text = pack.name,
                         fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                         textAlign = TextAlign.Center,
                         fontSize = 19.sp,
@@ -432,87 +403,53 @@ fun StoreStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMod
                         color = Color(0xFF000000)
                     )
 
-
-                    Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).size(20.dp).background(Color(0xFF2A293C)),
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .size(20.dp)
+                            .background(Color(0xFF2A293C)),
                         contentAlignment = Alignment.Center
-                    ){
-
-//                        if (pack.favorite) {
-//                            Image(
-//                                painter = painterResource(Res.drawable.check_mark),
-//                                contentDescription = null,
-//                                modifier = Modifier
-//                                    .size(15.dp),
-//                                colorFilter = ColorFilter.tint(Color.White)
-//                            )
-//                        } else {
-//                            Icon(
-//                                imageVector = Icons.Default.Add,
-//                                contentDescription = "Add",
-//                                tint = Color.White,
-//                                modifier = Modifier
-//                                    .size(20.dp)
-//                                    .clickable {
-//                                        if (profile != null) {
-//                                            viewModel.addPackToFavorites(pack.id, profile.id)
-//                                        }
-//                                    }
-//                            )
-//                        }
-
-                        Icon(
+                    ) {
+                        if (pack.favorite) {
+                            Image(
+                                painter = painterResource(Res.drawable.check_mark),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(15.dp)
+                                    .clickable {
+                                        viewModel.removePackFromFavorites(pack.packId)
+                                    },
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        } else {
+                            Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Add",
                                 tint = Color.White,
                                 modifier = Modifier
                                     .size(20.dp)
                                     .clickable {
-                                        if (profile != null) {
-                                            viewModel.addPackToFavorites(pack.id, profile.id)
-                                        }
+                                        viewModel.addPackToFavorites(pack.packId)
                                     }
                             )
-
-
-
-                    }
-////////////////////////////
-                    Box(modifier = Modifier.clip(RoundedCornerShape(4.dp)).size(20.dp).background(Color(0xFF2A293C)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.check_mark),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(15.dp)
-                                .clickable {
-                                    if (profile != null) {
-                                        viewModel.removePackFromFavorites(pack.id, profile.id)
-                                    }
-                                },
-                            colorFilter = ColorFilter.tint(Color.White)
-                        )
-                    }
-                    //////////////
-                }
-
-                stickerPacksTest.forEach { pack ->
-                    pack.stickers.chunked(5).forEach { rowStickers ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.Start
-                        ) {
-                            rowStickers.forEach { sticker ->
-                                StickerItem(sticker)
-                            }
                         }
                     }
                 }
-                //                    StickerItem()
+
+
+                pack.fileIds.chunked(5).forEach { rowStickers ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        rowStickers.forEach { sticker ->
+                            StickerItem(sticker)
+                        }
+                    }
+                }
             }
         }
-
     }
 }

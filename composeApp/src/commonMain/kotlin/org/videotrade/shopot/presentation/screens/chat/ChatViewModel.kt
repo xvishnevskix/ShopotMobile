@@ -35,7 +35,6 @@ import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.presentation.components.Chat.FavoritePack
-import org.videotrade.shopot.presentation.components.Chat.Sticker
 import org.videotrade.shopot.presentation.components.Chat.StickerPack
 import kotlin.random.Random
 
@@ -86,11 +85,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
 
-    private val _stickers = MutableStateFlow<List<Sticker>>(emptyList())
-    val stickers: StateFlow<List<Sticker>> get() = _stickers
-
     private val _favoritePacks = MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
     val favoritePacks: StateFlow<List<FavoritePack>> get() = _favoritePacks
+
+    private val _stickerPack = MutableStateFlow(StickerPack("", "", false, emptyList() ))  // Исправление здесь
+    val stickerPack: StateFlow<StickerPack> get() = _stickerPack
 
     fun downloadStickerPacks() {
         viewModelScope.launch {
@@ -99,46 +98,27 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    fun getStickersForPack(packId: String) {
+    fun getPack(packId: String) {
         viewModelScope.launch {
-            val stickersList = stickerUseCase.getStickersForPack(packId) ?: return@launch
-            _stickers.value = stickersList
+            val stickerPack = stickerUseCase.getPack(packId) ?: return@launch
+            _stickerPack.value = stickerPack
         }
     }
 
-    fun addPackToFavorites(packId: String, userId: String) {
+    fun getFavoritePacks() {
         viewModelScope.launch {
-            try {
-                val url = "packs/$packId/favorite"
-                val headers = mapOf("X-User-Id" to userId)
-
-                println("Отправка запроса на добавление пака в избранное: $url")
-
-                val response = origin().post(url, "", headers)
-
-                response?.let {
-                    println("Ответ от сервера: $it")
-                } ?: println("Не удалось добавить пак в избранное")
-            } catch (e: Exception) {
-                println("Ошибка при добавлении пака в избранное: ${e.message}")
-            }
-        }
-    }
-
-    fun getFavoritePacks(userId: String) {
-        viewModelScope.launch {
-            val favoritePackList = stickerUseCase.getFavoritePacks(userId) // Предполагается, что UseCase реализован для получения избранных паков
+            val favoritePackList = stickerUseCase.getFavoritePacks()
             _favoritePacks.value = favoritePackList ?: emptyList()
         }
     }
 
-    fun removePackFromFavorites(packId: String, userId: String) {
+    fun removePackFromFavorites(packId: String) {
         viewModelScope.launch {
-            val success = stickerUseCase.removePackFromFavorites(packId, userId)
+            val success = stickerUseCase.removePackFromFavorites(packId)
             if (success) {
-                // Обновляем список избранных паков после удаления
-                val updatedFavoritePacks = _favoritePacks.value.filter { it.packId != packId }
-                _favoritePacks.value = updatedFavoritePacks
+                _stickerPacks.value = _stickerPacks.value.map { pack ->
+                    if (pack.packId == packId) pack.copy(favorite = false) else pack
+                }
                 println("Pack successfully removed from favorites")
             } else {
                 println("Failed to remove pack from favorites")
@@ -146,28 +126,19 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
 
-//    fun addPackToFavorites(packId: String) {
-//        viewModelScope.launch {
-//            try {
-//
-//                val jsonContent = Json.encodeToString(
-//                    buildJsonObject {
-//                        put("packageId", packId)
-//                    }
-//                )
-//
-//                println("Отправка запроса на добавление в избранное: $jsonContent")
-//
-////                val response = origin().post("stickers/package/favorite", jsonContent)
-//                val response = origin().post("stickers/package/favorite?packageId=$packId", jsonContent)
-//                response?.let {
-//                    println("Ответ от сервера: $it")
-//                } ?: println("Не удалось добавить пак в избранное")
-//            } catch (e: Exception) {
-//                println("Ошибка при добавлении пака в избранное: ${e.message}")
-//            }
-//        }
-//    }
+    fun addPackToFavorites(packId: String) {
+        viewModelScope.launch {
+            val success = stickerUseCase.addPackToFavorites(packId)
+            if (success) {
+                _stickerPacks.value = _stickerPacks.value.map { pack ->
+                    if (pack.packId == packId) pack.copy(favorite = true) else pack
+                }
+                println("Pack successfully added to favorites")
+            } else {
+                println("Failed to add pack to favorites")
+            }
+        }
+    }
     
     init {
         

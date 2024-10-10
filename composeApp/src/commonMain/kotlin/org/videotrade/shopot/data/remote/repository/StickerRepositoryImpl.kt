@@ -6,9 +6,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.repository.StickerRepository
 import org.videotrade.shopot.presentation.components.Chat.FavoritePack
-import org.videotrade.shopot.presentation.components.Chat.Sticker
 import org.videotrade.shopot.presentation.components.Chat.StickerPack
-import org.videotrade.shopot.presentation.components.Chat.StickerPackResponse
+
 
 class StickerRepositoryImpl : StickerRepository {
 
@@ -18,48 +17,63 @@ class StickerRepositoryImpl : StickerRepository {
         val originInstance = origin()
         println("Sticker get")
 
-        val stickerPackResponse = originInstance.get<StickerPackResponse>("packs") ?: return null
 
-        println("Sticker Packs Result: ${stickerPackResponse.content}")
+        val stickerPackList = originInstance.get<List<StickerPack>>("packs") ?: return null
+
+        println("Sticker Packs Result: $stickerPackList")
 
 
-        stickerPacks.value = stickerPackResponse.content
+        stickerPacks.value = stickerPackList
 
-        return stickerPackResponse.content
+        return stickerPackList
     }
 
 
-
-    override suspend fun getStickersForPack(packId: String): List<Sticker>? {
+    override suspend fun getFavoritePacks(): List<FavoritePack>? {
         val originInstance = origin()
-        println("Fetching stickers for packId: $packId")
+        println("Fetching favorite packs")
 
-        // Используем originInstance.get для запроса стикеров
-        val stickers = originInstance.get<List<Sticker>>("stickers/package/$packId/stickers") ?: return null
-        println("Stickersssssssss: $stickers")
-
-        return stickers
-    }
-
-    override suspend fun getFavoritePacks(userId: String): List<FavoritePack>? {
-        val originInstance = origin()
-        println("Fetching favorite packs for userId: $userId")
-
-        // Используем originInstance.get для запроса избранных паков
-        val favoritePacks = originInstance.get<List<FavoritePack>>("packs/$userId/favorites") ?: return null
+        val favoritePacks = originInstance.get<List<FavoritePack>>("packs/favorites") ?: return null
         println("Favorite packs: $favoritePacks")
 
         return favoritePacks
     }
 
-    override suspend fun removePackFromFavorites(packId: String, userId: String): Boolean {
+    override suspend fun getPack(packId: String): StickerPack? {
         val originInstance = origin()
-        println("Removing pack from favorites for userId: $userId and packId: $packId")
+        println("Fetching pack with packId: $packId")
+
+        val stickerPack = originInstance.get<StickerPack>("packs/$packId") ?: return null
+        println("Fetched Sticker Pack: $stickerPack")
+
+        return stickerPack
+    }
+
+    override suspend fun addPackToFavorites(packId: String): Boolean {
+        return try {
+            val originInstance = origin()
+            val response = originInstance.post("packs/$packId/favorite", "")
+            response?.let {
+                println("Pack successfully added to favorites: $it")
+                true
+            } ?: run {
+                println("Failed to add pack to favorites")
+                false
+            }
+        } catch (e: Exception) {
+            println("Error while adding pack to favorites: ${e.message}")
+            false
+        }
+    }
+
+
+    override suspend fun removePackFromFavorites(packId: String): Boolean {
+        val originInstance = origin()
+        println("Removing pack from favorites for packId: $packId")
 
         val url = "packs/$packId/favorite"
-        val headers = mapOf("X-User-Id" to userId)
 
-        return originInstance.delete(url, headers)
+        return originInstance.delete(url)
     }
 
     override fun clearData() {

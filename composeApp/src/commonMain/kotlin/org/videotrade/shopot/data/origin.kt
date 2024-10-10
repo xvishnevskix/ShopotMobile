@@ -39,8 +39,6 @@ class origin {
         try {
             val token = getValueInStorage("accessToken")
 
-
-            println("tokentokentoken ${token}")
             
             println("url ${EnvironmentConfig.serverUrl}$url")
             
