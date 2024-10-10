@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.components.Call
 
 import Avatar
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,9 +22,13 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -34,7 +39,8 @@ fun CallBar() {
     val isTimerRunning = callViewModel.isTimerRunning.collectAsState()
     val timerValue = callViewModel.timer.collectAsState()
     val userIcon = callViewModel.userIcon.collectAsState()
-
+    val callScreenInfo = callViewModel.callScreenInfo.collectAsState()
+    val commonViewModel: CommonViewModel = koinInject()
 
 
     if (isTimerRunning.value) {
@@ -45,7 +51,9 @@ fun CallBar() {
                 .fillMaxWidth()
                 .height(40.dp)
                 .background(Color(0xFF2A293C))
-                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .padding(horizontal = 8.dp, vertical = 2.dp).clickable {
+                    callScreenInfo.value?.let { commonViewModel.mainNavigator.value?.push(it) }
+                }
             ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

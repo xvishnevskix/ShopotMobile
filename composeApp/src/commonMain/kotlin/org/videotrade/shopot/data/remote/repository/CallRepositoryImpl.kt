@@ -63,8 +63,10 @@ import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
@@ -102,7 +104,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     private val isCall = mutableStateOf(false)
-    private val isIncomingCall = mutableStateOf(false)
+    
+    private val _isCallActive = MutableStateFlow(false)
+    override val isCallActive: StateFlow<Boolean> get() = _isCallActive
+    
+    
+    private val _isIncomingCall = MutableStateFlow(false)
+    override val isIncomingCall: StateFlow<Boolean> get() = _isIncomingCall
     
     private val _isCallBackground = MutableStateFlow(false)
     override val isCallBackground: StateFlow<Boolean> get() = _isCallBackground
@@ -153,9 +161,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-    override fun setIsCallBackground(isCallBackground: Boolean) {
-        _isCallBackground.value = isCallBackground
-    }
+
     
     override suspend fun connectionWs(userId: String, navigator: Navigator) {
         val httpClient = HttpClient {
@@ -235,7 +241,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         
                                                         otherUserId.value = userId
                                                         
-                                                        isIncomingCall.value = true
+                                                        _isIncomingCall.value = true
                                                         val contact = findContactByPhone(
                                                             user.phone,
                                                             contactsUseCase.contacts.value
@@ -314,20 +320,48 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
-                                        if (isIncomingCall.value) {
-                                            navigator.push(MainScreen())
+                                        val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+                                        
+                                        val currentScreen = navigator.lastItem
+                                        
+                                        callViewModel.stopTimer()
+                                        
+                                        setIsCallActive(false)
+                                        
+                                        if (_isIncomingCall.value) {
+                                            if (currentScreen is CallScreen) {
+                                                // Вы на экране CallScreen
+                                                navigator.push(MainScreen())
+                                                
+                                                println("Мы на экране CallScreen")
+                                            } else if (currentScreen is MainScreen) {
+                                                // Вы на экране MainScreen
+                                                println("Мы на экране MainScreen")
+                                            }
                                         }
                                         
                                         println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
                                         if (isCall.value)
                                             rejectCallAnswer(navigator)
                                         
-                                        println("rejectCall2 ${isConnectedWebrtc.value}")
+
                                         
                                         
-                                        if (isConnectedWebrtc.value) {
+
                                             
-                                            navigator.push(MainScreen())
+                                            
+                                            
+                                            if (isConnectedWebrtc.value) {
+                                                
+                                                if (currentScreen is CallScreen) {
+                                                    // Вы на экране CallScreen
+                                                    navigator.push(MainScreen())
+                                                    
+                                                    println("Мы на экране CallScreen")
+                                                } else if (currentScreen is MainScreen) {
+                                                    // Вы на экране MainScreen
+                                                    println("Мы на экране MainScreen")
+                                                }
                                             
                                         }
                                         
@@ -428,7 +462,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         
                                                         otherUserId.value = userId
                                                         
-                                                        isIncomingCall.value = true
+                                                        _isIncomingCall.value = true
                                                         val contact = findContactByPhone(
                                                             user.phone,
                                                             contactsUseCase.contacts.value
@@ -1040,6 +1074,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value
             println("rejectCallAnswer1")
+            val currentScreen = navigator.lastItem
             
             if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
@@ -1083,7 +1118,16 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _peerConnection.value = PeerConnection(rtcConfiguration)
             
             
-            navigator.push(MainScreen())
+            
+            if (currentScreen is CallScreen) {
+                // Вы на экране CallScreen
+                navigator.push(MainScreen())
+                
+                println("Мы на экране CallScreen")
+            } else if (currentScreen is MainScreen) {
+                // Вы на экране MainScreen
+                println("Мы на экране MainScreen")
+            }
             
             Logger.d { "Call answer rejected and resources cleaned up successfully." }
         } catch (e: Exception) {
@@ -1107,8 +1151,15 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     override fun setIsIncomingCall(isIncomingCallValue: Boolean) {
-        isIncomingCall.value = isIncomingCallValue
+        _isIncomingCall.value = isIncomingCallValue
     }
     
+    override fun setIsCallActive(isCallActive: Boolean) {
+        _isCallActive.value = isCallActive
+    }
+    
+    override fun setIsCallBackground(isCallBackground: Boolean) {
+        _isCallBackground.value = isCallBackground
+    }
     
 }

@@ -19,6 +19,11 @@ interface CallRepository {
     val isConnectedWebrtc: StateFlow<Boolean>
     
     val isConnectedWs: StateFlow<Boolean>
+    
+    val isIncomingCall: StateFlow<Boolean>
+    
+    val isCallActive: StateFlow<Boolean>
+    
     val isCallBackground: StateFlow<Boolean>
     
     val localStream: StateFlow<MediaStream?>
@@ -66,11 +71,11 @@ interface CallRepository {
 //    fun rejectCallAnswer()
     
     fun clearData()
+    
     fun setIsIncomingCall(isIncomingCallValue: Boolean)
     
     fun setIsCallBackground(isCallBackground: Boolean)
     
-    
-    
+    fun setIsCallActive(isCallActive: Boolean)
     
 }

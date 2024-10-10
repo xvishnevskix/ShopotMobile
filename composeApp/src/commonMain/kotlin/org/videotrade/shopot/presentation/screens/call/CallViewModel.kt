@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
@@ -29,6 +30,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
     val isConnectedWs = callUseCase.isConnectedWs
     val isCallBackground = callUseCase.isCallBackground
     
+    val isIncomingCall = callUseCase.isIncomingCall
+    
     private val _isConnectedWebrtc = MutableStateFlow(false)
     val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
     
@@ -53,28 +56,28 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     
     val localStreamm = callUseCase.localStream
-
-//    init {
-//        startObserving()
-//    }
-
+    
+    val isCallActive = callUseCase.isCallActive
+    
+    
     // Таймер
     private val _timer = MutableStateFlow("00:00:00")
     val timer: StateFlow<String> get() = _timer
-
+    
     private var timerJob: Job? = null
     private var elapsedSeconds = 0L
-
+    
     val isTimerRunning = MutableStateFlow(false)
-
+    
     private val _userIcon = MutableStateFlow<String?>(null)
     val userIcon: StateFlow<String?> get() = _userIcon
-
-
+    
+    val callScreenInfo = MutableStateFlow<Screen?>(null)
+    
     fun updateUserIcon(icon: String?) {
         _userIcon.value = icon
     }
-
+    
     fun startTimer(icon: String?) {
         updateUserIcon(icon)
         elapsedSeconds = 0L
@@ -88,14 +91,14 @@ class CallViewModel() : ViewModel(), KoinComponent {
             }
         }
     }
-
+    
     fun stopTimer() {
         timerJob?.cancel()
         isTimerRunning.value = false
         timerJob = null
     }
-
-
+    
+    
     private fun formatTime(seconds: Long): String {
         val hours = (seconds / 3600).toInt().toString().padStart(2, '0')
         val minutes = ((seconds % 3600) / 60).toInt().toString().padStart(2, '0')
@@ -302,5 +305,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.setIsCallBackground(isCallBackground)
     }
     
+    fun setIsCallActive(isCallActive: Boolean) {
+        return callUseCase.setIsCallActive(isCallActive)
+    }
     
 }

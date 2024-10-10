@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
@@ -35,12 +33,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.seiko.imageloader.rememberImagePainter
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
@@ -54,7 +49,6 @@ import org.videotrade.shopot.presentation.screens.group.GroupProfileScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileChatScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.person
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,46 +67,46 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                 .background(Color.White),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-
+            
             ) {
-
+            
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-
-
+                
+                
                 BackIcon(Modifier.padding(start = 23.dp, end = 8.dp).pointerInput(Unit) {
-
+                    
                     viewModel.clearMessages()
                     viewModel.setMessagePage(0)
                     navigator.pop()
-
-
+                    
+                    
                 })
             }
-
+            
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier.fillMaxWidth(0.85f).padding(end = 5.dp).pointerInput(Unit) {
-
+                    
                     if (chat.personal) {
                         navigator.push(ProfileChatScreen(chat))
                     } else {
-
+                        
                         viewModel.loadGroupUsers(chat.chatId)
                         navigator.push(GroupProfileScreen(profile, chat))
-
+                        
                     }
                 }
             ) {
-
+                
                 Avatar(
                     icon = chat.icon,
                     size = 40.dp
                 )
-
+                
                 val fullName =
                     listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.groupName)
                         .joinToString(" ")
@@ -120,10 +114,10 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         ?.let {
                             if (it.length > 35) "${it.take(32)}..." else it
                         } ?: ""
-
+                
                 if (chat.personal) {
                     val displayName = fullName.ifBlank { chat.phone!! }
-
+                    
                     Text(
                         text = displayName,
                         fontSize = 16.sp,
@@ -144,10 +138,10 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         color = Color(0xFF000000)
                     )
                 }
-
-
+                
+                
             }
-
+            
             Box(
                 modifier = Modifier.padding(end = 23.dp)
             ) {
@@ -157,12 +151,13 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         contentDescription = "Call",
                         tint = Color(0xFF000000),
                         modifier = Modifier.size(20.dp).pointerInput(Unit) {
-
+                            
                             scope.launch {
                                 try {
                                     val cameraPer =
-                                        PermissionsProviderFactory.create().getPermission("microphone")
-
+                                        PermissionsProviderFactory.create()
+                                            .getPermission("microphone")
+                                    
                                     if (!cameraPer) return@launch
 //
 //                                callViewModel.makeCallBackground(
@@ -178,10 +173,33 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 //                            )
 //
                                     callViewModel.initWebrtc()
+                                    
+                                    callViewModel.callScreenInfo.value = CallScreen(
+                                        chat.userId,
+                                        "Call",
+                                        chat.icon,
+                                        chat.firstName!!,
+                                        chat.lastName!!,
+                                        chat.phone!!,
+                                    )
 //
+//                                    if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
+//                                        println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
+//                                        navigator.push(
+//                                            CallScreen(
+//                                                chat.userId,
+//                                                "Call",
+//                                                chat.icon,
+//                                                chat.firstName!!,
+//                                                chat.lastName!!,
+//                                                chat.phone!!,
+//                                            )
+//                                        )
+//                                    }
+                                    
                                     if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
                                         println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
-                                        navigator.push(
+                                       commonViewModel.mainNavigator.value?.push(
                                             CallScreen(
                                                 chat.userId,
                                                 "Call",
@@ -193,32 +211,20 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                         )
                                     }
 //
-
+                                
                                 } catch (e: Exception) {
                                     println("ERROR : $e")
-
+                                    
                                 }
                             }
                             println("userID : ${chat.userId}")
-
-
+                            
+                            
                         }
                     )
             }
-
+            
         }
-        Box(
-            modifier = Modifier.fillMaxWidth().background(Color.Blue).height(35.dp)
-                .clickable {
-                    callViewModel.startTimer(chat.icon)
-                }
-        ) {}
-        Box(
-            modifier = Modifier.fillMaxWidth().background(Color.Red).height(35.dp)
-                .clickable {
-                    callViewModel.stopTimer()
-                }
-        ) {}
         CallBar()
     }
 }

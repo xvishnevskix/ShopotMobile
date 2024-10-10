@@ -20,6 +20,8 @@ class CallUseCase : KoinComponent {
     val isConnectedWebrtc: StateFlow<Boolean> get() = repository.isConnectedWebrtc
     val isConnectedWs: StateFlow<Boolean> get() = repository.isConnectedWs
     val isCallBackground: StateFlow<Boolean> get() = repository.isCallBackground
+    val isIncomingCall: StateFlow<Boolean> get() = repository.isIncomingCall
+    val isCallActive: StateFlow<Boolean> get() = repository.isCallActive
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
     val callState: StateFlow<PeerConnectionState> get() = repository.callState
@@ -119,6 +121,10 @@ class CallUseCase : KoinComponent {
     
     fun setIsCallBackground(isCallBackground: Boolean) {
         return repository.setIsCallBackground(isCallBackground)
+    }
+    
+    fun setIsCallActive(isCallActive: Boolean) {
+        return repository.setIsCallActive(isCallActive)
     }
     
     

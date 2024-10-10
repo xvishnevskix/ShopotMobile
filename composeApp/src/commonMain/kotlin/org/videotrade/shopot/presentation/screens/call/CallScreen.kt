@@ -3,7 +3,6 @@ package org.videotrade.shopot.presentation.screens.call
 import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -52,6 +52,7 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
+import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
@@ -77,13 +78,15 @@ class CallScreen(
         
         
         var secondsElapsed by remember { mutableStateOf(0) }
-        var isRunning by remember { mutableStateOf(false) }
-        
         val viewModel: CallViewModel = koinInject()
         val callStateView by viewModel.callState.collectAsState()
+        val isCallActive by viewModel.isCallActive.collectAsState()
         val isConnectedWs by viewModel.isConnectedWs.collectAsState()
         val localStream by viewModel.localStreamm.collectAsState()
         val isCallBackground by viewModel.isCallBackground.collectAsState()
+        val isIncomingCall by viewModel.isIncomingCall.collectAsState()
+        val timerValue = viewModel.timer.collectAsState()
+        val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
         
         
         val hasExecuted = remember { mutableStateOf(false) }
@@ -105,59 +108,85 @@ class CallScreen(
         }
         
         
-        
-        LaunchedEffect(Unit) {
+        if (isIncomingCall) {
+            LaunchedEffect(Unit) {
+                musicPlayer.play("callee")
+                isPlaying = true
+            }
             
-            when (callCase) {
-                "Call" -> {
-                    musicPlayer.play("caller")
-                    isPlaying = true
+            DisposableEffect(Unit) {
+                onDispose {
+                    if (
+                        isPlaying
+                    ) {
+                        musicPlayer.stop()
+                        isPlaying = false
+                        
+                    }
+                    
                 }
             }
             
-        }
-        
-        LaunchedEffect(isRunning) {
-            if (isRunning) {
-                musicPlayer.stop()
-                isPlaying = false
+            LaunchedEffect(isConnectedWebrtc) {
+                if (isConnectedWebrtc)
+                    navigator.push(
+                        CallScreen(
+                            userId,
+                            if (isCallBackground) "IncomingBackgroundCall" else "IncomingCall",
+                            userIcon,
+                            userFirstName,
+                            userLastName,
+                            userPhone,
+                        )
+                    )
             }
-        }
-        
-        DisposableEffect(Unit) {
-            onDispose {
+            
+        } else {
+            LaunchedEffect(Unit) {
                 
                 when (callCase) {
                     "Call" -> {
-                        if (
-                            isPlaying
-                        ) {
-                            musicPlayer.stop()
-                            isPlaying = false
-                        }
+                        musicPlayer.play("caller")
+                        isPlaying = true
                     }
                 }
                 
-                
             }
-        }
-        
-        LaunchedEffect(isConnectedWs) {
-            println("isConnectedWs $isConnectedWs")
             
-            if(isConnectedWs) {
-                viewModel.initCall(callCase, userId)
+            LaunchedEffect(isCallActive) {
+                if (isCallActive) {
+                    musicPlayer.stop()
+                    isPlaying = false
+                }
+            }
+            
+            DisposableEffect(Unit) {
+                onDispose {
+                    
+                    when (callCase) {
+                        "Call" -> {
+                            if (
+                                isPlaying
+                            ) {
+                                musicPlayer.stop()
+                                isPlaying = false
+                            }
+                        }
+                    }
+                    
+                    
+                }
+            }
+            
+            LaunchedEffect(isConnectedWs) {
+                println("isConnectedWs $isConnectedWs")
+                if (!isCallActive)
+                    if (isConnectedWs) {
+                        viewModel.initCall(callCase, userId)
+                    }
             }
         }
         
-        
-        
-        LaunchedEffect(isRunning) {
-            while (isRunning) {
-                delay(1000L)
-                secondsElapsed++
-            }
-        }
         
         val callIncoming: String = stringResource(MokoRes.strings.call_incoming)
         val connectionEstablishmentInProgress: String =
@@ -178,7 +207,12 @@ class CallScreen(
                 PeerConnectionState.Connected -> {
                     callState.value = connectionEstablished
                     delay(500)
-                    isRunning = true
+                    
+                    if (!isCallActive) {
+                        viewModel.startTimer(userIcon)
+                        viewModel.setIsCallActive(true)
+                    }
+                    
                 }
                 
                 PeerConnectionState.Disconnected -> callState.value = connectionWasBroken
@@ -202,9 +236,13 @@ class CallScreen(
             modifier = Modifier
                 .fillMaxSize()
         ) {
-
-
-
+            
+            
+            Button(onClick = {
+                navigator.pop()
+            }, content = {
+                Text("fafasfafafa")
+            })
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -228,19 +266,20 @@ class CallScreen(
             
             
             Text(
-                text = if (isRunning) {
-                    val hours = secondsElapsed / 3600
-                    val minutes = (secondsElapsed % 3600) / 60
-                    val seconds = secondsElapsed % 60
-                    if (hours > 0) {
-                        "${hours.toString().padStart(2, '0')}:${
-                            minutes.toString().padStart(2, '0')
-                        }:${seconds.toString().padStart(2, '0')}"
-                    } else {
-                        "${minutes.toString().padStart(2, '0')}:${
-                            seconds.toString().padStart(2, '0')
-                        }"
-                    }
+                text = if (isCallActive) {
+                    timerValue.value
+//                    val hours = secondsElapsed / 3600
+//                    val minutes = (secondsElapsed % 3600) / 60
+//                    val seconds = secondsElapsed % 60
+//                    if (hours > 0) {
+//                        "${hours.toString().padStart(2, '0')}:${
+//                            minutes.toString().padStart(2, '0')
+//                        }:${seconds.toString().padStart(2, '0')}"
+//                    } else {
+//                        "${minutes.toString().padStart(2, '0')}:${
+//                            seconds.toString().padStart(2, '0')
+//                        }"
+//                    }
                 } else {
                     callState.value
                 },
@@ -300,45 +339,80 @@ class CallScreen(
 //                microfonBtn {}
 //            }
             
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                microfonBtn(isSwitchToMicrophone.value) {
-                    viewModel.setMicro()
-                    isSwitchToMicrophone.value = !isSwitchToMicrophone.value
-                }
-//                videoBtn { }
-                
-                speakerBtn(isSwitchToSpeaker.value) {
-                    CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
-                    
-                    
-                    isSwitchToSpeaker.value = !isSwitchToSpeaker.value
-                }
-            }
-            Spacer(modifier = Modifier.height(56.dp))
-            Row(
-                verticalAlignment = Alignment.Top,
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                rejectBtn({
-                    
-                    println("rejectBtn")
-                    if (!isCallBackground) {
-                        viewModel.rejectCall(navigator, userId)
+            if(isIncomingCall) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 50.dp)
+                ) {
+                    rejectBtn({
                         
-                        navigator.push(MainScreen())
+                        if (!isCallBackground) {
+                            viewModel.rejectCall(navigator, userId)
+                            
+                            navigator.push(MainScreen())
+                            
+                        } else {
+                            viewModel.rejectCallBackground(userId)
+                        }
                         
-                    } else {
-                        viewModel.rejectCallBackground(userId)
+                        
+                    })
+                    aceptBtn {
+                        
+                        viewModel.initWebrtc()
+                        
+                        
                     }
+                }
+            } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    microfonBtn(isSwitchToMicrophone.value) {
+                        viewModel.setMicro()
+                        isSwitchToMicrophone.value = !isSwitchToMicrophone.value
+                        viewModel.setIsCallActive(true)
+                        viewModel.startTimer(userIcon)
+                    }
+//                videoBtn { }
                     
-                    
-                }, stringResource(MokoRes.strings.end_call))
+                    speakerBtn(isSwitchToSpeaker.value) {
+                        CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
+                        
+                        
+                        isSwitchToSpeaker.value = !isSwitchToSpeaker.value
+                    }
+                }
+                Spacer(modifier = Modifier.height(56.dp))
+                Row(
+                    verticalAlignment = Alignment.Top,
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    rejectBtn({
+                        
+                        viewModel.stopTimer()
+                        viewModel.setIsCallActive(false)
+                        println("rejectBtn")
+                        if (!isCallBackground) {
+                            viewModel.rejectCall(navigator, userId)
+                            
+                            navigator.push(MainScreen())
+                            
+                        } else {
+                            viewModel.rejectCallBackground(userId)
+                        }
+                        
+                        
+                    }, stringResource(MokoRes.strings.end_call))
+                }
             }
+            
         }
     }
 }

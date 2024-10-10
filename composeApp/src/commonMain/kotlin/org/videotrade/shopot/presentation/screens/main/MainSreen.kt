@@ -57,7 +57,10 @@ class MainScreen : Screen {
             commonViewModel.setAppIsActive(true)
             commonViewModel.setMainNavigator(navigator)
         }
+        val currentScreen = navigator.lastItem
         
+        
+        println("currentScreen $currentScreen")
         
         
         MaterialTheme {
