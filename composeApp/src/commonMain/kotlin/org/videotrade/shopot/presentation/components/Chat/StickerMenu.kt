@@ -66,6 +66,7 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.model.StickerPack
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.Montserrat_Medium
@@ -78,50 +79,6 @@ import shopot.composeapp.generated.resources.sticker1
 
 
 
-//
-//val stickerPacksTest = listOf(
-//    StickerPackTest(
-//        name = "Набор стикеров 1",
-//        id = "",
-//        favorite = false,
-//        stickers = listOf(
-//            Sticker(
-//                id = "Стикер 1",
-//            ),
-//
-//
-//            )
-//    ),
-//)
-//
-//data class StickerPackTest(
-//    val id: String,
-//    val favorite: Boolean,
-//    val name: String,
-//    val stickers: List<Sticker>,
-//
-//    )
-
-//@Serializable
-//data class Sticker(
-//    val id: String,
-//
-//)
-
-@Serializable
-data class StickerPack(
-    val name: String,
-    val packId: String,
-    val favorite: Boolean,
-    val fileIds: List<String?>
-)
-
-@Serializable
-data class FavoritePack(
-    val id: String,
-    val userId: String,
-    val packId: String
-)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable

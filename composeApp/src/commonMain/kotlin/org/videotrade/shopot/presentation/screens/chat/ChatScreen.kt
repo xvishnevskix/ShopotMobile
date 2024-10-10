@@ -166,7 +166,7 @@ class ChatScreen(
                         scaffoldState = scaffoldStickerState,
                         sheetContent = {
                             if (showStickerMenu.value) {
-                                StickerMenuContent(profile)
+                                StickerMenuContent()
                             }
                         },
                         sheetPeekHeight = 0.dp

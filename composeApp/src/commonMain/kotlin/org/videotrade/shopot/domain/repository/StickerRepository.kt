@@ -1,8 +1,8 @@
 package org.videotrade.shopot.domain.repository
 
-import kotlinx.coroutines.flow.StateFlow
-import org.videotrade.shopot.presentation.components.Chat.FavoritePack
-import org.videotrade.shopot.presentation.components.Chat.StickerPack
+import org.videotrade.shopot.domain.model.FavoritePack
+import org.videotrade.shopot.domain.model.StickerPack
+
 
 interface StickerRepository {
     suspend fun downloadStickerPacks(): List<StickerPack>?

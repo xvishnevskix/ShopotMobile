@@ -1,13 +1,10 @@
 package org.videotrade.shopot.data.remote.repository
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.FavoritePack
+import org.videotrade.shopot.domain.model.StickerPack
 import org.videotrade.shopot.domain.repository.StickerRepository
-import org.videotrade.shopot.presentation.components.Chat.FavoritePack
-import org.videotrade.shopot.presentation.components.Chat.StickerPack
-
 
 class StickerRepositoryImpl : StickerRepository {
 
