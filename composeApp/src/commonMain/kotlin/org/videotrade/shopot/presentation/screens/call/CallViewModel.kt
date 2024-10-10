@@ -12,12 +12,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.multiplatform.closeApp
@@ -54,6 +56,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val isScreenOn = MutableStateFlow(false)
     
+    val callCase = MutableStateFlow(CallCase.Call)
     
     val localStreamm = callUseCase.localStream
     
@@ -76,6 +79,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun updateUserIcon(icon: String?) {
         _userIcon.value = icon
+        
+        callCase
     }
     
     fun startTimer(icon: String?) {
@@ -275,19 +280,26 @@ class CallViewModel() : ViewModel(), KoinComponent {
         startObserving()
     }
     
-    fun initCall(callCase: String, userId: String) {
+    fun initCall(callCase: CallCase, userId: String) {
         println("dsadadadadad ${callUseCase.wsSession.value}")
         
         viewModelScope.launch {
             if (callUseCase.wsSession.value != null) {
                 when (callCase) {
-                    "Call" -> {
+                    CallCase.Call -> {
                         updateOtherUserId(userId)
                         makeCall(userId)
                     }
+//                    CallCase.IncomingBackgroundCall -> answerCallBackground()
+//                    CallCase.IncomingCall -> answerCall()
+                    CallCase.IncomingBackgroundCall -> {
                     
-                    "IncomingCall" -> answerCall()
-                    "IncomingBackgroundCall" -> answerCallBackground()
+                    
+                    }
+                    CallCase.IncomingCall -> {
+                    
+                    
+                    }
                 }
             }
         }

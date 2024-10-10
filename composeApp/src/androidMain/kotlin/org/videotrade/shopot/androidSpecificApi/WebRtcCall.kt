@@ -40,6 +40,7 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.AppActivity
 import org.videotrade.shopot.R
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
@@ -147,8 +148,10 @@ class FullscreenNotificationActivity : AppActivity() {
                 println("userId: $userId")
                 
                 
+                callViewModel.callCase.value = CallCase.IncomingBackgroundCall
                 val navScreen = if (isScreenOn) {
-                    CallScreen(userId!!, "IncomingBackgroundCall", "", "", "", "")
+                    callViewModel.callCase.value = CallCase.IncomingBackgroundCall
+                    CallScreen(userId!!, "", "", "", "")
                 } else {
                     IncomingCallScreen(userId!!, "", "", "", "")
                     

@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -64,7 +65,6 @@ import shopot.composeapp.generated.resources.person
 
 class CallScreen(
     private val userId: String,
-    private val callCase: String,
     private val userIcon: String? = null,
     private val userFirstName: String,
     private val userLastName: String,
@@ -87,11 +87,14 @@ class CallScreen(
         val isIncomingCall by viewModel.isIncomingCall.collectAsState()
         val timerValue = viewModel.timer.collectAsState()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
+        val callCase by viewModel.callCase.collectAsState()
         
         
         val hasExecuted = remember { mutableStateOf(false) }
         
         val callState = remember { mutableStateOf("") }
+        
+        
         
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
@@ -128,26 +131,29 @@ class CallScreen(
             }
             
             LaunchedEffect(isConnectedWebrtc) {
-                if (isConnectedWebrtc)
-                    navigator.push(
-                        CallScreen(
-                            userId,
-                            if (isCallBackground) "IncomingBackgroundCall" else "IncomingCall",
-                            userIcon,
-                            userFirstName,
-                            userLastName,
-                            userPhone,
-                        )
-                    )
+                if (isConnectedWebrtc) {
+                    if (isCallBackground) {
+                        viewModel.answerCallBackground()
+                    } else {
+                        viewModel.answerCall()
+                    }
+                }
             }
-            
         } else {
             LaunchedEffect(Unit) {
-                
                 when (callCase) {
-                    "Call" -> {
+                    CallCase.Call -> {
                         musicPlayer.play("caller")
                         isPlaying = true
+                    }
+                    
+                    CallCase.IncomingBackgroundCall -> {
+                    
+                    
+                    }
+                    CallCase.IncomingCall -> {
+                    
+                    
                     }
                 }
                 
@@ -164,13 +170,22 @@ class CallScreen(
                 onDispose {
                     
                     when (callCase) {
-                        "Call" -> {
+                        CallCase.Call -> {
                             if (
                                 isPlaying
                             ) {
                                 musicPlayer.stop()
                                 isPlaying = false
                             }
+                        }
+                        
+                        CallCase.IncomingBackgroundCall -> {
+                        
+                        
+                        }
+                        CallCase.IncomingCall -> {
+                        
+                        
                         }
                     }
                     
@@ -266,7 +281,7 @@ class CallScreen(
             
             
             Text(
-                text = if (isCallActive) {
+                text = if (isIncomingCall) stringResource(MokoRes.strings.incoming_call) else if (isCallActive) {
                     timerValue.value
 //                    val hours = secondsElapsed / 3600
 //                    val minutes = (secondsElapsed % 3600) / 60
@@ -339,7 +354,7 @@ class CallScreen(
 //                microfonBtn {}
 //            }
             
-            if(isIncomingCall) {
+            if (isIncomingCall) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceAround,

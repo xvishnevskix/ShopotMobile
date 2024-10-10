@@ -56,6 +56,7 @@ import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
@@ -65,8 +66,6 @@ import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
-import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
@@ -161,7 +160,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-
     
     override suspend fun connectionWs(userId: String, navigator: Navigator) {
         val httpClient = HttpClient {
@@ -205,6 +203,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     "newCall" -> {
                                         try {
                                             val contactsUseCase: ContactsUseCase by inject()
+                                            val callViewModel: CallViewModel by inject()
                                             
                                             val cameraPer = PermissionsProviderFactory.create()
                                                 .getPermission("microphone")
@@ -256,11 +255,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         }
                                                         
                                                         setIsCallBackground(false)
-                                                        
+                                                        callViewModel.callCase.value = CallCase.IncomingCall
                                                         navigator.push(
-                                                            IncomingCallScreen(
+                                                            CallScreen(
                                                                 userId,
-                                                                user.icon ?: null,
+                                                                null,
                                                                 user.firstName,
                                                                 user.lastName,
                                                                 user.phone,
@@ -320,7 +319,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
-                                        val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+                                        val callViewModel: CallViewModel =
+                                            KoinPlatform.getKoin().get()
                                         
                                         val currentScreen = navigator.lastItem
                                         
@@ -344,24 +344,24 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         if (isCall.value)
                                             rejectCallAnswer(navigator)
                                         
-
                                         
                                         
-
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        if (isConnectedWebrtc.value) {
                                             
-                                            
-                                            
-                                            if (isConnectedWebrtc.value) {
+                                            if (currentScreen is CallScreen) {
+                                                // Вы на экране CallScreen
+                                                navigator.push(MainScreen())
                                                 
-                                                if (currentScreen is CallScreen) {
-                                                    // Вы на экране CallScreen
-                                                    navigator.push(MainScreen())
-                                                    
-                                                    println("Мы на экране CallScreen")
-                                                } else if (currentScreen is MainScreen) {
-                                                    // Вы на экране MainScreen
-                                                    println("Мы на экране MainScreen")
-                                                }
+                                                println("Мы на экране CallScreen")
+                                            } else if (currentScreen is MainScreen) {
+                                                // Вы на экране MainScreen
+                                                println("Мы на экране MainScreen")
+                                            }
                                             
                                         }
                                         

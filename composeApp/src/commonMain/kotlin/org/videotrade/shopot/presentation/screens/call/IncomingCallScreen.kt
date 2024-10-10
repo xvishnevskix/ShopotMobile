@@ -97,19 +97,19 @@ class IncomingCallScreen(
             }
         }
         
-        LaunchedEffect(isConnectedWebrtc) {
-            if (isConnectedWebrtc)
-                navigator.push(
-                    CallScreen(
-                        userId,
-                        if (isCallBackground) "IncomingBackgroundCall" else "IncomingCall",
-                        userIcon,
-                        userFirstName,
-                        userLastName,
-                        userPhone,
-                    )
-                )
-        }
+//        LaunchedEffect(isConnectedWebrtc) {
+//            if (isConnectedWebrtc)
+//                navigator.push(
+//                    CallScreen(
+//                        userId,
+//                        if (isCallBackground) "IncomingBackgroundCall" else "IncomingCall",
+//                        userIcon,
+//                        userFirstName,
+//                        userLastName,
+//                        userPhone,
+//                    )
+//                )
+//        }
         
         val name = remember { "$userFirstName $userLastName" }
         
