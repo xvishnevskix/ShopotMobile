@@ -390,6 +390,7 @@ class CallScreen(
                             navigator.push(MainScreen())
                             
                         } else {
+                            
                             viewModel.rejectCallBackground(userId)
                         }
                         

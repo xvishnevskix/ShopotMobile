@@ -160,6 +160,8 @@ class FullscreenNotificationActivity : AppActivity() {
                     CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
                 } else {
                     callViewModel.setIsIncomingCall(true)
+                    callViewModel.setIsCallBackground(true)
+                    
                     CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
                 }
                 
