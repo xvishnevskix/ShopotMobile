@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.JsonObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.multiplatform.closeApp
@@ -56,8 +55,6 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val isScreenOn = MutableStateFlow(false)
     
-    val callCase = MutableStateFlow(CallCase.Call)
-    
     val localStreamm = callUseCase.localStream
     
     val isCallActive = callUseCase.isCallActive
@@ -77,10 +74,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val callScreenInfo = MutableStateFlow<Screen?>(null)
     
-    fun updateUserIcon(icon: String?) {
+    private fun updateUserIcon(icon: String?) {
         _userIcon.value = icon
-        
-        callCase
     }
     
     fun startTimer(icon: String?) {
@@ -280,27 +275,12 @@ class CallViewModel() : ViewModel(), KoinComponent {
         startObserving()
     }
     
-    fun initCall(callCase: CallCase, userId: String) {
+    fun initCall(userId: String) {
         println("dsadadadadad ${callUseCase.wsSession.value}")
-        
         viewModelScope.launch {
             if (callUseCase.wsSession.value != null) {
-                when (callCase) {
-                    CallCase.Call -> {
-                        updateOtherUserId(userId)
-                        makeCall(userId)
-                    }
-//                    CallCase.IncomingBackgroundCall -> answerCallBackground()
-//                    CallCase.IncomingCall -> answerCall()
-                    CallCase.IncomingBackgroundCall -> {
-                    
-                    
-                    }
-                    CallCase.IncomingCall -> {
-                    
-                    
-                    }
-                }
+                updateOtherUserId(userId)
+                makeCall(userId)
             }
         }
         
@@ -319,6 +299,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun setIsCallActive(isCallActive: Boolean) {
         return callUseCase.setIsCallActive(isCallActive)
+    }
+    
+    fun setIsIncomingCall(isIncomingCallValue: Boolean)  {
+        return callUseCase.setIsIncomingCall(isIncomingCallValue)
     }
     
 }

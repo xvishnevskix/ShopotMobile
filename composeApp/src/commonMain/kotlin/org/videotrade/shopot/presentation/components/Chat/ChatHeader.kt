@@ -36,7 +36,6 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
-import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
@@ -174,8 +173,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 //                            )
 //
                                     callViewModel.initWebrtc()
-                                    
-                                    callViewModel.callCase.value = CallCase.Call
                                     callViewModel.callScreenInfo.value = CallScreen(
                                         chat.userId,
                                         chat.icon,
@@ -200,7 +197,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                     
                                     if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
                                         println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
-                                        callViewModel.callCase.value = CallCase.Call
                                        commonViewModel.mainNavigator.value?.push(
                                             CallScreen(
                                                 chat.userId,
@@ -208,6 +204,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                                 chat.firstName!!,
                                                 chat.lastName!!,
                                                 chat.phone!!,
+                                                sendCall = true
                                             )
                                         )
                                     }

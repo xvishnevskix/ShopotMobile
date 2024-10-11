@@ -56,7 +56,6 @@ import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
-import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
@@ -254,8 +253,15 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                             )
                                                         }
                                                         
+                                                        callViewModel.callScreenInfo.value =  CallScreen(
+                                                            userId,
+                                                            null,
+                                                            user.firstName,
+                                                            user.lastName,
+                                                            user.phone,
+                                                        )
+                                                        
                                                         setIsCallBackground(false)
-                                                        callViewModel.callCase.value = CallCase.IncomingCall
                                                         navigator.push(
                                                             CallScreen(
                                                                 userId,

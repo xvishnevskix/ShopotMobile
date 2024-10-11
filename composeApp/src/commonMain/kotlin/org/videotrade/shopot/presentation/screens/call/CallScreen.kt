@@ -50,7 +50,6 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
-import org.videotrade.shopot.domain.model.CallCase
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -69,8 +68,8 @@ class CallScreen(
     private val userFirstName: String,
     private val userLastName: String,
     private val userPhone: String,
-    
-    ) : Screen {
+    private val sendCall: Boolean? = null,
+) : Screen {
     
     @Composable
     override fun Content() {
@@ -87,13 +86,10 @@ class CallScreen(
         val isIncomingCall by viewModel.isIncomingCall.collectAsState()
         val timerValue = viewModel.timer.collectAsState()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
-        val callCase by viewModel.callCase.collectAsState()
-        
         
         val hasExecuted = remember { mutableStateOf(false) }
         
         val callState = remember { mutableStateOf("") }
-        
         
         
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
@@ -111,27 +107,42 @@ class CallScreen(
         }
         
         
-        if (isIncomingCall) {
-            LaunchedEffect(Unit) {
+        LaunchedEffect(Unit) {
+            if (isIncomingCall) {
                 musicPlayer.play("callee")
+                isPlaying = true
+            } else {
+                musicPlayer.play("caller")
                 isPlaying = true
             }
             
-            DisposableEffect(Unit) {
-                onDispose {
-                    if (
-                        isPlaying
-                    ) {
-                        musicPlayer.stop()
-                        isPlaying = false
-                        
-                    }
-                    
-                }
+        }
+        
+        LaunchedEffect(isCallActive) {
+            if (isCallActive) {
+                musicPlayer.stop()
+                isPlaying = false
             }
-            
+        }
+        
+        DisposableEffect(Unit) {
+            onDispose {
+                if (
+                    isPlaying
+                ) {
+                    musicPlayer.stop()
+                    isPlaying = false
+                }
+                
+                
+            }
+        }
+        
+        
+        if (isIncomingCall) {
             LaunchedEffect(isConnectedWebrtc) {
                 if (isConnectedWebrtc) {
+                    viewModel.setIsIncomingCall(false)
                     if (isCallBackground) {
                         viewModel.answerCallBackground()
                     } else {
@@ -140,65 +151,14 @@ class CallScreen(
                 }
             }
         } else {
-            LaunchedEffect(Unit) {
-                when (callCase) {
-                    CallCase.Call -> {
-                        musicPlayer.play("caller")
-                        isPlaying = true
-                    }
-                    
-                    CallCase.IncomingBackgroundCall -> {
-                    
-                    
-                    }
-                    CallCase.IncomingCall -> {
-                    
-                    
-                    }
+            LaunchedEffect(isConnectedWs) {
+                if (sendCall == true) {
+                    if (!isCallActive)
+                        if (isConnectedWs) {
+                            viewModel.initCall(userId)
+                        }
                 }
                 
-            }
-            
-            LaunchedEffect(isCallActive) {
-                if (isCallActive) {
-                    musicPlayer.stop()
-                    isPlaying = false
-                }
-            }
-            
-            DisposableEffect(Unit) {
-                onDispose {
-                    
-                    when (callCase) {
-                        CallCase.Call -> {
-                            if (
-                                isPlaying
-                            ) {
-                                musicPlayer.stop()
-                                isPlaying = false
-                            }
-                        }
-                        
-                        CallCase.IncomingBackgroundCall -> {
-                        
-                        
-                        }
-                        CallCase.IncomingCall -> {
-                        
-                        
-                        }
-                    }
-                    
-                    
-                }
-            }
-            
-            LaunchedEffect(isConnectedWs) {
-                println("isConnectedWs $isConnectedWs")
-                if (!isCallActive)
-                    if (isConnectedWs) {
-                        viewModel.initCall(callCase, userId)
-                    }
             }
         }
         
@@ -376,9 +336,7 @@ class CallScreen(
                         
                     })
                     aceptBtn {
-                        
                         viewModel.initWebrtc()
-                        
                         
                     }
                 }
