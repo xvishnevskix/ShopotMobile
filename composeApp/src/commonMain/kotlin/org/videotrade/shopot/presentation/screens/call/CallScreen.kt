@@ -226,7 +226,7 @@ class CallScreen(
             
             
             Button(onClick = {
-                navigator.pop()
+                viewModel.replacePopCall(navigator)
             }, content = {
                 Text("fafasfafafa")
             })

@@ -23,9 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.app.NotificationCompat
-import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -92,6 +90,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                     try {
                         val parseCallData = Json.parseToJsonElement(callData).jsonObject
                         println("callData41412412 $callData")
+                        callViewModel.setIsCallBackground(true)
                         
                         // Пробуждаем экран и показываем активность через Foreground Service
                         val serviceIntent = Intent(this, CallForegroundService::class.java)
@@ -101,7 +100,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                             startService(serviceIntent)
                         }
                         
-                        callViewModel.setIsCallBackground(true)
                         // Устанавливаем данные вызова в callViewModel
                         callViewModel.setAnswerData(parseCallData)
                     } catch (e: Exception) {
@@ -132,7 +130,7 @@ class FullscreenNotificationActivity : AppActivity() {
                 
                 val answerData = callViewModel.answerData.value
                 
-
+                
                 
                 LaunchedEffect(Unit) {
                     if (profileId != null) {
@@ -207,7 +205,7 @@ class CallForegroundService : Service() {
         callViewModel.setIsScreenOn(isScreenOn)
         
         // Создаем Intent для FullscreenNotificationActivity
-        val fullScreenIntent = Intent(this, FullscreenNotificationActivity::class.java)
+        val fullScreenIntent = Intent(this, AppActivity::class.java)
         val fullScreenPendingIntent = PendingIntent.getActivity(
             this, 0, fullScreenIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -286,7 +284,7 @@ class CallForegroundService : Service() {
             powerManager.isInteractive
         
         if (!isScreenOn) {
-            val activityIntent = Intent(this, FullscreenNotificationActivity::class.java)
+            val activityIntent = Intent(this, AppActivity::class.java)
             activityIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             val options = ActivityOptions.makeBasic()
             options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
@@ -331,7 +329,7 @@ class CallActionReceiver : BroadcastReceiver() {
                     notificationManager.cancel(1) // ID уведомления, используемого для Foreground Service
                     
                     // Запуск FullscreenNotificationActivity
-                    val activityIntent = Intent(context, FullscreenNotificationActivity::class.java)
+                    val activityIntent = Intent(context, AppActivity::class.java)
                     activityIntent.flags =
                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     val options = ActivityOptions.makeBasic()
@@ -342,7 +340,7 @@ class CallActionReceiver : BroadcastReceiver() {
                     val channelId = "ongoing_call_channel"
                     
                     // PendingIntent для запуска активности при нажатии на уведомление
-                    val ongoingIntent = Intent(context, FullscreenNotificationActivity::class.java)
+                    val ongoingIntent = Intent(context, AppActivity::class.java)
                     ongoingIntent.flags =
                         Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                     val ongoingPendingIntent = PendingIntent.getActivity(
@@ -360,6 +358,7 @@ class CallActionReceiver : BroadcastReceiver() {
                         endCallIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
+                    
                     
                     val ongoingNotification = NotificationCompat.Builder(context, channelId)
                         .setContentTitle("Звонок в процессе")
@@ -426,6 +425,11 @@ class CallActionReceiver : BroadcastReceiver() {
                 val notificationManager =
                     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.cancel(2) // Закрываем уведомление с ID 2
+            }
+            
+            
+            "ACTION_CLICK_ONGOING_NOTIFICATION" -> {
+                println("asdadasdada")
             }
         }
     }

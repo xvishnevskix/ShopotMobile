@@ -46,7 +46,6 @@ import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.closeApp
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class CallViewModel() : ViewModel(), KoinComponent {
@@ -339,7 +338,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         println("wsSessionIntrowsUseCase.wsSession ${wsUseCase.wsSession.value}")
         
         val profileId = getValueInStorage("profileId")
-
+        
         
         wsUseCase.wsSession
             .onEach { wsSessionNew ->
@@ -495,5 +494,15 @@ class CallViewModel() : ViewModel(), KoinComponent {
         viewModelScope.launch {
             wsUseCase.connectionWs(userId, navigator)
         }
+    }
+    
+    fun replacePopCall(navigator: Navigator) {
+        val navPop = navigator.pop()
+        
+        if (!navPop) {
+            navigator.push(MainScreen())
+        }
+        
+        
     }
 }
