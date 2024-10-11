@@ -120,7 +120,14 @@ class ChatScreen(
                     .fillMaxSize()
                     .background(Color.White)
                     .pointerInput(Unit) {
-                        showStickerMenu.value = false
+                        detectTapGestures {
+                            scope.launch {
+                                if (scaffoldStickerState.bottomSheetState.isVisible) {
+                                    scaffoldStickerState.bottomSheetState.partialExpand()
+                                    showStickerMenu.value = false
+                                }
+                            }
+                        }
                     }
             ) {
                 SafeArea(isBlurred = selectedMessage.value != null, 7.dp) {
@@ -166,10 +173,16 @@ class ChatScreen(
                         scaffoldState = scaffoldStickerState,
                         sheetContent = {
                             if (showStickerMenu.value) {
-                                StickerMenuContent()
+                                StickerMenuContent(chat) {
+                                    // Функция, которая закроет BottomSheet при выборе стикера
+                                    scope.launch {
+                                        scaffoldStickerState.bottomSheetState.partialExpand()
+                                        showStickerMenu.value = false
+                                    }
+                                }
                             }
                         },
-                        sheetPeekHeight = 0.dp
+                        sheetPeekHeight = 0.dp,
                     ) {}
                 }
 

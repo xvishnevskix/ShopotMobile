@@ -284,8 +284,20 @@ fun MessageBox(
                             bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
                             bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                         ),
-                        shadowElevation = 4.dp,
-                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
+
+
+                        shadowElevation = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") 0.dp else 4.dp,
+
+
+                        color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
+                            Color.Transparent  // Прозрачный цвет для стикеров
+                        } else {
+                            if (message.fromUser == profile.id) Color(0xFF2A293C)  // Цвет для сообщений от текущего пользователя
+                            else Color(0xFFF3F4F6)  // Цвет для сообщений от других пользователей
+                        }
+
+
+
                     ) {
                         var messageFormatWidth by remember { mutableStateOf(0) }
 //                        var selectedMessageWidth by remember { mutableStateOf(0) }
@@ -510,7 +522,6 @@ fun MessageFormat(
                     messageSenderName
                 )
 
-//                StickerMessage(message, profile)
             }
             
             "video" -> {
@@ -519,6 +530,14 @@ fun MessageFormat(
                     message.attachments!!,
                     messageSenderName
                 )
+            }
+
+            "sticker" -> {
+                StickerMessage(
+                    message,
+                    profile,
+                    message.attachments!!
+                    )
             }
 
             else -> {
