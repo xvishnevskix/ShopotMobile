@@ -578,37 +578,49 @@ class ChatViewModel : ViewModel(), KoinComponent {
         stickerId: String
     ) {
         // Добавляем сообщение с стикером
-        addMessage(
-            MessageItem(
-                Random.nextInt(1, 1501).toString(),  // Генерация уникального идентификатора для сообщения
-                profile.value.id,  // Идентификатор пользователя
-                "",  // Текст сообщения (пусто, так как это стикер)
-                false,  // Сообщение не прочитано
-                null,  // Нет ответа на сообщение
-                0,  // Статус сообщения
-                getCurrentTimeList(),  // Текущее время отправки сообщения
-                false,  // Сообщение не удалено
-                chat.id,  // Идентификатор чата
-                false,  // Сообщение не заменено
-                true,  // Сообщение является файлом (в данном случае стикером)
-                listOf(
-                    Attachment(
-                        Random.nextInt(1, 501).toString(),  // Уникальный ID вложения
-                        Random.nextInt(1, 501).toString(),  // Уникальный ID файла
-                        profile.value.id,  // Идентификатор пользователя
-                        stickerId,  // Используем stickerId как ID файла
-                        "sticker",  // Тип файла - стикер
-                        stickerId,  // Имя файла стикера (стикерID)
-                        size = 0L,  // Размер файла для стикера не указываем (может быть 0)
-                        photoPath = null,  // Нет пути к файлу, так как это стикер
-                        photoName = null,  // Нет фото имени, так как это стикер
-                        photoByteArray = null  // Нет данных о файле
-                    )
-                ),
-                upload = true,  // Указываем, что сообщение загружается
-                uploadId = Random.nextInt(1, 1501).toString()  // Уникальный ID для загрузки
+        
+        if (currentChat.value !== null) {
+            sendMessage(
+                content = footerText.value,
+                fromUser = profile.value.id,
+                chatId = currentChat.value!!.chatId,
+                notificationToken = null,
+                attachments = listOf(stickerId),
+                isCipher = false
             )
-        )
+        }
+        
+//        addMessage(
+//            MessageItem(
+//                Random.nextInt(1, 1501).toString(),  // Генерация уникального идентификатора для сообщения
+//                profile.value.id,  // Идентификатор пользователя
+//                "",  // Текст сообщения (пусто, так как это стикер)
+//                false,  // Сообщение не прочитано
+//                null,  // Нет ответа на сообщение
+//                0,  // Статус сообщения
+//                getCurrentTimeList(),  // Текущее время отправки сообщения
+//                false,  // Сообщение не удалено
+//                chat.id,  // Идентификатор чата
+//                false,  // Сообщение не заменено
+//                true,  // Сообщение является файлом (в данном случае стикером)
+//                listOf(
+//                    Attachment(
+//                        Random.nextInt(1, 501).toString(),  // Уникальный ID вложения
+//                        Random.nextInt(1, 501).toString(),  // Уникальный ID файла
+//                        profile.value.id,  // Идентификатор пользователя
+//                        stickerId,  // Используем stickerId как ID файла
+//                        "sticker",  // Тип файла - стикер
+//                        stickerId,  // Имя файла стикера (стикерID)
+//                        size = 0L,  // Размер файла для стикера не указываем (может быть 0)
+//                        photoPath = null,  // Нет пути к файлу, так как это стикер
+//                        photoName = null,  // Нет фото имени, так как это стикер
+//                        photoByteArray = null  // Нет данных о файле
+//                    )
+//                ),
+//                upload = true,  // Указываем, что сообщение загружается
+//                uploadId = Random.nextInt(1, 1501).toString()  // Уникальный ID для загрузки
+//            )
+//        )
     }
 
 
@@ -618,16 +630,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun sendSticker(
         fileId: String,
     ) {
-        if (currentChat.value !== null) {
-            sendMessage(
-                content = footerText.value,
-                fromUser = profile.value.id,
-                chatId = currentChat.value!!.chatId,
-                notificationToken = null,
-                attachments = listOf(fileId),
-                isCipher = false
-            )
-        }
+
         
     }
     
