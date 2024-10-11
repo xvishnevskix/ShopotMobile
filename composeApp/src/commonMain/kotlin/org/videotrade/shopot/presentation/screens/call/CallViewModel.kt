@@ -7,26 +7,55 @@ import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.http.HttpMethod
+import io.ktor.util.encodeBase64
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import okio.ByteString.Companion.decodeBase64
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.delValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.usecase.CallUseCase
+import org.videotrade.shopot.domain.usecase.ChatsUseCase
+import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.closeApp
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class CallViewModel() : ViewModel(), KoinComponent {
     private val callUseCase: CallUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
+    private val contactsUseCase: ContactsUseCase by inject()
+    private val commonViewModel: CommonViewModel by inject()
+    private val wsUseCase: WsUseCase by inject()
+    private val chatsUseCase: ChatsUseCase by inject()
     
     val isConnectedWs = callUseCase.isConnectedWs
     val isCallBackground = callUseCase.isCallBackground
@@ -301,8 +330,170 @@ class CallViewModel() : ViewModel(), KoinComponent {
         return callUseCase.setIsCallActive(isCallActive)
     }
     
-    fun setIsIncomingCall(isIncomingCallValue: Boolean)  {
+    fun setIsIncomingCall(isIncomingCallValue: Boolean) {
         return callUseCase.setIsIncomingCall(isIncomingCallValue)
     }
     
+    
+    private fun observeWsConnection() {
+        println("wsSessionIntrowsUseCase.wsSession ${wsUseCase.wsSession.value}")
+        
+        val profileId = getValueInStorage("profileId")
+
+        
+        wsUseCase.wsSession
+            .onEach { wsSessionNew ->
+                
+                if (profileId !== null && isObserving.value) {
+                    
+                    if (wsSessionNew != null) {
+                        println("wsSessionIntro $wsSessionNew")
+                        stopObserving()
+                        chatsUseCase.getChatsInBack(wsSessionNew, profileId)
+                        
+                    }
+                }
+                
+            }
+            .launchIn(viewModelScope)
+        
+        
+    }
+    
+    
+    fun checkUserShared(userId: String, navigator: Navigator) {
+        
+        viewModelScope.launch {
+            
+            val httpClient = HttpClient {
+                install(WebSockets)
+            }
+            try {
+                httpClient.webSocket(
+                    method = HttpMethod.Get,
+                    host = webSocketsUrl,
+                    port = 3050,
+                    path = "/crypto?userId=$userId",
+                    
+                    ) {
+                    
+                    println("jsonElement$userId")
+                    
+                    val jsonContent = Json.encodeToString(
+                        buildJsonObject {
+                            put("action", "getKeys")
+                        }
+                    )
+                    
+                    send(Frame.Text(jsonContent))
+                    
+                    for (frame in incoming) {
+                        if (frame is Frame.Text) {
+                            val text = frame.readText()
+                            
+                            val jsonElement = Json.parseToJsonElement(text)
+                            
+                            println("jsonElement $jsonElement")
+                            
+                            val action =
+                                jsonElement.jsonObject["action"]?.jsonPrimitive?.content
+                            
+                            
+                            when (action) {
+                                "answerPublicKey" -> {
+                                    val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                                    
+                                    val publicKeyString =
+                                        jsonElement.jsonObject["publicKey"]?.jsonPrimitive?.content
+                                    
+                                    val publicKeyBytes =
+                                        publicKeyString?.decodeBase64()?.toByteArray()
+                                    
+                                    println("publicKeyBytes ${publicKeyBytes?.encodeBase64()}")
+                                    
+                                    
+                                    val result = publicKeyBytes?.let {
+                                        cipherWrapper.getSharedSecretCommon(
+                                            it
+                                        )
+                                    }
+                                    
+                                    
+                                    if (result !== null) {
+                                        val answerPublicKeyJsonContent = Json.encodeToString(
+                                            buildJsonObject {
+                                                put("action", "sendCipherText")
+                                                put("cipherText", result.ciphertext.encodeBase64())
+                                            }
+                                        )
+                                        
+                                        println(
+                                            "successSharedSecret111 ${
+                                                EncapsulationFileResult(
+                                                    result.sharedSecret,
+                                                    result.sharedSecret
+                                                )
+                                            }"
+                                        )
+                                        
+                                        
+                                        addValueInStorage(
+                                            "sharedSecret",
+                                            result.sharedSecret.encodeBase64()
+                                        )
+                                        
+                                        send(Frame.Text(answerPublicKeyJsonContent))
+                                    }
+                                    
+                                    
+                                }
+                                
+                                "successSharedSecret" -> {
+                                    addValueInStorage("profileId", userId)
+                                    
+                                    commonViewModel.updateNotificationToken()
+                                    fetchContacts(navigator)
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+            
+            
+            }
+        }
+        
+    }
+    
+    
+    private fun fetchContacts(navigator: Navigator) {
+        viewModelScope.launch {
+            val contacts = contactsUseCase.fetchContacts()
+            
+            if (contacts != null) {
+                val profileCase = profileUseCase.downloadProfile()
+                
+                if (profileCase == null) {
+                    delValueInStorage("accessToken")
+                    delValueInStorage("refreshToken")
+                    
+                    return@launch
+                    
+                } else {
+                    addValueInStorage("profileId", profileCase.id)
+                    observeWsConnection()
+                    connectionWs(profileCase.id, navigator)
+                }
+                
+            }
+        }
+    }
+    
+    private fun connectionWs(userId: String, navigator: Navigator) {
+        viewModelScope.launch {
+            wsUseCase.connectionWs(userId, navigator)
+        }
+    }
 }

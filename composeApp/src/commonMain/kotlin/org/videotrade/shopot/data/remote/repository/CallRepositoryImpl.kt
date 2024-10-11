@@ -253,13 +253,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                             )
                                                         }
                                                         
-                                                        callViewModel.callScreenInfo.value =  CallScreen(
-                                                            userId,
-                                                            null,
-                                                            user.firstName,
-                                                            user.lastName,
-                                                            user.phone,
-                                                        )
+                                                        callViewModel.callScreenInfo.value =
+                                                            CallScreen(
+                                                                userId,
+                                                                null,
+                                                                user.firstName,
+                                                                user.lastName,
+                                                                user.phone,
+                                                            )
                                                         
                                                         setIsCallBackground(false)
                                                         navigator.push(
@@ -861,95 +862,95 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         println("Start answerCallBackground1")
         
         CoroutineScope(Dispatchers.IO).launch {
-            println("Start answerCallBackground2")
+            println("Start answerCallBackground2 ${wsSession.value}")
             
             
             try {
 //                val contactsUseCase: ContactsUseCase by inject()
                 val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
-
-//                val cameraPer = PermissionsProviderFactory.create()
-//                    .getPermission("microphone")
-//
-//                if (cameraPer) {
-                callViewModel.answerData.value?.let { answerData ->
-                    
-                    val rtcMessage = answerData.jsonObject["rtcMessage"]?.jsonObject
-                    
-                    rtcMessage.let {
-                        val sdp =
-                            it?.get("sdp")?.jsonPrimitive?.content
-                                ?: return@launch
+                
+                val cameraPer = PermissionsProviderFactory.create()
+                    .getPermission("microphone")
+                
+                if (cameraPer) {
+                    callViewModel.answerData.value?.let { answerData ->
                         
+                        val rtcMessage = answerData.jsonObject["rtcMessage"]?.jsonObject
                         
-                        val callerId =
-                            answerData.jsonObject["userId"]?.jsonPrimitive?.content
-                        
-                        _peerConnection.value?.setRemoteDescription(
-                            SessionDescription(
-                                SessionDescriptionType.Offer,
-                                sdp
-                            )
-                        )
-                        
-                        if (callerId != null) {
-                            otherUserId.value = callerId
+                        rtcMessage.let {
+                            val sdp =
+                                it?.get("sdp")?.jsonPrimitive?.content
+                                    ?: return@launch
                             
-                            println("111111")
                             
-                            val answer = peerConnection.value?.createAnswer(
-                                options = OfferAnswerOptions(
-                                    offerToReceiveAudio = true
+                            val callerId =
+                                answerData.jsonObject["userId"]?.jsonPrimitive?.content
+                            
+                            _peerConnection.value?.setRemoteDescription(
+                                SessionDescription(
+                                    SessionDescriptionType.Offer,
+                                    sdp
                                 )
                             )
-                            println("22222")
                             
-                            
-                            if (answer != null) {
-                                peerConnection.value?.setLocalDescription(answer)
-                            }
-                            println("3333")
-                            
-                            if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                            if (callerId != null) {
+                                otherUserId.value = callerId
                                 
-                                return@launch
-                            }
-                            println("44444")
-                            
-                            val answerCallMessage = WebRTCMessage(
-                                type = "answerCall",
-                                callerId = callerId,
-                                rtcMessage = answer?.let {
-                                    SessionDescriptionDTO(
-                                        it.type,
-                                        answer.sdp
+                                println("111111")
+                                
+                                val answer = peerConnection.value?.createAnswer(
+                                    options = OfferAnswerOptions(
+                                        offerToReceiveAudio = true
                                     )
-                                }
-                            )
-                            
-                            
-                            val jsonMessage =
-                                Json.encodeToString(
-                                    WebRTCMessage.serializer(),
-                                    answerCallMessage
                                 )
-                            
-                            setIsIncomingCall(false)
-                            
-                            
-                            Logger.d {
-                                "answerCallMessage $jsonMessage"
+                                println("22222")
+                                
+                                
+                                if (answer != null) {
+                                    peerConnection.value?.setLocalDescription(answer)
+                                }
+                                println("3333")
+                                
+                                if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                                    
+                                    return@launch
+                                }
+                                println("44444")
+                                
+                                val answerCallMessage = WebRTCMessage(
+                                    type = "answerCall",
+                                    callerId = callerId,
+                                    rtcMessage = answer?.let {
+                                        SessionDescriptionDTO(
+                                            it.type,
+                                            answer.sdp
+                                        )
+                                    }
+                                )
+                                
+                                
+                                val jsonMessage =
+                                    Json.encodeToString(
+                                        WebRTCMessage.serializer(),
+                                        answerCallMessage
+                                    )
+                                
+                                setIsIncomingCall(false)
+                                
+                                
+                                Logger.d {
+                                    "answerCallMessage $jsonMessage"
+                                }
+                                
+                                wsSession.value?.send(Frame.Text(jsonMessage))
+                                
                             }
-                            
-                            wsSession.value?.send(Frame.Text(jsonMessage))
                             
                         }
-                        
                     }
                 }
-//                }
-            
-            
+                
+                
             } catch (e: Exception) {
                 
                 println("Error newCall: $e")

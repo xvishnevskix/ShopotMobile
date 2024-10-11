@@ -23,7 +23,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.app.NotificationCompat
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -130,9 +132,9 @@ class FullscreenNotificationActivity : AppActivity() {
                 
                 val answerData = callViewModel.answerData.value
                 
+
+                
                 LaunchedEffect(Unit) {
-                    val profileId = getValueInStorage("profileId")
-                    
                     if (profileId != null) {
                         
                         if (isScreenOn) {
@@ -151,15 +153,16 @@ class FullscreenNotificationActivity : AppActivity() {
                 val user =
                     Json.decodeFromString<ProfileDTO>(userJson.toString())
                 println("user:421412 $user")
-
-
+                
+                
                 val navScreen = if (isScreenOn) {
-                    CallScreen(user.id, user.icon, user.firstName, user.lastName, user.phone,true)
+                    callViewModel.setIsCallBackground(true)
+                    CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
                 } else {
                     callViewModel.setIsIncomingCall(true)
-                    CallScreen(user.id, user.icon, user.firstName, user.lastName, user.phone)
+                    CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
                 }
-
+                
                 Navigator(
                     navScreen
                 ) { navigator ->

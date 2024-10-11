@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -143,11 +144,22 @@ class CallScreen(
             LaunchedEffect(isConnectedWebrtc) {
                 if (isConnectedWebrtc) {
                     viewModel.setIsIncomingCall(false)
-                    if (isCallBackground) {
-                        viewModel.answerCallBackground()
-                    } else {
-                        viewModel.answerCall()
-                    }
+                    viewModel.answerCall()
+                }
+            }
+        } else if (isCallBackground) {
+            val profileId = getValueInStorage("profileId")
+            
+            LaunchedEffect(Unit) {
+                if (profileId != null) {
+                    viewModel.checkUserShared(profileId, navigator)
+                }
+            }
+            
+            LaunchedEffect(isConnectedWs) {
+                if (isConnectedWs) {
+                    viewModel.setIsCallBackground(false)
+                    viewModel.answerCallBackground()
                 }
             }
         } else {

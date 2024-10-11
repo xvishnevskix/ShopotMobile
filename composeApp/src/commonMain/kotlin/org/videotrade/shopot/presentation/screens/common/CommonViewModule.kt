@@ -84,7 +84,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private fun updateNotificationToken() {
+    fun updateNotificationToken() {
 
         viewModelScope.launch {
 
@@ -212,6 +212,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
 
     }
+    
 
     fun sendImage() {
         viewModelScope.launch {
