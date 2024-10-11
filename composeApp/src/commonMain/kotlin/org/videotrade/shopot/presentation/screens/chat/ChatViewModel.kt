@@ -44,6 +44,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
     
+    val footerText = MutableStateFlow("")
+    
     val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
     
     private val _messages = MutableStateFlow<List<MessageItem>>(listOf())
@@ -77,29 +79,31 @@ class ChatViewModel : ViewModel(), KoinComponent {
         MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
     val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
         _selectedMessagesByChat.asStateFlow()
-
+    
     ////////////////// СТИКЕРЫ /////////////////////////////
-
+    
     private val stickerUseCase = StickerUseCase()
-
+    
     private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
-
-    private val _favoritePacks = MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
+    
+    private val _favoritePacks =
+        MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
     val favoritePacks: StateFlow<List<FavoritePack>> get() = _favoritePacks
-
-    private val _stickerPack = MutableStateFlow(StickerPack("", "", false, emptyList() ))  // Исправление здесь
+    
+    private val _stickerPack =
+        MutableStateFlow(StickerPack("", "", false, emptyList()))  // Исправление здесь
     val stickerPack: StateFlow<StickerPack> get() = _stickerPack
-
+    
     private var currentPage = 0
     private val pageSize = 3
     private var isLastPage = false
     private var _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
-
+    
     fun downloadStickerPacks(reset: Boolean = false) {
         if (_isLoading.value || isLastPage) return
-
+        
         _isLoading.value = true
         viewModelScope.launch {
             if (reset) {
@@ -107,7 +111,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 currentPage = 0
                 isLastPage = false
             }
-
+            
             val packs = stickerUseCase.downloadStickerPacks(currentPage, pageSize)
             if (packs.isNullOrEmpty()) {
                 isLastPage = true
@@ -118,21 +122,21 @@ class ChatViewModel : ViewModel(), KoinComponent {
             _isLoading.value = false
         }
     }
-
+    
     fun getPack(packId: String) {
         viewModelScope.launch {
             val stickerPack = stickerUseCase.getPack(packId) ?: return@launch
             _stickerPack.value = stickerPack
         }
     }
-
+    
     fun getFavoritePacks() {
         viewModelScope.launch {
             val favoritePackList = stickerUseCase.getFavoritePacks()
             _favoritePacks.value = favoritePackList ?: emptyList()
         }
     }
-
+    
     fun removePackFromFavorites(packId: String) {
         viewModelScope.launch {
             val success = stickerUseCase.removePackFromFavorites(packId)
@@ -146,7 +150,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             }
         }
     }
-
+    
     fun addPackToFavorites(packId: String) {
         viewModelScope.launch {
             val success = stickerUseCase.addPackToFavorites(packId)
@@ -185,7 +189,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun setScaffoldState(state: Boolean) {
         isScaffoldForwardState.value = state
     }
-
+    
     fun setScaffoldStickerState(state: Boolean) {
         isScaffoldForwardState.value = state
     }
@@ -567,6 +571,23 @@ class ChatViewModel : ViewModel(), KoinComponent {
         _selectedMessagesByChat.value = _selectedMessagesByChat.value.toMutableMap().apply {
             this[chatId] = Pair(null, null)
         }
+    }
+    
+    
+    fun sendSticker(
+        fileId: String,
+    ) {
+        if (currentChat.value !== null) {
+            sendMessage(
+                content = footerText.value,
+                fromUser = profile.value.id,
+                chatId = currentChat.value!!.chatId,
+                notificationToken = null,
+                attachments = listOf(fileId),
+                isCipher = false
+            )
+        }
+        
     }
     
     

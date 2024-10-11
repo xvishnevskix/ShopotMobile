@@ -78,7 +78,6 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Popup
-import com.preat.peekaboo.image.picker.toImageBitmap
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
@@ -98,7 +97,6 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
-import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.file_message
 import shopot.composeapp.generated.resources.menu_gallery
 import shopot.composeapp.generated.resources.menu_video
@@ -129,7 +127,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
     var voiceName by remember { mutableStateOf("") }
     var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    val text = remember { mutableStateOf("") }
+    
+    val footerText = viewModel.footerText.collectAsState().value
+    
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
@@ -237,7 +237,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
             imagePath = Res.drawable.menu_gallery,
             onClick = {
                 viewModel.sendImage(
-                    text.value,
+                    footerText,
                     viewModel.profile.value.id,
                     chat.id,
                     "image",
@@ -554,10 +554,10 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                     }
                     
                     BasicTextField(
-                        value = text.value,
+                        value = footerText,
                         onValueChange = { newText ->
                             if (!isRecording) {
-                                text.value = newText
+                                viewModel.footerText.value = newText
                             }
                         },
                         modifier = Modifier
@@ -574,7 +574,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                         visualTransformation = VisualTransformation.None,
                         decorationBox = { innerTextField ->
                             Box {
-                                if (text.value.isEmpty()) {
+                                if (footerText.isEmpty()) {
                                     Text(
                                         stringResource(MokoRes.strings.write_message),
                                         textAlign = TextAlign.Center,
@@ -591,7 +591,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                     )
                     
                     
-                    if (text.value.isNotEmpty()) {
+                    if (footerText.isNotEmpty()) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "Send",
@@ -601,9 +601,9 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                 .padding(end = 15.dp)
                                 .pointerInput(Unit) {
                                     detectTapGestures(onTap = {
-                                        if (text.value.isNotBlank()) {
+                                        if (footerText.isNotBlank()) {
                                             viewModel.sendMessage(
-                                                content = text.value,
+                                                content = footerText,
                                                 fromUser = viewModel.profile.value.id,
                                                 chatId = chat.id,
                                                 notificationToken = chat.notificationToken,
@@ -611,20 +611,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                                 login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
                                                 true
                                             )
-                                            text.value = ""
+                                            viewModel.footerText.value = ""
                                         }
                                     })
                                 }
                         )
                     } else {
-
-//                val alpha = (105f + offset.x) / 20f
-                        val scale = 1f + (offset.x / 850f)
-
-                        //значки микрофона и стикера
+                        
                         
                         Row {
-
+                            
                             if (!isRecording) {
                                 Box(
                                     contentAlignment = Alignment.CenterEnd,
@@ -636,8 +632,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                         }
                                 ) {
                                     Image(
-                                        painter = painterResource(Res.drawable.sticker_menu)
-                                        ,
+                                        painter = painterResource(Res.drawable.sticker_menu),
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
@@ -645,12 +640,15 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                     )
                                 }
                             }
-
+                            
                             Box(
                                 contentAlignment = Alignment.CenterEnd,
                                 modifier = Modifier
                                     .padding(end = if (!isRecording) 15.dp else 0.dp)
-                                    .size(height = 65.dp, width = if (isRecording) 150.dp else 20.dp)
+                                    .size(
+                                        height = 65.dp,
+                                        width = if (isRecording) 150.dp else 20.dp
+                                    )
                                     .clip(RoundedCornerShape(50))
                                     .pointerInput(Unit) {
                                         detectDragGestures(
@@ -664,15 +662,16 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                                 // Проверяем, если смещение больше -200f, то сбрасываем смещение
                                                 if (offset.x > -200f) {
                                                     println("Drag send")
-
+                                                    
                                                     val seconds = recordingTime % 60
-
+                                                    
                                                     if (seconds > 1) {
-                                                        val fileDir = audioRecorder.stopRecording(true)
-
+                                                        val fileDir =
+                                                            audioRecorder.stopRecording(true)
+                                                        
                                                         if (fileDir !== null) {
                                                             isStartRecording = false
-
+                                                            
                                                             viewModel.sendVoice(
                                                                 fileDir,
                                                                 chat,
@@ -680,40 +679,40 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                                             )
                                                         }
                                                     }
-
+                                                    
                                                     println("Drag isStop")
-
+                                                    
                                                     viewModel.setIsRecording(false)
                                                     offset = Offset.Zero
                                                 } else {
                                                     println("Drag stop")
-
+                                                    
                                                     // Если смещение больше чем -200f, завершаем запись
                                                     viewModel.setIsRecording(false)
-
+                                                    
                                                     offset = Offset.Zero
                                                 }
                                             },
                                             onDrag = { change, dragAmount ->
 //                                    println("dragAmount ${dragAmount}")
-
-
+                                                
+                                                
                                                 change.consume()
                                                 val newOffset = Offset(
                                                     x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
                                                         .coerceAtMost(0f),
                                                     y = offset.y
                                                 )
-
+                                                
                                                 if (newOffset.x <= -200f) {
-
+                                                    
                                                     viewModel.setIsRecording(false)
-
+                                                    
                                                     audioRecorder.stopRecording(false)
-
+                                                    
                                                     offset = Offset.Zero
                                                 }
-
+                                                
                                                 offset = newOffset
                                             }
                                         )
@@ -722,34 +721,38 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                         detectTapGestures(
                                             onTap = {
                                                 println("Tap detected")
-
+                                                
                                                 val seconds = recordingTime % 60
-
+                                                
                                                 if (seconds > 1) {
                                                     val fileDir = audioRecorder.stopRecording(true)
-
+                                                    
                                                     if (fileDir !== null) {
                                                         isStartRecording = false
-
-                                                        viewModel.sendVoice(fileDir, chat, voiceName)
-
+                                                        
+                                                        viewModel.sendVoice(
+                                                            fileDir,
+                                                            chat,
+                                                            voiceName
+                                                        )
+                                                        
                                                     }
                                                 }
-
+                                                
                                                 viewModel.setIsRecording(false)
-
+                                                
                                                 recordingTime = 0
                                                 isDragging = false
-
-
+                                                
+                                                
                                             },
                                             onPress = {
                                                 if (!isDragging) {
                                                     viewModel.setIsRecording(!isRecording)
                                                 }
                                                 println("Press released")
-
-
+                                                
+                                                
                                             }
                                         )
                                     }
@@ -759,7 +762,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                 } else {
                                     Modifier.size(width = 17.dp, height = 26.dp)
                                 }
-
+                                
                                 Image(
                                     modifier = sizeModifier
                                         .offset {

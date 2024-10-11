@@ -167,6 +167,7 @@ fun StickerMenuContent() {
 
 @Composable
 fun StickerItem(stickerId: String?) {
+    val chatViewModel: ChatViewModel = koinInject()
 
     val imagePainter = if (stickerId.isNullOrBlank()) {
         painterResource(Res.drawable.sticker1)
@@ -176,7 +177,14 @@ fun StickerItem(stickerId: String?) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(4.dp)
+        modifier = Modifier.padding(4.dp).clickable {
+            println("Я СТИКЕР $stickerId")
+            
+            if (stickerId != null) {
+                chatViewModel.sendSticker(stickerId)
+            }
+            
+        }
     ) {
         println("Я СТИКЕР $stickerId")
         println("Я СТИКЕР $imagePainter")
