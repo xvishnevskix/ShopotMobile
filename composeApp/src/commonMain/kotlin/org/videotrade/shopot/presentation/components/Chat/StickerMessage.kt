@@ -18,8 +18,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.rememberAsyncImagePainter
+import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -34,17 +36,21 @@ import shopot.composeapp.generated.resources.sticker1
 fun StickerMessage(
     message: MessageItem,
     profile: ProfileDTO,
-//    attachments: List<Attachment>,
+    attachments: List<Attachment>,
 ) {
 
 
-    val imagePainter = rememberAsyncImagePainter(Res.drawable.sticker1)
+//    val imagePainter = if (attachments[0].stickerId) {
+//        painterResource(Res.drawable.sticker1)
+//    } else {
+//        rememberImagePainter("${serverUrl}file/plain/${attachments[0].stickerId}")
+//    }
 
 
     Image(
         painter = painterResource(Res.drawable.sticker1),
         contentDescription = "Image",
-        contentScale = ContentScale.Crop,
+        contentScale = ContentScale.Fit,
         modifier = Modifier
             .size(150.dp, 150.dp)
             .padding(7.dp)

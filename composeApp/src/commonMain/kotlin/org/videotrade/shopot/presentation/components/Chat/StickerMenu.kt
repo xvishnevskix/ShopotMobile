@@ -71,6 +71,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.StickerPack
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -88,7 +89,7 @@ import shopot.composeapp.generated.resources.sticker1
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun StickerMenuContent() {
+fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
     val tabTitles = listOf(
 //        stringResource(MokoRes.strings.recent),
         stringResource(MokoRes.strings.favorite),
@@ -158,15 +159,15 @@ fun StickerMenuContent() {
         ) { page ->
             when (page) {
 //                0 -> RecentStickersContent(stickerPacks, viewModel)
-                0 -> FavoriteStickersContent(viewModel)
-                1 -> StoreStickersContent(viewModel)
+                0 -> FavoriteStickersContent(viewModel, chat, onStickerClick)
+                1 -> StoreStickersContent(viewModel, chat, onStickerClick)
             }
         }
     }
 }
 
 @Composable
-fun StickerItem(stickerId: String?) {
+fun StickerItem(stickerId: String, viewModel: ChatViewModel = koinInject(), chat: ChatItem, onClick: (String) -> Unit) {
 
     val imagePainter = if (stickerId.isNullOrBlank()) {
         painterResource(Res.drawable.sticker1)
@@ -176,7 +177,10 @@ fun StickerItem(stickerId: String?) {
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(4.dp)
+        modifier = Modifier.padding(4.dp).clickable {
+            viewModel.sendStickerMessage(chat, stickerId)
+            onClick(stickerId)
+        }
     ) {
         println("Я СТИКЕР $stickerId")
         println("Я СТИКЕР $imagePainter")
@@ -192,7 +196,7 @@ fun StickerItem(stickerId: String?) {
 }
 
 @Composable
-fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject()) {
+fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject(), chat: ChatItem) {
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -223,7 +227,7 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMo
                         horizontalArrangement = Arrangement.Start
                     ) {
                         rowStickers.forEach { sticker ->
-                                StickerItem(sticker)
+//                                StickerItem(sticker, viewModel, chat)
                         }
                     }
                 }
@@ -234,18 +238,16 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMo
 }
 
 @Composable
-fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject()) {
+fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem, onStickerClick: (String) -> Unit) {
 
     val stickerPacks = viewModel.stickerPacks.collectAsState()
     val isLoading = viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
 
-    // Загружаем стикеры при инициализации
     LaunchedEffect(Unit) {
         viewModel.downloadStickerPacks(reset = true)
     }
 
-    // Подгружаем следующие страницы при достижении конца списка
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
             .map { visibleItems ->
@@ -269,6 +271,13 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject()) {
                 modifier = Modifier.align(Alignment.Center),
                 color = Color(0xFF2A293C)
             )
+        } else if (!isLoading.value && favoritePacks.isEmpty()) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store))
+            }
         }
 
 
@@ -328,7 +337,10 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject()) {
                             ) {
                                 rowStickers.forEach { sticker ->
                                     if (sticker != null) {
-                                        StickerItem(sticker)
+                                        StickerItem(sticker, viewModel, chat)
+                                        {
+                                            onStickerClick(sticker)
+                                        }
                                     }
                                 }
                             }
@@ -352,20 +364,12 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject()) {
                     }
                 }
             }
-        } else {
-
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store))
-            }
         }
     }
 }
 
 @Composable
-fun StoreStickersContent(viewModel: ChatViewModel = koinInject()) {
+fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem, onStickerClick: (String) -> Unit) {
 
     val stickerPacks = viewModel.stickerPacks.collectAsState()
     val isLoading = viewModel.isLoading.collectAsState()
@@ -469,7 +473,11 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject()) {
                             horizontalArrangement = Arrangement.Start
                         ) {
                             rowStickers.forEach { sticker ->
-                                StickerItem(sticker)
+                                if (sticker != null) {
+                                    StickerItem(sticker, viewModel, chat) {
+                                        onStickerClick(sticker)
+                                    }
+                                }
                             }
                         }
                     }
