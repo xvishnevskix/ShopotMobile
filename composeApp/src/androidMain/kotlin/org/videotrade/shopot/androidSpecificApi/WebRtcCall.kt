@@ -314,15 +314,13 @@ class CallActionReceiver : BroadcastReceiver() {
         val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
         
         when (intent.action) {
-            
-            
             "ACTION_ACCEPT_CALL" -> {
-                
                 CoroutineScope(Dispatchers.IO).launch {
                     println("Вызов принят")
                     
                     val serviceIntent = Intent(context, CallForegroundService::class.java)
                     context.stopService(serviceIntent)
+                    
                     // Закрытие уведомления с кнопками "Принять" и "Отклонить"
                     val notificationManager =
                         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -340,10 +338,10 @@ class CallActionReceiver : BroadcastReceiver() {
                     val channelId = "ongoing_call_channel"
                     
                     // PendingIntent для запуска активности при нажатии на уведомление
-                    val ongoingIntent = Intent(context, AppActivity::class.java)
-                    ongoingIntent.flags =
-                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    val ongoingPendingIntent = PendingIntent.getActivity(
+                    val ongoingIntent = Intent(context, CallActionReceiver::class.java).apply {
+                        action = "ACTION_CLICK_ONGOING_NOTIFICATION"
+                    }
+                    val ongoingPendingIntent = PendingIntent.getBroadcast(
                         context, 0, ongoingIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
@@ -358,7 +356,6 @@ class CallActionReceiver : BroadcastReceiver() {
                         endCallIntent,
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                     )
-                    
                     
                     val ongoingNotification = NotificationCompat.Builder(context, channelId)
                         .setContentTitle("Звонок в процессе")
@@ -383,13 +380,8 @@ class CallActionReceiver : BroadcastReceiver() {
                         notificationManager.createNotificationChannel(channel)
                     }
                     
-                    notificationManager.notify(
-                        2,
-                        ongoingNotification
-                    ) // Устанавливаем ID 2 для нового уведомления
+                    notificationManager.notify(2, ongoingNotification) // Устанавливаем ID 2 для нового уведомления
                 }
-                
-                
             }
             
             "ACTION_DECLINE_CALL" -> {
@@ -407,7 +399,6 @@ class CallActionReceiver : BroadcastReceiver() {
             
             "ACTION_END_CALL" -> {
                 println("Звонок завершен")
-                
                 // Завершение активности
                 val activityManager =
                     context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
@@ -418,18 +409,25 @@ class CallActionReceiver : BroadcastReceiver() {
                     }
                 }
                 
-                val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
-                
                 callViewModel.rejectCallBackground("")
+                
                 // Закрытие уведомления
                 val notificationManager =
                     context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.cancel(2) // Закрываем уведомление с ID 2
             }
             
-            
             "ACTION_CLICK_ONGOING_NOTIFICATION" -> {
-                println("asdadasdada")
+                println("Нажали на уведомление! Действие: ACTION_CLICK_ONGOING_NOTIFICATION")
+                callViewModel.replaceInCall.value = true
+                
+                // Создаем Intent для запуска активности (приложения) или восстановления текущей
+                val activityIntent = Intent(context, AppActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                }
+                
+                // Запускаем активную активность (если она уже существует)
+                context.startActivity(activityIntent)
             }
         }
     }

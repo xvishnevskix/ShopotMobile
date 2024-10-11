@@ -53,6 +53,8 @@ import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
+import org.videotrade.shopot.multiplatform.isCallActiveNatific
+import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -107,6 +109,9 @@ class CallScreen(
             rememberImagePainter("${serverUrl}file/plain/${userIcon}")
         }
         
+        LaunchedEffect(Unit) {
+            onResumeCallActivity(navigator)
+        }
         
         LaunchedEffect(Unit) {
             if (isIncomingCall) {
@@ -198,6 +203,7 @@ class CallScreen(
                     if (!isCallActive) {
                         viewModel.startTimer(userIcon)
                         viewModel.setIsCallActive(true)
+                        isCallActiveNatific()
                     }
                     
                 }

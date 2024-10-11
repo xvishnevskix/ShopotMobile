@@ -11,9 +11,11 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 
 
@@ -30,6 +32,9 @@ class AndroidAppLifecycleObserver : LifecycleObserver, AppLifecycleObserver, Koi
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     override fun onAppBackgrounded() {
         coroutineScope.launch {
+            val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+            
+            callViewModel.replaceInCall.value = false
             println("iOS: Приложение свернуто disconnect")
         }
     }

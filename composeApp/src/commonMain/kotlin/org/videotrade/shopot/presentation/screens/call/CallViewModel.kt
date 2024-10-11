@@ -87,6 +87,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val isCallActive = callUseCase.isCallActive
     
+    val replaceInCall = MutableStateFlow(false)
     
     // Таймер
     private val _timer = MutableStateFlow("00:00:00")
