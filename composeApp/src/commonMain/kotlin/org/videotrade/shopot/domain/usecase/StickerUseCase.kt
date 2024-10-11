@@ -9,8 +9,8 @@ import org.videotrade.shopot.domain.repository.StickerRepository
 class StickerUseCase : KoinComponent {
     private val repository: StickerRepository by inject()
 
-    suspend fun downloadStickerPacks(): List<StickerPack>? {
-        return repository.downloadStickerPacks()
+    suspend fun downloadStickerPacks(page: Int, size: Int): List<StickerPack>? {
+        return repository.downloadStickerPacks(page, size)
     }
 
     suspend fun getFavoritePacks(): List<FavoritePack>? {

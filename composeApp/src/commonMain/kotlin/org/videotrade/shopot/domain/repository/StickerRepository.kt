@@ -5,7 +5,7 @@ import org.videotrade.shopot.domain.model.StickerPack
 
 
 interface StickerRepository {
-    suspend fun downloadStickerPacks(): List<StickerPack>?
+    suspend fun downloadStickerPacks(page: Int, size: Int): List<StickerPack>?
 
     suspend fun getFavoritePacks(): List<FavoritePack>?
 

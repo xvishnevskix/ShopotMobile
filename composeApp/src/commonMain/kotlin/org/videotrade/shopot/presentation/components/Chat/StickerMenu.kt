@@ -11,12 +11,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -39,6 +42,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -57,6 +61,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.rememberAsyncImagePainter
 import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import org.jetbrains.compose.resources.Font
@@ -231,91 +237,129 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMo
 fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject()) {
 
     val stickerPacks = viewModel.stickerPacks.collectAsState()
+    val isLoading = viewModel.isLoading.collectAsState()
+    val listState = rememberLazyListState()
 
-
+    // Загружаем стикеры при инициализации
     LaunchedEffect(Unit) {
-        viewModel.downloadStickerPacks()
-        println("ПАКИИИИ ${stickerPacks.value}")
+        viewModel.downloadStickerPacks(reset = true)
     }
 
+    // Подгружаем следующие страницы при достижении конца списка
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo }
+            .map { visibleItems ->
+                if (visibleItems.isNotEmpty()) {
+                    visibleItems.last().index
+                } else null
+            }
+            .distinctUntilChanged()
+            .collect { lastVisibleItemIndex ->
+                if (lastVisibleItemIndex != null && lastVisibleItemIndex >= stickerPacks.value.size - 1) {
+                    viewModel.downloadStickerPacks()
+                }
+            }
+    }
 
     val favoritePacks = stickerPacks.value.filter { it.favorite }
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (isLoading.value && favoritePacks.isEmpty()) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color(0xFF2A293C)
+            )
+        }
 
-    if (favoritePacks.isNotEmpty()) {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .padding(vertical = 4.dp, horizontal = 16.dp)
-        ) {
 
-            items(favoritePacks) { pack ->
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 5.dp)
-                            .padding(bottom = 10.dp)
-                    ) {
-                    Text(
-                        text = pack.name,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        textAlign = TextAlign.Center,
-                        fontSize = 19.sp,
-                        lineHeight = 20.sp,
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        color = Color(0xFF000000),
-                        modifier = Modifier
-                            .padding(horizontal = 5.dp)
-                            .padding(bottom = 10.dp)
-                    )
-
-                        Box(
-                            modifier = Modifier
-                                .size(20.dp),
-                            contentAlignment = Alignment.TopCenter
-                        ) {
-
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Close",
-                                tint = Color(0xFF979797),
-                                modifier = Modifier
-                                    .padding()
-                                    .clickable {
-                                        viewModel.removePackFromFavorites(pack.packId)
-                                    },
-
-                            )
-                        }
-                }
-                    pack.fileIds.chunked(5).forEach { rowStickers ->
+        if (favoritePacks.isNotEmpty()) {
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(vertical = 4.dp, horizontal = 16.dp)
+            ) {
+                items(favoritePacks) { pack ->
+                    Column {
                         Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.Top,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.Start
+                                .padding(horizontal = 5.dp)
+                                .padding(bottom = 10.dp)
                         ) {
-                            rowStickers.forEach { sticker ->
-                                if (sticker != null) {
-                                    StickerItem(sticker)
+                            Text(
+                                text = pack.name,
+                                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                                textAlign = TextAlign.Center,
+                                fontSize = 19.sp,
+                                lineHeight = 20.sp,
+                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                                color = Color(0xFF000000),
+                                modifier = Modifier
+                                    .padding(horizontal = 5.dp)
+                                    .padding(bottom = 10.dp)
+                            )
+
+                            Box(
+                                modifier = Modifier.size(20.dp),
+                                contentAlignment = Alignment.TopCenter
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
+                                    tint = Color(0xFF979797),
+                                    modifier = Modifier
+                                        .clickable {
+                                            viewModel.removePackFromFavorites(pack.packId)
+                                        }
+                                )
+                            }
+                        }
+
+                        pack.fileIds.chunked(5).forEach { rowStickers ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                horizontalArrangement = Arrangement.Start
+                            ) {
+                                rowStickers.forEach { sticker ->
+                                    if (sticker != null) {
+                                        StickerItem(sticker)
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        }
-    } else {
 
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store))
+
+                if (isLoading.value && favoritePacks.isNotEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(
+                                color = Color(0xFF2A293C)
+                            )
+                        }
+                    }
+                }
+            }
+        } else {
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store))
+            }
         }
     }
 }
@@ -324,86 +368,125 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject()) {
 fun StoreStickersContent(viewModel: ChatViewModel = koinInject()) {
 
     val stickerPacks = viewModel.stickerPacks.collectAsState()
+    val isLoading = viewModel.isLoading.collectAsState()
+    val listState = rememberLazyListState()
 
 
     LaunchedEffect(Unit) {
-
-        viewModel.downloadStickerPacks()
-        println("ПАКИИИИ ${stickerPacks}")
+        viewModel.downloadStickerPacks(reset = true)
     }
 
 
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.layoutInfo.visibleItemsInfo }
+            .map { visibleItems ->
+                if (visibleItems.isNotEmpty()) {
+                    visibleItems.last().index
+                } else null
+            }
+            .distinctUntilChanged()
+            .collect { lastVisibleItemIndex ->
+                if (lastVisibleItemIndex != null && lastVisibleItemIndex >= stickerPacks.value.size - 1) {
+                    viewModel.downloadStickerPacks()
+                }
+            }
+    }
 
-    LazyColumn(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .padding(vertical = 4.dp, horizontal = 16.dp)
-    ) {
-        items(stickerPacks.value) { pack ->
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 5.dp)
-                        .padding(bottom = 10.dp)
-                ) {
-                    Text(
-                        text = pack.name,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        textAlign = TextAlign.Center,
-                        fontSize = 19.sp,
-                        lineHeight = 20.sp,
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        color = Color(0xFF000000)
-                    )
+    Box(modifier = Modifier.fillMaxSize()) {
 
-                    Box(
+        if (isLoading.value && stickerPacks.value.isEmpty()) {
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color(0xFF2A293C)
+            )
+        }
+
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(vertical = 4.dp, horizontal = 16.dp)
+        ) {
+            items(stickerPacks.value) { pack ->
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .size(20.dp)
-                            .background(Color(0xFF2A293C)),
-                        contentAlignment = Alignment.Center
+                            .fillMaxWidth()
+                            .padding(horizontal = 5.dp)
+                            .padding(bottom = 10.dp)
                     ) {
-                        if (pack.favorite) {
-                            Image(
-                                painter = painterResource(Res.drawable.check_mark),
-                                contentDescription = null,
-                                modifier = Modifier
-                                    .size(15.dp)
-                                    .clickable {
-                                        viewModel.removePackFromFavorites(pack.packId)
-                                    },
-                                colorFilter = ColorFilter.tint(Color.White)
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Add",
-                                tint = Color.White,
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .clickable {
-                                        viewModel.addPackToFavorites(pack.packId)
-                                    }
-                            )
+                        Text(
+                            text = pack.name,
+                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                            textAlign = TextAlign.Center,
+                            fontSize = 19.sp,
+                            lineHeight = 20.sp,
+                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                            color = Color(0xFF000000)
+                        )
+
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .size(20.dp)
+                                .background(Color(0xFF2A293C)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (pack.favorite) {
+                                Image(
+                                    painter = painterResource(Res.drawable.check_mark),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(15.dp)
+                                        .clickable {
+                                            viewModel.removePackFromFavorites(pack.packId)
+                                        },
+                                    colorFilter = ColorFilter.tint(Color.White)
+                                )
+                            } else {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .size(20.dp)
+                                        .clickable {
+                                            viewModel.addPackToFavorites(pack.packId)
+                                        }
+                                )
+                            }
+                        }
+                    }
+
+                    pack.fileIds.chunked(5).forEach { rowStickers ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
+                            horizontalArrangement = Arrangement.Start
+                        ) {
+                            rowStickers.forEach { sticker ->
+                                StickerItem(sticker)
+                            }
                         }
                     }
                 }
+            }
 
-
-                pack.fileIds.chunked(5).forEach { rowStickers ->
-                    Row(
+            if (isLoading.value && stickerPacks.value.isNotEmpty()) {
+                item {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.Start
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
                     ) {
-                        rowStickers.forEach { sticker ->
-                            StickerItem(sticker)
-                        }
+                        CircularProgressIndicator(
+                            color = Color(0xFF2A293C)
+                        )
                     }
                 }
             }

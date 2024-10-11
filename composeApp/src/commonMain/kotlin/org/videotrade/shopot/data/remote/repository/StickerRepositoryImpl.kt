@@ -10,19 +10,10 @@ class StickerRepositoryImpl : StickerRepository {
 
     private val stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
 
-    override suspend fun downloadStickerPacks(): List<StickerPack>? {
+    override suspend fun downloadStickerPacks(page: Int, size: Int): List<StickerPack>? {
         val originInstance = origin()
-        println("Sticker get")
-
-
-        val stickerPackList = originInstance.get<List<StickerPack>>("packs") ?: return null
-
-        println("Sticker Packs Result: $stickerPackList")
-
-
-        stickerPacks.value = stickerPackList
-
-        return stickerPackList
+        val url = "packs?page=$page&size=$size"
+        return originInstance.get<List<StickerPack>>(url)
     }
 
 

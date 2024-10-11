@@ -78,7 +78,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
         _selectedMessagesByChat.asStateFlow()
 
-    //////////////////
+    ////////////////// СТИКЕРЫ /////////////////////////////
 
     private val stickerUseCase = StickerUseCase()
 
@@ -91,10 +91,31 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val _stickerPack = MutableStateFlow(StickerPack("", "", false, emptyList() ))  // Исправление здесь
     val stickerPack: StateFlow<StickerPack> get() = _stickerPack
 
-    fun downloadStickerPacks() {
+    private var currentPage = 0
+    private val pageSize = 3
+    private var isLastPage = false
+    private var _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    fun downloadStickerPacks(reset: Boolean = false) {
+        if (_isLoading.value || isLastPage) return
+
+        _isLoading.value = true
         viewModelScope.launch {
-            val packs = stickerUseCase.downloadStickerPacks() ?: return@launch
-            _stickerPacks.value = packs
+            if (reset) {
+                _stickerPacks.value = emptyList()
+                currentPage = 0
+                isLastPage = false
+            }
+
+            val packs = stickerUseCase.downloadStickerPacks(currentPage, pageSize)
+            if (packs.isNullOrEmpty()) {
+                isLastPage = true
+            } else {
+                currentPage++
+                _stickerPacks.value = _stickerPacks.value + packs
+            }
+            _isLoading.value = false
         }
     }
 
@@ -139,6 +160,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             }
         }
     }
+    ///////////////////////////////////////////////////////
     
     init {
         
