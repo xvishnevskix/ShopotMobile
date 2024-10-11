@@ -29,20 +29,18 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.AppActivity
 import org.videotrade.shopot.R
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
-import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
 
 // MyFirebaseMessagingService
 class MyFirebaseMessagingService : FirebaseMessagingService() {
@@ -50,7 +48,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         println("AAAAAAAAAAAAAAA ${remoteMessage.data}")
-        
         // Проверка и запрос исключения из оптимизации батареи
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             println("asfafsaffaafa")
@@ -71,15 +68,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Выполняем действия на основе данных сообщения
         triggerActionBasedOnData(remoteMessage.data)
         
-        // Пробуждаем экран и показываем активность через Foreground Service
-        val serviceIntent = Intent(this, CallForegroundService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            println("!!!!!")
-            startForegroundService(serviceIntent)
-        } else {
-            println("......")
-            startService(serviceIntent)
-        }
+        
     }
     
     @RequiresApi(Build.VERSION_CODES.O)
@@ -93,10 +82,22 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             if (profileId != null) {
                 val callData = data["callData"]
                 
+                
+                
+                
+                
                 if (callData != null) {
                     try {
                         val parseCallData = Json.parseToJsonElement(callData).jsonObject
                         println("callData41412412 $callData")
+                        
+                        // Пробуждаем экран и показываем активность через Foreground Service
+                        val serviceIntent = Intent(this, CallForegroundService::class.java)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            startForegroundService(serviceIntent)
+                        } else {
+                            startService(serviceIntent)
+                        }
                         
                         callViewModel.setIsCallBackground(true)
                         // Устанавливаем данные вызова в callViewModel
@@ -134,7 +135,7 @@ class FullscreenNotificationActivity : AppActivity() {
                     
                     if (profileId != null) {
                         
-                        if(isScreenOn) {
+                        if (isScreenOn) {
                             callViewModel.initWebrtc()
                         }
                         
@@ -143,17 +144,22 @@ class FullscreenNotificationActivity : AppActivity() {
                 }
                 
                 
-                val userId = answerData?.get("userId")?.jsonPrimitive?.content
-                println("userId: $userId")
+                val userJson =
+                    answerData?.jsonObject?.get("user")?.jsonObject
                 
                 
+                val user =
+                    Json.decodeFromString<ProfileDTO>(userJson.toString())
+                println("user:421412 $user")
+
+
                 val navScreen = if (isScreenOn) {
-                    CallScreen(userId!!, "", "", "", "")
+                    CallScreen(user.id, user.icon, user.firstName, user.lastName, user.phone,true)
                 } else {
-                    IncomingCallScreen(userId!!, "", "", "", "")
-                    
+                    callViewModel.setIsIncomingCall(true)
+                    CallScreen(user.id, user.icon, user.firstName, user.lastName, user.phone)
                 }
-                
+
                 Navigator(
                     navScreen
                 ) { navigator ->
@@ -311,7 +317,7 @@ class CallActionReceiver : BroadcastReceiver() {
                 
                 CoroutineScope(Dispatchers.IO).launch {
                     println("Вызов принят")
-
+                    
                     val serviceIntent = Intent(context, CallForegroundService::class.java)
                     context.stopService(serviceIntent)
                     // Закрытие уведомления с кнопками "Принять" и "Отклонить"
