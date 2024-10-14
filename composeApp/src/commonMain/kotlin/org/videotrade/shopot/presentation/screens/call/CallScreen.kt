@@ -53,6 +53,7 @@ import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
+import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
@@ -60,6 +61,7 @@ import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -82,6 +84,7 @@ class CallScreen(
         
         var secondsElapsed by remember { mutableStateOf(0) }
         val viewModel: CallViewModel = koinInject()
+        val commonViewModel: CommonViewModel = koinInject()
         val callStateView by viewModel.callState.collectAsState()
         val isCallActive by viewModel.isCallActive.collectAsState()
         val isConnectedWs by viewModel.isConnectedWs.collectAsState()
@@ -164,7 +167,9 @@ class CallScreen(
             
             LaunchedEffect(Unit) {
                 if (profileId != null) {
+                    commonViewModel.mainNavigator.value = navigator
                     viewModel.checkUserShared(profileId, navigator)
+                    
                 }
             }
             
@@ -393,14 +398,14 @@ class CallScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     rejectBtn({
-                        
+                        clearNotificationsForChannel("OngoingCallChannel")
                         viewModel.stopTimer()
                         viewModel.setIsCallActive(false)
                         if (!isCallBackground) {
                             println("rejectBtn")
                             
                             viewModel.rejectCall(navigator, userId)
-                            
+
 //                            navigator.push(MainScreen())
                             
                         } else {

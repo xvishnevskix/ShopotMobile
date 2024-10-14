@@ -86,7 +86,7 @@ actual fun isCallActiveNatific() {
     notificationManager.cancel(1) // ID уведомления, используемого для Foreground Service
     
     // Создание нового уведомления, которое будет висеть
-    val channelId = "ongoing_call_channel"
+    val channelId = "OngoingCallChannel"
     
     // PendingIntent для запуска активности при нажатии на уведомление
     val ongoingIntent = Intent(context, CallActionReceiver::class.java).apply {
@@ -144,6 +144,7 @@ actual fun clearNotificationsForChannel(channelId: String) {
     // Проверяем активные уведомления и удаляем те, которые соответствуют переданному channelId
     val activeNotifications = notificationManager.activeNotifications
     for (notification in activeNotifications) {
+        println("notification $notification")
         if (notification.notification.channelId == channelId) {
             notificationManager.cancel(notification.id)  // Удаление уведомления по ID
         }

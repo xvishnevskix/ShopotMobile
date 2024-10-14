@@ -330,6 +330,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
+                                        clearNotificationsForChannel("OngoingCallChannel")
                                         
                                         println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
                                         
