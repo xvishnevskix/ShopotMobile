@@ -68,7 +68,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         // Выполняем действия на основе данных сообщения
         triggerActionBasedOnData(remoteMessage.data)
         
-        
     }
     
     @RequiresApi(Build.VERSION_CODES.O)
@@ -81,10 +80,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             
             if (profileId != null) {
                 val callData = data["callData"]
-                
-                
-                
-                
                 
                 if (callData != null) {
                     try {
@@ -113,77 +108,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
 }
 
-// FullscreenNotificationActivity
-class FullscreenNotificationActivity : AppActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        
-        
-        setContent {
-            KoinContext {
-                val callViewModel: CallViewModel = koinInject()
-                val isConnectedWebrtc by callViewModel.isConnectedWebrtc.collectAsState()
-                val isScreenOn by callViewModel.isScreenOn.collectAsState()
-                
-                val profileId = getValueInStorage("profileId")
-                
-                
-                val answerData = callViewModel.answerData.value
-                
-                
-                
-                LaunchedEffect(Unit) {
-                    if (profileId != null) {
-                        
-                        if (isScreenOn) {
-                            callViewModel.initWebrtc()
-                        }
-                        
-                        callViewModel.connectionBackgroundWs(profileId)
-                    }
-                }
-                
-                
-                val userJson =
-                    answerData?.jsonObject?.get("user")?.jsonObject
-                
-                
-                val user =
-                    Json.decodeFromString<ProfileDTO>(userJson.toString())
-                println("user:421412 $user")
-                
-                
-                val navScreen = if (isScreenOn) {
-                    callViewModel.setIsCallBackground(true)
-                    CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
-                } else {
-                    callViewModel.setIsIncomingCall(true)
-                    callViewModel.setIsCallBackground(true)
-                    
-                    CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
-                }
-                
-                Navigator(
-                    navScreen
-                ) { navigator ->
-                    SlideTransition(navigator)
-                }
-            }
-            
-            
-            // Добавляем флаги для пробуждения экрана и отображения активности поверх экрана блокировки
-            window.addFlags(
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
-                        or WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
-                        or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
-                        or WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
-            )
-            
-            println("FullscreenNotificationActivity created")
-        }
-    }
-}
-
 class CallForegroundService : Service() {
     
     override fun onBind(intent: Intent?): IBinder? {
@@ -209,7 +133,7 @@ class CallForegroundService : Service() {
         )
         
         // Создаем уведомление
-        val channelId = "foreground_service_channel"
+        val channelId = "CallNotificationChannel"
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Входящий звонок")
             .setContentText("Входящий вызов")
@@ -331,7 +255,7 @@ class CallActionReceiver : BroadcastReceiver() {
                     options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
                     context.startActivity(activityIntent, options.toBundle())
                     
-
+                    
                 }
             }
             
@@ -351,21 +275,21 @@ class CallActionReceiver : BroadcastReceiver() {
             "ACTION_END_CALL" -> {
                 println("Звонок завершен")
                 // Завершение активности
-                val activityManager =
-                    context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-                
-                activityManager.appTasks.forEach { task ->
-                    if (task.taskInfo.baseActivity?.className == FullscreenNotificationActivity::class.java.name) {
-                        task.finishAndRemoveTask()
-                    }
-                }
-                
-                callViewModel.rejectCallBackground("")
-                
-                // Закрытие уведомления
-                val notificationManager =
-                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.cancel(2) // Закрываем уведомление с ID 2
+//                val activityManager =
+//                    context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+//
+//                activityManager.appTasks.forEach { task ->
+//                    if (task.taskInfo.baseActivity?.className == AppActivity::class.java.name) {
+//                        task.finishAndRemoveTask()
+//                    }
+//                }
+//
+//                callViewModel.rejectCallBackground("")
+//
+//                // Закрытие уведомления
+//                val notificationManager =
+//                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+//                notificationManager.cancel(2) // Закрываем уведомление с ID 2
             }
             
             "ACTION_CLICK_ONGOING_NOTIFICATION" -> {

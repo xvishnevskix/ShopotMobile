@@ -18,3 +18,5 @@ expect object CallProviderFactory {
 expect fun onResumeCallActivity(navigator: Navigator)
 
 expect fun isCallActiveNatific()
+
+expect fun clearNotificationsForChannel(channelId: String)

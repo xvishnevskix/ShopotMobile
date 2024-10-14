@@ -66,7 +66,7 @@ class AndroidApp : Application() {
         }
         
         
-
+        
         if (!Settings.canDrawOverlays(this)) {
             val intent = Intent(
                 Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -75,7 +75,7 @@ class AndroidApp : Application() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
-
+        
         
         
         initializeFactories(this)
@@ -104,9 +104,10 @@ class AndroidApp : Application() {
     // Метод для создания канала уведомлений
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "default_channel_id"
-            val channel = NotificationChannel(
-                channelId,
+            // Канал для входящих звонков
+            val incomingCallChannelId = "CallNotificationChannel"
+            val incomingCallChannel = NotificationChannel(
+                incomingCallChannelId,
                 "Incoming Call Channel",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
@@ -114,13 +115,26 @@ class AndroidApp : Application() {
                 setShowBadge(true)
             }
             
+            // Канал для активных звонков
+            val ongoingCallChannelId = "OngoingCallChannel"
+            val ongoingCallChannel = NotificationChannel(
+                ongoingCallChannelId,
+                "Ongoing Call Channel",
+                NotificationManager.IMPORTANCE_LOW
+            ).apply {
+                description = "Канал для активных звонков"
+                setShowBadge(false)  // Отключение значка для активных звонков
+            }
+            
             val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(channel)
+            notificationManager?.createNotificationChannel(incomingCallChannel)
+            notificationManager?.createNotificationChannel(ongoingCallChannel)
         }
-
-
     }
+    
+    
 }
+
 
 open class AppActivity : ComponentActivity() {
     private var permissionResultCallback: ((Int, Boolean) -> Unit)? = null
@@ -141,7 +155,7 @@ open class AppActivity : ComponentActivity() {
         createNotificationChannel(this)
         
         FileKit.init(this)
-
+        
         Firebase.initialize(this) // This line
         getAppLifecycleObserver()
         
@@ -151,20 +165,20 @@ open class AppActivity : ComponentActivity() {
         setContent {
             App()
         }
-        
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "default_channel_id"
-            val channel = NotificationChannel(
-                channelId,
-                "Incoming Call Channel",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Канал для входящих вызовов"
-            }
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(channel)
-        }
 
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            val channelId = "default_channel_id"
+//            val channel = NotificationChannel(
+//                channelId,
+//                "Incoming Call Channel",
+//                NotificationManager.IMPORTANCE_HIGH
+//            ).apply {
+//                description = "Канал для входящих вызовов"
+//            }
+//            val notificationManager = getSystemService(NotificationManager::class.java)
+//            notificationManager?.createNotificationChannel(channel)
+//        }
+    
     }
     
     private fun initializeProviders() {

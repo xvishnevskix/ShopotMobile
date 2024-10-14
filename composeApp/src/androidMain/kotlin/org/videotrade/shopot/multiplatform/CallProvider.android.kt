@@ -133,3 +133,19 @@ actual fun isCallActiveNatific() {
     
     notificationManager.notify(2, ongoingNotification) // Устанавливаем ID 2 для нового уведомления
 }
+
+actual fun clearNotificationsForChannel(channelId: String) {
+    // Получаем контекст через getContextObj.getContext()
+    val context = getContextObj.getContext()
+    
+    // Получаем NotificationManager из контекста
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    
+    // Проверяем активные уведомления и удаляем те, которые соответствуют переданному channelId
+    val activeNotifications = notificationManager.activeNotifications
+    for (notification in activeNotifications) {
+        if (notification.notification.channelId == channelId) {
+            notificationManager.cancel(notification.id)  // Удаление уведомления по ID
+        }
+    }
+}
