@@ -499,7 +499,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun replacePopCall(navigator: Navigator) {
         val navPop = navigator.pop()
-        
+        println("navPop $navPop")
         if (!navPop) {
             navigator.push(MainScreen())
         }

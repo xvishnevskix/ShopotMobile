@@ -29,6 +29,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.test.TestScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 
@@ -41,6 +42,7 @@ fun CallBar() {
     val userIcon = callViewModel.userIcon.collectAsState()
     val callScreenInfo = callViewModel.callScreenInfo.collectAsState()
     val commonViewModel: CommonViewModel = koinInject()
+    val navigator = LocalNavigator.currentOrThrow
 
 
     if (isTimerRunning.value) {
@@ -52,7 +54,12 @@ fun CallBar() {
                 .height(40.dp)
                 .background(Color(0xFF2A293C))
                 .padding(horizontal = 8.dp, vertical = 2.dp).clickable {
-                    callScreenInfo.value?.let { commonViewModel.mainNavigator.value?.push(it) }
+                    
+                    if (navigator.lastItem !is CallScreen) {
+                        // Выполняем навигацию только если мы не находимся на этом экране
+                        callScreenInfo.value?.let { navigator.push(it) }
+                    }
+               
                 }
             ,
             verticalAlignment = Alignment.CenterVertically,

@@ -334,53 +334,7 @@ class CallActionReceiver : BroadcastReceiver() {
                     options.setLaunchDisplayId(Display.DEFAULT_DISPLAY)
                     context.startActivity(activityIntent, options.toBundle())
                     
-                    // Создание нового уведомления, которое будет висеть
-                    val channelId = "ongoing_call_channel"
-                    
-                    // PendingIntent для запуска активности при нажатии на уведомление
-                    val ongoingIntent = Intent(context, CallActionReceiver::class.java).apply {
-                        action = "ACTION_CLICK_ONGOING_NOTIFICATION"
-                    }
-                    val ongoingPendingIntent = PendingIntent.getBroadcast(
-                        context, 0, ongoingIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    
-                    // Добавляем действие "Завершить" в уведомление
-                    val endCallIntent = Intent(context, CallActionReceiver::class.java).apply {
-                        action = "ACTION_END_CALL"
-                    }
-                    val endCallPendingIntent = PendingIntent.getBroadcast(
-                        context,
-                        1,
-                        endCallIntent,
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                    )
-                    
-                    val ongoingNotification = NotificationCompat.Builder(context, channelId)
-                        .setContentTitle("Звонок в процессе")
-                        .setContentText("Идет звонок")
-                        .setSmallIcon(R.drawable.home_black)
-                        .setPriority(NotificationCompat.PRIORITY_LOW) // Низкий приоритет, чтобы не мешать пользователю
-                        .setOngoing(true) // Устанавливаем уведомление как постоянно отображаемое
-                        .setContentIntent(ongoingPendingIntent) // Добавляем PendingIntent для клика по уведомлению
-                        .addAction(
-                            R.drawable.decline_call_button,
-                            "Завершить",
-                            endCallPendingIntent
-                        ) // Кнопка "Завершить"
-                        .build()
-                    
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        val channel = NotificationChannel(
-                            channelId,
-                            "Ongoing Call Channel",
-                            NotificationManager.IMPORTANCE_LOW
-                        )
-                        notificationManager.createNotificationChannel(channel)
-                    }
-                    
-                    notificationManager.notify(2, ongoingNotification) // Устанавливаем ID 2 для нового уведомления
+
                 }
             }
             
