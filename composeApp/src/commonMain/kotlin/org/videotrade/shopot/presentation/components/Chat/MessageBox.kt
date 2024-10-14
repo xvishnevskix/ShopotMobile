@@ -7,7 +7,9 @@ import SelectedMessageText
 import SelectedVideoMessage
 import SelectedVoiceMessage
 import VideoMessage
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +28,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +62,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
@@ -130,12 +136,22 @@ fun MessageBox(
     onClick: () -> Unit,
     onPositioned: (LayoutCoordinates) -> Unit,
     isVisible: Boolean,
-    chat: ChatItem
+    chat: ChatItem,
+    answerMessageId: MutableState<String?>,
+    coroutineScope: CoroutineScope,
+    listState: LazyListState,
+    messagesState: List<MessageItem>
 ) {
     val isReadByMe = remember { mutableStateOf(false) }
     var swipeOffset by remember { mutableStateOf(0f) }
     val iconOpacity by animateFloatAsState(targetValue = if (swipeOffset > 0) swipeOffset / 75f else 0f)
     val animatedOffset by animateFloatAsState(targetValue = swipeOffset)
+    val isHighlighted = message.id == answerMessageId.value
+    val backgroundColor = animateColorAsState(
+        targetValue = if (isHighlighted) Color(0xFF2A293C).copy(alpha = 0.2f) else Color.Transparent,
+        animationSpec = tween(durationMillis = 500)
+    )
+    val focusManager = LocalFocusManager.current
 
 //    LaunchedEffect(Unit) {
 //        message.phone?.let {
@@ -146,7 +162,7 @@ fun MessageBox(
 //            }
 //        }
 //    }
-    val focusManager = LocalFocusManager.current
+
 
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
@@ -160,8 +176,18 @@ fun MessageBox(
         }
     }
 
+    //покраска сообщенния при переходе на него
+    LaunchedEffect(answerMessageId.value) {
+        if (isHighlighted) {
+            delay(2000)
+            answerMessageId.value = null
+        }
+    }
+
     Column(
         modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .background(color = backgroundColor.value )
             .onGloballyPositioned(onPositioned)
             .alpha(if (isVisible) 1f else 0f).pointerInput(message) {
                 detectTapGestures(
@@ -258,8 +284,20 @@ fun MessageBox(
                             bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
                             bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                         ),
-                        shadowElevation = 4.dp,
-                        color = if (message.fromUser == profile.id) Color(0xFF2A293C) else Color(0xFFF3F4F6)
+
+
+                        shadowElevation = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") 0.dp else 4.dp,
+
+
+                        color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
+                            Color.Transparent  // Прозрачный цвет для стикеров
+                        } else {
+                            if (message.fromUser == profile.id) Color(0xFF2A293C)  // Цвет для сообщений от текущего пользователя
+                            else Color(0xFFF3F4F6)  // Цвет для сообщений от других пользователей
+                        }
+
+
+
                     ) {
                         var messageFormatWidth by remember { mutableStateOf(0) }
 //                        var selectedMessageWidth by remember { mutableStateOf(0) }
@@ -267,6 +305,11 @@ fun MessageBox(
                         Column(
                             horizontalAlignment = if (message.fromUser == profile.id) Alignment.End else Alignment.Start,
                         ) {
+                            println("id answerMessageId ${answerMessageId.value}")
+
+                            println("id answerMessageId 2 ${message.answerMessage?.id}")
+
+
                             // Ответ на сообщение
                             message.answerMessage?.let {
 
@@ -281,8 +324,45 @@ fun MessageBox(
                                         )
                                         .padding(top = 4.dp, start = 4.dp, end = 4.dp)
                                         .clip(RoundedCornerShape(14.dp))
-                                        .background(Color.White)
-                                        .wrapContentHeight(),
+                                        .background(color = Color.White)
+                                        .wrapContentHeight()
+                                        .clickable {
+//                                            answerMessageId.value = it.id // Устанавливаем ID выделенного сообщения
+
+                                            coroutineScope.launch {
+
+
+//                                                listState.animateScrollToItem(messagesState.indexOfFirst { msg -> msg.id == it.id })
+
+//                                                var messageIndex: Int
+//                                                var attemptCount = 0
+//                                                val maxAttempts = 5
+//
+//                                                do {
+//
+//                                                    messageIndex = messagesState.indexOfFirst { msg -> msg.id == it.id }
+//                                                    if (messageIndex == -1 && attemptCount < maxAttempts) {
+//
+//                                                        viewModel.getMessagesBack(chat.chatId)
+//                                                        attemptCount++
+//                                                        delay(500)
+//
+//                                                        messageIndex = messagesState.indexOfFirst { msg -> msg.id == it.id }
+//                                                        println("messageIndex = ${messageIndex}")
+//                                                    }
+//                                                } while (messageIndex == -1 && attemptCount < maxAttempts)
+//                                                println("messageIndex ${messageIndex != -1}")
+//                                                println("messageIndex = ${messageIndex}")
+//
+//
+//
+//                                                if (messageIndex != -1) {
+//                                                    listState.animateScrollToItem(messageIndex)
+//                                                    println("messageIndex = ${messageIndex}")
+//                                                }
+                                            }
+                                        },
+
                                     verticalAlignment = Alignment.Top,
                                     horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start
                                 ) {
@@ -452,6 +532,13 @@ fun MessageFormat(
                 )
             }
 
+            "sticker" -> {
+                StickerMessage(
+                    message,
+                    message.attachments!!
+                    )
+            }
+
             else -> {
                 FileMessage(
                     message,
@@ -498,12 +585,17 @@ fun SelectedMessageFormat(
 
             "image" -> {
                 SelectedMessageImage(message.attachments!!, messageAnswerName)
+//                SelectedStickerMessage(message.attachments!!, messageAnswerName)
 
             }
 
             "video" -> {
                 SelectedVideoMessage(message.attachments!!, messageAnswerName)
 
+            }
+            
+            "sticker" -> {
+                SelectedStickerMessage(message.attachments!!, messageAnswerName)
             }
 
             else -> {

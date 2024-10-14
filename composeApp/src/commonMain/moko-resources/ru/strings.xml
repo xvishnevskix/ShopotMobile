@@ -162,7 +162,6 @@
 
     <string name="you">Вы</string>
     <string name="voice_message">Голосовое сообщение</string>
-    <string name="yesterday">Вчера</string>
     <string name="create_new_chat">Создайте новый чат</string>
 
     <string name="group_name_is_required">Название группы обязательно для заполнения</string>
@@ -185,5 +184,18 @@
     <string name="december">Декабря</string>
 
     <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
 
+    <string name="recent">Недавние</string>
+    <string name="favorite">Избранное</string>
+    <string name="store">Магазин</string>
+    <string name="sticker">Стикер</string>
+    <string name="add_stickers_from_the_store">Добавьте стикеры из магазина 🛒</string>
 </resources>

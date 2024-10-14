@@ -18,12 +18,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.rememberAsyncImagePainter
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.kotlinx.serializer.KotlinxSerializer
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
+import shopot.composeapp.generated.resources.AnimatedSticker1
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.sticker1
 
 
 @Composable
@@ -33,23 +40,18 @@ fun MessageImage(
     messageSenderName: String? = null
 ) {
     var imageFilePath by remember { mutableStateOf("") }
-
-//    val imagePainter =
-//        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
-
+// val imagePainter =
+// rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
     val imagePainter = rememberAsyncImagePainter(imageFilePath)
     val navigator = LocalNavigator.current
     val url =
         "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
-
     LaunchedEffect(Unit) {
         val fileName = attachments[0].name
         val fileType = attachments[0].type
-
         val fileProvider = FileProviderFactory.create()
         val existingFile =
             fileProvider.existingFile(fileName, fileType)
-
         if (!existingFile.isNullOrBlank()) {
             imageFilePath = existingFile
             println("existingFile ${existingFile}")
@@ -62,18 +64,12 @@ fun MessageImage(
             ) { newProgress ->
                 println("newProgress $newProgress")
             }
-
-
             if (filePath != null) {
                 imageFilePath = filePath
             }
-
             println("filePath $filePath")
         }
-
-
     }
-
     Image(
         painter = imagePainter,
         contentDescription = "Image",
@@ -88,7 +84,6 @@ fun MessageImage(
                     bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
                     bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                 )
-
             ).clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null // Убирает эффект нажатия

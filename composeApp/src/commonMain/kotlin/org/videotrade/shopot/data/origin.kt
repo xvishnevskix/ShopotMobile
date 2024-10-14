@@ -2,6 +2,7 @@ package org.videotrade.shopot.data
 
 import androidx.compose.runtime.MutableState
 import io.ktor.client.HttpClient
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -86,8 +87,7 @@ class origin {
         
         try {
             val token = getValueInStorage("accessToken")
-            println("url ${EnvironmentConfig.serverUrl}$url}")
-            println("data ${data}")
+            println("url ${EnvironmentConfig.serverUrl}$url")
 
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.serverUrl}$url") {
@@ -95,8 +95,8 @@ class origin {
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
                 }
-            
-            
+
+            println("Отправляем данные: $data")
             println("response.bodyAsText() ${response.bodyAsText()}")
             
             if (response.status.isSuccess()) {
@@ -117,6 +117,43 @@ class origin {
         }
         
         return null
+    }
+
+    // Новый метод post с поддержкой заголовков
+    suspend inline fun post(
+        url: String,
+        data: String,
+        headers: Map<String, String> = emptyMap()
+    ): String? {
+        return try {
+            val token = getValueInStorage("accessToken")
+            println("url ${EnvironmentConfig.serverUrl}$url")
+
+            val response: HttpResponse =
+                client.post("${EnvironmentConfig.serverUrl}$url") {
+                    contentType(ContentType.Application.Json)
+                    header(HttpHeaders.Authorization, "Bearer $token")
+                    headers.forEach { (key, value) ->
+                        header(key, value)
+                    }
+                    setBody(data)
+                }
+
+            println("Отправляем данные: $data")
+            println("response.bodyAsText() ${response.bodyAsText()}")
+
+            if (response.status.isSuccess()) {
+                return response.bodyAsText()
+            } else {
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+            }
+            null
+        } catch (e: Exception) {
+            println("Error1111: $e")
+            null
+        } finally {
+            client.close()
+        }
     }
     
     
@@ -214,6 +251,37 @@ class origin {
         }
         
         return null
+    }
+
+    suspend inline fun delete(
+        url: String,
+        headers: Map<String, String> = emptyMap()
+    ): Boolean {
+        return try {
+            val token = getValueInStorage("accessToken")
+            println("url ${EnvironmentConfig.serverUrl}$url")
+
+            val response: HttpResponse = client.delete("${EnvironmentConfig.serverUrl}$url") {
+                contentType(ContentType.Application.Json)
+                header(HttpHeaders.Authorization, "Bearer $token")
+                headers.forEach { (key, value) ->
+                    header(key, value)
+                }
+            }
+
+            if (response.status == HttpStatusCode.NoContent) {
+                // Успешное удаление, сервер возвращает 204 No Content
+                true
+            } else {
+                println("Failed to delete: ${response.status.description} ${response.request}")
+                false
+            }
+        } catch (e: Exception) {
+            println("Error while deleting data: $e")
+            false
+        } finally {
+            client.close()
+        }
     }
     
     

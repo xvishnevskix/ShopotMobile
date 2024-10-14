@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
@@ -30,19 +31,19 @@ fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName:
                 color = Color(0xff000000),
                 fontSize = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-            ),
-
             )
+        )
         selectedMessage.content?.let {
             Text(
                 text = it,
+                maxLines = 1, // Ограничение до одной строки
+                overflow = TextOverflow.Ellipsis, // Добавление многоточия в конце
                 style = TextStyle(
                     color = Color(0xff979797),
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                ),
-
                 )
+            )
         }
     }
 }
