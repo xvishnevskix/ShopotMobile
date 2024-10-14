@@ -64,6 +64,8 @@ class AndroidApp : Application() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
+        
+        
 
         if (!Settings.canDrawOverlays(this)) {
             val intent = Intent(
@@ -132,14 +134,14 @@ open class AppActivity : ComponentActivity() {
     
     private var lastRequestCode: Int = -1
     
-    @RequiresApi(Build.VERSION_CODES.O)
+    @RequiresApi(Build.VERSION_CODES.O_MR1)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getContextObj.initializeActivity(this)
         createNotificationChannel(this)
         
         FileKit.init(this)
-        
+
         Firebase.initialize(this) // This line
         getAppLifecycleObserver()
         
@@ -159,7 +161,6 @@ open class AppActivity : ComponentActivity() {
             ).apply {
                 description = "Канал для входящих вызовов"
             }
-            
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager?.createNotificationChannel(channel)
         }

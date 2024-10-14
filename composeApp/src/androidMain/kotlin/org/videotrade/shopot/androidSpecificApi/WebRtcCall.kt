@@ -195,11 +195,8 @@ class CallForegroundService : Service() {
         
         // Проверяем состояние экрана
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        val isScreenOn = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+        val isScreenOn =
             powerManager.isInteractive
-        } else {
-            powerManager.isScreenOn
-        }
         val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
         
         callViewModel.setIsScreenOn(isScreenOn)

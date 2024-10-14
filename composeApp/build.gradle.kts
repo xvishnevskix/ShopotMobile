@@ -146,7 +146,7 @@ android {
     compileSdk = 34
     
     defaultConfig {
-        minSdk = 24
+        minSdk = 27
         targetSdk = 34
         
         applicationId = "org.videotrade.shopot.androidApp"

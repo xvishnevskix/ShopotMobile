@@ -1,5 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
+import android.app.KeyguardManager
+import android.content.Context
 import android.os.Build
 import android.os.Process
 import androidx.activity.ComponentActivity
@@ -30,4 +32,19 @@ actual fun closeApp() {
         exitProcess(0) // Выход из приложения
     }
     
+}
+
+actual fun isScreenOn(): Boolean {
+    val context = getContextObj.getContext()
+    
+    val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    return !keyguardManager.isDeviceLocked
+    
+}
+
+actual fun setScreenLockFlags(showWhenLocked: Boolean) {
+    val activity = getContextObj.getActivity() as ComponentActivity
+    
+    activity.setShowWhenLocked(showWhenLocked)
+    activity.setTurnScreenOn(showWhenLocked)
 }

@@ -55,6 +55,7 @@ import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
+import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -94,6 +95,10 @@ class CallScreen(
         
         val callState = remember { mutableStateOf("") }
         
+        LaunchedEffect(Unit) {
+            setScreenLockFlags(true)
+        }
+        
         
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
@@ -125,6 +130,8 @@ class CallScreen(
         }
         
         LaunchedEffect(isCallActive) {
+            setScreenLockFlags(false)
+            
             if (isCallActive) {
                 musicPlayer.stop()
                 isPlaying = false
@@ -389,13 +396,15 @@ class CallScreen(
                         
                         viewModel.stopTimer()
                         viewModel.setIsCallActive(false)
-                        println("rejectBtn")
                         if (!isCallBackground) {
+                            println("rejectBtn")
+                            
                             viewModel.rejectCall(navigator, userId)
                             
-                            navigator.push(MainScreen())
+//                            navigator.push(MainScreen())
                             
                         } else {
+                            println("isCallBackground")
                             
                             viewModel.rejectCallBackground(userId)
                         }

@@ -11,3 +11,10 @@ actual fun getBuildVersion(): Long {
 
 actual fun closeApp() {
 }
+
+actual fun isScreenOn(): Boolean {
+    return false
+}
+
+actual fun setScreenLockFlags(showWhenLocked: Boolean) {
+}

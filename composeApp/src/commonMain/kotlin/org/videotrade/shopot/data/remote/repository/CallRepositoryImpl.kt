@@ -63,8 +63,10 @@ import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
@@ -352,12 +354,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             rejectCallAnswer(navigator)
                                         
                                         
-                                        
-                                        
-                                        
-                                        
-                                        
-                                        
                                         if (isConnectedWebrtc.value) {
                                             
                                             if (currentScreen is CallScreen) {
@@ -395,6 +391,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         val httpClient = HttpClient {
             install(WebSockets)
         }
+        
+        val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
         
         if (!_isConnectedWs.value) {
             try {
@@ -536,10 +534,59 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
-                                        
-                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
-                                        
+
+                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value} ${isScreenOn()}")
+
+
+
                                     }
+//                                    "rejectCall" -> {
+//                                        val callViewModel: CallViewModel =
+//                                            KoinPlatform.getKoin().get()
+//
+//                                        val currentScreen = navigator.lastItem
+//
+//                                        callViewModel.stopTimer()
+//
+//                                        setIsCallActive(false)
+//
+//                                        if (_isIncomingCall.value) {
+//                                            if (currentScreen is CallScreen) {
+//                                                // Вы на экране CallScreen
+//                                                navigator.push(MainScreen())
+//
+//                                                println("Мы на экране CallScreen")
+//                                            } else if (currentScreen is MainScreen) {
+//                                                // Вы на экране MainScreen
+//                                                println("Мы на экране MainScreen")
+//                                            }
+//                                        }
+//
+//                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
+//                                        if (isCall.value)
+//                                            rejectCallAnswer(navigator)
+//
+//
+//                                        if (isConnectedWebrtc.value) {
+//
+//                                            if (currentScreen is CallScreen) {
+//                                                // Вы на экране CallScreen
+//                                                navigator.push(MainScreen())
+//
+//                                                println("Мы на экране CallScreen")
+//                                            } else if (currentScreen is MainScreen) {
+//                                                // Вы на экране MainScreen
+//                                                println("Мы на экране MainScreen")
+//                                            }
+//
+//                                        }
+//
+//
+//
+//                                        println("rejectCall3")
+//
+//                                    }
+                                
                                 }
                             }
                         }
