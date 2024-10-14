@@ -35,20 +35,15 @@ import shopot.composeapp.generated.resources.sticker1
 @Composable
 fun StickerMessage(
     message: MessageItem,
-    profile: ProfileDTO,
     attachments: List<Attachment>,
 ) {
 
 
-//    val imagePainter = if (attachments[0].stickerId) {
-//        painterResource(Res.drawable.sticker1)
-//    } else {
-//        rememberImagePainter("${serverUrl}file/plain/${attachments[0].stickerId}")
-//    }
+    val imagePainter = rememberImagePainter("${serverUrl}file/plain/${attachments[0].fileId}")
 
 
     Image(
-        painter = painterResource(Res.drawable.sticker1),
+        painter = imagePainter,
         contentDescription = "Image",
         contentScale = ContentScale.Fit,
         modifier = Modifier

@@ -31,11 +31,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import coil3.compose.rememberAsyncImagePainter
+import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -49,8 +51,9 @@ import shopot.composeapp.generated.resources.sticker_menu
 
 @Composable
 fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderName: String) {
-
-
+    
+    
+    val imagePainter = rememberImagePainter("${serverUrl}file/plain/${attachments[0].fileId}")
 
 
 
@@ -61,7 +64,7 @@ fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderN
     ) {
 
         Image(
-            painter = painterResource(Res.drawable.sticker1),
+            painter = imagePainter,
             contentDescription = "Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier

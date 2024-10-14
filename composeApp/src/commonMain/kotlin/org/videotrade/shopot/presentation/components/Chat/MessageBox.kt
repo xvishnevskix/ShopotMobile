@@ -535,7 +535,6 @@ fun MessageFormat(
             "sticker" -> {
                 StickerMessage(
                     message,
-                    profile,
                     message.attachments!!
                     )
             }
@@ -593,6 +592,10 @@ fun SelectedMessageFormat(
             "video" -> {
                 SelectedVideoMessage(message.attachments!!, messageAnswerName)
 
+            }
+            
+            "sticker" -> {
+                SelectedStickerMessage(message.attachments!!, messageAnswerName)
             }
 
             else -> {
