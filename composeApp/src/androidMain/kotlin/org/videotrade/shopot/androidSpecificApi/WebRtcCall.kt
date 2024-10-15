@@ -29,6 +29,7 @@ import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
@@ -190,6 +191,7 @@ class CallForegroundService : Service() {
         println("wakeDevice and startActivity")
         
         // Пробуждаем устройство
+      
         wakeDevice()
         
         // Если экран выключен, запускаем FullscreenNotificationActivity
@@ -209,14 +211,20 @@ class CallForegroundService : Service() {
     }
     
     private fun wakeDevice() {
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        val wakeLock = powerManager.newWakeLock(
-            PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
-                    PowerManager.ACQUIRE_CAUSES_WAKEUP or
-                    PowerManager.ON_AFTER_RELEASE,
-            "MyApp::WakeLock"
-        )
-        wakeLock.acquire(5000) // Держим WakeLock на 5 секунд для пробуждения устройства
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(500)
+            
+            val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val wakeLock = powerManager.newWakeLock(
+                PowerManager.SCREEN_BRIGHT_WAKE_LOCK or
+                        PowerManager.ACQUIRE_CAUSES_WAKEUP or
+                        PowerManager.ON_AFTER_RELEASE,
+                "MyApp::WakeLock"
+            )
+            wakeLock.acquire(5000) // Держим WakeLock на 5 секунд для пробуждения устройства
+        }
+
     }
 }
 

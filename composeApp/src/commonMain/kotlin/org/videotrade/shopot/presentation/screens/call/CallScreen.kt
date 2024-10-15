@@ -133,8 +133,6 @@ class CallScreen(
         }
         
         LaunchedEffect(isCallActive) {
-            setScreenLockFlags(false)
-            
             if (isCallActive) {
                 musicPlayer.stop()
                 isPlaying = false
@@ -142,6 +140,8 @@ class CallScreen(
         }
         
         DisposableEffect(Unit) {
+            setScreenLockFlags(false)
+            
             onDispose {
                 if (
                     isPlaying

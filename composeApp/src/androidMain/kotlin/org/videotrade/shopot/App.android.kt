@@ -154,7 +154,6 @@ open class AppActivity : ComponentActivity() {
         createNotificationChannel(this)
         
         FileKit.init(this)
-        
         Firebase.initialize(this) // This line
         getAppLifecycleObserver()
         
