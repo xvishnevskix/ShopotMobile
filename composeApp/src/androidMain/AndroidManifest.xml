@@ -43,8 +43,6 @@
             android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize"
             android:screenOrientation="fullSensor"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true"
             android:exported="true"
             tools:ignore="DiscouragedApi">
             <intent-filter>

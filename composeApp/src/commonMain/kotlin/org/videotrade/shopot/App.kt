@@ -48,8 +48,7 @@ fun isActiveCall(callViewModel: CallViewModel) {
     val isScreenOn by callViewModel.isScreenOn.collectAsState()
 
     val profileId = getValueInStorage("profileId")
-
-
+    
     val answerData = callViewModel.answerData.value
 
 
