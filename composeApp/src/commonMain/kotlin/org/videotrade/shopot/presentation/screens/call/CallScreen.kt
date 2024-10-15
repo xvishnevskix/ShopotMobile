@@ -354,7 +354,6 @@ class CallScreen(
                         .padding(horizontal = 50.dp)
                 ) {
                     rejectBtn({
-                        println("isScreenOn ${isScreenOn()}")
 //                        if (!isCallBackground) {
 //                            viewModel.rejectCall(navigator, userId)
 //
@@ -399,23 +398,7 @@ class CallScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     rejectBtn({
-                        clearNotificationsForChannel("OngoingCallChannel")
-                        viewModel.stopTimer()
-                        viewModel.setIsCallActive(false)
-                        if (!isCallBackground) {
-                            println("rejectBtn")
-                            
-                            viewModel.rejectCall(navigator, userId)
-
-//                            navigator.push(MainScreen())
-                            
-                        } else {
-                            println("isCallBackground")
-                            
-                            viewModel.rejectCallBackground(userId)
-                        }
-                        
-                        
+                            viewModel.rejectCall(userId)
                     }, stringResource(MokoRes.strings.end_call))
                 }
             }

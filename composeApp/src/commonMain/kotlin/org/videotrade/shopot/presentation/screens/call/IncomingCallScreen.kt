@@ -174,17 +174,7 @@ class IncomingCallScreen(
                         .padding(horizontal = 50.dp)
                 ) {
                     rejectBtn({
-                        
-                        if (!isCallBackground) {
-                            viewModel.rejectCall(navigator, userId)
-                            
-                            navigator.push(MainScreen())
-                            
-                        } else {
-                            viewModel.rejectCallBackground(userId)
-                        }
-                        
-                        
+                            viewModel.rejectCall( userId)
                     })
                     aceptBtn {
                         

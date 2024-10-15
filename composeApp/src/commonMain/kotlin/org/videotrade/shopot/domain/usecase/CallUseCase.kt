@@ -99,13 +99,10 @@ class CallUseCase : KoinComponent {
     }
     
     
-    suspend fun rejectCall(navigator: Navigator, userId: String): Boolean {
-        return repository.rejectCall(navigator, userId)
+    suspend fun rejectCall(userId: String): Boolean {
+        return repository.rejectCall( userId)
     }
-    
-    suspend fun rejectCallBackground(userId: String): Boolean {
-        return repository.rejectCallBackground(userId)
-    }
+
     
     fun rejectCallAnswer() {
 //        repository.rejectCallAnswer()

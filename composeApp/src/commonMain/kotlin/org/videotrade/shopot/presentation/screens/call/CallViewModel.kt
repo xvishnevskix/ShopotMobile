@@ -44,7 +44,7 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
-import org.videotrade.shopot.multiplatform.closeApp
+import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
@@ -262,28 +262,22 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.answerCallBackground()
     }
     
-    fun rejectCall(navigator: Navigator, userId: String) {
+    fun rejectCall(userId: String) {
         viewModelScope.launch {
-            val isRejectCall = callUseCase.rejectCall(navigator, userId)
+            clearNotificationsForChannel("OngoingCallChannel")
+            stopTimer()
+            setIsCallActive(false)
             
-            if (isRejectCall) {
-                
-                navigator.push(MainScreen())
-                
-            }
+            val isRejectCall = callUseCase.rejectCall(userId)
+            
+//            if (isRejectCall) {
+//                val navigator = commonViewModel.mainNavigator.value
+//                navigator?.push(MainScreen())
+//            }
         }
         
     }
     
-    
-    fun rejectCallBackground(userId: String) {
-        viewModelScope.launch {
-            callUseCase.rejectCallBackground(userId)
-            
-            closeApp()
-        }
-        
-    }
     
     fun rejectCallAnswer(): Boolean {
         _callState.value = PeerConnectionState.New

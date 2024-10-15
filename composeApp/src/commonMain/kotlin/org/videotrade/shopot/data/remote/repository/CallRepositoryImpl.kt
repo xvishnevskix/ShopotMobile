@@ -73,6 +73,9 @@ import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
+    
+    private val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+    
     private val iceServers = listOf(
         "stun:stun.l.google.com:19302",
         "stun:stun1.l.google.com:19302",
@@ -357,7 +360,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         }
                                         
                                         if (isCall.value)
-                                            rejectCallAnswer(navigator)
+                                            rejectCallAnswer()
                                         
                                         
                                         if (isConnectedWebrtc.value) {
@@ -563,7 +566,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             }
                                             
                                             if (isCall.value)
-                                                navigator?.let { rejectCallAnswer(it) }
+                                                rejectCallAnswer()
                                             
                                             if (isConnectedWebrtc.value) {
                                                 if (currentScreen is CallScreen) {
@@ -997,7 +1000,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    override suspend fun rejectCall(navigator: Navigator, userId: String): Boolean {
+    override suspend fun rejectCall(userId: String): Boolean {
         try {
             
             
@@ -1009,13 +1012,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             )
             
             
-            rejectCallAnswer(navigator)
             
             setIsIncomingCall(false)
             
             wsSession.value?.send(Frame.Text(jsonContent))
             println("rejectCall13")
             
+            rejectCallAnswer()
             
             println("rejectCall134")
             
@@ -1023,102 +1026,20 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
         } catch (e: Exception) {
             println(e)
+            val navigator = commonViewModel.mainNavigator.value
             
-            navigator.push(MainScreen())
+            navigator?.push(MainScreen())
             return false
             
         }
     }
     
-    override suspend fun rejectCallBackground(userId: String): Boolean {
-        try {
-            
-            
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                    put("type", "rejectCall")
-                    put("userId", userId)
-                }
-            )
-            
-            
-            rejectCallBackgroundAnswer()
-            
-            setIsIncomingCall(false)
-            
-            wsSession.value?.send(Frame.Text(jsonContent))
-            println("rejectCall13")
-            
-            
-            println("rejectCall134")
-            
-            return true
-            
-        } catch (e: Exception) {
-            println(e)
-            return false
-            
-        }
-    }
     
-    private fun rejectCallBackgroundAnswer() {
+    private fun rejectCallAnswer() {
         try {
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value
             println("rejectCallAnswer1")
-            
-            if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
-                // Останавливаем все треки локального потока
-                println("rejectCallAnswer2")
-                
-                localStream.value?.let { stream ->
-                    stream.tracks.forEach { track ->
-                        track.stop()
-                    }
-                }
-                
-                println("rejectCallAnswer3")
-                
-                // Удаляем все треки
-                currentPeerConnection.getTransceivers().forEach {
-                    currentPeerConnection.removeTrack(it.sender)
-                }
-                
-                // Закрываем PeerConnection
-                currentPeerConnection.close()
-            } else {
-                Logger.w { "PeerConnection already closed" }
-            }
-            
-            println("rejectCallAnswer4")
-            
-            // Очищаем локальный и удаленный потоки
-            isCall.value = false
-            _peerConnection.value = null
-            localStream.value = null
-            remoteVideoTrack.value = null
-            _isConnectedWebrtc.value = false
-            offer.value = null
-            otherUserId.value = ""
-            callerId.value = ""
-            _iceState.value = IceConnectionState.New
-            _callState.value = PeerConnectionState.New
-            
-            println("rejectCallAnswer5")
-            
-            Logger.d { "Call answer rejected and resources cleaned up successfully." }
-        } catch (e: Exception) {
-            Logger.e(e) { "Failed to reject call answer and clean up resources. $e" }
-        }
-    }
-    
-    
-    private fun rejectCallAnswer(navigator: Navigator) {
-        try {
-            // Проверяем, инициализирован ли peerConnection
-            val currentPeerConnection = _peerConnection.value
-            println("rejectCallAnswer1")
-            val currentScreen = navigator.lastItem
             
             if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
@@ -1163,15 +1084,24 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             
             
-            if (currentScreen is CallScreen) {
-                // Вы на экране CallScreen
-                navigator.push(MainScreen())
+            if (isScreenOn()) {
                 
-                println("Мы на экране CallScreen")
-            } else if (currentScreen is MainScreen) {
-                // Вы на экране MainScreen
-                println("Мы на экране MainScreen")
+                val navigator = commonViewModel.mainNavigator.value
+                val currentScreen = navigator?.lastItem
+                
+                if (currentScreen is CallScreen) {
+                    // Вы на экране CallScreen
+                    navigator.push(MainScreen())
+                    
+                    println("Мы на экране CallScreen")
+                } else if (currentScreen is MainScreen) {
+                    // Вы на экране MainScreen
+                    println("Мы на экране MainScreen")
+                }
+            } else {
+                closeApp()
             }
+            
             
             Logger.d { "Call answer rejected and resources cleaned up successfully." }
         } catch (e: Exception) {
