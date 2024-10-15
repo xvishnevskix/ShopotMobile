@@ -20,3 +20,5 @@ expect fun onResumeCallActivity(navigator: Navigator)
 expect fun isCallActiveNatific()
 
 expect fun clearNotificationsForChannel(channelId: String)
+
+expect fun closeAppAndCloseCall()

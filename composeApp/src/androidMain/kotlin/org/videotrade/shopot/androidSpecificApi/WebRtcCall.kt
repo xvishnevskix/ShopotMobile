@@ -1,6 +1,5 @@
 package org.videotrade.shopot.androidSpecificApi
 
-import android.app.ActivityManager
 import android.app.ActivityOptions
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -11,20 +10,12 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.Display
-import android.view.WindowManager
-import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.core.app.NotificationCompat
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.SlideTransition
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
@@ -33,14 +24,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
-import org.koin.compose.KoinContext
-import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.AppActivity
 import org.videotrade.shopot.R
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 
 // MyFirebaseMessagingService
@@ -84,6 +72,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         val parseCallData = Json.parseToJsonElement(callData).jsonObject
                         println("callData41412412 $callData")
                         callViewModel.setIsCallBackground(true)
+                        
+                        callViewModel.connectionBackgroundWs(profileId)
                         
                         // Пробуждаем экран и показываем активность через Foreground Service
                         val serviceIntent = Intent(this, CallForegroundService::class.java)
@@ -172,15 +162,13 @@ class CallForegroundService : Service() {
         val notification = notificationBuilder.build()
         
         // Создаем канал уведомлений для Android 8.0 и выше
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Foreground Service Channel",
-                NotificationManager.IMPORTANCE_HIGH
-            )
-            val manager = getSystemService(NotificationManager::class.java)
-            manager?.createNotificationChannel(channel)
-        }
+        val channel = NotificationChannel(
+            channelId,
+            "Foreground Service Channel",
+            NotificationManager.IMPORTANCE_HIGH
+        )
+        val manager = getSystemService(NotificationManager::class.java)
+        manager?.createNotificationChannel(channel)
         
         // Запускаем Foreground Service
         startForeground(1, notification) // Используйте один и тот же ID для уведомления
@@ -191,7 +179,7 @@ class CallForegroundService : Service() {
         println("wakeDevice and startActivity")
         
         // Пробуждаем устройство
-      
+        
         wakeDevice()
         
         // Если экран выключен, запускаем FullscreenNotificationActivity
@@ -224,7 +212,7 @@ class CallForegroundService : Service() {
             )
             wakeLock.acquire(5000) // Держим WakeLock на 5 секунд для пробуждения устройства
         }
-
+        
     }
 }
 
@@ -263,6 +251,15 @@ class CallActionReceiver : BroadcastReceiver() {
             "ACTION_DECLINE_CALL" -> {
                 println("Вызов отклонен")
                 
+                val answerData = callViewModel.answerData.value
+                
+                
+                val userJson =
+                    answerData?.jsonObject?.get("user")?.jsonObject
+                val user =
+                    Json.decodeFromString<ProfileDTO>(userJson.toString())
+                println("user.id ${user.id}")
+                callViewModel.rejectCall(user.id)
                 // Остановка Foreground Service
                 val serviceIntent = Intent(context, CallForegroundService::class.java)
                 context.stopService(serviceIntent)

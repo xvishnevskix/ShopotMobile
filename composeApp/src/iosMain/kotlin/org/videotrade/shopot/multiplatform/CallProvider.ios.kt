@@ -50,3 +50,6 @@ actual fun isCallActiveNatific() {
 
 actual fun clearNotificationsForChannel(channelId: String) {
 }
+
+actual fun closeAppAndCloseCall() {
+}

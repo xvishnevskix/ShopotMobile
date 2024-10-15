@@ -68,8 +68,6 @@ fun isActiveCall(callViewModel: CallViewModel) {
             if (isScreenOn) {
                 callViewModel.initWebrtc()
             }
-
-            callViewModel.connectionBackgroundWs(profileId)
         }
     }
 
