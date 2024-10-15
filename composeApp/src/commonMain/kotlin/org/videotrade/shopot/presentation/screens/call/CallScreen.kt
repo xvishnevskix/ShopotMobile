@@ -55,6 +55,7 @@ import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
+import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -175,7 +176,7 @@ class CallScreen(
             
             LaunchedEffect(isConnectedWs) {
                 if (isConnectedWs) {
-                    viewModel.setIsCallBackground(false)
+//                    viewModel.setIsCallBackground(false)
                     viewModel.answerCallBackground()
                 }
             }
@@ -353,17 +354,17 @@ class CallScreen(
                         .padding(horizontal = 50.dp)
                 ) {
                     rejectBtn({
-                        
-                        if (!isCallBackground) {
-                            viewModel.rejectCall(navigator, userId)
-                            
-                            navigator.push(MainScreen())
-                            
-                        } else {
-                            viewModel.rejectCallBackground(userId)
-                        }
-                        
-                        
+                        println("isScreenOn ${isScreenOn()}")
+//                        if (!isCallBackground) {
+//                            viewModel.rejectCall(navigator, userId)
+//
+//                            navigator.push(MainScreen())
+//
+//                        } else {
+//                            viewModel.rejectCallBackground(userId)
+//                        }
+//
+//
                     })
                     aceptBtn {
                         viewModel.initWebrtc()
