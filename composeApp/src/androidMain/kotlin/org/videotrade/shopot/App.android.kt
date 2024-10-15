@@ -104,33 +104,31 @@ class AndroidApp : Application() {
     
     // Метод для создания канала уведомлений
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // Канал для входящих звонков
-            val incomingCallChannelId = "CallNotificationChannel"
-            val incomingCallChannel = NotificationChannel(
-                incomingCallChannelId,
-                "Incoming Call Channel",
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = "Канал для входящих вызовов"
-                setShowBadge(true)
-            }
-            
-            // Канал для активных звонков
-            val ongoingCallChannelId = "OngoingCallChannel"
-            val ongoingCallChannel = NotificationChannel(
-                ongoingCallChannelId,
-                "Ongoing Call Channel",
-                NotificationManager.IMPORTANCE_LOW
-            ).apply {
-                description = "Канал для активных звонков"
-                setShowBadge(false)  // Отключение значка для активных звонков
-            }
-            
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager?.createNotificationChannel(incomingCallChannel)
-            notificationManager?.createNotificationChannel(ongoingCallChannel)
+        // Канал для входящих звонков
+        val incomingCallChannelId = "CallNotificationChannel"
+        val incomingCallChannel = NotificationChannel(
+            incomingCallChannelId,
+            "Incoming Call Channel",
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = "Канал для входящих вызовов"
+            setShowBadge(true)
         }
+        
+        // Канал для активных звонков
+        val ongoingCallChannelId = "OngoingCallChannel"
+        val ongoingCallChannel = NotificationChannel(
+            ongoingCallChannelId,
+            "Ongoing Call Channel",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Канал для активных звонков"
+            setShowBadge(false)  // Отключение значка для активных звонков
+        }
+        
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager?.createNotificationChannel(incomingCallChannel)
+        notificationManager?.createNotificationChannel(ongoingCallChannel)
     }
     
     

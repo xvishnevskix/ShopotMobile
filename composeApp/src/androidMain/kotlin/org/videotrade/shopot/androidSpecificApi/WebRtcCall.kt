@@ -49,20 +49,18 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         println("AAAAAAAAAAAAAAA ${remoteMessage.data}")
         // Проверка и запрос исключения из оптимизации батареи
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            println("asfafsaffaafa")
-            val intent = Intent()
-            val packageName = packageName
-            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-            if (!pm.isIgnoringBatteryOptimizations(packageName)) {
-                println("Запрос на исключение из оптимизации батареи отправлен")
-                intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
-                intent.data = Uri.parse("package:$packageName")
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                startActivity(intent)
-            } else {
-                println("Приложение уже исключено из оптимизации батареи")
-            }
+        println("asfafsaffaafa")
+        val intent = Intent()
+        val packageName = packageName
+        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+        if (!pm.isIgnoringBatteryOptimizations(packageName)) {
+            println("Запрос на исключение из оптимизации батареи отправлен")
+            intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
+            intent.data = Uri.parse("package:$packageName")
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        } else {
+            println("Приложение уже исключено из оптимизации батареи")
         }
         
         // Выполняем действия на основе данных сообщения
@@ -70,7 +68,6 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         
     }
     
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun triggerActionBasedOnData(data: Map<String, String>) {
         if (data["action"] == "callBackground") {
             val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
@@ -139,7 +136,6 @@ class CallForegroundService : Service() {
         
         // Если экран выключен — используем FullScreenIntent
         if (!isScreenOn) {
-            println("000000asda0da")
             notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
         } else {
             // Добавляем действия для принятия и отклонения вызова

@@ -25,18 +25,11 @@ internal fun App() = AppTheme {
     val viewModel: MainViewModel = koinInject()
     val commonViewModel: CommonViewModel = koinInject()
     val callViewModel: CallViewModel = koinInject()
-    
-    
-    
+
     KoinContext {
         if (callViewModel.isCallBackground.value) {
             isActiveCall(callViewModel)
         } else {
-        
-//            LaunchedEffect(Unit) {
-//                setScreenLockFlags(false)
-//            }
-            
             Navigator(
                 IntroScreen()
             ) { navigator ->
