@@ -100,8 +100,12 @@ class CallScreen(
         val callState = remember { mutableStateOf("") }
         
         LaunchedEffect(Unit) {
+            println("isIncomingCall4142 ${isIncomingCall}")
+            println("isCallBackground4142 ${isCallBackground}")
+            
             setScreenLockFlags(true)
         }
+        
         
         
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
@@ -158,6 +162,7 @@ class CallScreen(
         
         if (isIncomingCall) {
             LaunchedEffect(isConnectedWebrtc) {
+                println("isConnectedWebrtc $isConnectedWebrtc")
                 if (isConnectedWebrtc) {
                     viewModel.setIsIncomingCall(false)
                     viewModel.answerCall()
@@ -175,6 +180,8 @@ class CallScreen(
             }
             
             LaunchedEffect(isConnectedWs) {
+                
+                println("isConnectedWs $isConnectedWs")
                 if (isConnectedWs) {
 //                    viewModel.setIsCallBackground(false)
                     viewModel.answerCallBackground()
@@ -354,16 +361,7 @@ class CallScreen(
                         .padding(horizontal = 50.dp)
                 ) {
                     rejectBtn({
-//                        if (!isCallBackground) {
-//                            viewModel.rejectCall(navigator, userId)
-//
-//                            navigator.push(MainScreen())
-//
-//                        } else {
-//                            viewModel.rejectCallBackground(userId)
-//                        }
-//
-//
+                        viewModel.rejectCall(userId)
                     })
                     aceptBtn {
                         viewModel.initWebrtc()

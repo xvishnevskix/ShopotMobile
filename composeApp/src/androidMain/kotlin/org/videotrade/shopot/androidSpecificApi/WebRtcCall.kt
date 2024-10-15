@@ -72,6 +72,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         val parseCallData = Json.parseToJsonElement(callData).jsonObject
                         println("callData41412412 $callData")
                         callViewModel.setIsCallBackground(true)
+                        callViewModel.setIsIncomingCall(true)
                         
                         callViewModel.connectionBackgroundWs(profileId)
                         
@@ -227,6 +228,7 @@ class CallActionReceiver : BroadcastReceiver() {
             "ACTION_ACCEPT_CALL" -> {
                 CoroutineScope(Dispatchers.IO).launch {
                     println("Вызов принят")
+                    callViewModel.setIsIncomingCall(false)
                     
                     val serviceIntent = Intent(context, CallForegroundService::class.java)
                     context.stopService(serviceIntent)

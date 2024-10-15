@@ -65,7 +65,7 @@ fun isActiveCall(callViewModel: CallViewModel) {
             callViewModel.callScreenInfo.value =
                 CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
 
-            if (isScreenOn) {
+            if (!callViewModel.isIncomingCall.value) {
                 callViewModel.initWebrtc()
             }
         }
@@ -74,7 +74,6 @@ fun isActiveCall(callViewModel: CallViewModel) {
 
 
     if (!isScreenOn) {
-        callViewModel.setIsIncomingCall(true)
     }
 
     Navigator(

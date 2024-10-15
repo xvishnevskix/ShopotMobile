@@ -477,7 +477,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         
                                                         otherUserId.value = userId
                                                         
-                                                        _isIncomingCall.value = true
                                                         val contact = findContactByPhone(
                                                             user.phone,
                                                             contactsUseCase.contacts.value
