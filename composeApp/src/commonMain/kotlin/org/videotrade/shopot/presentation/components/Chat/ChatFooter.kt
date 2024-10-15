@@ -100,6 +100,7 @@ import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.file_message
 import shopot.composeapp.generated.resources.menu_gallery
 import shopot.composeapp.generated.resources.menu_video
+import shopot.composeapp.generated.resources.sticker_menu
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -254,7 +255,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                             
                             if (fileData?.fileType?.substringBefore("/") == "image") {
                                 viewModel.sendImage(
-                                    text.value,
+                                    viewModel.footerText.value,
                                     viewModel.profile.value.id,
                                     chat.id,
                                     "image",

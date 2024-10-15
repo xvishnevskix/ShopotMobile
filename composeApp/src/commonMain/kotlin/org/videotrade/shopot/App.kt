@@ -12,6 +12,7 @@ import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -31,6 +32,11 @@ internal fun App() = AppTheme {
         if (callViewModel.isCallBackground.value) {
             isActiveCall(callViewModel)
         } else {
+        
+//            LaunchedEffect(Unit) {
+//                setScreenLockFlags(false)
+//            }
+            
             Navigator(
                 IntroScreen()
             ) { navigator ->

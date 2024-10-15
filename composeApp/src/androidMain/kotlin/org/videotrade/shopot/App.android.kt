@@ -42,6 +42,7 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.NotificationHelper.createNotificationChannel
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
+import org.videotrade.shopot.multiplatform.setScreenLockFlags
 
 
 class AndroidApp : Application() {

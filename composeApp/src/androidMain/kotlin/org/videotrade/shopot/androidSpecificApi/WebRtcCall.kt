@@ -89,11 +89,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         
                         // Пробуждаем экран и показываем активность через Foreground Service
                         val serviceIntent = Intent(this, CallForegroundService::class.java)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                            startForegroundService(serviceIntent)
-                        } else {
-                            startService(serviceIntent)
-                        }
+                        startForegroundService(serviceIntent)
                         
                         // Устанавливаем данные вызова в callViewModel
                         callViewModel.setAnswerData(parseCallData)
@@ -143,6 +139,7 @@ class CallForegroundService : Service() {
         
         // Если экран выключен — используем FullScreenIntent
         if (!isScreenOn) {
+            println("000000asda0da")
             notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
         } else {
             // Добавляем действия для принятия и отклонения вызова
