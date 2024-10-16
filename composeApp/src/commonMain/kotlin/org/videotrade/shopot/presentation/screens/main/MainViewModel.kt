@@ -69,9 +69,9 @@ class MainViewModel : ViewModel(), KoinComponent {
                 println("userIDWWWWW : ${commonViewModel.mainNavigator.value}")
                 
 
-                    callUseCase.connectionWs(
-                        it.id
-                    )
+//                    callUseCase.connectionWs(
+//                        it.id
+//                    )
                 
             }
             

@@ -18,6 +18,7 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
@@ -34,6 +35,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val chatsUseCase: ChatsUseCase by inject()
+    private val callUseCase: CallUseCase by inject()
 
 //
 //    val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
@@ -155,6 +157,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
                 profile.value = profileCase
 
                 connectionWs(profileCase.id, navigator)
+                callUseCase.connectionWs(profileCase.id)
             }
 
         }
