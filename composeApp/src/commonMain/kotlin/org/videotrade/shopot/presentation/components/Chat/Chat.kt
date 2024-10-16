@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
@@ -78,12 +79,14 @@ fun Chat(
 
     var isScrolling by remember { mutableStateOf(false) }
     var shouldShowHeader by remember { mutableStateOf(false) }
+    val answerMessageId = remember { mutableStateOf<String?>(null) }
 
     if (messagesState.isNotEmpty()) {
         val groupedMessages = messagesState.groupBy { message ->
             message.created.subList(0, 3)
         }
         val numberOfDays = groupedMessages.size
+
 
         LaunchedEffect(listState) {
             snapshotFlow { listState.isScrollInProgress }
@@ -93,18 +96,17 @@ fun Chat(
                         shouldShowHeader = true
                         delay(2000)
                     } else {
-                            shouldShowHeader = false
+                        shouldShowHeader = false
                     }
                 }
         }
 
         LaunchedEffect(listState) {
             snapshotFlow { listState.layoutInfo.visibleItemsInfo }
-                .debounce(100) // задержка в 100 миллисекунд
+                .debounce(100)
                 .distinctUntilChanged()
                 .collect { visibleItems ->
                     if (viewModel.messages.value.size > 23) {
-
                         if (visibleItems.isNotEmpty() && visibleItems.last().index == viewModel.messages.value.size - 1 + numberOfDays) {
                             coroutineScope.launch {
                                 viewModel.getMessagesBack(chat.chatId)
@@ -114,14 +116,11 @@ fun Chat(
                 }
         }
 
-
-
         LazyColumn(
             state = listState,
             reverseLayout = true,
             modifier = modifier.background(Color.White)
         ) {
-
             groupedMessages.forEach { (date, messages) ->
 
                 stickyHeader {
@@ -166,16 +165,17 @@ fun Chat(
                             messageY = coordinates.positionInParent().y.toInt()
                         },
                         isVisible = isVisible,
-                        chat = chat
+                        chat = chat,
+                        answerMessageId = answerMessageId,
+                        coroutineScope = coroutineScope,
+                        listState = listState,
+                        messagesState = messagesState
                     )
                 }
-
-
             }
         }
     }
 }
-
 
 
 

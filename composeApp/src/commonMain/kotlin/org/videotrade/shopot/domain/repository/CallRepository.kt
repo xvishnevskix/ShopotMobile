@@ -1,6 +1,5 @@
 package org.videotrade.shopot.domain.repository
 
-import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
@@ -16,9 +15,15 @@ interface CallRepository {
     
     val peerConnection: StateFlow<PeerConnection?>
     
-    
     val isConnectedWebrtc: StateFlow<Boolean>
     
+    val isConnectedWs: StateFlow<Boolean>
+    
+    val isIncomingCall: StateFlow<Boolean>
+    
+    val isCallActive: StateFlow<Boolean>
+    
+    val isCallBackground: StateFlow<Boolean>
     
     val localStream: StateFlow<MediaStream?>
     
@@ -29,7 +34,11 @@ interface CallRepository {
     val iseState: StateFlow<IceConnectionState>
     
     
-    suspend fun connectionWs(userId: String, navigator: Navigator)
+    suspend fun connectionWs(userId: String)
+    
+    suspend fun connectionBackgroundWs(userId: String)
+    
+    
     suspend fun reconnectPeerConnection()
     suspend fun setOffer()
     
@@ -49,13 +58,23 @@ interface CallRepository {
     
     
     suspend fun makeCall(userId: String, calleeId: String)
+    
+    suspend fun makeCallBackground(notificToken: String, calleeId: String)
+    
     suspend fun answerCall()
     
-   suspend fun rejectCall(navigator: Navigator, userId: String): Boolean
-//    fun rejectCallAnswer()
+    fun answerCallBackground()
+    
+    suspend fun rejectCall(userId: String): Boolean
     
     fun clearData()
+    
     fun setIsIncomingCall(isIncomingCallValue: Boolean)
     
+    fun setIsCallBackground(isCallBackground: Boolean)
+    
+    fun setIsCallActive(isCallActive: Boolean)
+    
+    fun setOtherUserId(newOtherUserId: String)
     
 }

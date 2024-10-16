@@ -52,9 +52,15 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
     val mainNavigator = MutableStateFlow<Navigator?>(null)
     val tabNavigator = MutableStateFlow<TabNavigator?>(null)
-
+    
     val isRestartApp = MutableStateFlow(false)
-
+    
+    val appIsActive = MutableStateFlow(false)
+    
+    
+    fun setAppIsActive(activeValue: Boolean) {
+        appIsActive.value = activeValue
+    }
 
     fun restartApp() {
         isRestartApp.value = true
@@ -78,7 +84,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private fun updateNotificationToken() {
+    fun updateNotificationToken() {
 
         viewModelScope.launch {
 
@@ -186,6 +192,8 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                     val introViewModel: IntroViewModel =
                                         KoinPlatform.getKoin().get()
 
+                                    addValueInStorage("profileId", userId!!)
+
                                     updateNotificationToken()
 
 //                                    navigator.push(TestScreen())
@@ -204,6 +212,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
 
     }
+    
 
     fun sendImage() {
         viewModelScope.launch {
@@ -238,4 +247,28 @@ class CommonViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    fun sendNotify(
+        title: String,
+        content: String? = "Уведомление",
+        notificationToken: String?
+    ) {
+        viewModelScope.launch {
+            println("Уведомление ${notificationToken}")
+
+            if (notificationToken !== null) {
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("title", title)
+                        put("body", content)
+                        put("notificationToken", notificationToken)
+
+                    }
+                )
+
+                println("Уведомление ${jsonContent}")
+
+                origin().post("notification/notify", jsonContent)
+            }
+        }
+    }
 }

@@ -129,6 +129,7 @@ kotlin {
             implementation(libs.kotlinx.coroutines.android)
             implementation(libs.ktor.client.okhttp)
             implementation(project.dependencies.platform(libs.firebase.bom))
+            implementation(libs.firebase.messaging.ktx)
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.lifecycle.process)
@@ -145,7 +146,7 @@ android {
     compileSdk = 34
     
     defaultConfig {
-        minSdk = 24
+        minSdk = 27
         targetSdk = 34
         
         applicationId = "org.videotrade.shopot.androidApp"

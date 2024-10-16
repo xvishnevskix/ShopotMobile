@@ -1,0 +1,57 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Картинка контакта -->
+
+    <!-- Имя контакта -->
+    <TextView
+        android:id="@+id/contact_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:text="Асланбек"
+        android:textSize="24sp"
+        android:textColor="@android:color/black"/>
+
+    <!-- Статус звонка -->
+    <TextView
+        android:id="@+id/call_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/contact_name"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Звонок Telegram"
+        android:textSize="18sp"
+        android:textColor="@android:color/black"/>
+
+<!--    &lt;!&ndash; Кнопка Принять звонок &ndash;&gt;-->
+<!--    <ImageButton-->
+<!--        android:id="@+id/accept_call_button"-->
+<!--        android:layout_width="80dp"-->
+<!--        android:layout_height="80dp"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_marginBottom="50dp"-->
+<!--        android:layout_alignParentStart="true"-->
+<!--        android:layout_marginStart="40dp"-->
+<!--        android:background="@drawable/accept_call_button"-->
+<!--        android:src="@drawable/accept_call_button"-->
+<!--        android:scaleType="centerInside"/>-->
+
+<!--    &lt;!&ndash; Кнопка Отклонить звонок &ndash;&gt;-->
+<!--    <ImageButton-->
+<!--        android:id="@+id/decline_call_button"-->
+<!--        android:layout_width="80dp"-->
+<!--        android:layout_height="80dp"-->
+<!--        android:layout_alignParentBottom="true"-->
+<!--        android:layout_marginBottom="50dp"-->
+<!--        android:layout_alignParentEnd="true"-->
+<!--        android:layout_marginEnd="40dp"-->
+<!--        android:background="@drawable/decline_call_button"-->
+<!--        android:src="@drawable/decline_call_button"-->
+<!--        android:scaleType="centerInside"/>-->
+</RelativeLayout>

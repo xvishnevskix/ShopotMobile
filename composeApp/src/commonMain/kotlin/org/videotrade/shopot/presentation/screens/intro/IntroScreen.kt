@@ -37,7 +37,7 @@ class IntroScreen : Screen {
 
 
         LaunchedEffect(key1 = Unit) {
-            clearAllNotifications()
+//            clearAllNotifications()
         }
 
         LaunchedEffect(key1 = Unit) {

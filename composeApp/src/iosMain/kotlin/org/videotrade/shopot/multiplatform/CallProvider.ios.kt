@@ -1,13 +1,13 @@
 package org.videotrade.shopot.multiplatform
 
 
+import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionPortOverrideNone
 import platform.AVFAudio.AVAudioSessionPortOverrideSpeaker
 import platform.AVFAudio.setActive
-import platform.Foundation.NSError
 import platform.Foundation.NSLog
 
 actual class CallProvider {
@@ -39,4 +39,17 @@ actual object CallProviderFactory {
     actual fun create(): CallProvider {
         return CallProvider()
     }
+}
+
+
+actual fun onResumeCallActivity(navigator: Navigator) {
+}
+
+actual fun isCallActiveNatific() {
+}
+
+actual fun clearNotificationsForChannel(channelId: String) {
+}
+
+actual fun closeAppAndCloseCall() {
 }

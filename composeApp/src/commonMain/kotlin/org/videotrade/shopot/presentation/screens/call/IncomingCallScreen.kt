@@ -35,14 +35,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
-import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -51,7 +48,13 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 
-class IncomingCallScreen(private val userId: String, private val user: ProfileDTO) : Screen {
+class IncomingCallScreen(
+    private val userId: String,
+    private val userIcon: String? = null,
+    private val userFirstName: String,
+    private val userLastName: String,
+    private val userPhone: String
+) : Screen {
     
     @Composable
     override fun Content() {
@@ -60,16 +63,21 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
         
         val viewModel: CallViewModel = koinInject()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
+        val isCallBackground by viewModel.isCallBackground.collectAsState()
+        
         val musicPlayer = remember { MusicPlayer() }
         
         // Используем состояние для отслеживания, играет ли музыка
         var isPlaying by remember { mutableStateOf(false) }
+
+//        val imagePainter = if (user.icon.isNullOrBlank()) {
+//            painterResource(Res.drawable.person)
+//        } else {
+//            rememberImagePainter("${serverUrl}file/plain/${user.icon}")
+//        }
         
-        val imagePainter = if (user.icon.isNullOrBlank()) {
-            painterResource(Res.drawable.person)
-        } else {
-            rememberImagePainter("${serverUrl}file/plain/${user.icon}")
-        }
+        val imagePainter = painterResource(Res.drawable.person)
+        
         
         LaunchedEffect(Unit) {
             musicPlayer.play("callee")
@@ -89,19 +97,21 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
             }
         }
         
-        LaunchedEffect(isConnectedWebrtc) {
-            
-            if (isConnectedWebrtc)
-                navigator.push(
-                    CallScreen(
-                        userId,
-                        "IncomingCall",
-                        user
-                    )
-                )
-        }
+//        LaunchedEffect(isConnectedWebrtc) {
+//            if (isConnectedWebrtc)
+//                navigator.push(
+//                    CallScreen(
+//                        userId,
+//                        if (isCallBackground) "IncomingBackgroundCall" else "IncomingCall",
+//                        userIcon,
+//                        userFirstName,
+//                        userLastName,
+//                        userPhone,
+//                    )
+//                )
+//        }
         
-        val name = remember { "${user.firstName} ${user.lastName}" }
+        val name = remember { "$userFirstName $userLastName" }
         
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -129,7 +139,7 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
                         )
                         .clip(CircleShape)
                 ) {
-                    Avatar(user.icon, 190.dp)
+                    Avatar(null, 190.dp)
                 }
                 
                 Text(
@@ -149,7 +159,7 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
                 
                 Text(
                     modifier = Modifier.padding(top = 12.5.dp),
-                    text = "+${user.phone}",
+                    text = "+${userPhone}",
                     fontSize = 24.sp,
                     color = Color.White
                 )
@@ -164,10 +174,7 @@ class IncomingCallScreen(private val userId: String, private val user: ProfileDT
                         .padding(horizontal = 50.dp)
                 ) {
                     rejectBtn({
-                        
-                        viewModel.rejectCall(navigator, userId)
-                        
-                        navigator.push(MainScreen())
+                            viewModel.rejectCall( userId)
                     })
                     aceptBtn {
                         

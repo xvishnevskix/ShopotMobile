@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.FullscreenNotification" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Убедитесь, что статус-бар и навигационная панель скрыты -->
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+</resources>

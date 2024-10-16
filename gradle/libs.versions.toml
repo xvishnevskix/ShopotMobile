@@ -40,6 +40,7 @@ workRuntimeKtx = "2.9.0"
 
 coil3 = "3.0.0-alpha06"
 coreI18n = "1.0.0-alpha01"
+firebaseMessagingKtx = "24.0.1"
 
 [libraries]
 
@@ -47,6 +48,7 @@ coreI18n = "1.0.0-alpha01"
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 
 

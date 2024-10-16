@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,6 +31,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.screens.group.GroupEditScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -38,43 +41,48 @@ import shopot.composeapp.generated.resources.check_mark
 fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
     val navigator = LocalNavigator.currentOrThrow
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 40.dp, bottom = 23.dp).background(Color(0xFFF3F4F6)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(Color(0xFFF3F4F6)),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
 
-        ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back",
-            modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
-                navigator.pop()
-            },
-            tint = Color.Black
-        )
+            ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Back",
+                modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
+                    navigator.pop()
+                },
+                tint = Color.Black
+            )
 
-        Text(
-            text = text,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-            fontSize = 17.sp,
-            textAlign = TextAlign.Center,
-            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-            lineHeight = 20.sp,
-            modifier = Modifier.padding(end = 10.dp),
-            color = Color.Black
-            
-        )
-        Image(
-            painter = painterResource(Res.drawable.check_mark),
-            contentDescription = "Checkmark",
-            modifier = Modifier.padding(start = 0.dp, end = 6.dp)
-                .size(width = 16.dp, height = 12.dp).pointerInput(Unit) {
-                if (onClick != null) {
-                    onClick()
-                }
-            },
-            contentScale = ContentScale.FillBounds
-        )
+            Text(
+                text = text,
+                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                fontSize = 17.sp,
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                lineHeight = 20.sp,
+                modifier = Modifier.padding(end = 10.dp),
+                color = Color.Black
+
+            )
+            Image(
+                painter = painterResource(Res.drawable.check_mark),
+                contentDescription = "Checkmark",
+                modifier = Modifier.padding(start = 0.dp, end = 6.dp)
+                    .size(width = 16.dp, height = 12.dp).pointerInput(Unit) {
+                        if (onClick != null) {
+                            onClick()
+                        }
+                    },
+                contentScale = ContentScale.FillBounds
+            )
+        }
+        Box(Modifier.padding(bottom = 23.dp)) {
+            CallBar()
+        }
     }
 
 }

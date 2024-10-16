@@ -1,6 +1,5 @@
 package org.videotrade.shopot.domain.usecase
 
-import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
@@ -18,6 +17,10 @@ class CallUseCase : KoinComponent {
     
     val peerConnection: StateFlow<PeerConnection?> get() = repository.peerConnection
     val isConnectedWebrtc: StateFlow<Boolean> get() = repository.isConnectedWebrtc
+    val isConnectedWs: StateFlow<Boolean> get() = repository.isConnectedWs
+    val isCallBackground: StateFlow<Boolean> get() = repository.isCallBackground
+    val isIncomingCall: StateFlow<Boolean> get() = repository.isIncomingCall
+    val isCallActive: StateFlow<Boolean> get() = repository.isCallActive
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
     val callState: StateFlow<PeerConnectionState> get() = repository.callState
@@ -28,9 +31,14 @@ class CallUseCase : KoinComponent {
         return repository.reconnectPeerConnection()
     }
     
-    suspend fun connectionWs(userId: String, navigator: Navigator) {
+    suspend fun connectionWs(userId: String) {
         
-        return repository.connectionWs(userId, navigator)
+        return repository.connectionWs(userId)
+    }
+    
+    suspend fun connectionBackgroundWs(userId: String) {
+        
+        return repository.connectionBackgroundWs(userId)
     }
     
     suspend fun setOffer() {
@@ -38,6 +46,7 @@ class CallUseCase : KoinComponent {
         return repository.setOffer()
     }
     
+
     
     suspend fun getWsSession(): DefaultClientWebSocketSession? {
         return repository.getWsSession()
@@ -70,18 +79,29 @@ class CallUseCase : KoinComponent {
     }
     
     
-    suspend fun makeCall(userId: String, calleeId: String){
+    suspend fun makeCall(userId: String, calleeId: String) {
         repository.makeCall(userId, calleeId)
     }
+    
+    suspend fun makeCallBackground(notificToken: String, calleeId: String) {
+        repository.makeCallBackground(notificToken, calleeId)
+    }
+    
     
     suspend fun answerCall() {
         repository.answerCall()
     }
     
     
-  suspend  fun rejectCall(navigator: Navigator,userId: String): Boolean {
-     return   repository.rejectCall(navigator, userId)
+    fun answerCallBackground() {
+        repository.answerCallBackground()
     }
+    
+    
+    suspend fun rejectCall(userId: String): Boolean {
+        return repository.rejectCall( userId)
+    }
+
     
     fun rejectCallAnswer() {
 //        repository.rejectCallAnswer()
@@ -93,6 +113,18 @@ class CallUseCase : KoinComponent {
     
     fun setIsIncomingCall(isIncomingCallValue: Boolean) {
         repository.setIsIncomingCall(isIncomingCallValue)
+    }
+    
+    fun setIsCallBackground(isCallBackground: Boolean) {
+        return repository.setIsCallBackground(isCallBackground)
+    }
+    
+    fun setIsCallActive(isCallActive: Boolean) {
+        return repository.setIsCallActive(isCallActive)
+    }
+    
+    fun setOtherUserId(newOtherUserId: String) {
+        return repository.setOtherUserId(newOtherUserId)
     }
     
     

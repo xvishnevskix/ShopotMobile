@@ -1,27 +1,65 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.http.HttpMethod
+import io.ktor.util.encodeBase64
+import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.put
+import okio.ByteString.Companion.decodeBase64
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.delValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.usecase.CallUseCase
+import org.videotrade.shopot.domain.usecase.ChatsUseCase
+import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.EncapsulationFileResult
+import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class CallViewModel() : ViewModel(), KoinComponent {
     private val callUseCase: CallUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
+    private val contactsUseCase: ContactsUseCase by inject()
+    private val commonViewModel: CommonViewModel by inject()
+    private val wsUseCase: WsUseCase by inject()
+    private val chatsUseCase: ChatsUseCase by inject()
+    
+    val isConnectedWs = callUseCase.isConnectedWs
+    val isCallBackground = callUseCase.isCallBackground
+    
+    val isIncomingCall = callUseCase.isIncomingCall
     
     private val _isConnectedWebrtc = MutableStateFlow(false)
     val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
@@ -41,12 +79,70 @@ class CallViewModel() : ViewModel(), KoinComponent {
     // Флаг для управления наблюдением
     private var isObserving = MutableStateFlow(true)
     
+    var answerData = MutableStateFlow<JsonObject?>(null)
+    
+    val isScreenOn = MutableStateFlow(false)
     
     val localStreamm = callUseCase.localStream
-
-//    init {
-//        startObserving()
-//    }
+    
+    val isCallActive = callUseCase.isCallActive
+    
+    val replaceInCall = MutableStateFlow(false)
+    
+    // Таймер
+    private val _timer = MutableStateFlow("00:00:00")
+    val timer: StateFlow<String> get() = _timer
+    
+    private var timerJob: Job? = null
+    private var elapsedSeconds = 0L
+    
+    val isTimerRunning = MutableStateFlow(false)
+    
+    private val _userIcon = MutableStateFlow<String?>(null)
+    val userIcon: StateFlow<String?> get() = _userIcon
+    
+    val callScreenInfo = MutableStateFlow<Screen?>(null)
+    
+    private fun updateUserIcon(icon: String?) {
+        _userIcon.value = icon
+    }
+    
+    fun startTimer(icon: String?) {
+        updateUserIcon(icon)
+        elapsedSeconds = 0L
+        isTimerRunning.value = true
+        timerJob?.cancel()
+        timerJob = viewModelScope.launch {
+            while (true) {
+                delay(1000L)
+                elapsedSeconds++
+                _timer.value = formatTime(elapsedSeconds)
+            }
+        }
+    }
+    
+    fun stopTimer() {
+        timerJob?.cancel()
+        isTimerRunning.value = false
+        timerJob = null
+    }
+    
+    
+    private fun formatTime(seconds: Long): String {
+        val hours = (seconds / 3600).toInt().toString().padStart(2, '0')
+        val minutes = ((seconds % 3600) / 60).toInt().toString().padStart(2, '0')
+        val secs = (seconds % 60).toInt().toString().padStart(2, '0')
+        return "$hours:$minutes:$secs"
+    }
+    
+    fun setAnswerData(JsonObject: JsonObject?) {
+        answerData.value = JsonObject
+    }
+    
+    fun setIsScreenOn(isScreenOnNew: Boolean) {
+        isScreenOn.value = isScreenOnNew
+    }
+    
     
     private fun startObserving() {
         viewModelScope.launch {
@@ -114,13 +210,19 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
+    fun connectionCallWs(userId: String) {
+        viewModelScope.launch {
+            callUseCase.connectionWs(userId)
+        }
+    }
+    
     fun updateOtherUserId(userId: String) {
         viewModelScope.launch {
             callUseCase.updateOtherUserId(userId)
         }
     }
     
-    private fun getOtherUserId(): String {
+    fun getOtherUserId(): String {
         return callUseCase.getOtherUserId()
     }
     
@@ -155,17 +257,26 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.answerCall()
     }
     
-    fun rejectCall(navigator: Navigator, userId: String) {
+    fun answerCallBackground() {
+        callUseCase.answerCallBackground()
+    }
+    
+    fun rejectCall(userId: String) {
         viewModelScope.launch {
-            val isRejectCall = callUseCase.rejectCall(navigator, userId)
+            clearNotificationsForChannel("OngoingCallChannel")
+            stopTimer()
+            setIsCallActive(false)
             
-            if (isRejectCall) {
-                navigator.push(MainScreen())
+            val isRejectCall = callUseCase.rejectCall(userId)
 
-            }
+//            if (isRejectCall) {
+//                val navigator = commonViewModel.mainNavigator.value
+//                navigator?.push(MainScreen())
+//            }
         }
         
     }
+    
     
     fun rejectCallAnswer(): Boolean {
         _callState.value = PeerConnectionState.New
@@ -186,23 +297,209 @@ class CallViewModel() : ViewModel(), KoinComponent {
         startObserving()
     }
     
-    fun initCall(callCase: String, userId: String) {
+    fun initCall(userId: String) {
         println("dsadadadadad ${callUseCase.wsSession.value}")
-        
         viewModelScope.launch {
             if (callUseCase.wsSession.value != null) {
-                when (callCase) {
-                    "Call" -> {
-                        updateOtherUserId(userId)
-                        makeCall(userId)
-                    }
-                    
-                    "IncomingCall" -> answerCall()
-                }
+                updateOtherUserId(userId)
+                makeCall(userId)
             }
         }
         
     }
     
-
+    fun makeCallBackground(notificToken: String, calleeId: String) {
+        viewModelScope.launch {
+            callUseCase.makeCallBackground(notificToken, calleeId)
+            
+        }
+    }
+    
+    fun setIsCallBackground(isCallBackground: Boolean) {
+        callUseCase.setIsCallBackground(isCallBackground)
+    }
+    
+    fun setIsCallActive(isCallActive: Boolean) {
+        return callUseCase.setIsCallActive(isCallActive)
+    }
+    
+    fun setIsIncomingCall(isIncomingCallValue: Boolean) {
+        return callUseCase.setIsIncomingCall(isIncomingCallValue)
+    }
+    
+    
+    private fun observeWsConnection() {
+        println("wsSessionIntrowsUseCase.wsSession ${wsUseCase.wsSession.value}")
+        
+        val profileId = getValueInStorage("profileId")
+        
+        
+        wsUseCase.wsSession
+            .onEach { wsSessionNew ->
+                
+                if (profileId !== null && isObserving.value) {
+                    
+                    if (wsSessionNew != null) {
+                        println("wsSessionIntro $wsSessionNew")
+                        stopObserving()
+                        chatsUseCase.getChatsInBack(wsSessionNew, profileId)
+                        
+                    }
+                }
+                
+            }
+            .launchIn(viewModelScope)
+        
+        
+    }
+    
+    
+    fun checkUserShared(userId: String, navigator: Navigator) {
+        
+        viewModelScope.launch {
+            
+            val httpClient = HttpClient {
+                install(WebSockets)
+            }
+            try {
+                httpClient.webSocket(
+                    method = HttpMethod.Get,
+                    host = webSocketsUrl,
+                    port = 3050,
+                    path = "/crypto?userId=$userId",
+                    
+                    ) {
+                    
+                    println("jsonElement$userId")
+                    
+                    val jsonContent = Json.encodeToString(
+                        buildJsonObject {
+                            put("action", "getKeys")
+                        }
+                    )
+                    
+                    send(Frame.Text(jsonContent))
+                    
+                    for (frame in incoming) {
+                        if (frame is Frame.Text) {
+                            val text = frame.readText()
+                            
+                            val jsonElement = Json.parseToJsonElement(text)
+                            
+                            println("jsonElement $jsonElement")
+                            
+                            val action =
+                                jsonElement.jsonObject["action"]?.jsonPrimitive?.content
+                            
+                            
+                            when (action) {
+                                "answerPublicKey" -> {
+                                    val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                                    
+                                    val publicKeyString =
+                                        jsonElement.jsonObject["publicKey"]?.jsonPrimitive?.content
+                                    
+                                    val publicKeyBytes =
+                                        publicKeyString?.decodeBase64()?.toByteArray()
+                                    
+                                    println("publicKeyBytes ${publicKeyBytes?.encodeBase64()}")
+                                    
+                                    
+                                    val result = publicKeyBytes?.let {
+                                        cipherWrapper.getSharedSecretCommon(
+                                            it
+                                        )
+                                    }
+                                    
+                                    
+                                    if (result !== null) {
+                                        val answerPublicKeyJsonContent = Json.encodeToString(
+                                            buildJsonObject {
+                                                put("action", "sendCipherText")
+                                                put("cipherText", result.ciphertext.encodeBase64())
+                                            }
+                                        )
+                                        
+                                        println(
+                                            "successSharedSecret111 ${
+                                                EncapsulationFileResult(
+                                                    result.sharedSecret,
+                                                    result.sharedSecret
+                                                )
+                                            }"
+                                        )
+                                        
+                                        
+                                        addValueInStorage(
+                                            "sharedSecret",
+                                            result.sharedSecret.encodeBase64()
+                                        )
+                                        
+                                        send(Frame.Text(answerPublicKeyJsonContent))
+                                    }
+                                    
+                                    
+                                }
+                                
+                                "successSharedSecret" -> {
+                                    addValueInStorage("profileId", userId)
+                                    
+                                    commonViewModel.updateNotificationToken()
+                                    fetchContacts(navigator)
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+            
+            
+            }
+        }
+        
+    }
+    
+    
+    private fun fetchContacts(navigator: Navigator) {
+        viewModelScope.launch {
+            val contacts = contactsUseCase.fetchContacts()
+            
+            if (contacts != null) {
+                val profileCase = profileUseCase.downloadProfile()
+                
+                if (profileCase == null) {
+                    delValueInStorage("accessToken")
+                    delValueInStorage("refreshToken")
+                    
+                    return@launch
+                    
+                } else {
+                    addValueInStorage("profileId", profileCase.id)
+                    observeWsConnection()
+                    connectionMainWs(profileCase.id, navigator)
+                }
+                
+            }
+        }
+    }
+    
+    private fun connectionMainWs(userId: String, navigator: Navigator) {
+        viewModelScope.launch {
+            wsUseCase.connectionWs(userId, navigator)
+        }
+    }
+    
+    fun replacePopCall(navigator: Navigator) {
+        val navPop = navigator.pop()
+        println("navPop $navPop")
+        if (!navPop) {
+            navigator.push(MainScreen())
+        }
+    }
+    
+    
+    fun setOtherUserId(newOtherUserId: String) {
+        callUseCase.setOtherUserId(newOtherUserId)
+    }
 }

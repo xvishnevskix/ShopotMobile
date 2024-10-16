@@ -18,7 +18,6 @@ import kotlinx.datetime.toInstant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
@@ -69,12 +68,10 @@ class MainViewModel : ViewModel(), KoinComponent {
                 
                 println("userIDWWWWW : ${commonViewModel.mainNavigator.value}")
                 
-                commonViewModel.mainNavigator.value?.let { navigator ->
-                    callUseCase.connectionWs(
-                        it.id,
-                        navigator
-                    )
-                }
+
+//                    callUseCase.connectionWs(
+//                        it.id
+//                    )
                 
             }
             
@@ -232,10 +229,12 @@ class MainViewModel : ViewModel(), KoinComponent {
             delValueInStorage("accessToken")
             delValueInStorage("refreshToken")
             
-  
+            
             
             navigator.replace(SignInScreen())
             
         }
     }
+    
+
 }

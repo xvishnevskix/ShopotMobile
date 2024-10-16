@@ -1,7 +1,6 @@
 package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
-import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.IceConnectionState
@@ -29,8 +28,12 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,8 +51,11 @@ import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
 import org.videotrade.shopot.api.findContactByPhone
+import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
@@ -57,11 +63,19 @@ import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
-import org.videotrade.shopot.presentation.screens.call.IncomingCallScreen
+import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
+import org.videotrade.shopot.multiplatform.closeApp
+import org.videotrade.shopot.multiplatform.isScreenOn
+import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.screens.call.CallViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
+    
+    private val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+    
     private val iceServers = listOf(
         "stun:stun.l.google.com:19302",
         "stun:stun1.l.google.com:19302",
@@ -85,8 +99,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         )
     )
     
-    private val isConnected = mutableStateOf(false)
-    
     
     private fun generateRandomNumber(): String {
         return Random.nextInt(1, 41).toString() // верхняя граница исключена, поэтому указываем 11
@@ -97,7 +109,16 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     private val isCall = mutableStateOf(false)
-    private val isIncomingCall = mutableStateOf(false)
+    
+    private val _isCallActive = MutableStateFlow(false)
+    override val isCallActive: StateFlow<Boolean> get() = _isCallActive
+    
+    
+    private val _isIncomingCall = MutableStateFlow(false)
+    override val isIncomingCall: StateFlow<Boolean> get() = _isIncomingCall
+    
+    private val _isCallBackground = MutableStateFlow(false)
+    override val isCallBackground: StateFlow<Boolean> get() = _isCallBackground
     
     private val callerId = mutableStateOf(generateRandomNumber())
     
@@ -119,6 +140,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
     
+    private val _isConnectedWs = MutableStateFlow(false)
+    
+    override val isConnectedWs: StateFlow<Boolean> get() = _isConnectedWs
     
     private val _callState = MutableStateFlow(PeerConnectionState.New)
     
@@ -142,12 +166,15 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-    override suspend fun connectionWs(userId: String, navigator: Navigator) {
+    
+    override suspend fun connectionWs(userId: String) {
+        
+        println("aaaaaaa11111")
         val httpClient = HttpClient {
             install(WebSockets)
         }
         
-        if (!isConnected.value) {
+        if (!_isConnectedWs.value) {
             try {
                 httpClient.webSocket(
                     method = HttpMethod.Get,
@@ -156,7 +183,246 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     path = "/ws?callerId=${userId}",
                 ) {
                     _wsSession.value = this
-                    isConnected.value = true
+                    _isConnectedWs.value = true
+                    println("Connection Call")
+                    
+                    val callOutputRoutine = launch {
+                        for (frame in incoming) {
+                            if (frame is Frame.Text) {
+                                
+                                val text = frame.readText()
+                                
+                                
+                                val jsonElement = Json.parseToJsonElement(text)
+                                
+                                println("jsonElement1112 $jsonElement")
+                                
+                                
+                                val type = jsonElement.jsonObject["type"]?.jsonPrimitive?.content
+                                
+                                println("jsonElement1112 $type")
+                                
+                                
+                                val rtcMessage = jsonElement.jsonObject["rtcMessage"]?.jsonObject
+                                
+                                
+                                
+                                when (type) {
+                                    "newCall" -> {
+                                        try {
+                                            val contactsUseCase: ContactsUseCase by inject()
+                                            val callViewModel: CallViewModel by inject()
+                                            val navigator = commonViewModel.mainNavigator.value
+                                            
+                                            val cameraPer = PermissionsProviderFactory.create()
+                                                .getPermission("microphone")
+                                            
+                                            if (cameraPer) {
+                                                rtcMessage?.let {
+                                                    val userJson =
+                                                        jsonElement.jsonObject["user"]?.jsonObject
+                                                    
+                                                    
+                                                    var user =
+                                                        Json.decodeFromString<ProfileDTO>(userJson.toString())
+                                                    
+                                                    
+                                                    println("aadauser $user")
+                                                    
+                                                    val sdp =
+                                                        it["sdp"]?.jsonPrimitive?.content
+                                                            ?: return@launch
+                                                    
+                                                    
+                                                    val callerId =
+                                                        jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
+                                                    
+                                                    offer.value = SessionDescription(
+                                                        SessionDescriptionType.Offer,
+                                                        sdp
+                                                    )
+                                                    
+                                                    
+                                                    
+                                                    callerId?.let { userId ->
+                                                        
+                                                        
+                                                        otherUserId.value = userId
+                                                        
+                                                        _isIncomingCall.value = true
+                                                        val contact = findContactByPhone(
+                                                            user.phone,
+                                                            contactsUseCase.contacts.value
+                                                        )
+                                                        if (
+                                                            contact !== null && contact.firstName !== null && contact.lastName !== null
+                                                        ) {
+                                                            user = user.copy(
+                                                                firstName = contact.firstName,
+                                                                lastName = contact.lastName
+                                                            )
+                                                        }
+                                                        
+                                                        callViewModel.callScreenInfo.value =
+                                                            CallScreen(
+                                                                userId,
+                                                                null,
+                                                                user.firstName,
+                                                                user.lastName,
+                                                                user.phone,
+                                                            )
+                                                        
+                                                        setIsCallBackground(false)
+                                                        navigator?.push(
+                                                            CallScreen(
+                                                                userId,
+                                                                null,
+                                                                user.firstName,
+                                                                user.lastName,
+                                                                user.phone,
+                                                            )
+                                                        )
+                                                        
+                                                    }
+                                                    
+                                                    
+                                                }
+                                            }
+                                            
+                                            
+                                        } catch (e: Exception) {
+                                            
+                                            println("Error newCall: $e")
+                                        }
+                                    }
+                                    
+                                    "callAnswered" -> {
+                                        rtcMessage?.let {
+                                            
+                                            println("return@launch callAnswered ${it["sdp"]?.jsonPrimitive?.content}")
+                                            
+                                            val sdp =
+                                                it["sdp"]?.jsonPrimitive?.content ?: return@launch
+                                            
+                                            val answer = SessionDescription(
+                                                SessionDescriptionType.Answer,
+                                                sdp
+                                            )
+                                            _peerConnection.value?.setRemoteDescription(answer)
+                                        }
+                                    }
+                                    
+                                    "ICEcandidate" -> {
+                                        rtcMessage?.let {
+                                            Logger.d("ICEcandidate111111 $rtcMessage")
+                                            val jsonElement =
+                                                Json.parseToJsonElement(rtcMessage.toString())
+                                            val label =
+                                                jsonElement.jsonObject["label"]?.jsonPrimitive?.int
+                                            val id =
+                                                jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                                            val candidate =
+                                                jsonElement.jsonObject["candidate"]?.jsonPrimitive?.content
+                                            
+                                            if (candidate != null && id != null && label != null) {
+                                                val iceCandidate = IceCandidate(
+                                                    candidate = candidate,
+                                                    sdpMid = id,
+                                                    sdpMLineIndex = label
+                                                )
+                                                _peerConnection.value?.addIceCandidate(iceCandidate)
+                                            }
+                                        }
+                                    }
+                                    
+                                    "rejectCall" -> {
+                                        val navigator = commonViewModel.mainNavigator.value
+                                        
+                                        clearNotificationsForChannel("OngoingCallChannel")
+                                        
+                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
+                                        
+                                        
+                                        val callViewModel: CallViewModel =
+                                            KoinPlatform.getKoin().get()
+                                        
+                                        val currentScreen = navigator?.lastItem
+                                        
+                                        callViewModel.stopTimer()
+                                        
+                                        setIsCallActive(false)
+                                        
+                                        if (isScreenOn()) {
+                                            
+                                            if (_isIncomingCall.value) {
+                                                if (currentScreen is CallScreen) {
+                                                    // Вы на экране CallScreen
+                                                    navigator?.push(MainScreen())
+                                                    
+                                                    println("Мы на экране CallScreen")
+                                                } else if (currentScreen is MainScreen) {
+                                                    // Вы на экране MainScreen
+                                                    println("Мы на экране MainScreen")
+                                                }
+                                            }
+                                            
+                                            if (isCall.value)
+                                                rejectCallAnswer()
+                                            
+                                            
+                                            if (isConnectedWebrtc.value) {
+                                                
+                                                if (currentScreen is CallScreen) {
+                                                    // Вы на экране CallScreen
+                                                    navigator?.push(MainScreen())
+                                                    
+                                                    println("Мы на экране CallScreen")
+                                                } else if (currentScreen is MainScreen) {
+                                                    // Вы на экране MainScreen
+                                                    println("Мы на экране MainScreen")
+                                                }
+                                                
+                                            }
+                                        } else {
+                                            rejectCallAnswer()
+                                        }
+                                        
+                                        
+                                        
+                                        println("rejectCall3")
+                                        
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    callOutputRoutine.join()
+                }
+            } catch (e: Exception) {
+                _isConnectedWs.value = false
+                println("Ошибка соединения: $e")
+            }
+        }
+    }
+    
+    override suspend fun connectionBackgroundWs(userId: String) {
+        val httpClient = HttpClient {
+            install(WebSockets)
+        }
+        
+        val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+        
+        if (!_isConnectedWs.value) {
+            try {
+                httpClient.webSocket(
+                    method = HttpMethod.Get,
+                    host = webSocketsUrl,
+                    port = 3006,
+                    path = "/ws?callerId=${userId}",
+                ) {
+                    _wsSession.value = this
+                    _isConnectedWs.value = true
                     println("Connection Call")
                     
                     val callOutputRoutine = launch {
@@ -220,7 +486,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                         
                                                         otherUserId.value = userId
                                                         
-                                                        isIncomingCall.value = true
                                                         val contact = findContactByPhone(
                                                             user.phone,
                                                             contactsUseCase.contacts.value
@@ -233,13 +498,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                                 lastName = contact.lastName
                                                             )
                                                         }
-                                                        
-                                                        navigator.push(
-                                                            IncomingCallScreen(
-                                                                userId,
-                                                                user
-                                                            )
-                                                        )
                                                         
                                                     }
                                                     
@@ -294,28 +552,43 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
-                                        if (isIncomingCall.value) {
-                                            navigator.push(MainScreen())
-                                        }
+                                        clearNotificationsForChannel("OngoingCallChannel")
                                         
-                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
-                                        if (isCall.value)
-                                            rejectCallAnswer(navigator)
+                                        val callViewModel: CallViewModel =
+                                            KoinPlatform.getKoin().get()
                                         
-                                        println("rejectCall2 ${isConnectedWebrtc.value}")
+                                        callViewModel.stopTimer()
                                         
+                                        setIsCallActive(false)
                                         
-                                        if (isConnectedWebrtc.value) {
+                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value} ${isScreenOn()}")
+                                        
+                                        if (isScreenOn()) {
+                                            val navigator = commonViewModel.mainNavigator.value
                                             
-                                            navigator.push(MainScreen())
+                                            val currentScreen = navigator?.lastItem
                                             
+                                            if (_isIncomingCall.value) {
+                                                if (currentScreen is CallScreen) {
+                                                    navigator.push(MainScreen())
+                                                }
+                                            }
+                                            
+                                            if (isCall.value)
+                                                rejectCallAnswer()
+                                            
+                                            if (isConnectedWebrtc.value) {
+                                                if (currentScreen is CallScreen) {
+                                                    navigator.push(MainScreen())
+                                                }
+                                                
+                                            }
+                                        } else {
+                                            rejectCallAnswer()
                                         }
-                                        
-                                        
-                                        
-                                        println("rejectCall3")
                                         
                                     }
+                                    
                                 }
                             }
                         }
@@ -324,7 +597,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     callOutputRoutine.join()
                 }
             } catch (e: Exception) {
-                isConnected.value = false
+                _isConnectedWs.value = false
                 println("Ошибка соединения: $e")
             }
         }
@@ -346,16 +619,21 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         if (peerConnection.value !== null) {
             
+            
+            val cameraPer = PermissionsProviderFactory.create()
+                .getPermission("microphone")
+//
+//            if (cameraPer) {
             val stream = MediaDevices.getUserMedia(audio = true)
             
             localStream.value = stream
-            
             
             stream.tracks.forEach { track ->
                 println("addtrack ${track}")
                 peerConnection.value!!.addTrack(track, localStream.value!!)
             }
-            
+
+//            }
             
             
             _isConnectedWebrtc.value = true
@@ -477,7 +755,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     @OptIn(DelicateCoroutinesApi::class)
-    suspend override fun makeCall(userId: String, calleeId: String) {
+    override suspend fun makeCall(userId: String, calleeId: String) {
         println("makeCall31313131 ${wsSession.value}")
         
         coroutineScope {
@@ -517,6 +795,58 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 } catch (e: Exception) {
                     println("Failed to send message: ${e.message}")
                 }
+            }
+        }
+        
+    }
+    
+    override suspend fun makeCallBackground(notificToken: String, calleeId: String) {
+        coroutineScope {
+            try {
+                println("makeCall")
+                
+                val offer = peerConnection.value?.createOffer(
+                    OfferAnswerOptions(
+                        offerToReceiveAudio = true
+                    )
+                )
+                if (offer != null) {
+                    peerConnection.value?.setLocalDescription(offer)
+                }
+                
+                
+                val profileId = getValueInStorage("profileId")
+                
+                val newCallMessage = WebRTCMessage(
+                    type = "call",
+                    calleeId = calleeId,
+                    userId = profileId,
+                    rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
+                )
+                
+                val jsonMessage =
+                    Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
+                
+                
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("callData", jsonMessage)
+                        put(
+                            "notificationToken",
+                            notificToken
+                        )
+                        
+                    }
+                )
+                
+                origin().post("notification/notifyCallBackground", jsonContent)
+                
+                
+                println("Message sent successfully Call")
+                
+                
+            } catch (e: Exception) {
+                println("Failed to send message: ${e.message}")
             }
         }
         
@@ -576,8 +906,110 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
+    override fun answerCallBackground() {
+        
+        println("Start answerCallBackground1")
+        
+        CoroutineScope(Dispatchers.IO).launch {
+            println("Start answerCallBackground2 ${wsSession.value}")
+            
+            
+            try {
+//                val contactsUseCase: ContactsUseCase by inject()
+                val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+                
+                val cameraPer = PermissionsProviderFactory.create()
+                    .getPermission("microphone")
+                
+                if (cameraPer) {
+                    callViewModel.answerData.value?.let { answerData ->
+                        
+                        val rtcMessage = answerData.jsonObject["rtcMessage"]?.jsonObject
+                        
+                        rtcMessage.let {
+                            val sdp =
+                                it?.get("sdp")?.jsonPrimitive?.content
+                                    ?: return@launch
+                            
+                            
+                            val callerId =
+                                answerData.jsonObject["userId"]?.jsonPrimitive?.content
+                            
+                            _peerConnection.value?.setRemoteDescription(
+                                SessionDescription(
+                                    SessionDescriptionType.Offer,
+                                    sdp
+                                )
+                            )
+                            
+                            if (callerId != null) {
+                                otherUserId.value = callerId
+                                
+                                println("111111")
+                                
+                                val answer = peerConnection.value?.createAnswer(
+                                    options = OfferAnswerOptions(
+                                        offerToReceiveAudio = true
+                                    )
+                                )
+                                println("22222")
+                                
+                                
+                                if (answer != null) {
+                                    peerConnection.value?.setLocalDescription(answer)
+                                }
+                                println("3333")
+                                
+                                if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                                    
+                                    return@launch
+                                }
+                                println("44444")
+                                
+                                val answerCallMessage = WebRTCMessage(
+                                    type = "answerCall",
+                                    callerId = callerId,
+                                    rtcMessage = answer?.let {
+                                        SessionDescriptionDTO(
+                                            it.type,
+                                            answer.sdp
+                                        )
+                                    }
+                                )
+                                
+                                
+                                val jsonMessage =
+                                    Json.encodeToString(
+                                        WebRTCMessage.serializer(),
+                                        answerCallMessage
+                                    )
+                                
+                                setIsIncomingCall(false)
+                                
+                                
+                                Logger.d {
+                                    "answerCallMessage $jsonMessage"
+                                }
+                                
+                                wsSession.value?.send(Frame.Text(jsonMessage))
+                                
+                            }
+                            
+                        }
+                    }
+                }
+                
+                
+            } catch (e: Exception) {
+                
+                println("Error newCall: $e")
+            }
+        }
+        
+    }
     
-    override suspend fun rejectCall(navigator: Navigator, userId: String): Boolean {
+    
+    override suspend fun rejectCall(userId: String): Boolean {
         try {
             
             
@@ -589,13 +1021,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             )
             
             
-            rejectCallAnswer(navigator)
             
             setIsIncomingCall(false)
             
             wsSession.value?.send(Frame.Text(jsonContent))
             println("rejectCall13")
             
+            rejectCallAnswer()
             
             println("rejectCall134")
             
@@ -603,14 +1035,16 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
         } catch (e: Exception) {
             println(e)
+            val navigator = commonViewModel.mainNavigator.value
             
-            navigator.push(MainScreen())
+            navigator?.push(MainScreen())
             return false
             
         }
     }
     
-    fun rejectCallAnswer(navigator: Navigator) {
+    
+    private fun rejectCallAnswer() {
         try {
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value
@@ -658,7 +1092,28 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _peerConnection.value = PeerConnection(rtcConfiguration)
             
             
-            navigator.push(MainScreen())
+            
+            if (isScreenOn()) {
+                
+                val navigator = commonViewModel.mainNavigator.value
+                val currentScreen = navigator?.lastItem
+                
+                if (currentScreen is CallScreen) {
+                    // Вы на экране CallScreen
+                    navigator.push(MainScreen())
+                    
+                    println("Мы на экране CallScreen")
+                } else if (currentScreen is MainScreen) {
+                    // Вы на экране MainScreen
+                    println("Мы на экране MainScreen")
+                }
+            } else {
+                CoroutineScope(Dispatchers.IO).launch {
+                    wsSession.value?.close()
+                }
+                closeApp()
+            }
+            
             
             Logger.d { "Call answer rejected and resources cleaned up successfully." }
         } catch (e: Exception) {
@@ -682,7 +1137,19 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     override fun setIsIncomingCall(isIncomingCallValue: Boolean) {
-        isIncomingCall.value = isIncomingCallValue
+        _isIncomingCall.value = isIncomingCallValue
+    }
+    
+    override fun setIsCallActive(isCallActive: Boolean) {
+        _isCallActive.value = isCallActive
+    }
+    
+    override fun setIsCallBackground(isCallBackground: Boolean) {
+        _isCallBackground.value = isCallBackground
+    }
+    
+    override fun setOtherUserId(newOtherUserId: String) {
+        otherUserId.value = newOtherUserId
     }
     
     

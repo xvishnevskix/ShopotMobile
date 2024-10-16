@@ -8,3 +8,13 @@ actual fun getBuildVersion(): Long {
     val buildVersion = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleVersion") as? Long
     return buildVersion ?: 0
 }
+
+actual fun closeApp() {
+}
+
+actual fun isScreenOn(): Boolean {
+    return false
+}
+
+actual fun setScreenLockFlags(showWhenLocked: Boolean) {
+}

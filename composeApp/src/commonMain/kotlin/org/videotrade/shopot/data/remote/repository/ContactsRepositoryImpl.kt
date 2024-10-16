@@ -25,77 +25,118 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         )
     )
     override val contacts: StateFlow<List<ContactDTO>> get() = _contacts
-    
-    
+
+
+//    override suspend fun fetchContacts(): List<ContactDTO>? {
+//        try {
+//
+//
+//            val newContacts = mutableListOf<ContactDTO>()
+//
+//            val contactsNative = ContactsProviderFactory.create().getContacts()
+//            val contactsGet = origin().get<List<ContactDTO>>("user/getAll") ?: return null
+//
+//
+//            // Функция для нормализации номера телефона
+//            fun normalizePhoneNumber(phone: String): String {
+//
+//                return phone.replace(Regex("[^0-9]"), "")
+//            }
+//
+//            // Преобразование контактов из backend в словарь по нормализованному номеру телефона для быстрого поиска
+//            val backendContactsMap = contactsGet.associateBy {
+//                normalizePhoneNumber(it.phone)
+//            }
+//
+//
+//            println("contactst11231 $backendContactsMap ")
+//
+//            // Сравнение контактов по нормализованному номеру телефона
+//            for (contact in contactsNative) {
+//                val normalizedPhone = normalizePhoneNumber(contact.phone)
+//
+//
+//                val backendContact = backendContactsMap[normalizedPhone]
+//
+//
+//                println("normalizedPhone $normalizedPhone $backendContactsMap")
+//
+//                if (backendContact != null) {
+//                    newContacts.add(
+//                        ContactDTO(
+//                            backendContact.id,
+//                            backendContact.login,
+//                            backendContact.email,
+//                            contact.firstName,
+//                            contact.lastName,
+//                            backendContact.description,
+//                            normalizedPhone,
+//                            backendContact.status,
+//                            icon = backendContact.icon,
+//                        )
+//                    )
+//                }
+//            }
+//
+//
+//            println("contactst $contactsGet $contactsNative")
+//            println("newContacts $newContacts")
+//
+//            _contacts.value = newContacts
+//
+//            return newContacts
+//        } catch (e: Exception) {
+//
+//            println("ERROR111: $e")
+//
+//            return null
+//
+//        }
+//
+//
+//    }
     override suspend fun fetchContacts(): List<ContactDTO>? {
         try {
-            
-            
+
+
             val newContacts = mutableListOf<ContactDTO>()
-            
+
             val contactsNative = ContactsProviderFactory.create().getContacts()
             val contactsGet = origin().get<List<ContactDTO>>("user/getAll") ?: return null
-            
-            
+
+
             // Функция для нормализации номера телефона
             fun normalizePhoneNumber(phone: String): String {
-                
+
                 return phone.replace(Regex("[^0-9]"), "")
             }
-            
+
             // Преобразование контактов из backend в словарь по нормализованному номеру телефона для быстрого поиска
             val backendContactsMap = contactsGet.associateBy {
                 normalizePhoneNumber(it.phone)
             }
-            
-            
+
+
             println("contactst11231 $backendContactsMap ")
-            
-            // Сравнение контактов по нормализованному номеру телефона
-            for (contact in contactsNative) {
-                val normalizedPhone = normalizePhoneNumber(contact.phone)
-                
-                
-                val backendContact = backendContactsMap[normalizedPhone]
-                
-                
-                println("normalizedPhone $normalizedPhone $backendContactsMap")
-                
-                if (backendContact != null) {
-                    newContacts.add(
-                        ContactDTO(
-                            backendContact.id,
-                            backendContact.login,
-                            backendContact.email,
-                            contact.firstName,
-                            contact.lastName,
-                            backendContact.description,
-                            normalizedPhone,
-                            backendContact.status,
-                            icon = backendContact.icon,
-                        )
-                    )
-                }
-            }
-            
-            
+
+
             println("contactst $contactsGet $contactsNative")
             println("newContacts $newContacts")
-            
+
             _contacts.value = newContacts
-            
+
             return newContacts
         } catch (e: Exception) {
-            
+
             println("ERROR111: $e")
-            
+
             return null
-            
+
         }
-        
-        
+
+
     }
-    
+
     override fun getContacts(): List<ContactDTO> {
         
         return contacts.value

@@ -29,6 +29,7 @@ data class Attachment(
     val messageId: String = "",
     val userId: String,
     val fileId: String = "",
+//    val stickerId: String = "",
     var type: String,
     var name: String,
     var originalFileDir: String? = null,

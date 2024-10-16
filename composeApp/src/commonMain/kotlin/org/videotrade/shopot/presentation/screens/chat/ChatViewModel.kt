@@ -22,17 +22,21 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.domain.model.FavoritePack
 import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.model.StickerPack
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
@@ -40,6 +44,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
+    
+    val footerText = MutableStateFlow("")
     
     val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
     
@@ -64,7 +70,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     var downloadProgress = MutableStateFlow(0f)
     
     
-    val isScaffoldState = MutableStateFlow(false)
+    val isScaffoldForwardState = MutableStateFlow(false)
+    val isScaffoldStickerState = MutableStateFlow(false)
     
     val forwardMessage = MutableStateFlow<MessageItem?>(null)
     
@@ -73,7 +80,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
         MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
     val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
         _selectedMessagesByChat.asStateFlow()
-    
+
     
     init {
         
@@ -96,7 +103,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     fun setScaffoldState(state: Boolean) {
-        isScaffoldState.value = state
+        isScaffoldForwardState.value = state
+    }
+
+    fun setScaffoldStickerState(state: Boolean) {
+        isScaffoldForwardState.value = state
     }
     
     fun setCurrentChat(chat: ChatItem) {
@@ -145,7 +156,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ) {
         viewModelScope.launch {
             var contentSort = ""
-            
+
+            val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+
             
             if (content !== null && isCipher) {
                 val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
@@ -171,7 +184,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 selectedMessagesByChat.value[chatId]?.first?.id
             )
             println("сообщениесообщениесообщениесообщение")
-            sendNotify("$login", content, notificationToken)
+
+
+            commonViewModel.sendNotify("$login", content, notificationToken)
+
             clearSelection(chatId)
         }
     }
@@ -276,30 +292,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun sendNotify(
-        title: String,
-        content: String? = "Уведомление",
-        notificationToken: String?
-    ) {
-        viewModelScope.launch {
-            println("Уведомление ${notificationToken}")
-            
-            if (notificationToken !== null) {
-                val jsonContent = Json.encodeToString(
-                    buildJsonObject {
-                        put("title", title)
-                        put("body", content)
-                        put("notificationToken", notificationToken)
-                        
-                    }
-                )
-                
-                println("Уведомление ${jsonContent}")
-                
-                origin().post("notification/notify", jsonContent)
-            }
-        }
-    }
+
     
     fun sendForwardMessage(
         messageId: String,
@@ -479,6 +472,152 @@ class ChatViewModel : ViewModel(), KoinComponent {
         _selectedMessagesByChat.value = _selectedMessagesByChat.value.toMutableMap().apply {
             this[chatId] = Pair(null, null)
         }
+    }
+
+
+    ////////////////// СТИКЕРЫ /////////////////////////////
+
+    private val stickerUseCase = StickerUseCase()
+
+    private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
+    val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
+
+    private val _favoritePacks = MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
+    val favoritePacks: StateFlow<List<FavoritePack>> get() = _favoritePacks
+
+    private val _stickerPack = MutableStateFlow(StickerPack("", "", false, emptyList() ))  // Исправление здесь
+    val stickerPack: StateFlow<StickerPack> get() = _stickerPack
+
+    private var currentPage = 0
+    private val pageSize = 3
+    private var isLastPage = false
+    private var _isLoading = MutableStateFlow(false)
+    val isLoading: StateFlow<Boolean> get() = _isLoading
+
+    fun downloadStickerPacks(reset: Boolean = false) {
+        if (_isLoading.value || isLastPage) return
+
+        _isLoading.value = true
+        viewModelScope.launch {
+            if (reset) {
+                _stickerPacks.value = emptyList()
+                currentPage = 0
+                isLastPage = false
+            }
+
+            val packs = stickerUseCase.downloadStickerPacks(currentPage, pageSize)
+            if (packs.isNullOrEmpty()) {
+                isLastPage = true
+            } else {
+                currentPage++
+                _stickerPacks.value = _stickerPacks.value + packs
+            }
+            _isLoading.value = false
+        }
+    }
+
+    fun getPack(packId: String) {
+        viewModelScope.launch {
+            val stickerPack = stickerUseCase.getPack(packId) ?: return@launch
+            _stickerPack.value = stickerPack
+        }
+    }
+
+    fun getFavoritePacks() {
+        viewModelScope.launch {
+            val favoritePackList = stickerUseCase.getFavoritePacks()
+            _favoritePacks.value = favoritePackList ?: emptyList()
+        }
+    }
+
+    fun removePackFromFavorites(packId: String) {
+        viewModelScope.launch {
+            val success = stickerUseCase.removePackFromFavorites(packId)
+            if (success) {
+                _stickerPacks.value = _stickerPacks.value.map { pack ->
+                    if (pack.packId == packId) pack.copy(favorite = false) else pack
+                }
+                println("Pack successfully removed from favorites")
+            } else {
+                println("Failed to remove pack from favorites")
+            }
+        }
+    }
+
+    fun addPackToFavorites(packId: String) {
+        viewModelScope.launch {
+            val success = stickerUseCase.addPackToFavorites(packId)
+            if (success) {
+                _stickerPacks.value = _stickerPacks.value.map { pack ->
+                    if (pack.packId == packId) pack.copy(favorite = true) else pack
+                }
+                println("Pack successfully added to favorites")
+            } else {
+                println("Failed to add pack to favorites")
+            }
+        }
+    }
+
+
+    fun sendStickerMessage(
+        chat: ChatItem,
+        stickerId: String
+    ) {
+        // Добавляем сообщение с стикером
+        
+        if (currentChat.value !== null) {
+            sendMessage(
+                content = footerText.value,
+                fromUser = profile.value.id,
+                chatId = currentChat.value!!.chatId,
+                notificationToken = null,
+                attachments = listOf(stickerId),
+                isCipher = false
+            )
+        }
+        
+//        addMessage(
+//            MessageItem(
+//                Random.nextInt(1, 1501).toString(),  // Генерация уникального идентификатора для сообщения
+//                profile.value.id,  // Идентификатор пользователя
+//                "",  // Текст сообщения (пусто, так как это стикер)
+//                false,  // Сообщение не прочитано
+//                null,  // Нет ответа на сообщение
+//                0,  // Статус сообщения
+//                getCurrentTimeList(),  // Текущее время отправки сообщения
+//                false,  // Сообщение не удалено
+//                chat.id,  // Идентификатор чата
+//                false,  // Сообщение не заменено
+//                true,  // Сообщение является файлом (в данном случае стикером)
+//                listOf(
+//                    Attachment(
+//                        Random.nextInt(1, 501).toString(),  // Уникальный ID вложения
+//                        Random.nextInt(1, 501).toString(),  // Уникальный ID файла
+//                        profile.value.id,  // Идентификатор пользователя
+//                        stickerId,  // Используем stickerId как ID файла
+//                        "sticker",  // Тип файла - стикер
+//                        stickerId,  // Имя файла стикера (стикерID)
+//                        size = 0L,  // Размер файла для стикера не указываем (может быть 0)
+//                        photoPath = null,  // Нет пути к файлу, так как это стикер
+//                        photoName = null,  // Нет фото имени, так как это стикер
+//                        photoByteArray = null  // Нет данных о файле
+//                    )
+//                ),
+//                upload = true,  // Указываем, что сообщение загружается
+//                uploadId = Random.nextInt(1, 1501).toString()  // Уникальный ID для загрузки
+//            )
+//        )
+    }
+
+
+    ///////////////////////////////////////////////////////
+    
+    
+    fun sendSticker(
+        fileId: String,
+    ) {
+
+        
     }
     
     

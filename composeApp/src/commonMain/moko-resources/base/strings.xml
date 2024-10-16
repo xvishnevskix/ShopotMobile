@@ -166,7 +166,6 @@
 
     <string name="you">You</string>
     <string name="voice_message">Voice message</string>
-    <string name="yesterday">Yesterday</string>
     <string name="create_new_chat">Create a new chat</string>
 
     <string name="group_name_is_required">Group name is required</string>
@@ -189,4 +188,19 @@
     <string name="december">December</string>
 
     <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="monday">Monday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
+
+    <string name="recent">Recent</string>
+    <string name="favorite">Favorite</string>
+    <string name="store">Store</string>
+    <string name="sticker">Sticker</string>
+    <string name="add_stickers_from_the_store">Add stickers from the store 🛒</string>
+
 </resources>

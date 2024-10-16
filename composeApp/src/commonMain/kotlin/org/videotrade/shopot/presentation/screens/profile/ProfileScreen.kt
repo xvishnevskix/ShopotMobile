@@ -74,7 +74,6 @@ class ProfileScreen(
         
         val profile = profileViewModel.profile.collectAsState().value
         
-        println("sssssss ${profile}")
         val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
         
         val navigator = LocalNavigator.currentOrThrow

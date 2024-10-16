@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -35,6 +37,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
@@ -53,42 +56,43 @@ fun HeaderMain() {
     val scope = rememberCoroutineScope()
     val navigator = LocalNavigator.currentOrThrow
 
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-
-        ) {
-
+    Column {
         Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
+
+            ) {
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
 
 
-            Image(
-                modifier = Modifier.size(38.dp, height = 26.dp).pointerInput(Unit) {
-                
-                
-                },
-                painter = painterResource(Res.drawable.logo_main),
-                contentDescription = null,
+                Image(
+                    modifier = Modifier.size(38.dp, height = 26.dp).pointerInput(Unit) {
+
+
+                    },
+                    painter = painterResource(Res.drawable.logo_main),
+                    contentDescription = null,
+
+                    )
+
+                Text(
+                    stringResource(MokoRes.strings.whisper),
+                    modifier = Modifier.padding(start = 7.dp),
+
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                    color = Color(0xFF000000)
 
                 )
-
-            Text(
-                stringResource(MokoRes.strings.whisper),
-                modifier = Modifier.padding(start = 7.dp),
-
-                textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-                color = Color(0xFF000000)
-
-            )
-        }
+            }
 
 //        Row(
 //            verticalAlignment = Alignment.CenterVertically,
@@ -122,7 +126,10 @@ fun HeaderMain() {
 //                )
 //        }
 
+        }
+        Box(modifier = Modifier.padding(top = 5.dp)) {
+            CallBar()
+        }
     }
-
 
 }
