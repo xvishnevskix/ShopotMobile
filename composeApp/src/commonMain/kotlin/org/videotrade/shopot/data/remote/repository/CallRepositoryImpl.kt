@@ -1148,4 +1148,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _isCallBackground.value = isCallBackground
     }
     
+    override fun setOtherUserId(newOtherUserId: String) {
+        otherUserId.value = newOtherUserId
+    }
+    
+    
 }

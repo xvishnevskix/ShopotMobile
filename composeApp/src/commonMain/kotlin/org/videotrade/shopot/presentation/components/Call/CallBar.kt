@@ -42,7 +42,7 @@ fun CallBar() {
     val userIcon = callViewModel.userIcon.collectAsState()
     val callScreenInfo = callViewModel.callScreenInfo.collectAsState()
     val commonViewModel: CommonViewModel = koinInject()
-    val navigator = LocalNavigator.currentOrThrow
+    
 
 
     if (isTimerRunning.value) {
@@ -55,9 +55,9 @@ fun CallBar() {
                 .background(Color(0xFF2A293C))
                 .padding(horizontal = 8.dp, vertical = 2.dp).clickable {
                     
-                    if (navigator.lastItem !is CallScreen) {
+                    if (commonViewModel.mainNavigator.value?.lastItem !is CallScreen) {
                         // Выполняем навигацию только если мы не находимся на этом экране
-                        callScreenInfo.value?.let { navigator.push(it) }
+                        callScreenInfo.value?.let { commonViewModel.mainNavigator.value?.push(it) }
                     }
                
                 }

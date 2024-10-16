@@ -75,4 +75,6 @@ interface CallRepository {
     
     fun setIsCallActive(isCallActive: Boolean)
     
+    fun setOtherUserId(newOtherUserId: String)
+    
 }

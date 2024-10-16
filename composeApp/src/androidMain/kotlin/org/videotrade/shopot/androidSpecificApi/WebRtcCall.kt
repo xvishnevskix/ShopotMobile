@@ -76,7 +76,16 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         callViewModel.setIsCallBackground(true)
                         callViewModel.setIsIncomingCall(true)
                         
+                        val answerData = callViewModel.answerData.value
                         
+                        
+                        val userJson =
+                            answerData?.jsonObject?.get("user")?.jsonObject
+                        val user =
+                            Json.decodeFromString<ProfileDTO>(userJson.toString())
+                        println("user.id ${user.id}")
+                        
+                        callViewModel.setOtherUserId(user.id)
                         callViewModel.connectionCallWs(profileId)
                         
                         // Пробуждаем экран и показываем активность через Foreground Service
@@ -255,29 +264,30 @@ class CallActionReceiver : BroadcastReceiver() {
             
             "ACTION_DECLINE_CALL" -> {
                 println("Вызов отклонен")
+                try {
+                    callViewModel.rejectCall(callViewModel.getOtherUserId())
+                    
+                    // Остановка Foreground Service
+                    val serviceIntent = Intent(context, CallForegroundService::class.java)
+                    context.stopService(serviceIntent)
+                    
+                    // Закрытие уведомления
+                    val notificationManager =
+                        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    notificationManager.cancel(1) // Закрываем уведомление Foreground Service
+                } catch (e: Exception) {
                 
-                val answerData = callViewModel.answerData.value
-                
-                
-                val userJson =
-                    answerData?.jsonObject?.get("user")?.jsonObject
-                val user =
-                    Json.decodeFromString<ProfileDTO>(userJson.toString())
-                println("user.id ${user.id}")
-                callViewModel.rejectCall(user.id)
-                // Остановка Foreground Service
-                val serviceIntent = Intent(context, CallForegroundService::class.java)
-                context.stopService(serviceIntent)
-                
-                // Закрытие уведомления
-                val notificationManager =
-                    context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.cancel(1) // Закрываем уведомление Foreground Service
+                }
             }
             
             "ACTION_END_CALL" -> {
                 println("Звонок завершен")
                 // Завершение активности
+                try {
+                    callViewModel.rejectCall(callViewModel.getOtherUserId())
+                } catch (e: Exception) {
+                
+                }
 //                val activityManager =
 //                    context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
 //

@@ -123,5 +123,9 @@ class CallUseCase : KoinComponent {
         return repository.setIsCallActive(isCallActive)
     }
     
+    fun setOtherUserId(newOtherUserId: String) {
+        return repository.setOtherUserId(newOtherUserId)
+    }
+    
     
 }

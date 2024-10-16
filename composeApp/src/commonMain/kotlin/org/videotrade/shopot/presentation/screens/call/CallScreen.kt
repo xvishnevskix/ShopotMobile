@@ -63,6 +63,7 @@ import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -83,6 +84,7 @@ class CallScreen(
         val navigator = LocalNavigator.currentOrThrow
         
         val viewModel: CallViewModel = koinInject()
+        val mainViewModel: MainViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
         val callStateView by viewModel.callState.collectAsState()
         val isCallActive by viewModel.isCallActive.collectAsState()
@@ -155,8 +157,8 @@ class CallScreen(
                 
             }
         }
-
-
+        
+        
         if (isIncomingCall) {
             LaunchedEffect(isConnectedWebrtc) {
                 println("isConnectedWebrtc $isConnectedWebrtc")
@@ -167,17 +169,17 @@ class CallScreen(
             }
         } else if (isCallBackground) {
             val profileId = getValueInStorage("profileId")
-
+            
             LaunchedEffect(Unit) {
                 if (profileId != null) {
                     commonViewModel.mainNavigator.value = navigator
                     viewModel.checkUserShared(profileId, navigator)
-
+                    
                 }
             }
-
+            
             LaunchedEffect(isConnectedWs) {
-
+                
                 println("isConnectedWs $isConnectedWs")
                 if (isConnectedWs) {
 //                    viewModel.setIsCallBackground(false)
@@ -192,7 +194,7 @@ class CallScreen(
                             viewModel.initCall(userId)
                         }
                 }
-
+                
             }
         }
         
@@ -243,13 +245,16 @@ class CallScreen(
                 .blur(7.dp)
         )
         
-        Image(
-            painter = painterResource(Res.drawable.reductionArrows),
-            contentDescription = "Call",
-            modifier = Modifier.padding(start = 30.dp, top = 40.dp).size(20.dp).pointerInput(Unit) {
-                viewModel.replacePopCall(navigator)
-            }
-        )
+        if (isCallActive && mainViewModel.chats.value.isNotEmpty()) {
+            Image(
+                painter = painterResource(Res.drawable.reductionArrows),
+                contentDescription = "Call",
+                modifier = Modifier.padding(start = 30.dp, top = 40.dp).size(20.dp)
+                    .pointerInput(Unit) {
+                        viewModel.replacePopCall(navigator)
+                    }
+            )
+        }
         
         Box(modifier = Modifier.fillMaxSize().safeContentPadding()) {
             Column(
@@ -257,7 +262,7 @@ class CallScreen(
                     .fillMaxSize()
             ) {
                 
-
+                
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

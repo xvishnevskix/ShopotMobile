@@ -222,7 +222,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
-    private fun getOtherUserId(): String {
+    fun getOtherUserId(): String {
         return callUseCase.getOtherUserId()
     }
     
@@ -268,7 +268,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
             setIsCallActive(false)
             
             val isRejectCall = callUseCase.rejectCall(userId)
-            
+
 //            if (isRejectCall) {
 //                val navigator = commonViewModel.mainNavigator.value
 //                navigator?.push(MainScreen())
@@ -484,7 +484,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
-     private fun connectionMainWs(userId: String, navigator: Navigator) {
+    private fun connectionMainWs(userId: String, navigator: Navigator) {
         viewModelScope.launch {
             wsUseCase.connectionWs(userId, navigator)
         }
@@ -496,7 +496,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
         if (!navPop) {
             navigator.push(MainScreen())
         }
-        
-        
+    }
+    
+    
+    fun setOtherUserId(newOtherUserId: String) {
+        callUseCase.setOtherUserId(newOtherUserId)
     }
 }
