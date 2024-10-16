@@ -13,10 +13,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
@@ -53,9 +55,7 @@ import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
-import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
-import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -63,11 +63,11 @@ import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
+import shopot.composeapp.generated.resources.reductionArrows
 
 class CallScreen(
     private val userId: String,
@@ -82,8 +82,6 @@ class CallScreen(
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         
-        
-        var secondsElapsed by remember { mutableStateOf(0) }
         val viewModel: CallViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
         val callStateView by viewModel.callState.collectAsState()
@@ -105,7 +103,6 @@ class CallScreen(
             
             setScreenLockFlags(true)
         }
-        
         
         
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
@@ -158,8 +155,8 @@ class CallScreen(
                 
             }
         }
-        
-        
+
+
         if (isIncomingCall) {
             LaunchedEffect(isConnectedWebrtc) {
                 println("isConnectedWebrtc $isConnectedWebrtc")
@@ -170,17 +167,17 @@ class CallScreen(
             }
         } else if (isCallBackground) {
             val profileId = getValueInStorage("profileId")
-            
+
             LaunchedEffect(Unit) {
                 if (profileId != null) {
                     commonViewModel.mainNavigator.value = navigator
                     viewModel.checkUserShared(profileId, navigator)
-                    
+
                 }
             }
-            
+
             LaunchedEffect(isConnectedWs) {
-                
+
                 println("isConnectedWs $isConnectedWs")
                 if (isConnectedWs) {
 //                    viewModel.setIsCallBackground(false)
@@ -195,7 +192,7 @@ class CallScreen(
                             viewModel.initCall(userId)
                         }
                 }
-                
+
             }
         }
         
@@ -236,6 +233,7 @@ class CallScreen(
             }
         }
         
+        
         Image(
             painter = imagePainter,
             contentDescription = "image",
@@ -245,42 +243,47 @@ class CallScreen(
                 .blur(7.dp)
         )
         
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
-            
-            
-            Button(onClick = {
+        Image(
+            painter = painterResource(Res.drawable.reductionArrows),
+            contentDescription = "Call",
+            modifier = Modifier.padding(start = 30.dp, top = 40.dp).size(20.dp).pointerInput(Unit) {
                 viewModel.replacePopCall(navigator)
-            }, content = {
-                Text("fafasfafafa")
-            })
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp)
-            )
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .width(190.dp)
-                    .height(190.dp)
-                    .background(
-                        color = Color(255, 255, 255),
-                        shape = RoundedCornerShape(100.dp)
-                    )
-                    .clip(CircleShape)
-            ) {
-                Avatar(userIcon, 190.dp)
             }
-            
-            
-            
-            
-            Text(
-                text = if (isIncomingCall) stringResource(MokoRes.strings.incoming_call) else if (isCallActive) {
-                    timerValue.value
+        )
+        
+        Box(modifier = Modifier.fillMaxSize().safeContentPadding()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(100.dp)
+                )
+                
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .width(190.dp)
+                        .height(190.dp)
+                        .background(
+                            color = Color(255, 255, 255),
+                            shape = RoundedCornerShape(100.dp)
+                        )
+                        .clip(CircleShape)
+                ) {
+                    Avatar(userIcon, 190.dp)
+                }
+                
+                
+                
+                
+                Text(
+                    text = if (isIncomingCall) stringResource(MokoRes.strings.incoming_call) else if (isCallActive) {
+                        timerValue.value
 //                    val hours = secondsElapsed / 3600
 //                    val minutes = (secondsElapsed % 3600) / 60
 //                    val seconds = secondsElapsed % 60
@@ -293,48 +296,48 @@ class CallScreen(
 //                            seconds.toString().padStart(2, '0')
 //                        }"
 //                    }
-                } else {
-                    callState.value
-                },
-                modifier = Modifier
-                    .padding(top = 25.dp)
-                    .align(Alignment.CenterHorizontally),
-                fontSize = 16.sp,
-                color = Color(255, 255, 255),
-                textAlign = TextAlign.Center,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-            )
-            
-            
-            Text(
-                modifier = Modifier
-                    .padding(top = 12.5.dp)
-                    .align(Alignment.CenterHorizontally),
-                text = "$userFirstName $userLastName",
-                fontSize = 26.sp,
-                color = Color(255, 255, 255),
-                textAlign = TextAlign.Center,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-            )
-            
-            Text(
-                modifier = Modifier
-                    .padding(top = 12.5.dp)
-                    .align(Alignment.CenterHorizontally),
-                text = "+${userPhone}",
-                fontSize = 20.sp,
-                color = Color(255, 255, 255),
-                textAlign = TextAlign.Center,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-            )
-            
-            Spacer(modifier = Modifier.fillMaxHeight(0.2F))
+                    } else {
+                        callState.value
+                    },
+                    modifier = Modifier
+                        .padding(top = 25.dp)
+                        .align(Alignment.CenterHorizontally),
+                    fontSize = 16.sp,
+                    color = Color(255, 255, 255),
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                )
+                
+                
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.5.dp)
+                        .align(Alignment.CenterHorizontally),
+                    text = "$userFirstName $userLastName",
+                    fontSize = 26.sp,
+                    color = Color(255, 255, 255),
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                )
+                
+                Text(
+                    modifier = Modifier
+                        .padding(top = 12.5.dp)
+                        .align(Alignment.CenterHorizontally),
+                    text = "+${userPhone}",
+                    fontSize = 20.sp,
+                    color = Color(255, 255, 255),
+                    textAlign = TextAlign.Center,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+                    lineHeight = 20.sp,
+                )
+                
+                Spacer(modifier = Modifier.fillMaxHeight(0.2F))
 
 //            Row(
 //                verticalAlignment = Alignment.CenterVertically,
@@ -351,56 +354,57 @@ class CallScreen(
 //                }, "Завершить")
 //                microfonBtn {}
 //            }
-            
-            if (isIncomingCall) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 50.dp)
-                ) {
-                    rejectBtn({
-                        viewModel.rejectCall(userId)
-                    })
-                    aceptBtn {
-                        viewModel.initWebrtc()
-                        
-                    }
-                }
-            } else {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceAround,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    microfonBtn(isSwitchToMicrophone.value) {
-                        viewModel.setMicro()
-                        isSwitchToMicrophone.value = !isSwitchToMicrophone.value
-                        viewModel.setIsCallActive(true)
-                        viewModel.startTimer(userIcon)
-                    }
-//                videoBtn { }
-                    
-                    speakerBtn(isSwitchToSpeaker.value) {
-                        CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
-                        
-                        
-                        isSwitchToSpeaker.value = !isSwitchToSpeaker.value
-                    }
-                }
-                Spacer(modifier = Modifier.height(56.dp))
-                Row(
-                    verticalAlignment = Alignment.Top,
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    rejectBtn({
+                
+                if (isIncomingCall) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 50.dp)
+                    ) {
+                        rejectBtn({
                             viewModel.rejectCall(userId)
-                    }, stringResource(MokoRes.strings.end_call))
+                        })
+                        aceptBtn {
+                            viewModel.initWebrtc()
+                            
+                        }
+                    }
+                } else {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        microfonBtn(isSwitchToMicrophone.value) {
+                            viewModel.setMicro()
+                            isSwitchToMicrophone.value = !isSwitchToMicrophone.value
+                            viewModel.setIsCallActive(true)
+                            viewModel.startTimer(userIcon)
+                        }
+//                videoBtn { }
+                        
+                        speakerBtn(isSwitchToSpeaker.value) {
+                            CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
+                            
+                            
+                            isSwitchToSpeaker.value = !isSwitchToSpeaker.value
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(56.dp))
+                    Row(
+                        verticalAlignment = Alignment.Top,
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        rejectBtn({
+                            viewModel.rejectCall(userId)
+                        }, stringResource(MokoRes.strings.end_call))
+                    }
                 }
+                
             }
-            
         }
     }
 }
