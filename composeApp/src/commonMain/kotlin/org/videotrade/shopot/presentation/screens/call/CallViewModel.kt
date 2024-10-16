@@ -210,10 +210,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
-    fun connectionBackgroundWs(userId: String) {
+    fun connectionCallWs(userId: String) {
         viewModelScope.launch {
-            println("dsadada")
-            callUseCase.connectionBackgroundWs(userId)
+            callUseCase.connectionWs(userId)
         }
     }
     
@@ -478,14 +477,14 @@ class CallViewModel() : ViewModel(), KoinComponent {
                 } else {
                     addValueInStorage("profileId", profileCase.id)
                     observeWsConnection()
-                    connectionWs(profileCase.id, navigator)
+                    connectionMainWs(profileCase.id, navigator)
                 }
                 
             }
         }
     }
     
-    private fun connectionWs(userId: String, navigator: Navigator) {
+     private fun connectionMainWs(userId: String, navigator: Navigator) {
         viewModelScope.launch {
             wsUseCase.connectionWs(userId, navigator)
         }

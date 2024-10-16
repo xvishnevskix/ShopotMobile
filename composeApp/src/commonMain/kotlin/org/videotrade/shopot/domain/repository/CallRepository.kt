@@ -1,6 +1,5 @@
 package org.videotrade.shopot.domain.repository
 
-import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
@@ -35,7 +34,7 @@ interface CallRepository {
     val iseState: StateFlow<IceConnectionState>
     
     
-    suspend fun connectionWs(userId: String, navigator: Navigator)
+    suspend fun connectionWs(userId: String)
     
     suspend fun connectionBackgroundWs(userId: String)
     

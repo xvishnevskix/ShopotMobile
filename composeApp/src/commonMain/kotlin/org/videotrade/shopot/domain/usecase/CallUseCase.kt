@@ -1,6 +1,5 @@
 package org.videotrade.shopot.domain.usecase
 
-import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
@@ -32,9 +31,9 @@ class CallUseCase : KoinComponent {
         return repository.reconnectPeerConnection()
     }
     
-    suspend fun connectionWs(userId: String, navigator: Navigator) {
+    suspend fun connectionWs(userId: String) {
         
-        return repository.connectionWs(userId, navigator)
+        return repository.connectionWs(userId)
     }
     
     suspend fun connectionBackgroundWs(userId: String) {

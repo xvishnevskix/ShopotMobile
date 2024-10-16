@@ -1,7 +1,6 @@
 package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
-import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.IceConnectionState
@@ -168,7 +167,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    override suspend fun connectionWs(userId: String, navigator: Navigator) {
+    override suspend fun connectionWs(userId: String) {
+        
+        println("aaaaaaa11111")
         val httpClient = HttpClient {
             install(WebSockets)
         }
@@ -211,6 +212,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         try {
                                             val contactsUseCase: ContactsUseCase by inject()
                                             val callViewModel: CallViewModel by inject()
+                                            val navigator = commonViewModel.mainNavigator.value
                                             
                                             val cameraPer = PermissionsProviderFactory.create()
                                                 .getPermission("microphone")
@@ -271,7 +273,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                             )
                                                         
                                                         setIsCallBackground(false)
-                                                        navigator.push(
+                                                        navigator?.push(
                                                             CallScreen(
                                                                 userId,
                                                                 null,
@@ -334,6 +336,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     }
                                     
                                     "rejectCall" -> {
+                                        val navigator = commonViewModel.mainNavigator.value
+                                        
                                         clearNotificationsForChannel("OngoingCallChannel")
                                         
                                         println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
@@ -342,40 +346,45 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         val callViewModel: CallViewModel =
                                             KoinPlatform.getKoin().get()
                                         
-                                        val currentScreen = navigator.lastItem
+                                        val currentScreen = navigator?.lastItem
                                         
                                         callViewModel.stopTimer()
                                         
                                         setIsCallActive(false)
                                         
-                                        if (_isIncomingCall.value) {
-                                            if (currentScreen is CallScreen) {
-                                                // Вы на экране CallScreen
-                                                navigator.push(MainScreen())
-                                                
-                                                println("Мы на экране CallScreen")
-                                            } else if (currentScreen is MainScreen) {
-                                                // Вы на экране MainScreen
-                                                println("Мы на экране MainScreen")
+                                        if (isScreenOn()) {
+                                            
+                                            if (_isIncomingCall.value) {
+                                                if (currentScreen is CallScreen) {
+                                                    // Вы на экране CallScreen
+                                                    navigator?.push(MainScreen())
+                                                    
+                                                    println("Мы на экране CallScreen")
+                                                } else if (currentScreen is MainScreen) {
+                                                    // Вы на экране MainScreen
+                                                    println("Мы на экране MainScreen")
+                                                }
                                             }
-                                        }
-                                        
-                                        if (isCall.value)
+                                            
+                                            if (isCall.value)
+                                                rejectCallAnswer()
+                                            
+                                            
+                                            if (isConnectedWebrtc.value) {
+                                                
+                                                if (currentScreen is CallScreen) {
+                                                    // Вы на экране CallScreen
+                                                    navigator?.push(MainScreen())
+                                                    
+                                                    println("Мы на экране CallScreen")
+                                                } else if (currentScreen is MainScreen) {
+                                                    // Вы на экране MainScreen
+                                                    println("Мы на экране MainScreen")
+                                                }
+                                                
+                                            }
+                                        } else {
                                             rejectCallAnswer()
-                                        
-                                        
-                                        if (isConnectedWebrtc.value) {
-                                            
-                                            if (currentScreen is CallScreen) {
-                                                // Вы на экране CallScreen
-                                                navigator.push(MainScreen())
-                                                
-                                                println("Мы на экране CallScreen")
-                                            } else if (currentScreen is MainScreen) {
-                                                // Вы на экране MainScreen
-                                                println("Мы на экране MainScreen")
-                                            }
-                                            
                                         }
                                         
                                         

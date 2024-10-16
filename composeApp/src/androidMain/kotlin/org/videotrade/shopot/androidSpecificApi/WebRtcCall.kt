@@ -29,6 +29,7 @@ import org.videotrade.shopot.AppActivity
 import org.videotrade.shopot.R
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 
 // MyFirebaseMessagingService
@@ -60,6 +61,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     private fun triggerActionBasedOnData(data: Map<String, String>) {
         if (data["action"] == "callBackground") {
             val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+            val callUseCase: CallUseCase = KoinPlatform.getKoin().get()
             val profileId = getValueInStorage("profileId")
             
             println("profileId $profileId")
@@ -74,7 +76,8 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         callViewModel.setIsCallBackground(true)
                         callViewModel.setIsIncomingCall(true)
                         
-                        callViewModel.connectionBackgroundWs(profileId)
+                        
+                        callViewModel.connectionCallWs(profileId)
                         
                         // Пробуждаем экран и показываем активность через Foreground Service
                         val serviceIntent = Intent(this, CallForegroundService::class.java)
