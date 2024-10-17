@@ -8,12 +8,14 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.TopAppBar
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -146,8 +148,9 @@ class ChatScreen(
                                 })
                             },
 
+
                             modifier = Modifier
-                                .fillMaxSize()
+                                .fillMaxSize().background(Color.White)
                         ) { innerPadding ->
                             Chat(
                                 viewModel,
@@ -170,6 +173,9 @@ class ChatScreen(
                     BottomSheetModal(scaffoldForwardState)
                     //стикеры
                     BottomSheetScaffold(
+                        modifier = Modifier.background(Color(0xFFF3F4F6)),
+                        containerColor = Color(0xFFF3F4F6),
+                        sheetContainerColor = Color(0xFFF3F4F6),
                         scaffoldState = scaffoldStickerState,
                         sheetContent = {
                             if (showStickerMenu.value) {

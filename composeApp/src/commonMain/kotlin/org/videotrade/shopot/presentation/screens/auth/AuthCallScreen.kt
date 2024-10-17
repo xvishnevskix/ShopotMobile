@@ -162,15 +162,17 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
             
             Box(
-                modifier = Modifier.fillMaxSize().padding(top = 220.dp),
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
             ) {
 
 
-                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-
+                LazyColumn(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
 
                     item {
+                        Spacer(modifier = Modifier.height(150.dp))
                         Text(
                             stringResource(MokoRes.strings.enter_last_4_digits_of_the_incoming_call),
                             modifier = Modifier.padding(bottom = 10.dp),
@@ -291,7 +293,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
                                     }
                             )
-
+                        Spacer(modifier = Modifier.height(300.dp))
                     }
                 }
 

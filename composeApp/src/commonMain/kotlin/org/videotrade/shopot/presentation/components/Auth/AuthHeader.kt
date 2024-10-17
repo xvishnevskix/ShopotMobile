@@ -67,6 +67,7 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
 
     if (showDialog) {
         AlertDialog(
+            containerColor = Color(0xFFF3F4F6),
             onDismissRequest = {
                 showDialog = false
             },

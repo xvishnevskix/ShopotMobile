@@ -3,7 +3,9 @@ package org.videotrade.shopot.presentation.screens.auth
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Text
@@ -134,7 +136,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
             AuthHeader(stringResource(MokoRes.strings.login))
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.TopCenter
             ) {
 
 
@@ -142,6 +144,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
 
 
                     item {
+                        Spacer(modifier = Modifier.height(150.dp))
                         Text(
                             stringResource(MokoRes.strings.enter_the_code_from_the_sms),
                             modifier = Modifier.padding(bottom = 5.dp),
@@ -150,7 +153,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                             textAlign = TextAlign.Center,
                             letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
                             lineHeight = 24.sp,
-
+                            color = Color.Black
                             )
                         Text(
                             stringResource(MokoRes.strings.an_sms_with_code_will_be_sent_to_your_number_enter_the_code_in_the_field_below),
@@ -256,6 +259,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                                     }
                                 }
                         )
+                        Spacer(modifier = Modifier.height(300.dp))
                     }
                 }
 
