@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateListOf
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -18,20 +17,21 @@ class ContactsViewModel() : ViewModel(),
     val selectedContacts = mutableStateListOf<ContactDTO>()
     
     
-    private val ContactsUseCase: ContactsUseCase by inject()
+    private val contactsUseCase: ContactsUseCase by inject()
     private val ProfileUseCase: ProfileUseCase by inject()
     
     
     private val _contacts = MutableStateFlow<List<ContactDTO>>(emptyList())
     
-    val contacts: StateFlow<List<ContactDTO>> get() = _contacts
+    //    val contacts: StateFlow<List<ContactDTO>> get() = _contacts
+    val contacts = contactsUseCase.contacts
     
     
     fun fetchContacts() {
         viewModelScope.launch {
             
             
-            val contactsSort = ContactsUseCase.fetchContacts()
+            val contactsSort = contactsUseCase.fetchContacts()
             
             if (contactsSort != null) {
                 _contacts.value = contactsSort
@@ -44,7 +44,7 @@ class ContactsViewModel() : ViewModel(),
         viewModelScope.launch {
             
             
-            val contactsSort = ContactsUseCase.getContacts()
+            val contactsSort = contactsUseCase.getContacts()
             
             println("contactsSort ${contactsSort}")
             
@@ -62,7 +62,7 @@ class ContactsViewModel() : ViewModel(),
         viewModelScope.launch {
             val profile = ProfileUseCase.getProfile()
             
-            ContactsUseCase.createChat(profile.id, contact)
+            contactsUseCase.createChat(profile.id, contact)
             
         }
         
@@ -72,7 +72,7 @@ class ContactsViewModel() : ViewModel(),
         viewModelScope.launch {
             val idUsers = selectedContacts.map { it.id }.toMutableList()
             idUsers.add(ProfileUseCase.getProfile().id)
-            ContactsUseCase.createGroupChat(idUsers, groupName)
+            contactsUseCase.createGroupChat(idUsers, groupName)
         }
     }
     

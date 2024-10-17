@@ -138,7 +138,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     }
 
     override fun getContacts(): List<ContactDTO> {
-        
+        println("contacts.value ${contacts.value}")
         return contacts.value
     }
     

@@ -69,7 +69,7 @@ class CreateChatScreen() : Screen {
         
         }
         
-        
+        println("contacts@@##@##@ $contacts")
         
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             contacts
