@@ -147,7 +147,7 @@ class ChatScreen(
                                     }
                                 })
                             },
-
+                            containerColor = Color.White,
 
                             modifier = Modifier
                                 .fillMaxSize().background(Color.White)
