@@ -887,8 +887,12 @@ actual class FileProvider {
         return byteArray
     }
     
+    
     actual fun getFileBytesForDir(fileDirectory: String): ByteArray? {
-        TODO("Not yet implemented")
+        val fileUrl = NSURL.fileURLWithPath(fileDirectory)
+        val data = NSData.dataWithContentsOfURL(fileUrl)
+        
+        return data?.toByteArray()
     }
     
     actual fun getFileSizeFromUri(fileDirectory: String): Long? {

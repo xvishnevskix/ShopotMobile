@@ -142,6 +142,7 @@ actual class FileProvider(private val applicationContext: Context) {
             "zip" -> applicationContext.cacheDir
             "file" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             "cipher" -> applicationContext.cacheDir
+            "cache" -> applicationContext.cacheDir
             else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         }
         println("2222222")

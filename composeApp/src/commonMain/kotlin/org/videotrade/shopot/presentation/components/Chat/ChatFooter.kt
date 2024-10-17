@@ -128,7 +128,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
     var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
     
-    val footerText = viewModel.footerText.collectAsState().value
+    val footerText by viewModel.footerText.collectAsState()
     
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value

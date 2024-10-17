@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
+import androidx.compose.runtime.mutableStateOf
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
