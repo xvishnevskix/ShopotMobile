@@ -51,12 +51,7 @@ fun Avatar(
             return@Surface
         }
 
-        Image(
-            painter = painterResource(Res.drawable.person),
-            contentDescription = "Avatar",
-            contentScale = contentScale,  // Используем contentScale как есть
-            modifier = modifier,
-        )
+
 
         if (imagePainter !== null) {
             Image(
@@ -67,7 +62,12 @@ fun Avatar(
 
                 )
         } else {
-
+            Image(
+                painter = painterResource(Res.drawable.person),
+                contentDescription = "Avatar",
+                contentScale = contentScale,  // Используем contentScale как есть
+                modifier = modifier,
+            )
         }
 
 

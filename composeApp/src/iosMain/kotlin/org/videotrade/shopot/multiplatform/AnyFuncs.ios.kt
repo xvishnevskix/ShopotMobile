@@ -5,8 +5,9 @@ actual fun getPlatform(): String {
 }
 
 actual fun getBuildVersion(): Long {
-    val buildVersion = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleVersion") as? Long
-    return buildVersion ?: 0
+//    val buildVersion = NSBundle.mainBundle.objectForInfoDictionaryKey("CFBundleVersion") as? Long
+//    return buildVersion ?: 0
+    return  0
 }
 
 actual fun closeApp() {

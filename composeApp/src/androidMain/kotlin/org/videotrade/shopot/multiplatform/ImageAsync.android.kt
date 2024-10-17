@@ -37,13 +37,20 @@ actual fun imageAsync(imageId: String): ByteArray? {
         
         if (filePath != null) {
             withContext(Dispatchers.IO) {
-                imageByteArray = FileProviderFactory.create().getFileBytesForDir(filePath)
+                val bitmap = BitmapFactory.decodeFile(filePath)
+                
+                if (bitmap != null) {
+                    val outputStream = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                    imageByteArray = outputStream.toByteArray()
+                }
             }
         }
     }
     
     return imageByteArray
 }
+
 @OptIn(InternalAPI::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
