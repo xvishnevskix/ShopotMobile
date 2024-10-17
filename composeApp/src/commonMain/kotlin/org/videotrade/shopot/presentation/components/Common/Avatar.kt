@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -17,7 +20,7 @@ import org.videotrade.shopot.multiplatform.imageAsync
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
-val avatarCache = LruCache<String, ByteArray>(100) // Кэш для 50 аватарок
+val avatarCache = LruCache<String, ByteArray>(100) // Кэш для 100 аватарок
 
 @Composable
 fun Avatar(
@@ -25,71 +28,59 @@ fun Avatar(
     size: Dp = 40.dp,
     onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier.size(size).clickable {
-        if (onClick != null) {
-            onClick()
-        }
+        onClick?.invoke()
     },
     contentScale: ContentScale = ContentScale.Crop,
     bitmap: ImageBitmap? = null,
 ) {
-
-    val imagePainter = icon?.let { getImagePainter(it) }
-
-
+    val imageBitmap = remember(icon) {
+        mutableStateOf<ImageBitmap?>(null)
+    }
+    
+    // Если icon не пустой и изображение еще не загружено
+    if (icon != null && imageBitmap.value == null) {
+        LaunchedEffect(icon) {
+            // Проверка кэша
+            val cachedImage = avatarCache[icon]
+            if (cachedImage != null) {
+                println("cachedImage31313131")
+                imageBitmap.value = cachedImage.toImageBitmap()
+            } else {
+                println("cachedIma1121")
+                val newByteArray = imageAsync(icon)
+                if (newByteArray != null) {
+                    avatarCache.put(icon, newByteArray)
+                    imageBitmap.value = newByteArray.toImageBitmap()
+                }
+            }
+        }
+    }
+    
     Surface(
-        modifier = Modifier.size(size),
+        modifier = modifier,
         shape = CircleShape,
     ) {
-
-        if (bitmap !== null) {
+        if (bitmap != null) {
             Image(
                 bitmap = bitmap,
                 contentDescription = "Avatar",
-                contentScale = contentScale,  // Используем contentScale как есть
-                modifier = modifier,
+                contentScale = contentScale,
+                modifier = Modifier.size(size)
             )
-            return@Surface
-        }
-
-
-
-        if (imagePainter !== null) {
+        } else if (imageBitmap.value != null) {
             Image(
-                bitmap = imagePainter.toImageBitmap(),
+                bitmap = imageBitmap.value!!,
                 contentDescription = "Avatar",
-                contentScale = contentScale,  // Используем contentScale как есть
-                modifier = modifier,
-
-                )
+                contentScale = contentScale,
+                modifier = Modifier.size(size)
+            )
         } else {
             Image(
                 painter = painterResource(Res.drawable.person),
                 contentDescription = "Avatar",
-                contentScale = contentScale,  // Используем contentScale как есть
-                modifier = modifier,
+                contentScale = contentScale,
+                modifier = Modifier.size(size)
             )
         }
-
-
     }
 }
-
-@Composable
-fun getImagePainter(icon: String): ByteArray? {
-    // Проверяем, есть ли изображение в кэше памяти
-    val cachedImage = avatarCache[icon]
-
-    if (cachedImage != null) {
-        return cachedImage
-    } else {
-        val newPainter = imageAsync(icon)
-
-        if (newPainter != null) {
-            avatarCache.put(icon, newPainter)
-            return newPainter
-
-        }
-    }
-    return null
-}
-

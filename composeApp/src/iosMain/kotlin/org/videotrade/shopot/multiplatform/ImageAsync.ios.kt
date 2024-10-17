@@ -31,26 +31,20 @@ import platform.Foundation.writeToURL
 import platform.UIKit.UIImage
 
 
-@Composable
-actual fun imageAsync(imageId: String): ByteArray? {
-    var imageBitmap by remember(imageId) { mutableStateOf<ByteArray?>(null) }
+actual suspend fun imageAsync(imageId: String): ByteArray? {
+    val imageExist = FileProviderFactory.create().existingFile(imageId, "image")
+    val filePath = imageExist ?: downloadImageInCache(imageId)
     
-    LaunchedEffect(imageId) {
-        val imageExist = FileProviderFactory.create().existingFile(imageId, "image")
-        val filePath = imageExist ?: downloadImageInCache(imageId)
-        
-        if (filePath != null) {
-            withContext(Dispatchers.IO) {
-                val fileUrl = NSURL.fileURLWithPath(filePath)
-                val imageData = NSData.dataWithContentsOfURL(fileUrl)
-                
-                if (imageData != null) {
-                    imageBitmap = imageData.toByteArray()                }
-            }
+    return if (filePath != null) {
+        withContext(Dispatchers.IO) {
+            val fileUrl = NSURL.fileURLWithPath(filePath)
+            val imageData = NSData.dataWithContentsOfURL(fileUrl)
+            
+            imageData?.toByteArray()
         }
+    } else {
+        null
     }
-    
-    return imageBitmap
 }
 
 

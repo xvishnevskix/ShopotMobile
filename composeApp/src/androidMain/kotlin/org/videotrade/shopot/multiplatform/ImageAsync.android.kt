@@ -2,18 +2,7 @@ package org.videotrade.shopot.multiplatform
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.util.LruCache
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
-import avatarCache
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
@@ -25,30 +14,28 @@ import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
 import java.io.ByteArrayOutputStream
 import java.io.File
+
 // Определение кэша для изображений
 
-@Composable
-actual fun imageAsync(imageId: String): ByteArray? {
-    var imageByteArray by remember(imageId) { mutableStateOf<ByteArray?>(null) }
+actual suspend fun imageAsync(imageId: String): ByteArray? {
+    val imageExist = FileProviderFactory.create().existingFile(imageId, "image")
+    val filePath = imageExist ?: downloadImageInCache(imageId)
     
-    LaunchedEffect(imageId) {
-        val imageExist = FileProviderFactory.create().existingFile(imageId, "image")
-        val filePath = imageExist ?: downloadImageInCache(imageId)
-        
-        if (filePath != null) {
-            withContext(Dispatchers.IO) {
-                val bitmap = BitmapFactory.decodeFile(filePath)
-                
-                if (bitmap != null) {
-                    val outputStream = ByteArrayOutputStream()
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                    imageByteArray = outputStream.toByteArray()
-                }
+    if (filePath != null) {
+        return withContext(Dispatchers.IO) {
+            val bitmap = BitmapFactory.decodeFile(filePath)
+            
+            if (bitmap != null) {
+                val outputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                outputStream.toByteArray()
+            } else {
+                null
             }
         }
     }
     
-    return imageByteArray
+    return null
 }
 
 @OptIn(InternalAPI::class)
