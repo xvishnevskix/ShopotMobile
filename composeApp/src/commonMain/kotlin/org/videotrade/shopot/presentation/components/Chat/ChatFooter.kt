@@ -49,7 +49,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +70,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
@@ -114,7 +117,7 @@ data class MenuItem(
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: () -> Unit) {
+fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: MutableState<Boolean>, onStickerButtonClick: () -> Unit) {
     val scope = rememberCoroutineScope()
     
     
@@ -127,7 +130,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
     var voiceName by remember { mutableStateOf("") }
     var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    
+    val keyboardController = LocalSoftwareKeyboardController.current
     val footerText = viewModel.footerText.collectAsState().value
     
     
@@ -189,6 +192,19 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
         } else {
             recordingTime = 0
         }
+    }
+
+    LaunchedEffect(showStickerMenu) {
+        if (showStickerMenu.value) {
+            keyboardController?.hide()
+        }
+    }
+
+    DisposableEffect(showStickerMenu.value) {
+        if (showStickerMenu.value) {
+            keyboardController?.hide()
+        }
+        onDispose { }
     }
     
     
@@ -590,7 +606,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                             )
                         }
                     }
-                    
+
                     BasicTextField(
                         value = footerText,
                         onValueChange = { newText ->

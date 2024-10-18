@@ -140,7 +140,7 @@ class ChatScreen(
 
                             },
                             bottomBar = {
-                                ChatFooter(chat, viewModel, onStickerButtonClick = {
+                                ChatFooter(chat, viewModel, showStickerMenu, onStickerButtonClick = {
                                     showStickerMenu.value = true
                                     scope.launch {
                                         scaffoldStickerState.bottomSheetState.expand()
