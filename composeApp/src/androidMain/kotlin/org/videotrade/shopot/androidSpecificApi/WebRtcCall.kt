@@ -76,11 +76,11 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         callViewModel.setIsCallBackground(true)
                         callViewModel.setIsIncomingCall(true)
                         
-                        val answerData = callViewModel.answerData.value
-                        
-                        
                         val userJson =
-                            answerData?.jsonObject?.get("user")?.jsonObject
+                            parseCallData.jsonObject.get("user")?.jsonObject
+                        
+                        println("userJson ${userJson}")
+                        
                         val user =
                             Json.decodeFromString<ProfileDTO>(userJson.toString())
                         println("user.id ${user.id}")

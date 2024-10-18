@@ -66,6 +66,8 @@ class MyLifecycleObserver(private val navigator: Navigator) : DefaultLifecycleOb
         val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
         
         if (callViewModel.replaceInCall.value) {
+            println("Pushh!!!!!")
+            
             callViewModel.callScreenInfo.value?.let { navigator.push(it) }        // Ваш код, который нужно выполнить при onResume
         }
         

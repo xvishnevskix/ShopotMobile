@@ -160,6 +160,8 @@ class CallScreen(
         
         
         if (isIncomingCall) {
+            println("isIncomingCallCase")
+            
             LaunchedEffect(isConnectedWebrtc) {
                 println("isConnectedWebrtc $isConnectedWebrtc")
                 if (isConnectedWebrtc) {
@@ -168,6 +170,8 @@ class CallScreen(
                 }
             }
         } else if (isCallBackground) {
+            println("isCallBackgroundCase")
+            
             val profileId = getValueInStorage("profileId")
             
             LaunchedEffect(Unit) {
@@ -188,6 +192,9 @@ class CallScreen(
             }
         } else {
             LaunchedEffect(isConnectedWs) {
+                
+                println("Call")
+                
                 if (sendCall == true) {
                     if (!isCallActive)
                         if (isConnectedWs) {
