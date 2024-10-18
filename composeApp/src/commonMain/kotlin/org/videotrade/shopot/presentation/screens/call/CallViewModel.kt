@@ -61,8 +61,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val isIncomingCall = callUseCase.isIncomingCall
     
-    private val _isConnectedWebrtc = MutableStateFlow(false)
-    val isConnectedWebrtc: StateFlow<Boolean> get() = _isConnectedWebrtc
+//    private val _isConnectedWebrtc = MutableStateFlow(false)
+    val isConnectedWebrtc =  callUseCase.isConnectedWebrtc
     
     private val _localStream = MutableStateFlow<MediaStream?>(null)
     val localStream: StateFlow<MediaStream?> get() = _localStream
@@ -193,14 +193,14 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     private fun observeIsConnectedWebrtc() {
-        callUseCase.isConnectedWebrtc
-            .onEach { isConnectedWebrtcNew ->
-                if (isObserving.value) {
-                    _isConnectedWebrtc.value = isConnectedWebrtcNew
-                    println("isConnectedWebrtcNew $isConnectedWebrtcNew")
-                }
-            }
-            .launchIn(viewModelScope)
+//        callUseCase.isConnectedWebrtc
+//            .onEach { isConnectedWebrtcNew ->
+//                if (isObserving.value) {
+//                    _isConnectedWebrtc.value = isConnectedWebrtcNew
+//                    println("isConnectedWebrtcNew $isConnectedWebrtcNew")
+//                }
+//            }
+//            .launchIn(viewModelScope)
     }
     
     

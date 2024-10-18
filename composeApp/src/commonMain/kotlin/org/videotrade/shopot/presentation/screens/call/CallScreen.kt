@@ -222,11 +222,15 @@ class CallScreen(
                 PeerConnectionState.Connecting -> callState.value =
                     connectionEstablishmentInProgress
                 
+     
+                
                 PeerConnectionState.Connected -> {
                     callState.value = connectionEstablished
                     delay(500)
                     
-                    if (!isCallActive) {
+                    if (!isCallActive && isConnectedWebrtc) {
+                        
+                        println("AASDASDAS")
                         viewModel.startTimer(userIcon)
                         viewModel.setIsCallActive(true)
                         isCallActiveNatific()
@@ -392,7 +396,7 @@ class CallScreen(
                         microfonBtn(isSwitchToMicrophone.value) {
                             viewModel.setMicro()
                             isSwitchToMicrophone.value = !isSwitchToMicrophone.value
-                            viewModel.setIsCallActive(true)
+//                            viewModel.setIsCallActive(true)
                             viewModel.startTimer(userIcon)
                         }
 //                videoBtn { }

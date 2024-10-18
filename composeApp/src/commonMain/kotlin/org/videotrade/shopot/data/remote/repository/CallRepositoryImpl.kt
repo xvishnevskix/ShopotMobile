@@ -1140,6 +1140,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _wsSession.value = null
         _iceState.value = IceConnectionState.New
         _callState.value = PeerConnectionState.New
+      
         isMuted.value = false
     }
     
