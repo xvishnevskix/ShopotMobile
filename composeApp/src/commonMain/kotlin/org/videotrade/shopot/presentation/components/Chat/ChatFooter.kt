@@ -236,13 +236,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
             text = stringResource(MokoRes.strings.gallery),
             imagePath = Res.drawable.menu_gallery,
             onClick = {
-                viewModel.sendImage(
-                    footerText,
-                    viewModel.profile.value.id,
-                    chat.id,
-                    "image",
-                    "jpg",
-                )
+//                viewModel.sendImage(
+//                    footerText,
+//                    viewModel.profile.value.id,
+//                    chat.id,
+//                    "image",
+//                    "jpg",
+//                )
                 
                 scope.launch {
                     try {
@@ -258,8 +258,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                     viewModel.footerText.value,
                                     viewModel.profile.value.id,
                                     chat.id,
-                                    "image",
-                                    "jpg",
+                                    filePick.fileName,
+                                    filePick.fileAbsolutePath
                                 )
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
