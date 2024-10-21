@@ -68,7 +68,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
 
 
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().background(Color.White),
             contentAlignment = Alignment.TopStart
         ) {
 
