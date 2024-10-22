@@ -1,14 +1,5 @@
 package org.videotrade.shopot.multiplatform
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
-import coil3.compose.rememberAsyncImagePainter
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
@@ -28,10 +19,9 @@ import platform.Foundation.NSURL
 import platform.Foundation.dataWithBytes
 import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.writeToURL
-import platform.UIKit.UIImage
 
 
-actual suspend fun imageAsync(imageId: String): ByteArray? {
+actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ByteArray? {
     val imageExist = FileProviderFactory.create().existingFile(imageId, "image")
     val filePath = imageExist ?: downloadImageInCache(imageId)
     

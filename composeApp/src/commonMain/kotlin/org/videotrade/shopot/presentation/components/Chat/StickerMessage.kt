@@ -39,7 +39,7 @@ fun StickerMessage(
                 imageBitmap.value = cachedImage.toImageBitmap()
             } else {
                 println("cachedIma1121")
-                val newByteArray = imageAsync(imageId)
+                val newByteArray = imageAsync(imageId, "", false)
                 if (newByteArray != null) {
                     avatarCache.put(imageId, newByteArray)
                     imageBitmap.value = newByteArray.toImageBitmap()

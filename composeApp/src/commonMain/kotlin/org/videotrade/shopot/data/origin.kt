@@ -285,7 +285,7 @@ class origin {
     }
     
     
-    suspend fun sendFile(
+    suspend fun sendImageFile(
         fileDir: String? = null,
         contentType: String,
         filename: String,
@@ -306,28 +306,6 @@ class origin {
         }
     }
     
-    
-    suspend fun sendLargeFile(
-        url: String,
-        fileDir: String? = null,
-        contentType: String,
-        filename: String,
-        progress: MutableState<Float>
-    ): FileDTO? {
-        return if (fileDir != null) {
-            FileProviderFactory.create().uploadFileToDirectory(
-                "file/upload",
-                fileDir,
-                contentType,
-                filename
-            ) {
-                
-                progress.value = it
-                println("progress ${it}")
-            }
-        } else {
-            null
-        }
-    }
+
     
 }

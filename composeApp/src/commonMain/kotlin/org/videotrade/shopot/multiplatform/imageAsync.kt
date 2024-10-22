@@ -1,7 +1,3 @@
 package org.videotrade.shopot.multiplatform
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
-
-expect suspend fun imageAsync(imageId: String): ByteArray?
+expect suspend fun imageAsync(imageId: String,imageName: String, isCipher:Boolean): ByteArray?

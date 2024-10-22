@@ -192,7 +192,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun sendAttachments(
+    private fun sendAttachments(
         content: String?,
         fromUser: String,
         chatId: String,
@@ -201,7 +201,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         fileDir: String
     ) {
         viewModelScope.launch {
-            val fileId = origin().sendFile(
+            
+            val fileId = uploadFileNotInput(
                 fileDir,
                 contentType,
                 fileName,

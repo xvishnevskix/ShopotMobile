@@ -1,4 +1,3 @@
-
 import androidx.collection.LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -33,28 +32,32 @@ fun Avatar(
     contentScale: ContentScale = ContentScale.Crop,
     bitmap: ImageBitmap? = null,
 ) {
-    val imageBitmap = remember(icon) {
-        mutableStateOf<ImageBitmap?>(null)
-    }
+//    val imageBitmap = remember(icon) {
+//        mutableStateOf<ImageBitmap?>(null)
+//    }
+//
+//    // Если icon не пустой и изображение еще не загружено
+//    if (icon != null && imageBitmap.value == null) {
+//        LaunchedEffect(icon) {
+//            // Проверка кэша
+//            val cachedImage = avatarCache[icon]
+//            if (cachedImage != null) {
+//                println("cachedImage31313131")
+//                imageBitmap.value = cachedImage.toImageBitmap()
+//            } else {
+//                println("cachedIma1121")
+//                val newByteArray = imageAsync(icon)
+//                if (newByteArray != null) {
+//                    avatarCache.put(icon, newByteArray)
+//                    imageBitmap.value = newByteArray.toImageBitmap()
+//                }
+//            }
+//        }
+//    }
     
-    // Если icon не пустой и изображение еще не загружено
-    if (icon != null && imageBitmap.value == null) {
-        LaunchedEffect(icon) {
-            // Проверка кэша
-            val cachedImage = avatarCache[icon]
-            if (cachedImage != null) {
-                println("cachedImage31313131")
-                imageBitmap.value = cachedImage.toImageBitmap()
-            } else {
-                println("cachedIma1121")
-                val newByteArray = imageAsync(icon)
-                if (newByteArray != null) {
-                    avatarCache.put(icon, newByteArray)
-                    imageBitmap.value = newByteArray.toImageBitmap()
-                }
-            }
-        }
-    }
+    val imageBitmap = getImageStorage(icon, icon, false)
+    
+    
     
     Surface(
         modifier = modifier,
@@ -67,9 +70,9 @@ fun Avatar(
                 contentScale = contentScale,
                 modifier = Modifier.size(size)
             )
-        } else if (imageBitmap.value != null) {
+        } else if (imageBitmap != null) {
             Image(
-                bitmap = imageBitmap.value!!,
+                bitmap = imageBitmap,
                 contentDescription = "Avatar",
                 contentScale = contentScale,
                 modifier = Modifier.size(size)
@@ -84,3 +87,33 @@ fun Avatar(
         }
     }
 }
+
+
+@Composable
+fun getImageStorage(imageId: String?, imageName: String?, isCipher: Boolean): ImageBitmap? {
+    val imageBitmap = remember(imageId) {
+        mutableStateOf<ImageBitmap?>(null)
+    }
+    
+    // Если icon не пустой и изображение еще не загружено
+    if (imageId != null && imageBitmap.value == null) {
+        LaunchedEffect(imageId) {
+            // Проверка кэша
+            val cachedImage = avatarCache[imageId]
+            if (cachedImage != null) {
+                println("cachedImage31313131")
+                imageBitmap.value = cachedImage.toImageBitmap()
+            } else {
+                println("cachedIma1121")
+                
+                val newByteArray = imageName?.let { imageAsync(imageId, it, isCipher) }
+                if (newByteArray != null) {
+                    avatarCache.put(imageId, newByteArray)
+                    imageBitmap.value = newByteArray.toImageBitmap()
+                }
+            }
+        }
+    }
+    return imageBitmap.value
+}
+
