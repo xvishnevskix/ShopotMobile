@@ -548,6 +548,7 @@ actual class FileProvider(private val applicationContext: Context) {
         return findFileInDirectory(directory, fileName, fileType)
     }
     
+    
     private fun findFileInDirectory(directory: File, fileName: String, fileType: String): String? {
         
         println("findFileInDirectory3121 ${directory} $fileName")
@@ -642,6 +643,35 @@ actual class FileProvider(private val applicationContext: Context) {
     }
     
     
+    actual fun existingFileInDir(fileName: String, fileType: String): String? {
+        // Определяем каталог для поиска файла в зависимости от типа файла
+        val directory = when (fileType) {
+            "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
+            "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
+            "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
+            "document" -> File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                "Documents"
+            )
+            
+            "zip" -> File(context.cacheDir, "Zips")
+            "cipher" -> File(context.cacheDir, "CipherFiles")
+            "cache" -> File(context.cacheDir, "CacheFiles")
+            else -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
+        }
+        
+        // Проверяем, существует ли файл в указанной директории
+        val file = File(directory, fileName)
+        return if (file.exists()) {
+            println("Файл найден: ${file.absolutePath}")
+            file.absolutePath
+        } else {
+            println("Файл не найден: $fileName в каталоге $directory")
+            null
+        }
+    }
+    
+    
     actual suspend fun uploadFileNotInput(
         url: String,
         fileDirectory: String,
@@ -659,9 +689,6 @@ actual class FileProvider(private val applicationContext: Context) {
                 socketTimeoutMillis = 600_000
             }
         }
-        
-        // Get the file from URI
-        val file = getFileFromUri(applicationContext, uri)
         
         
         try {
@@ -684,28 +711,35 @@ actual class FileProvider(private val applicationContext: Context) {
             
             val cipherFile = File(cipherFilePath)
             
+            
             val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-                setBody(MultiPartFormDataContent(
-                    formData {
-                        append(
-                            "file",
-                            InputProvider(file.length()) { file.inputStream().asInput() },
-                            Headers.build {
-                                append(HttpHeaders.ContentType, fileType)
-                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                            }
-                        )
-                        // Добавляем block и authTag как дополнительные поля
-                        append(
-                            "encupsFile",
-                            Json.encodeToString(
-                                EncapsulationFileResult.serializer(),
-                                encupsChachaFileResult
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {
+                            append(
+                                "file",
+                                cipherFile.readBytes(),
+                                Headers.build {
+                                    append(HttpHeaders.ContentType, fileType)
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=\"${filename}\""
+                                    )
+                                }
                             )
-                        )
-                    }
-                ))
-                header(HttpHeaders.Authorization, "Bearer $token")
+                            
+                            append(
+                                "encupsFile",
+                                Json.encodeToString(
+                                    EncapsulationFileResult.serializer(),
+                                    encupsChachaFileResult
+                                )
+                            )
+                        }
+                    )
+                )
+                
+                
                 
                 onUpload { bytesSentTotal, contentLength ->
                     if (contentLength != -1L) { // -1 means that the content length is unknown
@@ -713,6 +747,7 @@ actual class FileProvider(private val applicationContext: Context) {
                         onProgress(progress)
                     }
                 }
+                header(HttpHeaders.Authorization, "Bearer $token")
             }
             
             if (response.status.isSuccess()) {

@@ -202,7 +202,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ) {
         viewModelScope.launch {
             
-            val fileId = uploadFileNotInput(
+            val fileId = origin().sendImageFile(
                 fileDir,
                 contentType,
                 fileName,

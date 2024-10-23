@@ -294,7 +294,7 @@ class origin {
     ): String? {
 
         return if (fileDir != null) {
-            FileProviderFactory.create().uploadCipherFile(
+            FileProviderFactory.create().uploadFileNotInput(
                 if (isAuth) "file/upload/no-auth" else "file/upload",
                 fileDir,
                 contentType,

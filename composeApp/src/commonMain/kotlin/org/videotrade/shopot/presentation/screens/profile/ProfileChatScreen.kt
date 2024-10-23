@@ -86,6 +86,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         icon = chat.icon,
                         size = 186.dp,
                         onClick = {
+                            println("AAAAA")
                             navigator.push(
                                 PhotoViewerScreen(
                                     imageFilePath = null,

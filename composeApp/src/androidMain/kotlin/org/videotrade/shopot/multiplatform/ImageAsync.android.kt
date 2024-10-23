@@ -1,14 +1,9 @@
 package org.videotrade.shopot.multiplatform
 
-import android.Manifest
 import android.content.ContentUris
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.MediaStore
-import androidx.activity.ComponentActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityCompat.requestPermissions
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
@@ -26,19 +21,20 @@ import java.io.FileInputStream
 
 actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ByteArray? {
     val filePath = withContext(Dispatchers.IO) {
+        val fileProvider = FileProviderFactory.create()
         
         if (!isCipher) {
-            val imageExist = FileProviderFactory.create().existingFile(imageId, "image")
+            val imageExist = fileProvider.existingFileInDir(imageId, "image")
             
             println("imageExist $imageExist")
             
             imageExist ?: downloadImageInCache(imageId)
         } else {
-            val imageExist = FileProviderFactory.create().existingFile(imageName, "image")
+            val imageExist = fileProvider.existingFileInDir(imageName, "image")
             
             println("imageExist $imageExist")
             
-            imageExist ?: FileProviderFactory.create().downloadCipherFile(
+            imageExist ?: fileProvider.downloadCipherFile(
                 "${serverUrl}file/id/$imageId",
                 "image",
                 imageName,
@@ -67,7 +63,7 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
 //            } else {
 //                null
 //            }
-
+            
             getFileAsByteArray(getContextObj.getContext(), filePath)
         }
     }
