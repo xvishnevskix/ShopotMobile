@@ -71,7 +71,7 @@ import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.delete_account
 
 
-class ProfileEditScreen(private var profile: ProfileDTO) : Screen {
+class ProfileEditScreen() : Screen {
     
     @Composable
     override fun Content() {

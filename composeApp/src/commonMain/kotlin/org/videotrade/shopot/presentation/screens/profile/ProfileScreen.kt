@@ -90,7 +90,7 @@ class ProfileScreen(
                 stringResource(MokoRes.strings.edit_profile)
             ) {
                 navigator.push(
-                    ProfileEditScreen(profile)
+                    ProfileEditScreen()
                 )
             },
 //            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы") {

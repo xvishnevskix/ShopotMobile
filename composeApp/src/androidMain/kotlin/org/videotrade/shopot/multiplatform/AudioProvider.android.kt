@@ -1,11 +1,17 @@
 package org.videotrade.shopot.multiplatform
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.media.AudioManager
+import android.media.AudioManager.ADJUST_UNMUTE
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.provider.Settings
+import androidx.activity.ComponentActivity
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import java.io.File
 import java.io.FileInputStream
@@ -31,33 +37,55 @@ actual class AudioRecorder(private val context: Context) {
     }
     
     actual fun stopRecording(getDir: Boolean): String? {
-        mediaRecorder?.apply {
-            stop()
-            release()
-        }
-        mediaRecorder = null
-        
-        return if (getDir) {
-            val file = File(outputFile)
-            println("outputFile $outputFile")
-            if (!file.exists()) return null
+        try {
             
-            val fileSize = file.length().toInt()
-            val byteArray = ByteArray(fileSize)
-            val fis = FileInputStream(file)
-            fis.read(byteArray)
-            fis.close()
-            unmuteAllAudioSources()
-            outputFile // Return the absolute path to the file
-        } else {
-            val file = File(outputFile)
-            if (!file.exists()) return null
-            file.delete()
-            unmuteAllAudioSources()
+            mediaRecorder?.apply {
+                stop()
+                release()
+            }
+            mediaRecorder = null
             
+            return if (getDir) {
+                val file = File(outputFile)
+                println("outputFile $outputFile")
+                if (!file.exists()) return null
+                println("11111")
+                
+                val fileSize = file.length().toInt()
+                println("22222")
+                
+                val byteArray = ByteArray(fileSize)
+                println("33333")
+                
+                val fis = FileInputStream(file)
+                println("44444")
+                
+                fis.read(byteArray)
+                println("55555")
+                
+                fis.close()
+                println("66666")
+                
+                unmuteAllAudioSources(getContextObj.getContext())
+                println("7777")
+                
+                outputFile // Return the absolute path to the file
+            } else {
+                val file = File(outputFile)
+                if (!file.exists()) return null
+                file.delete()
+                unmuteAllAudioSources(getContextObj.getContext())
+                
+                return null
+            }
+        } catch (e: Exception) {
+            println("error $e")
             return null
+            
         }
     }
+    
+
     
     private fun stopAllAudioSources() {
         // Release the current MediaRecorder if it is still active
@@ -76,13 +104,20 @@ actual class AudioRecorder(private val context: Context) {
         audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true)
     }
     
-    fun unmuteAllAudioSources() {
+    private fun unmuteAllAudioSources(context: Context) {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
-        audioManager.setStreamMute(AudioManager.STREAM_ALARM, false)
-        audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false)
-        audioManager.setStreamMute(AudioManager.STREAM_RING, false)
-        audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false)
+        if (hasDndPermission(context)) {
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, ADJUST_UNMUTE, 0)
+        }
+    }
+    
+    private fun hasDndPermission(context: Context): Boolean {
+        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        return notificationManager.isNotificationPolicyAccessGranted
     }
 }
 
@@ -186,7 +221,7 @@ actual class MusicPlayer {
                 mediaPlayer?.start() // Продолжаем проигрывание, если оно было приостановлено
             }
         } catch (e: Exception) {
-        println("e: $e")
+            println("e: $e")
         }
     }
     

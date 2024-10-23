@@ -41,7 +41,7 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
 @OptIn(InternalAPI::class, ExperimentalForeignApi::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
-    val filePath = FileProviderFactory.create().getFilePath(imageId, "image") ?: return null
+    val filePath = FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
     
     println("starting download")
     

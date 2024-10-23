@@ -689,7 +689,7 @@ actual class FileProvider {
         
         
         val cipherFilePath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 fileNameCipher,
                 "cipher"
             )
@@ -936,13 +936,13 @@ actual class FileProvider {
         
         
         val cipherVideoPath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 videoNameCipher,
                 "cipher"
             )
         
         val cipherPhotoPath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 photoNameCipher,
                 "cipher"
             )

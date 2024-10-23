@@ -347,7 +347,7 @@ actual class FileProvider(private val applicationContext: Context) {
         
         
         val cipherFilePath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 fileNameCipher,
                 "cipher"
             )
