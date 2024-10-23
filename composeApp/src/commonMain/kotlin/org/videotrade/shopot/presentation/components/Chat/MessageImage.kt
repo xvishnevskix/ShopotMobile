@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -33,13 +33,23 @@ fun MessageImage(
     attachments: List<Attachment>,
     messageSenderName: String? = null
 ) {
-    var imageFilePath by remember { mutableStateOf("") }
+//    var imageFilePath by remember { mutableStateOf("") }
+    val fileName = attachments[0].name
+    val fileId = attachments[0].fileId
+    
+    val imageBitmap = remember(fileId) {
+        mutableStateOf<ImageBitmap?>(null)
+    }
 // val imagePainter =
 // rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}")
 //    val imagePainter = rememberAsyncImagePainter(imageFilePath)
-    val fileName = attachments[0].name
+
+
+//    val imagePainter = getImageStorage(attachments[0].fileId, fileName, true)
     
-    val imagePainter = getImageStorage(attachments[0].fileId, fileName, true)
+    LaunchedEffect(fileId) {
+        imageBitmap.value = getImageStorage(fileId, fileName, true)
+    }
     
     val navigator = LocalNavigator.current
 //    val url =
@@ -67,9 +77,9 @@ fun MessageImage(
 //            println("filePath $filePath")
 //        }
 //    }
-    if (imagePainter != null) {
+    if (imageBitmap.value != null) {
         Image(
-            bitmap = imagePainter,
+            bitmap = imageBitmap.value!!,
             contentDescription = "Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -86,12 +96,12 @@ fun MessageImage(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убирает эффект нажатия
                 ) {
-                    if (imageFilePath.isNotBlank())
+                    if (imageBitmap.value !== null)
                         navigator?.push(
                             PhotoViewerScreen(
-                                imageFilePath,
+                                imageBitmap.value!!,
                                 messageSenderName,
-                                message = message
+                                message.created
                             )
                         )
                 }
@@ -117,12 +127,12 @@ fun MessageImage(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убирает эффект нажатия
                 ) {
-                    if (imageFilePath.isNotBlank())
+                    if (imageBitmap.value !== null)
                         navigator?.push(
                             PhotoViewerScreen(
-                                imageFilePath,
+                                imageBitmap.value!!,
                                 messageSenderName,
-                                message = message
+                                message.created
                             )
                         )
                 }

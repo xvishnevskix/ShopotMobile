@@ -230,13 +230,13 @@ actual class FileProvider(private val applicationContext: Context) {
                 ?: throw IllegalStateException("Access token is missing")
             println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
             
-            val fileDirectory = getFilePath(
+            val fileDirectory = createNewFileWithApp(
                 filename.substringBeforeLast(".", filename),
                 "cipher"
             ) ?: return null
             println("1111111")
             
-            val decryptFilePath = getFilePath(filename, dirType) ?: return null
+            val decryptFilePath = createNewFileWithApp(filename, dirType) ?: return null
             println("222222")
             
             println("decryptFilePath $decryptFilePath")
@@ -690,7 +690,8 @@ actual class FileProvider(private val applicationContext: Context) {
             }
         }
         
-        
+        println("$fileDirectory $fileType $filename"
+        )
         try {
             val token = getValueInStorage("accessToken")
             

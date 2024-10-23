@@ -1,9 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
-import android.content.ContentUris
 import android.content.Context
-import android.os.Build
-import android.provider.MediaStore
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
@@ -15,7 +12,6 @@ import org.videotrade.shopot.androidSpecificApi.getContextObj
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
 import java.io.File
-import java.io.FileInputStream
 
 // Определение кэша для изображений
 
@@ -72,50 +68,13 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
 }
 
 fun getFileAsByteArray(context: Context, filePath: String): ByteArray? {
-    val projection = arrayOf(MediaStore.Images.Media._ID)
-    val selection = "${MediaStore.Images.Media.DATA} = ?"
-    val selectionArgs = arrayOf(filePath)
-    
-    val contentUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
-    } else {
-        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-    }
-    
-    val uri = context.contentResolver.query(contentUri, projection, selection, selectionArgs, null)
-        .use { cursor ->
-            if (cursor != null && cursor.moveToFirst()) {
-                val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Images.Media._ID))
-                ContentUris.withAppendedId(contentUri, id)
-            } else {
-                null
-            }
-        }
-    
-    return uri?.let {
-        try {
-            context.contentResolver.openInputStream(it)?.use { inputStream ->
-                inputStream.readBytes()
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
-    } ?: run {
-        // Если файл не найден через MediaStore, попробуем открыть его напрямую по filePath
-        try {
-            val file = File(filePath)
-            if (file.exists()) {
-                FileInputStream(file).use { fileInputStream ->
-                    fileInputStream.readBytes()
-                }
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            null
-        }
+   return try {
+       val op = File(filePath).readBytes()
+       println("op ${op.size}")
+       op
+    } catch (e: Exception) {
+       null
+       
     }
 }
 
@@ -123,7 +82,8 @@ fun getFileAsByteArray(context: Context, filePath: String): ByteArray? {
 @OptIn(InternalAPI::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
-    val filePath = FileProviderFactory.create().getFilePath(imageId, "image") ?: return null
+    val filePath =
+        FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
     
     println("starting download")
     

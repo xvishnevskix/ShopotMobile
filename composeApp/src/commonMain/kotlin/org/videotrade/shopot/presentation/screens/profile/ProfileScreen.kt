@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,12 +35,15 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
+import getImageStorage
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
+import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.settings.LanguageScreen
@@ -71,6 +75,7 @@ class ProfileScreen(
         val mainViewModel: MainViewModel = koinInject()
         val profileViewModel: ProfileViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
+        val scope = rememberCoroutineScope()
         
         val profile = profileViewModel.profile.collectAsState().value
         
@@ -147,7 +152,22 @@ class ProfileScreen(
                     ProfileHeader(stringResource(MokoRes.strings.info), false)
                     Avatar(
                         icon = profile.icon,
-                        size = 186.dp
+                        size = 186.dp,
+                        onClick = {
+                            scope.launch {
+                                val imageBitmap = getImageStorage(profile.icon, profile.icon, false)
+                                println(" imageBitmap $imageBitmap")
+                                imageBitmap?.let {
+                                    commonViewModel.mainNavigator.value?.push(
+                                        PhotoViewerScreen(
+                                            it,
+                                            messageSenderName = "${profile.firstName} ${profile.lastName}",
+                                        )
+                                    )
+                                }
+                                
+                            }
+                        }
                     )
                     Text(
                         "${profile.firstName} ${profile.lastName}",

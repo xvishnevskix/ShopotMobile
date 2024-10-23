@@ -1,4 +1,3 @@
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,30 +30,30 @@ import shopot.composeapp.generated.resources.Res
 @Composable
 fun ViewerHeader(name: String, time: String = "") {
     val navigator = LocalNavigator.currentOrThrow
-
+    
     Row(
         modifier = Modifier
             .background(Color(0xFF29303C).copy(alpha = 0.8f))
             .fillMaxWidth()
             .statusBarsPadding()
 //            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
-        .padding(top = 5.dp,start = 15.dp, end = 15.dp, bottom = 10.dp),
+            .padding(top = 5.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Back",
             modifier = Modifier
                 .padding(end = 8.dp)
                 .clickable {
-                   navigator.pop()
+                    navigator.pop()
                 }
                 .width(20.dp),
             tint = Color.White
         )
-
+        
         Spacer(modifier = Modifier.width(20.dp))
-
+        
         Column {
             Text(
                 text = if (name == "") stringResource(MokoRes.strings.you) else name,
@@ -62,12 +61,14 @@ fun ViewerHeader(name: String, time: String = "") {
                 fontSize = 16.sp,
                 color = Color.White
             )
-            Text(
-                text = time,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                fontSize = 14.sp,
-                color = Color.White
-            )
+            
+            if (time.isNotEmpty())
+                Text(
+                    text = time,
+                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+                    fontSize = 14.sp,
+                    color = Color.White
+                )
         }
     }
 }
