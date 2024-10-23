@@ -77,7 +77,8 @@ fun MessageImage(
 //            println("filePath $filePath")
 //        }
 //    }
-    if (imageBitmap.value != null) {
+//    if (imageBitmap.value != null) {
+        if (false) {
         Image(
             bitmap = imageBitmap.value!!,
             contentDescription = "Image",
