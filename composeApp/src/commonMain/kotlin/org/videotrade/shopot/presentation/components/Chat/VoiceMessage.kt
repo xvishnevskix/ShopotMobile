@@ -143,7 +143,7 @@ fun VoiceMessage(
             }
         } else {
             val existingFile = FileProviderFactory.create()
-                .existingFile(attachments.first().name, attachments.first().type)
+                .existingFileInDir(attachments.first().name, attachments.first().type)
             if (!existingFile.isNullOrBlank()) {
                 downloadJob?.cancel()
                 isLoading = false

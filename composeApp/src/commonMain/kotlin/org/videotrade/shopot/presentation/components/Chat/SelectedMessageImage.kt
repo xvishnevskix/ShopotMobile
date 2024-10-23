@@ -59,7 +59,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
 
         val fileProvider = FileProviderFactory.create()
         val existingFile =
-            fileProvider.existingFile(fileName, fileType)
+            fileProvider.existingFileInDir(fileName, fileType)
 
         if (!existingFile.isNullOrBlank()) {
             imageFilePath = existingFile

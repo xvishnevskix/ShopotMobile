@@ -58,7 +58,7 @@ fun MessageImage(
 //        val fileType = attachments[0].type
 //        val fileProvider = FileProviderFactory.create()
 //        val existingFile =
-//            fileProvider.existingFile(fileName, fileType)
+//            fileProvider.existingFileInDir(fileName, fileType)
 //        if (!existingFile.isNullOrBlank()) {
 //            imageFilePath = existingFile
 //            println("existingFile ${existingFile}")

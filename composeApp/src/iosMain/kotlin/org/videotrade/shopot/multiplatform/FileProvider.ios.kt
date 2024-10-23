@@ -666,7 +666,7 @@ actual class FileProvider {
     actual suspend fun uploadCipherFile(
         url: String,
         fileDirectory: String,
-        contentType: String,
+        fileType: String,
         filename: String,
         onProgress: (Float) -> Unit
     ): String? {
@@ -683,7 +683,7 @@ actual class FileProvider {
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
         
-        println("22222 $filename $contentType")
+        println("22222 $filename $fileType")
         
         val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
         
@@ -725,7 +725,7 @@ actual class FileProvider {
                     formData {
                         append("file", fileData.toByteArray(),
                             Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
+                                append(HttpHeaders.ContentType, fileType)
                                 append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
                             }
                         )

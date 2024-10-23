@@ -81,7 +81,7 @@ fun VideoMessage(
 
 
         if (photoFileName !== null) {
-            val existingPhotoFile = fileProvider.existingFile(photoFileName, "imageCache")
+            val existingPhotoFile = fileProvider.existingFileInDir(photoFileName, "image")
 
             val url =
                 "${EnvironmentConfig.serverUrl}file/id/${attachments[0].photoId}"
@@ -122,7 +122,7 @@ fun VideoMessage(
                 isStartCipherLoading.value = true
                 message.attachments?.get(0)?.let { attachment ->
 
-                    println("adasdada ${attachment.name} ${attachment.type}")
+                    println("adasdada ${attachment.name} ${attachment.photoPath}")
 
                     val fileIds = fileProvider.uploadVideoFile(
                         "file/upload/video",
@@ -171,7 +171,7 @@ fun VideoMessage(
         println("fileName $fileName")
 
         val existingFile = fileName.let {
-            fileProvider.existingFile(it, "video")
+            fileProvider.existingFileInDir(it, "video")
         }
 
         if (!existingFile.isNullOrBlank()) {
