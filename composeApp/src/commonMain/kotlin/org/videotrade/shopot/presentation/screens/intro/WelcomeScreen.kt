@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -59,6 +60,7 @@ import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.LoginLogo
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -113,9 +115,17 @@ class WelcomeScreen : Screen {
                     }
                     Row {
                         Text(
-                            "Поддержка",
-                            modifier = Modifier.safeContentPadding()
+                            stringResource(MokoRes.strings.support),
+                            modifier = Modifier.safeContentPadding(),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                fontWeight = FontWeight(500),
+                                textAlign = TextAlign.Center,
+                                color = Color(0xFF373533)
                             )
+                        )
                     }
                 }
 
