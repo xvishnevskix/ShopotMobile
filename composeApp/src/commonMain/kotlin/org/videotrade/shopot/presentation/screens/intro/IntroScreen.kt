@@ -92,12 +92,12 @@ class IntroScreen : Screen {
                     }
 
 
-                    navigator.replace(SignInScreen())
+                    navigator.replace(WelcomeScreen())
                 }
 
             } catch (e: Exception) {
 
-                navigator.replace(SignInScreen())
+                navigator.replace(WelcomeScreen())
 
             }
 
