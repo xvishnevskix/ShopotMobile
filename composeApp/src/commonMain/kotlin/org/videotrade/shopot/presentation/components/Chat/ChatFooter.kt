@@ -49,7 +49,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -68,6 +70,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.VisualTransformation
@@ -114,7 +117,7 @@ data class MenuItem(
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: () -> Unit) {
+fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: MutableState<Boolean>, onStickerButtonClick: () -> Unit) {
     val scope = rememberCoroutineScope()
     
     
@@ -127,8 +130,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
     var voiceName by remember { mutableStateOf("") }
     var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    
-    val footerText by viewModel.footerText.collectAsState()
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val footerText = viewModel.footerText.collectAsState().value
     
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
@@ -190,6 +193,19 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
             recordingTime = 0
         }
     }
+
+    LaunchedEffect(showStickerMenu) {
+        if (showStickerMenu.value) {
+            keyboardController?.hide()
+        }
+    }
+
+    DisposableEffect(showStickerMenu.value) {
+        if (showStickerMenu.value) {
+            keyboardController?.hide()
+        }
+        onDispose { }
+    }
     
     
     val infiniteTransition = rememberInfiniteTransition()
@@ -236,13 +252,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
             text = stringResource(MokoRes.strings.gallery),
             imagePath = Res.drawable.menu_gallery,
             onClick = {
-//                viewModel.sendImage(
-//                    footerText,
-//                    viewModel.profile.value.id,
-//                    chat.id,
-//                    "image",
-//                    "jpg",
-//                )
+                viewModel.sendImage(
+                    footerText,
+                    viewModel.profile.value.id,
+                    chat.id,
+                    "image",
+                    "jpg",
+                )
                 
                 scope.launch {
                     try {
@@ -258,8 +274,8 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, onStickerButtonClick: (
                                     viewModel.footerText.value,
                                     viewModel.profile.value.id,
                                     chat.id,
-                                    filePick.fileName,
-                                    filePick.fileAbsolutePath
+                                    "image",
+                                    "jpg",
                                 )
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->

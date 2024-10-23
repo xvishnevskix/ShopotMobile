@@ -156,8 +156,36 @@ fun formatDateOnly(dateOnly: List<Int>): String {
 
 @Composable
 fun formatTimeOnly(timestamp: List<Int>): String {
-    val hour = timestamp[3]
-    val minute = timestamp[4]
+    return try {
+        val year = timestamp[0]
+        val month = timestamp[1]
+        val day = timestamp[2]
+        val hour = timestamp[3]
+        val minute = timestamp[4]
+        val second = timestamp[5]
+        val nanosecond = timestamp[6]
 
-    return "${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}"
+        // Создание LocalDateTime на основе входящих данных
+        val localDateTime = LocalDateTime(year, month, day, hour, minute, second, nanosecond)
+
+        println("localDateTime ${localDateTime}")
+
+        // Преобразование LocalDateTime в Instant с предположением, что время в UTC
+        val instant = localDateTime.toInstant(TimeZone.UTC)
+
+        // Получение текущего часового пояса устройства
+        val currentTimeZone = TimeZone.currentSystemDefault()
+
+        println("currentTimeZone ${currentTimeZone}")
+
+        // Преобразование Instant в LocalDateTime с учётом текущего часового пояса устройства
+        val dateTimeInCurrentZone = instant.toLocalDateTime(currentTimeZone)
+
+        println("dateTimeInCurrentZone ${dateTimeInCurrentZone}")
+
+        // Форматирование времени с учётом локального времени устройства
+        "${dateTimeInCurrentZone.hour.toString().padStart(2, '0')}:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"
+    } catch (e: Exception) {
+        ""
+    }
 }

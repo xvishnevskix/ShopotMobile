@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -64,12 +65,13 @@ fun BottomSheetModal(scaffoldState: BottomSheetScaffoldState) {
     
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        
+        sheetContainerColor = Color(0xFFF3F4F6),
         sheetContent = {
             // Контент модального окна
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .background(Color(0xFFF3F4F6))
                     .height(800.dp) // Высота окна
                     .padding(16.dp)
             ) {

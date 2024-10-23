@@ -105,7 +105,12 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
 
 
 
-    Column(modifier = Modifier.fillMaxHeight(0.5f).fillMaxWidth()) {
+    Column(modifier = Modifier
+        .fillMaxHeight(0.5f)
+        .fillMaxWidth()
+        .background(Color(0xFFF3F4F6))
+    )
+    {
         val coroutineScope = rememberCoroutineScope()
 
 
@@ -134,6 +139,7 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
+                        .background(Color(0xFFF3F4F6))
                         .padding(8.dp)
                         .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                 ) {
@@ -265,7 +271,8 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
 
     val favoritePacks = stickerPacks.value.filter { it.favorite }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF3F4F6))) {
+
         if (isLoading.value && favoritePacks.isEmpty()) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
@@ -276,7 +283,9 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store))
+                Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store),
+                    color = Color.Black
+                )
             }
         }
 
@@ -287,6 +296,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
+                    .background(Color(0xFFF3F4F6))
                     .padding(vertical = 4.dp, horizontal = 16.dp)
             ) {
                 items(favoritePacks) { pack ->

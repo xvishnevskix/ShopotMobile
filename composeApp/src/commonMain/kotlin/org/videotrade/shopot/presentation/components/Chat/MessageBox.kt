@@ -235,7 +235,8 @@ fun MessageBox(
                         painter = painterResource(Res.drawable.chat_reply),
                         contentDescription = null,
                         modifier = Modifier
-                            .size(23.dp)
+                            .size(23.dp),
+                        tint = Color.Black
                     )
                 }
             }
