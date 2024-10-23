@@ -273,6 +273,7 @@ class origin {
                 // Успешное удаление, сервер возвращает 204 No Content
                 true
             } else {
+                
                 println("Failed to delete: ${response.status.description} ${response.request}")
                 false
             }
@@ -285,7 +286,7 @@ class origin {
     }
     
     
-    suspend fun sendFile(
+    suspend fun sendImageFile(
         fileDir: String? = null,
         contentType: String,
         filename: String,
@@ -293,7 +294,7 @@ class origin {
     ): String? {
 
         return if (fileDir != null) {
-            FileProviderFactory.create().uploadCipherFile(
+            FileProviderFactory.create().uploadFileNotInput(
                 if (isAuth) "file/upload/no-auth" else "file/upload",
                 fileDir,
                 contentType,
@@ -306,28 +307,6 @@ class origin {
         }
     }
     
-    
-    suspend fun sendLargeFile(
-        url: String,
-        fileDir: String? = null,
-        contentType: String,
-        filename: String,
-        progress: MutableState<Float>
-    ): FileDTO? {
-        return if (fileDir != null) {
-            FileProviderFactory.create().uploadFileToDirectory(
-                "file/upload",
-                fileDir,
-                contentType,
-                filename
-            ) {
-                
-                progress.value = it
-                println("progress ${it}")
-            }
-        } else {
-            null
-        }
-    }
+
     
 }

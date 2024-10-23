@@ -9,8 +9,13 @@ expect class FileProvider {
     suspend fun pickFile(pickerType: PickerType): PlatformFilePick?
 
     suspend fun pickGallery(): PlatformFilePick?
-
+    
     fun getFilePath(fileName: String, fileType: String): String?
+    
+    
+    fun createNewFileWithApp(fileName: String, fileType: String): String?
+    
+    fun saveFileInDir(fileName: String, fileDirectory: String, fileType: String): String?
     
     suspend fun downloadFileToDirectory(
         url: String,
@@ -25,13 +30,13 @@ expect class FileProvider {
         onProgress: (Float) -> Unit
     ): String?
     
-    suspend fun uploadFileToDirectory(
+    suspend fun uploadFileNotInput(
         url: String,
         fileDirectory: String,
-        contentType: String,
+        fileType: String,
         filename: String,
         onProgress: (Float) -> Unit
-    ): FileDTO?
+    ): String?
     
     
     suspend fun uploadCipherFile(
@@ -58,6 +63,10 @@ expect class FileProvider {
     
     
     fun existingFile(fileName: String, fileType: String): String?
+    
+    fun existingFileInDir(fileName: String, fileType: String): String?
+    
+    
     fun getFileSizeFromUri(fileDirectory: String): Long?
     suspend fun delFile(fileDirectory: String): Boolean
     

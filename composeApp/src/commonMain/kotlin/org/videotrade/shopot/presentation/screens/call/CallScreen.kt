@@ -160,6 +160,8 @@ class CallScreen(
         
         
         if (isIncomingCall) {
+            println("isIncomingCallCase")
+            
             LaunchedEffect(isConnectedWebrtc) {
                 println("isConnectedWebrtc $isConnectedWebrtc")
                 if (isConnectedWebrtc) {
@@ -168,6 +170,8 @@ class CallScreen(
                 }
             }
         } else if (isCallBackground) {
+            println("isCallBackgroundCase")
+            
             val profileId = getValueInStorage("profileId")
             
             LaunchedEffect(Unit) {
@@ -188,6 +192,9 @@ class CallScreen(
             }
         } else {
             LaunchedEffect(isConnectedWs) {
+                
+                println("Call")
+                
                 if (sendCall == true) {
                     if (!isCallActive)
                         if (isConnectedWs) {
@@ -215,11 +222,15 @@ class CallScreen(
                 PeerConnectionState.Connecting -> callState.value =
                     connectionEstablishmentInProgress
                 
+     
+                
                 PeerConnectionState.Connected -> {
                     callState.value = connectionEstablished
                     delay(500)
                     
-                    if (!isCallActive) {
+                    if (!isCallActive && isConnectedWebrtc) {
+                        
+                        println("AASDASDAS")
                         viewModel.startTimer(userIcon)
                         viewModel.setIsCallActive(true)
                         isCallActiveNatific()
@@ -385,7 +396,7 @@ class CallScreen(
                         microfonBtn(isSwitchToMicrophone.value) {
                             viewModel.setMicro()
                             isSwitchToMicrophone.value = !isSwitchToMicrophone.value
-                            viewModel.setIsCallActive(true)
+//                            viewModel.setIsCallActive(true)
                             viewModel.startTimer(userIcon)
                         }
 //                videoBtn { }

@@ -536,7 +536,7 @@ fun MessageFormat(
             "sticker" -> {
                 StickerMessage(
                     message,
-                    message.attachments!!
+                    message.attachments!![0].fileId
                     )
             }
 

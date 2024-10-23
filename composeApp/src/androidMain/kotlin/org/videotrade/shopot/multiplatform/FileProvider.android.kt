@@ -3,7 +3,6 @@ package org.videotrade.shopot.multiplatform
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
@@ -15,7 +14,6 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.core.app.ActivityCompat.startActivityForResult
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -50,12 +48,12 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.domain.model.FileDTO
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -63,6 +61,12 @@ import kotlin.random.Random
 
 
 actual class FileProvider(private val applicationContext: Context) {
+    
+    private val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+    
+    private val context = getContextObj.getContext()
+    
+    
     actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {
         try {
             val filePick = FileKit.pickFile(
@@ -92,43 +96,41 @@ actual class FileProvider(private val applicationContext: Context) {
             return null
         }
     }
-
-
+    
+    
     actual suspend fun pickGallery(): PlatformFilePick? {
         val imageAndVideoType = PickerType.ImageAndVideo
-
-
+        
+        
         try {
             val filePick = FileKit.pickFile(
                 type = imageAndVideoType,
                 mode = PickerMode.Single,
             )
-
+            
             println("filePick $filePick")
             var filePathNew = ""
-
+            
             if (filePick?.uri !== null) {
-
+                
                 runBlocking {
                     val file = getFileFromUri(getContextObj.getContext(), filePick.uri)
                     filePathNew = file.absoluteFile.toString()
                 }
-
+                
                 return PlatformFilePick(
                     filePick.uri.toString(),
                     filePathNew,
                     filePick.getSize(),
                     filePick.name
                 )
-
+                
             }
             return null
         } catch (e: Exception) {
             return null
         }
     }
-
-
     
     
     actual fun getFilePath(fileName: String, fileType: String): String? {
@@ -142,6 +144,7 @@ actual class FileProvider(private val applicationContext: Context) {
             "zip" -> applicationContext.cacheDir
             "file" -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
             "cipher" -> applicationContext.cacheDir
+            "cache" -> applicationContext.cacheDir
             else -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         }
         println("2222222")
@@ -211,7 +214,6 @@ actual class FileProvider(private val applicationContext: Context) {
     }
     
     
-    @RequiresApi(Build.VERSION_CODES.O)
     actual suspend fun downloadCipherFile(
         url: String,
         contentType: String,
@@ -546,7 +548,10 @@ actual class FileProvider(private val applicationContext: Context) {
         return findFileInDirectory(directory, fileName, fileType)
     }
     
+    
     private fun findFileInDirectory(directory: File, fileName: String, fileType: String): String? {
+        
+        println("findFileInDirectory3121 ${directory} $fileName")
         val file = File(directory, fileName)
         println("findFileInDirectory ${file.exists()} $file")
         return if (file.exists()) {
@@ -557,13 +562,123 @@ actual class FileProvider(private val applicationContext: Context) {
     }
     
     
-    actual suspend fun uploadFileToDirectory(
+    actual fun createNewFileWithApp(fileName: String, fileType: String): String? {
+        
+        // Определяем каталог для хранения файла в зависимости от типа файла
+        val directory = when (fileType) {
+            "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
+            "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
+            "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
+            "document" -> File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                "Documents"
+            )
+            
+            "zip" -> File(context.cacheDir, "Zips")
+            "cipher" -> File(context.cacheDir, "CipherFiles")
+            "cache" -> File(context.cacheDir, "CacheFiles")
+            else -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
+        }
+        
+        // Создаем папку, если она не существует
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        
+        // Проверка, существует ли файл с таким именем
+        val existingFile = File(directory, fileName)
+        if (existingFile.exists()) {
+            println("Файл уже существует: ${existingFile.absolutePath}")
+            return null
+        }
+        
+        val file = File(directory, fileName)
+        println("Путь к файлу: ${file.absolutePath}")
+        
+        return file.absolutePath
+    }
+    
+    actual fun saveFileInDir(fileName: String, fileDirectory: String, fileType: String): String? {
+        val sourceFile = File(fileDirectory)
+        
+        // Проверяем, существует ли исходный файл
+        if (!sourceFile.exists()) {
+            println("Исходный файл не найден: $fileDirectory")
+            return null
+        }
+        
+        // Определяем каталог для сохранения файла в зависимости от типа файла
+        val directory = when (fileType) {
+            "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
+            "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
+            "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
+            "document" -> File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                "Documents"
+            )
+            
+            "zip" -> File(context.cacheDir, "Zips")
+            "cipher" -> File(context.cacheDir, "CipherFiles")
+            "cache" -> File(context.cacheDir, "CacheFiles")
+            else -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
+        }
+        
+        // Создаем каталог, если он не существует
+        if (!directory.exists()) {
+            directory.mkdirs()
+        }
+        
+        // Определяем путь для нового файла
+        val destinationFile = File(directory, fileName)
+        
+        return try {
+            // Копируем файл в нужный каталог
+            sourceFile.copyTo(destinationFile, overwrite = true)
+            println("Файл успешно сохранен: ${destinationFile.absolutePath}")
+            destinationFile.absolutePath
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+    
+    
+    actual fun existingFileInDir(fileName: String, fileType: String): String? {
+        // Определяем каталог для поиска файла в зависимости от типа файла
+        val directory = when (fileType) {
+            "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
+            "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
+            "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
+            "document" -> File(
+                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
+                "Documents"
+            )
+            
+            "zip" -> File(context.cacheDir, "Zips")
+            "cipher" -> File(context.cacheDir, "CipherFiles")
+            "cache" -> File(context.cacheDir, "CacheFiles")
+            else -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
+        }
+        
+        // Проверяем, существует ли файл в указанной директории
+        val file = File(directory, fileName)
+        return if (file.exists()) {
+            println("Файл найден: ${file.absolutePath}")
+            file.absolutePath
+        } else {
+            println("Файл не найден: $fileName в каталоге $directory")
+            null
+        }
+    }
+    
+    
+    actual suspend fun uploadFileNotInput(
         url: String,
         fileDirectory: String,
-        contentType: String,
+        fileType: String,
         filename: String,
         onProgress: (Float) -> Unit
-    ): FileDTO? {
+    ): String? {
         val uri = Uri.parse(fileDirectory)
         println("Parsed URI: $uri")
         
@@ -575,27 +690,56 @@ actual class FileProvider(private val applicationContext: Context) {
             }
         }
         
-        // Get the file from URI
-        val file = getFileFromUri(applicationContext, uri)
-        println("Local file path: ${file.absolutePath}")
         
         try {
             val token = getValueInStorage("accessToken")
             
+            val sharedSecret = getValueInStorage("sharedSecret")
+            
+            val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
+            
+            val cipherFilePath = createNewFileWithApp(
+                fileNameCipher,
+                "cipher"
+            ) ?: return null
+            
+            val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+                fileDirectory,
+                cipherFilePath,
+                sharedSecret?.decodeBase64Bytes()!!
+            ) ?: return null
+            
+            val cipherFile = File(cipherFilePath)
+            
+            
             val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-                setBody(MultiPartFormDataContent(
-                    formData {
-                        append(
-                            "file",
-                            InputProvider(file.length()) { file.inputStream().asInput() },
-                            Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
-                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                            }
-                        )
-                    }
-                ))
-                header(HttpHeaders.Authorization, "Bearer $token")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {
+                            append(
+                                "file",
+                                cipherFile.readBytes(),
+                                Headers.build {
+                                    append(HttpHeaders.ContentType, fileType)
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=\"${filename}\""
+                                    )
+                                }
+                            )
+                            
+                            append(
+                                "encupsFile",
+                                Json.encodeToString(
+                                    EncapsulationFileResult.serializer(),
+                                    encupsChachaFileResult
+                                )
+                            )
+                        }
+                    )
+                )
+                
+                
                 
                 onUpload { bytesSentTotal, contentLength ->
                     if (contentLength != -1L) { // -1 means that the content length is unknown
@@ -603,19 +747,25 @@ actual class FileProvider(private val applicationContext: Context) {
                         onProgress(progress)
                     }
                 }
+                header(HttpHeaders.Authorization, "Bearer $token")
             }
+            
             if (response.status.isSuccess()) {
-                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
+                val jsonElement = Json.parseToJsonElement(response.bodyAsText())
                 
+                println("jsonElementFile ${jsonElement}")
                 
-                return responseData
+                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
                 
+                saveFileInDir(filename, fileDirectory, fileType)
+                
+                cipherFile.delete()
+                
+                return id
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
                 return null
-                
             }
-            println("File uploaded successfully: ${response.status}")
         } catch (e: Exception) {
             println("File upload failed: ${e.message}")
             return null
@@ -714,14 +864,14 @@ actual class FileProvider(private val applicationContext: Context) {
         )
         
         if (encupsChachaVideoResult !== null && encupsChachaPhotoResult !== null) {
-
+            
             val videoFile = File(cipherVideoPath)
             val photoFile = File(cipherPhotoPath)
             
             if (!videoFile.exists() && !photoFile.exists()) {
                 return null
             }
-
+            
             try {
                 val token = getValueInStorage("accessToken")
                 

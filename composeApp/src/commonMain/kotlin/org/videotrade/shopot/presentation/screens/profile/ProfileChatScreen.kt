@@ -86,6 +86,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         icon = chat.icon,
                         size = 186.dp,
                         onClick = {
+                            println("AAAAA")
                             navigator.push(
                                 PhotoViewerScreen(
                                     imageFilePath = null,
@@ -122,9 +123,9 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                             )
                         }
 
-                        if (chat.chatUser[0].login != null) {
+                        if (chat.chatUser?.get(0)?.login != null) {
                             Text(
-                                chat.chatUser[0].login!!,
+                                chat.chatUser!![0].login!!,
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
@@ -136,9 +137,9 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                     }
 
 
-                    if (chat.chatUser[0].description != null) {
+                    if (chat.chatUser?.get(0)?.description != null) {
                         Text(
-                            chat.chatUser[0].description!!,
+                            chat.chatUser!![0].description!!,
                             textAlign = TextAlign.Center,
                             fontSize = 14.sp,
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),

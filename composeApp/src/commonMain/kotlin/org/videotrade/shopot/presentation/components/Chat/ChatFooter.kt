@@ -606,7 +606,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: Mutabl
                             )
                         }
                     }
-
+                    
                     BasicTextField(
                         value = footerText,
                         onValueChange = { newText ->

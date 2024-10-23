@@ -55,7 +55,7 @@ init {
         
         val icon = image?.let {
             withContext(Dispatchers.IO) {
-                origin().sendFile(
+                origin().sendImageFile(
                     image.fileAbsolutePath,
                     "image", image.fileName,
                     false

@@ -24,6 +24,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.AppActivity
 import org.videotrade.shopot.R
@@ -76,16 +77,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
                         callViewModel.setIsCallBackground(true)
                         callViewModel.setIsIncomingCall(true)
                         
-                        val answerData = callViewModel.answerData.value
+                        val userId =
+                            parseCallData.jsonObject["userId"]?.jsonPrimitive
+
+                        println("user.id ${userId}")
                         
-                        
-                        val userJson =
-                            answerData?.jsonObject?.get("user")?.jsonObject
-                        val user =
-                            Json.decodeFromString<ProfileDTO>(userJson.toString())
-                        println("user.id ${user.id}")
-                        
-                        callViewModel.setOtherUserId(user.id)
+                        callViewModel.setOtherUserId(userId.toString())
                         callViewModel.connectionCallWs(profileId)
                         
                         // Пробуждаем экран и показываем активность через Foreground Service

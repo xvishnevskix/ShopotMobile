@@ -227,8 +227,9 @@ class IntroViewModel : ViewModel(), KoinComponent {
         val getVersion = 12
 
         val op = getBuildVersion()
-
-        return getVersion > op
+        
+//        return getVersion > op
+        return false
     }
 }
 

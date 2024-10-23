@@ -1,6 +1,7 @@
 package org.videotrade.shopot
 
 //import org.videotrade.shopot.multiplatform.MediaProviderFactory
+import android.Manifest
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -17,6 +18,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -66,16 +68,16 @@ class AndroidApp : Application() {
             startActivity(intent)
         }
         
+
         
-        
-        if (!Settings.canDrawOverlays(this)) {
-            val intent = Intent(
-                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                Uri.parse("package:$packageName")
-            )
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-        }
+//        if (!Settings.canDrawOverlays(this)) {
+//            val intent = Intent(
+//                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+//                Uri.parse("package:$packageName")
+//            )
+//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+//            startActivity(intent)
+//        }
         
         
         
@@ -147,7 +149,6 @@ open class AppActivity : ComponentActivity() {
     
     private var lastRequestCode: Int = -1
     
-    @RequiresApi(Build.VERSION_CODES.O_MR1)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         getContextObj.initializeActivity(this)
@@ -176,6 +177,17 @@ open class AppActivity : ComponentActivity() {
 //            val notificationManager = getSystemService(NotificationManager::class.java)
 //            notificationManager?.createNotificationChannel(channel)
 //        }
+        
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // Запрашиваем разрешение, если его нет
+            requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                1001
+            )
+            // Возвращаем null, так как выполнение функции должно быть прервано до получения разрешения
+//                return@withContext null
+        }
     
     }
     

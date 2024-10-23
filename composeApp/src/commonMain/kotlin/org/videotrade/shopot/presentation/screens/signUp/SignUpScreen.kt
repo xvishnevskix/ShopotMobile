@@ -238,7 +238,7 @@ class SignUpScreen(private val phone: String) : Screen {
 
                                             try {
                                                 val icon = image?.let {
-                                                    origin().sendFile(
+                                                    origin().sendImageFile(
                                                         image!!.fileAbsolutePath,
                                                         "image", image!!.fileName,
                                                         true

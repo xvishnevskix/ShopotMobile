@@ -1074,10 +1074,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             }
             
             println("rejectCallAnswer4")
-            
-            // Очищаем локальный и удаленный потоки
+// Очищаем локальный и удаленный потоки
             isCall.value = false
-            _peerConnection.value = null
+            _isCallActive.value = false
+            _isIncomingCall.value = false
+            _isCallBackground.value = false
             localStream.value = null
             remoteVideoTrack.value = null
             _isConnectedWebrtc.value = false
@@ -1086,7 +1087,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             callerId.value = ""
             _iceState.value = IceConnectionState.New
             _callState.value = PeerConnectionState.New
-            
+            isMuted.value = false
             println("rejectCallAnswer5")
             
             _peerConnection.value = PeerConnection(rtcConfiguration)
@@ -1124,15 +1125,23 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override fun clearData() {
         _peerConnection.value?.close()
         _peerConnection.value = null
+        isCall.value = false
+        _isCallActive.value = false
+        _isIncomingCall.value = false
+        _isCallBackground.value = false
+        _peerConnection.value = null
         localStream.value = null
         remoteVideoTrack.value = null
         _isConnectedWebrtc.value = false
+        _isConnectedWs.value = false
         offer.value = null
         otherUserId.value = ""
-        callerId.value = ""
+        callerId.value = generateRandomNumber() // Генерация нового callerId для следующего вызова
+        _wsSession.value = null
         _iceState.value = IceConnectionState.New
         _callState.value = PeerConnectionState.New
-        _wsSession.value = null
+      
+        isMuted.value = false
     }
     
     

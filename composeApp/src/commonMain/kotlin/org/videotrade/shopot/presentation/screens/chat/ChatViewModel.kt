@@ -2,7 +2,6 @@ package org.videotrade.shopot.presentation.screens.chat
 
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -80,7 +79,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
         MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
     val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
         _selectedMessagesByChat.asStateFlow()
-
+    
     
     init {
         
@@ -105,7 +104,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun setScaffoldState(state: Boolean) {
         isScaffoldForwardState.value = state
     }
-
+    
     fun setScaffoldStickerState(state: Boolean) {
         isScaffoldForwardState.value = state
     }
@@ -156,9 +155,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ) {
         viewModelScope.launch {
             var contentSort = ""
-
+            
             val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
-
+            
             
             if (content !== null && isCipher) {
                 val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
@@ -184,16 +183,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 selectedMessagesByChat.value[chatId]?.first?.id
             )
             println("сообщениесообщениесообщениесообщение")
-
-
+            
+            
             commonViewModel.sendNotify("$login", content, notificationToken)
-
+            
             clearSelection(chatId)
         }
     }
     
     
-    fun sendAttachments(
+    private fun sendAttachments(
         content: String?,
         fromUser: String,
         chatId: String,
@@ -202,7 +201,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         fileDir: String
     ) {
         viewModelScope.launch {
-            val fileId = origin().sendFile(
+            
+            val fileId = origin().sendImageFile(
                 fileDir,
                 contentType,
                 fileName,
@@ -228,7 +228,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
         photoPath: String? = null,
         photoName: String? = null,
     ) {
-
+        
         println("filePick.fileName ${filePick.fileName}")
         addMessage(
             MessageItem(
@@ -291,8 +291,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    
-
     
     fun sendForwardMessage(
         messageId: String,
@@ -385,23 +383,21 @@ class ChatViewModel : ViewModel(), KoinComponent {
         content: String? = null,
         fromUser: String,
         chatId: String,
-        uploadId: String,
-        fileId: String
+        fileName: String,
+        fileAbsolutePath: String
     ) {
         viewModelScope.launch {
-            val filePick = FileProviderFactory.create()
-                .pickFile(PickerType.Image)
-            if (filePick !== null) {
-                sendAttachments(
-                    content,
-                    fromUser,
-                    chatId,
-                    "image",
-                    filePick.fileName,
-                    filePick.fileAbsolutePath,
-                )
-                
-            }
+//            val filePick = FileProviderFactory.create()
+//                .pickFile(PickerType.Image)
+            sendAttachments(
+                content,
+                fromUser,
+                chatId,
+                "image",
+                fileName,
+                fileAbsolutePath,
+            )
+            
         }
         
     }
@@ -473,30 +469,32 @@ class ChatViewModel : ViewModel(), KoinComponent {
             this[chatId] = Pair(null, null)
         }
     }
-
-
+    
+    
     ////////////////// СТИКЕРЫ /////////////////////////////
-
+    
     private val stickerUseCase = StickerUseCase()
-
+    
     private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
-
-    private val _favoritePacks = MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
+    
+    private val _favoritePacks =
+        MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
     val favoritePacks: StateFlow<List<FavoritePack>> get() = _favoritePacks
-
-    private val _stickerPack = MutableStateFlow(StickerPack("", "", false, emptyList() ))  // Исправление здесь
+    
+    private val _stickerPack =
+        MutableStateFlow(StickerPack("", "", false, emptyList()))  // Исправление здесь
     val stickerPack: StateFlow<StickerPack> get() = _stickerPack
-
+    
     private var currentPage = 0
     private val pageSize = 3
     private var isLastPage = false
     private var _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
-
+    
     fun downloadStickerPacks(reset: Boolean = false) {
         if (_isLoading.value || isLastPage) return
-
+        
         _isLoading.value = true
         viewModelScope.launch {
             if (reset) {
@@ -504,7 +502,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 currentPage = 0
                 isLastPage = false
             }
-
+            
             val packs = stickerUseCase.downloadStickerPacks(currentPage, pageSize)
             if (packs.isNullOrEmpty()) {
                 isLastPage = true
@@ -515,21 +513,21 @@ class ChatViewModel : ViewModel(), KoinComponent {
             _isLoading.value = false
         }
     }
-
+    
     fun getPack(packId: String) {
         viewModelScope.launch {
             val stickerPack = stickerUseCase.getPack(packId) ?: return@launch
             _stickerPack.value = stickerPack
         }
     }
-
+    
     fun getFavoritePacks() {
         viewModelScope.launch {
             val favoritePackList = stickerUseCase.getFavoritePacks()
             _favoritePacks.value = favoritePackList ?: emptyList()
         }
     }
-
+    
     fun removePackFromFavorites(packId: String) {
         viewModelScope.launch {
             val success = stickerUseCase.removePackFromFavorites(packId)
@@ -543,7 +541,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             }
         }
     }
-
+    
     fun addPackToFavorites(packId: String) {
         viewModelScope.launch {
             val success = stickerUseCase.addPackToFavorites(packId)
@@ -557,8 +555,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
             }
         }
     }
-
-
+    
+    
     fun sendStickerMessage(
         chat: ChatItem,
         stickerId: String
@@ -575,7 +573,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 isCipher = false
             )
         }
-        
+
 //        addMessage(
 //            MessageItem(
 //                Random.nextInt(1, 1501).toString(),  // Генерация уникального идентификатора для сообщения
@@ -608,15 +606,15 @@ class ChatViewModel : ViewModel(), KoinComponent {
 //            )
 //        )
     }
-
-
+    
+    
     ///////////////////////////////////////////////////////
     
     
     fun sendSticker(
         fileId: String,
     ) {
-
+    
         
     }
     
