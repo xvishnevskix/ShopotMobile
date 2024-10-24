@@ -90,7 +90,7 @@ class SignUpPhoneScreen : Screen {
 
                         Spacer(modifier = Modifier.height(80.dp))
 
-                        PhoneInput(phone)
+//                        PhoneInput(phone)
 
                         Box(
                             modifier = Modifier.padding(top = 20.dp)

@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Common
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -12,7 +13,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -20,43 +23,85 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.Font
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
+
+enum class ButtonStyle {
+    Primary,
+    Outline,
+    Gradient
+}
 
 @Composable
 fun CustomButton(
     text: String,
     onClick: (CoroutineScope) -> Unit,
-    width: Dp = 325.dp, // default width
-    height: Dp = 48.dp,
-    
-    ) {
+    width: Dp = 262.dp,
+    height: Dp = 56.dp,
+    style: ButtonStyle = ButtonStyle.Primary,
+) {
     val scope = rememberCoroutineScope()
+
+    val backgroundColor: Color
+    val textColor: Color
+    val buttonShape: Shape = RoundedCornerShape(16.dp)
+
+    // Determine styles based on ButtonStyle
+    when (style) {
+        ButtonStyle.Primary -> {
+            backgroundColor = Color(0xFF373533)
+            textColor = Color.White
+        }
+        ButtonStyle.Outline -> {
+            backgroundColor = Color.Transparent
+            textColor = Color(0xFF373533)
+        }
+        ButtonStyle.Gradient -> {
+            backgroundColor = Color.Transparent // Gradient will be applied in Modifier
+            textColor = Color(0xFF373533)
+        }
+    }
+
     Button(
         onClick = { onClick(scope) },
-        // Use ButtonDefaults.buttonColors if you need to customize the colors further
-        colors = ButtonDefaults.buttonColors(Color(0xFFb2A293C)),
-        shape = RoundedCornerShape(24), // This gives us the rounded corners
-        modifier = Modifier.padding().width(width) // set the width
+        colors = ButtonDefaults.buttonColors(backgroundColor),
+        shape = buttonShape,
+        modifier = Modifier
+            .width(width) // set the width
             .height(height)
-            .shadow(
-                elevation = 15.dp, // радиус размытия
-                shape = RoundedCornerShape(0.dp), // форма тени, 0 dp для квадратной
-                clip = false, // не обрезать контент под тенью
-                ambientColor = Color.Black.copy(alpha = 0.25F), // цвет тени
-                spotColor = Color.Black.copy(alpha = 0.25F) // усилить тень в направлении
+            .let {
+                if (style == ButtonStyle.Outline) {
+                    it.border(
+                        width = 1.dp,
+                        color = Color(0xFF373533),
+                        shape = buttonShape
+                    )
+                } else {
+                    it
+                }
+            }
+            .background(
+                brush = when (style) {
+                    ButtonStyle.Gradient -> Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFCAB7A3), // rgb(202, 183, 163)
+                            Color(0xFFEDDCCC), // rgb(237, 220, 204)
+                            Color(0xFFBBA796)  // rgb(187, 167, 150)
+                        )
+                    )
+                    else -> Brush.verticalGradient(listOf(backgroundColor, backgroundColor))
+                },
+                shape = buttonShape
             )
-            .background(Color.Transparent),
-        
-        
-        ) {
+    ) {
         Text(
             text = text,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
             textAlign = TextAlign.Center,
-            fontSize = 13.sp,
-            lineHeight = 15.sp,
-            color = Color(255, 255, 255),
+            fontSize = 16.sp,
+            lineHeight = 16.sp,
+            color = textColor,
         )
     }
 }

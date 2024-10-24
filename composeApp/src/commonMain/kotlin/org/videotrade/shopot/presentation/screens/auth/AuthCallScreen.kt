@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.screens.auth
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -157,8 +158,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         SafeArea {
             
             when (authCase) {
-                "SignIn" -> AuthHeader(stringResource(MokoRes.strings.login), 0.55F)
-                "SignUp" -> AuthHeader(stringResource(MokoRes.strings.create_account), 0.75F)
+                "SignIn" -> AuthHeader(stringResource(MokoRes.strings.login))
+                "SignUp" -> AuthHeader(stringResource(MokoRes.strings.create_account))
             }
             
             Box(
@@ -167,11 +168,11 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             ) {
 
 
-                LazyColumn(
+                Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
 
-                    item {
+
                         Spacer(modifier = Modifier.height(150.dp))
                         Text(
                             stringResource(MokoRes.strings.enter_last_4_digits_of_the_incoming_call),
@@ -305,7 +306,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
     }
     
     
-}
+
 
 
 suspend fun sendRequestToBackend(

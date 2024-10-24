@@ -1,11 +1,14 @@
 package org.videotrade.shopot.presentation.components.Auth
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -21,8 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.lerp
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -45,6 +51,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.addValueInStorage
@@ -53,23 +60,26 @@ import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.screens.call.CallScreen
+import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.arrow_left
+import shopot.composeapp.generated.resources.auth_logo
 
 @Composable
 fun AuthHeader(text: String, f: Float = 0.55F) {
     val navigator = LocalNavigator.currentOrThrow
-    var showDialog by remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
 
-    if (showDialog) {
+    if (showDialog.value) {
         AlertDialog(
             containerColor = Color(0xFFF3F4F6),
             onDismissRequest = {
-                showDialog = false
+                showDialog.value = false
             },
 
             text = {
@@ -90,7 +100,7 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
                     stringResource(MokoRes.strings.no),
                     { scope ->
                         scope.launch {
-                            showDialog = false
+                            showDialog.value = false
 
                         }
                     },
@@ -102,9 +112,9 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
                     stringResource(MokoRes.strings.yes),
                     { scope ->
                         scope.launch {
-                            showDialog = false
+                            showDialog.value = false
                             navigator.push(
-                                SignInScreen()
+                                WelcomeScreen()
                             )
                         }
                     },
@@ -115,18 +125,29 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+        modifier = Modifier.fillMaxWidth().padding(top = 30.dp, start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Icon(
-            imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Back",
-            modifier = Modifier.padding(end = 8.dp).clickable {
-                showDialog = true
-            }.width(20.dp),
-            tint = Color.Black
-        )
+//        Icon(
+//            imageVector = Icons.Default.ArrowBack,
+//            contentDescription = "Back",
+//            modifier = Modifier.padding(end = 8.dp).clickable {
+//                showDialog = true
+//            }.width(20.dp),
+//            tint = Color.Black
+//        )
+        Box(modifier = Modifier.clickable {
+            showDialog.value = true
+        }.padding(start = 8.dp, end = 8.dp)) {
+            Image(
+                modifier = Modifier
+                    .size(width = 7.dp, height = 14.dp),
+                painter = painterResource(Res.drawable.arrow_left),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
+        }
 
         Text(
             text = text,
