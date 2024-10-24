@@ -117,7 +117,7 @@ class SignInScreen : Screen {
         )
 
 
-        SafeArea {
+
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
                 sheetContent = {
@@ -126,7 +126,7 @@ class SignInScreen : Screen {
                         selectedCountryCode = countryCode,
                         onCountrySelected = { selectedCode ->
                             countryCode = selectedCode
-                            val currentNumber = textState.value.text.removePrefix(countryCode)
+                            val currentNumber = textState.value.text
                             textState.value = TextFieldValue(
                                 text = currentNumber,
                                 selection = TextRange(currentNumber.length)
@@ -254,7 +254,6 @@ class SignInScreen : Screen {
                 }
             }
         }
-    }
 
 //        SafeArea {
 //

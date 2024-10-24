@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.lerp
@@ -62,6 +63,8 @@ import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -151,13 +154,14 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
 
         Text(
             text = text,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.W600,
-            textAlign = TextAlign.Center,
-            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-            lineHeight = 24.sp,
-            color = Color.Black
+            style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                textAlign = TextAlign.Center,
+                color = Color(0xFF373533)
+            )
         )
 
         Spacer(modifier = Modifier.width(20.dp))

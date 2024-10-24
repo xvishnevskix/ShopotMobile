@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -35,6 +36,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -49,6 +51,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
+import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -80,33 +83,50 @@ fun PhoneInput(
 
         Spacer(modifier = Modifier.width(16.dp))
 
-        BasicTextField(
-            value = textState.value,
-            onValueChange = { newTextValue ->
-                // Оставляем только цифры в номере
-                val newText = newTextValue.text.filter { char -> char.isDigit() }
-                val cursorPosition = newText.length
-                if (newText.length <= (getPhoneNumberLength(countryCode) - countryCode.length)) {
-                    textState.value = TextFieldValue(text = newText, selection = TextRange(cursorPosition))
-                }
-            },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            textStyle = TextStyle(
-                textAlign = TextAlign.Start,
-                fontSize = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                lineHeight = 16.sp,
-                color = Color(0xFF373533),
-            ),
+        Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(16.dp))
                 .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(16.dp))
                 .background(Color(0xFFFFFFFF))
                 .width(161.dp)
                 .height(56.dp)
-                .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
-        )
+                .padding(start = 20.dp, top = 20.dp, bottom = 20.dp, end = 20.dp)
+        ) {
+            if (textState.value.text.isEmpty()) {
+                Text(
+                    text = "XXX XXX XX XX",
+                    style = TextStyle(
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        color = Color(0x80373533)
+                    ),
+                    modifier = Modifier
+                )
+            }
+
+            BasicTextField(
+                value = textState.value,
+                onValueChange = { newTextValue ->
+                    // Оставляем только цифры в номере
+                    val newText = newTextValue.text.filter { char -> char.isDigit() }
+                    val cursorPosition = newText.length
+                    if (newText.length <= (getPhoneNumberLength(countryCode) - countryCode.length)) {
+                        textState.value = TextFieldValue(text = newText, selection = TextRange(cursorPosition))
+                    }
+                },
+                singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                textStyle = TextStyle(
+                    textAlign = TextAlign.Start,
+                    fontSize = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    lineHeight = 16.sp,
+                    color = Color(0xFF373533),
+                ),
+                modifier = Modifier.fillMaxSize()
+            )
+        }
     }
 }
 
@@ -205,7 +225,7 @@ fun CountryPicker(
 
 
 
-@OptIn(ExperimentalMaterialApi::class)
+
 @Composable
 fun CountryPickerBottomSheet(
     countries: List<Pair<String, String>>,
@@ -216,31 +236,185 @@ fun CountryPickerBottomSheet(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp)
-            .fillMaxHeight(0.9f)
+            .fillMaxHeight(1f)
     ) {
-        Text(
-            text = "Выбор кода страны",
-            style = TextStyle(
-                fontSize = 18.sp,
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 30.dp, start = 16.dp, end = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
 
-                textAlign = TextAlign.Start
-            ),
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        countries.forEach { country ->
-            ListItem(
-                modifier = Modifier.clickable {
-                    onCountrySelected(country.first)
-                },
-                text = {
-                    Text(
-                        "${country.second} (${country.first})",
-                        fontSize = 16.sp,
-                        color = Color.Black
-                    )
-                }
+            Box(modifier = Modifier.clickable {
+
+            }.padding(start = 8.dp, end = 8.dp)) {
+                Image(
+                    modifier = Modifier
+                        .size(width = 7.dp, height = 14.dp),
+                    painter = painterResource(Res.drawable.arrow_left),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
+
+            Text(
+                text = "Выбор кода страны",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF373533)
+                )
             )
-            Divider()
+
+            Spacer(modifier = Modifier.width(20.dp))
         }
-    }
+
+        Spacer(modifier = Modifier.height(30.dp))
+
+        Column {
+            Text(
+                text = "Выбрано",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF373533)
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            val selectedCountry = countries.find { it.first == selectedCountryCode }
+
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .background(color = Color(0xFFF7F7F7), shape = RoundedCornerShape(size = 16.dp))
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp,top = 20.dp,end = 16.dp,bottom = 20.dp)
+                ) {
+                    selectedCountry?.let {
+                        Text(
+                            text = "${it.second}",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                textAlign = TextAlign.Start,
+                                color = Color(0xFF373533)
+                            )
+                        )
+                        Text(
+                            text = "${it.first}",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                textAlign = TextAlign.Start,
+                                color = Color(0xFF373533)
+                            )
+                        )
+                    }
+                }
+            }
+
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
+
+        Column(modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = "Список других стран",
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF373533)
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn {
+                item {
+                    countries.forEach { country ->
+                        val (flag, countryName) = country.second.split("   ", limit = 2)
+                        val isSelected = country.first == selectedCountryCode
+                        val textColor = if (isSelected) Color(0xFF373533) else Color(0x80373533)
+                        val borderColor = if (isSelected) Color(0xFF373533) else Color(0x33373533) // rgba(55, 53, 51, 0.2)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp)
+                                .background(color = Color.Transparent)
+                                .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(size = 16.dp))
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .clickable {
+                                        onCountrySelected(country.first)
+                                    }
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp)
+                            ) {
+                                // Смайлик и название страны
+                                Row {
+                                    Text(
+                                        text = "${flag}",
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            lineHeight = 16.sp,
+                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                            fontWeight = FontWeight(400),
+                                            textAlign = TextAlign.Start,
+                                            color = Color(0xFF373533)
+                                        )
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Text(
+                                        text = "${countryName}",
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            lineHeight = 16.sp,
+                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                            fontWeight = FontWeight(400),
+                                            textAlign = TextAlign.Start,
+                                            color = textColor
+                                        )
+                                    )
+                                }
+                                // Код страны без скобочек
+                                Text(
+                                    text = "${country.first}",
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                        fontWeight = FontWeight(400),
+                                        textAlign = TextAlign.End,
+                                        color = textColor
+                                    )
+                                )
+                            }
+
+                        }
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+                }
+            }
+        }
 }
