@@ -71,6 +71,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.CountryPickerBottomSheet
@@ -98,6 +99,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val responseState = remember { mutableStateOf<String?>("1111") }
+        val otpFields = remember { mutableStateListOf("", "", "", "") }
         val isSuccessOtp = remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
         val viewModel: IntroViewModel = koinInject()
@@ -106,11 +108,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         var time by remember { mutableStateOf(10) }
         var isRunning by remember { mutableStateOf(false) }
         var reloadSend by remember { mutableStateOf(false) }
+        var isSmsMode by remember { mutableStateOf(false) }
+        var isSms by remember { mutableStateOf(false) }
 
         val isLoading = remember { mutableStateOf(false) }
 
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
         val invalidCode = stringResource(MokoRes.strings.invalid_code)
+        val sentSMSCode = stringResource(MokoRes.strings.sms_with_code_sent)
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
 
@@ -139,6 +144,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
 
+
+
         fun startTimer() {
             coroutineScope.launch {
                 while (isRunning && time > 0) {
@@ -147,8 +154,108 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 }
                 if (time == 0) {
                     isRunning = false // Останавливаем таймер, когда достигнет 0
-                    reloadSend = true
-                    time = 10 // Сбрасываем таймер обратно на 60 секунд
+                    isSmsMode = true // Переходим в режим SMS после завершения таймера
+                    time = 10 // Сбрасываем таймер обратно
+                }
+            }
+        }
+
+        fun handleError(errorMessage: String) {
+            hasError.value = true
+            isLoading.value = false
+            animationTrigger.value = !animationTrigger.value
+            toasterViewModel.toaster.show(
+                message = errorMessage,
+                type = ToastType.Warning,
+                duration = ToasterDefaults.DurationDefault,
+            )
+        }
+
+        suspend fun handleAuthCase() {
+            when (authCase) {
+                "SignIn" -> sendLogin(
+                    phone,
+                    navigator,
+                    viewModel,
+                    сommonViewModel = сommonViewModel,
+                    toasterViewModel = toasterViewModel,
+                    phoneNotRegistered = phoneNotRegistered
+                )
+
+                "SignUp" -> sendSignUp(phone, navigator)
+            }
+        }
+
+        fun sendSms(sentSMSCode: String) {
+            isSms = true
+            coroutineScope.launch {
+                if (!isRunning) {
+                    isRunning = true
+                    startTimer()
+                }
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("phoneNumber", phone.drop(1))
+                        put("is_sms", true)
+                    }
+                )
+                val response = origin().post("2fa", jsonContent)
+                if (response != null) {
+                    val jsonElement = Json.parseToJsonElement(response)
+                    val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                    responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+
+                    toasterViewModel.toaster.show(
+                        message = sentSMSCode,
+                        type = ToastType.Success,
+                        duration = ToasterDefaults.DurationDefault,
+                    )
+
+
+                    val otpText = otpFields.joinToString("")
+                    if (otpText.length == 4) {
+                        if (responseState.value == otpText) {
+                            handleAuthCase()
+                        } else {
+                            handleError(invalidCode)
+                        }
+                    }
+                } else {
+                    handleError(invalidCode)
+                }
+            }
+        }
+
+        fun sendCall() {
+            coroutineScope.launch {
+                if (!isRunning) {
+                    isRunning = true
+                    startTimer()
+                }
+
+                val response = sendRequestToBackend(phone,
+                    null,
+                    "2fa",
+                    toasterViewModel,
+                    hasError = hasError,
+                    animationTrigger = animationTrigger)
+                if (response != null) {
+                    val jsonString = response.bodyAsText()
+                    val jsonElement = Json.parseToJsonElement(jsonString)
+                    val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                    responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+
+                    // Проверка, что все 4 цифры введены перед проверкой
+                    val otpText = otpFields.joinToString("")
+                    if (otpText.length == 4) {
+                        if (responseState.value == otpText) {
+                            handleAuthCase()
+                        } else {
+                            handleError(invalidCode)
+                        }
+                    }
+                } else {
+                    handleError(invalidCode)
                 }
             }
         }
@@ -159,21 +266,23 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 isRunning = true
                 startTimer()
             }
-            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel, hasError = hasError,
-                animationTrigger = animationTrigger)
-            if (response != null) {
-                val jsonString = response.bodyAsText()
-                val jsonElement = Json.parseToJsonElement(jsonString)
-                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-            }
+//            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel, hasError = hasError,
+//                animationTrigger = animationTrigger)
+//            if (response != null) {
+//                val jsonString = response.bodyAsText()
+//                val jsonElement = Json.parseToJsonElement(jsonString)
+//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+//            }
+
+//            sendCall()
         }
 
 
         val isError = remember { mutableStateOf(false) }
 
 
-        val otpFields = remember { mutableStateListOf("", "", "", "") }
+
 
 
 
@@ -233,7 +342,10 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
-                                "Введите 4 последние цифры входящего звонка",
+                                if (!isSms)
+                                    "Введите 4 последние цифры входящего звонка"
+                                else
+                                    "Введите код из СМС, отправленный на номер",
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     lineHeight = 16.sp,
@@ -245,51 +357,36 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             )
                             Spacer(modifier = Modifier.height(50.dp))
 
-                            Otp(otpFields, isLoading.value, hasError.value, animationTrigger.value)
+                            Otp(otpFields, isLoading.value, hasError.value, animationTrigger.value,
+                                onOtpComplete = { otpText ->
+                                    coroutineScope.launch {
+                                        if (responseState.value == otpText) {
+                                            handleAuthCase()
+                                        } else {
+                                            handleError(invalidCode)
+                                        }
+                                    }
+                                }
+                                )
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            CustomButton(if (!isRunning) "Получить код в смс" else "Получить код в смс ${time}", {
-
-                                val otpText = otpFields.joinToString("")
-
-
-                                coroutineScope.launch {
-                                    isLoading.value = true
-                                    if (
-                                        responseState.value != otpText && !isSuccessOtp.value
-
-                                    ) {
-                                        hasError.value = true
-                                        isLoading.value = false
-                                        animationTrigger.value
-                                        toasterViewModel.toaster.show(
-                                            message = invalidCode,
-                                            type = ToastType.Warning,
-                                            duration = ToasterDefaults.DurationDefault,
-                                        )
-                                        animationTrigger.value = !animationTrigger.value
-                                        return@launch
+                            CustomButton(
+                                text = if (isRunning && time > 0) {
+                                    if (isSmsMode) "Получить новый код ${time}" else "Получить код в смс ${time}"
+                                } else {
+                                    if (isSmsMode) "Получить новый код" else "Получить код в смс"
+                                },
+                                {
+                                    if (isSmsMode) {
+                                        sendSms(sentSMSCode)
+                                    } else {
+                                        sendCall()
                                     }
-
-                                    when (authCase) {
-
-                                        "SignIn" -> sendLogin(
-                                            phone,
-                                            navigator,
-                                            viewModel,
-                                            сommonViewModel,
-                                            toasterViewModel = toasterViewModel,
-                                            phoneNotRegistered
-                                        )
-
-                                        "SignUp" -> sendSignUp(phone, navigator)
-                                    }
-
-                                }
-
-
-                            }, style = ButtonStyle.Gradient)
+                                },
+                                style = ButtonStyle.Gradient,
+                                disabled = isRunning
+                            )
                         }
 
                     }

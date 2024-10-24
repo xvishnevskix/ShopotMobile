@@ -122,7 +122,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
                 chatsInit(navigator)
 
             } else {
-                navigator.push(SignInScreen())
+                navigator.push(WelcomeScreen())
 
 
             }

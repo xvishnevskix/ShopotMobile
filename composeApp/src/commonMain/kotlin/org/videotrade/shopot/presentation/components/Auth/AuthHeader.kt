@@ -75,7 +75,7 @@ import shopot.composeapp.generated.resources.arrow_left
 import shopot.composeapp.generated.resources.auth_logo
 
 @Composable
-fun AuthHeader(text: String, f: Float = 0.55F) {
+fun AuthHeader(text: String) {
     val navigator = LocalNavigator.currentOrThrow
     val showDialog = remember { mutableStateOf(false) }
 

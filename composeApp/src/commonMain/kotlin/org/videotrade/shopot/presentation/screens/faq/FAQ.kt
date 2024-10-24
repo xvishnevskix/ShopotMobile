@@ -1,5 +1,7 @@
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -57,6 +59,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 
 import androidx.compose.ui.unit.dp
@@ -87,14 +90,14 @@ import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.BaseHeader
+import org.videotrade.shopot.presentation.components.Common.ButtonStyle
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.SFProText_Semibold
-
-
-
 
 
 suspend fun sendEmail(
@@ -151,38 +154,45 @@ class FAQ() : Screen {
         val email = remember { mutableStateOf("") }
         val description = remember { mutableStateOf("") }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                BaseHeader("FAQ")
+        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+            Column(
+                modifier = Modifier.padding(10.dp).fillMaxHeight(0.95f),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
 
-                Spacer(modifier = Modifier.fillMaxHeight(0.05F))
+                Column {
+                    BaseHeader(stringResource(MokoRes.strings.support))
 
-                Text(
-                    stringResource(MokoRes.strings.main_questions),
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(start = 20.dp, bottom = 15.dp),
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                    lineHeight = 20.sp,
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                )
+                    Spacer(modifier = Modifier.fillMaxHeight(0.05F))
 
-                Column(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                        .fillMaxWidth()
-                ) {
-                    PolicyItem(stringResource(MokoRes.strings.privacy_policy)) {
-                        navigator.push(PrivacyPolicy())
-                    }
-                    PolicyItem(stringResource(MokoRes.strings.user_agreement)) {
-                        navigator.push(UserAgreement())
-                    }
-                    PolicyItem(stringResource(MokoRes.strings.data_processing_agreement)) {
-                        navigator.push(DataProcessingAgreement())
+                    Text(
+                        stringResource(MokoRes.strings.main_questions),
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFF373533),
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 4.dp, end = 4.dp)
+                            .fillMaxWidth()
+                    ) {
+                        PolicyItem(stringResource(MokoRes.strings.privacy_policy)) {
+                            navigator.push(PrivacyPolicy())
+                        }
+                        PolicyItem(stringResource(MokoRes.strings.user_agreement)) {
+                            navigator.push(UserAgreement())
+                        }
+                        PolicyItem(stringResource(MokoRes.strings.data_processing_agreement)) {
+                            navigator.push(DataProcessingAgreement())
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.fillMaxHeight(0.8F))
 
                 Box(
                     modifier = Modifier
@@ -193,7 +203,7 @@ class FAQ() : Screen {
                 ) {
                     CustomButton(stringResource(MokoRes.strings.ask_question), {
                         modalVisible.value = true
-                    })
+                    }, style = ButtonStyle.Gradient)
                 }
 
                 if (modalVisible.value) {
@@ -201,7 +211,7 @@ class FAQ() : Screen {
                         onDismiss = {
                             modalVisible.value = false
                             isMessageSent.value = false
-                                    },
+                        },
                         email = email,
                         description = description,
                         isMessageSent = isMessageSent,
@@ -213,7 +223,8 @@ class FAQ() : Screen {
                                     loading.value = true
                                     val response = sendEmail(email.value, description.value)
                                     loading.value = false
-                                    isSuccessfulSend.value = response != null && response.status.isSuccess()
+                                    isSuccessfulSend.value =
+                                        response != null && response.status.isSuccess()
                                     isMessageSent.value = true
                                 }
                             }
@@ -228,21 +239,33 @@ class FAQ() : Screen {
 
     @Composable
     fun PolicyItem(text: String, onClick: () -> Unit) {
-        Text(
-            text = text,
+        Box(
             modifier = Modifier
-                .clickable(onClick = onClick)
-                .padding(vertical = 7.dp)
-                .padding(start = 5.dp, bottom = 5.dp),
-            style = TextStyle(
-                textDecoration = TextDecoration.Underline,
-                fontSize = 17.sp,
-                letterSpacing = (-0.5).sp,
-                color = Color(0xFF979797),
-
-
+                .padding(top = 4.dp, bottom = 4.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color(0x33373533),
+                    shape = RoundedCornerShape(size = 16.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier
+                    .clickable(onClick = onClick)
+                    .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp),
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF373533),
+                )
             )
-        )
+        }
     }
 
     @Composable
@@ -301,7 +324,9 @@ class FAQ() : Screen {
                             }
                         } else {
                             Text(
-                                text = if (isSuccessfulSend.value) stringResource(MokoRes.strings.your_request_has_been_sent_successfully) else stringResource(MokoRes.strings.an_error_occurred_please_try_again),
+                                text = if (isSuccessfulSend.value) stringResource(MokoRes.strings.your_request_has_been_sent_successfully) else stringResource(
+                                    MokoRes.strings.an_error_occurred_please_try_again
+                                ),
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(vertical = 15.dp)
                             )

@@ -102,7 +102,7 @@ fun CustomButton(
             textAlign = TextAlign.Center,
             fontSize = 16.sp,
             lineHeight = 16.sp,
-            color = textColor,
+            color = if (disabled) Color(0x80373533) else textColor,
         )
     }
 }

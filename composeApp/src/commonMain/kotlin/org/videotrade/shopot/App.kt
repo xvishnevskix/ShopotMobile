@@ -1,5 +1,6 @@
 package org.videotrade.shopot
 
+import FAQ
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,6 +22,7 @@ import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
+import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -36,8 +38,10 @@ internal fun App() = AppTheme {
             setScreenLockFlags(false)
             
             Navigator(
-//                IntroScreen()
-               AuthCallScreen("79603412966", "SignIn")
+//                FAQ()
+                IntroScreen()
+//               AuthCallScreen("79603412966", "SignIn")
+//                SignUpScreen("79603412961")
             ) { navigator ->
                 SlideTransition(navigator)
             }

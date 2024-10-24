@@ -65,12 +65,12 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 fun Otp(
     otpFields: SnapshotStateList<String>,
     isLoading: Boolean = false,
     hasError: Boolean,
     animationTrigger: Boolean,
+    onOtpComplete: (String) -> Unit
 ) {
 
 
@@ -100,6 +100,15 @@ fun Otp(
         }
     }
 
+    // Объединяем введенные данные в одну строку для проверки
+    val otpText = otpFields.joinToString("")
+
+    // Проверка, заполнены ли все поля
+    LaunchedEffect(otpText) {
+        if (otpText.length == 4) {
+            onOtpComplete(otpText) // Вызываем функцию обратного вызова
+        }
+    }
 
     if (isLoading) {
         LoadingDots()

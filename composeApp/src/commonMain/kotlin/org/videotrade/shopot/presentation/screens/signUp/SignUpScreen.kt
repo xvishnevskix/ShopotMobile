@@ -3,14 +3,19 @@ package org.videotrade.shopot.presentation.screens.signUp
 import Avatar
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,6 +38,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
@@ -73,14 +79,18 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
+import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.human
 import shopot.composeapp.generated.resources.pencil_in_circle
 
 data class SignUpTextState(
@@ -122,7 +132,7 @@ class SignUpScreen(private val phone: String) : Screen {
         val nickValidate4 = stringResource(MokoRes.strings.nickname_can_contain_only_letters_and_numbers)
         
         SafeArea {
-            AuthHeader(stringResource(MokoRes.strings.create_account), 0.75F)
+            AuthHeader(stringResource(MokoRes.strings.create_account))
             
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -166,55 +176,72 @@ class SignUpScreen(private val phone: String) : Screen {
                                     )
                                 }
                             } else {
-                                Avatar(icon = null, 140.dp)
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(50))
+                                        .width(128.dp)
+                                        .height(128.dp)
+                                        .background(color = Color(0xFFF7F7F7)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(Res.drawable.human),
+                                        contentDescription = "Edit",
+                                        modifier = Modifier.size(60.dp)
+                                    )
+                                }
                                 Image(
                                     painter = painterResource(Res.drawable.pencil_in_circle),
                                     contentDescription = "Edit",
-                                    modifier = Modifier.size(28.dp).align(Alignment.BottomEnd)
+                                    modifier = Modifier.size(24.dp).align(Alignment.BottomEnd)
                                 )
                             }
                             
                             
                         }
                     }
-                    
+
                     item {
-                        Column(
-                            modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            TextFieldWithTitle(
-                                title = stringResource(MokoRes.strings.name),
-                                value = textState.value.firstName,
-                                onValueChange = {
-                                    textState.value = textState.value.copy(firstName = it)
-                                    firstNameError.value = validateFirstName(it, nameValidate1, nameValidate2, nameValidate3) // Валидация имени
-                                },
-                                placeholder = stringResource(MokoRes.strings.name),
-                                error = firstNameError.value
-                            )
 
-                            TextFieldWithTitle(
-                                title = stringResource(MokoRes.strings.lastname),
-                                value = textState.value.lastName,
-                                onValueChange = {
-                                    textState.value = textState.value.copy(lastName = it)
-                                    lastNameError.value = validateLastName(it, lastnameValidate1, lastnameValidate2) // Валидация фамилии
-                                },
-                                placeholder = stringResource(MokoRes.strings.lastname),
-                                error = lastNameError.value
-                            )
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                TextFieldWithTitle(
+                                    title = "Укажите имя",
+                                    value = textState.value.firstName,
+                                    onValueChange = {
+                                        textState.value = textState.value.copy(firstName = it)
+                                        firstNameError.value = validateFirstName(it, nameValidate1, nameValidate2, nameValidate3) // Валидация имени
+                                    },
+                                    placeholder = stringResource(MokoRes.strings.name),
+                                    error = firstNameError.value
+                                )
 
-                            TextFieldWithTitle(
-                                title = stringResource(MokoRes.strings.come_up_nickname),
-                                value = textState.value.nickname,
-                                onValueChange = {
-                                    textState.value = textState.value.copy(nickname = it)
-                                    nicknameError.value = validateNickname(it, nickValidate1, nickValidate2, nickValidate3, nickValidate4) // Валидация никнейма
-                                },
-                                placeholder = stringResource(MokoRes.strings.come_up_nickname),
-                                error = nicknameError.value
-                            )
+                                TextFieldWithTitle(
+                                    title = "Укажите фамилию",
+                                    value = textState.value.lastName,
+                                    onValueChange = {
+                                        textState.value = textState.value.copy(lastName = it)
+                                        lastNameError.value = validateLastName(it, lastnameValidate1, lastnameValidate2) // Валидация фамилии
+                                    },
+                                    placeholder = stringResource(MokoRes.strings.lastname),
+                                    error = lastNameError.value
+                                )
+
+                                TextFieldWithTitle(
+                                    title = "Придумайте ник",
+                                    value = textState.value.nickname,
+                                    onValueChange = {
+                                        textState.value = textState.value.copy(nickname = it)
+                                        nicknameError.value = validateNickname(it, nickValidate1, nickValidate2, nickValidate3, nickValidate4) // Валидация никнейма
+                                    },
+                                    placeholder = stringResource(MokoRes.strings.come_up_nickname),
+                                    error = nicknameError.value
+                                )
+                                Spacer(modifier = Modifier.height(80.dp))
+
+
                         }
                     }
                     
@@ -318,7 +345,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                             }
                                         }
                                     }
-                                }
+                                }, style = ButtonStyle.Gradient
                             )
                         }
                     }
@@ -340,17 +367,17 @@ class SignUpScreen(private val phone: String) : Screen {
         ) {
             Text(
                 title,
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
-                fontSize = 14.sp,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 15.sp,
+                color = Color(0xFF373533),
                 modifier = Modifier.padding(
                     top = 5.dp,
                     bottom = 8.dp,
-                    start = 4.dp
                 ),
-                color = Color(0xFF000000)
+
             )
             BasicTextField(
                 value = value,
@@ -359,30 +386,32 @@ class SignUpScreen(private val phone: String) : Screen {
                     if (value.isEmpty()) {
                         Text(
                             text = placeholder, style = TextStyle(
-                                color = Color(0xFFC7C7C7),
-                                fontSize = 12.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                lineHeight = 15.sp,
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                textAlign = TextAlign.Start,
+                                color = Color(0x80373533)
                             )
                         )
                     }
                     innerTextField()
                 },
                 textStyle = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
                     textAlign = TextAlign.Start,
-                    fontSize = 15.sp,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    color = Color(0xFF000000)
+                    color = Color(0xFF373533)
                 ),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 modifier = Modifier
-                    .shadow(1.dp, RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp))
-                    .fillMaxWidth(0.9f).background(Color(0xFFFFFFFF))
-                    .padding(start = 15.dp, top = 19.dp, bottom = 15.dp)
+
+                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                    .fillMaxWidth(0.95f).background(Color(0xFFFFFFFF))
+                    .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
             )
 
             error?.let {
@@ -390,6 +419,10 @@ class SignUpScreen(private val phone: String) : Screen {
                     text = it,
                     color = Color.Red,
                     fontSize = 12.sp,
+                    lineHeight = 12.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    textAlign = TextAlign.Center,
                     modifier = Modifier.padding(start = 4.dp, top = 4.dp)
                 )
             }
