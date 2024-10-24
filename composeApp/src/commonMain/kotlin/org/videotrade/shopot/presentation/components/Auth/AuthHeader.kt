@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -87,7 +88,11 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
 
             text = {
                 Text(
-                    "${stringResource(MokoRes.strings.are_you_sure_you_want_to_go_out)}\n${stringResource(MokoRes.strings.you_will_be_returned_to_the_initial_login_screen)}",
+                    "${stringResource(MokoRes.strings.are_you_sure_you_want_to_go_out)}\n${
+                        stringResource(
+                            MokoRes.strings.you_will_be_returned_to_the_initial_login_screen
+                        )
+                    }",
                     fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                     textAlign = TextAlign.Center,
                     fontSize = 14.sp,
@@ -128,7 +133,8 @@ fun AuthHeader(text: String, f: Float = 0.55F) {
     }
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 30.dp, start = 16.dp, end = 16.dp),
+        modifier = Modifier.safeDrawingPadding().fillMaxWidth()
+            .padding(top = 30.dp, start = 16.dp, end = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

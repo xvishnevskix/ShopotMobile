@@ -1,5 +1,9 @@
 package org.videotrade.shopot.presentation.components.Auth
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -70,8 +74,38 @@ val getPhoneNumberLength = { code: String ->
 fun PhoneInput(
     textState: MutableState<TextFieldValue>,
     countryCode: String,
-    onCountrySelected: () -> Unit
+    hasError: Boolean,
+    onCountrySelected: () -> Unit,
+    animationTrigger: Boolean,
 ) {
+
+    // Анимация смещения для "тряски"
+    val offsetX = remember { Animatable(0f) }
+
+    // Цвет бордера: красный, если ошибка, иначе серый
+    val borderColor by animateColorAsState(
+        targetValue = if (hasError) Color(0xFFFF3B30) else Color(0x33373533),
+        animationSpec = tween(durationMillis = 300)
+    )
+
+    // Запускаем анимацию тряски, если есть ошибка
+    LaunchedEffect(animationTrigger) {
+        if (hasError) {
+            offsetX.animateTo(
+                targetValue = 0f,
+                animationSpec = keyframes {
+                    durationMillis = 500
+                    // Двигаем текстовое поле влево и вправо
+                    -5f at 0
+                    5f at 100
+                    -5f at 200
+                    5f at 300
+                    0f at 400
+                }
+            )
+        }
+    }
+
     Row(
         modifier = Modifier.width(262.dp),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -85,8 +119,9 @@ fun PhoneInput(
 
         Box(
             modifier = Modifier
+                .offset(x = offsetX.value.dp)
                 .clip(RoundedCornerShape(16.dp))
-                .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(16.dp))
+                .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(16.dp))
                 .background(Color(0xFFFFFFFF))
                 .width(161.dp)
                 .height(56.dp)
@@ -112,7 +147,8 @@ fun PhoneInput(
                     val newText = newTextValue.text.filter { char -> char.isDigit() }
                     val cursorPosition = newText.length
                     if (newText.length <= (getPhoneNumberLength(countryCode) - countryCode.length)) {
-                        textState.value = TextFieldValue(text = newText, selection = TextRange(cursorPosition))
+                        textState.value =
+                            TextFieldValue(text = newText, selection = TextRange(cursorPosition))
                     }
                 },
                 singleLine = true,
@@ -150,23 +186,23 @@ fun CountryPicker(
     ) {
 
 
-            Row(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-                ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
 
 
-                Text(
-                    "${selectedCountryCode}",
-                    textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                    lineHeight = 16.sp,
-                    color = Color(0xFF373533),
-                )
+            Text(
+                "${selectedCountryCode}",
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                lineHeight = 16.sp,
+                color = Color(0xFF373533),
+            )
 
 //                Icon(
 //                    imageVector = Icons.Default.ArrowDropDown,
@@ -176,14 +212,14 @@ fun CountryPicker(
 //                    tint = Color.Black
 //                )
 
-                Image(
-                    modifier = Modifier
-                        .rotate(270f)
-                        .size(width = 5.dp, height = 12.dp),
-                    painter = painterResource(Res.drawable.arrow_left),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
+            Image(
+                modifier = Modifier
+                    .rotate(270f)
+                    .size(width = 5.dp, height = 12.dp),
+                painter = painterResource(Res.drawable.arrow_left),
+                contentDescription = null,
+                contentScale = ContentScale.Crop
+            )
 
 //                DropdownMenu(
 //                    expanded = expanded,
@@ -217,20 +253,19 @@ fun CountryPicker(
 //                        )
 //                    }
 //                }
-            }
+        }
 
 
     }
 }
 
 
-
-
 @Composable
 fun CountryPickerBottomSheet(
     countries: List<Pair<String, String>>,
     selectedCountryCode: String,
-    onCountrySelected: (String) -> Unit
+    onCountrySelected: (String) -> Unit,
+    onBackClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -245,7 +280,7 @@ fun CountryPickerBottomSheet(
         ) {
 
             Box(modifier = Modifier.clickable {
-
+                onBackClick()
             }.padding(start = 8.dp, end = 8.dp)) {
                 Image(
                     modifier = Modifier
@@ -300,7 +335,8 @@ fun CountryPickerBottomSheet(
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth().padding(start = 16.dp,top = 20.dp,end = 16.dp,bottom = 20.dp)
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp)
                 ) {
                     selectedCountry?.let {
                         Text(
@@ -352,13 +388,18 @@ fun CountryPickerBottomSheet(
                         val (flag, countryName) = country.second.split("   ", limit = 2)
                         val isSelected = country.first == selectedCountryCode
                         val textColor = if (isSelected) Color(0xFF373533) else Color(0x80373533)
-                        val borderColor = if (isSelected) Color(0xFF373533) else Color(0x33373533) // rgba(55, 53, 51, 0.2)
+                        val borderColor =
+                            if (isSelected) Color(0xFF373533) else Color(0x33373533) // rgba(55, 53, 51, 0.2)
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp)
                                 .background(color = Color.Transparent)
-                                .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(size = 16.dp))
+                                .border(
+                                    width = 1.dp,
+                                    color = borderColor,
+                                    shape = RoundedCornerShape(size = 16.dp)
+                                )
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -368,7 +409,12 @@ fun CountryPickerBottomSheet(
                                         onCountrySelected(country.first)
                                     }
                                     .fillMaxWidth()
-                                    .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp)
+                                    .padding(
+                                        start = 16.dp,
+                                        top = 20.dp,
+                                        end = 16.dp,
+                                        bottom = 20.dp
+                                    )
                             ) {
                                 // Смайлик и название страны
                                 Row {
@@ -414,7 +460,7 @@ fun CountryPickerBottomSheet(
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
-                }
             }
         }
+    }
 }

@@ -13,12 +13,14 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -35,7 +37,7 @@ internal fun App() = AppTheme {
             
             Navigator(
 //                IntroScreen()
-                SignInScreen()
+               AuthCallScreen("79603412966", "SignIn")
             ) { navigator ->
                 SlideTransition(navigator)
             }
