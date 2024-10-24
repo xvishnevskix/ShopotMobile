@@ -103,7 +103,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
-        var time by remember { mutableStateOf(60) }
+        var time by remember { mutableStateOf(10) }
         var isRunning by remember { mutableStateOf(false) }
         var reloadSend by remember { mutableStateOf(false) }
 
@@ -111,6 +111,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
         val invalidCode = stringResource(MokoRes.strings.invalid_code)
+        var hasError = remember { mutableStateOf(false) }
+        val animationTrigger = remember { mutableStateOf(false) }
 
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
@@ -146,25 +148,26 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 if (time == 0) {
                     isRunning = false // Останавливаем таймер, когда достигнет 0
                     reloadSend = true
-                    time = 60 // Сбрасываем таймер обратно на 60 секунд
+                    time = 10 // Сбрасываем таймер обратно на 60 секунд
                 }
             }
         }
 
-//        LaunchedEffect(Unit) {
-//
-//            if (!isRunning) {
-//                isRunning = true
-//                startTimer()
-//            }
-//            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel)
-//            if (response != null) {
-//                val jsonString = response.bodyAsText()
-//                val jsonElement = Json.parseToJsonElement(jsonString)
-//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//            }
-//        }
+        LaunchedEffect(Unit) {
+
+            if (!isRunning) {
+                isRunning = true
+                startTimer()
+            }
+            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel, hasError = hasError,
+                animationTrigger = animationTrigger)
+            if (response != null) {
+                val jsonString = response.bodyAsText()
+                val jsonElement = Json.parseToJsonElement(jsonString)
+                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+            }
+        }
 
 
         val isError = remember { mutableStateOf(false) }
@@ -242,29 +245,32 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             )
                             Spacer(modifier = Modifier.height(50.dp))
 
-                            Otp(otpFields, isLoading.value)
+                            Otp(otpFields, isLoading.value, hasError.value, animationTrigger.value)
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            CustomButton("Получить код в смс", {
+                            CustomButton(if (!isRunning) "Получить код в смс" else "Получить код в смс ${time}", {
 
                                 val otpText = otpFields.joinToString("")
 
 
                                 coroutineScope.launch {
                                     isLoading.value = true
-                                    //                                    if (
-                                    //                                        responseState.value != otpText && !isSuccessOtp.value
-                                    //
-                                    //                                    ) {
-                                    //                                        isLoading.value = false
-                                    //                                        toasterViewModel.toaster.show(
-                                    //                                            message = invalidCode,
-                                    //                                            type = ToastType.Warning,
-                                    //                                            duration = ToasterDefaults.DurationDefault,
-                                    //                                        )
-                                    //                                        return@launch
-                                    //                                    }
+                                    if (
+                                        responseState.value != otpText && !isSuccessOtp.value
+
+                                    ) {
+                                        hasError.value = true
+                                        isLoading.value = false
+                                        animationTrigger.value
+                                        toasterViewModel.toaster.show(
+                                            message = invalidCode,
+                                            type = ToastType.Warning,
+                                            duration = ToasterDefaults.DurationDefault,
+                                        )
+                                        animationTrigger.value = !animationTrigger.value
+                                        return@launch
+                                    }
 
                                     when (authCase) {
 
@@ -291,7 +297,6 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
     }
-
 }
 //SafeArea {
 //
@@ -528,7 +533,7 @@ suspend fun sendLogin(
             NotifierManager.getPushNotifier().getToken(),
             "auth/login",
             toasterViewModel,
-            phoneNotRegistered
+            phoneNotRegistered,
         )
 
 

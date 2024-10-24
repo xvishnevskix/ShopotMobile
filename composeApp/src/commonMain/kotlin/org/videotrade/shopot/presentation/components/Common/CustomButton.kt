@@ -40,6 +40,7 @@ fun CustomButton(
     width: Dp = 262.dp,
     height: Dp = 56.dp,
     style: ButtonStyle = ButtonStyle.Primary,
+    disabled: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
 
