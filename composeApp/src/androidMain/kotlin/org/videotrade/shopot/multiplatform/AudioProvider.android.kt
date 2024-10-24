@@ -184,6 +184,11 @@ actual object AudioFactory {
     actual fun createAudioPlayer(): AudioPlayer {
         return AudioPlayer(applicationContext)
     }
+    
+    
+    actual fun createMusicPlayer(): MusicPlayer {
+        return MusicPlayer()
+    }
 }
 
 
@@ -191,40 +196,58 @@ actual class MusicPlayer {
     
     private var mediaPlayer: MediaPlayer? = null
     
-    // Метод для воспроизведения музыки
     actual fun play(musicName: String) {
         try {
             val context = getContextObj.getContext()
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             
-            if (mediaPlayer == null) {
-                // Получаем AssetManager для доступа к ресурсам assets
-                val assetManager = context.assets
-                
-                // Открываем файл из assets
-                val inputStream = assetManager.open("${musicName}.mp3")
-                
-                // Создаем временный файл для проигрывания (т.к. MediaPlayer не работает напрямую с InputStream)
-                val tempFile = File.createTempFile("music", ".mp3", context.cacheDir)
-                val outputStream = FileOutputStream(tempFile)
-                inputStream.copyTo(outputStream)
-                inputStream.close()
-                outputStream.close()
-                
-                // Инициализация MediaPlayer с временным файлом
-                mediaPlayer = MediaPlayer().apply {
-                    setDataSource(tempFile.absolutePath)
-                    isLooping = true // Устанавливаем цикличное проигрывание
-                    prepare() // Подготовка MediaPlayer
-                    start() // Начинаем воспроизведение
+            // Запрашиваем аудио фокус для системного звука
+            val focusRequest = audioManager.requestAudioFocus(
+                { focusChange ->
+                    when (focusChange) {
+                        AudioManager.AUDIOFOCUS_LOSS -> {
+                            mediaPlayer?.pause()
+                        }
+                        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                            mediaPlayer?.pause()
+                        }
+                        AudioManager.AUDIOFOCUS_GAIN -> {
+                            mediaPlayer?.start()
+                        }
+                    }
+                },
+                AudioManager.STREAM_ALARM, // Используем системный поток для уведомлений/сигналов
+                AudioManager.AUDIOFOCUS_GAIN
+            )
+            
+            if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                if (mediaPlayer == null) {
+                    val assetManager = context.assets
+                    val inputStream = assetManager.open("${musicName}.mp3")
+                    
+                    val tempFile = File.createTempFile("system_sound", ".mp3", context.cacheDir)
+                    val outputStream = FileOutputStream(tempFile)
+                    inputStream.copyTo(outputStream)
+                    inputStream.close()
+                    outputStream.close()
+                    
+                    mediaPlayer = MediaPlayer().apply {
+                        setDataSource(tempFile.absolutePath)
+                        setAudioStreamType(AudioManager.STREAM_ALARM) // Устанавливаем поток как системный (сигнал/уведомление)
+                        isLooping = false // Выключаем цикличное воспроизведение
+                        prepare()
+                        start()
+                    }
+                } else {
+                    mediaPlayer?.start()
                 }
             } else {
-                mediaPlayer?.start() // Продолжаем проигрывание, если оно было приостановлено
+                println("Не удалось получить аудио фокус.")
             }
         } catch (e: Exception) {
             println("e: $e")
         }
     }
-    
     // Метод для остановки воспроизведения музыки
     actual fun stop() {
         mediaPlayer?.stop()

@@ -14,6 +14,7 @@ import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.AVAudioSessionCategorySoloAmbient
 import platform.AVFAudio.AVAudioSessionModeDefault
 import platform.AVFAudio.AVEncoderAudioQualityKey
 import platform.AVFAudio.AVFormatIDKey
@@ -249,6 +250,10 @@ actual object AudioFactory {
         println("Creating AudioPlayer")
         return AudioPlayer()
     }
+    
+    actual fun createMusicPlayer(): MusicPlayer {
+        return MusicPlayer()
+    }
 }
 
 actual class MusicPlayer {
@@ -267,18 +272,17 @@ actual class MusicPlayer {
         
         val fileUrl = NSURL.fileURLWithPath(filePath)
         
-        // Проверяем, что URL файла корректен
-        if (fileUrl == null) {
-            println("Ошибка: Невозможно создать URL для файла $musicName.mp3.")
-            return
-        }
-        
         try {
+            // Настройка аудиосессии для системного звука
+            val audioSession = AVAudioSession.sharedInstance()
+            audioSession.setCategory(AVAudioSessionCategorySoloAmbient, error = null)
+            audioSession.setActive(true, error = null)
+            
             // Инициализация AVAudioPlayer
             audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
-                numberOfLoops = -1 // Цикличное воспроизведение
-                prepareToPlay()    // Подготовка к воспроизведению
-                play()             // Начало воспроизведения
+                numberOfLoops = 0 // Однократное воспроизведение (можно изменить на -1 для цикличного)
+                prepareToPlay()   // Подготовка к воспроизведению
+                play()            // Начало воспроизведения
             }
             
             if (audioPlayer == null) {
@@ -288,6 +292,7 @@ actual class MusicPlayer {
             println("Ошибка при попытке воспроизведения: ${e.message}")
         }
     }
+
     
     actual fun stop() {
         audioPlayer?.stop()

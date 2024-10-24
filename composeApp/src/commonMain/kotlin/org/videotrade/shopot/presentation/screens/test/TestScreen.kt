@@ -48,7 +48,9 @@ import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.VideoPlayer
 import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getBuildVersion
@@ -68,6 +70,7 @@ class TestScreen : Screen {
         val callViewModel: CallViewModel = koinInject()
         
         val navigator = LocalNavigator.currentOrThrow
+        val musicPlayer = remember { AudioFactory.createMusicPlayer()  }
         
 
         MaterialTheme {
@@ -75,11 +78,9 @@ class TestScreen : Screen {
                 Button(onClick = {
                     scope.launch {
                    try {
-                       // Проверяем, находится ли уже TestScreen на вершине стека
-                       if (navigator.lastItem !is TestScreen) {
-                           // Выполняем навигацию только если мы не находимся на этом экране
-                           navigator.replace(TestScreen())
-                       }
+                       
+                       musicPlayer.play("callee")
+                    
                    }catch (e:Exception){
                    
                    }

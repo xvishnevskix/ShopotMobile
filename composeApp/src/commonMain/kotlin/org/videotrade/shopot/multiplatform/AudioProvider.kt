@@ -24,5 +24,6 @@ expect class MusicPlayer {
 expect object AudioFactory {
     fun createAudioRecorder(): AudioRecorder
     fun createAudioPlayer(): AudioPlayer
+    fun createMusicPlayer(): MusicPlayer
     
 }

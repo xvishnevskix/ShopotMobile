@@ -53,6 +53,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
@@ -110,7 +111,7 @@ class CallScreen(
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
-        val musicPlayer = remember { MusicPlayer() }
+        val musicPlayer = remember { AudioFactory.createMusicPlayer()  }
         
         var isPlaying by remember { mutableStateOf(false) }
         
