@@ -208,7 +208,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 TextFieldWithTitle(
-                                    title = "Укажите имя",
+                                    title = stringResource(MokoRes.strings.enter_your_name),
                                     value = textState.value.firstName,
                                     onValueChange = {
                                         textState.value = textState.value.copy(firstName = it)
@@ -219,7 +219,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 )
 
                                 TextFieldWithTitle(
-                                    title = "Укажите фамилию",
+                                    title = stringResource(MokoRes.strings.enter_your_last_name),
                                     value = textState.value.lastName,
                                     onValueChange = {
                                         textState.value = textState.value.copy(lastName = it)
@@ -230,7 +230,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 )
 
                                 TextFieldWithTitle(
-                                    title = "Придумайте ник",
+                                    title = stringResource(MokoRes.strings.come_up_with_a_nickname),
                                     value = textState.value.nickname,
                                     onValueChange = {
                                         textState.value = textState.value.copy(nickname = it)

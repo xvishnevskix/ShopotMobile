@@ -292,7 +292,9 @@ fun CountryPickerBottomSheet(
             }
 
             Text(
-                text = "Выбор кода страны",
+                text = stringResource(
+                    MokoRes.strings.select_country_code
+                ),
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 16.sp,
@@ -310,7 +312,9 @@ fun CountryPickerBottomSheet(
 
         Column {
             Text(
-                text = "Выбрано",
+                text = stringResource(
+                    MokoRes.strings.selected
+                ),
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 16.sp,
@@ -371,7 +375,9 @@ fun CountryPickerBottomSheet(
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Список других стран",
+                text = stringResource(
+                    MokoRes.strings.list_of_other_countries
+                ),
                 style = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 16.sp,

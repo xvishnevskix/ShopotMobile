@@ -175,7 +175,7 @@ class SignUpPhoneScreen : Screen {
                                 modifier = Modifier
                             ) {
                                 Text(
-                                    "Регистрация",
+                                    stringResource(MokoRes.strings.registration),
                                     style = TextStyle(
                                         fontSize = 24.sp,
                                         lineHeight = 24.sp,
@@ -187,7 +187,7 @@ class SignUpPhoneScreen : Screen {
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    "Введите свой номер телефона",
+                                    stringResource(MokoRes.strings.enter_your_phone_number),
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         lineHeight = 16.sp,

@@ -189,7 +189,7 @@ class SignInScreen : Screen {
                                 modifier = Modifier
                             ) {
                                 Text(
-                                    "Авторизация",
+                                    stringResource(MokoRes.strings.authorization),
                                     style = TextStyle(
                                         fontSize = 24.sp,
                                         lineHeight = 24.sp,
@@ -201,7 +201,7 @@ class SignInScreen : Screen {
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    "Введите свой номер телефона",
+                                    stringResource(MokoRes.strings.enter_your_phone_number),
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         lineHeight = 16.sp,

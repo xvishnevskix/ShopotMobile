@@ -275,7 +275,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
 //            }
 
-//            sendCall()
+            sendCall()
         }
 
 
@@ -330,7 +330,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             modifier = Modifier
                         ) {
                             Text(
-                                "Подтвердите номер",
+                                stringResource(MokoRes.strings.confirm_the_number),
                                 style = TextStyle(
                                     fontSize = 24.sp,
                                     lineHeight = 24.sp,
@@ -343,9 +343,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             Spacer(modifier = Modifier.height(8.dp))
                             Text(
                                 if (!isSms)
-                                    "Введите 4 последние цифры входящего звонка"
+                                    stringResource(MokoRes.strings.enter_last_4_digits_of_the_incoming_call)
                                 else
-                                    "Введите код из СМС, отправленный на номер",
+                                    stringResource(MokoRes.strings.enter_the_code_from_the_sms_sent_to_the_number),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     lineHeight = 16.sp,
@@ -373,9 +373,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
                             CustomButton(
                                 text = if (isRunning && time > 0) {
-                                    if (isSmsMode) "Получить новый код ${time}" else "Получить код в смс ${time}"
+                                    if (isSmsMode) "${stringResource(MokoRes.strings.get_a_new_code)} ${time}" else "${stringResource(MokoRes.strings.receive_code_via_sms)} ${time}"
                                 } else {
-                                    if (isSmsMode) "Получить новый код" else "Получить код в смс"
+                                    if (isSmsMode) stringResource(MokoRes.strings.get_a_new_code) else stringResource(MokoRes.strings.receive_code_via_sms)
                                 },
                                 {
                                     if (isSmsMode) {

@@ -98,7 +98,7 @@ class WelcomeScreen : Screen {
         val logoOffsetY = remember { Animatable(0f) }
         val contentAlpha = animateFloatAsState(
             targetValue = if (contentVisible) 1f else 0f,
-            animationSpec = tween(durationMillis = 1000)
+            animationSpec = tween(durationMillis = 800)
         )
 
         // Launch animations when the screen is first composed
@@ -179,7 +179,9 @@ class WelcomeScreen : Screen {
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Text(
-                                    "Выберите, чтобы продолжить",
+                                    stringResource(
+                                        MokoRes.strings.choose_to_continue
+                                    ),
                                     style = TextStyle(
                                         fontSize = 16.sp,
                                         lineHeight = 16.sp,
@@ -190,11 +192,11 @@ class WelcomeScreen : Screen {
                                     )
                                 )
                                 Spacer(modifier = Modifier.height(50.dp))
-                                CustomButton(stringResource(MokoRes.strings.login), {
+                                CustomButton(stringResource(MokoRes.strings.entrance), {
                                     navigator.push(SignInScreen())
                                 }, style = ButtonStyle.Primary)
                                 Spacer(modifier = Modifier.height(16.dp))
-                                CustomButton(stringResource(MokoRes.strings.sign_up), {
+                                CustomButton(stringResource(MokoRes.strings.registration), {
                                     navigator.push(SignUpPhoneScreen())
                                 }, style = ButtonStyle.Outline)
                             }

@@ -56,15 +56,6 @@ fun BaseHeader(text: String) {
                 contentScale = ContentScale.Crop
             )
         }
-//        Icon(
-//            imageVector = Icons.Default.ArrowBack,
-//            contentDescription = "Back",
-//            modifier = Modifier.padding(end = 8.dp).clickable {
-//                navigator.pop()
-//            }.width(20.dp),
-//            tint = Color.Black
-//        )
-
         Text(
             text = text,
             fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
