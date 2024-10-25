@@ -360,10 +360,12 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             Otp(otpFields, isLoading.value, hasError.value, animationTrigger.value,
                                 onOtpComplete = { otpText ->
                                     coroutineScope.launch {
+                                        isLoading.value = true
                                         if (responseState.value == otpText) {
                                             handleAuthCase()
                                         } else {
                                             handleError(invalidCode)
+                                            isLoading.value = false
                                         }
                                     }
                                 }

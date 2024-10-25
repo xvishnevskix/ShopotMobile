@@ -106,7 +106,8 @@ fun Otp(
     // Проверка, заполнены ли все поля
     LaunchedEffect(otpText) {
         if (otpText.length == 4) {
-            onOtpComplete(otpText) // Вызываем функцию обратного вызова
+            onOtpComplete(otpText)
+        // Вызываем функцию обратного вызова
         }
     }
 
