@@ -22,6 +22,7 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -258,6 +259,10 @@ suspend fun handleConnectWebSocket(
 
                                             // Обновляем последнее сообщение в чате
                                             chatsUseCase.updateLastMessageChat(messageNew)
+                                             val musicPlayer = AudioFactory.createMusicPlayer()
+                                            
+                                            musicPlayer.play("newmess", false)
+                                            
                                         }
 
                                     } catch (e: Exception) {
@@ -335,7 +340,11 @@ suspend fun handleConnectWebSocket(
                                             }
 
                                             chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
-
+                                            
+                                            
+                                            val musicPlayer = AudioFactory.createMusicPlayer()
+                                            
+                                            musicPlayer.play("newmess", false)
                                         }
 
                                     } catch (e: Exception) {
@@ -577,7 +586,10 @@ suspend fun handleConnectWebSocket(
                                             }
 
                                             chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
-
+                                            
+                                            val musicPlayer = AudioFactory.createMusicPlayer()
+                                            
+                                            musicPlayer.play("newmess", false)
                                         }
 
                                     } catch (e: Exception) {

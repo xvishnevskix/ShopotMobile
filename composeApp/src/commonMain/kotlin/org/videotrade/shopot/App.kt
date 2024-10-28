@@ -16,6 +16,7 @@ import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
 import org.videotrade.shopot.theme.AppTheme
@@ -33,8 +34,8 @@ internal fun App() = AppTheme {
             setScreenLockFlags(false)
             
             Navigator(
-//                IntroScreen()
-                TestScreen()
+                IntroScreen()
+//                TestScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

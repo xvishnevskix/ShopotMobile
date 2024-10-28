@@ -16,7 +16,7 @@ expect class AudioPlayer {
 
 
 expect class MusicPlayer {
-    fun play(musicName: String)
+    fun play(musicName: String, isRepeat:Boolean)
     fun stop()
     fun isPlaying(): Boolean
 }

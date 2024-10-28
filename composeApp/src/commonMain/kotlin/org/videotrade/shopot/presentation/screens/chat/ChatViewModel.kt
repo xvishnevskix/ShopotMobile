@@ -43,7 +43,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
-    
+    private val musicPlayer = AudioFactory.createMusicPlayer()
+   
     val footerText = MutableStateFlow("")
     
     val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
@@ -142,84 +143,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
+
     
-    fun sendMessage(
-        content: String? = null,
-        fromUser: String,
-        chatId: String,
-        notificationToken: String?,
-        attachments: List<String>? = null,
-        login: String? = null,
-        isCipher: Boolean,
-        forwardMessage: Boolean = false
-    ) {
-        viewModelScope.launch {
-            var contentSort = ""
-            
-            val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
-            
-            
-            if (content !== null && isCipher) {
-                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                
-                val resEncups = encupsMessage(content, cipherWrapper)
-                
-                contentSort = Json.encodeToString(resEncups)
-            } else {
-                contentSort = content!!
-            }
-            
-            chatUseCase.sendMessage(
-                MessageItem(
-                    content = contentSort,
-                    fromUser = fromUser,
-                    chatId = chatId,
-                    anotherRead = false,
-                    iread = false,
-                    attachments = null,
-                    forwardMessage = forwardMessage,
-                ),
-                attachments,
-                selectedMessagesByChat.value[chatId]?.first?.id
-            )
-            println("сообщениесообщениесообщениесообщение")
-            
-            
-            commonViewModel.sendNotify("$login", content, notificationToken)
-            
-            clearSelection(chatId)
-        }
-    }
-    
-    
-    private fun sendAttachments(
-        content: String?,
-        fromUser: String,
-        chatId: String,
-        contentType: String,
-        fileName: String,
-        fileDir: String
-    ) {
-        viewModelScope.launch {
-            
-            val fileId = origin().sendImageFile(
-                fileDir,
-                contentType,
-                fileName,
-                false,
-            )
-            
-            if (fileId !== null)
-                sendMessage(
-                    content = content,
-                    fromUser = fromUser,
-                    chatId = chatId,
-                    notificationToken = null,
-                    attachments = listOf(fileId),
-                    isCipher = false
-                )
-        }
-    }
+
     
     fun addFileMessage(
         chat: ChatItem,
@@ -264,57 +190,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun sendLargeFileAttachments(
-        content: String? = null,
-        fromUser: String,
-        chatId: String,
-        uploadId: String,
-        fileIds: List<String>,
-        fileType: String
-    ) {
-        viewModelScope.launch {
-            chatUseCase.sendUploadMessage(
-                MessageItem(
-                    content = content,
-                    fromUser = fromUser,
-                    chatId = chatId,
-                    uploadId = uploadId,
-                    anotherRead = false,
-                    iread = false,
-                    attachments = null
-                ),
-                fileIds,
-                selectedMessagesByChat.value[chatId]?.first?.id,
-                fileType
-            
-            )
-        }
-    }
+
     
     
-    fun sendForwardMessage(
-        messageId: String,
-        chatId: String,
-    ) {
-        viewModelScope.launch {
-            try {
-                val jsonContent = Json.encodeToString(
-                    buildJsonObject {
-                        put("action", "forwardMessage")
-                        put("chatId", chatId)
-                        put("messageId", messageId)
-                        put("userId", profileUseCase.getProfile().id)
-                        put("fileType", forwardMessage.value?.attachments?.get(0)?.type)
-                    }
-                )
-                println("jsonContent $jsonContent")
-                wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
-                
-            } catch (e: Exception) {
-                println("Failed to send message: ${e.message}")
-            }
-        }
-    }
+
     
     fun addMessage(message: MessageItem) {
         
@@ -339,6 +218,84 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
+    
+    fun sendMessage(
+        content: String? = null,
+        fromUser: String,
+        chatId: String,
+        notificationToken: String?,
+        attachments: List<String>? = null,
+        login: String? = null,
+        isCipher: Boolean,
+        forwardMessage: Boolean = false
+    ) {
+        viewModelScope.launch {
+            var contentSort = ""
+            
+            val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+            
+            
+            if (content !== null && isCipher) {
+                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                
+                val resEncups = encupsMessage(content, cipherWrapper)
+                
+                contentSort = Json.encodeToString(resEncups)
+            } else {
+                contentSort = content!!
+            }
+            
+            chatUseCase.sendMessage(
+                MessageItem(
+                    content = contentSort,
+                    fromUser = fromUser,
+                    chatId = chatId,
+                    anotherRead = false,
+                    iread = false,
+                    attachments = null,
+                    forwardMessage = forwardMessage,
+                ),
+                attachments,
+                selectedMessagesByChat.value[chatId]?.first?.id
+            )
+            println("сообщениесообщениесообщениесообщение")
+            
+            musicPlayer.play("message", false)
+            commonViewModel.sendNotify("$login", content, notificationToken)
+            
+            clearSelection(chatId)
+        }
+    }
+    
+    
+    fun sendLargeFileAttachments(
+        content: String? = null,
+        fromUser: String,
+        chatId: String,
+        uploadId: String,
+        fileIds: List<String>,
+        fileType: String
+    ) {
+        viewModelScope.launch {
+            chatUseCase.sendUploadMessage(
+                MessageItem(
+                    content = content,
+                    fromUser = fromUser,
+                    chatId = chatId,
+                    uploadId = uploadId,
+                    anotherRead = false,
+                    iread = false,
+                    attachments = null
+                ),
+                fileIds,
+                selectedMessagesByChat.value[chatId]?.first?.id,
+                fileType
+            
+            )
+            musicPlayer.play("message", false)
+            
+        }
+    }
     
     fun sendVoice(fileDir: String, chat: ChatItem, voiceName: String) {
         val fileSize =
@@ -376,6 +333,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 uploadId = Random.nextInt(1, 501).toString()
             )
         )
+        
+        musicPlayer.play("message", false)
+        
     }
     
     
@@ -389,6 +349,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
 //            val filePick = FileProviderFactory.create()
 //                .pickFile(PickerType.Image)
+            
+            
             sendAttachments(
                 content,
                 fromUser,
@@ -402,6 +364,79 @@ class ChatViewModel : ViewModel(), KoinComponent {
         
     }
     
+    private fun sendAttachments(
+        content: String?,
+        fromUser: String,
+        chatId: String,
+        contentType: String,
+        fileName: String,
+        fileDir: String
+    ) {
+        viewModelScope.launch {
+            
+            val fileId = origin().sendImageFile(
+                fileDir,
+                contentType,
+                fileName,
+                false,
+            )
+            
+            if (fileId !== null)
+                sendMessage(
+                    content = content,
+                    fromUser = fromUser,
+                    chatId = chatId,
+                    notificationToken = null,
+                    attachments = listOf(fileId),
+                    isCipher = false
+                )
+        }
+    }
+    
+    fun sendStickerMessage(
+        chat: ChatItem,
+        stickerId: String
+    ) {
+        // Добавляем сообщение с стикером
+        
+        if (currentChat.value !== null) {
+            sendMessage(
+                content = footerText.value,
+                fromUser = profile.value.id,
+                chatId = currentChat.value!!.chatId,
+                notificationToken = null,
+                attachments = listOf(stickerId),
+                isCipher = false
+            )
+        }
+
+    }
+    
+    fun sendForwardMessage(
+        messageId: String,
+        chatId: String,
+    ) {
+        viewModelScope.launch {
+            try {
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("action", "forwardMessage")
+                        put("chatId", chatId)
+                        put("messageId", messageId)
+                        put("userId", profileUseCase.getProfile().id)
+                        put("fileType", forwardMessage.value?.attachments?.get(0)?.type)
+                    }
+                )
+                println("jsonContent $jsonContent")
+                wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+                
+                musicPlayer.play("message", false)
+                
+            } catch (e: Exception) {
+                println("Failed to send message: ${e.message}")
+            }
+        }
+    }
     
     fun findContactByPhone(phone: String): ContactDTO? {
         return contactsUseCase.contacts.value.find { it.phone == phone }
@@ -557,55 +592,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-    fun sendStickerMessage(
-        chat: ChatItem,
-        stickerId: String
-    ) {
-        // Добавляем сообщение с стикером
-        
-        if (currentChat.value !== null) {
-            sendMessage(
-                content = footerText.value,
-                fromUser = profile.value.id,
-                chatId = currentChat.value!!.chatId,
-                notificationToken = null,
-                attachments = listOf(stickerId),
-                isCipher = false
-            )
-        }
 
-//        addMessage(
-//            MessageItem(
-//                Random.nextInt(1, 1501).toString(),  // Генерация уникального идентификатора для сообщения
-//                profile.value.id,  // Идентификатор пользователя
-//                "",  // Текст сообщения (пусто, так как это стикер)
-//                false,  // Сообщение не прочитано
-//                null,  // Нет ответа на сообщение
-//                0,  // Статус сообщения
-//                getCurrentTimeList(),  // Текущее время отправки сообщения
-//                false,  // Сообщение не удалено
-//                chat.id,  // Идентификатор чата
-//                false,  // Сообщение не заменено
-//                true,  // Сообщение является файлом (в данном случае стикером)
-//                listOf(
-//                    Attachment(
-//                        Random.nextInt(1, 501).toString(),  // Уникальный ID вложения
-//                        Random.nextInt(1, 501).toString(),  // Уникальный ID файла
-//                        profile.value.id,  // Идентификатор пользователя
-//                        stickerId,  // Используем stickerId как ID файла
-//                        "sticker",  // Тип файла - стикер
-//                        stickerId,  // Имя файла стикера (стикерID)
-//                        size = 0L,  // Размер файла для стикера не указываем (может быть 0)
-//                        photoPath = null,  // Нет пути к файлу, так как это стикер
-//                        photoName = null,  // Нет фото имени, так как это стикер
-//                        photoByteArray = null  // Нет данных о файле
-//                    )
-//                ),
-//                upload = true,  // Указываем, что сообщение загружается
-//                uploadId = Random.nextInt(1, 1501).toString()  // Уникальный ID для загрузки
-//            )
-//        )
-    }
     
     
     ///////////////////////////////////////////////////////

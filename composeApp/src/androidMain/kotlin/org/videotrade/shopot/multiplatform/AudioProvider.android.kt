@@ -1,17 +1,13 @@
 package org.videotrade.shopot.multiplatform
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.media.AudioManager
 import android.media.AudioManager.ADJUST_UNMUTE
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
-import android.provider.Settings
-import androidx.activity.ComponentActivity
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import java.io.File
 import java.io.FileInputStream
@@ -85,7 +81,6 @@ actual class AudioRecorder(private val context: Context) {
         }
     }
     
-
     
     private fun stopAllAudioSources() {
         // Release the current MediaRecorder if it is still active
@@ -116,7 +111,8 @@ actual class AudioRecorder(private val context: Context) {
     }
     
     private fun hasDndPermission(context: Context): Boolean {
-        val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         return notificationManager.isNotificationPolicyAccessGranted
     }
 }
@@ -196,7 +192,7 @@ actual class MusicPlayer {
     
     private var mediaPlayer: MediaPlayer? = null
     
-    actual fun play(musicName: String) {
+    actual fun play(musicName: String, isRepeat: Boolean) {
         try {
             val context = getContextObj.getContext()
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -204,17 +200,25 @@ actual class MusicPlayer {
             // Запрашиваем аудио фокус для системного звука
             val focusRequest = audioManager.requestAudioFocus(
                 { focusChange ->
-                    when (focusChange) {
-                        AudioManager.AUDIOFOCUS_LOSS -> {
-                            mediaPlayer?.pause()
+                    if (isRepeat) {
+                        when (focusChange) {
+                            AudioManager.AUDIOFOCUS_LOSS -> {
+                                mediaPlayer?.pause()
+                            }
+                            
+                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                                mediaPlayer?.pause()
+                            }
+                            
+                            AudioManager.AUDIOFOCUS_GAIN -> {
+                                mediaPlayer?.start()
+                            }
                         }
-                        AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                            mediaPlayer?.pause()
-                        }
-                        AudioManager.AUDIOFOCUS_GAIN -> {
-                            mediaPlayer?.start()
-                        }
+                    } else {
+                        mediaPlayer?.start()
                     }
+                    
+                    
                 },
                 AudioManager.STREAM_ALARM, // Используем системный поток для уведомлений/сигналов
                 AudioManager.AUDIOFOCUS_GAIN
@@ -234,7 +238,8 @@ actual class MusicPlayer {
                     mediaPlayer = MediaPlayer().apply {
                         setDataSource(tempFile.absolutePath)
                         setAudioStreamType(AudioManager.STREAM_ALARM) // Устанавливаем поток как системный (сигнал/уведомление)
-                        isLooping = false // Выключаем цикличное воспроизведение
+                        isLooping =
+                            isRepeat // Устанавливаем цикличное воспроизведение в зависимости от параметра isRepeat
                         prepare()
                         start()
                     }
@@ -248,12 +253,18 @@ actual class MusicPlayer {
             println("e: $e")
         }
     }
+    
     // Метод для остановки воспроизведения музыки
     actual fun stop() {
         mediaPlayer?.stop()
         mediaPlayer?.reset()
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+    
+    fun stopMediaPlayer() {
+        mediaPlayer?.stop()
+        
     }
     
     // Проверка, воспроизводится ли музыка

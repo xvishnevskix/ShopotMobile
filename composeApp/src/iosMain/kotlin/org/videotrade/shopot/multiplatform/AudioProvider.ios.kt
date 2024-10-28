@@ -149,6 +149,7 @@ actual class AudioRecorder {
         }
     }
 }
+
 actual class AudioPlayer {
     private var audioPlayer: AVAudioPlayer? = null
     
@@ -261,7 +262,7 @@ actual class MusicPlayer {
     private var audioPlayer: AVAudioPlayer? = null
     
     @OptIn(ExperimentalForeignApi::class)
-    actual fun play(musicName: String) {
+    actual fun play(musicName: String, isRepeat: Boolean) {
         // Получаем путь к файлу из бандла приложения
         val filePath = NSBundle.mainBundle.pathForResource(name = musicName, ofType = "mp3")
         
@@ -280,9 +281,10 @@ actual class MusicPlayer {
             
             // Инициализация AVAudioPlayer
             audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
-                numberOfLoops = 0 // Однократное воспроизведение (можно изменить на -1 для цикличного)
-                prepareToPlay()   // Подготовка к воспроизведению
-                play()            // Начало воспроизведения
+                numberOfLoops =
+                    if (isRepeat) -1 else 0 // Устанавливаем количество повторений в зависимости от isRepeat
+                prepareToPlay()                         // Подготовка к воспроизведению
+                play()                                  // Начало воспроизведения
             }
             
             if (audioPlayer == null) {
@@ -292,7 +294,6 @@ actual class MusicPlayer {
             println("Ошибка при попытке воспроизведения: ${e.message}")
         }
     }
-
     
     actual fun stop() {
         audioPlayer?.stop()

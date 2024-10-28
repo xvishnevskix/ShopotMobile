@@ -14,7 +14,7 @@ actual fun closeApp() {
 }
 
 actual fun isScreenOn(): Boolean {
-    return false
+    return true
 }
 
 actual fun setScreenLockFlags(showWhenLocked: Boolean) {
