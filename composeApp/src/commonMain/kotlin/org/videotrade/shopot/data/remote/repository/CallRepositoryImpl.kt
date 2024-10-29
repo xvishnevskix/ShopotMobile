@@ -111,8 +111,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //        ),
         IceServer(
             urls = listOf(
-                "turn:89.221.60.156:3478",
-//                "turn:89.221.60.161:3478",
+//                "turn:89.221.60.156:3478",
+                "turn:89.221.60.161:3478",
 //                "turn:videotradedev2.ru:3478",
             ),
             username = "andrew",

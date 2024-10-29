@@ -261,7 +261,10 @@ suspend fun handleConnectWebSocket(
                                             chatsUseCase.updateLastMessageChat(messageNew)
                                              val musicPlayer = AudioFactory.createMusicPlayer()
                                             
-                                            musicPlayer.play("newmess", false)
+                                            
+                                            if(message.fromUser != userId) {
+                                                musicPlayer.play("newmess", false)
+                                            }
                                             
                                         }
 
@@ -344,8 +347,12 @@ suspend fun handleConnectWebSocket(
                                             
                                             val musicPlayer = AudioFactory.createMusicPlayer()
                                             
-                                            musicPlayer.play("newmess", false)
-                                        }
+                                            println("(message.fromUser ${message.fromUser} ${userId}")
+                                            
+                                            
+                                            if(message.fromUser != userId) {
+                                                musicPlayer.play("newmess", false)
+                                            }                                     }
 
                                     } catch (e: Exception) {
 
@@ -589,8 +596,11 @@ suspend fun handleConnectWebSocket(
                                             
                                             val musicPlayer = AudioFactory.createMusicPlayer()
                                             
-                                            musicPlayer.play("newmess", false)
-                                        }
+                                            println("(message.fromUser ${message.fromUser} ${userId}")
+                                            
+                                            if(message.fromUser != userId) {
+                                                musicPlayer.play("newmess", false)
+                                            }                                       }
 
                                     } catch (e: Exception) {
 

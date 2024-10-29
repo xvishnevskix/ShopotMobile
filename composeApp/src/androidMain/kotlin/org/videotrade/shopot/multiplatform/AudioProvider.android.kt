@@ -238,8 +238,8 @@ actual class MusicPlayer {
                     mediaPlayer = MediaPlayer().apply {
                         setDataSource(tempFile.absolutePath)
                         setAudioStreamType(AudioManager.STREAM_ALARM) // Устанавливаем поток как системный (сигнал/уведомление)
-                        isLooping =
-                            isRepeat // Устанавливаем цикличное воспроизведение в зависимости от параметра isRepeat
+                        isLooping =false
+//                            isRepeat // Устанавливаем цикличное воспроизведение в зависимости от параметра isRepeat
                         prepare()
                         start()
                     }
