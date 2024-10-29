@@ -375,25 +375,25 @@ fun MessageBox(
                                 }
                             }
 
-                            // Проверка на персональный чат
-                            if (!chat.personal) {
-                                if (message.fromUser != profile.id) {
-                                    Text(
-                                        text = messageSenderName,
-                                        style = TextStyle(
-                                            color = Color.Gray,
-                                            fontSize = 12.sp,
-                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                        ),
-                                        modifier = Modifier.padding(
-                                            start = 25.dp,
-                                            end = 25.dp,
-                                            top = 7.dp,
-                                            bottom = 0.dp
-                                        ),
-                                    )
-                                }
-                            }
+//                            // Проверка на персональный чат
+//                            if (!chat.personal) {
+//                                if (message.fromUser != profile.id) {
+//                                    Text(
+//                                        text = messageSenderName,
+//                                        style = TextStyle(
+//                                            color = Color.Gray,
+//                                            fontSize = 12.sp,
+//                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+//                                        ),
+//                                        modifier = Modifier.padding(
+//                                            start = 25.dp,
+//                                            end = 25.dp,
+//                                            top = 7.dp,
+//                                            bottom = 0.dp
+//                                        ),
+//                                    )
+//                                }
+//                            }
 
                             // Пересланное сообщение
                             if (message.forwardMessage == true) {
