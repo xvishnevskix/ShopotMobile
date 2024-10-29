@@ -43,6 +43,10 @@ actual fun isScreenOn(): Boolean {
 }
 
 actual fun setScreenLockFlags(showWhenLocked: Boolean) {
+    
+    println("setScreenLockFlags")
+    
+    
     val activity = getContextObj.getActivity() as ComponentActivity
     
     activity.setShowWhenLocked(showWhenLocked)

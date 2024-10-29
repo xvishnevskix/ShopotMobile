@@ -46,7 +46,7 @@ fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderNam
         val photoFileName = attachments[0].photoName
         
         val existingPhotoFile = photoFileName?.let {
-            fileProvider.existingFile(it, "imageCache")
+            fileProvider.existingFileInDir(it, "imageCache")
         }
         
         if (!existingPhotoFile.isNullOrBlank()) {

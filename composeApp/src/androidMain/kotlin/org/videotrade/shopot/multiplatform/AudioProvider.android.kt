@@ -1,8 +1,11 @@
 package org.videotrade.shopot.multiplatform
 
 import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.AudioManager
+import android.media.AudioManager.ADJUST_UNMUTE
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
@@ -31,33 +34,54 @@ actual class AudioRecorder(private val context: Context) {
     }
     
     actual fun stopRecording(getDir: Boolean): String? {
-        mediaRecorder?.apply {
-            stop()
-            release()
-        }
-        mediaRecorder = null
-        
-        return if (getDir) {
-            val file = File(outputFile)
-            println("outputFile $outputFile")
-            if (!file.exists()) return null
+        try {
             
-            val fileSize = file.length().toInt()
-            val byteArray = ByteArray(fileSize)
-            val fis = FileInputStream(file)
-            fis.read(byteArray)
-            fis.close()
-            unmuteAllAudioSources()
-            outputFile // Return the absolute path to the file
-        } else {
-            val file = File(outputFile)
-            if (!file.exists()) return null
-            file.delete()
-            unmuteAllAudioSources()
+            mediaRecorder?.apply {
+                stop()
+                release()
+            }
+            mediaRecorder = null
             
+            return if (getDir) {
+                val file = File(outputFile)
+                println("outputFile $outputFile")
+                if (!file.exists()) return null
+                println("11111")
+                
+                val fileSize = file.length().toInt()
+                println("22222")
+                
+                val byteArray = ByteArray(fileSize)
+                println("33333")
+                
+                val fis = FileInputStream(file)
+                println("44444")
+                
+                fis.read(byteArray)
+                println("55555")
+                
+                fis.close()
+                println("66666")
+                
+                unmuteAllAudioSources(getContextObj.getContext())
+                println("7777")
+                
+                outputFile // Return the absolute path to the file
+            } else {
+                val file = File(outputFile)
+                if (!file.exists()) return null
+                file.delete()
+                unmuteAllAudioSources(getContextObj.getContext())
+                
+                return null
+            }
+        } catch (e: Exception) {
+            println("error $e")
             return null
+            
         }
     }
+    
     
     private fun stopAllAudioSources() {
         // Release the current MediaRecorder if it is still active
@@ -76,13 +100,21 @@ actual class AudioRecorder(private val context: Context) {
         audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true)
     }
     
-    fun unmuteAllAudioSources() {
+    private fun unmuteAllAudioSources(context: Context) {
         val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false)
-        audioManager.setStreamMute(AudioManager.STREAM_ALARM, false)
-        audioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false)
-        audioManager.setStreamMute(AudioManager.STREAM_RING, false)
-        audioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false)
+        if (hasDndPermission(context)) {
+            audioManager.adjustStreamVolume(AudioManager.STREAM_NOTIFICATION, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_ALARM, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_RING, ADJUST_UNMUTE, 0)
+            audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM, ADJUST_UNMUTE, 0)
+        }
+    }
+    
+    private fun hasDndPermission(context: Context): Boolean {
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        return notificationManager.isNotificationPolicyAccessGranted
     }
 }
 
@@ -149,6 +181,11 @@ actual object AudioFactory {
     actual fun createAudioPlayer(): AudioPlayer {
         return AudioPlayer(applicationContext)
     }
+    
+    
+    actual fun createMusicPlayer(): MusicPlayer {
+        return MusicPlayer()
+    }
 }
 
 
@@ -156,37 +193,88 @@ actual class MusicPlayer {
     
     private var mediaPlayer: MediaPlayer? = null
     
-    // Метод для воспроизведения музыки
-    actual fun play(musicName: String) {
+    actual fun play(musicName: String, isRepeat: Boolean, isCategoryMusic: MusicType) {
         try {
             val context = getContextObj.getContext()
+            val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             
-            if (mediaPlayer == null) {
-                // Получаем AssetManager для доступа к ресурсам assets
-                val assetManager = context.assets
-                
-                // Открываем файл из assets
-                val inputStream = assetManager.open("${musicName}.mp3")
-                
-                // Создаем временный файл для проигрывания (т.к. MediaPlayer не работает напрямую с InputStream)
-                val tempFile = File.createTempFile("music", ".mp3", context.cacheDir)
-                val outputStream = FileOutputStream(tempFile)
-                inputStream.copyTo(outputStream)
-                inputStream.close()
-                outputStream.close()
-                
-                // Инициализация MediaPlayer с временным файлом
-                mediaPlayer = MediaPlayer().apply {
-                    setDataSource(tempFile.absolutePath)
-                    isLooping = true // Устанавливаем цикличное проигрывание
-                    prepare() // Подготовка MediaPlayer
-                    start() // Начинаем воспроизведение
+            // Запрашиваем аудио фокус для системного звука
+            val focusRequest = audioManager.requestAudioFocus(
+                { focusChange ->
+                    if (isRepeat) {
+                        when (focusChange) {
+                            AudioManager.AUDIOFOCUS_LOSS -> {
+                                mediaPlayer?.pause()
+                            }
+                            
+                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                                mediaPlayer?.pause()
+                            }
+                            
+                            AudioManager.AUDIOFOCUS_GAIN -> {
+                                mediaPlayer?.start()
+                            }
+                        }
+                    } else {
+                        mediaPlayer?.start()
+                    }
+                    
+                    
+                },
+                AudioManager.STREAM_ALARM, // Используем системный поток для уведомлений/сигналов
+                AudioManager.AUDIOFOCUS_GAIN
+            )
+            
+            if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                if (mediaPlayer == null) {
+                    val assetManager = context.assets
+                    val inputStream = assetManager.open("${musicName}.mp3")
+                    
+                    val tempFile = File.createTempFile("system_sound", ".mp3", context.cacheDir)
+                    val outputStream = FileOutputStream(tempFile)
+                    inputStream.copyTo(outputStream)
+                    inputStream.close()
+                    outputStream.close()
+                    
+                    mediaPlayer = MediaPlayer().apply {
+                        setDataSource(tempFile.absolutePath)
+                        
+                        
+                        val audioAttributes = when (isCategoryMusic) {
+                            MusicType.Notification -> {
+                                AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_NOTIFICATION) // Устанавливаем использование для уведомлений
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для системных звуков
+                                    .build()
+                            }
+                            
+                            MusicType.Ringtone -> AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE) // Устанавливаем использование для мелодии звонка
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для звуков оповещений и звонков
+                                .build()
+                            
+                            else -> AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_NOTIFICATION) // Устанавливаем использование для уведомлений
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для системных звуков
+                                .build()
+                        }
+                        
+                        
+                        setAudioAttributes(audioAttributes) // Устанавливаем аудио атрибуты
+                        isLooping =
+                            isRepeat // Устанавливаем цикличное воспроизведение в зависимости от параметра isRepeat
+                        prepare()
+                        start()
+                    }
+                    
+                } else {
+                    mediaPlayer?.start()
                 }
             } else {
-                mediaPlayer?.start() // Продолжаем проигрывание, если оно было приостановлено
+                println("Не удалось получить аудио фокус.")
             }
         } catch (e: Exception) {
-        println("e: $e")
+            println("e: $e")
         }
     }
     
@@ -196,6 +284,11 @@ actual class MusicPlayer {
         mediaPlayer?.reset()
         mediaPlayer?.release()
         mediaPlayer = null
+    }
+    
+    fun stopMediaPlayer() {
+        mediaPlayer?.stop()
+        
     }
     
     // Проверка, воспроизводится ли музыка

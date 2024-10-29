@@ -53,9 +53,10 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
-import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
+import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -110,7 +111,7 @@ class CallScreen(
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
-        val musicPlayer = remember { MusicPlayer() }
+        val musicPlayer = remember { AudioFactory.createMusicPlayer()  }
         
         var isPlaying by remember { mutableStateOf(false) }
         
@@ -127,10 +128,10 @@ class CallScreen(
         
         LaunchedEffect(Unit) {
             if (isIncomingCall) {
-                musicPlayer.play("callee")
+                musicPlayer.play("callee", true, MusicType.Ringtone)
                 isPlaying = true
             } else {
-                musicPlayer.play("caller")
+                musicPlayer.play("caller", true,  MusicType.Ringtone)
                 isPlaying = true
             }
             
@@ -144,9 +145,11 @@ class CallScreen(
         }
         
         DisposableEffect(Unit) {
-            setScreenLockFlags(false)
-            
             onDispose {
+                
+                println("DisposableEffect")
+                setScreenLockFlags(false)
+                
                 if (
                     isPlaying
                 ) {

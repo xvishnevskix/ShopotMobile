@@ -30,15 +30,13 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.seiko.imageloader.rememberImagePainter
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
+import getImageStorage
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.ChatItem
-import org.videotrade.shopot.domain.model.MessageItem
-import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -47,7 +45,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
 class ProfileChatScreen(private val chat: ChatItem) : Screen {
-
+    
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
@@ -58,20 +56,20 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
             derivedStateOf { pagerState.currentPage }
         }
         println("sssssss ${chat.userId}")
-
+        
         val tabs = ProfileMediaTabs.entries.map { tab ->
             org.videotrade.shopot.presentation.screens.group.TabInfo(
                 title = stringResource(tab.titleResId),
                 text = stringResource(tab.textResId)
             )
         }
-
-
+        
+        
         Box(
             modifier = Modifier.fillMaxSize().background(Color.White),
             contentAlignment = Alignment.TopStart
         ) {
-
+            
             Column {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -87,13 +85,21 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         size = 186.dp,
                         onClick = {
                             println("AAAAA")
-                            navigator.push(
-                                PhotoViewerScreen(
-                                    imageFilePath = null,
-                                    messageSenderName = "${chat.firstName} ${chat.lastName}",
-                                    icon = chat.icon,
-                                )
-                            )
+                            
+                            scope.launch {
+                                val imageBitmap = getImageStorage(chat.icon, chat.icon, false)
+                                println(" imageBitmap $imageBitmap")
+                                imageBitmap?.let {
+                                    navigator.push(
+                                        PhotoViewerScreen(
+                                            it,
+                                            messageSenderName = "${chat.firstName} ${chat.lastName}",
+                                        )
+                                    )
+                                }
+                                
+                            }
+                            
                         }
                     )
                     Text(
@@ -122,7 +128,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                                 color = Color(0xFF979797)
                             )
                         }
-
+                        
                         if (chat.chatUser?.get(0)?.login != null) {
                             Text(
                                 chat.chatUser!![0].login!!,
@@ -135,8 +141,8 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                             )
                         }
                     }
-
-
+                    
+                    
                     if (chat.chatUser?.get(0)?.description != null) {
                         Text(
                             chat.chatUser!![0].description!!,
@@ -188,7 +194,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
 //                            )
 //                        }
                 }
-
+                
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -321,10 +327,10 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
 //                        }
 //                    }
 //                }
-
+            
             }
         }
-
+        
     }
 }
 
@@ -349,7 +355,7 @@ enum class ProfileMediaTabs(
         titleResId = MokoRes.strings.links,
         textResId = MokoRes.strings.nothing_here
     );
-
+    
     companion object {
         @Composable
         fun createTabs(): List<TabInfo> {

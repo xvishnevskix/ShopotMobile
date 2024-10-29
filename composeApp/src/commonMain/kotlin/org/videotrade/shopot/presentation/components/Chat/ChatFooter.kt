@@ -162,7 +162,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: Mutabl
                                 PermissionsProviderFactory.create().getPermission("microphone")
                             if (microphonePer) {
                                 val audioFilePathNew = FileProviderFactory.create()
-                                    .getFilePath(
+                                    .createNewFileWithApp(
                                         voiceName,
                                         "audio/mp4"
                                     ) // Генерация пути к файлу
@@ -797,8 +797,6 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: Mutabl
                                                 
                                                 recordingTime = 0
                                                 isDragging = false
-                                                
-                                                
                                             },
                                             onPress = {
                                                 if (!isDragging) {

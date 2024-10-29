@@ -18,6 +18,7 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.test.TestScreen
 import org.videotrade.shopot.theme.AppTheme
 
 @Composable
@@ -25,7 +26,7 @@ internal fun App() = AppTheme {
     val viewModel: MainViewModel = koinInject()
     val commonViewModel: CommonViewModel = koinInject()
     val callViewModel: CallViewModel = koinInject()
-
+    
     KoinContext {
         if (callViewModel.isCallBackground.value) {
             isActiveCall(callViewModel)
@@ -33,7 +34,8 @@ internal fun App() = AppTheme {
             setScreenLockFlags(false)
             
             Navigator(
-                IntroScreen()
+//                IntroScreen()
+                TestScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }
@@ -46,36 +48,36 @@ internal fun App() = AppTheme {
 @Composable
 fun isActiveCall(callViewModel: CallViewModel) {
     val isScreenOn by callViewModel.isScreenOn.collectAsState()
-
+    
     val profileId = getValueInStorage("profileId")
     
     val answerData = callViewModel.answerData.value
-
-
+    
+    
     val userJson =
         answerData?.jsonObject?.get("user")?.jsonObject
-
-
+    
+    
     val user =
         Json.decodeFromString<ProfileDTO>(userJson.toString())
-
+    
     LaunchedEffect(Unit) {
         if (profileId != null) {
-
+            
             callViewModel.callScreenInfo.value =
                 CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
-
+            
             if (!callViewModel.isIncomingCall.value) {
                 callViewModel.initWebrtc()
             }
         }
     }
-
-
-
+    
+    
+    
     if (!isScreenOn) {
     }
-
+    
     Navigator(
         CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
     ) { navigator ->

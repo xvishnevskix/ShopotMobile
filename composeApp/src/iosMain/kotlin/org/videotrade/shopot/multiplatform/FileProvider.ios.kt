@@ -10,7 +10,6 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onUpload
-import io.ktor.client.request.forms.InputProvider
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.header
@@ -40,15 +39,12 @@ import kotlinx.cinterop.reinterpret
 import kotlinx.cinterop.toKString
 import kotlinx.cinterop.usePinned
 import kotlinx.cinterop.value
-import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.domain.model.FileDTO
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import platform.CoreFoundation.CFRelease
 import platform.CoreFoundation.CFStringCreateWithCString
 import platform.CoreFoundation.CFStringGetCString
@@ -63,8 +59,6 @@ import platform.Foundation.NSCachesDirectory
 import platform.Foundation.NSData
 import platform.Foundation.NSDocumentDirectory
 import platform.Foundation.NSError
-import platform.Foundation.NSFileCoordinator
-import platform.Foundation.NSFileCoordinatorReadingOptions
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSFileSize
 import platform.Foundation.NSMakeRange
@@ -89,9 +83,9 @@ import platform.darwin.NSObject
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import platform.Foundation.*
-import kotlin.concurrent.AtomicReference
 
 actual class FileProvider {
+    private val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {
@@ -362,7 +356,7 @@ actual class FileProvider {
     }
     
     private fun createTempFile(filename: String): NSURL {
-        val tempDir = NSTemporaryDirectory() as String
+        val tempDir = NSTemporaryDirectory()
         val tempPath = tempDir + filename
         return NSURL.fileURLWithPath(tempPath)
     }
@@ -603,70 +597,10 @@ actual class FileProvider {
     
     
     @OptIn(InternalAPI::class)
-    actual suspend fun uploadFileToDirectory(
-        url: String,
-        fileDirectory: String,
-        contentType: String,
-        filename: String,
-        onProgress: (Float) -> Unit
-    ): FileDTO? {
-        val client = HttpClient(Darwin) {
-            install(HttpTimeout) {
-                requestTimeoutMillis = 600_000
-                connectTimeoutMillis = 600_000
-                socketTimeoutMillis = 600_000
-            }
-        }
-        
-        // Get the file from the provided directory
-        val file = NSURL.fileURLWithPath(fileDirectory)
-        val fileData = NSData.dataWithContentsOfURL(file) ?: return null
-        
-        
-        try {
-            val token = getValueInStorage("accessToken")
-            
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
-                body = MultiPartFormDataContent(
-                    formData {
-                        append("file", fileData.toByteArray(),
-                            Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
-                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
-                            }
-                        )
-                    }
-                )
-                header(HttpHeaders.Authorization, "Bearer $token")
-                
-                onUpload { bytesSentTotal, contentLength ->
-                    if (contentLength != -1L) { // -1 means that the content length is unknown
-                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
-                        onProgress(progress)
-                    }
-                }
-            }
-            
-            if (response.status.isSuccess()) {
-                val responseData: FileDTO = Json.decodeFromString(response.bodyAsText())
-                return responseData
-            } else {
-                println("Failed to retrieve data: ${response.status.description} ${response.request}")
-                return null
-            }
-        } catch (e: Exception) {
-            println("File upload failed: ${e.message}")
-            return null
-        } finally {
-            client.close()
-        }
-    }
-    
-    @OptIn(InternalAPI::class)
     actual suspend fun uploadCipherFile(
         url: String,
         fileDirectory: String,
-        contentType: String,
+        fileType: String,
         filename: String,
         onProgress: (Float) -> Unit
     ): String? {
@@ -683,13 +617,13 @@ actual class FileProvider {
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
         
-        println("22222 $filename $contentType")
+        println("22222 $filename $fileType")
         
         val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
         
         
         val cipherFilePath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 fileNameCipher,
                 "cipher"
             )
@@ -723,9 +657,10 @@ actual class FileProvider {
             val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
                 body = MultiPartFormDataContent(
                     formData {
-                        append("file", fileData.toByteArray(),
+                        append("file",
+                            fileData.toByteArray(),
                             Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
+                                append(HttpHeaders.ContentType, fileType)
                                 append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
                             }
                         )
@@ -936,13 +871,13 @@ actual class FileProvider {
         
         
         val cipherVideoPath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 videoNameCipher,
                 "cipher"
             )
         
         val cipherPhotoPath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 photoNameCipher,
                 "cipher"
             )
@@ -1069,6 +1004,283 @@ actual class FileProvider {
         return null
     }
     
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun createNewFileWithApp(fileName: String, fileType: String): String? {
+        // Получаем путь к каталогу для хранения файла в зависимости от типа файла
+        val directoryPath = when (fileType) {
+            "audio" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Audio"
+            }
+            "video" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Video"
+            }
+            "image" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Images"
+            }
+            "document" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Documents"
+            }
+            "zip" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Zips"
+            }
+            "cipher" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/CipherFiles"
+            }
+            "cache" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/CacheFiles"
+            }
+            else -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Others"
+            }
+        }
+        
+        // Проверка, удалось ли получить путь к каталогу
+        if (directoryPath == null) {
+            println("Ошибка: не удалось получить путь к каталогу")
+            return null
+        }
+        
+        // Создаем папку, если она не существует
+        val fileManager = NSFileManager.defaultManager
+        if (!fileManager.fileExistsAtPath(directoryPath)) {
+            fileManager.createDirectoryAtPath(directoryPath, true, null, null)
+        }
+        
+        // Проверка, существует ли файл с таким именем
+        val filePath = "$directoryPath/$fileName"
+        if (fileManager.fileExistsAtPath(filePath)) {
+            println("Файл уже существует: $filePath")
+            return null
+        }
+        
+        println("Путь к файлу: $filePath")
+        
+        return filePath
+    }
+    
+    
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun saveFileInDir(fileName: String, fileDirectory: String, fileType: String): String? {
+        val fileManager = NSFileManager.defaultManager
+        
+        // Проверяем, существует ли исходный файл
+        if (!fileManager.fileExistsAtPath(fileDirectory)) {
+            println("Исходный файл не найден: $fileDirectory")
+            return null
+        }
+        
+        // Определяем каталог для сохранения файла в зависимости от типа файла
+        val directoryPath = when (fileType) {
+            "audio" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Audio"
+            }
+            "video" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Video"
+            }
+            "image" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Images"
+            }
+            "document" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Documents"
+            }
+            "zip" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Zips"
+            }
+            "cipher" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/CipherFiles"
+            }
+            "cache" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/CacheFiles"
+            }
+            else -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Others"
+            }
+        }
+        
+        // Проверка, удалось ли получить путь к каталогу
+        if (directoryPath == null) {
+            println("Ошибка: не удалось получить путь к каталогу")
+            return null
+        }
+        
+        // Создаем каталог, если он не существует
+        if (!fileManager.fileExistsAtPath(directoryPath)) {
+            try {
+                fileManager.createDirectoryAtPath(directoryPath, true, null, null)
+            } catch (e: Exception) {
+                println("Ошибка при создании каталога: ${e}")
+                return null
+            }
+        }
+        
+        // Определяем путь для нового файла
+        val destinationFilePath = "$directoryPath/$fileName"
+        val success = fileManager.copyItemAtPath(fileDirectory, destinationFilePath, null)
+        
+        return if (success) {
+            println("Файл успешно сохранен: $destinationFilePath")
+            destinationFilePath
+        } else {
+            println("Ошибка при копировании файла")
+            null
+        }
+    }
+    
+    actual suspend fun uploadFileNotInput(
+        url: String,
+        fileDirectory: String,
+        fileType: String,
+        filename: String,
+        onProgress: (Float) -> Unit
+    ): String? {
+        val client = HttpClient(Darwin) {
+            install(HttpTimeout) {
+                requestTimeoutMillis = 600_000
+                connectTimeoutMillis = 600_000
+                socketTimeoutMillis = 600_000
+            }
+        }
+        
+        println("$fileDirectory $fileType $filename"
+        )
+        try {
+            val token = getValueInStorage("accessToken")
+            
+            val sharedSecret = getValueInStorage("sharedSecret")
+            
+            val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
+            
+            val cipherFilePath = createNewFileWithApp(
+                fileNameCipher,
+                "cipher"
+            ) ?: return null
+            
+            val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
+                fileDirectory,
+                cipherFilePath,
+                sharedSecret?.decodeBase64Bytes()!!
+            ) ?: return null
+            
+            
+            val file = NSURL.fileURLWithPath(cipherFilePath)
+            val cipherFile = NSData.dataWithContentsOfURL(file) ?: return null
+            
+            
+            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {
+                            append(
+                                "file",
+                                cipherFile.toByteArray(),
+                                Headers.build {
+                                    append(HttpHeaders.ContentType, fileType)
+                                    append(
+                                        HttpHeaders.ContentDisposition,
+                                        "filename=\"${filename}\""
+                                    )
+                                }
+                            )
+                            
+                            append(
+                                "encupsFile",
+                                Json.encodeToString(
+                                    EncapsulationFileResult.serializer(),
+                                    encupsChachaFileResult
+                                )
+                            )
+                        }
+                    )
+                )
+                
+                
+                
+                onUpload { bytesSentTotal, contentLength ->
+                    if (contentLength != -1L) { // -1 means that the content length is unknown
+                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
+                        onProgress(progress)
+                    }
+                }
+                header(HttpHeaders.Authorization, "Bearer $token")
+            }
+            
+            if (response.status.isSuccess()) {
+                val jsonElement = Json.parseToJsonElement(response.bodyAsText())
+                
+                println("jsonElementFile ${jsonElement}")
+                
+                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
+                
+                saveFileInDir(filename, fileDirectory, fileType)
+                
+                deleteFile(cipherFilePath)
+                
+                return id
+            } else {
+                println("Failed to retrieve data: ${response.status.description} ${response.request}")
+                return null
+            }
+        } catch (e: Exception) {
+            println("File upload failed: ${e.message}")
+            return null
+            
+        } finally {
+            
+            client.close()
+            
+        }
+    }
+    
+    
+    actual fun existingFileInDir(fileName: String, fileType: String): String? {
+        // Определяем каталог для поиска файла в зависимости от типа файла
+        val directoryPath = when (fileType) {
+            "audio" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Audio"
+            }
+            "video" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Video"
+            }
+            "image" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Images"
+            }
+            "document" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Documents"
+            }
+            "zip" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Zips"
+            }
+            "cipher" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/CipherFiles"
+            }
+            "cache" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/CacheFiles"
+            }
+            else -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+                "$it/Others"
+            }
+        }
+        
+        // Проверяем, удалось ли получить путь к каталогу
+        if (directoryPath == null) {
+            println("Ошибка: не удалось получить путь к каталогу")
+            return null
+        }
+        
+        // Формируем полный путь к файлу
+        val filePath = "$directoryPath/$fileName"
+        val fileManager = NSFileManager.defaultManager
+        
+        // Проверяем, существует ли файл по указанному пути
+        return if (fileManager.fileExistsAtPath(filePath)) {
+            println("Файл найден: $filePath")
+            filePath
+        } else {
+            println("Файл не найден: $fileName в каталоге $directoryPath")
+            null
+        }
+    }
+    
 }
 
 actual object FileProviderFactory {
@@ -1078,3 +1290,23 @@ actual object FileProviderFactory {
 }
 
 
+@OptIn(ExperimentalForeignApi::class)
+fun deleteFile(filePath: String): Boolean {
+    val fileManager = NSFileManager.defaultManager
+    
+    // Проверяем, существует ли файл по указанному пути
+    if (fileManager.fileExistsAtPath(filePath)) {
+        return try {
+            // Удаляем файл
+            fileManager.removeItemAtPath(filePath, null)
+            println("Файл успешно удален: $filePath")
+            true
+        } catch (e: Exception) {
+            println("Ошибка при удалении файла: ${e}")
+            false
+        }
+    } else {
+        println("Файл не найден: $filePath")
+      return  false
+    }
+}

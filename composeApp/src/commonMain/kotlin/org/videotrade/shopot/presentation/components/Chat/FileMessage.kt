@@ -141,7 +141,7 @@ fun FileMessage(
         val fileName = attachments[0].name
         println("fileName $fileName")
         
-        val existingFile = audioFile.existingFile(fileName, attachments[0].type)
+        val existingFile = audioFile.existingFileInDir(fileName, attachments[0].type)
         
         if (!existingFile.isNullOrBlank()) {
             isLoadingSuccess = true

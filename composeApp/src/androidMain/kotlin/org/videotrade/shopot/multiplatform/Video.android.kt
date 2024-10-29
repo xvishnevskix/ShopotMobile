@@ -2,7 +2,6 @@ package org.videotrade.shopot.multiplatform
 
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
-import android.net.Uri
 import android.os.Environment
 import android.widget.MediaController
 import android.widget.VideoView
@@ -26,20 +25,23 @@ actual fun getAndSaveFirstFrame(
         val bitmap = retriever.getFrameAtTime(0) // Получаем первый кадр (на временной отметке 0)
         val fileName = "${Random.nextInt(1, 2001)}_frame.png"
         bitmap?.let {
-            // Указываем папку "Загрузки"
-            val downloadsDir = getContextObj.getContext().cacheDir
+            val downloadsDir = File(
+                getContextObj.getContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES),
+                "Images"
+            )
+            
             
             val file = File(downloadsDir, fileName)
-
+            
             // Сохраняем Bitmap в файл
             FileOutputStream(file).use { out ->
                 it.compress(Bitmap.CompressFormat.PNG, 100, out)
             }
-
+            
             // Получаем массив байтов из Bitmap
             val stream = ByteArrayOutputStream()
             it.compress(Bitmap.CompressFormat.PNG, 100, stream)
-
+            
             completion(
                 fileName,
                 file.absolutePath,
@@ -53,13 +55,14 @@ actual fun getAndSaveFirstFrame(
         retriever.release()
     }
 }
+
 @Composable
 actual fun VideoPlayer(modifier: Modifier, filePath: String) {
     // Преобразование пути к файлу в URI
     if (!File(filePath).exists()) {
-      return
+        return
     }
-
+    
     AndroidView(
         modifier = modifier,
         factory = { context ->

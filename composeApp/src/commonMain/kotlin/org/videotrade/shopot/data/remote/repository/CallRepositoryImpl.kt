@@ -75,29 +75,53 @@ import kotlin.random.Random
 class CallRepositoryImpl : CallRepository, KoinComponent {
     
     private val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+
+//    private val iceServers = listOf(
+//        "stun:stun.l.google.com:19302",
+//        "stun:stun1.l.google.com:19302",
+//        "stun:stun2.l.google.com:19302",
+//    )
+//
+//    private val turnServers = listOf(
+////        "turn:89.221.60.156:3478",
+//        "turn:89.221.60.161:3478",
+//    )
+//
+//    // Создание конфигурации для PeerConnection
+//    private val rtcConfiguration = RtcConfiguration(
+//        iceServers = listOf(
+//            IceServer(iceServers),
+//            IceServer(
+//                urls = turnServers, // URL TURN сервера
+//                username = "andrew", // Имя пользователя
+//                password = "kapustin" // Пароль
+//            )
+//        )
+//    )
     
     private val iceServers = listOf(
-        "stun:stun.l.google.com:19302",
-        "stun:stun1.l.google.com:19302",
-        "stun:stun2.l.google.com:19302",
-    )
-    
-    private val turnServers = listOf(
-//        "turn:89.221.60.156:3478",
-        "turn:89.221.60.161:3478?transport=udp",
+//        IceServer(
+//            urls = listOf("stun:stun.l.google.com:19302")
+//        ),
+//        IceServer(
+//            urls = listOf("stun:stun1.l.google.com:19302")
+//        ),
+//        IceServer(
+//            urls = listOf("stun:stun2.l.google.com:19302")
+//        ),
+        IceServer(
+            urls = listOf(
+//                "turn:89.221.60.156:3478",
+                "turn:89.221.60.161:3478",
+//                "turn:videotradedev2.ru:3478",
+            ),
+            username = "andrew",
+            password = "kapustin",
+        )
     )
     
     // Создание конфигурации для PeerConnection
-    private val rtcConfiguration = RtcConfiguration(
-        iceServers = listOf(
-            IceServer(iceServers),
-            IceServer(
-                urls = turnServers, // URL TURN сервера
-                username = "andrew", // Имя пользователя
-                password = "kapustin" // Пароль
-            )
-        )
-    )
+    private val rtcConfiguration = RtcConfiguration(iceServers = iceServers)
     
     
     private fun generateRandomNumber(): String {
@@ -340,7 +364,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         clearNotificationsForChannel("OngoingCallChannel")
                                         
-                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value}")
+                                        println("fafafasfa515151151 ${isScreenOn()}")
                                         
                                         
                                         val callViewModel: CallViewModel =
@@ -406,203 +430,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         }
     }
     
-    override suspend fun connectionBackgroundWs(userId: String) {
-        val httpClient = HttpClient {
-            install(WebSockets)
-        }
-        
-        val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
-        
-        if (!_isConnectedWs.value) {
-            try {
-                httpClient.webSocket(
-                    method = HttpMethod.Get,
-                    host = webSocketsUrl,
-                    port = 3006,
-                    path = "/ws?callerId=${userId}",
-                ) {
-                    _wsSession.value = this
-                    _isConnectedWs.value = true
-                    println("Connection Call")
-                    
-                    val callOutputRoutine = launch {
-                        for (frame in incoming) {
-                            if (frame is Frame.Text) {
-                                
-                                val text = frame.readText()
-                                
-                                
-                                val jsonElement = Json.parseToJsonElement(text)
-                                
-                                println("jsonElement1112 $jsonElement")
-                                
-                                
-                                val type = jsonElement.jsonObject["type"]?.jsonPrimitive?.content
-                                
-                                println("jsonElement1112 $type")
-                                
-                                
-                                val rtcMessage = jsonElement.jsonObject["rtcMessage"]?.jsonObject
-                                
-                                
-                                
-                                when (type) {
-                                    "newCall" -> {
-                                        try {
-                                            val contactsUseCase: ContactsUseCase by inject()
-                                            
-                                            val cameraPer = PermissionsProviderFactory.create()
-                                                .getPermission("microphone")
-                                            
-                                            if (cameraPer) {
-                                                rtcMessage?.let {
-                                                    val userJson =
-                                                        jsonElement.jsonObject["user"]?.jsonObject
-                                                    
-                                                    
-                                                    var user =
-                                                        Json.decodeFromString<ProfileDTO>(userJson.toString())
-                                                    
-                                                    
-                                                    println("aadauser $user")
-                                                    
-                                                    val sdp =
-                                                        it["sdp"]?.jsonPrimitive?.content
-                                                            ?: return@launch
-                                                    
-                                                    
-                                                    val callerId =
-                                                        jsonElement.jsonObject["callerId"]?.jsonPrimitive?.content
-                                                    
-                                                    offer.value = SessionDescription(
-                                                        SessionDescriptionType.Offer,
-                                                        sdp
-                                                    )
-                                                    
-                                                    
-                                                    
-                                                    callerId?.let { userId ->
-                                                        
-                                                        
-                                                        otherUserId.value = userId
-                                                        
-                                                        val contact = findContactByPhone(
-                                                            user.phone,
-                                                            contactsUseCase.contacts.value
-                                                        )
-                                                        if (
-                                                            contact !== null && contact.firstName !== null && contact.lastName !== null
-                                                        ) {
-                                                            user = user.copy(
-                                                                firstName = contact.firstName,
-                                                                lastName = contact.lastName
-                                                            )
-                                                        }
-                                                        
-                                                    }
-                                                    
-                                                    
-                                                }
-                                            }
-                                            
-                                            
-                                        } catch (e: Exception) {
-                                            
-                                            println("Error newCall: $e")
-                                        }
-                                    }
-                                    
-                                    "callAnswered" -> {
-                                        rtcMessage?.let {
-                                            
-                                            println("return@launch callAnswered ${it["sdp"]?.jsonPrimitive?.content}")
-                                            
-                                            val sdp =
-                                                it["sdp"]?.jsonPrimitive?.content ?: return@launch
-                                            
-                                            val answer = SessionDescription(
-                                                SessionDescriptionType.Answer,
-                                                sdp
-                                            )
-                                            _peerConnection.value?.setRemoteDescription(answer)
-                                        }
-                                    }
-                                    
-                                    "ICEcandidate" -> {
-                                        rtcMessage?.let {
-                                            Logger.d("ICEcandidate111111 $rtcMessage")
-                                            val jsonElement =
-                                                Json.parseToJsonElement(rtcMessage.toString())
-                                            val label =
-                                                jsonElement.jsonObject["label"]?.jsonPrimitive?.int
-                                            val id =
-                                                jsonElement.jsonObject["id"]?.jsonPrimitive?.content
-                                            val candidate =
-                                                jsonElement.jsonObject["candidate"]?.jsonPrimitive?.content
-                                            
-                                            if (candidate != null && id != null && label != null) {
-                                                val iceCandidate = IceCandidate(
-                                                    candidate = candidate,
-                                                    sdpMid = id,
-                                                    sdpMLineIndex = label
-                                                )
-                                                _peerConnection.value?.addIceCandidate(iceCandidate)
-                                            }
-                                        }
-                                    }
-                                    
-                                    "rejectCall" -> {
-                                        clearNotificationsForChannel("OngoingCallChannel")
-                                        
-                                        val callViewModel: CallViewModel =
-                                            KoinPlatform.getKoin().get()
-                                        
-                                        callViewModel.stopTimer()
-                                        
-                                        setIsCallActive(false)
-                                        
-                                        println("rejectCall1 ${isCall.value} ${isConnectedWebrtc.value} ${isScreenOn()}")
-                                        
-                                        if (isScreenOn()) {
-                                            val navigator = commonViewModel.mainNavigator.value
-                                            
-                                            val currentScreen = navigator?.lastItem
-                                            
-                                            if (_isIncomingCall.value) {
-                                                if (currentScreen is CallScreen) {
-                                                    navigator.push(MainScreen())
-                                                }
-                                            }
-                                            
-                                            if (isCall.value)
-                                                rejectCallAnswer()
-                                            
-                                            if (isConnectedWebrtc.value) {
-                                                if (currentScreen is CallScreen) {
-                                                    navigator.push(MainScreen())
-                                                }
-                                                
-                                            }
-                                        } else {
-                                            rejectCallAnswer()
-                                        }
-                                        
-                                    }
-                                    
-                                }
-                            }
-                        }
-                    }
-                    
-                    callOutputRoutine.join()
-                }
-            } catch (e: Exception) {
-                _isConnectedWs.value = false
-                println("Ошибка соединения: $e")
-            }
-        }
-    }
-    
     
     override suspend fun initWebrtc(): Nothing = coroutineScope {
         
@@ -640,7 +467,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             // Обработка кандидатов ICE
             peerConnection.value!!.onIceCandidate
                 .onEach { candidate ->
-                    Logger.d { "PC2213131" }
+                    println("candidate ${candidate}")
                     
                     val iceCandidateMessage = WebRTCMessage(
                         type = "ICEcandidate",
@@ -1140,7 +967,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _wsSession.value = null
         _iceState.value = IceConnectionState.New
         _callState.value = PeerConnectionState.New
-      
+        
         isMuted.value = false
     }
     

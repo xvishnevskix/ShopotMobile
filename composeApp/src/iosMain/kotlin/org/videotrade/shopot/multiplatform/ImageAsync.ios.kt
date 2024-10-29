@@ -22,7 +22,7 @@ import platform.Foundation.writeToURL
 
 
 actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ByteArray? {
-    val imageExist = FileProviderFactory.create().existingFile(imageId, "image")
+    val imageExist = FileProviderFactory.create().existingFileInDir(imageId, "image")
     val filePath = imageExist ?: downloadImageInCache(imageId)
     
     return if (filePath != null) {
@@ -41,7 +41,7 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
 @OptIn(InternalAPI::class, ExperimentalForeignApi::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
-    val filePath = FileProviderFactory.create().getFilePath(imageId, "image") ?: return null
+    val filePath = FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
     
     println("starting download")
     

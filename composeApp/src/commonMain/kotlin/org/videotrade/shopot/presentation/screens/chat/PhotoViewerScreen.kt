@@ -20,29 +20,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import cafe.adriel.voyager.core.screen.Screen
-import coil3.compose.AsyncImagePainter
-import coil3.compose.rememberAsyncImagePainter
-import com.seiko.imageloader.rememberImagePainter
-import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import getImageStorage
 import org.videotrade.shopot.api.formatTimeOnly
 import org.videotrade.shopot.domain.model.MessageItem
-import org.videotrade.shopot.presentation.components.Common.SafeArea
-import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.person
 
 class PhotoViewerScreen(
-    private val imageFilePath: String?,
+    private val imageBitmap: ImageBitmap,
     private val messageSenderName: String? = null,
-    private val icon: String? = null,
-    private val message: MessageItem? = null,
+    private val imageCreated: List<Int>? = null,
 ) : Screen {
     @Composable
     override fun Content() {
@@ -50,67 +42,61 @@ class PhotoViewerScreen(
         var offset by remember { mutableStateOf(Offset.Zero) }
         var imageSize by remember { mutableStateOf(IntSize.Zero) }
         var isHeaderVisible by remember { mutableStateOf(true) }
-
-        val imagePainter = if (imageFilePath != null) {
-            rememberAsyncImagePainter(imageFilePath)
-        } else {
-            rememberImagePainter("${serverUrl}file/plain/$icon")
-        }
-
-
-            BoxWithConstraints(
+        
+        
+        BoxWithConstraints(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF29303c))
+        ) {
+            Image(
+                bitmap = imageBitmap,
+                contentDescription = null,
+                contentScale = ContentScale.Fit,
                 modifier = Modifier
+                    .graphicsLayer(
+                        scaleX = scale,
+                        scaleY = scale,
+                        translationX = offset.x,
+                        translationY = offset.y
+                    )
                     .fillMaxSize()
-                    .background(Color(0xFF29303c))
-            ) {
-                println("iconiconicon ${icon}")
-                Image(
-                    painter = imagePainter,
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier
-                        .graphicsLayer(
-                            scaleX = scale,
-                            scaleY = scale,
-                            translationX = offset.x,
-                            translationY = offset.y
+                    .onGloballyPositioned { layoutCoordinates ->
+                        imageSize = layoutCoordinates.size
+                    }
+                    .pointerInput(Unit) {
+                        detectTapGestures(
+                            onTap = {
+                                isHeaderVisible = !isHeaderVisible
+                            }
                         )
-                        .fillMaxSize()
-                        .onGloballyPositioned { layoutCoordinates ->
-                            imageSize = layoutCoordinates.size
-                        }
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = {
-                                    isHeaderVisible = !isHeaderVisible
-                                }
+                    }
+                    .pointerInput(Unit) {
+                        detectTransformGestures { _, pan, zoom, _ ->
+                            scale = (scale * zoom).coerceIn(1f, 5f)
+                            
+                            
+                            val maxX = (imageSize.width * (scale - 1)) / 2f
+                            val maxY = (imageSize.height * (scale - 1)) / 2f
+                            
+                            offset = Offset(
+                                x = (offset.x + pan.x).coerceIn(-maxX, maxX),
+                                y = (offset.y + pan.y).coerceIn(-maxY, maxY)
                             )
                         }
-                        .pointerInput(Unit) {
-                            detectTransformGestures { _, pan, zoom, _ ->
-                                scale = (scale * zoom).coerceIn(1f, 5f)
-
-
-                                val maxX = (imageSize.width * (scale - 1)) / 2f
-                                val maxY = (imageSize.height * (scale - 1)) / 2f
-
-                                offset = Offset(
-                                    x = (offset.x + pan.x).coerceIn(-maxX, maxX),
-                                    y = (offset.y + pan.y).coerceIn(-maxY, maxY)
-                                )
-                            }
-                        }
-                )
-
-                AnimatedVisibility(
-                    visible = isHeaderVisible,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                    modifier = Modifier.align(Alignment.TopCenter)
-                ) {
-                    message?.let { formatTimeOnly(it.created) }
-                        ?.let { ViewerHeader("$messageSenderName", it) }
-                }
+                    }
+            )
+            
+            AnimatedVisibility(
+                visible = isHeaderVisible,
+                enter = fadeIn(),
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.TopCenter)
+            ) {
+                imageCreated?.let { formatTimeOnly(it) }
+                
+                ViewerHeader("$messageSenderName")
             }
+        }
     }
 }

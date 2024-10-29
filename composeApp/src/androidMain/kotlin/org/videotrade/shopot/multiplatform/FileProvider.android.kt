@@ -230,13 +230,13 @@ actual class FileProvider(private val applicationContext: Context) {
                 ?: throw IllegalStateException("Access token is missing")
             println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
             
-            val fileDirectory = getFilePath(
+            val fileDirectory = createNewFileWithApp(
                 filename.substringBeforeLast(".", filename),
                 "cipher"
             ) ?: return null
             println("1111111")
             
-            val decryptFilePath = getFilePath(filename, dirType) ?: return null
+            val decryptFilePath = createNewFileWithApp(filename, dirType) ?: return null
             println("222222")
             
             println("decryptFilePath $decryptFilePath")
@@ -321,7 +321,7 @@ actual class FileProvider(private val applicationContext: Context) {
     actual suspend fun uploadCipherFile(
         url: String,
         fileDirectory: String,
-        contentType: String,
+        fileType: String,
         filename: String,
         onProgress: (Float) -> Unit
     ): String? {
@@ -341,13 +341,13 @@ actual class FileProvider(private val applicationContext: Context) {
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
         
-        println("22222 $filename $contentType")
+        println("22222 $filename $fileType")
         
         val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
         
         
         val cipherFilePath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 fileNameCipher,
                 "cipher"
             )
@@ -387,7 +387,7 @@ actual class FileProvider(private val applicationContext: Context) {
                             "file",
                             InputProvider(file.length()) { file.inputStream().asInput() },
                             Headers.build {
-                                append(HttpHeaders.ContentType, contentType)
+                                append(HttpHeaders.ContentType, fileType)
                                 append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
                             }
                         )
@@ -427,12 +427,10 @@ actual class FileProvider(private val applicationContext: Context) {
                 
                 println("id $id")
                 
+                saveFileInDir(filename, fileDirectory, fileType)
+                
                 file.delete()
 
-//                val fileCopy = File(fileDirectory)
-//
-//                fileCopy.delete()
-                
                 return id
                 
             } else {
@@ -679,9 +677,6 @@ actual class FileProvider(private val applicationContext: Context) {
         filename: String,
         onProgress: (Float) -> Unit
     ): String? {
-        val uri = Uri.parse(fileDirectory)
-        println("Parsed URI: $uri")
-        
         val client = HttpClient() {
             install(HttpTimeout) {
                 requestTimeoutMillis = 600_000
@@ -690,7 +685,8 @@ actual class FileProvider(private val applicationContext: Context) {
             }
         }
         
-        
+        println("$fileDirectory $fileType $filename"
+        )
         try {
             val token = getValueInStorage("accessToken")
             
@@ -835,13 +831,13 @@ actual class FileProvider(private val applicationContext: Context) {
         
         
         val cipherVideoPath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 videoNameCipher,
                 "cipher"
             )
         
         val cipherPhotoPath = FileProviderFactory.create()
-            .getFilePath(
+            .createNewFileWithApp(
                 photoNameCipher,
                 "cipher"
             )
@@ -951,6 +947,10 @@ actual class FileProvider(private val applicationContext: Context) {
                         Json.decodeFromString(jsonElement.toString())
                     
                     println("id $ids")
+                    
+                    saveFileInDir(videoName, videoPath, "video")
+                    saveFileInDir(photoName, photoPath, "image")
+                    
                     
                     videoFile.delete()
                     photoFile.delete()

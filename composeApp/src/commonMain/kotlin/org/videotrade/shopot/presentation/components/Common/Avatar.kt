@@ -32,32 +32,13 @@ fun Avatar(
     contentScale: ContentScale = ContentScale.Crop,
     bitmap: ImageBitmap? = null,
 ) {
-//    val imageBitmap = remember(icon) {
-//        mutableStateOf<ImageBitmap?>(null)
-//    }
-//
-//    // Если icon не пустой и изображение еще не загружено
-//    if (icon != null && imageBitmap.value == null) {
-//        LaunchedEffect(icon) {
-//            // Проверка кэша
-//            val cachedImage = avatarCache[icon]
-//            if (cachedImage != null) {
-//                println("cachedImage31313131")
-//                imageBitmap.value = cachedImage.toImageBitmap()
-//            } else {
-//                println("cachedIma1121")
-//                val newByteArray = imageAsync(icon)
-//                if (newByteArray != null) {
-//                    avatarCache.put(icon, newByteArray)
-//                    imageBitmap.value = newByteArray.toImageBitmap()
-//                }
-//            }
-//        }
-//    }
-    
-    val imageBitmap = getImageStorage(icon, icon, false)
-    
-    
+    val imageBitmap = remember(icon) {
+        mutableStateOf<ImageBitmap?>(null)
+    }
+
+    LaunchedEffect(icon) {
+        imageBitmap.value = getImageStorage(icon, icon, false)
+    }
     
     Surface(
         modifier = modifier,
@@ -70,9 +51,9 @@ fun Avatar(
                 contentScale = contentScale,
                 modifier = Modifier.size(size)
             )
-        } else if (imageBitmap != null) {
+        } else if (imageBitmap.value != null) {
             Image(
-                bitmap = imageBitmap,
+                bitmap = imageBitmap.value!!,
                 contentDescription = "Avatar",
                 contentScale = contentScale,
                 modifier = Modifier.size(size)
@@ -89,31 +70,35 @@ fun Avatar(
 }
 
 
-@Composable
-fun getImageStorage(imageId: String?, imageName: String?, isCipher: Boolean): ImageBitmap? {
-    val imageBitmap = remember(imageId) {
-        mutableStateOf<ImageBitmap?>(null)
-    }
-    
+suspend fun getImageStorage(imageId: String?, imageName: String?, isCipher: Boolean): ImageBitmap? {
     // Если icon не пустой и изображение еще не загружено
-    if (imageId != null && imageBitmap.value == null) {
-        LaunchedEffect(imageId) {
+    try {
+        if (imageId != null) {
             // Проверка кэша
             val cachedImage = avatarCache[imageId]
             if (cachedImage != null) {
                 println("cachedImage31313131")
-                imageBitmap.value = cachedImage.toImageBitmap()
+                return cachedImage.toImageBitmap()
             } else {
                 println("cachedIma1121")
                 
                 val newByteArray = imageName?.let { imageAsync(imageId, it, isCipher) }
-                if (newByteArray != null) {
+                
+                if (newByteArray != null && newByteArray.isNotEmpty() ) {
+                    println("newByteArray $newByteArray")
+                    
+                    // Попробуем декодировать массив байтов безопасно
+                    
+                    println("newByteArray ${newByteArray.size}")
+                    val imageBitmap = newByteArray.toImageBitmap()
                     avatarCache.put(imageId, newByteArray)
-                    imageBitmap.value = newByteArray.toImageBitmap()
+                    return imageBitmap
                 }
             }
         }
+    } catch (e: Exception) {
+        println("error getImageStorage $e")
     }
-    return imageBitmap.value
+    return null
 }
 
