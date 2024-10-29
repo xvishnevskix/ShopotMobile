@@ -16,7 +16,7 @@ expect class AudioPlayer {
 
 
 expect class MusicPlayer {
-    fun play(musicName: String, isRepeat:Boolean)
+    fun play(musicName: String, isRepeat: Boolean, isCategoryMusic: MusicType)
     fun stop()
     fun isPlaying(): Boolean
 }
@@ -26,4 +26,10 @@ expect object AudioFactory {
     fun createAudioPlayer(): AudioPlayer
     fun createMusicPlayer(): MusicPlayer
     
+}
+
+
+enum class MusicType {
+    Notification,
+    Ringtone
 }

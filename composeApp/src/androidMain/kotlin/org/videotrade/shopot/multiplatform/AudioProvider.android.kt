@@ -3,6 +3,7 @@ package org.videotrade.shopot.multiplatform
 import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
+import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.AudioManager.ADJUST_UNMUTE
 import android.media.MediaMetadataRetriever
@@ -192,7 +193,7 @@ actual class MusicPlayer {
     
     private var mediaPlayer: MediaPlayer? = null
     
-    actual fun play(musicName: String, isRepeat: Boolean) {
+    actual fun play(musicName: String, isRepeat: Boolean, isCategoryMusic: MusicType) {
         try {
             val context = getContextObj.getContext()
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -237,12 +238,35 @@ actual class MusicPlayer {
                     
                     mediaPlayer = MediaPlayer().apply {
                         setDataSource(tempFile.absolutePath)
-                        setAudioStreamType(AudioManager.STREAM_ALARM) // Устанавливаем поток как системный (сигнал/уведомление)
-                        isLooping =false
-//                            isRepeat // Устанавливаем цикличное воспроизведение в зависимости от параметра isRepeat
+                        
+                        
+                        val audioAttributes = when (isCategoryMusic) {
+                            MusicType.Notification -> {
+                                AudioAttributes.Builder()
+                                    .setUsage(AudioAttributes.USAGE_NOTIFICATION) // Устанавливаем использование для уведомлений
+                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для системных звуков
+                                    .build()
+                            }
+                            
+                            MusicType.Ringtone -> AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE) // Устанавливаем использование для мелодии звонка
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для звуков оповещений и звонков
+                                .build()
+                            
+                            else -> AudioAttributes.Builder()
+                                .setUsage(AudioAttributes.USAGE_NOTIFICATION) // Устанавливаем использование для уведомлений
+                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для системных звуков
+                                .build()
+                        }
+                        
+                        
+                        setAudioAttributes(audioAttributes) // Устанавливаем аудио атрибуты
+                        isLooping =
+                            isRepeat // Устанавливаем цикличное воспроизведение в зависимости от параметра isRepeat
                         prepare()
                         start()
                     }
+                    
                 } else {
                     mediaPlayer?.start()
                 }

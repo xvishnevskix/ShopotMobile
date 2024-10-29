@@ -56,6 +56,7 @@ import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
+import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -127,10 +128,10 @@ class CallScreen(
         
         LaunchedEffect(Unit) {
             if (isIncomingCall) {
-                musicPlayer.play("callee", true)
+                musicPlayer.play("callee", true, MusicType.Ringtone)
                 isPlaying = true
             } else {
-                musicPlayer.play("caller", true)
+                musicPlayer.play("caller", true,  MusicType.Ringtone)
                 isPlaying = true
             }
             

@@ -12,6 +12,7 @@ import platform.AVFAudio.AVAudioPlayer
 import platform.AVFAudio.AVAudioQualityHigh
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryAmbient
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.AVAudioSessionCategorySoloAmbient
@@ -262,8 +263,8 @@ actual class MusicPlayer {
     private var audioPlayer: AVAudioPlayer? = null
     
     @OptIn(ExperimentalForeignApi::class)
-    actual fun play(musicName: String, isRepeat: Boolean) {
-        // Получаем путь к файлу из бандла приложения
+    actual fun play(musicName: String, isRepeat: Boolean, isCategoryMusic: MusicType) {
+        // Получаем путь к файлу в бандле приложения
         val filePath = NSBundle.mainBundle.pathForResource(name = musicName, ofType = "mp3")
         
         if (filePath == null) {
@@ -274,15 +275,22 @@ actual class MusicPlayer {
         val fileUrl = NSURL.fileURLWithPath(filePath)
         
         try {
-            // Настройка аудиосессии для системного звука
+            // Настройка аудиосессии
             val audioSession = AVAudioSession.sharedInstance()
-            audioSession.setCategory(AVAudioSessionCategorySoloAmbient, error = null)
+            
+            when (isCategoryMusic) {
+                MusicType.Notification -> {
+                    audioSession.setCategory(AVAudioSessionCategoryAmbient, error = null)
+                }
+                MusicType.Ringtone -> {
+                    audioSession.setCategory(AVAudioSessionCategorySoloAmbient, error = null)
+                }
+            }
             audioSession.setActive(true, error = null)
             
             // Инициализация AVAudioPlayer
             audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
-                numberOfLoops =
-                    if (isRepeat) -1 else 0 // Устанавливаем количество повторений в зависимости от isRepeat
+                numberOfLoops = if (isRepeat) -1 else 0 // Устанавливаем количество повторений в зависимости от isRepeat
                 prepareToPlay()                         // Подготовка к воспроизведению
                 play()                                  // Начало воспроизведения
             }
@@ -294,7 +302,6 @@ actual class MusicPlayer {
             println("Ошибка при попытке воспроизведения: ${e.message}")
         }
     }
-    
     actual fun stop() {
         audioPlayer?.stop()
         audioPlayer = null

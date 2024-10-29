@@ -35,6 +35,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PlatformFilePick
+import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import kotlin.random.Random
 
@@ -260,7 +261,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             )
             println("сообщениесообщениесообщениесообщение")
             
-            musicPlayer.play("message", false)
+            musicPlayer.play("message", false, MusicType.Notification)
             commonViewModel.sendNotify("$login", content, notificationToken)
             
             clearSelection(chatId)
@@ -292,7 +293,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 fileType
             
             )
-            musicPlayer.play("message", false)
+            musicPlayer.play("message", false, MusicType.Notification)
             
         }
     }
@@ -334,7 +335,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             )
         )
         
-        musicPlayer.play("message", false)
+        musicPlayer.play("message", false, MusicType.Notification)
         
     }
     
@@ -430,7 +431,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 println("jsonContent $jsonContent")
                 wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
                 
-                musicPlayer.play("message", false)
+                musicPlayer.play("message", false, MusicType.Notification)
                 
             } catch (e: Exception) {
                 println("Failed to send message: ${e.message}")

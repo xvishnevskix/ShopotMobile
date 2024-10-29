@@ -12,6 +12,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.AudioFactory
+import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -35,8 +36,8 @@ class TestScreen : Screen {
                     scope.launch {
                    try {
                        
-                       musicPlayer.play("message", false)
-                    
+                       musicPlayer.play("callee", true, MusicType.Ringtone)
+                     
                    }catch (e:Exception){
                    
                    }

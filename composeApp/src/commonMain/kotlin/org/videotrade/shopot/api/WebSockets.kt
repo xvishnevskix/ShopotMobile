@@ -24,6 +24,7 @@ import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
@@ -263,7 +264,7 @@ suspend fun handleConnectWebSocket(
                                             
                                             
                                             if(message.fromUser != userId) {
-                                                musicPlayer.play("newmess", false)
+                                                musicPlayer.play("newmess", false,  MusicType.Notification)
                                             }
                                             
                                         }
@@ -351,7 +352,7 @@ suspend fun handleConnectWebSocket(
                                             
                                             
                                             if(message.fromUser != userId) {
-                                                musicPlayer.play("newmess", false)
+                                                musicPlayer.play("newmess", false, MusicType.Notification)
                                             }                                     }
 
                                     } catch (e: Exception) {
@@ -599,7 +600,7 @@ suspend fun handleConnectWebSocket(
                                             println("(message.fromUser ${message.fromUser} ${userId}")
                                             
                                             if(message.fromUser != userId) {
-                                                musicPlayer.play("newmess", false)
+                                                musicPlayer.play("newmess", false, MusicType.Notification)
                                             }                                       }
 
                                     } catch (e: Exception) {
