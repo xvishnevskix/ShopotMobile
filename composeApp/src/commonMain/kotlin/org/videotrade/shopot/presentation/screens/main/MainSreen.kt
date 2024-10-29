@@ -35,6 +35,7 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab

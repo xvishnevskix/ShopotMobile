@@ -144,9 +144,11 @@ class CallScreen(
         }
         
         DisposableEffect(Unit) {
-            setScreenLockFlags(false)
-            
             onDispose {
+                
+                println("DisposableEffect")
+                setScreenLockFlags(false)
+                
                 if (
                     isPlaying
                 ) {
