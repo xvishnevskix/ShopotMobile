@@ -111,8 +111,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //        ),
         IceServer(
             urls = listOf(
-//                "turn:89.221.60.156:3478",
-                "turn:89.221.60.161:3478",
+                "turn:89.221.60.156:3478",
+//                "turn:89.221.60.161:3478",
 //                "turn:videotradedev2.ru:3478",
             ),
             username = "andrew",
@@ -216,20 +216,15 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 
                                 val text = frame.readText()
                                 
-                                
                                 val jsonElement = Json.parseToJsonElement(text)
                                 
                                 println("jsonElement1112 $jsonElement")
-                                
                                 
                                 val type = jsonElement.jsonObject["type"]?.jsonPrimitive?.content
                                 
                                 println("jsonElement1112 $type")
                                 
-                                
                                 val rtcMessage = jsonElement.jsonObject["rtcMessage"]?.jsonObject
-                                
-                                
                                 
                                 when (type) {
                                     "newCall" -> {
