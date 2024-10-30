@@ -1,5 +1,8 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,17 +35,23 @@ import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -55,8 +64,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 
 import androidx.compose.ui.unit.dp
@@ -84,17 +97,19 @@ import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.BaseHeader
+import org.videotrade.shopot.presentation.components.Common.ButtonStyle
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.SFProText_Semibold
-
-
-
+import shopot.composeapp.generated.resources.auth_logo
 
 
 suspend fun sendEmail(
@@ -151,38 +166,74 @@ class FAQ() : Screen {
         val email = remember { mutableStateOf("") }
         val description = remember { mutableStateOf("") }
 
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                BaseHeader("FAQ")
+        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
 
-                Spacer(modifier = Modifier.fillMaxHeight(0.05F))
+            if (modalVisible.value) {
+                ModalDialog(
+                    onDismiss = {
+                        modalVisible.value = false
+                        isMessageSent.value = false
+                    },
+                    email = email,
+                    description = description,
+                    isMessageSent = isMessageSent,
+                    loading = loading,
+                    isSuccessfulSend = isSuccessfulSend,
+                    onSubmit = {
+                        if (email.value.isNotEmpty() && description.value.length >= 3) {
+                            coroutineScope.launch {
+                                loading.value = true
+                                val response = sendEmail(email.value, description.value)
+                                loading.value = false
+                                isSuccessfulSend.value =
+                                    response != null && response.status.isSuccess()
+                                isMessageSent.value = true
+                            }
+                        }
+//                            isMessageSent.value = true
+                    }
 
-                Text(
-                    stringResource(MokoRes.strings.main_questions),
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(start = 20.dp, bottom = 15.dp),
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                    lineHeight = 20.sp,
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                 )
+            }
 
-                Column(
-                    modifier = Modifier
-                        .padding(start = 20.dp)
-                        .fillMaxWidth()
-                ) {
-                    PolicyItem(stringResource(MokoRes.strings.privacy_policy)) {
-                        navigator.push(PrivacyPolicy())
-                    }
-                    PolicyItem(stringResource(MokoRes.strings.user_agreement)) {
-                        navigator.push(UserAgreement())
-                    }
-                    PolicyItem(stringResource(MokoRes.strings.data_processing_agreement)) {
-                        navigator.push(DataProcessingAgreement())
+            Column(
+                modifier = Modifier.padding(10.dp).fillMaxHeight(0.95f),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+
+                Column {
+                    BaseHeader(stringResource(MokoRes.strings.support))
+
+                    Spacer(modifier = Modifier.fillMaxHeight(0.05F))
+
+                    Text(
+                        stringResource(MokoRes.strings.main_questions),
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        textAlign = TextAlign.Center,
+                        color = Color(0xFF373533),
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Column(
+                        modifier = Modifier
+                            .padding(start = 4.dp, end = 4.dp)
+                            .fillMaxWidth()
+                    ) {
+                        PolicyItem(stringResource(MokoRes.strings.privacy_policy)) {
+                            navigator.push(PrivacyPolicy())
+                        }
+                        PolicyItem(stringResource(MokoRes.strings.user_agreement)) {
+                            navigator.push(UserAgreement())
+                        }
+                        PolicyItem(stringResource(MokoRes.strings.data_processing_agreement)) {
+                            navigator.push(DataProcessingAgreement())
+                        }
                     }
                 }
 
-                Spacer(modifier = Modifier.fillMaxHeight(0.8F))
 
                 Box(
                     modifier = Modifier
@@ -193,56 +244,43 @@ class FAQ() : Screen {
                 ) {
                     CustomButton(stringResource(MokoRes.strings.ask_question), {
                         modalVisible.value = true
-                    })
+                    }, style = ButtonStyle.Gradient)
                 }
 
-                if (modalVisible.value) {
-                    ModalDialog(
-                        onDismiss = {
-                            modalVisible.value = false
-                            isMessageSent.value = false
-                                    },
-                        email = email,
-                        description = description,
-                        isMessageSent = isMessageSent,
-                        loading = loading,
-                        isSuccessfulSend = isSuccessfulSend,
-                        onSubmit = {
-                            if (email.value.isNotEmpty() && description.value.length >= 3) {
-                                coroutineScope.launch {
-                                    loading.value = true
-                                    val response = sendEmail(email.value, description.value)
-                                    loading.value = false
-                                    isSuccessfulSend.value = response != null && response.status.isSuccess()
-                                    isMessageSent.value = true
-                                }
-                            }
-//                            isMessageSent.value = true
-                        }
 
-                    )
-                }
             }
         }
     }
 
     @Composable
     fun PolicyItem(text: String, onClick: () -> Unit) {
-        Text(
-            text = text,
+        Box(
             modifier = Modifier
-                .clickable(onClick = onClick)
-                .padding(vertical = 7.dp)
-                .padding(start = 5.dp, bottom = 5.dp),
-            style = TextStyle(
-                textDecoration = TextDecoration.Underline,
-                fontSize = 17.sp,
-                letterSpacing = (-0.5).sp,
-                color = Color(0xFF979797),
-
-
+                .padding(top = 4.dp, bottom = 4.dp)
+                .fillMaxWidth()
+                .height(56.dp)
+                .border(
+                    width = 1.dp,
+                    color = Color(0x33373533),
+                    shape = RoundedCornerShape(size = 16.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = text,
+                modifier = Modifier
+                    .clickable(onClick = onClick)
+                    .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp),
+                style = TextStyle(
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    textAlign = TextAlign.Center,
+                    color = Color(0xFF373533),
+                )
             )
-        )
+        }
     }
 
     @Composable
@@ -261,7 +299,7 @@ class FAQ() : Screen {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.9f))
+                .background(Color.Black.copy(alpha = 0.3f))
                 .clickable { onDismiss() },
             contentAlignment = Alignment.Center
         ) {
@@ -272,24 +310,46 @@ class FAQ() : Screen {
                 ) {
                     Column(
                         modifier = Modifier
-                            .padding(20.dp)
+                            .padding(5.dp)
                             .fillMaxWidth()
                     ) {
                         if (!isMessageSent.value) {
-                            EmailInput(email, isEmailValid)
-                            Spacer(modifier = Modifier.height(10.dp))
-                            DescriptionInput(description, isDescValid)
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Row(
+                                modifier = Modifier.clickable { onDismiss() }.fillMaxWidth().padding(5.dp),
+                                horizontalArrangement = Arrangement.End,
+                            ) {
+                                Icon(
 
-                            CustomButton(stringResource(MokoRes.strings.send),
-                                {
-                                    isEmailValid = validateEmail(email.value)
-                                    isDescValid = validateDescription(description.value)
-                                    if (isEmailValid && isDescValid) {
-                                        onSubmit()
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
+                                    tint = Color(0xFF000000),
+                                    modifier = Modifier
+                                        .size(15.dp)
+
+
+                                )
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                            ) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                EmailInput(email, isEmailValid)
+                                Spacer(modifier = Modifier.height(10.dp))
+                                DescriptionInput(description, isDescValid)
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                CustomButton(stringResource(MokoRes.strings.send),
+                                    {
+                                        isEmailValid = validateEmail(email.value)
+                                        isDescValid = validateDescription(description.value)
+                                        if (isEmailValid && isDescValid) {
+                                            onSubmit()
+                                        }
                                     }
-                                }
-                            )
+                                    , style = ButtonStyle.Gradient
+                                )
+                            }
                         } else if (loading.value) {
                             Box(
                                 contentAlignment = Alignment.Center,
@@ -300,11 +360,61 @@ class FAQ() : Screen {
                                 CircularProgressIndicator(color = Color(0xFF979797))
                             }
                         } else {
-                            Text(
-                                text = if (isSuccessfulSend.value) stringResource(MokoRes.strings.your_request_has_been_sent_successfully) else stringResource(MokoRes.strings.an_error_occurred_please_try_again),
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(vertical = 15.dp)
-                            )
+
+                            if (isSuccessfulSend.value) {
+                                Column(
+                                    modifier = Modifier.width(324.dp)
+                                        .height(324.dp)
+                                        .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(size = 16.dp))
+                                        ,
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        modifier = Modifier
+                                            .size(width = 128.dp, height = 86.dp),
+                                        painter = painterResource(Res.drawable.auth_logo),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop
+                                    )
+                                    Spacer(modifier = Modifier.height(32.dp))
+                                    Text(
+                                        stringResource(
+                                            MokoRes.strings.request_accepted
+                                        ),
+                                        fontSize = 20.sp,
+                                        lineHeight = 20.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                        fontWeight = FontWeight(500),
+                                        textAlign = TextAlign.Center,
+                                        color = Color(0xFF373533),
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        stringResource(
+                                            MokoRes.strings.we_will_contact_you_shortly_and_try_to_solve_the_problem
+                                        ),
+                                        fontSize = 15.sp,
+                                        lineHeight = 15.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                        fontWeight = FontWeight(400),
+                                        textAlign = TextAlign.Center,
+                                        color = Color(0x80373533),
+                                        maxLines = 3,
+                                    )
+
+                                }
+                            }
+                            else {
+                                Text(
+                                    text = stringResource(
+                                        MokoRes.strings.an_error_occurred_please_try_again
+                                    ),
+                                    fontSize = 14.sp,
+                                    modifier = Modifier.padding(vertical = 15.dp)
+                                )
+                            }
+
                         }
                     }
                 }
@@ -317,8 +427,13 @@ class FAQ() : Screen {
         Column {
             Text(
                 stringResource(MokoRes.strings.your_email),
-                fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 11.dp)
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                textAlign = TextAlign.Center,
+                color = Color(0xFF373533),
+                modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
                 value = email.value,
@@ -328,28 +443,29 @@ class FAQ() : Screen {
                         if (email.value.isEmpty()) {
                             Text(
                                 "example@mail.ru",
-                                textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF979797),
-                                modifier = Modifier.padding()
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                textAlign = TextAlign.Start,
+                                color = Color(0x80373533)
                             )
                         }
                         innerTextField()
                     }
                 },
                 textStyle = TextStyle(
-                    fontSize = 15.sp,
-                    color = Color(0xFF000000)
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    textAlign = TextAlign.Start,
+                    color = Color(0xFF373533)
                 ),
                 modifier = Modifier
-                    .shadow(3.dp, RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp))
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFFFFF))
-                    .padding(10.dp)
+                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                    .fillMaxWidth(1f).background(Color(0xFFFFFFFF))
+                    .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
             )
             if (!isEmailValid) {
                 Text(
@@ -367,8 +483,13 @@ class FAQ() : Screen {
         Column {
             Text(
                 stringResource(MokoRes.strings.appeal),
-                fontSize = 14.sp,
-                modifier = Modifier.padding(bottom = 11.dp)
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                textAlign = TextAlign.Center,
+                color = Color(0xFF373533),
+                modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
                 value = description.value,
@@ -378,29 +499,29 @@ class FAQ() : Screen {
                         if (description.value.isEmpty()) {
                             Text(
                                 stringResource(MokoRes.strings.detailed_description_will_help_us_answer_you_as_soon_as_possible),
-                                textAlign = TextAlign.Start,
                                 fontSize = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF979797),
-                                modifier = Modifier.padding()
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                textAlign = TextAlign.Start,
+                                color = Color(0x80373533)
                             )
                         }
                         innerTextField()
                     }
                 },
                 textStyle = TextStyle(
-                    fontSize = 15.sp,
-                    color = Color(0xFF000000)
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    textAlign = TextAlign.Start,
+                    color = Color(0xFF373533)
                 ),
                 modifier = Modifier
-                    .height(200.dp)
-                    .shadow(3.dp, RoundedCornerShape(12.dp))
-                    .clip(RoundedCornerShape(12.dp))
-                    .fillMaxWidth()
-                    .background(Color(0xFFFFFFFF))
-                    .padding(10.dp)
+                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                    .fillMaxWidth(1f).height(232.dp).background(Color(0xFFFFFFFF))
+                    .padding(start = 16.dp, top = 16.dp, bottom = 20.dp)
             )
             if (!isDescValid) {
                 Text(

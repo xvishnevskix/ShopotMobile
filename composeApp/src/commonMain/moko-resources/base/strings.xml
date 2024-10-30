@@ -203,4 +203,27 @@
     <string name="sticker">Sticker</string>
     <string name="add_stickers_from_the_store">Add stickers from the store 🛒</string>
 
+    <string name="choose_to_continue">Choose to continue</string>
+    <string name="registration">Registration</string>
+    <string name="request_accepted">Request accepted!</string>
+    <string name="we_will_contact_you_shortly_and_try_to_solve_the_problem">We will contact you shortly and try to solve the problem</string>
+    <string name="entrance">Login</string>
+    <string name="select_country_code">Select country code</string>
+    <string name="selected">Selected</string>
+    <string name="list_of_other_countries">List of countries</string>
+    <string name="enter_your_name">Name</string>
+    <string name="enter_your_last_name">Last name</string>
+    <string name="come_up_with_a_nickname">Nickname</string>
+    <string name="authorization">Authorization</string>
+    <string name="confirm_the_number">Confirm the number</string>
+    <string name="enter_the_last_4_digits_of_the_incoming_call">Enter the last 4 digits of the incoming call</string>
+    <string name="enter_the_code_from_the_sms_sent_to_the_number">Enter the code from the SMS sent to the number</string>
+    <string name="get_a_new_code">Get a new code</string>
+    <string name="receive_code_via_sms">Receive code via SMS</string>
+
+
+
+
+
+
 </resources>

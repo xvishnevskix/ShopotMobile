@@ -30,6 +30,7 @@ import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 
 class MainViewModel : ViewModel(), KoinComponent {
@@ -231,7 +232,7 @@ class MainViewModel : ViewModel(), KoinComponent {
             
             
             
-            navigator.replace(SignInScreen())
+            navigator.replace(WelcomeScreen())
             
         }
     }

@@ -4,10 +4,15 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
@@ -24,6 +29,7 @@ import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.auth_logo
 import shopot.composeapp.generated.resources.logo
 
 
@@ -92,12 +98,12 @@ class IntroScreen : Screen {
                     }
 
 
-                    navigator.replace(SignInScreen())
+                    navigator.replace(WelcomeScreen())
                 }
 
             } catch (e: Exception) {
 
-                navigator.replace(SignInScreen())
+                navigator.replace(WelcomeScreen())
 
             }
 
@@ -105,16 +111,29 @@ class IntroScreen : Screen {
 
 
 
-        Box(modifier = Modifier.background(color = MaterialTheme.colorScheme.background)) {
-            SafeArea {
+        Box(modifier = Modifier.fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFBBA796), // rgb(187, 167, 150)
+                        Color(0xFFEDDCCC), // rgb(237, 220, 204)
+                        Color(0xFFCAB7A3), // rgb(202, 183, 163)
+                        Color(0xFFEDDCCC), // rgb(237, 220, 204)
+                        Color(0xFFBBA796)  // rgb(187, 167, 150)
+                    )
+                )
+            ),
+            contentAlignment = Alignment.Center
+            ) {
+
                 Image(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    painter = painterResource(Res.drawable.logo),
+                        .size(width = 195.dp, height = 132.dp),
+                    painter = painterResource(Res.drawable.auth_logo),
                     contentDescription = null,
 
                     )
-            }
+
         }
 
     }

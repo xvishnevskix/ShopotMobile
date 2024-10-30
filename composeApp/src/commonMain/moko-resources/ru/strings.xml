@@ -92,7 +92,7 @@
     <string name="confirm">Подтвердить</string>
 
     <string name="create_account">Создать аккаунт</string>
-    <string name="enter_your_phone_number">Введите номер телефона</string>
+    <string name="enter_your_phone_number">Введите свой номер телефона</string>
     <string name="send_code">Отправить код</string>
     <string name="name">Имя</string>
     <string name="lastname">Фамилия</string>
@@ -116,14 +116,14 @@
 
     <string name="support">Поддержка</string>
     <string name="ask_question">Задать вопрос</string>
-    <string name="main_questions">Основные вопросы</string>
+    <string name="main_questions">Основные положения</string>
     <string name="privacy_policy">Политика конфиденциальности</string>
     <string name="user_agreement">Пользовательское соглашение</string>
     <string name="data_processing_agreement">Соглашение об обработке данных</string>
 
     <string name="your_email">Ваша электронная почта</string>
     <string name="appeal">Обращение</string>
-    <string name="detailed_description_will_help_us_answer_you_as_soon_as_possible">Подробное описание поможет ответить вам как можно скорее</string>
+    <string name="detailed_description_will_help_us_answer_you_as_soon_as_possible">Подробное описание поможет ответить быстрее</string>
     <string name="send">Отправить</string>
     <string name="please_enter_a_valid_email">Введите корректный email</string>
     <string name="don_not_forget_to_describe_the_problem">Не забудьте описать проблему</string>
@@ -198,4 +198,23 @@
     <string name="store">Магазин</string>
     <string name="sticker">Стикер</string>
     <string name="add_stickers_from_the_store">Добавьте стикеры из магазина 🛒</string>
+
+    <string name="choose_to_continue">Выберите, чтобы продолжить</string>
+    <string name="registration">Регистрация</string>
+    <string name="request_accepted">Обращение принято!</string>
+    <string name="we_will_contact_you_shortly_and_try_to_solve_the_problem">В ближайшее время мы свяжемся с Вами и постараемся решить возникшую проблему</string>
+    <string name="entrance">Вход</string>
+    <string name="select_country_code">Выбор кода страны</string>
+    <string name="selected">Выбрано</string>
+    <string name="list_of_other_countries">Список других стран</string>
+    <string name="enter_your_name">Укажите имя</string>
+    <string name="enter_your_last_name">Укажите фамилию</string>
+    <string name="come_up_with_a_nickname">Придумайте ник</string>
+    <string name="authorization">Авторизация</string>
+    <string name="confirm_the_number">Подтвердите номер</string>
+    <string name="enter_the_last_4_digits_of_the_incoming_call">Введите 4 последние цифры входящего звонка</string>
+    <string name="enter_the_code_from_the_sms_sent_to_the_number">Введите код из СМС, отправленный на номер</string>
+    <string name="get_a_new_code">Получить новый код</string>
+    <string name="receive_code_via_sms">Получить код в смс</string>
+
 </resources>

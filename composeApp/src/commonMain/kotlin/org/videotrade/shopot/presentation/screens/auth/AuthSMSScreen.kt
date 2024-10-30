@@ -167,7 +167,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
 
 
 
-                        Otp(otpFields, isLoading.value)
+//                        Otp(otpFields, isLoading.value)
 
 
                         CustomButton(
