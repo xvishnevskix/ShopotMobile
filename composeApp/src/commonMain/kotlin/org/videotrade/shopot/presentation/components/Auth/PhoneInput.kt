@@ -77,6 +77,7 @@ fun PhoneInput(
     hasError: Boolean,
     onCountrySelected: () -> Unit,
     animationTrigger: Boolean,
+    showPhoneMenu: MutableState<Boolean>
 ) {
 
     // Анимация смещения для "тряски"
@@ -112,7 +113,8 @@ fun PhoneInput(
     ) {
         CountryPicker(
             selectedCountryCode = countryCode,
-            onCountrySelected = onCountrySelected
+            onCountrySelected = onCountrySelected,
+            showPhoneMenu
         )
 
         Spacer(modifier = Modifier.width(16.dp))
@@ -169,8 +171,8 @@ fun PhoneInput(
 @Composable
 fun CountryPicker(
     selectedCountryCode: String,
-    onCountrySelected: () -> Unit
-
+    onCountrySelected: () -> Unit,
+    showPhoneMenu: MutableState<Boolean>
 
 ) {
     Box(
@@ -181,6 +183,7 @@ fun CountryPicker(
             .background(Color(0xFFF7F7F7))
             .clickable {
                 onCountrySelected()
+                showPhoneMenu.value = !showPhoneMenu.value
             },
         contentAlignment = Alignment.Center
     ) {
@@ -262,10 +265,12 @@ fun CountryPicker(
 
 @Composable
 fun CountryPickerBottomSheet(
+    showPhoneMenu: MutableState<Boolean>,
     countries: List<Pair<String, String>>,
     selectedCountryCode: String,
     onCountrySelected: (String) -> Unit,
     onBackClick: () -> Unit,
+
 ) {
     Column(
         modifier = Modifier

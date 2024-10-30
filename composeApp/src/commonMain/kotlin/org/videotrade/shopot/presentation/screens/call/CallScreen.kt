@@ -280,7 +280,7 @@ class CallScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
+                        .height(50.dp)
                 )
                 
                 Box(

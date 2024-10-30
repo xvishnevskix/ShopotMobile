@@ -10,16 +10,21 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -85,7 +91,8 @@ class SignUpPhoneScreen : Screen {
         val animationTrigger = remember { mutableStateOf(false) }
         val bottomSheetState =
             rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
-
+        val keyboardController = LocalSoftwareKeyboardController.current
+        var showPhoneMenu = remember { mutableStateOf(false) }
         val phone = remember {
             mutableStateOf(
                 TextFieldValue(
@@ -107,6 +114,18 @@ class SignUpPhoneScreen : Screen {
             "+63" to "\uD83C\uDDF5\uD83C\uDDED   ${stringResource(MokoRes.strings.ph)}"
         )
 
+        LaunchedEffect(showPhoneMenu) {
+            if (showPhoneMenu.value) {
+                keyboardController?.hide()
+            }
+        }
+        DisposableEffect(showPhoneMenu.value) {
+            if (showPhoneMenu.value) {
+                keyboardController?.hide()
+            }
+            onDispose { }
+        }
+
 
 
         SafeArea(padding = 0.dp)
@@ -117,6 +136,7 @@ class SignUpPhoneScreen : Screen {
 
                     CountryPickerBottomSheet(
                         countries = countries,
+                        showPhoneMenu = showPhoneMenu,
                         selectedCountryCode = countryCode,
                         onCountrySelected = { selectedCode ->
                             countryCode = selectedCode
@@ -135,6 +155,7 @@ class SignUpPhoneScreen : Screen {
                             bottomSheetState.hide()
                         }
                     }
+
                 },
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -151,11 +172,12 @@ class SignUpPhoneScreen : Screen {
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
+                            .imePadding()
                     ) {
                         AuthHeader(stringResource(MokoRes.strings.create_account))
                         Column(
                             modifier = Modifier.safeContentPadding().fillMaxWidth()
-                                .fillMaxHeight(0.85f),
+                                .fillMaxHeight(0.85f).verticalScroll(rememberScrollState()),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -208,7 +230,8 @@ class SignUpPhoneScreen : Screen {
                                         coroutineScope.launch {
                                             bottomSheetState.show()
                                         }
-                                    }
+                                    },
+                                    showPhoneMenu = showPhoneMenu,
                                 )
 
                                 Spacer(modifier = Modifier.height(16.dp))

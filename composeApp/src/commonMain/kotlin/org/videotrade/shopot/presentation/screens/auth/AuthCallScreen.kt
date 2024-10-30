@@ -11,10 +11,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -294,7 +297,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
                     .background(
                         Color.White
-                    ),
+                    ).imePadding(),
                 contentAlignment = Alignment.TopCenter
             ) {
 
@@ -303,6 +306,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
+                        .imePadding()
                 ) {
                     when (authCase) {
                         "SignIn" -> AuthHeader(stringResource(MokoRes.strings.login))
@@ -310,7 +314,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     }
                     Column(
                         modifier = Modifier.safeContentPadding().fillMaxWidth()
-                            .fillMaxHeight(0.85f),
+                            .fillMaxHeight(0.85f).verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
