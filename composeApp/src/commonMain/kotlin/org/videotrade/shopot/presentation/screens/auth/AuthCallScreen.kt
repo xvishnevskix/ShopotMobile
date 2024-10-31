@@ -258,7 +258,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         }
                     }
                 } else {
-                    handleError(invalidCode)
+                    if (authCase == "SignIn") {
+                        handleError(invalidCode)
+                    }
                 }
             }
         }
