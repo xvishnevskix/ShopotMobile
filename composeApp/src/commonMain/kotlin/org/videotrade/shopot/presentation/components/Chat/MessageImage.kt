@@ -41,6 +41,7 @@ fun MessageImage(
         mutableStateOf<ImageBitmap?>(null)
     }
     LaunchedEffect(fileId) {
+        println("Loading image for fileId: $fileId")
         imageBitmap.value = getImageStorage(fileId, fileName, true)
     }
     

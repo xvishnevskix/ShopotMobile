@@ -89,7 +89,7 @@ suspend fun getImageStorage(imageId: String?, imageName: String?, isCipher: Bool
                     
                     // Попробуем декодировать массив байтов безопасно
                     
-                    println("newByteArray ${newByteArray.size}")
+                    println("imageIdimageBitmap $imageId")
                     val imageBitmap = newByteArray.toImageBitmap()
                     avatarCache.put(imageId, newByteArray)
                     return imageBitmap

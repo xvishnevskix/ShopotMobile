@@ -661,7 +661,7 @@ actual class FileProvider(private val applicationContext: Context) {
         // Проверяем, существует ли файл в указанной директории
         val file = File(directory, fileName)
         return if (file.exists()) {
-            println("Файл найден: ${file.absolutePath}")
+            println("Файл найден: ${file.absolutePath + fileName}")
             file.absolutePath
         } else {
             println("Файл не найден: $fileName в каталоге $directory")

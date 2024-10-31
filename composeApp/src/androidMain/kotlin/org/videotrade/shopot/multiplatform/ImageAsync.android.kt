@@ -26,14 +26,14 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
             
             imageExist ?: downloadImageInCache(imageId)
         } else {
-            val imageExist = fileProvider.existingFileInDir(imageName, "image")
+            val imageExist = fileProvider.existingFileInDir(imageId, "image")
             
             println("imageExist $imageExist")
             
             imageExist ?: fileProvider.downloadCipherFile(
                 "${serverUrl}file/id/$imageId",
                 "image",
-                imageName,
+                imageId,
                 "image"
             ) { _ -> }
             
