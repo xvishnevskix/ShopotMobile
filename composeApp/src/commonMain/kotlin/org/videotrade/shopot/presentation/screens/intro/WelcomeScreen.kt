@@ -206,7 +206,7 @@ class WelcomeScreen : Screen {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center,
-                            modifier = Modifier.graphicsLayer {
+                            modifier = Modifier.padding(bottom = 10.dp).graphicsLayer {
                                 alpha = contentAlpha.value
                             }.pointerInput(Unit) {
                                 navigator.push(FAQ())

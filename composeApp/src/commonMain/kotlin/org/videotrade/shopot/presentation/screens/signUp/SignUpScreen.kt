@@ -13,14 +13,17 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -131,39 +134,43 @@ class SignUpScreen(private val phone: String) : Screen {
         val nickValidate3 = stringResource(MokoRes.strings.nickname_should_not_exceed_30_characters)
         val nickValidate4 = stringResource(MokoRes.strings.nickname_can_contain_only_letters_and_numbers)
         
-        SafeArea {
-            AuthHeader(stringResource(MokoRes.strings.create_account))
-            
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.TopCenter
-            ) {
-                LazyColumn(
-                    modifier = Modifier.padding(top = 70.dp).fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    contentPadding = PaddingValues(bottom = 20.dp)
+        SafeArea(padding = 4.dp) {
+            Column(modifier = Modifier
+                .imePadding()) {
+                AuthHeader(stringResource(MokoRes.strings.create_account))
+
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.TopCenter
                 ) {
-                    item {
+                    Column(
+                        modifier = Modifier.padding(top = 50.dp).fillMaxSize().verticalScroll(
+                            rememberScrollState()
+                        ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+
+                        ) {
+
                         Box(modifier = Modifier.clickable {
                             scope.launch {
                                 val filePick = FileProviderFactory.create()
                                     .pickFile(PickerType.Image)
-                                
-                                
+
+
                                 image = filePick
-                                
+
                             }
-                            
-                            
+
+
                         }) {
-                            
-                            
+
+
                             if (image !== null) {
 //                                Avatar(bitmap = images, size = 140.dp)
-                                
+
                                 val imagePainter =
                                     rememberAsyncImagePainter(image?.fileAbsolutePath)
-                                
+
                                 Surface(
                                     modifier = Modifier.size(140.dp),
                                     shape = CircleShape,
@@ -196,58 +203,58 @@ class SignUpScreen(private val phone: String) : Screen {
                                     modifier = Modifier.size(24.dp).align(Alignment.BottomEnd)
                                 )
                             }
-                            
-                            
-                        }
-                    }
 
-                    item {
-
-                            Column(
-                                modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                TextFieldWithTitle(
-                                    title = stringResource(MokoRes.strings.enter_your_name),
-                                    value = textState.value.firstName,
-                                    onValueChange = {
-                                        textState.value = textState.value.copy(firstName = it)
-                                        firstNameError.value = validateFirstName(it, nameValidate1, nameValidate2, nameValidate3) // Валидация имени
-                                    },
-                                    placeholder = stringResource(MokoRes.strings.name),
-                                    error = firstNameError.value
-                                )
-
-                                TextFieldWithTitle(
-                                    title = stringResource(MokoRes.strings.enter_your_last_name),
-                                    value = textState.value.lastName,
-                                    onValueChange = {
-                                        textState.value = textState.value.copy(lastName = it)
-                                        lastNameError.value = validateLastName(it, lastnameValidate1, lastnameValidate2) // Валидация фамилии
-                                    },
-                                    placeholder = stringResource(MokoRes.strings.lastname),
-                                    error = lastNameError.value
-                                )
-
-                                TextFieldWithTitle(
-                                    title = stringResource(MokoRes.strings.come_up_with_a_nickname),
-                                    value = textState.value.nickname,
-                                    onValueChange = {
-                                        textState.value = textState.value.copy(nickname = it)
-                                        nicknameError.value = validateNickname(it, nickValidate1, nickValidate2, nickValidate3, nickValidate4) // Валидация никнейма
-                                    },
-                                    placeholder = stringResource(MokoRes.strings.come_up_nickname),
-                                    error = nicknameError.value
-                                )
-                                Spacer(modifier = Modifier.height(80.dp))
 
 
                         }
-                    }
-                    
-                    item {
+
+
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            TextFieldWithTitle(
+                                title = stringResource(MokoRes.strings.enter_your_name),
+                                value = textState.value.firstName,
+                                onValueChange = {
+                                    textState.value = textState.value.copy(firstName = it)
+                                    firstNameError.value = validateFirstName(it, nameValidate1, nameValidate2, nameValidate3) // Валидация имени
+                                },
+                                placeholder = stringResource(MokoRes.strings.name),
+                                error = firstNameError.value
+                            )
+
+                            TextFieldWithTitle(
+                                title = stringResource(MokoRes.strings.enter_your_last_name),
+                                value = textState.value.lastName,
+                                onValueChange = {
+                                    textState.value = textState.value.copy(lastName = it)
+                                    lastNameError.value = validateLastName(it, lastnameValidate1, lastnameValidate2) // Валидация фамилии
+                                },
+                                placeholder = stringResource(MokoRes.strings.lastname),
+                                error = lastNameError.value
+                            )
+
+                            TextFieldWithTitle(
+                                title = stringResource(MokoRes.strings.come_up_with_a_nickname),
+                                value = textState.value.nickname,
+                                onValueChange = {
+                                    textState.value = textState.value.copy(nickname = it)
+                                    nicknameError.value = validateNickname(it, nickValidate1, nickValidate2, nickValidate3, nickValidate4) // Валидация никнейма
+                                },
+                                placeholder = stringResource(MokoRes.strings.come_up_nickname),
+                                error = nicknameError.value
+                            )
+                            Spacer(modifier = Modifier.height(80.dp))
+
+
+
+                        }
+
+
                         Box(
-                            modifier = Modifier.padding(top = 20.dp)
+                            modifier = Modifier.padding(top = 20.dp, bottom = 20.dp)
                         ) {
                             CustomButton(
                                 stringResource(MokoRes.strings.create_account),
@@ -348,6 +355,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 }, style = ButtonStyle.Gradient
                             )
                         }
+
                     }
                 }
             }

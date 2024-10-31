@@ -294,7 +294,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
 
 
-        SafeArea(padding = 0.dp) {
+        SafeArea(padding = 4.dp) {
             Box(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
                     .background(
@@ -375,28 +375,34 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                         }
                                     }
                                 }
-                                )
+                            )
 
                             Spacer(modifier = Modifier.height(16.dp))
-
-                            CustomButton(
-                                text = if (isRunning && time > 0) {
-                                    if (isSmsMode) "${stringResource(MokoRes.strings.get_a_new_code)} ${time}" else "${stringResource(MokoRes.strings.receive_code_via_sms)} ${time}"
-                                } else {
-                                    if (isSmsMode) stringResource(MokoRes.strings.get_a_new_code) else stringResource(MokoRes.strings.receive_code_via_sms)
-                                },
-                                {
-                                    if (isSmsMode) {
-                                        sendSms(sentSMSCode)
+                            Box(modifier = Modifier.padding(bottom = 20.dp)) {
+                                CustomButton(
+                                    text = if (isRunning && time > 0) {
+                                        if (isSmsMode) "${stringResource(MokoRes.strings.get_a_new_code)} ${time}" else "${
+                                            stringResource(
+                                                MokoRes.strings.receive_code_via_sms
+                                            )
+                                        } ${time}"
                                     } else {
-                                        sendCall()
-                                    }
-                                },
-                                style = ButtonStyle.Gradient,
-                                disabled = isRunning
-                            )
+                                        if (isSmsMode) stringResource(MokoRes.strings.get_a_new_code) else stringResource(
+                                            MokoRes.strings.receive_code_via_sms
+                                        )
+                                    },
+                                    {
+                                        if (isSmsMode) {
+                                            sendSms(sentSMSCode)
+                                        } else {
+                                            sendCall()
+                                        }
+                                    },
+                                    style = ButtonStyle.Gradient,
+                                    disabled = isRunning
+                                )
+                            }
                         }
-
                     }
                 }
             }

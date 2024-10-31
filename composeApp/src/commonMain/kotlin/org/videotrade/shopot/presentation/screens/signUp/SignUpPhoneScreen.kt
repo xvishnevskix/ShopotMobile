@@ -128,7 +128,7 @@ class SignUpPhoneScreen : Screen {
 
 
 
-        SafeArea(padding = 0.dp)
+        SafeArea(padding = 4.dp)
         {
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
@@ -239,55 +239,58 @@ class SignUpPhoneScreen : Screen {
                                     stringResource(MokoRes.strings.required_phone_number_length)
 
 
-
-                                CustomButton(stringResource(MokoRes.strings.send_code), {
-                                    coroutineScope.launch {
-                                        val fullPhoneNumber = countryCode + phone.value.text
-                                        val phoneNumberLength = getPhoneNumberLength(countryCode)
-                                        hasError.value = false
-
-                                        if (fullPhoneNumber.length < phoneNumberLength) {
-                                            hasError.value = true
-                                            toasterViewModel.toaster.show(
-                                                "$requiredPhoneLength $phoneNumberLength",
-                                                type = ToastType.Error,
-                                                duration = ToasterDefaults.DurationDefault
-                                            )
-                                            animationTrigger.value = !animationTrigger.value
-
-                                        } else {
-                                            val response =
-                                                sendRequestToBackend(
-                                                    fullPhoneNumber,
-                                                    NotifierManager.getPushNotifier().getToken(),
-                                                    "auth/login",
-                                                    toasterViewModel,
-                                                    sendCode,
-                                                    hasError = hasError,
-                                                    animationTrigger = animationTrigger
-                                                )
-                                            if (response == null) {
-                                                navigator.push(
-                                                    AuthCallScreen(
-                                                        phone.value.text,
-                                                        "SignUp"
-                                                    )
-                                                )
-                                            }
+                                Box( modifier = Modifier.padding(bottom = 20.dp)) {
+                                    CustomButton(stringResource(MokoRes.strings.send_code), {
+                                        coroutineScope.launch {
+                                            val fullPhoneNumber = countryCode + phone.value.text
+                                            val phoneNumberLength =
+                                                getPhoneNumberLength(countryCode)
                                             hasError.value = false
-                                            if (response != null) {
+
+                                            if (fullPhoneNumber.length < phoneNumberLength) {
                                                 hasError.value = true
                                                 toasterViewModel.toaster.show(
-                                                    phoneRegistered,
+                                                    "$requiredPhoneLength $phoneNumberLength",
                                                     type = ToastType.Error,
                                                     duration = ToasterDefaults.DurationDefault
                                                 )
                                                 animationTrigger.value = !animationTrigger.value
-                                            }
 
+                                            } else {
+                                                val response =
+                                                    sendRequestToBackend(
+                                                        fullPhoneNumber,
+                                                        NotifierManager.getPushNotifier()
+                                                            .getToken(),
+                                                        "auth/login",
+                                                        toasterViewModel,
+                                                        sendCode,
+                                                        hasError = hasError,
+                                                        animationTrigger = animationTrigger
+                                                    )
+                                                if (response == null) {
+                                                    navigator.push(
+                                                        AuthCallScreen(
+                                                            phone.value.text,
+                                                            "SignUp"
+                                                        )
+                                                    )
+                                                }
+                                                hasError.value = false
+                                                if (response != null) {
+                                                    hasError.value = true
+                                                    toasterViewModel.toaster.show(
+                                                        phoneRegistered,
+                                                        type = ToastType.Error,
+                                                        duration = ToasterDefaults.DurationDefault
+                                                    )
+                                                    animationTrigger.value = !animationTrigger.value
+                                                }
+
+                                            }
                                         }
-                                    }
-                                }, style = ButtonStyle.Gradient)
+                                    }, style = ButtonStyle.Gradient)
+                                }
                             }
 
                         }
