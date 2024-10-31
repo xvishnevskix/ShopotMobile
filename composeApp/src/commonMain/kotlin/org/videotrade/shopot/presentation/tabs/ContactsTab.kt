@@ -24,13 +24,14 @@ import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chatNav
 import shopot.composeapp.generated.resources.contactsNav
+import shopot.composeapp.generated.resources.contacts_nav
 
 object ContactsTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
             val title = stringResource(MokoRes.strings.contacts)
-            val icon: Painter = painterResource(Res.drawable.contactsNav)
+            val icon: Painter = painterResource(Res.drawable.contacts_nav)
             
             
             return remember {

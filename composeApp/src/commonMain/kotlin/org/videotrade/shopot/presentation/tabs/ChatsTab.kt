@@ -17,6 +17,7 @@ import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chatNav
+import shopot.composeapp.generated.resources.chat_nav
 import shopot.composeapp.generated.resources.profileNav
 
 object ChatsTab : Tab {
@@ -24,7 +25,7 @@ object ChatsTab : Tab {
         @Composable
         get() {
             val title = stringResource(MokoRes.strings.chats)
-            val icon: Painter = painterResource(Res.drawable.chatNav)
+            val icon: Painter = painterResource(Res.drawable.chat_nav)
             
             
             return remember {

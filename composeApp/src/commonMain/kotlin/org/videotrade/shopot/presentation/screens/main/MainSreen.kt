@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.main
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
@@ -17,10 +18,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -41,6 +45,8 @@ import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import org.videotrade.shopot.presentation.tabs.ContactsTab
 import org.videotrade.shopot.presentation.tabs.ProfileTab
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
@@ -79,9 +85,9 @@ class MainScreen : Screen {
                             ,
                             elevation = 0.dp // Убирает тень снизу
                         ) {
-                            TabNavigationItem(ProfileTab)
-                            TabNavigationItem(ChatsTab)
-                            TabNavigationItem(ContactsTab)
+                            TabNavigationItem(ProfileTab, width = 18.dp, height = 18.dp)
+                            TabNavigationItem(ChatsTab, width = 18.dp, height = 17.dp)
+                            TabNavigationItem(ContactsTab, width = 18.dp, height = 15.dp)
                         }
                     },
                     content = {
@@ -98,7 +104,7 @@ class MainScreen : Screen {
 }
 
 @Composable
-private fun RowScope.TabNavigationItem(tab: Tab) {
+private fun RowScope.TabNavigationItem(tab: Tab, width: Dp, height: Dp) {
     val tabNavigator: TabNavigator = LocalTabNavigator.current
     
     BottomNavigationItem(
@@ -106,26 +112,33 @@ private fun RowScope.TabNavigationItem(tab: Tab) {
         onClick = { tabNavigator.current = tab },
         icon = {
             tab.options.icon?.let { icon ->
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.size(24.dp)
+                ) {
                 Icon(
                     modifier = Modifier
-                        .size(30.dp)
+                        .size(24.dp)
                         .padding(bottom = 5.dp),
                     painter = icon,
                     contentDescription = tab.options.title,
-                    tint = if (tabNavigator.current == tab) Color(3, 104, 255) else Color.Black
+                    tint = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else Color(0xFF373533)
                 )
+                }
             }
         },
         label = {
-            Text(
-                tab.options.title,
-                textAlign = TextAlign.Center,
-                fontSize = 13.sp,
-                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-                color = if (tabNavigator.current == tab) Color(3, 104, 255) else Color.Black,
-            )
+
+                Text(
+                    tab.options.title,
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    textAlign = TextAlign.Center,
+                    color = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else Color(0xFF373533),
+                )
+
         },
         modifier = Modifier.size(56.dp)
     )

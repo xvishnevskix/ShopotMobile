@@ -21,13 +21,14 @@ import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.profileNav
+import shopot.composeapp.generated.resources.profile_nav
 
 object ProfileTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
             val title = stringResource(MokoRes.strings.profile)
-            val icon: Painter = painterResource(Res.drawable.profileNav)
+            val icon: Painter = painterResource(Res.drawable.profile_nav)
             
             return remember {
                 TabOptions(
