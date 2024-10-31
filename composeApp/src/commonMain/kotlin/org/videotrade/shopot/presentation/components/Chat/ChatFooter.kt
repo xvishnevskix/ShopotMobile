@@ -102,7 +102,6 @@ import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.file_message
 import shopot.composeapp.generated.resources.menu_gallery
-import shopot.composeapp.generated.resources.menu_video
 import shopot.composeapp.generated.resources.sticker_menu
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -117,7 +116,12 @@ data class MenuItem(
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: MutableState<Boolean>, onStickerButtonClick: () -> Unit) {
+fun ChatFooter(
+    chat: ChatItem,
+    viewModel: ChatViewModel,
+    showStickerMenu: MutableState<Boolean>,
+    onStickerButtonClick: () -> Unit
+) {
     val scope = rememberCoroutineScope()
     
     
@@ -131,7 +135,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: Mutabl
     var voicePath by remember { mutableStateOf("") }
     var offset by remember { mutableStateOf(Offset.Zero) }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val footerText = viewModel.footerText.collectAsState().value
+    val footerText by viewModel.footerText.collectAsState()
     
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
@@ -193,13 +197,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: Mutabl
             recordingTime = 0
         }
     }
-
+    
     LaunchedEffect(showStickerMenu) {
         if (showStickerMenu.value) {
             keyboardController?.hide()
         }
     }
-
+    
     DisposableEffect(showStickerMenu.value) {
         if (showStickerMenu.value) {
             keyboardController?.hide()
@@ -252,13 +256,13 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: Mutabl
             text = stringResource(MokoRes.strings.gallery),
             imagePath = Res.drawable.menu_gallery,
             onClick = {
-                viewModel.sendImage(
-                    footerText,
-                    viewModel.profile.value.id,
-                    chat.id,
-                    "image",
-                    "jpg",
-                )
+//                viewModel.sendImage(
+//                    footerText,
+//                    viewModel.profile.value.id,
+//                    chat.id,
+//                    "image",
+//                    "jpg",
+//                )
                 
                 scope.launch {
                     try {
@@ -275,7 +279,7 @@ fun ChatFooter(chat: ChatItem, viewModel: ChatViewModel, showStickerMenu: Mutabl
                                     viewModel.profile.value.id,
                                     chat.id,
                                     "image",
-                                    "jpg",
+                                    filePick.fileAbsolutePath,
                                 )
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
