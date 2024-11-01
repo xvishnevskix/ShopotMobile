@@ -1,5 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
+import androidx.compose.ui.graphics.ImageBitmap
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
@@ -21,7 +22,7 @@ import platform.Foundation.dataWithContentsOfURL
 import platform.Foundation.writeToURL
 
 
-actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ByteArray? {
+actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ImageBitmap? {
     val imageExist = FileProviderFactory.create().existingFileInDir(imageId, "image")
     val filePath = imageExist ?: downloadImageInCache(imageId)
     
