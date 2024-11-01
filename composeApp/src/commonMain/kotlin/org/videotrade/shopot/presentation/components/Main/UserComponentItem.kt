@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -25,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -84,10 +86,6 @@ fun UserComponentItem(
                 val fullName =
                     listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.groupName)
                         .joinToString(" ")
-                        .takeIf { it.isNotBlank() }
-                        ?.let {
-                            if (it.length > 25) "${it.take(22)}..." else it
-                        } ?: ""
 
                 Row() {
                     if (chat.personal) {
@@ -100,7 +98,11 @@ fun UserComponentItem(
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
-                            color = Color(0xFF000000)
+                            color = Color(0xFF000000),
+                            maxLines = 1, // Ограничиваем одной строкой
+                            overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
+                            modifier = Modifier.widthIn(max = 160.dp)
+
                         )
                     } else {
                         Text(
@@ -110,7 +112,11 @@ fun UserComponentItem(
                             fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                             lineHeight = 20.sp,
-                            color = Color(0xFF000000)
+                            color = Color(0xFF000000),
+                            maxLines = 1, // Ограничиваем одной строкой
+                            overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
+                            modifier = Modifier.widthIn(max = 160.dp)
+
                         )
                     }
                     if (!chat.personal) {
@@ -128,16 +134,16 @@ fun UserComponentItem(
                 Text(
                     text = chat.lastMessage?.let {
                         MessageContent(message = it)
-                    }?.takeIf { it.isNotEmpty() }?.let {
-                        if (it.length > 32) "${it.take(29)}..." else it
                     } ?: stringResource(MokoRes.strings.start_conversation),
-                    textAlign = TextAlign.Center,
+                    textAlign = TextAlign.Start,
                     fontSize = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                     lineHeight = 20.sp,
                     color = Color(0xFF979797),
-                    modifier = Modifier.padding(top = 5.dp)
+                    maxLines = 1, // Ограничиваем одной строкой
+                    overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
+                    modifier = Modifier.widthIn(max = 160.dp).padding(top = 5.dp),
                 )
 
 
