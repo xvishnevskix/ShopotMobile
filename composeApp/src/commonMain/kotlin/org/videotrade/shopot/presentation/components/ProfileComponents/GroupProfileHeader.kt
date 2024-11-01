@@ -68,7 +68,8 @@ fun GroupProfileHeader(text: String) {
                 contentDescription = "Back",
                 modifier = Modifier.padding(start = 0.dp, end = 1.dp).clickable {
                     navigator.pop()
-                }
+                },
+                tint = androidx.compose.ui.graphics.Color.Black
 
             )
 

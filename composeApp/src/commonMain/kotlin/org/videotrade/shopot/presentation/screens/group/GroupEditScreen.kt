@@ -63,7 +63,7 @@ class GroupEditScreen : Screen {
         )
 
         Box(
-            modifier = Modifier.fillMaxSize().background(Color.White),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.TopStart
         ) {
 

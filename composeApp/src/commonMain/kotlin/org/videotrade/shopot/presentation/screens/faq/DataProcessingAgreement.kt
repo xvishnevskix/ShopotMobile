@@ -60,7 +60,7 @@ class  DataProcessingAgreement () : Screen {
 
         Box(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize().background(Color.White)
         ) {
             Column(
                 modifier = Modifier.padding(10.dp).padding(bottom = 40.dp)

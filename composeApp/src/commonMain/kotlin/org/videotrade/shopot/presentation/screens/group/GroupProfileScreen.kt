@@ -88,7 +88,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
 //            viewModel.loadGroupUsers(chat.chatId)
 //        }
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().background(Color.White),
             contentAlignment = Alignment.TopStart
         ) {
             
@@ -190,10 +190,10 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                 
                 
                 Scaffold(
-                
+                    modifier = Modifier.background(Color.White)
                 ) {
                     Column(
-                        modifier = Modifier
+                        modifier = Modifier.background(Color.White)
                             .fillMaxSize()
                             .padding(top = it.calculateTopPadding()),
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -201,7 +201,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                     ) {
                         TabRow(
                             selectedTabIndex = selectedTabIndex.value,
-                            modifier = Modifier.fillMaxWidth(0.95F),
+                            modifier = Modifier.fillMaxWidth(0.95F).background(Color.White),
                             indicator = @Composable { tabPositions ->
                                 TabRowDefaults.SecondaryIndicator(
                                     modifier = Modifier
@@ -220,7 +220,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                                 
                                 Tab(
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .fillMaxWidth().background(Color.White)
                                         .padding(0.dp)
                                         .clip(
                                             RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
@@ -255,9 +255,10 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                                 .fillMaxWidth()
                                 .weight(1f)
                                 .padding(top = 10.dp)
+                                .background(Color.White)
                         ) {
                             Box(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier.fillMaxSize().background(Color.White),
                                 contentAlignment = Alignment.TopCenter,
                             ) {
                                 val selectedTab = tabs[selectedTabIndex.value]

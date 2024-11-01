@@ -310,6 +310,7 @@ class FAQ() : Screen {
                 ) {
                     Column(
                         modifier = Modifier
+                            .background(Color.White)
                             .padding(5.dp)
                             .fillMaxWidth()
                     ) {
