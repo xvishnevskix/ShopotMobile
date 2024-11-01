@@ -63,6 +63,7 @@ class PermissionsScreen : Screen {
         
         Box(
             modifier = Modifier
+                .background(Color.White)
                 .fillMaxSize()
                 .padding(16.dp),
         ) {
