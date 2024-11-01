@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.permissions
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,7 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,8 +40,12 @@ import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.presentation.components.Common.ButtonStyle
+import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 
@@ -70,14 +77,17 @@ class PermissionsScreen : Screen {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.Center)
+                    .align(Alignment.Center),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
                     text = stringResource(MokoRes.strings.enable_permissions),
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+                    fontSize = 20.sp,
+                    lineHeight = 20.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
-                    color = Color.Black,
+                    color = Color(0xFF373533),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
                 
@@ -85,10 +95,12 @@ class PermissionsScreen : Screen {
                 
                 Text(
                     text = stringResource(MokoRes.strings.notification_and_contact_permissions),
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
+                    fontSize = 15.sp,
+                    lineHeight = 15.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
                     textAlign = TextAlign.Center,
-                    color = Color.Black,
+                    color = Color(0x80373533),
                     modifier = Modifier.align(Alignment.CenterHorizontally) // Центрирование текста
                 )
                 
@@ -100,38 +112,43 @@ class PermissionsScreen : Screen {
                     }
                 }
                 Spacer(modifier = Modifier.height(102.dp))
-                
-                Button(
-                    onClick = {
-                        scope.launch {
-                            val contactsNative =
-                                PermissionsProviderFactory.create().getPermission("contacts")
-                            
-                            
-                            if (contactsNative) {
-                                
-                            }
-                            
-                            
-                            val permissionsNative =
-                                PermissionsProviderFactory.create().getPermission("notifications")
-                            
-                            
-                            if (permissionsNative) {
-                                
-                            }
-                            
-                            navigator.replace(IntroScreen())
+
+
+                CustomButton(stringResource(MokoRes.strings.enable_permissions), {
+                    scope.launch {
+                        val contactsNative =
+                            PermissionsProviderFactory.create().getPermission("contacts")
+
+
+                        if (contactsNative) {
+
                         }
-                    },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = stringResource(MokoRes.strings.enable_permissions),
-                        color = Color.White
-                    )
-                }
+
+
+                        val permissionsNative =
+                            PermissionsProviderFactory.create().getPermission("notifications")
+
+
+                        if (permissionsNative) {
+
+                        }
+
+                        navigator.replace(IntroScreen())
+                    }
+                }, style = ButtonStyle.Gradient)
+                
+//                Button(
+//                    onClick = {
+//
+//                    },
+//                    colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+//                    modifier = Modifier.fillMaxWidth()
+//                ) {
+//                    Text(
+//                        text = stringResource(MokoRes.strings.enable_permissions),
+//                        color = Color.White
+//                    )
+//                }
             }
         }
     }
@@ -139,22 +156,36 @@ class PermissionsScreen : Screen {
 
 @Composable
 fun NotificationPreview(title: String) {
-    Column(
+
+
+
+
+    Box(
         modifier = Modifier
+            .padding(top = 4.dp, bottom = 4.dp)
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10.dp)) // Округление углов элемента
-            .background(Color(0xFF333333))
-            .padding(16.dp)
-    
+            .height(56.dp)
+            .border(
+                width = 1.dp,
+                color = Color(0x33373533),
+                shape = RoundedCornerShape(size = 16.dp)
+            ),
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = title,
-            fontSize = 16.sp,
-            color = Color.White
+            modifier = Modifier
+
+                .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp),
+            style = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                fontWeight = FontWeight(400),
+                textAlign = TextAlign.Center,
+                color = Color(0xFF373533),
+            )
         )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
     }
     
     Spacer(modifier = Modifier.height(8.dp))

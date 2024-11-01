@@ -307,7 +307,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
+                    modifier = Modifier.fillMaxWidth()
                         .imePadding()
                 ) {
                     when (authCase) {
@@ -315,7 +315,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         "SignUp" -> AuthHeader(stringResource(MokoRes.strings.create_account))
                     }
                     Column(
-                        modifier = Modifier.safeContentPadding().fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth()
                             .fillMaxHeight(0.85f).verticalScroll(rememberScrollState()),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
@@ -333,7 +333,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier
+                            modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
                                 stringResource(MokoRes.strings.confirm_the_number),
