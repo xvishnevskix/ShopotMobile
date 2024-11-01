@@ -108,7 +108,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
-        var time by remember { mutableStateOf(10) }
+        var time by remember { mutableStateOf(30) }
         var isRunning by remember { mutableStateOf(false) }
         var reloadSend by remember { mutableStateOf(false) }
         var isSmsMode by remember { mutableStateOf(false) }
@@ -158,7 +158,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 if (time == 0) {
                     isRunning = false // Останавливаем таймер, когда достигнет 0
                     isSmsMode = true // Переходим в режим SMS после завершения таймера
-                    time = 10 // Сбрасываем таймер обратно
+                    time = 30 // Сбрасываем таймер обратно
                 }
             }
         }
