@@ -13,13 +13,14 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.Image
 import com.preat.peekaboo.image.picker.toImageBitmap
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.multiplatform.imageAsync
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
-val avatarCache = LruCache<String, ByteArray>(100) // Кэш для 100 аватарок
+val avatarCache = LruCache<String, ImageBitmap>(100) // Кэш для 100 аватарок
 
 @Composable
 fun Avatar(
@@ -78,19 +79,19 @@ suspend fun getImageStorage(imageId: String?, imageName: String?, isCipher: Bool
             val cachedImage = avatarCache[imageId]
             if (cachedImage != null) {
                 println("cachedImage31313131")
-                return cachedImage.toImageBitmap()
+                return cachedImage
             } else {
                 println("cachedIma1121")
                 
                 val newByteArray = imageName?.let { imageAsync(imageId, it, isCipher) }
                 
-                if (newByteArray != null && newByteArray.isNotEmpty() ) {
+                if (newByteArray != null) {
                     println("newByteArray $newByteArray")
                     
                     // Попробуем декодировать массив байтов безопасно
                     
                     println("imageIdimageBitmap $imageId")
-                    val imageBitmap = newByteArray.toImageBitmap()
+                    val imageBitmap = newByteArray
                     avatarCache.put(imageId, newByteArray)
                     return imageBitmap
                 }

@@ -1,6 +1,12 @@
 package org.videotrade.shopot.multiplatform
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
@@ -15,7 +21,7 @@ import java.io.File
 
 // Определение кэша для изображений
 
-actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ByteArray? {
+actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ImageBitmap? {
     val filePath = withContext(Dispatchers.IO) {
         val fileProvider = FileProviderFactory.create()
         
@@ -48,33 +54,46 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
     
     if (filePath != null) {
         return withContext(Dispatchers.IO) {
-
-
-//            val bitmap = BitmapFactory.decodeFile(filePath)
-//
-//            if (bitmap != null) {
-//                val outputStream = ByteArrayOutputStream()
-//                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-//                outputStream.toByteArray()
-//            } else {
-//                null
-//            }
+            val byteArray = getFileAsByteArray(getContextObj.getContext(), filePath)
             
-            getFileAsByteArray(getContextObj.getContext(), filePath)
+            byteArrayToCorrectedImageBitmap(byteArray!!, filePath)
         }
     }
     
     return null
 }
 
+fun byteArrayToCorrectedImageBitmap(byteArray: ByteArray, filePath: String): ImageBitmap {
+    val bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+    val exif = ExifInterface(filePath)
+    val rotation =
+        exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+    
+    val rotationDegrees = when (rotation) {
+        ExifInterface.ORIENTATION_ROTATE_90 -> 90
+        ExifInterface.ORIENTATION_ROTATE_180 -> 180
+        ExifInterface.ORIENTATION_ROTATE_270 -> 270
+        else -> 0
+    }
+    
+    val correctedBitmap = if (rotationDegrees != 0) {
+        val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
+        Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    } else {
+        bitmap
+    }
+    
+    return correctedBitmap.asImageBitmap()
+}
+
 fun getFileAsByteArray(context: Context, filePath: String): ByteArray? {
-   return try {
-       val op = File(filePath).readBytes()
-       println("op ${op.size}")
-       op
+    return try {
+        val op = File(filePath).readBytes()
+        println("op ${op.size}")
+        op
     } catch (e: Exception) {
-       null
-       
+        null
+        
     }
 }
 
@@ -82,8 +101,7 @@ fun getFileAsByteArray(context: Context, filePath: String): ByteArray? {
 @OptIn(InternalAPI::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
-    val filePath =
-        FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
+    val filePath = FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
     
     println("starting download")
     
@@ -106,6 +124,11 @@ private suspend fun downloadImageInCache(imageId: String): String? {
             
             println("Image successfully downloaded and saved to: $filePath")
         }
+        
+        // Проверка EXIF данных для ориентации
+        val exif = ExifInterface(filePath)
+        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+        println("EXIF Orientation: $orientation")
         
         return filePath
         
