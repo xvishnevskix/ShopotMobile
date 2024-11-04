@@ -23,19 +23,20 @@ import platform.Foundation.writeToURL
 
 
 actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ImageBitmap? {
-    val imageExist = FileProviderFactory.create().existingFileInDir(imageId, "image")
-    val filePath = imageExist ?: downloadImageInCache(imageId)
-    
-    return if (filePath != null) {
-        withContext(Dispatchers.IO) {
-            val fileUrl = NSURL.fileURLWithPath(filePath)
-            val imageData = NSData.dataWithContentsOfURL(fileUrl)
-            
-            imageData?.toByteArray()
-        }
-    } else {
-        null
-    }
+//    val imageExist = FileProviderFactory.create().existingFileInDir(imageId, "image")
+//    val filePath = imageExist ?: downloadImageInCache(imageId)
+//
+//    return if (filePath != null) {
+//        withContext(Dispatchers.IO) {
+//            val fileUrl = NSURL.fileURLWithPath(filePath)
+//            val imageData = NSData.dataWithContentsOfURL(fileUrl)
+//
+//            imageData?.toByteArray()
+//        }
+//    } else {
+//        null
+//    }
+    return null
 }
 
 
