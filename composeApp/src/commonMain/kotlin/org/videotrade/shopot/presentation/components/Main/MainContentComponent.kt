@@ -1,17 +1,22 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -28,7 +33,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.IntOffset
@@ -46,10 +53,13 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.auth_logo
 import shopot.composeapp.generated.resources.smart_encryption
 import shopot.composeapp.generated.resources.smart_lock
 
@@ -59,6 +69,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val chatState = mainViewModel.chats.collectAsState(initial = listOf()).value
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
+
 
     var refreshing by remember { mutableStateOf(false) }
     
@@ -78,7 +89,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 //        mainViewModel.getChatsInBack()
 //    }
     
-        SafeArea {
+        SafeArea() {
             Box(modifier = Modifier.fillMaxSize()) {
             
             Column(modifier = Modifier.fillMaxSize()) {
@@ -88,16 +99,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text(
-                        stringResource(MokoRes.strings.chats),
-                        modifier = Modifier.padding(bottom = 15.dp, top = 5.dp),
-                        textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF000000)
-                    )
+                    Spacer(modifier = Modifier.height(24.dp))
                     
                     Box(
                         modifier = Modifier
@@ -115,7 +117,10 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                             verticalArrangement = Arrangement.Center,
                         ) {
                             items(chatState) { item ->
-                                UserComponentItem(item, commonViewModel, mainViewModel)
+                                Column {
+                                    UserComponentItem(item, commonViewModel, mainViewModel)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                }
                             }
                             
                             if (chatState.isNotEmpty()) {
@@ -136,6 +141,8 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                 contentDescription = null,
                                             )
                                         }
+
+                                        Spacer(modifier = Modifier.height(10.dp))
                                         
                                         Row (
                                             horizontalArrangement = Arrangement.Center,
@@ -143,21 +150,18 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                         ) {
                                             Text(
                                                 stringResource(MokoRes.strings.encryption_info_1),
-                                                textAlign = TextAlign.Center,
-                                                fontSize = 10.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                                lineHeight = 20.sp,
-                                                color = Color(0xFF000000),
+                                                fontSize = 9.sp,
+                                                lineHeight = 10.sp,
+                                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                                color = Color(0xFF373533),
                                             )
                                             Text(
-                                                "  " + stringResource(MokoRes.strings.encryption_info_2),
+                                                " " + stringResource(MokoRes.strings.encryption_info_2),
                                                 textAlign = TextAlign.Start,
-                                                fontSize = 10.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                                lineHeight = 20.sp,
-                                                color = Color(0xFF219653),
+                                                fontSize = 9.sp,
+                                                lineHeight = 10.sp,
+                                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                                color = Color(0xFFCAB7A3),
                                                 textDecoration = TextDecoration.Underline,
                                             )
                                         }
@@ -166,23 +170,51 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                             } else {
                                 item {
                                     Column(
-                                        modifier = Modifier.padding(bottom = 10.dp)
+                                        modifier = Modifier.padding(bottom = 20.dp)
                                             .fillMaxSize()
                                             .size(600.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         verticalArrangement = Arrangement.Center
                                     ) {
-                                        Row {
-                                            Text(
-                                                stringResource(MokoRes.strings.create_new_chat),
-                                                modifier = Modifier,
-                                                textAlign = TextAlign.Center,
-                                                fontSize = 20.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                                lineHeight = 20.sp,
-                                                color = Color(0xFF979797)
+                                        Column(
+                                            modifier = Modifier.width(324.dp)
+                                                .height(324.dp)
+                                                .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(size = 16.dp))
+                                            ,
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Image(
+                                                modifier = Modifier
+                                                    .size(width = 195.dp, height = 132.dp),
+                                                painter = painterResource(Res.drawable.auth_logo),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop
                                             )
+                                            Spacer(modifier = Modifier.height(56.dp))
+                                            Text(
+                                                stringResource(
+                                                    MokoRes.strings.greeting
+                                                ),
+                                                fontSize = 24.sp,
+                                                lineHeight = 24.sp,
+                                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                                fontWeight = FontWeight(500),
+                                                textAlign = TextAlign.Center,
+                                                color = Color(0xFF373533),
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                "Создайте свой первый чат",
+                                                fontSize = 15.sp,
+                                                lineHeight = 15.sp,
+                                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                                fontWeight = FontWeight(400),
+                                                textAlign = TextAlign.Center,
+                                                color = Color(0x80373533),
+                                                maxLines = 3,
+                                            )
+
                                         }
                                     }
                                 }

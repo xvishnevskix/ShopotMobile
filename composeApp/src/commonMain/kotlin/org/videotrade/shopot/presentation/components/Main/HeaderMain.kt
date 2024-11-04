@@ -39,6 +39,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -64,41 +65,24 @@ fun HeaderMain() {
 
             ) {
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-
-
-                Image(
-                    modifier = Modifier.size(38.dp, height = 26.dp).pointerInput(Unit) {
-
-
-                    },
-                    painter = painterResource(Res.drawable.logo_main),
-                    contentDescription = null,
-
-                    )
 
                 Text(
-                    stringResource(MokoRes.strings.whisper),
-                    modifier = Modifier.padding(start = 7.dp),
-
+                    stringResource(MokoRes.strings.chats),
+                    fontSize = 24.sp,
+                    lineHeight = 24.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    color = Color(0xFF000000)
+                     color = Color(0xFF373533)
 
                 )
-            }
 
-//        Row(
-//            verticalAlignment = Alignment.CenterVertically,
-//            horizontalArrangement = Arrangement.Center
-//        ) {
-//
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+
 //            Image(
 //                modifier = Modifier.padding(end = 15.dp).size(22.dp).clickable(
 //                    interactionSource = interactionSource, // Используем источник взаимодействия
@@ -124,7 +108,7 @@ fun HeaderMain() {
 //                contentDescription = null,
 //
 //                )
-//        }
+        }
 
         }
         Box(modifier = Modifier.padding(top = 5.dp)) {

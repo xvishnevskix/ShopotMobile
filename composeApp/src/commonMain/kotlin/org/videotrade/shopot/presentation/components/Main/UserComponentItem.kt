@@ -9,13 +9,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -44,11 +49,16 @@ import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_group
+import shopot.composeapp.generated.resources.chat_reply
 import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.message_double_check
+import shopot.composeapp.generated.resources.message_single_check
 import shopot.composeapp.generated.resources.single_message_check
 
 @Composable
@@ -61,7 +71,7 @@ fun UserComponentItem(
     val profile = mainViewModel.profile.collectAsState().value
 
     Row(
-        modifier = Modifier.padding(bottom = 12.dp).fillMaxWidth().clickable {
+        modifier = Modifier.height(56.dp).fillMaxWidth().clickable {
             mainViewModel.setCurrentChat(chat.id)
             mainViewModel.setZeroUnread(chat)
             viewModel.clearMessages()
@@ -71,17 +81,19 @@ fun UserComponentItem(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
 
             Avatar(
                 icon = chat.icon,
-                size = 60.dp
+                size = 56.dp
             )
 
+            Spacer(modifier = Modifier.width(12.dp))
+
             Column(
-                modifier = Modifier.padding(start = 10.dp),
-                verticalArrangement = Arrangement.Center
+                modifier = Modifier,
+                verticalArrangement = Arrangement.Top
             ) {
                 val fullName =
                     listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.groupName)
@@ -95,10 +107,10 @@ fun UserComponentItem(
                             text = displayName,
                             textAlign = TextAlign.Start,
                             fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF000000),
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF373533),
                             maxLines = 1, // Ограничиваем одной строкой
                             overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
                             modifier = Modifier.widthIn(max = 160.dp)
@@ -109,10 +121,10 @@ fun UserComponentItem(
                             text = fullName,
                             textAlign = TextAlign.Start,
                             fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF000000),
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF373533),
                             maxLines = 1, // Ограничиваем одной строкой
                             overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
                             modifier = Modifier.widthIn(max = 160.dp)
@@ -129,21 +141,36 @@ fun UserComponentItem(
                     }
                 }
 
-
+                if (chat.lastMessage?.fromUser == profile.id) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(MokoRes.strings.you),
+                        textAlign = TextAlign.Start,
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF373533),
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                }
+                else {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
 
                 Text(
                     text = chat.lastMessage?.let {
                         MessageContent(message = it)
                     } ?: stringResource(MokoRes.strings.start_conversation),
                     textAlign = TextAlign.Start,
-                    fontSize = 14.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    color = Color(0xFF979797),
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0x80373533),
                     maxLines = 1, // Ограничиваем одной строкой
                     overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
-                    modifier = Modifier.widthIn(max = 160.dp).padding(top = 5.dp),
+                    modifier = Modifier.widthIn(max = 220.dp),
                 )
 
 
@@ -151,76 +178,84 @@ fun UserComponentItem(
 
         }
 
-        Row {
-            Column(
-                modifier = Modifier.padding(top = 12.dp, end = 5.dp)
-            ) {
-                if (chat.lastMessage?.fromUser == profile.id) {
-                    if (chat.lastMessage?.anotherRead == true) {
-                        Image(
-                            modifier = Modifier.size(14.dp),
-                            painter = painterResource(Res.drawable.double_message_check),
-                            contentDescription = null,
-                        )
-                    } else {
-                        Image(
-                            modifier = Modifier.size(14.dp),
-                            painter = painterResource(Res.drawable.single_message_check),
-                            contentDescription = null,
-                        )
-                    }
-                }
+        Column(
+            horizontalAlignment = Alignment.End,
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.fillMaxHeight()
+        ) {
 
+            if (chat.lastMessage !== null) {
+                Text(
+                    formatTimestamp(chat.lastMessage!!.created),
+                    textAlign = TextAlign.End,
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0x80373533),
+
+                    )
             }
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(top = 9.dp)
-            ) {
-                if (chat.lastMessage !== null) {
-                    Text(
-                        formatTimestamp(chat.lastMessage!!.created),
-                        textAlign = TextAlign.Center,
-                        fontSize = 14.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797),
+            Spacer(modifier = Modifier.height(12.dp))
 
-                        )
-                }
-//                Text(
-//                    formatTimestamp(chat.sortedDate),
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 14.sp,
-//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                    lineHeight = 20.sp,
-//                    color = Color(0xFF979797),
-//
-//                    )
-
-                Box(
+            if (chat.lastMessage?.fromUser == profile.id) {
+                Column(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(6.dp))
-//                        .background(if (boxText.isEmpty()) Color.Transparent else Color(0xFF2A293C))
-                        .background(Color(0xFF2A293C))
                 ) {
-                    if (chat.unread !== 0) {
-                        Text(
-                            text = "${chat.unread}",
-                            modifier = Modifier
-                                .padding(start = 6.dp, end = 6.dp, top = 0.dp, bottom = 0.dp),
-                            textAlign = TextAlign.Center,
-                            fontSize = 10.sp,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFFFFFFFF),
+                    if (chat.lastMessage?.fromUser == profile.id) {
+                        if (chat.lastMessage?.anotherRead == true) {
+                            Icon(
+                                painter = painterResource(Res.drawable.message_double_check),
+                                contentDescription = null,
+                                modifier = Modifier.size(width = 17.7.dp, height = 8.5.dp),
+                                tint = Color(0xFFa58462)
+                            )
+                        } else {
+                            Image(
+                                modifier = Modifier.size(width = 12.7.dp, height = 8.5.dp),
+                                painter = painterResource(Res.drawable.message_single_check),
+                                contentDescription = null,
+                            )
+                        }
+                    }
+
+                }
+            } else {
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.Top,
+                    modifier = Modifier
+                ) {
+
+
+
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(24.dp))
+//                        .background(if (boxText.isEmpty()) Color.Transparent else Color(0xFF2A293C))
+                            .background(Color(0xFFCAB7A3))
+                    ) {
+                        if (chat.unread !== 0) {
+                            Text(
+                                text = "${chat.unread}",
+                                modifier = Modifier
+                                    .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+                                textAlign = TextAlign.Center,
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                fontWeight = FontWeight(500),
+                                color = Color(0xFFFFFFFF)
 
                             )
+                        }
                     }
                 }
             }
+
+
+
+
 
         }
 
