@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -78,9 +80,10 @@ class MainScreen : Screen {
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = {
                         BottomNavigation(
-                            backgroundColor = Color(241, 238, 238),
+                            backgroundColor = Color.White,
                             modifier = Modifier
-                                .background(Color(241, 238, 238))
+                                .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                                .background(Color.White)
                                 .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                             ,
                             elevation = 0.dp // Убирает тень снизу

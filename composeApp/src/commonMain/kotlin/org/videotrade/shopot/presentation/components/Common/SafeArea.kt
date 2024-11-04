@@ -21,14 +21,16 @@ import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 fun SafeArea(
     isBlurred: Boolean = false,
     padding: Dp? = null,
-    content: @Composable () -> Unit
+    backgroundColor: Color = Color.White,
+    content: @Composable () -> Unit,
+
 ) {
     val blurRadius = if (isBlurred) 20.dp else 0.dp
     val toasterViewModel: CommonViewModel = koinInject()
     
     Box(
         modifier = Modifier
-            .fillMaxSize().background(Color.White)
+            .fillMaxSize().background(backgroundColor)
             .blur(blurRadius)
             .then(
                 if (getPlatform() == "Ios") {
