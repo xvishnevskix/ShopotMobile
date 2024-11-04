@@ -71,7 +71,8 @@ fun UserComponentItem(
     val profile = mainViewModel.profile.collectAsState().value
 
     Row(
-        modifier = Modifier.height(56.dp).fillMaxWidth().clickable {
+        modifier = Modifier
+            .background(Color(0xFFf9f9f9)).fillMaxWidth().clickable {
             mainViewModel.setCurrentChat(chat.id)
             mainViewModel.setZeroUnread(chat)
             viewModel.clearMessages()

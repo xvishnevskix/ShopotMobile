@@ -89,8 +89,8 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 //        mainViewModel.getChatsInBack()
 //    }
     
-        SafeArea() {
-            Box(modifier = Modifier.fillMaxSize()) {
+        SafeArea(backgroundColor = Color(0xFFf9f9f9)) {
+            Box(modifier = Modifier.background(Color(0xFFf9f9f9)).fillMaxSize()) {
             
             Column(modifier = Modifier.fillMaxSize()) {
                 HeaderMain()
@@ -150,19 +150,21 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                         ) {
                                             Text(
                                                 stringResource(MokoRes.strings.encryption_info_1),
-                                                fontSize = 9.sp,
+                                                fontSize = 9.5.sp,
                                                 lineHeight = 10.sp,
                                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                                 color = Color(0xFF373533),
+                                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                             )
                                             Text(
                                                 " " + stringResource(MokoRes.strings.encryption_info_2),
                                                 textAlign = TextAlign.Start,
-                                                fontSize = 9.sp,
+                                                fontSize = 9.5.sp,
                                                 lineHeight = 10.sp,
                                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                                 color = Color(0xFFCAB7A3),
                                                 textDecoration = TextDecoration.Underline,
+                                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                             )
                                         }
                                     }
@@ -170,16 +172,16 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                             } else {
                                 item {
                                     Column(
-                                        modifier = Modifier.padding(bottom = 20.dp)
+                                        modifier = Modifier.background(Color(0xFFf9f9f9)).padding(bottom = 20.dp)
                                             .fillMaxSize()
                                             .size(600.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally,
                                         verticalArrangement = Arrangement.Center
                                     ) {
                                         Column(
-                                            modifier = Modifier.width(324.dp)
+                                            modifier = Modifier.background(Color(0xFFf9f9f9)).width(324.dp)
                                                 .height(324.dp)
-                                                .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(size = 16.dp))
+                                                .background(color = Color(0xFFf9f9f9), shape = RoundedCornerShape(size = 16.dp))
                                             ,
                                             verticalArrangement = Arrangement.Center,
                                             horizontalAlignment = Alignment.CenterHorizontally
