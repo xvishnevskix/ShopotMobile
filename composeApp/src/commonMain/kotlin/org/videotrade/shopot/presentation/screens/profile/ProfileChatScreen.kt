@@ -64,6 +64,8 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
             )
         }
         
+        val imagePainter = getImageStorage(chat.icon, chat.icon, false)
+        
         
         Box(
             modifier = Modifier.fillMaxSize().background(Color.White),
@@ -87,17 +89,15 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                             println("AAAAA")
                             
                             scope.launch {
-                                val imageBitmap = getImageStorage(chat.icon, chat.icon, false)
-                                println(" imageBitmap $imageBitmap")
-                                imageBitmap?.let {
+                                imagePainter.value?.let {
                                     navigator.push(
                                         PhotoViewerScreen(
-                                            it,
+                                            imagePainter,
                                             messageSenderName = "${chat.firstName} ${chat.lastName}",
                                         )
                                     )
                                 }
-                                
+//
                             }
                             
                         }

@@ -8,20 +8,28 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import coil3.compose.rememberAsyncImagePainter
 import getImageStorage
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
@@ -33,23 +41,71 @@ fun MessageImage(
     attachments: List<Attachment>,
     messageSenderName: String? = null
 ) {
-//    var imageFilePath by remember { mutableStateOf("") }
+    val navigator = LocalNavigator.currentOrThrow
+    
     val fileName = attachments[0].name
     val fileId = attachments[0].fileId
     
-    val imageBitmap = remember(fileId) {
-        mutableStateOf<ImageBitmap?>(null)
-    }
-    LaunchedEffect(fileId) {
-        println("Loading image for fileId: $fileId")
-        imageBitmap.value = getImageStorage(fileId, fileName, true)
-    }
+    val imagePainter = remember { mutableStateOf<Painter?>(null) }
+    var imageFilePath = remember { mutableStateOf("") }
     
-    val navigator = LocalNavigator.current
+    imagePainter.value = if (getPlatform() == Platform.Android) {
+        getImageStorage(fileId, fileId, false).value
+    } else {
+        val url =
+            "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+        
+        LaunchedEffect(Unit) {
+            val fileType = attachments[0].type
+            
+            val fileProvider = FileProviderFactory.create()
+            
+            val existingFile =
+                fileProvider.existingFileInDir(fileName, fileType)
+            
+            if (!existingFile.isNullOrBlank()) {
+                imageFilePath.value = existingFile
+                println("existingFile ${existingFile}")
+            } else {
+                val filePath = fileProvider.downloadCipherFile(
+                    url,
+                    "image",
+                    fileName,
+                    "image"
+                ) { newProgress ->
+                    println("newProgress $newProgress")
+                }
+                
+                
+                if (filePath != null) {
+                    imageFilePath.value = filePath
+                }
+                
+                println("filePath $filePath")
+            }
+            
+        }
+        rememberAsyncImagePainter(imageFilePath)
+        
+    }
 
-    if (imageBitmap.value != null) {
+
+//    val imageBitmap = remember(fileId) {
+//        mutableStateOf<ImageBitmap?>(null)
+//    }
+//    LaunchedEffect(fileId) {
+//        println("Loading image for fileId: $fileId")
+//        imageBitmap.value = getImageStorage(fileId, fileName, true)
+//    }
+//
+
+
+//    val navigator = LocalNavigator.current
+    
+    if (imagePainter.value != null) {
+        println("imagePainter.value asdada")
         Image(
-            bitmap = imageBitmap.value!!,
+            painter = imagePainter.value!!,
             contentDescription = "Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -66,10 +122,10 @@ fun MessageImage(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убирает эффект нажатия
                 ) {
-                    if (imageBitmap.value !== null)
-                        navigator?.push(
+                    if (imagePainter.value !== null)
+                        navigator.push(
                             PhotoViewerScreen(
-                                imageBitmap.value!!,
+                                imagePainter,
                                 messageSenderName,
                                 message.created
                             )
@@ -97,10 +153,10 @@ fun MessageImage(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убирает эффект нажатия
                 ) {
-                    if (imageBitmap.value !== null)
-                        navigator?.push(
+                    if (imagePainter.value !== null)
+                        navigator.push(
                             PhotoViewerScreen(
-                                imageBitmap.value!!,
+                                imagePainter,
                                 messageSenderName,
                                 message.created
                             )

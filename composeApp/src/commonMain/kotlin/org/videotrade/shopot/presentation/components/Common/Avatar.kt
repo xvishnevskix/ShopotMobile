@@ -6,6 +6,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -35,78 +36,58 @@ fun Avatar(
         onClick?.invoke()
     },
     contentScale: ContentScale = ContentScale.Crop,
-//    bitmap: ImageBitmap? = null,
 ) {
-    val imagePainter = remember { mutableStateOf<Painter?>(null) }
+    val placeholderPainter = painterResource(Res.drawable.person)
     
-    if (icon.isNullOrBlank()) {
-        imagePainter.value = painterResource(Res.drawable.person)
+    val imagePainter = if (icon.isNullOrBlank()) {
+        remember { mutableStateOf(placeholderPainter) }
     } else {
-        if (getPlatform() == Platform.Android) {
-            LaunchedEffect(icon) {
-                val newImageBitmap = getImageStorage(icon, icon, false)
-                imagePainter.value = newImageBitmap?.let { BitmapPainter(it) }
-            }
-        } else {
-            imagePainter.value = rememberImagePainter(url = "${serverUrl}file/plain/$icon")
-        }
+        getImageStorage(icon, icon, false)
     }
-
+    
     
     Surface(
         modifier = modifier,
         shape = CircleShape,
     ) {
-        if (imagePainter.value != null) {
-            Image(
-                painter = imagePainter.value!!,
-                contentDescription = "Avatar",
-                contentScale = contentScale,
-                modifier = Modifier.size(size)
-            )
-        } else {
-            Image(
-                painter = painterResource(Res.drawable.person),
-                contentDescription = "Avatar",
-                contentScale = contentScale,
-                modifier = Modifier.size(size)
-            )
-        }
+        Image(
+            painter = imagePainter.value ?: painterResource(Res.drawable.person),
+            contentDescription = "Avatar",
+            contentScale = contentScale,
+            modifier = Modifier.size(size)
+        )
     }
 }
 
-
-suspend fun getImageStorage(imageId: String?, imageName: String?, isCipher: Boolean): ImageBitmap? {
-    // Если icon не пустой и изображение еще не загружено
-    try {
-        if (imageId != null) {
-            // Проверка кэша
-            val cachedImage = avatarCache[imageId]
-            if (cachedImage != null) {
-                println("cachedImage31313131")
-                return cachedImage
-            } else {
-                println("cachedIma1121")
-                
-                val imageData = if (getPlatform() == Platform.Android) {
-                    imageName?.let { imageAsync(imageId, it, isCipher) }
-                } else {
-                    null
+@Composable
+fun getImageStorage(imageId: String?, imageName: String?, isCipher: Boolean): State<Painter?> {
+    val imagePainter = remember { mutableStateOf<Painter?>(null) }
+    
+    if (getPlatform() == Platform.Android) {
+        LaunchedEffect(imageId) {
+            try {
+                if (imageId != null) {
+                    val cachedImage = avatarCache[imageId]
+                    if (cachedImage != null) {
+                        println("cachedImage31313131 ${cachedImage}")
+                        imagePainter.value = BitmapPainter(cachedImage)
+                    } else {
+                        println("cachedIma1121")
+                        val imageData = imageName?.let { imageAsync(imageId, it, isCipher) }
+                        if (imageData != null) {
+                            println("imageData $imageData")
+                            avatarCache.put(imageId, imageData)
+                            imagePainter.value = BitmapPainter(imageData)
+                        }
+                    }
                 }
-                
-                
-                if (imageData != null) {
-                    println("imageData $imageData")
-                    
-                    // Попробуем декодировать массив байтов безопасно
-                    avatarCache.put(imageId, imageData)
-                    return imageData
-                }
+            } catch (e: Exception) {
+                println("error getImageStorage $e")
             }
         }
-    } catch (e: Exception) {
-        println("error getImageStorage $e")
+    } else {
+        imagePainter.value = rememberImagePainter(url = "${serverUrl}file/plain/$imageId")
     }
-    return null
+  
+    return imagePainter
 }
-

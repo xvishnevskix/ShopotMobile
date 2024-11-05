@@ -12,6 +12,8 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,17 +24,19 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntSize
 import cafe.adriel.voyager.core.screen.Screen
+import coil3.compose.AsyncImagePainter
 import getImageStorage
 import org.videotrade.shopot.api.formatTimeOnly
 import org.videotrade.shopot.domain.model.MessageItem
 
 class PhotoViewerScreen(
-    private val imageBitmap: ImageBitmap,
+    private val imagePainter: State<Painter?>,
     private val messageSenderName: String? = null,
     private val imageCreated: List<Int>? = null,
 ) : Screen {
@@ -50,7 +54,7 @@ class PhotoViewerScreen(
                 .background(Color(0xFF29303c))
         ) {
             Image(
-                bitmap = imageBitmap,
+                painter = imagePainter.value!!,
                 contentDescription = null,
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
