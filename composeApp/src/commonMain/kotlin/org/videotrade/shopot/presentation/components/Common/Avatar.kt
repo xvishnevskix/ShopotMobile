@@ -13,13 +13,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.preat.peekaboo.image.picker.toImageBitmap
-import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.multiplatform.Platform
-import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.imageAsync
-import org.videotrade.shopot.multiplatform.imageAsyncIos
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
@@ -85,12 +80,13 @@ suspend fun getImageStorage(imageId: String?, imageName: String?, isCipher: Bool
                 return cachedImage
             } else {
                 println("cachedIma1121")
-                
-                val imageData = if (getPlatform() == Platform.Ios) {
-                    imageName?.let { imageAsync(imageId, it, isCipher) }
-                } else  {
-                    imageName?.let { imageAsyncIos(imageId, it, isCipher)?.toImageBitmap() }
-                }
+
+//                val imageData = if (getPlatform() == Platform.Ios) {
+//                    imageName?.let { imageAsync(imageId, it, isCipher) }
+//                } else  {
+//                    imageName?.let { imageAsyncIos(imageId, it, isCipher)?.toImageBitmap() }
+//                }
+                val imageData = imageName?.let { imageAsync(imageId, it, isCipher) }
                 
                 
                 if (imageData != null) {

@@ -141,10 +141,10 @@ private suspend fun downloadImageInCache(imageId: String): String? {
     return null
 }
 
-actual suspend fun imageAsyncIos(
-    imageId: String,
-    imageName: String,
-    isCipher: Boolean
-): ByteArray? {
-    TODO("Not yet implemented")
-}
+//actual suspend fun imageAsyncIos(
+//    imageId: String,
+//    imageName: String,
+//    isCipher: Boolean
+//): ByteArray? {
+//    TODO("Not yet implemented")
+//}
