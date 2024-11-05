@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
 import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
@@ -40,41 +39,39 @@ fun Avatar(
 ) {
     val imagePainter = remember { mutableStateOf<Painter?>(null) }
     
-    if (getPlatform() == Platform.Android) {
-        LaunchedEffect(icon) {
-            val newImageBitmap = getImageStorage(icon, icon, false)
-            imagePainter.value = newImageBitmap?.let { BitmapPainter(it) }
-        }
+    if (icon.isNullOrBlank()) {
+        imagePainter.value = painterResource(Res.drawable.person)
     } else {
-        imagePainter.value = rememberImagePainter(url = "${serverUrl}file/plain/$icon")
+        if (getPlatform() == Platform.Android) {
+            LaunchedEffect(icon) {
+                val newImageBitmap = getImageStorage(icon, icon, false)
+                imagePainter.value = newImageBitmap?.let { BitmapPainter(it) }
+            }
+        } else {
+            imagePainter.value = rememberImagePainter(url = "${serverUrl}file/plain/$icon")
+        }
     }
-    
 
-
-//    LaunchedEffect(icon) {
-//        imageBitmap.value = getImageStorage(icon, icon, false)
-//    }
-    
     
     Surface(
         modifier = modifier,
         shape = CircleShape,
     ) {
-            if (imagePainter.value != null) {
-                Image(
-                    painter = imagePainter.value!!,
-                    contentDescription = "Avatar",
-                    contentScale = contentScale,
-                    modifier = Modifier.size(size)
-                )
-            } else {
-                Image(
-                    painter = painterResource(Res.drawable.person),
-                    contentDescription = "Avatar",
-                    contentScale = contentScale,
-                    modifier = Modifier.size(size)
-                )
-            }
+        if (imagePainter.value != null) {
+            Image(
+                painter = imagePainter.value!!,
+                contentDescription = "Avatar",
+                contentScale = contentScale,
+                modifier = Modifier.size(size)
+            )
+        } else {
+            Image(
+                painter = painterResource(Res.drawable.person),
+                contentDescription = "Avatar",
+                contentScale = contentScale,
+                modifier = Modifier.size(size)
+            )
+        }
     }
 }
 
