@@ -204,6 +204,7 @@ fun CountryPicker(
                 fontSize = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 lineHeight = 16.sp,
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 color = Color(0xFF373533),
             )
 
@@ -306,6 +307,7 @@ fun CountryPickerBottomSheet(
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     color = Color(0xFF373533)
                 )
             )
@@ -326,6 +328,7 @@ fun CountryPickerBottomSheet(
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     color = Color(0xFF373533)
                 )
             )
@@ -356,6 +359,7 @@ fun CountryPickerBottomSheet(
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 color = Color(0xFF373533)
                             )
                         )
@@ -367,6 +371,7 @@ fun CountryPickerBottomSheet(
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 color = Color(0xFF373533)
                             )
                         )
@@ -389,6 +394,7 @@ fun CountryPickerBottomSheet(
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     color = Color(0xFF373533)
                 )
             )
@@ -437,6 +443,7 @@ fun CountryPickerBottomSheet(
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                             fontWeight = FontWeight(400),
                                             textAlign = TextAlign.Start,
+                                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                             color = Color(0xFF373533)
                                         )
                                     )
@@ -449,6 +456,7 @@ fun CountryPickerBottomSheet(
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                             fontWeight = FontWeight(400),
                                             textAlign = TextAlign.Start,
+                                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                             color = textColor
                                         )
                                     )
@@ -462,6 +470,7 @@ fun CountryPickerBottomSheet(
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
                                         textAlign = TextAlign.End,
+                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         color = textColor
                                     )
                                 )

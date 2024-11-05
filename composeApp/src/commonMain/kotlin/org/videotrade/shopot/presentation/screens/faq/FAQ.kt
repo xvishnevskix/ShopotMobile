@@ -197,7 +197,7 @@ class FAQ() : Screen {
             }
 
             Column(
-                modifier = Modifier.padding(10.dp).fillMaxHeight(0.95f),
+                modifier = Modifier.padding(10.dp).fillMaxHeight(0.9f),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 

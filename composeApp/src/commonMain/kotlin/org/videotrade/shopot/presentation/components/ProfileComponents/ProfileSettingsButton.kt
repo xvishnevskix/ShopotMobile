@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -61,7 +63,8 @@ fun ProfileSettingsButton(
                 onClick()
             }
             .background(Color.Transparent)
-            .fillMaxWidth(0.9F)
+            .fillMaxWidth()
+            .height(56.dp)
             .padding(16.dp)
         ,
         contentAlignment = Alignment.Center
@@ -69,20 +72,22 @@ fun ProfileSettingsButton(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight()
                 .background(Color.Transparent),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(0.dp)
+                modifier = Modifier
             ) {
                 Box(
-                    modifier = Modifier.width(35.dp),
+                    modifier = Modifier.width(35.dp).padding(end = 12.dp),
                     contentAlignment = Alignment.CenterStart
                 ) {
                     Image(
                         modifier = Modifier
-                            .padding(end = 18.dp)
+
                             .size(width = width, height = height),
                         painter = painterResource(drawableRes),
                         contentDescription = null,
@@ -103,7 +108,7 @@ fun ProfileSettingsButton(
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically
-                , modifier = Modifier.padding(top = 5.dp)
+                , modifier = Modifier
             ) {
 
                 Image(

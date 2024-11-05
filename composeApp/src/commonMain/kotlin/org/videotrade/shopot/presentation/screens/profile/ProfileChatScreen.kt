@@ -79,7 +79,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader(stringResource(MokoRes.strings.profile), true)
+                    ProfileHeader(stringResource(MokoRes.strings.profile))
                     Avatar(
                         icon = chat.icon,
                         size = 186.dp,

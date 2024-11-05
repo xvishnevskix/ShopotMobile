@@ -1,3 +1,4 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,10 +33,12 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.arrow_left
 
 @Composable
 fun LanguageHeader(text: String) {
@@ -47,14 +52,26 @@ fun LanguageHeader(text: String) {
 
             )
         {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
-                    navigator.pop()
-                },
-                tint = Color.Black
-            )
+//            Icon(
+//                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                contentDescription = "Back",
+//                modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
+//                    navigator.pop()
+//                },
+//                tint = Color.Black
+//            )
+
+            Box(modifier = Modifier.clickable {
+                navigator.pop()
+            }.padding(start = 8.dp, end = 8.dp)) {
+                Image(
+                    modifier = Modifier
+                        .size(width = 7.dp, height = 14.dp),
+                    painter = painterResource(Res.drawable.arrow_left),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Text(
                 text = text,
