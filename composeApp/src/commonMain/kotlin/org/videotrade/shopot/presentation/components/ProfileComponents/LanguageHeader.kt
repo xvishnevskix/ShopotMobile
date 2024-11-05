@@ -44,7 +44,9 @@ import shopot.composeapp.generated.resources.arrow_left
 fun LanguageHeader(text: String) {
     val navigator = LocalNavigator.currentOrThrow
 
-    Column {
+    Column(
+        modifier = Modifier.background(Color(0xFFf9f9f9))
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
             verticalAlignment = Alignment.CenterVertically,
