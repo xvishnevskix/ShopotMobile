@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,35 +38,31 @@ fun Avatar(
     contentScale: ContentScale = ContentScale.Crop,
 //    bitmap: ImageBitmap? = null,
 ) {
-    val imageBitmap = remember(icon) {
-        mutableStateOf<ImageBitmap?>(null)
+    val imagePainter = remember { mutableStateOf<Painter?>(null) }
+    
+    if (getPlatform() == Platform.Android) {
+        LaunchedEffect(icon) {
+            val newImageBitmap = getImageStorage(icon, icon, false)
+            imagePainter.value = newImageBitmap?.let { BitmapPainter(it) }
+        }
+    } else {
+        imagePainter.value = rememberImagePainter(url = "${serverUrl}file/plain/$icon")
     }
     
-    rememberImagePainter(
-    
-    )
-    
-    LaunchedEffect(icon) {
-        imageBitmap.value = getImageStorage(icon, icon, false)
-    }
+
+
+//    LaunchedEffect(icon) {
+//        imageBitmap.value = getImageStorage(icon, icon, false)
+//    }
     
     
     Surface(
         modifier = modifier,
         shape = CircleShape,
     ) {
-//        if (bitmap != null) {
-//            Image(
-//                bitmap = bitmap,
-//                contentDescription = "Avatar",
-//                contentScale = contentScale,
-//                modifier = Modifier.size(size)
-//            )
-//        } else
-        if (Platform.Android == getPlatform()) {
-            if (imageBitmap.value != null) {
+            if (imagePainter.value != null) {
                 Image(
-                    bitmap = imageBitmap.value!!,
+                    painter = imagePainter.value!!,
                     contentDescription = "Avatar",
                     contentScale = contentScale,
                     modifier = Modifier.size(size)
@@ -77,17 +75,6 @@ fun Avatar(
                     modifier = Modifier.size(size)
                 )
             }
-        } else {
-            AsyncImage(
-                model = "${serverUrl}file/plain/$icon",
-//                model = "https://example.com/image.jpg",
-                contentDescription = "Avatar",
-                contentScale = contentScale,
-                modifier = Modifier.size(size)
-            )
-        }
-        
-        
     }
 }
 
