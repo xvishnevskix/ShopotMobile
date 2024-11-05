@@ -8,8 +8,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -53,6 +55,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.edit_profile
 import shopot.composeapp.generated.resources.language
 import shopot.composeapp.generated.resources.log_out
+import shopot.composeapp.generated.resources.support
 
 
 data class ProfileSettingsItem(
@@ -93,14 +96,6 @@ class ProfileScreen(
                     ProfileEditScreen()
                 )
             },
-//            ProfileSettingsItem(Res.drawable.carbon_media_library, 25.dp, "Медиа, ссылки и файлы") {
-//                navigator.push(
-//                    ProfileMediaScreen(profile)
-//                )
-//            },
-//            ProfileSettingsItem(Res.drawable.theme, 25.dp, "Тема", {}),
-//            ProfileSettingsItem(Res.drawable.wallpaper, 25.dp, 25.dp, "Обои", {}),
-            
             ProfileSettingsItem(
                 Res.drawable.language,
                 25.dp,
@@ -111,23 +106,17 @@ class ProfileScreen(
                     LanguageScreen()
                 )
             },
-            
-            
+
             ProfileSettingsItem(
-                Res.drawable.log_out,
-                25.dp,
-                29.dp,
-                stringResource(MokoRes.strings.log_out)
+                Res.drawable.support,
+                18.dp,
+                18.dp,
+                stringResource(MokoRes.strings.support)
             ) {
                 
                 commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
             },
 
-//            ProfileSettingsItem(Res.drawable.black_star, 24.dp, "Закрепить сообщения"),
-//            ProfileSettingsItem(Res.drawable.search_icon, 22.dp, "Поиск по чату"),
-//            ProfileSettingsItem(Res.drawable.mute_icon, 18.dp, "Заглушить"),
-//            ProfileSettingsItem(Res.drawable.signal, 18.dp, "Сигнал"),
-//            ProfileSettingsItem(Res.drawable.download_photo, 19.dp, "Сохранить фото"),
         )
         
         
@@ -279,6 +268,7 @@ class ProfileScreen(
                             mainText = item.mainText,
                             onClick = item.onClick
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
                     }
                     
                 }

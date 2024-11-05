@@ -381,6 +381,7 @@ class SignUpScreen(private val phone: String) : Screen {
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
                 color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 modifier = Modifier.padding(
                     top = 5.dp,
                     bottom = 8.dp,
@@ -399,6 +400,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 color = Color(0x80373533)
                             )
                         )
@@ -431,6 +433,7 @@ class SignUpScreen(private val phone: String) : Screen {
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
                     textAlign = TextAlign.Center,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     modifier = Modifier.padding(start = 4.dp, top = 4.dp)
                 )
             }

@@ -29,6 +29,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
@@ -88,6 +90,7 @@ class PermissionsScreen : Screen {
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
                     color = Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 )
                 
@@ -101,6 +104,7 @@ class PermissionsScreen : Screen {
                     fontWeight = FontWeight(400),
                     textAlign = TextAlign.Center,
                     color = Color(0x80373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     modifier = Modifier.align(Alignment.CenterHorizontally) // Центрирование текста
                 )
                 
@@ -184,6 +188,7 @@ fun NotificationPreview(title: String) {
                 fontWeight = FontWeight(400),
                 textAlign = TextAlign.Center,
                 color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
             )
         )
     }

@@ -73,7 +73,8 @@ fun HeaderMain() {
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
-                     color = Color(0xFF373533)
+                     color = Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
 
                 )
 

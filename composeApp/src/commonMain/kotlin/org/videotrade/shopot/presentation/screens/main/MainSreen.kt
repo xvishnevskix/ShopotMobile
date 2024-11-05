@@ -140,6 +140,7 @@ private fun RowScope.TabNavigationItem(tab: Tab, width: Dp, height: Dp) {
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
                     color = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
                 )
 
         },

@@ -204,6 +204,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                 fontWeight = FontWeight(500),
                                                 textAlign = TextAlign.Center,
                                                 color = Color(0xFF373533),
+                                                letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                             )
                                             Spacer(modifier = Modifier.height(8.dp))
                                             Text(
@@ -212,6 +213,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                 lineHeight = 15.sp,
                                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                                 fontWeight = FontWeight(400),
+                                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                                 textAlign = TextAlign.Center,
                                                 color = Color(0x80373533),
                                                 maxLines = 3,

@@ -343,7 +343,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                     fontWeight = FontWeight(500),
                                     textAlign = TextAlign.Center,
-                                    color = Color(0xFF373533)
+                                    color = Color(0xFF373533),
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                 )
                             )
                             Spacer(modifier = Modifier.height(8.dp))
@@ -358,7 +359,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     textAlign = TextAlign.Center,
-                                    color = Color(0x80373533)
+                                    color = Color(0x80373533),
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                 )
                             )
                             Spacer(modifier = Modifier.height(50.dp))
