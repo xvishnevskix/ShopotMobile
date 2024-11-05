@@ -99,30 +99,53 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //        )
 //    )
     
+//    private val iceServers = listOf(
+////        IceServer(
+////            urls = listOf("stun:stun.l.google.com:19302")
+////        ),
+////        IceServer(
+////            urls = listOf("stun:stun1.l.google.com:19302")
+////        ),
+////        IceServer(
+////            urls = listOf("stun:stun2.l.google.com:19302")
+////        ),
+//        IceServer(
+//            urls = listOf(
+//                "turn:89.221.60.156:3478",
+////                "turn:89.221.60.161:3478",
+////                "turn:videotradedev2.ru:3478",
+//            ),
+//            username = "andrew",
+//            password = "kapustin",
+//        )
+//    )
+//
+//    // Создание конфигурации для PeerConnection
+//    private val rtcConfiguration = RtcConfiguration(iceServers = iceServers)
+//
+    
     private val iceServers = listOf(
-//        IceServer(
-//            urls = listOf("stun:stun.l.google.com:19302")
-//        ),
-//        IceServer(
-//            urls = listOf("stun:stun1.l.google.com:19302")
-//        ),
-//        IceServer(
-//            urls = listOf("stun:stun2.l.google.com:19302")
-//        ),
-        IceServer(
-            urls = listOf(
-                "turn:89.221.60.156:3478",
-//                "turn:89.221.60.161:3478",
-//                "turn:videotradedev2.ru:3478",
-            ),
-            username = "andrew",
-            password = "kapustin",
-        )
+        "stun:stun.l.google.com:19302",
+        "stun:stun1.l.google.com:19302",
+        "stun:stun2.l.google.com:19302",
+    )
+    
+    private val turnServers = listOf(
+        "turn:89.221.60.156:3478",
+//        "turn:89.221.60.161:3478?transport=udp",
     )
     
     // Создание конфигурации для PeerConnection
-    private val rtcConfiguration = RtcConfiguration(iceServers = iceServers)
-    
+    private val rtcConfiguration = RtcConfiguration(
+        iceServers = listOf(
+            IceServer(iceServers),
+            IceServer(
+                urls = turnServers, // URL TURN сервера
+                username = "andrew", // Имя пользователя
+                password = "kapustin" // Пароль
+            )
+        )
+    )
     
     private fun generateRandomNumber(): String {
         return Random.nextInt(1, 41).toString() // верхняя граница исключена, поэтому указываем 11
