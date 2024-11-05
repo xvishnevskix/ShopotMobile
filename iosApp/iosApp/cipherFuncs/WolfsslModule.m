@@ -77,9 +77,7 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
 
 
 + (NSData *)decryptWithCipher:(NSData *)cipher block:(NSData *)block authTagData:(NSData *)authTagData sharedSecret:(NSData *)sharedSecret {
-    NSLog(@"decryptWithCipher called");
     if (!cipher || !block || !authTagData || !sharedSecret) {
-        NSLog(@"One or more parameters are nil");
         return nil;
     }
 
@@ -89,7 +87,6 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
     const unsigned char *authTagBytes = [authTagData bytes];
 
     int cipherLength = (int) [cipher length];
-    NSLog(@"Cipher length: %d", cipherLength);
 
     unsigned char *authTag = calloc(16, sizeof(unsigned char));
     for (int i = 0; i < 16; ++i) {
@@ -100,27 +97,13 @@ encapsulate_with_chacha(unsigned char *message, unsigned char *shared_secret) {
     unsigned char *decryptedMessage = (unsigned char *) calloc(cipherLength + 1,
                                                                sizeof(unsigned char));
 
-    NSLog(@"Cipher Bytes: ");
-    for (int i = 0; i < cipherLength; i++) {
-        NSLog(@"%02x", cipherBytes[i]);
-    }
-    NSLog(@"Cipher Length: %d", cipherLength);
-
-    // Вывод в консоль значения authTag
-    NSLog(@"Auth Tag: ");
-    for (int i = 0; i < 16; i++) {
-        NSLog(@"%02x", authTag[i]);
-    }
 
     int result = wc_ChaCha20Poly1305_Decrypt(sharedSecretBytes, blockBytes, inAAD, 0, cipherBytes,
                                              cipherLength, authTag, decryptedMessage);
-    NSLog(@"wc_ChaCha20Poly1305_Decrypt result: %d", result);
 
     NSData *decryptedData = nil;
     if (result == 0) {
         decryptedData = [NSData dataWithBytes:decryptedMessage length:cipherLength];
-    } else {
-        NSLog(@"Decryption error with result code: %d", result);
     }
 
     free(decryptedMessage);

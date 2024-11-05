@@ -1,6 +1,5 @@
 package org.videotrade.shopot.multiplatform
 
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -14,7 +13,6 @@ import io.ktor.util.InternalAPI
 import io.ktor.utils.io.jvm.javaio.copyTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.videotrade.shopot.androidSpecificApi.getContextObj
 import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.api.getValueInStorage
 import java.io.File
@@ -22,42 +20,46 @@ import java.io.File
 // Определение кэша для изображений
 
 actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ImageBitmap? {
-    val filePath = withContext(Dispatchers.IO) {
-        val fileProvider = FileProviderFactory.create()
+    try {
+        val filePath = withContext(Dispatchers.IO) {
+            val fileProvider = FileProviderFactory.create()
+            
+            if (!isCipher) {
+                val imageExist = fileProvider.existingFileInDir(imageId, "image")
+                
+                println("imageExist $imageExist")
+                
+                imageExist ?: downloadImageInCache(imageId)
+            } else {
+                val imageExist = fileProvider.existingFileInDir(imageId, "image")
+                
+                println("imageExist $imageExist")
+                
+                imageExist ?: fileProvider.downloadCipherFile(
+                    "${serverUrl}file/id/$imageId",
+                    "image",
+                    imageId,
+                    "image"
+                ) { _ -> }
+                
+            }
+        }
         
-        if (!isCipher) {
-            val imageExist = fileProvider.existingFileInDir(imageId, "image")
-            
-            println("imageExist $imageExist")
-            
-            imageExist ?: downloadImageInCache(imageId)
-        } else {
-            val imageExist = fileProvider.existingFileInDir(imageId, "image")
-            
-            println("imageExist $imageExist")
-            
-            imageExist ?: fileProvider.downloadCipherFile(
-                "${serverUrl}file/id/$imageId",
-                "image",
-                imageId,
-                "image"
-            ) { _ -> }
-            
+        
+        
+        
+        
+        println("filePath4124141 $filePath")
+        
+        if (filePath != null) {
+            return withContext(Dispatchers.IO) {
+                val byteArray = File(filePath).readBytes()
+                
+                byteArrayToCorrectedImageBitmap(byteArray, filePath)
+            }
         }
-    }
+    } catch (e: Exception) {
     
-    
-    
-    
-    
-    println("filePath4124141 $filePath")
-    
-    if (filePath != null) {
-        return withContext(Dispatchers.IO) {
-            val byteArray = getFileAsByteArray(getContextObj.getContext(), filePath)
-            
-            byteArrayToCorrectedImageBitmap(byteArray!!, filePath)
-        }
     }
     
     return null
@@ -86,22 +88,12 @@ fun byteArrayToCorrectedImageBitmap(byteArray: ByteArray, filePath: String): Ima
     return correctedBitmap.asImageBitmap()
 }
 
-fun getFileAsByteArray(context: Context, filePath: String): ByteArray? {
-    return try {
-        val op = File(filePath).readBytes()
-        println("op ${op.size}")
-        op
-    } catch (e: Exception) {
-        null
-        
-    }
-}
-
 
 @OptIn(InternalAPI::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
-    val filePath = FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
+    val filePath =
+        FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
     
     println("starting download")
     
@@ -127,7 +119,8 @@ private suspend fun downloadImageInCache(imageId: String): String? {
         
         // Проверка EXIF данных для ориентации
         val exif = ExifInterface(filePath)
-        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+        val orientation =
+            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
         println("EXIF Orientation: $orientation")
         
         return filePath
@@ -148,3 +141,10 @@ private suspend fun downloadImageInCache(imageId: String): String? {
 //): ByteArray? {
 //    TODO("Not yet implemented")
 //}
+actual suspend fun imageAsyncIos(
+    imageId: String,
+    imageName: String,
+    isCipher: Boolean
+): ByteArray? {
+    TODO("Not yet implemented")
+}

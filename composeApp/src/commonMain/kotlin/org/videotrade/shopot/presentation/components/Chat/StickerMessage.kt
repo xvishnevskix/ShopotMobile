@@ -15,6 +15,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import avatarCache
 import com.preat.peekaboo.image.picker.toImageBitmap
+import getImageStorage
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.imageAsync
 
@@ -29,24 +30,11 @@ fun StickerMessage(
         mutableStateOf<ImageBitmap?>(null)
     }
     
-    // Если imageId не пустой и изображение еще не загружено
-//    if (imageBitmap.value == null) {
-//        LaunchedEffect(imageId) {
-//            // Проверка кэша
-//            val cachedImage = avatarCache[imageId]
-//            if (cachedImage != null) {
-//                println("cachedImage31313131")
-//                imageBitmap.value = cachedImage.toImageBitmap()
-//            } else {
-//                println("cachedIma1121")
-//                val newByteArray = imageAsync(imageId, "", false)
-//                if (newByteArray != null) {
-//                    avatarCache.put(imageId, newByteArray)
-//                    imageBitmap.value = newByteArray.toImageBitmap()
-//                }
-//            }
-//        }
-//    }
+    LaunchedEffect(imageId) {
+        imageBitmap.value = getImageStorage(imageId, imageId, false)
+    }
+    
+    
     if (imageBitmap.value !== null)
         Image(
             bitmap = imageBitmap.value!!,

@@ -13,7 +13,12 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.imageAsync
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
@@ -29,42 +34,60 @@ fun Avatar(
         onClick?.invoke()
     },
     contentScale: ContentScale = ContentScale.Crop,
-    bitmap: ImageBitmap? = null,
+//    bitmap: ImageBitmap? = null,
 ) {
     val imageBitmap = remember(icon) {
         mutableStateOf<ImageBitmap?>(null)
     }
     
+    rememberImagePainter(
+    
+    )
+    
     LaunchedEffect(icon) {
         imageBitmap.value = getImageStorage(icon, icon, false)
     }
+    
     
     Surface(
         modifier = modifier,
         shape = CircleShape,
     ) {
-        if (bitmap != null) {
-            Image(
-                bitmap = bitmap,
-                contentDescription = "Avatar",
-                contentScale = contentScale,
-                modifier = Modifier.size(size)
-            )
-        } else if (imageBitmap.value != null) {
-            Image(
-                bitmap = imageBitmap.value!!,
-                contentDescription = "Avatar",
-                contentScale = contentScale,
-                modifier = Modifier.size(size)
-            )
+//        if (bitmap != null) {
+//            Image(
+//                bitmap = bitmap,
+//                contentDescription = "Avatar",
+//                contentScale = contentScale,
+//                modifier = Modifier.size(size)
+//            )
+//        } else
+        if (Platform.Android == getPlatform()) {
+            if (imageBitmap.value != null) {
+                Image(
+                    bitmap = imageBitmap.value!!,
+                    contentDescription = "Avatar",
+                    contentScale = contentScale,
+                    modifier = Modifier.size(size)
+                )
+            } else {
+                Image(
+                    painter = painterResource(Res.drawable.person),
+                    contentDescription = "Avatar",
+                    contentScale = contentScale,
+                    modifier = Modifier.size(size)
+                )
+            }
         } else {
-            Image(
-                painter = painterResource(Res.drawable.person),
+            AsyncImage(
+                model = "${serverUrl}file/plain/$icon",
+//                model = "https://example.com/image.jpg",
                 contentDescription = "Avatar",
                 contentScale = contentScale,
                 modifier = Modifier.size(size)
             )
         }
+        
+        
     }
 }
 
@@ -80,13 +103,12 @@ suspend fun getImageStorage(imageId: String?, imageName: String?, isCipher: Bool
                 return cachedImage
             } else {
                 println("cachedIma1121")
-
-//                val imageData = if (getPlatform() == Platform.Ios) {
-//                    imageName?.let { imageAsync(imageId, it, isCipher) }
-//                } else  {
-//                    imageName?.let { imageAsyncIos(imageId, it, isCipher)?.toImageBitmap() }
-//                }
-                val imageData = imageName?.let { imageAsync(imageId, it, isCipher) }
+                
+                val imageData = if (getPlatform() == Platform.Android) {
+                    imageName?.let { imageAsync(imageId, it, isCipher) }
+                } else {
+                    null
+                }
                 
                 
                 if (imageData != null) {
