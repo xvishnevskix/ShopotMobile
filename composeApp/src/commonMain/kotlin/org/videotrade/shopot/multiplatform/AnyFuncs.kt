@@ -1,6 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
-expect fun getPlatform(): String
+expect fun getPlatform(): Platform
 
 expect fun getBuildVersion(): Long
 
@@ -10,3 +10,7 @@ expect fun isScreenOn(): Boolean
 
 expect fun setScreenLockFlags(showWhenLocked: Boolean)
 
+enum class Platform {
+    Ios,
+    Android
+}

@@ -92,6 +92,7 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -374,7 +375,7 @@ fun ChatFooter(
             .background(Color.White)
             .padding(top = 10.dp)
             .then(
-                if (getPlatform() == "Ios") {
+                if (getPlatform() == Platform.Ios) {
                     Modifier
                         .padding(bottom = 15.dp)
                 } else {

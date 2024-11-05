@@ -9,8 +9,8 @@ import androidx.annotation.RequiresApi
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import kotlin.system.exitProcess
 
-actual fun getPlatform(): String {
-    return "Android"
+actual fun getPlatform(): Platform {
+    return Platform.Android
 }
 
 @RequiresApi(Build.VERSION_CODES.P)

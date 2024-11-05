@@ -13,10 +13,13 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.Image
 import com.preat.peekaboo.image.picker.toImageBitmap
+import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.imageAsync
+import org.videotrade.shopot.multiplatform.imageAsyncIos
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
@@ -36,7 +39,7 @@ fun Avatar(
     val imageBitmap = remember(icon) {
         mutableStateOf<ImageBitmap?>(null)
     }
-
+    
     LaunchedEffect(icon) {
         imageBitmap.value = getImageStorage(icon, icon, false)
     }
@@ -83,17 +86,19 @@ suspend fun getImageStorage(imageId: String?, imageName: String?, isCipher: Bool
             } else {
                 println("cachedIma1121")
                 
-                val newByteArray = imageName?.let { imageAsync(imageId, it, isCipher) }
+                val imageData = if (getPlatform() == Platform.Ios) {
+                    imageName?.let { imageAsync(imageId, it, isCipher) }
+                } else  {
+                    imageName?.let { imageAsyncIos(imageId, it, isCipher)?.toImageBitmap() }
+                }
                 
-                if (newByteArray != null) {
-                    println("newByteArray $newByteArray")
+                
+                if (imageData != null) {
+                    println("imageData $imageData")
                     
                     // Попробуем декодировать массив байтов безопасно
-                    
-                    println("imageIdimageBitmap $imageId")
-                    val imageBitmap = newByteArray
-                    avatarCache.put(imageId, newByteArray)
-                    return imageBitmap
+                    avatarCache.put(imageId, imageData)
+                    return imageData
                 }
             }
         }

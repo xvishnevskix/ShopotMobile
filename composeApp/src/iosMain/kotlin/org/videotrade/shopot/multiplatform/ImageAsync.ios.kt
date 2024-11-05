@@ -23,19 +23,6 @@ import platform.Foundation.writeToURL
 
 
 actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Boolean): ImageBitmap? {
-//    val imageExist = FileProviderFactory.create().existingFileInDir(imageId, "image")
-//    val filePath = imageExist ?: downloadImageInCache(imageId)
-//
-//    return if (filePath != null) {
-//        withContext(Dispatchers.IO) {
-//            val fileUrl = NSURL.fileURLWithPath(filePath)
-//            val imageData = NSData.dataWithContentsOfURL(fileUrl)
-//
-//            imageData?.toByteArray()
-//        }
-//    } else {
-//        null
-//    }
     return null
 }
 
@@ -43,7 +30,8 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
 @OptIn(InternalAPI::class, ExperimentalForeignApi::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
-    val filePath = FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
+    val filePath =
+        FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
     
     println("starting download")
     
@@ -94,3 +82,22 @@ private suspend fun downloadImageInCache(imageId: String): String? {
     return null
 }
 
+actual suspend fun imageAsyncIos(
+    imageId: String,
+    imageName: String,
+    isCipher: Boolean
+): ByteArray? {
+    val imageExist = FileProviderFactory.create().existingFileInDir(imageId, "image")
+    val filePath = imageExist ?: downloadImageInCache(imageId)
+    
+    return if (filePath != null) {
+        withContext(Dispatchers.IO) {
+            val fileUrl = NSURL.fileURLWithPath(filePath)
+            val imageData = NSData.dataWithContentsOfURL(fileUrl)
+            
+            imageData?.toByteArray()
+        }
+    } else {
+        null
+    }
+}
