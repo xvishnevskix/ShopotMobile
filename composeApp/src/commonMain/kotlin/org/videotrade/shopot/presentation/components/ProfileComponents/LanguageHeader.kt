@@ -36,6 +36,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.tabs.ChatsTab
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.arrow_left
@@ -48,7 +49,7 @@ fun LanguageHeader(text: String) {
         modifier = Modifier.background(Color(0xFFf9f9f9))
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 10.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 
@@ -77,13 +78,12 @@ fun LanguageHeader(text: String) {
 
             Text(
                 text = text,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.W600,
-                textAlign = TextAlign.Center,
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 24.sp,
-                color = Color.Black
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
             )
 

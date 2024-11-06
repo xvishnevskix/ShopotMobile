@@ -30,6 +30,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.arrow_left
@@ -58,13 +59,13 @@ fun BaseHeader(text: String) {
         }
         Text(
             text = text,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.W600,
             textAlign = TextAlign.Center,
-            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-            lineHeight = 24.sp,
-            color = Color.Black
+            fontSize = 16.sp,
+            lineHeight = 16.sp,
+            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+            fontWeight = FontWeight(500),
+            color = Color(0xFF373533),
+            letterSpacing = TextUnit(0F, TextUnitType.Sp),
         )
 
         Spacer(modifier = Modifier.width(20.dp))

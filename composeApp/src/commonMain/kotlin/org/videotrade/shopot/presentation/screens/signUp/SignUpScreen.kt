@@ -84,7 +84,11 @@ import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
+import org.videotrade.shopot.presentation.components.Common.CustomTextField
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.Common.validateFirstName
+import org.videotrade.shopot.presentation.components.Common.validateLastName
+import org.videotrade.shopot.presentation.components.Common.validateNickname
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
@@ -103,13 +107,13 @@ data class SignUpTextState(
 )
 
 class SignUpScreen(private val phone: String) : Screen {
-    
+
     @OptIn(InternalAPI::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
-        
+
         val scope = rememberCoroutineScope()
         val textState = remember { mutableStateOf(SignUpTextState()) }
         val byteArray = remember { mutableStateOf<ByteArray?>(null) }
@@ -126,17 +130,23 @@ class SignUpScreen(private val phone: String) : Screen {
         val fillInputs = stringResource(MokoRes.strings.please_fill_in_all_input_fields)
         val nameValidate1 = stringResource(MokoRes.strings.name_is_required)
         val nameValidate2 = stringResource(MokoRes.strings.name_must_contain_only_letters)
-        val nameValidate3 = stringResource(MokoRes.strings.name_must_not_contain_more_than_20_characters)
+        val nameValidate3 =
+            stringResource(MokoRes.strings.name_must_not_contain_more_than_20_characters)
         val lastnameValidate1 = stringResource(MokoRes.strings.lastname_must_contain_only_letters)
-        val lastnameValidate2 = stringResource(MokoRes.strings.lastname_must_not_contain_more_than_20_characters)
+        val lastnameValidate2 =
+            stringResource(MokoRes.strings.lastname_must_not_contain_more_than_20_characters)
         val nickValidate1 = stringResource(MokoRes.strings.nickname_is_required)
-        val nickValidate2 = stringResource(MokoRes.strings.nickname_must_contain_at_least_6_characters)
+        val nickValidate2 =
+            stringResource(MokoRes.strings.nickname_must_contain_at_least_6_characters)
         val nickValidate3 = stringResource(MokoRes.strings.nickname_should_not_exceed_30_characters)
-        val nickValidate4 = stringResource(MokoRes.strings.nickname_can_contain_only_letters_and_numbers)
-        
+        val nickValidate4 =
+            stringResource(MokoRes.strings.nickname_can_contain_only_letters_and_numbers)
+
         SafeArea(padding = 4.dp) {
-            Column(modifier = Modifier
-                .imePadding()) {
+            Column(
+                modifier = Modifier
+                    .imePadding()
+            ) {
                 AuthHeader(stringResource(MokoRes.strings.create_account))
 
                 Box(
@@ -205,7 +215,6 @@ class SignUpScreen(private val phone: String) : Screen {
                             }
 
 
-
                         }
 
 
@@ -214,40 +223,54 @@ class SignUpScreen(private val phone: String) : Screen {
                             modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            TextFieldWithTitle(
+                            CustomTextField(
                                 title = stringResource(MokoRes.strings.enter_your_name),
                                 value = textState.value.firstName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(firstName = it)
-                                    firstNameError.value = validateFirstName(it, nameValidate1, nameValidate2, nameValidate3) // Валидация имени
+                                    firstNameError.value = validateFirstName(
+                                        it,
+                                        nameValidate1,
+                                        nameValidate2,
+                                        nameValidate3
+                                    ) // Валидация имени
                                 },
                                 placeholder = stringResource(MokoRes.strings.name),
                                 error = firstNameError.value
                             )
 
-                            TextFieldWithTitle(
+                            CustomTextField(
                                 title = stringResource(MokoRes.strings.enter_your_last_name),
                                 value = textState.value.lastName,
                                 onValueChange = {
                                     textState.value = textState.value.copy(lastName = it)
-                                    lastNameError.value = validateLastName(it, lastnameValidate1, lastnameValidate2) // Валидация фамилии
+                                    lastNameError.value = validateLastName(
+                                        it,
+                                        lastnameValidate1,
+                                        lastnameValidate2
+                                    ) // Валидация фамилии
                                 },
                                 placeholder = stringResource(MokoRes.strings.lastname),
                                 error = lastNameError.value
                             )
 
-                            TextFieldWithTitle(
+                            CustomTextField(
                                 title = stringResource(MokoRes.strings.come_up_with_a_nickname),
                                 value = textState.value.nickname,
                                 onValueChange = {
                                     textState.value = textState.value.copy(nickname = it)
-                                    nicknameError.value = validateNickname(it, nickValidate1, nickValidate2, nickValidate3, nickValidate4) // Валидация никнейма
+                                    nicknameError.value = validateNickname(
+                                        it,
+                                        nickValidate1,
+                                        nickValidate2,
+                                        nickValidate3,
+                                        nickValidate4
+                                    ) // Валидация никнейма
                                 },
                                 placeholder = stringResource(MokoRes.strings.come_up_nickname),
                                 error = nicknameError.value
                             )
                             Spacer(modifier = Modifier.height(80.dp))
-
 
 
                         }
@@ -265,8 +288,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                             type = ToastType.Error,
                                             duration = ToasterDefaults.DurationDefault
                                         )
-                                    }
-                                    else {
+                                    } else {
                                         scope.launch {
                                             val client = HttpClient(getHttpClientEngine())
 
@@ -288,7 +310,10 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         put("firstName", textState.value.firstName)
                                                         put("lastName", textState.value.lastName)
                                                         put("email", "admin.admin@gmail.com")
-                                                        put("description", textState.value.firstName)
+                                                        put(
+                                                            "description",
+                                                            textState.value.firstName
+                                                        )
                                                         put("login", textState.value.nickname)
                                                         put("status", "active")
                                                         put("icon", icon)
@@ -296,7 +321,6 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 )
 
                                                 println("jsonContent $jsonContent")
-
 
 
                                                 val response: HttpResponse =
@@ -361,111 +385,86 @@ class SignUpScreen(private val phone: String) : Screen {
             }
         }
     }
-    
-    @Composable
-    fun TextFieldWithTitle(
-        title: String,
-        value: String,
-        onValueChange: (String) -> Unit,
-        placeholder: String,
-        error: String? = null
-    ) {
-        Column(
-            modifier = Modifier.padding(top = 7.dp),
-        ) {
-            Text(
-                title,
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                fontWeight = FontWeight(500),
-                textAlign = TextAlign.Center,
-                color = Color(0xFF373533),
-                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                modifier = Modifier.padding(
-                    top = 5.dp,
-                    bottom = 8.dp,
-                ),
 
-            )
-            BasicTextField(
-                value = value,
-                onValueChange = onValueChange,
-                decorationBox = { innerTextField ->
-                    if (value.isEmpty()) {
-                        Text(
-                            text = placeholder, style = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                fontWeight = FontWeight(400),
-                                textAlign = TextAlign.Start,
-                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                color = Color(0x80373533)
-                            )
-                        )
-                    }
-                    innerTextField()
-                },
-                textStyle = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                    fontWeight = FontWeight(400),
-                    textAlign = TextAlign.Start,
-                    color = Color(0xFF373533)
-                ),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                modifier = Modifier
+//    @Composable
+//    fun TextFieldWithTitle(
+//        title: String,
+//        value: String,
+//        onValueChange: (String) -> Unit,
+//        placeholder: String,
+//        error: String? = null
+//    ) {
+//        Column(
+//            modifier = Modifier.padding(top = 7.dp),
+//        ) {
+//            Text(
+//                title,
+//                fontSize = 16.sp,
+//                lineHeight = 16.sp,
+//                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+//                fontWeight = FontWeight(500),
+//                textAlign = TextAlign.Center,
+//                color = Color(0xFF373533),
+//                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                modifier = Modifier.padding(
+//                    top = 5.dp,
+//                    bottom = 8.dp,
+//                ),
+//
+//            )
+//            BasicTextField(
+//                value = value,
+//                onValueChange = onValueChange,
+//                decorationBox = { innerTextField ->
+//                    if (value.isEmpty()) {
+//                        Text(
+//                            text = placeholder, style = TextStyle(
+//                                fontSize = 16.sp,
+//                                lineHeight = 16.sp,
+//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                                fontWeight = FontWeight(400),
+//                                textAlign = TextAlign.Start,
+//                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                                color = Color(0x80373533)
+//                            )
+//                        )
+//                    }
+//                    innerTextField()
+//                },
+//                textStyle = TextStyle(
+//                    fontSize = 16.sp,
+//                    lineHeight = 16.sp,
+//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                    fontWeight = FontWeight(400),
+//                    textAlign = TextAlign.Start,
+//                    color = Color(0xFF373533)
+//                ),
+//                singleLine = true,
+//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+//                modifier = Modifier
+//
+//                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+//                    .fillMaxWidth(0.95f).background(Color(0xFFFFFFFF))
+//                    .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
+//            )
+//
+//            error?.let {
+//                Text(
+//                    text = it,
+//                    color = Color.Red,
+//                    fontSize = 12.sp,
+//                    lineHeight = 12.sp,
+//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                    fontWeight = FontWeight(400),
+//                    textAlign = TextAlign.Center,
+//                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+//                )
+//            }
+//        }
+//    }
+//}
 
-                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
-                    .fillMaxWidth(0.95f).background(Color(0xFFFFFFFF))
-                    .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
-            )
-
-            error?.let {
-                Text(
-                    text = it,
-                    color = Color.Red,
-                    fontSize = 12.sp,
-                    lineHeight = 12.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                    fontWeight = FontWeight(400),
-                    textAlign = TextAlign.Center,
-                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
-                )
-            }
-        }
-    }
-}
 
 
-
-fun validateFirstName(name: String, nameValidate1: String, nameValidate2: String, nameValidate3: String): String? {
-    return when {
-        name.isEmpty() -> nameValidate1
-        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> nameValidate2
-        name.length > 20 -> nameValidate3
-        else -> null
-    }
-}
-
-fun validateLastName(name: String, lastnameValidate1: String, lastnameValidate2: String): String? {
-    return when {
-        !name.matches(Regex("^[a-zA-Zа-яА-Я]+$")) -> lastnameValidate1
-        name.length > 20 -> lastnameValidate2
-        else -> null
-    }
-}
-
-fun validateNickname(nickname: String, nickValidate1: String, nickValidate2: String, nickValidate3: String, nickValidate4: String): String? {
-    return when {
-        nickname.isEmpty() -> nickValidate1
-        nickname.length < 6 -> nickValidate2
-        nickname.length > 30 -> nickValidate3
-        !nickname.matches(Regex("^[a-zA-Z0-9]+$")) -> nickValidate4
-        else -> null
-    }
 }

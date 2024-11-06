@@ -1,0 +1,110 @@
+package org.videotrade.shopot.presentation.components.Common
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.Font
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
+import shopot.composeapp.generated.resources.Res
+
+@Composable
+fun CustomTextField(
+    title: String = "",
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    error: String? = null
+) {
+    Column(
+        modifier = Modifier.padding(),
+    ) {
+        if (title != "") {
+            Text(
+                title,
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                textAlign = TextAlign.Center,
+                color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                modifier = Modifier.padding(
+                    top = 5.dp,
+                    bottom = 8.dp,
+                ),
+
+                )
+        }
+        BasicTextField(
+            value = value,
+            onValueChange = onValueChange,
+            decorationBox = { innerTextField ->
+                if (value.isEmpty()) {
+                    Text(
+                        text = placeholder, style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            textAlign = TextAlign.Start,
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                            color = Color(0x80373533)
+                        )
+                    )
+                }
+                innerTextField()
+            },
+            textStyle = TextStyle(
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                fontWeight = FontWeight(400),
+                textAlign = TextAlign.Start,
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                color = Color(0xFF373533)
+            ),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+            modifier = Modifier
+
+                .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                .fillMaxWidth(1f).background(Color(0xFFFFFFFF))
+                .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
+        )
+
+
+        error?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                fontSize = 12.sp,
+                lineHeight = 12.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                fontWeight = FontWeight(400),
+                textAlign = TextAlign.Center,
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+            )
+        }
+
+    }
+}

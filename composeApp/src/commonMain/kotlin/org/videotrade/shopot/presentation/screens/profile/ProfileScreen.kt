@@ -22,6 +22,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +49,7 @@ import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
@@ -128,9 +131,27 @@ class ProfileScreen(
             },
 
         )
-        
-        
-        
+
+        val modalVisible = remember { mutableStateOf(false) }
+        val modalTitle = "Вы действительно хотите выйти?"
+
+
+        if (modalVisible.value) {
+            ModalDialogWithoutText(
+                onDismiss = { modalVisible.value = false },
+                onConfirm = {
+
+                    modalVisible.value = false
+                    commonViewModel.mainNavigator.value?.let {
+                        mainViewModel.leaveApp(it)
+                    }
+
+                },
+                confirmText = "Выйти",
+                dismissText = "Отмена",
+                title = modalTitle
+            )
+        }
         SafeArea(backgroundColor = Color(0xFFf9f9f9)) {
             Box(
                 modifier = Modifier.fillMaxSize().background(Color(0xFFf9f9f9)),
@@ -144,7 +165,11 @@ class ProfileScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        ProfileHeader(stringResource(MokoRes.strings.profile), commonViewModel, mainViewModel)
+                        ProfileHeader(
+                            stringResource(MokoRes.strings.profile),
+                            commonViewModel,
+                            mainViewModel,
+                            modalVisible)
                         Avatar(
                             icon = profile.icon,
                             size = 128.dp,
@@ -234,35 +259,6 @@ class ProfileScreen(
                         Spacer(modifier = Modifier.height(56.dp))
                     }
 
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-
-
-//                    profile.description?.let {
-//                        Text(
-//                            it,
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 14.sp,
-//                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-//                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                            lineHeight = 20.sp,
-//                            modifier = Modifier.padding(top = 10.dp),
-//                            color = Color(0xFF000000)
-//                        )
-//                    }
-//                    Text(
-//                        "Июль, 2024",
-//                        textAlign = TextAlign.Center,
-//                        fontSize = 16.sp,
-//                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                        lineHeight = 20.sp,
-//                        modifier = Modifier.padding(top = 5.dp),
-//                        color = Color(0xFF979797)
-//                    )
-                    }
 
                     LazyColumn(
                         modifier = Modifier
@@ -280,16 +276,11 @@ class ProfileScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                         }
-
                     }
-
-
                 }
-//            BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
-
             }
+
         }
-        
     }
 }
 

@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +36,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileEditScreen
@@ -44,9 +48,12 @@ import shopot.composeapp.generated.resources.profile_edit
 import shopot.composeapp.generated.resources.profile_exit
 
 @Composable
-fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(), mainViewModel: MainViewModel = koinInject()) {
+fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(), mainViewModel: MainViewModel = koinInject(), modalVisible: MutableState<Boolean>? = null
+)
+{
     val navigator = LocalNavigator.currentOrThrow
-    
+
+
     Column {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 40.dp, )
@@ -56,20 +63,6 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
 
             ) {
 
-//            Column(
-//                Modifier.padding(start = 10.dp, end = 0.dp).width(25.dp)
-//            ) {
-//                if (isPopScreen) {
-//                    BackIcon(
-//                        Modifier.pointerInput(Unit) {
-//
-//
-//                            navigator.pop()
-//
-//
-//                        })
-//                }
-//            }
 
             Text(
                 text = text,
@@ -100,7 +93,13 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
                 }
                 Box(
                     modifier = Modifier.padding(start = 15.dp, end = 2.dp).clickable {
-                        commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
+                        commonViewModel.mainNavigator.value?.let {
+
+                            if (modalVisible != null) {
+                                modalVisible.value = true
+                            }
+//                            mainViewModel.leaveApp(it)
+                        }
                     }
                 ) {
                     Image(
@@ -113,6 +112,8 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
                 }
             }
         }
+
+
 
         Box(Modifier.padding(bottom = 23.dp)) {
             CallBar()

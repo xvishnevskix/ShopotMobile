@@ -169,7 +169,7 @@ class FAQ() : Screen {
         Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
 
             if (modalVisible.value) {
-                ModalDialog(
+                SupportModalDialog(
                     onDismiss = {
                         modalVisible.value = false
                         isMessageSent.value = false
@@ -286,7 +286,7 @@ class FAQ() : Screen {
     }
 
     @Composable
-    fun ModalDialog(
+    fun SupportModalDialog(
         onDismiss: () -> Unit,
         email: MutableState<String>,
         description: MutableState<String>,

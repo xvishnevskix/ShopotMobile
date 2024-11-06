@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.ProfileComponents
 
+
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,24 +43,16 @@ import shopot.composeapp.generated.resources.check_mark
 import shopot.composeapp.generated.resources.profile_accept
 
 @Composable
-fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
+fun ProfileEditHeader(text: String, onClick: (() -> Unit)? = null) {
     val navigator = LocalNavigator.currentOrThrow
 
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(Color(0xFFf9f9f9)),
+            modifier = Modifier.fillMaxWidth().padding(top = 30.dp).background(Color(0xFFf9f9f9)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 
             ) {
-//            Icon(
-//                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-//                contentDescription = "Back",
-//                modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
-//                    navigator.pop()
-//                },
-//                tint = Color.Black
-//            )
 
             Box(modifier = Modifier.clickable {
                 navigator.pop()
@@ -83,7 +76,7 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
                 color = Color(0xFF373533),
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
-            )
+                )
             Image(
                 painter = painterResource(Res.drawable.profile_accept),
                 contentDescription = "Checkmark",

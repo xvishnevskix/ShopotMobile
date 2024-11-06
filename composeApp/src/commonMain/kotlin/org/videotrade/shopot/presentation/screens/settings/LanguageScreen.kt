@@ -76,7 +76,7 @@ class LanguageScreen : Screen {
 
         SafeArea(backgroundColor = Color(0xFFf9f9f9)) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 20.dp).background(Color(0xFFf9f9f9))
+                modifier = Modifier.fillMaxWidth().background(Color(0xFFf9f9f9))
             ) {
 
                 LanguageHeader("Выбор языка")
