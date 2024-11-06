@@ -2,7 +2,6 @@ package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
 import co.touchlab.kermit.Logger
-import com.shepeliev.webrtckmp.BundlePolicy
 import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.IceServer
@@ -14,7 +13,6 @@ import com.shepeliev.webrtckmp.OfferAnswerOptions
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.RtcConfiguration
-import com.shepeliev.webrtckmp.RtcpMuxPolicy
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
 import com.shepeliev.webrtckmp.SignalingState
@@ -81,31 +79,33 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     private val iceServers = listOf(
         IceServer(
-            urls = listOf(
-                "turn:89.221.60.156:3478",
-            ),
+            urls = listOf("turn:89.221.60.157:3478"),
             username = "andrew",
             password = "kapustin",
         )
     )
-//    // Создание конфигурации для PeerConnection
-//    private val rtcConfiguration = RtcConfiguration(iceServers = iceServers)
     
+    //    // Создание конфигурации для PeerConnection
     private val rtcConfiguration = RtcConfiguration(
-        bundlePolicy = BundlePolicy.Balanced,
-        certificates = null,  // если не требуется специальная конфигурация
-        iceCandidatePoolSize = 100,  // или другое значение для предзагрузки
-        iceServers = listOf(
-            IceServer(
-                urls = listOf("turn:89.221.60.157:3478"),
-                username = "andrew",
-                password = "kapustin"
-            )
-        ),
-//        iceTransportPolicy = IceTransportPolicy.Relay,  // использовать Relay для TURN
-        rtcpMuxPolicy = RtcpMuxPolicy.Require
-    )
+        iceServers = iceServers,
+        iceTransportPolicy = IceTransportPolicy.Relay,
+        )
 
+//    private val rtcConfiguration = RtcConfiguration(
+//        bundlePolicy = BundlePolicy.Balanced,
+//        certificates = null,  // если не требуется специальная конфигурация
+//        iceCandidatePoolSize = 100,  // или другое значение для предзагрузки
+//        iceServers = listOf(
+//            IceServer(
+//                urls = listOf("turn:89.221.60.157:3478"),
+//                username = "andrew",
+//                password = "kapustin"
+//            )
+//        ),
+//        iceTransportPolicy = IceTransportPolicy.Relay,  // использовать Relay для TURN
+//        rtcpMuxPolicy = RtcpMuxPolicy.Require
+//    )
+    
     private val _peerConnection =
         MutableStateFlow<PeerConnection?>(PeerConnection(rtcConfiguration))
     
@@ -137,7 +137,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
     
-
+    
     private val offer = MutableStateFlow<SessionDescription?>(null)
     
     override val localStream = MutableStateFlow<MediaStream?>(null)
@@ -166,7 +166,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     override suspend fun reconnectPeerConnection() {
-
+        
         // Переподключение PeerConnection
         _peerConnection.value = PeerConnection(rtcConfiguration)
     }
