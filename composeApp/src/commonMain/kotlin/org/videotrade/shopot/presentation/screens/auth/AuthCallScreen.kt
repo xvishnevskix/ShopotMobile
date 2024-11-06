@@ -137,10 +137,49 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             phoneNotRegistered,
                         )
                     }
+                    if (phone == "+79899236226") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                        )
+                    }
+                    if (phone == "+79388899885") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                        )
+                    }
+                    if (phone == "+375336483673") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                        )
+                    }
                 }
 
                 "SignUp" -> {
                     if (phone == "+79990000000") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+79899236226") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+79388899885") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+375336483673") {
                         sendSignUp(phone, navigator)
                     }
                 }

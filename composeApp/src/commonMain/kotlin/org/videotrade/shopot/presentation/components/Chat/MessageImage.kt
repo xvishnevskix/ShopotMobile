@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -24,6 +22,7 @@ import coil3.compose.rememberAsyncImagePainter
 import getImageStorage
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -52,30 +51,28 @@ fun MessageImage(
     imagePainter.value = if (getPlatform() == Platform.Android) {
         getImageStorage(fileId, fileId, false).value
     } else {
-        val url =
-            "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
         
         LaunchedEffect(Unit) {
             val fileType = attachments[0].type
             
             val fileProvider = FileProviderFactory.create()
             
-            val existingFile =
-                fileProvider.existingFileInDir(fileName, fileType)
+            val imageExist = fileProvider.existingFileInDir(fileId, "image")
             
-            if (!existingFile.isNullOrBlank()) {
-                imageFilePath.value = existingFile
-                println("existingFile ${existingFile}")
+            
+            if (!imageExist.isNullOrBlank()) {
+                imageFilePath.value = imageExist
+                println("existingFile ${imageExist}")
             } else {
-                val filePath = fileProvider.downloadCipherFile(
-                    url,
-                    "image",
-                    fileName,
-                    "image"
-                ) { newProgress ->
-                    println("newProgress $newProgress")
-                }
                 
+                println("imageExist $imageExist")
+                
+                val filePath = fileProvider.downloadCipherFile(
+                    "${serverUrl}file/id/$fileId",
+                    "image",
+                    fileId,
+                    "image"
+                ) { _ -> }
                 
                 if (filePath != null) {
                     imageFilePath.value = filePath
@@ -85,7 +82,9 @@ fun MessageImage(
             }
             
         }
-        rememberAsyncImagePainter(imageFilePath)
+        
+        
+        rememberAsyncImagePainter(imageFilePath.value)
         
     }
 

@@ -499,14 +499,14 @@ actual class FileProvider {
             val token = getValueInStorage("accessToken")
             println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
             
-            val fileDirectory = getFilePath(
+            val fileDirectory = createNewFileWithApp(
                 filename.substringBeforeLast(
                     ".",
                     filename
                 ), "cipher"
             ) ?: return null
             
-            val dectyptFilePath = getFilePath(
+            val dectyptFilePath = createNewFileWithApp(
                 filename,
                 dirType
             ) ?: return null
