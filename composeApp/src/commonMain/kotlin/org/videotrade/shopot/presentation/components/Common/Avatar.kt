@@ -61,7 +61,7 @@ fun Avatar(
 
 @Composable
 fun getImageStorage(imageId: String?, imageName: String?, isCipher: Boolean): State<Painter?> {
-    val imagePainter = remember { mutableStateOf<Painter?>(null) }
+    val imagePainter = remember(imageId) { mutableStateOf<Painter?>(null) }
     
     if (getPlatform() == Platform.Android) {
         LaunchedEffect(imageId) {
