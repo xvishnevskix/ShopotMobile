@@ -77,7 +77,33 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     private val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
     
+    private val stunServers = listOf(
+//        "stun:stun.l.google.com:19302",
+//        "stun:stun1.l.google.com:19302",
+//        "stun:stun2.l.google.com:19302",
+        "stun:89.221.60.157:3478",
+        
+    )
+//
+//    private val turnServers = listOf(
+////        "turn:89.221.60.156:3478",
+//        "turn:89.221.60.161:3478",
+//    )
+//
+//    // Создание конфигурации для PeerConnection
+//    private val rtcConfiguration = RtcConfiguration(
+//        iceServers = listOf(
+//            IceServer(iceServers),
+//            IceServer(
+//                urls = turnServers, // URL TURN сервера
+//                username = "andrew", // Имя пользователя
+//                password = "kapustin" // Пароль
+//            )
+//        )
+//    )
+    
     private val iceServers = listOf(
+        IceServer(stunServers),
         IceServer(
             urls = listOf("turn:89.221.60.157:3478"),
             username = "andrew",
@@ -85,11 +111,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         )
     )
     
-    //    // Создание конфигурации для PeerConnection
+// Создание конфигурации для PeerConnection
     private val rtcConfiguration = RtcConfiguration(
         iceServers = iceServers,
-        iceTransportPolicy = IceTransportPolicy.Relay,
-        )
+        iceTransportPolicy = IceTransportPolicy.NoHost,
+    )
 
 //    private val rtcConfiguration = RtcConfiguration(
 //        bundlePolicy = BundlePolicy.Balanced,
