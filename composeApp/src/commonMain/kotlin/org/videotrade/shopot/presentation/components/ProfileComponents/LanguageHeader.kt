@@ -46,7 +46,7 @@ fun LanguageHeader(text: String) {
     val navigator = LocalNavigator.currentOrThrow
 
     Column(
-        modifier = Modifier.background(Color(0xFFf9f9f9))
+        modifier = Modifier.background(Color.White)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 30.dp),

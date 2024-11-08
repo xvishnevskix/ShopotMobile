@@ -166,7 +166,7 @@ class FAQ() : Screen {
         val email = remember { mutableStateOf("") }
         val description = remember { mutableStateOf("") }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        Box(modifier = Modifier.fillMaxSize().background(Color(0xFFf9f9f9))) {
 
             if (modalVisible.value) {
                 SupportModalDialog(
@@ -202,7 +202,7 @@ class FAQ() : Screen {
             ) {
 
                 Column {
-                    BaseHeader(stringResource(MokoRes.strings.support))
+                    BaseHeader(stringResource(MokoRes.strings.support), Color(0xFFf9f9f9))
 
                     Spacer(modifier = Modifier.fillMaxHeight(0.05F))
 

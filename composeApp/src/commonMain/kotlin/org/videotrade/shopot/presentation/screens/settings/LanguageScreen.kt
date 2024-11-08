@@ -74,9 +74,9 @@ class LanguageScreen : Screen {
 
         val storedLanguage = getValueInStorage("selected_language")
 
-        SafeArea(backgroundColor = Color(0xFFf9f9f9)) {
+        SafeArea(backgroundColor = Color.White) {
             Column(
-                modifier = Modifier.fillMaxWidth().background(Color(0xFFf9f9f9))
+                modifier = Modifier.fillMaxWidth().background(Color.White)
             ) {
 
                 LanguageHeader("Выбор языка")

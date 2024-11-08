@@ -57,6 +57,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_group
 import shopot.composeapp.generated.resources.chat_reply
 import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.group
 import shopot.composeapp.generated.resources.message_double_check
 import shopot.composeapp.generated.resources.message_single_check
 import shopot.composeapp.generated.resources.single_message_check
@@ -137,9 +138,9 @@ fun UserComponentItem(
                     if (!chat.personal) {
                         Spacer(modifier = Modifier.width(7.dp))
                         Image(
-                            painter = painterResource(Res.drawable.chat_group),
+                            painter = painterResource(Res.drawable.group),
                             contentDescription = "Avatar",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(width = 18.dp, height = 15.dp)
                         )
                     }
                 }

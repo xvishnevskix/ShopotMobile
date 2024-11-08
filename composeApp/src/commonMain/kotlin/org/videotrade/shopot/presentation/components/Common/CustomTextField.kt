@@ -2,14 +2,17 @@ package org.videotrade.shopot.presentation.components.Common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -32,7 +35,8 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
-    error: String? = null
+    error: String? = null,
+    border: String = "gray"
 ) {
     Column(
         modifier = Modifier.padding(),
@@ -58,20 +62,34 @@ fun CustomTextField(
             value = value,
             onValueChange = onValueChange,
             decorationBox = { innerTextField ->
-                if (value.isEmpty()) {
-                    Text(
-                        text = placeholder, style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                            fontWeight = FontWeight(400),
-                            textAlign = TextAlign.Start,
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                            color = Color(0x80373533)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(58.dp)
+                        .background(Color.White, shape = RoundedCornerShape(size = 16.dp))
+                        .border(width = 1.dp, color = if (border == "gray") Color(0x33373533) else Color(0xFF373533), shape = RoundedCornerShape(size = 16.dp))
+                        .padding(
+                            horizontal = 16.dp,
+                            vertical = 16.dp
+                        ),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    if (value.isEmpty()) {
+                        Text(
+                            text = placeholder,
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                textAlign = TextAlign.Start,
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                color = Color(0x80373533)
+                            )
                         )
-                    )
+                    }
+                    innerTextField()
                 }
-                innerTextField()
             },
             textStyle = TextStyle(
                 fontSize = 16.sp,
@@ -85,10 +103,7 @@ fun CustomTextField(
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier
-
-                .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
-                .fillMaxWidth(1f).background(Color(0xFFFFFFFF))
-                .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
+                .fillMaxWidth(1f)
         )
 
 

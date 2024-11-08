@@ -1,13 +1,16 @@
 package org.videotrade.shopot.presentation.screens.contacts
 
 import Avatar
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,20 +19,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -45,14 +54,21 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.presentation.components.Common.CustomTextField
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.Common.validateFirstName
+import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.tabs.ChatsTab
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.arrow_left
 import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.create_group
+import shopot.composeapp.generated.resources.group
 
 class CreateChatScreen() : Screen {
     @Composable
@@ -93,20 +109,19 @@ class CreateChatScreen() : Screen {
             }
         }
 
-        
+        val groupedContacts = filteredContacts.groupBy { it.firstName?.firstOrNull()?.uppercaseChar() ?: '#' }
 
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .background(Color(255, 255, 255))
-            ) {
-                SafeArea {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .background(Color(0xFFF7F7F7))
+        ) {
+            SafeArea(padding = 0.dp) {
                 Column {
                     CreateChatHeader(
-                        text = stringResource(MokoRes.strings.create_chat),
+                        text = stringResource(MokoRes.strings.contacts),
                         isSearching = isSearching,
-                        searchQuery = searchQuery,
                     )
                     LazyColumn(
                         modifier = Modifier
@@ -115,92 +130,122 @@ class CreateChatScreen() : Screen {
                             .padding(bottom = 60.dp)
                     ) {
                         item {
-                            makeA_group(contacts)
+                            Crossfade(targetState = isSearching.value) { searching ->
+                                if (searching) {
+                                    ContactsSearch(searchQuery, isSearching)
+                                } else {
+                                    makeA_group(contacts)
+                                }
+                            }
                         }
-                        itemsIndexed(filteredContacts) { _, item ->
-                            ChatItem(viewModel, item = item)
+                        groupedContacts.forEach { (initial, contacts) ->
+                            item {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF7F7F7))
+                                ) {
+                                    Text(text = initial.toString(),
+                                        textAlign = TextAlign.Start,
+                                        fontSize = 16.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                        fontWeight = FontWeight(400),
+                                        color = Color(0x80373533),
+                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+                                }
+                            }
+                            items(contacts) { contact ->
+                                ContactItem(viewModel, item = contact)
+                            }
                         }
                         item {
                             Box(modifier = Modifier.height(70.dp))
                         }
                     }
                 }
-                }
-//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
+//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
+        }
 
     }
 }
-
 
 @Composable
 private fun makeA_group(contacts: List<ContactDTO>) {
     val navigator = LocalNavigator.currentOrThrow
-    Box(
-        modifier = Modifier
-            .background(Color(255, 255, 255))
-            .fillMaxSize()
-            .padding(top = 10.dp, bottom = 42.dp)
-            .clip(
-                RoundedCornerShape(4.dp)
-            )
-            .clickable {
-                if (contacts.isNotEmpty())
-                    navigator.push(CreateGroupFirstScreen())
-            }
-    
+
+
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+        Box(
             modifier = Modifier
+                .height(58.dp)
                 .fillMaxWidth()
-                .padding()
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
+                .border(
+                    width = 1.dp,
+                    color = Color(0x33373533),
+                    shape = RoundedCornerShape(size = 16.dp)
+                )
+                .clickable {
+                    if (contacts.isNotEmpty())
+                        navigator.push(CreateGroupFirstScreen())
+                },
+
             ) {
-                Image(
-                    painter = painterResource(Res.drawable.create_group),
-                    contentDescription = "create group",
-                    modifier = Modifier.size(56.dp)
-                )
-                
-                Text(
-                    text = stringResource(MokoRes.strings.create_group),
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                    textAlign = TextAlign.Center,
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                    modifier = Modifier
-                        .padding(start = 20.dp),
-                    color = Color.Black
-                
-                )
+            Row(horizontalArrangement = Arrangement.SpaceBetween
+                , verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth().padding(vertical =  20.dp, horizontal = 16.dp )
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Start
+                    , verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.group),
+                        contentDescription = "create group arrow",
+                        modifier = Modifier.size(width = 18.dp, height = 15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = stringResource(MokoRes.strings.create_group),
+                        modifier = Modifier
+                        ,
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0xFF373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        )
+                    )
+                }
+                Box() {
+                    Image(
+                        painter = painterResource(Res.drawable.arrow_left),
+                        contentDescription = "create group arrow",
+                        modifier = Modifier.size(width = 7.dp, height = 14.dp).rotate(180f)
+                    )
+                }
             }
-            Image(
-                painter = painterResource(Res.drawable.arrowleft),
-                contentDescription = "create group arrow",
-                modifier = Modifier.size(width = 7.dp, height = 14.dp).padding(top = 2.dp)
-            )
-            
         }
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
 
+
 @Composable
-private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
-    val navigator = LocalNavigator.currentOrThrow
-//    val tabNavigator: TabNavigator = LocalTabNavigator.current
+private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
     val tabNavigator = LocalTabNavigator.current
     
     
     Box(
-        modifier = Modifier
-            .padding(top = 22.dp)
+        modifier = Modifier.padding(horizontal = 16.dp)
             .clip(
                 RoundedCornerShape(4.dp)
             )
@@ -216,6 +261,7 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
     ) {
         Column(
         ) {
+            Spacer(modifier = Modifier.height(9.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -228,9 +274,10 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                     modifier = Modifier
                         .padding()
                 ) {
-                    Avatar(item.icon, 80.dp)
+                    Avatar(item.icon, 56.dp)
+                    Spacer(modifier = Modifier.width(12.dp))
                     Column(
-                        modifier = Modifier.padding(start = 16.dp).fillMaxWidth(0.8f)
+                        modifier = Modifier.fillMaxWidth(0.8f)
                     ) {
                         Text(
                             text = listOfNotNull(item.firstName, item.lastName)
@@ -240,38 +287,30 @@ private fun ChatItem(viewModel: ContactsViewModel, item: ContactDTO) {
                                     if (it.length > 35) "${it.take(32)}..." else it
                                 } ?: "",
                             fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            textAlign = TextAlign.Start,
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF000000)
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = item.phone,
-                            fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                             textAlign = TextAlign.Center,
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            color = Color(0xFF979797),
-                            modifier = Modifier.padding(top = 13.dp)
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0x80373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                            modifier = Modifier
                         )
                         
                     }
-                    
-                    
+
                 }
-                Image(
-                    painter = painterResource(Res.drawable.arrowleft),
-                    contentDescription = "create group arrow",
-                    modifier = Modifier.size(width = 7.dp, height = 14.dp)
-                )
             }
-            Divider(
-                color = Color(0xFFD9D9D9).copy(alpha = 0.43f),
-                thickness = 1.dp,
-                modifier = Modifier.padding(top = 22.dp)
-            )
+            Spacer(modifier = Modifier.height(9.dp))
         }
     }
 }

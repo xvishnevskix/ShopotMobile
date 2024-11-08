@@ -60,13 +60,13 @@ class PrivacyPolicy() : Screen {
 
         Box(
             modifier = Modifier
-                .fillMaxSize().background(Color.White)
+                .fillMaxSize().background(Color(0xFFf9f9f9))
         ) {
             Column(
                 modifier = Modifier.padding(10.dp).padding(bottom = 40.dp)
             ) {
 
-                BaseHeader("Политика конфиденциальности")
+                BaseHeader("Политика конфиденциальности", Color(0xFFf9f9f9))
 
                 Column(
                     modifier = Modifier

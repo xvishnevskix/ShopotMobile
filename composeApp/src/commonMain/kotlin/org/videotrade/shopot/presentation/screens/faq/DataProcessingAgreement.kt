@@ -60,13 +60,13 @@ class  DataProcessingAgreement () : Screen {
 
         Box(
             modifier = Modifier
-                .fillMaxSize().background(Color.White)
+                .fillMaxSize().background(Color(0xFFf9f9f9))
         ) {
             Column(
                 modifier = Modifier.padding(10.dp).padding(bottom = 40.dp)
             ) {
 
-                BaseHeader("Об обработке данных")
+                BaseHeader("Об обработке данных", Color(0xFFf9f9f9))
 
                 Column(
                     modifier = Modifier

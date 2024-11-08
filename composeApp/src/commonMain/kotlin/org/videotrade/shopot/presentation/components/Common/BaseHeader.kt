@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Auth
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,12 +37,12 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.arrow_left
 
 @Composable
-fun BaseHeader(text: String) {
+fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
     val navigator = LocalNavigator.currentOrThrow
 
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+        modifier = Modifier.background(background).fillMaxWidth().padding(top = 30.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

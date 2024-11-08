@@ -60,13 +60,13 @@ class UserAgreement() : Screen {
 
         Box(
             modifier = Modifier
-                .fillMaxSize().background(Color.White)
+                .fillMaxSize().background(Color(0xFFf9f9f9))
         ) {
             Column(
                 modifier = Modifier.padding(10.dp).padding(bottom = 40.dp)
             ) {
 
-                BaseHeader("Пользовательское соглашение")
+                BaseHeader("Пользовательское соглашение", Color(0xFFf9f9f9))
 
                 Column(
                     modifier = Modifier
