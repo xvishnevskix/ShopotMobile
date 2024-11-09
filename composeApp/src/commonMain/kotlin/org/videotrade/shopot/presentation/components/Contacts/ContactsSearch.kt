@@ -41,7 +41,7 @@ fun ContactsSearch(searchQuery: MutableState<String>, isSearching: MutableState<
             horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Box(modifier = Modifier.fillMaxWidth(0.8f)) {
+            Box(modifier = Modifier.fillMaxWidth(0.75f)) {
                 CustomTextField(
                     value = searchQuery.value,
                     onValueChange = { newText -> searchQuery.value = newText },

@@ -47,7 +47,7 @@ fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
 
-        Box(modifier = Modifier.clickable {
+        Box(modifier = Modifier.background(background).clickable {
             navigator.pop()
         }.padding(start = 8.dp, end = 8.dp)) {
             Image(

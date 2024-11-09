@@ -58,6 +58,7 @@ import org.videotrade.shopot.presentation.components.Common.CustomTextField
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
+import org.videotrade.shopot.presentation.components.Contacts.MakeGroup
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
@@ -134,7 +135,7 @@ class CreateChatScreen() : Screen {
                                 if (searching) {
                                     ContactsSearch(searchQuery, isSearching)
                                 } else {
-                                    makeA_group(contacts)
+                                    MakeGroup(contacts)
                                 }
                             }
                         }
@@ -171,72 +172,6 @@ class CreateChatScreen() : Screen {
 
     }
 }
-
-@Composable
-private fun makeA_group(contacts: List<ContactDTO>) {
-    val navigator = LocalNavigator.currentOrThrow
-
-
-    Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .height(58.dp)
-                .fillMaxWidth()
-                .border(
-                    width = 1.dp,
-                    color = Color(0x33373533),
-                    shape = RoundedCornerShape(size = 16.dp)
-                )
-                .clickable {
-                    if (contacts.isNotEmpty())
-                        navigator.push(CreateGroupFirstScreen())
-                },
-
-            ) {
-            Row(horizontalArrangement = Arrangement.SpaceBetween
-                , verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .fillMaxWidth().padding(vertical =  20.dp, horizontal = 16.dp )
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Start
-                    , verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Image(
-                        painter = painterResource(Res.drawable.group),
-                        contentDescription = "create group arrow",
-                        modifier = Modifier.size(width = 18.dp, height = 15.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = stringResource(MokoRes.strings.create_group),
-                        modifier = Modifier
-                        ,
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                            fontWeight = FontWeight(400),
-                            color = Color(0xFF373533),
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                        )
-                    )
-                }
-                Box() {
-                    Image(
-                        painter = painterResource(Res.drawable.arrow_left),
-                        contentDescription = "create group arrow",
-                        modifier = Modifier.size(width = 7.dp, height = 14.dp).rotate(180f)
-                    )
-                }
-            }
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-    }
-}
-
 
 
 @Composable

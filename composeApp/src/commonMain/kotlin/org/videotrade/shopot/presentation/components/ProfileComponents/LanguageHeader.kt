@@ -49,7 +49,7 @@ fun LanguageHeader(text: String) {
         modifier = Modifier.background(Color.White)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 30.dp),
+            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 

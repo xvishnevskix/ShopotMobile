@@ -532,7 +532,7 @@ class FAQ() : Screen {
                 modifier = Modifier
                     .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
                     .fillMaxWidth(1f).height(232.dp).background(Color(0xFFFFFFFF))
-                    .padding(start = 16.dp, top = 16.dp, bottom = 20.dp)
+                    .padding(start = 16.dp, top = 16.dp, bottom = 20.dp, end = 16.dp)
             )
             if (!isDescValid) {
                 Text(

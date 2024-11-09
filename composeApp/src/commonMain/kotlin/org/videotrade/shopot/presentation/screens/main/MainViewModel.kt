@@ -3,6 +3,7 @@ package org.videotrade.shopot.presentation.screens.main
 import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,7 +53,9 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     
     val profile = MutableStateFlow(ProfileDTO())
-    
+
+    private val _isLoadingChats = MutableStateFlow(true)
+    val isLoadingChats: StateFlow<Boolean> get() = _isLoadingChats.asStateFlow()
     
     val navigator = MutableStateFlow<Navigator?>(null)
     
@@ -84,18 +87,37 @@ class MainViewModel : ViewModel(), KoinComponent {
         defaultClientWebSocketSession: DefaultClientWebSocketSession? = null,
         userId: String? = null
     ) {
+//        viewModelScope.launch {
+//            if (defaultClientWebSocketSession !== null) {
+//                chatsUseCase.getChatsInBack(defaultClientWebSocketSession, userId!!)
+//                observeUsers()
+//
+//                return@launch
+//            }
+//
+//
+//            if (wsUseCase.wsSession.value !== null && wsUseCase.wsSession.value!!.isActive) {
+//                chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
+//                observeUsers()
+//            }
+//        }
+
         viewModelScope.launch {
-            if (defaultClientWebSocketSession !== null) {
-                chatsUseCase.getChatsInBack(defaultClientWebSocketSession, userId!!)
-                observeUsers()
-                
-                return@launch
-            }
-            
-            
-            if (wsUseCase.wsSession.value !== null && wsUseCase.wsSession.value!!.isActive) {
-                chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
-                observeUsers()
+            _isLoadingChats.value = true
+            delay(2000)
+            try {
+                if (defaultClientWebSocketSession != null) {
+                    chatsUseCase.getChatsInBack(defaultClientWebSocketSession, userId!!)
+                    observeUsers()
+                    return@launch
+                }
+
+                if (wsUseCase.wsSession.value != null && wsUseCase.wsSession.value!!.isActive) {
+                    chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
+                    observeUsers()
+                }
+            } finally {
+                _isLoadingChats.value = false
             }
         }
         
@@ -121,9 +143,14 @@ class MainViewModel : ViewModel(), KoinComponent {
     private val EARLY_DATE = LocalDateTime(1970, 1, 1, 0, 0, 0)
     
     private fun observeUsers() {
-        chatsUseCase.chats.onEach { newUsers ->
-            _chats.value = sortChatsByLastMessageCreated(newUsers)
-        }.launchIn(viewModelScope)
+        _isLoadingChats.value = true
+        try {
+            chatsUseCase.chats.onEach { newUsers ->
+                _chats.value = sortChatsByLastMessageCreated(newUsers)
+            }.launchIn(viewModelScope)
+        } finally {
+            _isLoadingChats.value = false
+        }
     }
     
     
@@ -201,9 +228,14 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     fun loadUsers() {
         viewModelScope.launch {
-            println("prrrr ${chatsUseCase.chats.value}")
-            _chats.update { chatList ->
-                sortChatsByLastMessageCreated(chatList)
+            _isLoadingChats.value = true
+            try {
+                println("prrrr ${chatsUseCase.chats.value}")
+                _chats.update { chatList ->
+                    sortChatsByLastMessageCreated(chatList)
+                }
+            } finally {
+                _isLoadingChats.value = false
             }
         }
     }

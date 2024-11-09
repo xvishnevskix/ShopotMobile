@@ -11,14 +11,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -34,12 +30,9 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Call.CallBar
-import org.videotrade.shopot.presentation.screens.group.GroupEditScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.arrow_left
-import shopot.composeapp.generated.resources.check_mark
 import shopot.composeapp.generated.resources.profile_accept
 
 @Composable
@@ -48,7 +41,7 @@ fun ProfileEditHeader(text: String, onClick: (() -> Unit)? = null) {
 
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 30.dp).background(Color(0xFFf9f9f9)),
+            modifier = Modifier.fillMaxWidth().padding(top = 20.dp).background(Color(0xFFf9f9f9)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 

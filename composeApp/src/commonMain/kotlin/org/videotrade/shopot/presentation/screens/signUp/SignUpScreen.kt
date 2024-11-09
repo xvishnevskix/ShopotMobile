@@ -220,7 +220,7 @@ class SignUpScreen(private val phone: String) : Screen {
 
 
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(top = 35.dp),
+                            modifier = Modifier.fillMaxWidth().padding(top = 35.dp).padding(horizontal = 10.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             CustomTextField(

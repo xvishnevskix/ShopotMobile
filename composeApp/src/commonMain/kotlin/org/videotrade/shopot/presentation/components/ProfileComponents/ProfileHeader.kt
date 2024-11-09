@@ -56,7 +56,7 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
 
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 40.dp, )
+            modifier = Modifier.fillMaxWidth().padding(top = 20.dp, )
                 .background(Color(0xFFf9f9f9)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,

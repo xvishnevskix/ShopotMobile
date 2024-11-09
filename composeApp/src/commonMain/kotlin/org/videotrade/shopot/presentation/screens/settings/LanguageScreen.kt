@@ -119,6 +119,7 @@ class LanguageScreen : Screen {
                         .background(color = Color(0xFFF7F7F7), shape = RoundedCornerShape(size = 16.dp))
 
                 ) {
+                    println("storedLanguage ${storedLanguage}")
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -130,6 +131,14 @@ class LanguageScreen : Screen {
                             if (selectedLanguage != null) {
                                 Text(
                                     text = selectedLanguage.emoji,
+                                    fontSize = 20.sp,
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                    color = Color(0xFF373533)
+                                )
+                            } else {
+                                Text(
+                                    text = languages[0].emoji,
                                     fontSize = 20.sp,
                                     modifier = Modifier.padding(end = 10.dp),
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
@@ -147,11 +156,33 @@ class LanguageScreen : Screen {
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     )
                                 )
+                            } else {
+                                Text(
+                                    text = languages[0].language,
+                                    style = TextStyle(
+                                        fontSize = 16.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                        fontWeight = FontWeight(400),
+                                        color = Color(0xFF373533),
+                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                    )
+                                )
                             }
                         }
                         if (selectedLanguage != null) {
                             Text(
                                 text = selectedLanguage.translation,
+                                style = TextStyle(
+                                    fontSize = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(400),
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                    color = Color(0xFF373533)
+                                )
+                            )
+                        } else {
+                            Text(
+                                text = languages[0].translation,
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
