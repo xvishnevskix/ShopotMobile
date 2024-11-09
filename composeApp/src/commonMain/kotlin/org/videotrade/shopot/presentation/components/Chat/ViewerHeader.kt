@@ -37,7 +37,7 @@ fun ViewerHeader(name: String, time: String = "") {
             .fillMaxWidth()
             .statusBarsPadding()
 //            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
-            .padding(top = 5.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
+            .padding(top = 15.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
