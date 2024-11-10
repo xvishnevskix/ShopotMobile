@@ -146,7 +146,7 @@ class ProfileScreen(
                     }
 
                 },
-                confirmText = "Выйти",
+                confirmText = stringResource(MokoRes.strings.log_out),
                 dismissText = stringResource(MokoRes.strings.cancel),
                 title = stringResource(MokoRes.strings.are_you_sure_you_want_to_go_out)
             )
