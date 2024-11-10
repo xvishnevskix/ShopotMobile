@@ -133,7 +133,6 @@ class ProfileScreen(
         )
 
         val modalVisible = remember { mutableStateOf(false) }
-        val modalTitle = "Вы действительно хотите выйти?"
 
 
         if (modalVisible.value) {
@@ -148,8 +147,8 @@ class ProfileScreen(
 
                 },
                 confirmText = "Выйти",
-                dismissText = "Отмена",
-                title = modalTitle
+                dismissText = stringResource(MokoRes.strings.cancel),
+                title = stringResource(MokoRes.strings.are_you_sure_you_want_to_go_out)
             )
         }
         SafeArea(backgroundColor = Color(0xFFf9f9f9)) {

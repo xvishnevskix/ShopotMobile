@@ -101,6 +101,5 @@ import shopot.composeapp.generated.resources.group
                 }
             }
         }
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }

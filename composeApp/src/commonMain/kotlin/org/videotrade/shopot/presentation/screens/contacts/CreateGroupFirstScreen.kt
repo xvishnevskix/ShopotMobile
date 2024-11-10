@@ -44,6 +44,8 @@ import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.InternalResourceApi
+import org.jetbrains.compose.resources.StringResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
@@ -62,6 +64,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
 class CreateGroupFirstScreen() : Screen {
+    @OptIn(InternalResourceApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -71,6 +74,8 @@ class CreateGroupFirstScreen() : Screen {
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
         val toasterViewModel: CommonViewModel = koinInject()
+
+        val selectParticipants = stringResource(MokoRes.strings.select_participants)
 
         viewModel.fetchContacts()
 
@@ -102,7 +107,7 @@ class CreateGroupFirstScreen() : Screen {
                         onClick = {
                             if (selectedContacts.isEmpty()) {
                                 toasterViewModel.toaster.show(
-                                    "Выберите участников",
+                                    message = selectParticipants,
                                     type = ToastType.Error,
                                     duration = ToasterDefaults.DurationDefault
                                 )
@@ -119,6 +124,7 @@ class CreateGroupFirstScreen() : Screen {
                     ) {
                         item {
                             ContactsSearch(searchQuery, isSearching)
+                            Spacer(modifier = Modifier.height(24.dp))
                         }
 
 //                        itemsIndexed(filteredContacts) { _, item ->

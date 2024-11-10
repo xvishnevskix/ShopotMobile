@@ -138,6 +138,7 @@ class CreateChatScreen() : Screen {
                                     MakeGroup(contacts)
                                 }
                             }
+                            Spacer(modifier = Modifier.height(24.dp))
                         }
                         groupedContacts.forEach { (initial, contacts) ->
                             item {

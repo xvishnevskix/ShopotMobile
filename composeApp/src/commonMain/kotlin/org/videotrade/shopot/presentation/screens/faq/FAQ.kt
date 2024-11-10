@@ -168,33 +168,7 @@ class FAQ() : Screen {
 
         Box(modifier = Modifier.fillMaxSize().background(Color(0xFFf9f9f9))) {
 
-            if (modalVisible.value) {
-                SupportModalDialog(
-                    onDismiss = {
-                        modalVisible.value = false
-                        isMessageSent.value = false
-                    },
-                    email = email,
-                    description = description,
-                    isMessageSent = isMessageSent,
-                    loading = loading,
-                    isSuccessfulSend = isSuccessfulSend,
-                    onSubmit = {
-                        if (email.value.isNotEmpty() && description.value.length >= 3) {
-                            coroutineScope.launch {
-                                loading.value = true
-                                val response = sendEmail(email.value, description.value)
-                                loading.value = false
-                                isSuccessfulSend.value =
-                                    response != null && response.status.isSuccess()
-                                isMessageSent.value = true
-                            }
-                        }
-//                            isMessageSent.value = true
-                    }
 
-                )
-            }
 
             Column(
                 modifier = Modifier.padding(10.dp).fillMaxHeight(0.9f),
@@ -250,6 +224,33 @@ class FAQ() : Screen {
 
 
             }
+            if (modalVisible.value) {
+                SupportModalDialog(
+                    onDismiss = {
+                        modalVisible.value = false
+                        isMessageSent.value = false
+                    },
+                    email = email,
+                    description = description,
+                    isMessageSent = isMessageSent,
+                    loading = loading,
+                    isSuccessfulSend = isSuccessfulSend,
+                    onSubmit = {
+                        if (email.value.isNotEmpty() && description.value.length >= 3) {
+                            coroutineScope.launch {
+                                loading.value = true
+                                val response = sendEmail(email.value, description.value)
+                                loading.value = false
+                                isSuccessfulSend.value =
+                                    response != null && response.status.isSuccess()
+                                isMessageSent.value = true
+                            }
+                        }
+//                            isMessageSent.value = true
+                    }
+
+                )
+            }
         }
     }
 
@@ -259,7 +260,6 @@ class FAQ() : Screen {
             modifier = Modifier
                 .padding(top = 4.dp, bottom = 4.dp)
                 .fillMaxWidth()
-                .height(56.dp)
                 .border(
                     width = 1.dp,
                     color = Color(0x33373533),

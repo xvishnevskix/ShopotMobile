@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Main
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -68,6 +69,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
+import org.videotrade.shopot.presentation.components.Contacts.MakeGroup
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -94,6 +97,19 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val isLoading by mainViewModel.isLoadingChats.collectAsState()
     var fakeLoading by remember { mutableStateOf(true) }
     var refreshing by remember { mutableStateOf(false) }
+
+    val isSearching = remember { mutableStateOf(false) }
+    val searchQuery = remember { mutableStateOf("") }
+
+    val filteredChats = if (searchQuery.value.isEmpty()) {
+        chatState
+    } else {
+        chatState.filter {
+            (it.firstName?.contains(searchQuery.value, ignoreCase = true) == true)
+                    || (it.lastName?.contains(searchQuery.value, ignoreCase = true) == true)
+                    || (it.phone?.contains(searchQuery.value) == true)
+        }
+    }
     
     val refreshState = rememberPullRefreshState(
         refreshing = refreshing,
@@ -121,8 +137,20 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         SafeArea(backgroundColor = if (isLoading) Color.White else Color(0xFFf9f9f9)) {
             Box(modifier = Modifier.background(color = if (isLoading) Color.White else Color(0xFFf9f9f9)).fillMaxSize()) {
             
-            Column(modifier = Modifier.fillMaxSize()) {
-                HeaderMain()
+            Column(modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.Start
+                ) {
+                HeaderMain(isSearching)
+
+
+                Crossfade(targetState = isSearching.value) { searching ->
+                    if (searching) {
+                        Column {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            ContactsSearch(searchQuery, isSearching, padding = 0.dp)
+                        }
+                    }
+                }
                 
                 Column(
                     modifier = Modifier.weight(1f),
@@ -155,7 +183,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                     },
                                 verticalArrangement = Arrangement.Center,
                             ) {
-                                items(chatState) { item ->
+                                items(filteredChats) { item ->
                                     Column {
                                         UserComponentItem(item, commonViewModel, mainViewModel)
                                         Spacer(modifier = Modifier.background(Color(0xFFF3F4F6)).height(16.dp))

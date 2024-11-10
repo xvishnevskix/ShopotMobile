@@ -156,18 +156,19 @@ class ProfileEditScreen() : Screen {
         val nickValidate2 = stringResource(MokoRes.strings.nickname_must_contain_at_least_6_characters)
         val nickValidate3 = stringResource(MokoRes.strings.nickname_should_not_exceed_30_characters)
         val nickValidate4 = stringResource(MokoRes.strings.nickname_can_contain_only_letters_and_numbers)
-        val fillInputs = "Заполните все поля правильно"
+        val deskValidate2 = stringResource(MokoRes.strings.the_description_must_not_exceed_40_characters)
+        val fillInputs = stringResource(MokoRes.strings.please_fill_in_all_fields_correctly)
 
         val firstModalVisible = remember { mutableStateOf(false) }
         val secondModalVisible = remember { mutableStateOf(false) }
-        val firstModalTitle = "Вы действительно хотите удалить аккаунт?"
-        val secondModalText =  "Удаление аккаунта приведет к безвозвратной потере всех данных, продолжить?"
-        val secondModalTitle = "Внимание!"
+        val firstModalTitle = stringResource(MokoRes.strings.are_you_sure_you_want_to_delete_your_account)
+        val secondModalText =  stringResource(MokoRes.strings.deleting_your_account_will_result_in_permanent_loss_of_all_data_continue)
+        val secondModalTitle = stringResource(MokoRes.strings.attention)
 
         SafeArea(backgroundColor = Color(0xFFf9f9f9)) {
             Column(modifier = Modifier.background(Color(0xFFf9f9f9))
                 .imePadding()) {
-                        ProfileEditHeader("Редактировать профиль") {
+                        ProfileEditHeader(stringResource(MokoRes.strings.edit_profile)) {
                         scope.launch {
 
                             if (firstNameError.value != null || lastNameError.value != null || descriptionError.value != null) {
@@ -327,11 +328,11 @@ class ProfileEditScreen() : Screen {
                                 profile.description?.let {
                                     textState.value.description?.let { it1 ->
                                         CustomTextField(
-                                            title = "Описание",
+                                            title = stringResource(MokoRes.strings.description),
                                             value = it1,
                                             onValueChange = {
                                                 textState.value = textState.value.copy(description = it)
-                                                descriptionError.value = validateDescription(it, lastnameValidate1, lastnameValidate2) // Валидация описания
+                                                descriptionError.value = validateDescription(it, descValidate2 = deskValidate2) // Валидация описания
                                             },
                                             placeholder = it,
                                             error = descriptionError.value
@@ -369,8 +370,8 @@ class ProfileEditScreen() : Screen {
                             firstModalVisible.value = false
                             secondModalVisible.value = true
                         },
-                        confirmText = "Удалить",
-                        dismissText = "Отмена",
+                        confirmText = stringResource(MokoRes.strings.delete),
+                        dismissText = stringResource(MokoRes.strings.cancel),
                         title = firstModalTitle
                     )
                 }
@@ -384,8 +385,8 @@ class ProfileEditScreen() : Screen {
                                 commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
                             }
                         },
-                        confirmText = "Удалить всё",
-                        dismissText = "Отмена",
+                        confirmText = stringResource(MokoRes.strings.delete_all),
+                        dismissText = stringResource(MokoRes.strings.cancel),
                         title = secondModalTitle
                     )
                 }

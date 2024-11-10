@@ -221,7 +221,20 @@
     <string name="get_a_new_code">Get a new code</string>
     <string name="receive_code_via_sms">Receive code via SMS</string>
 
-
+    <string name="cancel">Cancel</string>
+    <string name="select_participants">Select participants</string>
+    <string name="log_out">Log out</string>
+    <string name="please_fill_in_all_fields_correctly">Please fill in all fields correctly</string>
+    <string name="are_you_sure_you_want_to_delete_your_account">Are you sure you want to delete your account?</string>
+    <string name="deleting_your_account_will_result_in_permanent_loss_of_all_data_continue">Deleting your account will result in permanent loss of all data, continue?</string>
+    <string name="attention">Attention!</string>
+    <string name="delete_all">Delete all</string>
+    <string name="the_description_must_not_exceed_40_characters">The description must not exceed 40 characters</string>
+    <string name="recent">Недавние</string>
+    <string name="recent">Недавние</string>
+    <string name="recent">Недавние</string>
+    <string name="recent">Недавние</string>
+    <string name="recent">Недавние</string>
 
 
 
