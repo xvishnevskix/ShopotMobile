@@ -226,10 +226,7 @@
     <string name="attention">Внимание!</string>
     <string name="delete_all">Удалить всё</string>
     <string name="the_description_must_not_exceed_40_characters">Описание не должно превышать 40 символов</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
+    <string name="select_language">Select language</string>
+    <string name="other_languages">Other languages</string>
 
 </resources>

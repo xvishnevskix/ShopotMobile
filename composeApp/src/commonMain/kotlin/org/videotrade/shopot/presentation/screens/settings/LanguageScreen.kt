@@ -79,7 +79,7 @@ class LanguageScreen : Screen {
                 modifier = Modifier.fillMaxWidth().background(Color.White)
             ) {
 
-                LanguageHeader("Выбор языка")
+                LanguageHeader(stringResource(MokoRes.strings.select_language))
 
                 val languages = listOf(
                     LanguageItemData("Русский", "Russian", "🇷🇺", "ru"),
@@ -198,7 +198,7 @@ class LanguageScreen : Screen {
                 Spacer(modifier = Modifier.height(40.dp))
 
                 Text(
-                    text = "Другие языки",
+                    text = stringResource(MokoRes.strings.other_languages),
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),

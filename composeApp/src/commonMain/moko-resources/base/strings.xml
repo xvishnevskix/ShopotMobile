@@ -230,11 +230,9 @@
     <string name="attention">Attention!</string>
     <string name="delete_all">Delete all</string>
     <string name="the_description_must_not_exceed_40_characters">The description must not exceed 40 characters</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
-    <string name="recent">Недавние</string>
+    <string name="select_language">Select language</string>
+    <string name="other_languages">Other languages</string>
+
 
 
 
