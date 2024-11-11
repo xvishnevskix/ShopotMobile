@@ -8,20 +8,29 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import coil3.compose.rememberAsyncImagePainter
 import getImageStorage
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
@@ -33,23 +42,119 @@ fun MessageImage(
     attachments: List<Attachment>,
     messageSenderName: String? = null
 ) {
-//    var imageFilePath by remember { mutableStateOf("") }
-    val fileName = attachments[0].name
-    val fileId = attachments[0].fileId
-    
-    val imageBitmap = remember(fileId) {
-        mutableStateOf<ImageBitmap?>(null)
-    }
-    LaunchedEffect(fileId) {
-        println("Loading image for fileId: $fileId")
-        imageBitmap.value = getImageStorage(fileId, fileName, true)
-    }
-    
-    val navigator = LocalNavigator.current
+    if (getPlatform() == Platform.Android) {
+        val navigator = LocalNavigator.currentOrThrow
+        
+        val fileName = attachments[0].name
+        val fileId = attachments[0].fileId
+        
+        val imagePainter = remember { mutableStateOf<Painter?>(null) }
+        var imageFilePath = remember { mutableStateOf("") }
+        
+        imagePainter.value = getImageStorage(fileId, fileId, false).value
 
-    if (imageBitmap.value != null) {
+        
+        if (imagePainter.value != null) {
+            println("imagePainter.value asdada")
+            Image(
+                painter = imagePainter.value!!,
+                contentDescription = "Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(250.dp, 350.dp)
+                    .padding(7.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 20.dp,
+                            topEnd = 20.dp,
+                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
+                            bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                        )
+                    ).clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null // Убирает эффект нажатия
+                    ) {
+                        if (imagePainter.value !== null)
+                            navigator.push(
+                                PhotoViewerScreen(
+                                    imagePainter,
+                                    messageSenderName,
+                                    message.created
+                                )
+                            )
+                    }
+            )
+        } else {
+            Image(
+                painter = painterResource(Res.drawable.person), // Замените на ваш источник изображения
+                contentDescription = "Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(250.dp, 350.dp)
+                    .padding(7.dp)
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 20.dp,
+                            topEnd = 20.dp,
+                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
+                            bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                        )
+                    )
+                    .blur(1000.dp) // Применяет блюр к изображению (значение можно настроить)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null // Убирает эффект нажатия
+                    ) {
+                        if (imagePainter.value !== null)
+                            navigator.push(
+                                PhotoViewerScreen(
+                                    imagePainter,
+                                    messageSenderName,
+                                    message.created
+                                )
+                            )
+                    }
+            )
+        }
+    } else {
+        val imageFilePath = remember(attachments[0].fileId) { mutableStateOf("") }
+        
+        val imagePainter = rememberAsyncImagePainter(imageFilePath.value)
+        
+        val imageState = remember { mutableStateOf(imagePainter) }
+        
+        val navigator = LocalNavigator.current
+        val url =
+            "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+        LaunchedEffect(attachments[0].fileId) {
+            val fileId = attachments[0].fileId
+            val fileType = attachments[0].type
+            
+            val fileProvider = FileProviderFactory.create()
+            val existingFile =
+                fileProvider.existingFileInDir(fileId, fileType)
+            
+            if (!existingFile.isNullOrBlank()) {
+                imageFilePath.value = existingFile
+                println("existingFile ${existingFile}")
+            } else {
+                val filePath = fileProvider.downloadCipherFile(
+                    url,
+                    "image",
+                    fileId,
+                    "image"
+                ) { newProgress ->
+                    println("newProgress $newProgress")
+                }
+                if (filePath != null) {
+                    imageFilePath.value = filePath
+                }
+                println("filePath $filePath")
+            }
+        }
+        
         Image(
-            bitmap = imageBitmap.value!!,
+            painter = imagePainter,
             contentDescription = "Image",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -66,46 +171,16 @@ fun MessageImage(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убирает эффект нажатия
                 ) {
-                    if (imageBitmap.value !== null)
+                    if (imageFilePath.value.isNotBlank())
                         navigator?.push(
                             PhotoViewerScreen(
-                                imageBitmap.value!!,
+                                imageState,
                                 messageSenderName,
-                                message.created
-                            )
-                        )
-                }
-        )
-    } else {
-        Image(
-            painter = painterResource(Res.drawable.person), // Замените на ваш источник изображения
-            contentDescription = "Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(250.dp, 350.dp)
-                .padding(7.dp)
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 20.dp,
-                        topEnd = 20.dp,
-                        bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                        bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
-                    )
-                )
-                .blur(1000.dp) // Применяет блюр к изображению (значение можно настроить)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null // Убирает эффект нажатия
-                ) {
-                    if (imageBitmap.value !== null)
-                        navigator?.push(
-                            PhotoViewerScreen(
-                                imageBitmap.value!!,
-                                messageSenderName,
-                                message.created
                             )
                         )
                 }
         )
     }
 }
+
+

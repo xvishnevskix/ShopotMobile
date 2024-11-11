@@ -6,17 +6,12 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import avatarCache
-import com.preat.peekaboo.image.picker.toImageBitmap
+import getImageStorage
 import org.videotrade.shopot.domain.model.MessageItem
-import org.videotrade.shopot.multiplatform.imageAsync
 
 
 @Composable
@@ -24,32 +19,11 @@ fun StickerMessage(
     message: MessageItem,
     imageId: String,
 ) {
+    val imagePainter = getImageStorage(imageId, imageId, false)
     
-    val imageBitmap = remember(imageId) {
-        mutableStateOf<ImageBitmap?>(null)
-    }
-    
-    // Если imageId не пустой и изображение еще не загружено
-//    if (imageBitmap.value == null) {
-//        LaunchedEffect(imageId) {
-//            // Проверка кэша
-//            val cachedImage = avatarCache[imageId]
-//            if (cachedImage != null) {
-//                println("cachedImage31313131")
-//                imageBitmap.value = cachedImage.toImageBitmap()
-//            } else {
-//                println("cachedIma1121")
-//                val newByteArray = imageAsync(imageId, "", false)
-//                if (newByteArray != null) {
-//                    avatarCache.put(imageId, newByteArray)
-//                    imageBitmap.value = newByteArray.toImageBitmap()
-//                }
-//            }
-//        }
-//    }
-    if (imageBitmap.value !== null)
+    if (imagePainter.value !== null)
         Image(
-            bitmap = imageBitmap.value!!,
+            painter = imagePainter.value!!,
             contentDescription = "Image",
             contentScale = ContentScale.Fit,
             modifier = Modifier

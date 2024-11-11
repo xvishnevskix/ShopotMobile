@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -22,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -37,8 +41,11 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileChatHeader
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -64,6 +71,8 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
             )
         }
         
+        val imagePainter = getImageStorage(chat.icon, chat.icon, false)
+        
         
         Box(
             modifier = Modifier.fillMaxSize().background(Color.White),
@@ -79,82 +88,152 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         .background(Color(0xFFF3F4F6))
                         .padding(16.dp)
                 ) {
-                    ProfileHeader(stringResource(MokoRes.strings.profile))
+                    ProfileChatHeader(stringResource(MokoRes.strings.profile))
                     Avatar(
                         icon = chat.icon,
-                        size = 186.dp,
+                        size = 128.dp,
                         onClick = {
                             println("AAAAA")
                             
                             scope.launch {
-                                val imageBitmap = getImageStorage(chat.icon, chat.icon, false)
-                                println(" imageBitmap $imageBitmap")
-                                imageBitmap?.let {
+                                imagePainter.value?.let {
                                     navigator.push(
                                         PhotoViewerScreen(
-                                            it,
+                                            imagePainter,
                                             messageSenderName = "${chat.firstName} ${chat.lastName}",
                                         )
                                     )
                                 }
-                                
+//
                             }
                             
                         }
                     )
+                    Spacer(modifier = Modifier.height(24.dp))
                     Text(
                         "${chat.firstName} ${chat.lastName}",
                         textAlign = TextAlign.Center,
-                        fontSize = 20.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        modifier = Modifier.padding(top = 16.dp, bottom = 9.dp),
-                        color = Color(0xFF000000)
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        modifier = Modifier,
                     )
+                    Spacer(modifier = Modifier.height(12.dp))
                     Row(
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier.padding(bottom = 24.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier,
                     ) {
                         chat.phone?.let {
                             Text(
                                 it,
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                modifier = Modifier.padding(end = 18.dp),
-                                color = Color(0xFF979797)
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0x80373533),
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                modifier = Modifier.padding(end = if (chat.phone == "") 0.dp else 1.dp),
                             )
                         }
-                        
+
+                        Box(
+                            modifier = Modifier.padding(start = 18.dp, end = 18.dp).clip(RoundedCornerShape(50.dp)).width(4.dp)
+                                .height(4.dp)
+                                .background(color = Color(0x80373533)),
+                            contentAlignment = Alignment.Center
+                        ) {
+
+                        }
+
                         if (chat.chatUser?.get(0)?.login != null) {
                             Text(
                                 chat.chatUser!![0].login!!,
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF979797)
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0x80373533),
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
                     }
-                    
-                    
+
+                    Spacer(modifier = Modifier.height(28.dp))
+
                     if (chat.chatUser?.get(0)?.description != null) {
                         Text(
                             chat.chatUser!![0].description!!,
                             textAlign = TextAlign.Center,
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            modifier = Modifier.padding(bottom = 10.dp),
-                            color = Color(0xFF000000)
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFFCAB7A3),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                     }
+                    Spacer(modifier = Modifier.height(56.dp))
+//                    Text(
+//                        "${chat.firstName} ${chat.lastName}",
+//                        textAlign = TextAlign.Center,
+//                        fontSize = 16.sp,
+//                        lineHeight = 16.sp,
+//                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+//                        fontWeight = FontWeight(500),
+//                        color = Color(0xFF373533),
+//                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                    )
+//                    Row(
+//                        horizontalArrangement = Arrangement.SpaceAround,
+//                        modifier = Modifier.padding(bottom = 24.dp),
+//                    ) {
+//                        chat.phone?.let {
+//                            Text(
+//                                it,
+//                                textAlign = TextAlign.Center,
+//                                fontSize = 16.sp,
+//                                lineHeight = 16.sp,
+//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                                fontWeight = FontWeight(400),
+//                                color = Color(0x80373533),
+//                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                                modifier = Modifier.padding(end = if (chat.phone == "") 0.dp else 1.dp),
+//                            )
+//                        }
+//
+//                        if (chat.chatUser?.get(0)?.login != null) {
+//                            Text(
+//                                chat.chatUser!![0].login!!,
+//                                textAlign = TextAlign.Center,
+//                                fontSize = 16.sp,
+//                                lineHeight = 16.sp,
+//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                                fontWeight = FontWeight(400),
+//                                color = Color(0x80373533),
+//                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                            )
+//                        }
+//                    }
+//
+//
+//                    if (chat.chatUser?.get(0)?.description != null) {
+//                        Text(
+//                            chat.chatUser!![0].description!!,
+//                            textAlign = TextAlign.Center,
+//                            fontSize = 16.sp,
+//                            lineHeight = 16.sp,
+//                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+//                            fontWeight = FontWeight(500),
+//                            color = Color(0xFFCAB7A3),
+//                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                        )
+//                    }
 
 
 //                        Row(

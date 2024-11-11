@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.dokar.sonner.Toaster
 import org.koin.compose.koinInject
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 
@@ -33,7 +34,7 @@ fun SafeArea(
             .fillMaxSize().background(backgroundColor)
             .blur(blurRadius)
             .then(
-                if (getPlatform() == "Ios") {
+                if (getPlatform() == Platform.Ios) {
                     Modifier.safeContentPadding()
                 } else {
                     if (padding != null) Modifier.padding(padding) else Modifier.padding(

@@ -1,7 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
-actual fun getPlatform(): String {
-    return "Ios"
+actual fun getPlatform(): Platform {
+    return Platform.Ios
 }
 
 actual fun getBuildVersion(): Long {

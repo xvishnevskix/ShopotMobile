@@ -95,6 +95,7 @@ class ProfileScreen(
         val profile = profileViewModel.profile.collectAsState().value
         
         val mainScreenNavigator = commonViewModel.mainNavigator.collectAsState(initial = null).value
+        val imagePainter = getImageStorage(profile.icon, profile.icon, false)
         
         val navigator = LocalNavigator.currentOrThrow
         val items = listOf(
@@ -174,17 +175,14 @@ class ProfileScreen(
                             size = 128.dp,
                             onClick = {
                                 scope.launch {
-                                    val imageBitmap = getImageStorage(profile.icon, profile.icon, false)
-                                    println(" imageBitmap $imageBitmap")
-                                    imageBitmap?.let {
+                                    imagePainter.value?.let {
                                         commonViewModel.mainNavigator.value?.push(
                                             PhotoViewerScreen(
-                                                it,
+                                                imagePainter!!,
                                                 messageSenderName = "${profile.firstName} ${profile.lastName}",
                                             )
                                         )
                                     }
-
                                 }
                             }
                         )
