@@ -16,6 +16,7 @@ import android.provider.Settings
 import android.view.Display
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +30,6 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.AppActivity
 import org.videotrade.shopot.R
 import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 
@@ -60,44 +60,79 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
     }
     
     private fun triggerActionBasedOnData(data: Map<String, String>) {
-        if (data["action"] == "callBackground") {
-            val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
-            val callUseCase: CallUseCase = KoinPlatform.getKoin().get()
-            val profileId = getValueInStorage("profileId")
-            
-            println("profileId $profileId")
-            
-            if (profileId != null) {
-                val callData = data["callData"]
+        
+        when (data["action"]) {
+            "callBackground" -> {
+                val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+                val callUseCase: CallUseCase = KoinPlatform.getKoin().get()
+                val profileId = getValueInStorage("profileId")
                 
-                if (callData != null) {
-                    try {
-                        val parseCallData = Json.parseToJsonElement(callData).jsonObject
-                        println("callData41412412 $callData")
-                        callViewModel.setIsCallBackground(true)
-                        callViewModel.setIsIncomingCall(true)
-                        
-                        val userId =
-                            parseCallData.jsonObject["userId"]?.jsonPrimitive
-
-                        println("user.id ${userId}")
-                        
-                        callViewModel.setOtherUserId(userId.toString())
-                        callViewModel.connectionCallWs(profileId)
-                        
-                        // Пробуждаем экран и показываем активность через Foreground Service
-                        val serviceIntent = Intent(this, CallForegroundService::class.java)
-                        startForegroundService(serviceIntent)
-                        
-                        // Устанавливаем данные вызова в callViewModel
-                        callViewModel.setAnswerData(parseCallData)
-                    } catch (e: Exception) {
-                        println("Ошибка парсинга callData: ${e.message}")
+                println("profileId $profileId")
+                
+                if (profileId != null) {
+                    val callData = data["callData"]
+                    
+                    if (callData != null) {
+                        try {
+                            val parseCallData = Json.parseToJsonElement(callData).jsonObject
+                            println("callData41412412 $callData")
+                            callViewModel.setIsCallBackground(true)
+                            callViewModel.setIsIncomingCall(true)
+                            
+                            val userId =
+                                parseCallData.jsonObject["userId"]?.jsonPrimitive?.content
+                            
+                            println("user.id ${userId}")
+                            
+                            if (userId != null) {
+                                callViewModel.setOtherUserId(userId)
+                            }
+                            callViewModel.connectionCallWs(profileId)
+                            
+                            // Пробуждаем экран и показываем активность через Foreground Service
+                            val serviceIntent = Intent(this, CallForegroundService::class.java)
+                            startForegroundService(serviceIntent)
+                            
+                            // Устанавливаем данные вызова в callViewModel
+                            callViewModel.setAnswerData(parseCallData)
+                        } catch (e: Exception) {
+                            println("Ошибка парсинга callData: ${e.message}")
+                        }
                     }
                 }
+                // Ваш код, например, инициирование звонка
             }
-            // Ваш код, например, инициирование звонка
+            
+            "messageInChat" -> {
+                val channelId = "MessageInChatChannel"
+                
+                val callData = data["messageData"]
+                
+                val parseCallData = callData?.let { Json.parseToJsonElement(it).jsonObject }
+                println("callData41412412 $callData")
+                
+                
+                val title = parseCallData?.jsonObject?.get("title")?.jsonPrimitive?.content
+                val message = parseCallData?.jsonObject?.get("body")?.jsonPrimitive?.content
+                
+                println("title ${title} $message")
+                
+                val notificationManager = NotificationManagerCompat.from(this)
+                if (notificationManager.areNotificationsEnabled()) {
+                    // Создаем и отправляем уведомление
+                    val notification = NotificationCompat.Builder(this, channelId)
+                        .setSmallIcon(android.R.drawable.sym_def_app_icon)
+                        .setContentTitle(title)
+                        .setContentText(message)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setAutoCancel(true)
+                    
+                    notificationManager.notify(3, notification.build())
+                    
+                }
+            }
         }
+        
         
     }
 }
@@ -263,6 +298,7 @@ class CallActionReceiver : BroadcastReceiver() {
                 println("Вызов отклонен")
                 try {
                     callViewModel.rejectCall(callViewModel.getOtherUserId())
+                    callViewModel.disconnectWs()
                     
                     // Остановка Foreground Service
                     val serviceIntent = Intent(context, CallForegroundService::class.java)
@@ -282,6 +318,9 @@ class CallActionReceiver : BroadcastReceiver() {
                 // Завершение активности
                 try {
                     callViewModel.rejectCall(callViewModel.getOtherUserId())
+                    
+                    callViewModel.disconnectWs()
+                    
                 } catch (e: Exception) {
                 
                 }

@@ -192,7 +192,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     override suspend fun reconnectPeerConnection() {
-        
         // Переподключение PeerConnection
         _peerConnection.value = PeerConnection(rtcConfiguration)
     }
@@ -435,6 +434,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 println("Ошибка соединения: $e")
             }
         }
+    }
+    
+    
+    override suspend fun disconnectWs() {
+        wsSession.value?.close()
     }
     
     

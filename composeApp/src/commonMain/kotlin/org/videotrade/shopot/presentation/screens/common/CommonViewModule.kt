@@ -37,6 +37,7 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
@@ -261,7 +262,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
                         put("title", title)
                         put("body", content)
                         put("notificationToken", notificationToken)
-
+                        put("platform", getPlatform().name)
                     }
                 )
 

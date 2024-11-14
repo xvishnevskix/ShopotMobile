@@ -20,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
@@ -128,9 +129,20 @@ class AndroidApp : Application() {
             setShowBadge(false)  // Отключение значка для активных звонков
         }
         
+        val messageInChatChannelId = "MessageInChatChannel"
+        val messageInChatChannel = NotificationChannel(
+            messageInChatChannelId,
+            "messageInChatChannel",
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = "Канал для сообщений в чате"
+            setShowBadge(false)  // Отключение значка для активных звонков
+        }
+        
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager?.createNotificationChannel(incomingCallChannel)
         notificationManager?.createNotificationChannel(ongoingCallChannel)
+        notificationManager?.createNotificationChannel(messageInChatChannel)
     }
     
     
@@ -158,12 +170,15 @@ open class AppActivity : ComponentActivity() {
         Firebase.initialize(this) // This line
         getAppLifecycleObserver()
         
+        deleteNotification(this)
+        
         enableEdgeToEdge()
         initializeProviders()
         
         setContent {
             App()
         }
+
 
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //            val channelId = "default_channel_id"
@@ -221,4 +236,10 @@ open class AppActivity : ComponentActivity() {
         const val REQUEST_CODE_MICROPHONE = 3
         const val REQUEST_CODE_NOTIFICATIONS = 4
     }
+}
+
+
+fun deleteNotification(context: Context) {
+    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    notificationManager.cancel(3)
 }

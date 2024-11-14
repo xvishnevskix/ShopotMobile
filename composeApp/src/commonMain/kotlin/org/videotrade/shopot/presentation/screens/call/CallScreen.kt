@@ -242,11 +242,19 @@ class CallScreen(
                 }
                 
                 PeerConnectionState.Disconnected -> callState.value = connectionWasBroken
+                
                 PeerConnectionState.Failed -> callState.value =
                     errorOccurredWhileEstablishingConnection
                 
-                PeerConnectionState.Closed -> callState.value = connectionWasClosed
+                
+                
+                else -> callState.value = callIncoming
+                
+                
+//                PeerConnectionState.Closed -> callState.value = connectionWasClosed
+            
             }
+            
         }
         
         
