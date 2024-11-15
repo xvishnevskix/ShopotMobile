@@ -77,6 +77,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -84,6 +85,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.compose.ui.window.Popup
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
@@ -100,6 +102,7 @@ import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
@@ -376,8 +379,30 @@ fun ChatFooter(
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
-    
-    
+
+
+    val maxHeight = 200.dp // Увеличиваем максимальную высоту компонента
+    val minHeight = 56.dp  // Минимальная высота компонента
+    val lineHeight = 16.dp // Высота одной строки текста в dp
+    val maxLines = 8       // Максимальное количество строк текста
+
+    // Рассчитываем количество строк на основе текста
+    val calculatedLines = remember(footerText) {
+        val totalLines = footerText.split("\n").size
+        val approximateLines = (footerText.length / 20).coerceAtLeast(1) // Примерно 20 символов на строку
+        totalLines.coerceAtLeast(approximateLines)
+    }.coerceAtMost(maxLines)
+
+    // Высота на основе количества строк
+    val targetHeight = minHeight + calculatedLines * lineHeight
+
+    // Ограничиваем высоту максимумом
+    val finalHeight = targetHeight.coerceAtMost(maxHeight)
+
+    // Анимируем высоту
+    val animatedHeight by animateDpAsState(targetValue = finalHeight)
+
+
     Box(
         modifier = Modifier
 
@@ -405,7 +430,7 @@ fun ChatFooter(
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
                 .heightIn(max = 125.dp, min = 56.dp)
-                .height(height)
+                .height(animatedHeight)
 
         ) {
             Column(
@@ -533,12 +558,9 @@ fun ChatFooter(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .heightIn(max = 125.dp, min = 60.dp)
-                ) {
-                    if (!isRecording) {
 
-                        
-                        
-                    } else {
+                ) {
+                    if (isRecording) {
                         Row(
                             modifier = Modifier.padding(start = 15.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -573,7 +595,7 @@ fun ChatFooter(
                                 .fillMaxWidth(0.45f)
                                 .offset(x = (textOffset + swipeOffset.value).dp)
                                 .alpha(1f + (swipeOffset.value / 100f))
-                                .animateContentSize(),
+                            ,
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
@@ -601,11 +623,12 @@ fun ChatFooter(
                         modifier = Modifier
                             .alpha(if (isRecording) 0f else 1f)
                             .weight(1f)
+                            .animateContentSize()
                             ,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         AnimatedVisibility(
-                            visible = !isRecording, // Блок отображается, когда isRecording = false
+                            visible = !isRecording,
                             enter = fadeIn(animationSpec = tween(300)) + expandIn(expandFrom = Alignment.Center),
                             exit = fadeOut(animationSpec = tween(300)) + shrinkOut(shrinkTowards = Alignment.Center)
                         ) {
@@ -629,7 +652,6 @@ fun ChatFooter(
                         Row(
                             modifier = Modifier
                                 .weight(1f)
-
                                 .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
                                 .animateContentSize()
                         ) {
@@ -644,14 +666,15 @@ fun ChatFooter(
                                     }
                                 },
                                 modifier = Modifier
-                                    .padding(end = 8.dp, top = 5.dp, bottom = 5.dp)
                                     .weight(1f)
-                                    .padding(3.dp)
-
-                                    .then(if (isRecording) Modifier.height(0.dp) else Modifier),
+                                    .padding(16.dp),
                                 textStyle = TextStyle(
-                                    color = Color.Black,
-                                    fontSize = 16.sp
+                                    fontSize = 16.sp,
+                                    lineHeight = lineHeight.value.sp, // Применяем фиксированную высоту строки
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(400),
+                                    color = Color(0xFF373533),
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 ),
                                 cursorBrush = SolidColor(Color.Black),
                                 visualTransformation = VisualTransformation.None,
@@ -660,12 +683,12 @@ fun ChatFooter(
                                         if (footerText.isEmpty()) {
                                             Text(
                                                 stringResource(MokoRes.strings.write_message),
-                                                textAlign = TextAlign.Center,
                                                 fontSize = 16.sp,
-                                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                                lineHeight = 20.sp,
-                                                color = Color(0xFF979797),
+                                                lineHeight = lineHeight.value.sp,
+                                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                                fontWeight = FontWeight(400),
+                                                color = Color(0x80373533),
+                                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                             )
                                         }
                                         innerTextField()
@@ -694,10 +717,13 @@ fun ChatFooter(
                             }
 
                         }
+                        Spacer(modifier = Modifier.width(12.dp))
+
+
                     }
 
-                    Spacer(modifier = Modifier.width(12.dp))
-                    
+
+
                     
                     if (footerText.isNotEmpty()) {
 

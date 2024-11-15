@@ -173,9 +173,9 @@ class ChatScreen(
                     BottomSheetModal(scaffoldForwardState)
                     //стикеры
                     BottomSheetScaffold(
-                        modifier = Modifier.background(Color(0xFFF3F4F6)),
-                        containerColor = Color(0xFFF3F4F6),
-                        sheetContainerColor = Color(0xFFF3F4F6),
+                        modifier = Modifier.background(Color(0xFFF7F7F7)),
+                        containerColor = Color(0xFFF7F7F7),
+                        sheetContainerColor = Color(0xFFF7F7F7),
                         scaffoldState = scaffoldStickerState,
                         sheetContent = {
                             if (showStickerMenu.value) {
