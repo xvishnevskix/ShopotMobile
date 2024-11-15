@@ -72,7 +72,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     
     Column {
         Row(
-            modifier = Modifier.padding(horizontal = 23.dp).fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp)
+            modifier = Modifier.padding(top = 10.dp).padding(horizontal = 23.dp).fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp)
                 .background(Color.White),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,

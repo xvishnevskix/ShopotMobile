@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
@@ -723,15 +724,27 @@ fun ChatFooter(
                     }
 
 
+                    val boxSize by animateDpAsState(
+                        targetValue = if (footerText.isNotEmpty()) 56.dp else 50.dp,
+                        animationSpec = tween(
+                            durationMillis = 100, // Длительность анимации
+                            easing = FastOutSlowInEasing // Плавное увеличение
+                        )
+                    )
 
-                    
-                    if (footerText.isNotEmpty()) {
+                    val isFooterTextNotEmpty = footerText.isNotEmpty()
 
+
+                    AnimatedVisibility(
+                        visible = isFooterTextNotEmpty,
+                        enter = fadeIn(animationSpec = tween(100)) + expandIn(expandFrom = Alignment.Center),
+                        exit = fadeOut(animationSpec = tween(100)) + shrinkOut(shrinkTowards = Alignment.Center)
+                    ) {
                         Box(
                             modifier = Modifier
-                                .width(56.dp)
-                                .height(56.dp)
-                                .background(color = Color(0xFFCAB7A3), shape = RoundedCornerShape(size = 16.dp)),
+                                .background(color = Color(0xFFCAB7A3), shape = RoundedCornerShape(size = 16.dp))
+                                .size(boxSize)
+                                ,
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
@@ -756,152 +769,116 @@ fun ChatFooter(
                                 }
                             )
                         }
-                    } else {
-                        
-                        
+                    }
 
-
-                            Box(
-                                contentAlignment = Alignment.CenterEnd,
-                                modifier = Modifier
-                                    .size(
-                                        height = 56.dp,
-                                        width = if (isRecording) 150.dp else 20.dp
-                                    )
-
-                                    .pointerInput(Unit) {
-                                        detectDragGestures(
-                                            onDragStart = {
-                                                println("Drag started")
-                                                isDragging = true
-                                            },
-                                            onDragEnd = {
-                                                println("Drag ended")
-                                                isDragging = false
-                                                // Проверяем, если смещение больше -200f, то сбрасываем смещение
-                                                if (offset.x > -200f) {
-                                                    println("Drag send")
-                                                    
-                                                    val seconds = recordingTime % 60
-                                                    
-                                                    if (seconds > 1) {
-                                                        val fileDir =
-                                                            audioRecorder.stopRecording(true)
-                                                        
-                                                        if (fileDir !== null) {
-                                                            isStartRecording = false
-                                                            
-                                                            viewModel.sendVoice(
-                                                                fileDir,
-                                                                chat,
-                                                                voiceName
-                                                            )
-                                                        }
-                                                    }
-                                                    
-                                                    println("Drag isStop")
-                                                    
-                                                    viewModel.setIsRecording(false)
-                                                    offset = Offset.Zero
-                                                } else {
-                                                    println("Drag stop")
-                                                    
-                                                    // Если смещение больше чем -200f, завершаем запись
-                                                    viewModel.setIsRecording(false)
-                                                    
-                                                    offset = Offset.Zero
-                                                }
-                                            },
-                                            onDrag = { change, dragAmount ->
-//                                    println("dragAmount ${dragAmount}")
-                                                
-                                                
-                                                change.consume()
-                                                val newOffset = Offset(
-                                                    x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
-                                                        .coerceAtMost(0f),
-                                                    y = offset.y
-                                                )
-                                                
-                                                if (newOffset.x <= -200f) {
-                                                    
-                                                    viewModel.setIsRecording(false)
-                                                    
-                                                    audioRecorder.stopRecording(false)
-                                                    
-                                                    offset = Offset.Zero
-                                                }
-                                                
-                                                offset = newOffset
-                                            }
-                                        )
-                                    }
-                                    .pointerInput(Unit) {
-                                        detectTapGestures(
-                                            onTap = {
-                                                println("Tap detected")
-                                                
+                    AnimatedVisibility(
+                        visible = !isFooterTextNotEmpty,
+                        enter = fadeIn(animationSpec = tween(300)) + expandIn(expandFrom = Alignment.Center),
+                        exit = fadeOut(animationSpec = tween(300)) + shrinkOut(shrinkTowards = Alignment.Center)
+                    ) {
+                        Box(
+                            contentAlignment = Alignment.CenterEnd,
+                            modifier = Modifier
+                                .size(
+                                    height = 56.dp,
+                                    width = if (isRecording) 150.dp else 20.dp
+                                )
+                                .pointerInput(Unit) {
+                                    detectDragGestures(
+                                        onDragStart = {
+                                            println("Drag started")
+                                            isDragging = true
+                                        },
+                                        onDragEnd = {
+                                            println("Drag ended")
+                                            isDragging = false
+                                            if (offset.x > -200f) {
+                                                println("Drag send")
                                                 val seconds = recordingTime % 60
-                                                
                                                 if (seconds > 1) {
                                                     val fileDir = audioRecorder.stopRecording(true)
-                                                    
-                                                    if (fileDir !== null) {
+                                                    if (fileDir != null) {
                                                         isStartRecording = false
-                                                        
-                                                        viewModel.sendVoice(
-                                                            fileDir,
-                                                            chat,
-                                                            voiceName
-                                                        )
-                                                        
+                                                        viewModel.sendVoice(fileDir, chat, voiceName)
                                                     }
                                                 }
-                                                
                                                 viewModel.setIsRecording(false)
-                                                
-                                                recordingTime = 0
-                                                isDragging = false
-                                            },
-                                            onPress = {
-                                                if (!isDragging) {
-                                                    viewModel.setIsRecording(!isRecording)
-                                                }
-                                                println("Press released")
-                                                
-                                                
+                                                offset = Offset.Zero
+                                            } else {
+                                                println("Drag stop")
+                                                viewModel.setIsRecording(false)
+                                                offset = Offset.Zero
                                             }
-                                        )
-                                    }
-                            ) {
-                                val sizeModifier = if (isRecording) {
-                                    Modifier.size(width = 56.dp, height = 56.dp)
-                                } else {
-                                    Modifier.size(width = 30.dp, height = 30.dp)
-                                }
-
-                                Box(
-                                    modifier = sizeModifier
-                                        .offset { // Применяем offset к внешнему Box
-                                            IntOffset(
-                                                offset.x.roundToInt(),
-                                                offset.y.roundToInt()
+                                        },
+                                        onDrag = { change, dragAmount ->
+                                            change.consume()
+                                            val newOffset = Offset(
+                                                x = (offset.x + dragAmount.x).coerceAtLeast(-200f).coerceAtMost(0f),
+                                                y = offset.y
                                             )
+                                            if (newOffset.x <= -200f) {
+                                                viewModel.setIsRecording(false)
+                                                audioRecorder.stopRecording(false)
+                                                offset = Offset.Zero
+                                            }
+                                            offset = newOffset
                                         }
-                                        .scale(1f + (offset.x / 850f)) // Применяем scale к внешнему Box
-                                        .background(color = if (isRecording) Color(0xFFCAB7A3) else Color.White, shape = RoundedCornerShape(size = 16.dp)),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Image(
-                                        painter = painterResource(Res.drawable.chat_micro),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        colorFilter = if (!isRecording) ColorFilter.tint(Color(0xFF373533)) else ColorFilter.tint(Color.White)
                                     )
                                 }
+                                .pointerInput(Unit) {
+                                    detectTapGestures(
+                                        onTap = {
+                                            println("Tap detected")
+                                            val seconds = recordingTime % 60
+                                            if (seconds > 1) {
+                                                val fileDir = audioRecorder.stopRecording(true)
+                                                if (fileDir != null) {
+                                                    isStartRecording = false
+                                                    viewModel.sendVoice(fileDir, chat, voiceName)
+                                                }
+                                            }
+                                            viewModel.setIsRecording(false)
+                                            recordingTime = 0
+                                            isDragging = false
+                                        },
+                                        onPress = {
+                                            if (!isDragging) {
+                                                viewModel.setIsRecording(!isRecording)
+                                            }
+                                            println("Press released")
+                                        }
+                                    )
+                                }
+                        ) {
+                            val sizeModifier = if (isRecording) {
+                                Modifier.size(width = 56.dp, height = 56.dp)
+                            } else {
+                                Modifier.size(width = 30.dp, height = 30.dp)
                             }
 
-                        
+                            Box(
+                                modifier = sizeModifier
+                                    .offset {
+                                        IntOffset(
+                                            offset.x.roundToInt(),
+                                            offset.y.roundToInt()
+                                        )
+                                    }
+                                    .scale(1f + (offset.x / 850f))
+                                    .background(
+                                        color = if (isRecording) Color(0xFFCAB7A3) else Color.White,
+                                        shape = RoundedCornerShape(size = 16.dp)
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(Res.drawable.chat_micro),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    colorFilter = if (!isRecording) ColorFilter.tint(Color(0xFF373533)) else ColorFilter.tint(Color.White)
+                                )
+                            }
+                        }
                     }
                 }
             }

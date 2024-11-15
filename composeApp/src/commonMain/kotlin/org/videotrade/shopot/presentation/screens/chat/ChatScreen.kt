@@ -34,7 +34,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -140,12 +142,26 @@ class ChatScreen(
 
                             },
                             bottomBar = {
-                                ChatFooter(chat, viewModel, showStickerMenu, onStickerButtonClick = {
-                                    showStickerMenu.value = true
-                                    scope.launch {
-                                        scaffoldStickerState.bottomSheetState.expand()
-                                    }
-                                })
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .shadow(
+                                            elevation = 20.dp, spotColor = Color.Black, ambientColor = Color.Black,
+                                            shape = RectangleShape, // Прямоугольная форма тени
+                                            clip = false // Тень выходит за границы элемента
+                                        )
+                                ) {
+                                    ChatFooter(
+                                        chat,
+                                        viewModel,
+                                        showStickerMenu,
+                                        onStickerButtonClick = {
+                                            showStickerMenu.value = true
+                                            scope.launch {
+                                                scaffoldStickerState.bottomSheetState.expand()
+                                            }
+                                        })
+                                }
                             },
                             containerColor = Color.White,
 
