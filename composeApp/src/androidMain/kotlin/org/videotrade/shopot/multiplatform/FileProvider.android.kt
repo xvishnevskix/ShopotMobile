@@ -749,7 +749,7 @@ actual class FileProvider(private val applicationContext: Context) {
             if (response.status.isSuccess()) {
                 val jsonElement = Json.parseToJsonElement(response.bodyAsText())
                 
-                println("jsonElementFile ${jsonElement}")
+                println("jsonElementPhoto ${jsonElement}")
                 
                 val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
                 

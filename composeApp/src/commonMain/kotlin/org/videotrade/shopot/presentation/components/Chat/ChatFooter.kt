@@ -279,8 +279,9 @@ fun ChatFooter(
                                     viewModel.footerText.value,
                                     viewModel.profile.value.id,
                                     chat.id,
-                                    "image",
+                                    filePick.fileName,
                                     filePick.fileAbsolutePath,
+                                    fileData.fileType
                                 )
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->

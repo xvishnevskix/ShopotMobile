@@ -345,7 +345,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         fromUser: String,
         chatId: String,
         fileName: String,
-        fileAbsolutePath: String
+        fileAbsolutePath: String,
+        contentType: String,
     ) {
         viewModelScope.launch {
 //            val filePick = FileProviderFactory.create()
@@ -356,7 +357,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 content,
                 fromUser,
                 chatId,
-                "image",
+                contentType,
                 fileName,
                 fileAbsolutePath,
             )
