@@ -30,7 +30,8 @@ import shopot.composeapp.generated.resources.Res
 enum class ButtonStyle {
     Primary,
     Outline,
-    Gradient
+    Gradient,
+    Red
 }
 
 @Composable
@@ -62,6 +63,10 @@ fun CustomButton(
             backgroundColor = Color.Transparent // Gradient will be applied in Modifier
             textColor = Color(0xFF373533)
         }
+        ButtonStyle.Red -> {
+            backgroundColor = Color.Transparent // Gradient will be applied in Modifier
+            textColor = Color(0xFFFF3B30)
+        }
     }
 
     Button(
@@ -76,6 +81,12 @@ fun CustomButton(
                     it.border(
                         width = 1.dp,
                         color = Color(0xFF373533),
+                        shape = buttonShape
+                    )
+                } else if (style == ButtonStyle.Red) {
+                    it.border(
+                        width = 1.dp,
+                        color = Color(0xFFFF3B30),
                         shape = buttonShape
                     )
                 } else {

@@ -217,4 +217,16 @@
     <string name="get_a_new_code">Получить новый код</string>
     <string name="receive_code_via_sms">Получить код в смс</string>
 
+    <string name="cancel">Отмена</string>
+    <string name="select_participants">Выберите участников</string>
+    <string name="log_out">Выйти</string>
+    <string name="please_fill_in_all_fields_correctly">Заполните все поля правильно</string>
+    <string name="are_you_sure_you_want_to_delete_your_account">Вы действительно хотите удалить аккаунт?</string>
+    <string name="deleting_your_account_will_result_in_permanent_loss_of_all_data_continue">Удаление аккаунта приведет к безвозвратной потере всех данных, продолжить?</string>
+    <string name="attention">Внимание!</string>
+    <string name="delete_all">Удалить всё</string>
+    <string name="the_description_must_not_exceed_40_characters">Описание не должно превышать 40 символов</string>
+    <string name="select_language">Select language</string>
+    <string name="other_languages">Other languages</string>
+
 </resources>

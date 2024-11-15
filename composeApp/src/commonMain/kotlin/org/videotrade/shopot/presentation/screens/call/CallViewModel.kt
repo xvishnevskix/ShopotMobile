@@ -269,10 +269,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
             
             val isRejectCall = callUseCase.rejectCall(userId)
 
-//            if (isRejectCall) {
-//                val navigator = commonViewModel.mainNavigator.value
-//                navigator?.push(MainScreen())
-//            }
+            if (isRejectCall) {
+                val navigator = commonViewModel.mainNavigator.value
+                navigator?.popAll()
+            }
         }
         
     }

@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -45,6 +46,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -54,19 +56,14 @@ import shopot.composeapp.generated.resources.search_icon
 fun CreateChatHeader(
     text: String,
     isSearching: MutableState<Boolean>,
-    searchQuery: MutableState<String>,
 ) {
     val navigator = LocalNavigator.currentOrThrow
     
-    val textStyle = TextStyle(
-        color = androidx.compose.ui.graphics.Color.Black,
-        fontSize = 14.sp,
-        fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-        lineHeight = 20.sp,
-    )
+
     
-    Column {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,95 +71,96 @@ fun CreateChatHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Crossfade(targetState = isSearching.value) { searching ->
-                if (searching) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        BasicTextField(
-                            value = searchQuery.value,
-                            onValueChange = { newText -> searchQuery.value = newText },
-                            singleLine = true,
-                            textStyle = textStyle,
-                            cursorBrush = SolidColor(androidx.compose.ui.graphics.Color.Black),
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(35.dp)
-                                .background(androidx.compose.ui.graphics.Color.Transparent)
-                                .padding(start = 0.dp, end = 0.dp),
-                            decorationBox = { innerTextField ->
-                                Box(
-                                    modifier = Modifier
-                                        .background(androidx.compose.ui.graphics.Color.Transparent)
-                                        .padding(8.dp)
-                                ) {
-                                    if (searchQuery.value.isEmpty()) {
-                                        Text(
-                                            stringResource(MokoRes.strings.enter_name_or_phone),
-                                            style = textStyle.copy(color = androidx.compose.ui.graphics.Color.Gray)
-                                        )
-                                    }
-                                    innerTextField()
-                                }
-                            }
-                        )
-
-                        val rotationAngle by animateFloatAsState(
-                            targetValue = if (searching) 270f else 0f,
-                            animationSpec = tween(durationMillis = 10000, easing = LinearEasing)
-                        )
-
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            tint = Color(0xFF000000),
-                            modifier = Modifier
-                                .padding()
-                                .pointerInput(Unit) {
-                                    isSearching.value = false
-                                    searchQuery.value = ""
-                                }
-                                .rotate(rotationAngle)
-                        )
-                    }
-                } else {
+//            Crossfade(targetState = isSearching.value) { searching ->
+//                if (searching) {
+//                    Row(
+//                        modifier = Modifier.fillMaxWidth(),
+//                        verticalAlignment = Alignment.CenterVertically,
+//                        horizontalArrangement = Arrangement.SpaceBetween
+//                    ) {
+//                        BasicTextField(
+//                            value = searchQuery.value,
+//                            onValueChange = { newText -> searchQuery.value = newText },
+//                            singleLine = true,
+//                            textStyle = textStyle,
+//                            cursorBrush = SolidColor(androidx.compose.ui.graphics.Color.Black),
+//                            modifier = Modifier
+//                                .weight(1f)
+//                                .height(35.dp)
+//                                .background(androidx.compose.ui.graphics.Color.Transparent)
+//                                .padding(start = 0.dp, end = 0.dp),
+//                            decorationBox = { innerTextField ->
+//                                Box(
+//                                    modifier = Modifier
+//                                        .background(androidx.compose.ui.graphics.Color.Transparent)
+//                                        .padding(8.dp)
+//                                ) {
+//                                    if (searchQuery.value.isEmpty()) {
+//                                        Text(
+//                                            stringResource(MokoRes.strings.enter_name_or_phone),
+//                                            style = textStyle.copy(color = androidx.compose.ui.graphics.Color.Gray)
+//                                        )
+//                                    }
+//                                    innerTextField()
+//                                }
+//                            }
+//                        )
+//
+//                        val rotationAngle by animateFloatAsState(
+//                            targetValue = if (searching) 270f else 0f,
+//                            animationSpec = tween(durationMillis = 10000, easing = LinearEasing)
+//                        )
+//
+//                        Icon(
+//                            imageVector = Icons.Default.Close,
+//                            contentDescription = "Close",
+//                            tint = Color(0xFF000000),
+//                            modifier = Modifier
+//                                .padding()
+//                                .pointerInput(Unit) {
+//                                    isSearching.value = false
+//                                    searchQuery.value = ""
+//                                }
+//                                .rotate(rotationAngle)
+//                        )
+//                    }
+//                } else {
                     Row(
                         modifier = Modifier.fillMaxWidth().height(35.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Spacer(modifier = Modifier.width(0.dp))
 
                         Text(
                             text = text,
-                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                            fontSize = 17.sp,
                             textAlign = TextAlign.Center,
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 20.sp,
-                            modifier = Modifier.padding(end = 10.dp),
-                            color = Color.Black
+                            fontSize = 24.sp,
+                            lineHeight = 24.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
                         )
-                        Image(
-                            painter = painterResource(Res.drawable.search_icon),
-                            contentDescription = "Search",
-                            modifier = Modifier
-                                .padding(end = 2.dp)
-                                .size(18.dp)
-                                .pointerInput(Unit) {
-                                    isSearching.value = true
-                                },
-                            colorFilter = ColorFilter.tint(Color(0xff000000))
-                        )
+                       Crossfade(targetState = isSearching.value) { searching ->
+                           if (!searching) {
+                               Image(
+                                   painter = painterResource(Res.drawable.search_icon),
+                                   contentDescription = "Search",
+                                   modifier = Modifier
+                                       .padding(end = 2.dp)
+                                       .size(18.dp)
+                                       .pointerInput(Unit) {
+                                           isSearching.value = true
+                                       },
+                                   colorFilter = ColorFilter.tint(Color(0xff000000))
+                               )
+                           }
+                       }
                     }
-                }
             }
         }
-        Box(Modifier.padding(bottom = 23.dp)) {
+        Box(Modifier.padding(bottom = 18.dp)) {
             CallBar()
         }
-    }
 }

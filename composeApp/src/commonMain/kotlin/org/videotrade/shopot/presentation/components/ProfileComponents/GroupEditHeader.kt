@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -33,9 +34,12 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.screens.group.GroupEditScreen
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.arrow_left
 import shopot.composeapp.generated.resources.check_mark
+import shopot.composeapp.generated.resources.profile_accept
 
 @Composable
 fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
@@ -43,36 +47,48 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
 
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(Color(0xFFF3F4F6)),
+            modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(Color(0xFFf9f9f9)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 
             ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                contentDescription = "Back",
-                modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
-                    navigator.pop()
-                },
-                tint = Color.Black
-            )
+//            Icon(
+//                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+//                contentDescription = "Back",
+//                modifier = Modifier.padding(start = 10.dp,end = 1.dp).pointerInput(Unit) {
+//                    navigator.pop()
+//                },
+//                tint = Color.Black
+//            )
+
+            Box(modifier = Modifier.clickable {
+                navigator.pop()
+            }.padding(start = 8.dp, end = 8.dp)) {
+                Image(
+                    modifier = Modifier
+                        .size(width = 7.dp, height = 14.dp),
+                    painter = painterResource(Res.drawable.arrow_left),
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop
+                )
+            }
 
             Text(
                 text = text,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                fontSize = 17.sp,
                 textAlign = TextAlign.Center,
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp,
-                modifier = Modifier.padding(end = 10.dp),
-                color = Color.Black
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
             )
             Image(
-                painter = painterResource(Res.drawable.check_mark),
+                painter = painterResource(Res.drawable.profile_accept),
                 contentDescription = "Checkmark",
                 modifier = Modifier.padding(start = 0.dp, end = 6.dp)
-                    .size(width = 16.dp, height = 12.dp).pointerInput(Unit) {
+                    .size(18.dp).pointerInput(Unit) {
                         if (onClick != null) {
                             onClick()
                         }

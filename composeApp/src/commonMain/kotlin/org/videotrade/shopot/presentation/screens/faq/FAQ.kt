@@ -166,43 +166,17 @@ class FAQ() : Screen {
         val email = remember { mutableStateOf("") }
         val description = remember { mutableStateOf("") }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color.White)) {
+        Box(modifier = Modifier.fillMaxSize().background(Color(0xFFf9f9f9))) {
 
-            if (modalVisible.value) {
-                ModalDialog(
-                    onDismiss = {
-                        modalVisible.value = false
-                        isMessageSent.value = false
-                    },
-                    email = email,
-                    description = description,
-                    isMessageSent = isMessageSent,
-                    loading = loading,
-                    isSuccessfulSend = isSuccessfulSend,
-                    onSubmit = {
-                        if (email.value.isNotEmpty() && description.value.length >= 3) {
-                            coroutineScope.launch {
-                                loading.value = true
-                                val response = sendEmail(email.value, description.value)
-                                loading.value = false
-                                isSuccessfulSend.value =
-                                    response != null && response.status.isSuccess()
-                                isMessageSent.value = true
-                            }
-                        }
-//                            isMessageSent.value = true
-                    }
 
-                )
-            }
 
             Column(
-                modifier = Modifier.padding(10.dp).fillMaxHeight(0.95f),
+                modifier = Modifier.padding(10.dp).fillMaxHeight(0.9f),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
 
                 Column {
-                    BaseHeader(stringResource(MokoRes.strings.support))
+                    BaseHeader(stringResource(MokoRes.strings.support), Color(0xFFf9f9f9))
 
                     Spacer(modifier = Modifier.fillMaxHeight(0.05F))
 
@@ -214,6 +188,7 @@ class FAQ() : Screen {
                         fontWeight = FontWeight(500),
                         textAlign = TextAlign.Center,
                         color = Color(0xFF373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -249,6 +224,33 @@ class FAQ() : Screen {
 
 
             }
+            if (modalVisible.value) {
+                SupportModalDialog(
+                    onDismiss = {
+                        modalVisible.value = false
+                        isMessageSent.value = false
+                    },
+                    email = email,
+                    description = description,
+                    isMessageSent = isMessageSent,
+                    loading = loading,
+                    isSuccessfulSend = isSuccessfulSend,
+                    onSubmit = {
+                        if (email.value.isNotEmpty() && description.value.length >= 3) {
+                            coroutineScope.launch {
+                                loading.value = true
+                                val response = sendEmail(email.value, description.value)
+                                loading.value = false
+                                isSuccessfulSend.value =
+                                    response != null && response.status.isSuccess()
+                                isMessageSent.value = true
+                            }
+                        }
+//                            isMessageSent.value = true
+                    }
+
+                )
+            }
         }
     }
 
@@ -258,7 +260,6 @@ class FAQ() : Screen {
             modifier = Modifier
                 .padding(top = 4.dp, bottom = 4.dp)
                 .fillMaxWidth()
-                .height(56.dp)
                 .border(
                     width = 1.dp,
                     color = Color(0x33373533),
@@ -278,13 +279,14 @@ class FAQ() : Screen {
                     fontWeight = FontWeight(400),
                     textAlign = TextAlign.Center,
                     color = Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             )
         }
     }
 
     @Composable
-    fun ModalDialog(
+    fun SupportModalDialog(
         onDismiss: () -> Unit,
         email: MutableState<String>,
         description: MutableState<String>,
@@ -389,6 +391,7 @@ class FAQ() : Screen {
                                         fontWeight = FontWeight(500),
                                         textAlign = TextAlign.Center,
                                         color = Color(0xFF373533),
+                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
                                     Text(
@@ -401,6 +404,7 @@ class FAQ() : Screen {
                                         fontWeight = FontWeight(400),
                                         textAlign = TextAlign.Center,
                                         color = Color(0x80373533),
+                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         maxLines = 3,
                                     )
 
@@ -412,6 +416,7 @@ class FAQ() : Screen {
                                         MokoRes.strings.an_error_occurred_please_try_again
                                     ),
                                     fontSize = 14.sp,
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     modifier = Modifier.padding(vertical = 15.dp)
                                 )
                             }
@@ -434,6 +439,7 @@ class FAQ() : Screen {
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
                 color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
@@ -449,7 +455,8 @@ class FAQ() : Screen {
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
-                                color = Color(0x80373533)
+                                color = Color(0x80373533),
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
                         innerTextField()
@@ -473,6 +480,7 @@ class FAQ() : Screen {
                     stringResource(MokoRes.strings.please_enter_a_valid_email),
                     color = Color.Red,
                     fontSize = 12.sp,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     modifier = Modifier.padding(top = 5.dp)
                 )
             }
@@ -490,6 +498,7 @@ class FAQ() : Screen {
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
                 color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
@@ -505,7 +514,8 @@ class FAQ() : Screen {
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
-                                color = Color(0x80373533)
+                                color = Color(0x80373533),
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
                         innerTextField()
@@ -522,13 +532,14 @@ class FAQ() : Screen {
                 modifier = Modifier
                     .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
                     .fillMaxWidth(1f).height(232.dp).background(Color(0xFFFFFFFF))
-                    .padding(start = 16.dp, top = 16.dp, bottom = 20.dp)
+                    .padding(start = 16.dp, top = 16.dp, bottom = 20.dp, end = 16.dp)
             )
             if (!isDescValid) {
                 Text(
                     text = stringResource(MokoRes.strings.don_not_forget_to_describe_the_problem),
                     color = Color.Red,
                     fontSize = 12.sp,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     modifier = Modifier.padding(top = 5.dp)
                 )
             }

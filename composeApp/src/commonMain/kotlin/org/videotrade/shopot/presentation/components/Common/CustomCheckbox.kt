@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
@@ -26,7 +27,12 @@ fun CustomCheckbox(
         modifier = Modifier
             .size(24.dp)
             .clip(RoundedCornerShape(6.dp))
-            .background(backgroundColor)
+            .background(
+//                            Color(0xFFCAB7A3), // rgb(202, 183, 163)
+//                            Color(0xFFEDDCCC), // rgb(237, 220, 204)
+                            Color(0xFFBBA796)  // rgb(187, 167, 150)
+
+            )
             .clickable { onCheckedChange(!checked) },
         contentAlignment = Alignment.Center
     ) {

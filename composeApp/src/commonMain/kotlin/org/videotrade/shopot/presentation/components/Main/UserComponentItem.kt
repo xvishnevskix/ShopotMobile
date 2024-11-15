@@ -57,6 +57,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_group
 import shopot.composeapp.generated.resources.chat_reply
 import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.group
 import shopot.composeapp.generated.resources.message_double_check
 import shopot.composeapp.generated.resources.message_single_check
 import shopot.composeapp.generated.resources.single_message_check
@@ -112,6 +113,7 @@ fun UserComponentItem(
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
                             color = Color(0xFF373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             maxLines = 1, // Ограничиваем одной строкой
                             overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
                             modifier = Modifier.widthIn(max = 160.dp)
@@ -126,6 +128,7 @@ fun UserComponentItem(
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
                             color = Color(0xFF373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             maxLines = 1, // Ограничиваем одной строкой
                             overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
                             modifier = Modifier.widthIn(max = 160.dp)
@@ -135,9 +138,9 @@ fun UserComponentItem(
                     if (!chat.personal) {
                         Spacer(modifier = Modifier.width(7.dp))
                         Image(
-                            painter = painterResource(Res.drawable.chat_group),
+                            painter = painterResource(Res.drawable.group),
                             contentDescription = "Avatar",
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(width = 18.dp, height = 15.dp)
                         )
                     }
                 }
@@ -152,6 +155,7 @@ fun UserComponentItem(
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
                         color = Color(0xFF373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                 }
@@ -169,9 +173,10 @@ fun UserComponentItem(
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
                     color = Color(0x80373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     maxLines = 1, // Ограничиваем одной строкой
                     overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
-                    modifier = Modifier.widthIn(max = 220.dp),
+                    modifier = Modifier.widthIn(max = 200.dp),
                 )
 
 
@@ -194,6 +199,7 @@ fun UserComponentItem(
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
                     color = Color(0x80373533),
+                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
 
                     )
             }
@@ -234,19 +240,21 @@ fun UserComponentItem(
                         modifier = Modifier
                             .clip(RoundedCornerShape(24.dp))
 //                        .background(if (boxText.isEmpty()) Color.Transparent else Color(0xFF2A293C))
-                            .background(Color(0xFFCAB7A3))
+                            .background(Color(0xFFCAB7A3)),
+                        contentAlignment = Alignment.Center
                     ) {
                         if (chat.unread !== 0) {
                             Text(
                                 text = "${chat.unread}",
                                 modifier = Modifier
-                                    .padding(start = 8.dp, end = 8.dp, top = 4.dp, bottom = 4.dp),
+                                    .padding(start = 8.dp, end = 8.dp, top = 3.dp, bottom = 3.dp),
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                 fontWeight = FontWeight(500),
-                                color = Color(0xFFFFFFFF)
+                                color = Color(0xFFFFFFFF),
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
                             )
                         }

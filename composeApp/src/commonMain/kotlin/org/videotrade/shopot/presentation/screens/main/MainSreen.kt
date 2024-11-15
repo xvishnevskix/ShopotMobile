@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -22,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -81,11 +83,13 @@ class MainScreen : Screen {
                     bottomBar = {
                         BottomNavigation(
                             backgroundColor = Color.White,
+
                             modifier = Modifier
                                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
                                 .background(Color.White)
                                 .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                             ,
+
                             elevation = 0.dp // Убирает тень снизу
                         ) {
                             TabNavigationItem(ProfileTab, width = 18.dp, height = 18.dp)
@@ -140,6 +144,7 @@ private fun RowScope.TabNavigationItem(tab: Tab, width: Dp, height: Dp) {
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
                     color = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
                 )
 
         },
