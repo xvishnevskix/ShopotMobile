@@ -72,7 +72,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp)
+            modifier = Modifier.padding(horizontal = 23.dp).fillMaxWidth().statusBarsPadding().padding(bottom = 10.dp)
                 .background(Color.White),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
@@ -81,11 +81,11 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.Start,
             ) {
                 
                 
-                BackIcon(Modifier.padding(start = 23.dp).pointerInput(Unit) {
+                BackIcon(Modifier.pointerInput(Unit) {
                     
                     viewModel.clearMessages()
                     viewModel.setMessagePage(0)
@@ -160,7 +160,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 
             
             Box(
-                modifier = Modifier.padding(end = 12.dp)
+                modifier = Modifier
             ) {
                 if (chat.personal)
 

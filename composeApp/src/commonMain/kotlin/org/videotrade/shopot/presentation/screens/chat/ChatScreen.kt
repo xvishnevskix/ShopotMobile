@@ -132,7 +132,7 @@ class ChatScreen(
                         }
                     }
             ) {
-                SafeArea(isBlurred = selectedMessage.value != null, 7.dp) {
+                SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
                     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
                         Scaffold(
                             topBar = {

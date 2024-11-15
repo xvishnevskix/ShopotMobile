@@ -119,7 +119,7 @@ fun Chat(
         LazyColumn(
             state = listState,
             reverseLayout = true,
-            modifier = modifier.background(Color.White)
+            modifier = modifier.background(Color.White).padding(horizontal = 8.dp)
         ) {
             groupedMessages.forEach { (date, messages) ->
 
