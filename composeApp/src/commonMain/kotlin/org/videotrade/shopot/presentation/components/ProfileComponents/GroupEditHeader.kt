@@ -88,7 +88,7 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
                 painter = painterResource(Res.drawable.profile_accept),
                 contentDescription = "Checkmark",
                 modifier = Modifier.padding(start = 0.dp, end = 6.dp)
-                    .size(18.dp).pointerInput(Unit) {
+                    .size(width = 15.56.dp, height = 10.61.dp).pointerInput(Unit) {
                         if (onClick != null) {
                             onClick()
                         }

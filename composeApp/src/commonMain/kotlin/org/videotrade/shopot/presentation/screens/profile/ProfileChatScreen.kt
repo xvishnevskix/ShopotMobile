@@ -84,11 +84,11 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(bottomEnd = 46.dp, bottomStart = 46.dp))
-                        .background(Color(0xFFF3F4F6))
+                        .background(Color.White)
                         .padding(16.dp)
                 ) {
                     ProfileChatHeader(stringResource(MokoRes.strings.profile))
+                    Spacer(modifier = Modifier.height(30.dp))
                     Avatar(
                         icon = chat.icon,
                         size = 128.dp,

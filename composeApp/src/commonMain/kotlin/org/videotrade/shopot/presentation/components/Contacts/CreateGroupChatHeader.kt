@@ -124,7 +124,7 @@ fun CreateGroupChatHeader(
                     }.padding(start = 8.dp, end = 8.dp)) {
                             Image(
                                 modifier = Modifier
-                                    .size(width = 18.dp, height = 18.dp),
+                                    .size(width = 15.56.dp, height = 10.61.dp),
                                 painter = painterResource(Res.drawable.profile_accept),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop

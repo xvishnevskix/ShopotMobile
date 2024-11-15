@@ -42,7 +42,7 @@ fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
 
 
     Row(
-        modifier = Modifier.background(background).fillMaxWidth().padding(top = 30.dp),
+        modifier = Modifier.background(background).fillMaxWidth().padding(top = 35.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
