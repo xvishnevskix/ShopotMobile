@@ -130,8 +130,6 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         fakeLoading = true
         delay(300)
         fakeLoading = false
-
-        println("Loading state is: $isLoading")
     }
     
         SafeArea(backgroundColor = if (isLoading) Color.White else Color(0xFFf9f9f9)) {

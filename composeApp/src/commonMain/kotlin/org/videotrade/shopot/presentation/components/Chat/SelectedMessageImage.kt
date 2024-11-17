@@ -2,6 +2,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,6 +21,9 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -34,13 +38,15 @@ import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.menu_gallery
 
 @Composable
-fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderName: String) {
+fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
     val navigator = LocalNavigator.currentOrThrow
     
     val imagePainter = remember { mutableStateOf<Painter?>(null) }
@@ -89,8 +95,7 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
         
     }
         Row(
-            modifier = Modifier
-                .padding(start = 10.dp, end = 10.dp, top = 2.dp),
+            modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically
         ) {
             
@@ -101,44 +106,50 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
-                        .size(40.dp, 40.dp)
+                        .size(36.dp, 36.dp)
                 )
             }
             
             
             Column(
                 modifier = Modifier
-                    .padding(top = 0.dp, start = 8.dp, end = 8.dp, bottom = 2.dp)
+                    .padding(top = 0.dp, start = 8.dp, end = 8.dp)
             ) {
                 
                 
                 Text(
                     text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
                     style = TextStyle(
-                        color = Color(0xff000000),
                         fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        color = colorTitle,
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                     
                     )
-                
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(Res.drawable.menu_gallery),
-                        contentDescription = "Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            
-                            .size(20.dp),
-                        colorFilter = ColorFilter.tint(Color(0xFF979797))
-                    )
-                    Spacer(modifier = Modifier.width(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
+                Row(verticalAlignment = Alignment.Top) {
+//                    Image(
+//                        painter = painterResource(Res.drawable.menu_gallery),
+//                        contentDescription = "Image",
+//                        contentScale = ContentScale.Crop,
+//                        modifier = Modifier
+//
+//                            .size(20.dp),
+//                        colorFilter = ColorFilter.tint(Color(0xFF979797))
+//                    )
+//                    Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = stringResource(MokoRes.strings.photo),
                         style = TextStyle(
-                            color = Color(0xff979797),
                             fontSize = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0x80373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         ),
                     )
                     

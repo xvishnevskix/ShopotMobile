@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -154,12 +155,12 @@ fun FileMessage(
     
     Row(
         modifier = Modifier
-            .widthIn(max = 204.dp)
+            .widthIn(max = 260.dp)
             .padding(
-                start = 22.dp,
-                end = 22.dp,
-                top = if (message.fromUser == profile.id) 12.dp else 7.dp,
-                bottom = 12.dp
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp,
+                top = 16.dp
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -274,10 +275,11 @@ fun FileMessage(
             message.attachments?.get(0)?.let {
                 Text(
                     text = it.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     color = if (message.fromUser == profile.id) Color(0xFFFFFFFF) else Color(
                         0xFF2A293C
                     ),
-                    textAlign = TextAlign.Center,
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),

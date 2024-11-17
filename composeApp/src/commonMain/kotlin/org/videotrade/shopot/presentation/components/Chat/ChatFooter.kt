@@ -67,12 +67,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -108,6 +110,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_call
+import shopot.composeapp.generated.resources.chat_forward
 import shopot.composeapp.generated.resources.chat_micro
 import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
@@ -373,17 +376,17 @@ fun ChatFooter(
     )
     val editOptions = getEditOptions()
     
-    val expandedHeight = 125.dp
-    val collapsedHeight = if (selectedMessage != null) 125.dp else 56.dp
-    val collapsedselectedHeight = if (selectedMessage != null) 45.dp else 0.dp
+
+    val collapsedHeight = if (selectedMessage != null) 175.dp else 56.dp
+    val collapsedselectedHeight = if (selectedMessage != null) 41.dp else 0.dp
     
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
 
 
-    val maxHeight = 200.dp // Увеличиваем максимальную высоту компонента
-    val minHeight = 56.dp  // Минимальная высота компонента
+    val maxHeight = if (selectedMessage != null) 240.dp else 200.dp // Увеличиваем максимальную высоту компонента
+    val minHeight = if (selectedMessage != null) 97.dp else 56.dp // Минимальная высота компонента
     val lineHeight = 16.dp // Высота одной строки текста в dp
     val maxLines = 8       // Максимальное количество строк текста
 
@@ -430,61 +433,80 @@ fun ChatFooter(
                 .padding(top = 10.dp, bottom = 10.dp)
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
-                .heightIn(max = 125.dp, min = 56.dp)
+                .heightIn(max = 175.dp, min = 56.dp)
                 .height(animatedHeight)
 
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                
+
                 if (selectedMessage != null && selectedMessageSenderName != null) {
-                    Row(
-                        modifier = Modifier
-                            .padding(top = 10.dp, start = 1.dp, end = 1.dp)
-                            .fillMaxWidth(0.95f)
-                            .height(selectedHeight)
-                            .background(Color.White),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    )
-                    
-                    {
-                        
-                        Box(modifier = Modifier.widthIn(max = 320.dp)) {
-                            Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
-                                    .width(6.dp)
-                                    .fillMaxHeight()
-                                    .background(Color(0xff2A293C))
+                    Column {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(selectedHeight)
+                                .background(Color.White),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        )
+
+                        {
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                            
+                                Image(
+                                    painter = painterResource(Res.drawable.chat_forward),
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(width = 20.dp, height = 14.dp)
+                                        .graphicsLayer(scaleX = -1f), // Отражение по горизонтали
+                                    colorFilter = ColorFilter.tint(Color(0xFFCAB7A3))
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .width(1.dp)
+                                        .fillMaxHeight()
+                                        .background(Color(0xFFCAB7A3))
+                                ) {
+
+                                }
                             }
-                            SelectedMessageFormat(
-                                selectedMessage,
-                                profile,
-                                viewModel
-                            )
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            Box(modifier = Modifier.weight(1f)) {
+
+                                SelectedMessageFormat(
+                                    selectedMessage,
+                                    profile,
+                                    viewModel,
+                                    isFromFooter = true
+                                )
+                            }
+
+                            Box(
+                                modifier = Modifier.fillMaxHeight().width(60.dp)
+                                    .pointerInput(Unit) {
+                                        viewModel.clearSelection(chatId = chat.chatId)
+                                    }, contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
+                                    tint = Color(0xFFCAB7A3),
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
-                        
-                        Box(
-                            modifier = Modifier.padding(end = 4.dp).fillMaxHeight().width(60.dp)
-                                .pointerInput(Unit) {
-                                    viewModel.clearSelection(chatId = chat.chatId)
-                                }, contentAlignment = Alignment.CenterEnd
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = "Close",
-                                tint = Color(0xFF979797),
-                                modifier = Modifier.size(20.dp)
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(6.dp))
                     }
                 }
-                
-                
+
+
                 Popup(
                     alignment = Alignment.TopStart,
                     onDismissRequest = { showMenu = false },
@@ -558,7 +580,7 @@ fun ChatFooter(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .heightIn(max = 125.dp, min = 60.dp)
+                        .heightIn(max = 175.dp, min = 60.dp)
 
                 ) {
                     if (isRecording) {

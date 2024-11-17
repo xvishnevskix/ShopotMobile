@@ -188,7 +188,7 @@ fun VideoMessage(
     Box(
         modifier = Modifier
             .size(250.dp, 350.dp)
-            .padding(7.dp)
+            .padding(4.dp)
             .clip(
                 RoundedCornerShape(
                     topStart = 20.dp,

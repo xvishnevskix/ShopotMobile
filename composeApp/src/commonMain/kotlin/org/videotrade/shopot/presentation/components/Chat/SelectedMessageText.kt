@@ -1,13 +1,20 @@
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
@@ -15,33 +22,42 @@ import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
-fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName: String) {
+fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
     Column(
-        modifier = Modifier
-            .padding(top = 5.dp, start = 22.dp, end = 22.dp, bottom = 2.dp)
+        modifier = Modifier,
+        verticalArrangement = Arrangement.Top
     ) {
         Text(
             text = selectedMessageSenderName,
             style = TextStyle(
-                color = Color(0xff000000),
-                fontSize = 14.sp,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                color = colorTitle,
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
             )
         )
+        Spacer(modifier = Modifier.height(4.dp))
         selectedMessage.content?.let {
             Text(
                 text = it,
                 maxLines = 1, // Ограничение до одной строки
                 overflow = TextOverflow.Ellipsis, // Добавление многоточия в конце
                 style = TextStyle(
-                    color = Color(0xff979797),
                     fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0x80373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             )
         }

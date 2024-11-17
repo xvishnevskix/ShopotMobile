@@ -37,9 +37,9 @@ fun MessageText(message: MessageItem, profile: ProfileDTO, chat: ChatItem? = nul
           modifier = Modifier.padding(
               start = 16.dp,
               end = 16.dp,
+              top = 16.dp,
 //            top = if (message.fromUser == profile.id) 13.dp else 7.dp,
 //              top = if (chat?.personal == true && message.forwardMessage == false) 12.dp else 6.dp,
-              top = 20.dp,
               bottom = 20.dp
           ),
     )
