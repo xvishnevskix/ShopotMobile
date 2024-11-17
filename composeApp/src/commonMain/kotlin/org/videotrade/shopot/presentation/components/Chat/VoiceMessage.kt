@@ -287,7 +287,7 @@ fun LoadingBox(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(45.dp)
+        modifier = Modifier.size(24.dp)
     ) {
         if (progress !== null) {
             CircularProgressIndicator(
