@@ -4,8 +4,10 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
@@ -108,6 +110,7 @@ import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.arrow_left
 import shopot.composeapp.generated.resources.chat_arrow_left
 import shopot.composeapp.generated.resources.chat_call
 import shopot.composeapp.generated.resources.chat_forward
@@ -240,9 +243,9 @@ fun ChatFooter(
     
     val textOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = -10f,
+        targetValue = -15f,
         animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1200, easing = LinearEasing),
+            animation = tween(durationMillis = 1500, easing = LinearOutSlowInEasing),
             repeatMode = RepeatMode.Reverse
         )
     )
@@ -585,7 +588,7 @@ fun ChatFooter(
                 ) {
                     if (isRecording) {
                         Row(
-                            modifier = Modifier.padding(start = 15.dp),
+                            modifier = Modifier,
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
@@ -604,18 +607,19 @@ fun ChatFooter(
                                 text = "$hours:${minutes.toString().padStart(2, '0')}:${
                                     seconds.toString().padStart(2, '0')
                                 }",
-                                fontSize = 13.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF979797),
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0x80373533),
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
                         
                         Row(
                             modifier = Modifier
-                                .padding(start = 50.dp)
-                                .fillMaxWidth(0.45f)
+                                .padding(start = 40.dp)
+                                .fillMaxWidth(0.65f)
                                 .offset(x = (textOffset + swipeOffset.value).dp)
                                 .alpha(1f + (swipeOffset.value / 100f))
                             ,
@@ -624,19 +628,20 @@ fun ChatFooter(
                         ) {
                             Image(
                                 modifier = Modifier
-                                    .padding(end = 3.dp)
                                     .size(width = 7.dp, height = 14.dp),
-                                painter = painterResource(Res.drawable.chat_arrow_left),
+                                painter = painterResource(Res.drawable.arrow_left),
                                 contentDescription = null,
+                                colorFilter = ColorFilter.tint(Color(0x80373533))
                             )
+                            Spacer(modifier = Modifier.width(9.dp))
                             Text(
                                 text = stringResource(MokoRes.strings.left_cancel),
-                                fontSize = 13.sp,
-                                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                lineHeight = 20.sp,
-                                color = Color(0xFF979797),
-                                modifier = Modifier
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                color = Color(0x80373533),
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
                     }
