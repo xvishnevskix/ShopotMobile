@@ -1,8 +1,11 @@
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -10,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -17,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.GroupUserDTO
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -28,82 +34,47 @@ fun GroupUserCard(
     groupUser: GroupUserDTO
 ) {
     
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             modifier = Modifier
-                .padding(top = 15.dp)
-                .fillMaxWidth(0.9F)
+                .fillMaxWidth()
         ) {
             Row(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.Top
             ) {
-                Avatar(icon = "")
+                Avatar(icon = "", size = 56.dp)
+                Spacer(modifier = Modifier.width(12.dp))
                 Column(
-                    modifier = Modifier.padding(start = 15.dp)
+                    modifier = Modifier,
                 ) {
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Text(
                         "${groupUser.firstName} ${groupUser.lastName}",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF000000)
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
-//                    Text(
-//                        text = stringResource(MokoRes.strings.online),
-//                        textAlign = TextAlign.Center,
-//                        fontSize = 13.sp,
-//                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                        lineHeight = 20.sp,
-//                        color = Color(0xFF979797)
-//                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     Text(
                         text = "+${groupUser.phone}",
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF979797)
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0x80373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                 }
             }
-
-//            if (!isEdit) {
-//                Text(
-//                    text = stringResource(MokoRes.strings.owner),
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 13.sp,
-//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                    lineHeight = 20.sp,
-//                    color = Color(0xFF979797)
-//                )
-//            } else {
-//                Image(
-//                    painter = painterResource(Res.drawable.delete_circle),
-//                    contentDescription = "Avatar",
-//                    modifier = Modifier.size(width = 20.dp, height = 20.dp),
-//                    contentScale = ContentScale.FillBounds
-//                )
-//            }
-            
-            
         }
-        
-        
-        Divider(
-            color = Color(0xFFD9D9D9),
-            thickness = 1.dp,
-            modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp)
-        )
-    }
-    
 }

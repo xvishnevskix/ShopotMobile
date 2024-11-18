@@ -454,17 +454,28 @@ fun MessageBox(
 
                             // Проверка на персональный чат и наличие имени отправителя
                             if (!chat.personal && messageSenderName.isNotBlank()) {
-                                Text(
-                                    text = messageSenderName,
-                                    style = TextStyle(
-                                        color = Color.Gray,
-                                        fontSize = 12.sp,
-                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                    ),
+                                Box(
                                     modifier = Modifier.padding(
-
+                                        start = 16.dp,
+                                        end = 16.dp,
+                                        top = 16.dp,
                                     ),
-                                )
+                                ) {
+                                    Text(
+                                        text = messageSenderName,
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            lineHeight = 16.sp,
+                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                            fontWeight = FontWeight(400),
+                                            color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else Color(0xFFCAB7A3),
+                                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                        ),
+                                        modifier = Modifier.padding(
+
+                                        ),
+                                    )
+                                }
                             }
 
 
@@ -517,7 +528,7 @@ fun MessageBox(
                     Image(
                         modifier = Modifier
                             .padding(start = 4.dp)
-                            .size(14.dp),
+                            .size(width = 17.7.dp, height = 8.5.dp),
                         painter = painterResource(Res.drawable.message_double_check),
                         contentDescription = null,
                     )
@@ -525,7 +536,7 @@ fun MessageBox(
                     Image(
                         modifier = Modifier
                             .padding(start = 4.dp)
-                            .size(14.dp),
+                            .size(width = 12.7.dp, height = 8.5.dp),
                         painter = painterResource(Res.drawable.message_single_check),
                         contentDescription = null,
                     )

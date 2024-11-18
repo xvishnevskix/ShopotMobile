@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.call
 
 import Avatar
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -35,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -65,6 +67,8 @@ import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -250,59 +254,62 @@ class CallScreen(
         }
         
         
-        Image(
-            painter = imagePainter,
-            contentDescription = "image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxSize()
-                .blur(7.dp)
-        )
-        
-        if (isCallActive && mainViewModel.chats.value.isNotEmpty()) {
-            Image(
-                painter = painterResource(Res.drawable.reductionArrows),
-                contentDescription = "Call",
-                modifier = Modifier.padding(start = 30.dp, top = 40.dp).size(20.dp)
-                    .pointerInput(Unit) {
-                        viewModel.replacePopCall(navigator)
-                    }
-            )
-        }
+//        Image(
+//            painter = imagePainter,
+//            contentDescription = "image",
+//            contentScale = ContentScale.Crop,
+//            modifier = Modifier
+//                .fillMaxSize()
+//                .blur(7.dp)
+//        )
+//
+//        if (isCallActive && mainViewModel.chats.value.isNotEmpty()) {
+//            Image(
+//                painter = painterResource(Res.drawable.reductionArrows),
+//                contentDescription = "Call",
+//                modifier = Modifier.padding(start = 30.dp, top = 40.dp).size(20.dp)
+//                    .pointerInput(Unit) {
+//                        viewModel.replacePopCall(navigator)
+//                    }
+//            )
+//        }
         
         Box(modifier = Modifier.fillMaxSize().safeContentPadding()) {
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween
             ) {
-                
-                
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                )
-                
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .width(190.dp)
-                        .height(190.dp)
-                        .background(
-                            color = Color(255, 255, 255),
-                            shape = RoundedCornerShape(100.dp)
-                        )
-                        .clip(CircleShape)
+                //хэдер
+               Row {  }
+
+
+                //середина
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Avatar(userIcon, 190.dp)
-                }
-                
-                
-                
-                
-                Text(
-                    text = if (isIncomingCall) stringResource(MokoRes.strings.incoming_call) else if (isCallActive) {
-                        timerValue.value
+
+                    Avatar(userIcon, 128.dp)
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally),
+                        text = "$userFirstName $userLastName",
+                        fontSize = 24.sp,
+                        lineHeight = 24.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = if (isIncomingCall) stringResource(MokoRes.strings.incoming_call) else if (isCallActive) {
+                            timerValue.value
 //                    val hours = secondsElapsed / 3600
 //                    val minutes = (secondsElapsed % 3600) / 60
 //                    val seconds = secondsElapsed % 60
@@ -315,48 +322,36 @@ class CallScreen(
 //                            seconds.toString().padStart(2, '0')
 //                        }"
 //                    }
-                    } else {
-                        callState.value
-                    },
-                    modifier = Modifier
-                        .padding(top = 25.dp)
-                        .align(Alignment.CenterHorizontally),
-                    fontSize = 16.sp,
-                    color = Color(255, 255, 255),
-                    textAlign = TextAlign.Center,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                )
-                
-                
-                Text(
-                    modifier = Modifier
-                        .padding(top = 12.5.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = "$userFirstName $userLastName",
-                    fontSize = 26.sp,
-                    color = Color(255, 255, 255),
-                    textAlign = TextAlign.Center,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                )
-                
-                Text(
-                    modifier = Modifier
-                        .padding(top = 12.5.dp)
-                        .align(Alignment.CenterHorizontally),
-                    text = "+${userPhone}",
-                    fontSize = 20.sp,
-                    color = Color(255, 255, 255),
-                    textAlign = TextAlign.Center,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp,
-                )
-                
-                Spacer(modifier = Modifier.fillMaxHeight(0.2F))
+                        } else {
+                            callState.value
+                        },
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally),
+                        color = Color(0x80373533),
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        fontWeight = FontWeight(400),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                    )
+
+
+
+
+//                    Text(
+//                        modifier = Modifier
+//                            .padding(top = 12.5.dp)
+//                            .align(Alignment.CenterHorizontally),
+//                        text = "+${userPhone}",
+//                        fontSize = 20.sp,
+//                        color = Color(255, 255, 255),
+//                        textAlign = TextAlign.Center,
+//                        fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                        lineHeight = 20.sp,
+//                    )
+
+
 
 //            Row(
 //                verticalAlignment = Alignment.CenterVertically,
@@ -373,54 +368,89 @@ class CallScreen(
 //                }, "Завершить")
 //                microfonBtn {}
 //            }
-                
-                if (isIncomingCall) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 50.dp)
-                    ) {
-                        rejectBtn({
-                            viewModel.rejectCall(userId)
-                        })
-                        aceptBtn {
-                            viewModel.initWebrtc()
-                            
+                }
+
+
+                //футер с кнопками
+                Column {
+
+                    Crossfade(targetState = isSwitchToMicrophone.value) { isSwitched ->
+                        if (!isSwitched) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().height(42.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    stringResource(MokoRes.strings.you_turned_off_the_microphone),
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 16.sp,
+                                    lineHeight = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(400),
+                                    color = Color(0x80373533),
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
+                                )
+                                Spacer(modifier = Modifier.height(24.dp))
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.height(42.dp))
                         }
                     }
-                } else {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceAround,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        microfonBtn(isSwitchToMicrophone.value) {
-                            viewModel.setMicro()
-                            isSwitchToMicrophone.value = !isSwitchToMicrophone.value
+
+
+                    Row {
+
+                        if (isIncomingCall) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 30.dp)
+                            ) {
+                                rejectBtn({
+                                    viewModel.rejectCall(userId)
+                                }, size = 72.dp)
+                                aceptBtn(size = 72.dp, onClick = {
+                                    viewModel.initWebrtc()
+                                })
+                            }
+                        } else {
+                            Row(
+                                verticalAlignment = Alignment.Bottom,
+                                horizontalArrangement = Arrangement.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+
+                                speakerBtn(isSwitchToSpeaker.value) {
+                                    CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
+
+
+                                    isSwitchToSpeaker.value = !isSwitchToSpeaker.value
+                                }
+                                Spacer(modifier = Modifier.width(15.dp))
+
+                                microfonBtn(isSwitchToMicrophone.value) {
+                                    viewModel.setMicro()
+                                    isSwitchToMicrophone.value = !isSwitchToMicrophone.value
 //                            viewModel.setIsCallActive(true)
-                            viewModel.startTimer(userIcon)
+                                    viewModel.startTimer(userIcon)
+                                }
+
+                                Spacer(modifier = Modifier.width(15.dp))
+
+                                rejectBtn({
+                                    viewModel.rejectCall(userId)
+                                }, size = 56.dp)
+//
+                            }
+
                         }
-//                videoBtn { }
-                        
-                        speakerBtn(isSwitchToSpeaker.value) {
-                            CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
-                            
-                            
-                            isSwitchToSpeaker.value = !isSwitchToSpeaker.value
-                        }
+
+
                     }
-                    Spacer(modifier = Modifier.height(56.dp))
-                    Row(
-                        verticalAlignment = Alignment.Top,
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        rejectBtn({
-                            viewModel.rejectCall(userId)
-                        }, stringResource(MokoRes.strings.end_call))
-                    }
+
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
                 
             }

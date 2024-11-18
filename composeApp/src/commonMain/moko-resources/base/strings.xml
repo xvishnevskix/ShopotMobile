@@ -232,6 +232,8 @@
     <string name="the_description_must_not_exceed_40_characters">The description must not exceed 40 characters</string>
     <string name="select_language">Select language</string>
     <string name="other_languages">Other languages</string>
+    <string name="you_turned_off_the_microphone">You turned off the microphone</string>
+
 
 
 

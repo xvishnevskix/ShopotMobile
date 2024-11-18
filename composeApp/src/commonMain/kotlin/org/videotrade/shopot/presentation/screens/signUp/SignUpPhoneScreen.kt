@@ -245,6 +245,9 @@ class SignUpPhoneScreen : Screen {
                                     CustomButton(stringResource(MokoRes.strings.send_code), {
                                         coroutineScope.launch {
                                             val fullPhoneNumber = countryCode + phone.value.text
+
+
+
                                             val phoneNumberLength =
                                                 getPhoneNumberLength(countryCode)
                                             hasError.value = false
@@ -273,7 +276,7 @@ class SignUpPhoneScreen : Screen {
                                                 if (response == null) {
                                                     navigator.push(
                                                         AuthCallScreen(
-                                                            phone.value.text,
+                                                            fullPhoneNumber,
                                                             "SignUp"
                                                         )
                                                     )
