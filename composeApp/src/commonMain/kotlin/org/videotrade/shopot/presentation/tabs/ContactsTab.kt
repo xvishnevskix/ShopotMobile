@@ -22,8 +22,6 @@ import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.chatNav
-import shopot.composeapp.generated.resources.contactsNav
 import shopot.composeapp.generated.resources.contacts_nav
 
 object ContactsTab : Tab {

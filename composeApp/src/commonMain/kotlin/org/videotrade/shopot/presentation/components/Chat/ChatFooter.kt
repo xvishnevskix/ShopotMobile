@@ -113,11 +113,8 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.arrow_left
-import shopot.composeapp.generated.resources.chat_arrow_left
-import shopot.composeapp.generated.resources.chat_call
 import shopot.composeapp.generated.resources.chat_forward
 import shopot.composeapp.generated.resources.chat_micro
-import shopot.composeapp.generated.resources.chat_micro_active
 import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.chat_send_arrow
 import shopot.composeapp.generated.resources.clip
