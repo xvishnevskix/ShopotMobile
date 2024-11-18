@@ -51,7 +51,7 @@ class PhotoViewerScreen(
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF29303c))
+                .background(Color.White)
         ) {
             Image(
                 painter = imagePainter.value!!,

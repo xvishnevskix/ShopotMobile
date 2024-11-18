@@ -83,6 +83,7 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -427,8 +428,8 @@ fun MessageBox(
                                         style = TextStyle(
                                             fontSize = 16.sp,
                                             lineHeight = 16.sp,
-                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                            fontWeight = FontWeight(400),
+                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                            fontWeight = FontWeight(500),
                                             color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else Color(0xFFCAB7A3),
                                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         ),

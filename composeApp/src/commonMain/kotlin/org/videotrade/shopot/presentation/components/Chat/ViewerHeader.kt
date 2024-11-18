@@ -1,5 +1,6 @@
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,6 +24,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -33,42 +35,41 @@ fun ViewerHeader(name: String, time: String = "") {
     
     Row(
         modifier = Modifier
-            .background(Color(0xFF29303C).copy(alpha = 0.8f))
+            .background(Color.White.copy(alpha = 0.8f))
             .fillMaxWidth()
             .statusBarsPadding()
 //            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
-            .padding(top = 15.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
+            .padding(top = 15.dp, start = 24.dp, end = 124.dp, bottom = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Back",
-            modifier = Modifier
-                .padding(end = 8.dp)
-                .clickable {
-                    navigator.pop()
-                }
-                .width(20.dp),
-            tint = Color.White
-        )
-        
-        Spacer(modifier = Modifier.width(20.dp))
-        
-        Column {
-            Text(
-                text = if (name == "") stringResource(MokoRes.strings.you) else name,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-                fontSize = 16.sp,
-                color = Color.White
-            )
-            
-            if (time.isNotEmpty())
-                Text(
-                    text = time,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
-                    fontSize = 14.sp,
-                    color = Color.White
-                )
+
+        Box(modifier = Modifier
+            .padding(end = 8.dp)
+            .clickable {
+                navigator.pop()
+            }
+            .width(30.dp)) {
+            BackIcon()
         }
+
+        
+//        Spacer(modifier = Modifier.width(20.dp))
+//
+//        Column {
+//            Text(
+//                text = if (name == "") stringResource(MokoRes.strings.you) else name,
+//                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+//                fontSize = 16.sp,
+//                color = Color.White
+//            )
+//
+//            if (time.isNotEmpty())
+//                Text(
+//                    text = time,
+//                    fontFamily = FontFamily(Font(Res.font.Montserrat_Regular)),
+//                    fontSize = 14.sp,
+//                    color = Color.White
+//                )
+//        }
     }
 }

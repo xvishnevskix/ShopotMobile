@@ -160,17 +160,19 @@ fun FileMessage(
     
     Row(
         modifier = Modifier
-            .widthIn(max = 260.dp)
             .padding(
                 start = 16.dp,
                 end = 16.dp,
                 bottom = 16.dp,
                 top = 16.dp
-            ),
+            )
+            .widthIn(max = 260.dp)
+            ,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(36.dp).background(Color.White,
+                shape = RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center
         ) {
             IconButton(
@@ -209,18 +211,17 @@ fun FileMessage(
                     }
                 },
                 modifier = Modifier
-                    .size(36.dp) // Убедитесь, что это то, что вам нужно
-                    .background(Color.Transparent, shape = RoundedCornerShape(8.dp)) // Задаем форму
+
             ) {
                 if (isStartCipherLoading) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier
                     ) {
                         CircularProgressIndicator(
                             color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
                             strokeWidth = 2.dp,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
                         )
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -240,7 +241,7 @@ fun FileMessage(
                             progress = progress,  // Use animated progress
                             color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
                             strokeWidth = 2.dp,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
                         )
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -255,7 +256,7 @@ fun FileMessage(
                         )
                     } else {
                         Box(
-                            modifier = Modifier.size(36.dp).background(
+                            modifier = Modifier.background(
                                 color =  Color.White
                             ),
                             contentAlignment = Alignment.Center
@@ -305,6 +306,7 @@ fun FileMessage(
                 )
             }
 
+            Spacer(modifier = Modifier.height(4.dp))
 
             if (attachments[0].size !== null) {
                 Text(
