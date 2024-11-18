@@ -55,8 +55,6 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.add_main
 import shopot.composeapp.generated.resources.logo_main
 import shopot.composeapp.generated.resources.search_icon
-import shopot.composeapp.generated.resources.search_main
-import shopot.composeapp.generated.resources.settings_main
 
 @Composable
 fun HeaderMain(isSearching: MutableState<Boolean>,) {

@@ -91,52 +91,11 @@ import shopot.composeapp.generated.resources.chat_delete
 import shopot.composeapp.generated.resources.chat_forward
 import shopot.composeapp.generated.resources.chat_reply
 import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.menu_copy
+import shopot.composeapp.generated.resources.menu_delete
 import shopot.composeapp.generated.resources.message_double_check
 import shopot.composeapp.generated.resources.message_single_check
 import shopot.composeapp.generated.resources.single_message_check
-
-
-data class EditOption(
-    val text: String,
-    val imagePath: DrawableResource,
-    val onClick: (viewModule: ChatViewModel, message: MessageItem, clipboardManager: ClipboardManager) -> Unit,
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun getEditOptions(scaffoldState: BottomSheetScaffoldState? = null): List<EditOption> {
-
-    val coroutineScope = rememberCoroutineScope()
-
-    return listOf(
-
-        EditOption(
-            text = stringResource(MokoRes.strings.copy),
-            imagePath = Res.drawable.chat_copy,
-            onClick = { _, message, clipboardManager ->
-                message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
-            }
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.forward),
-            imagePath = Res.drawable.chat_forward,
-            onClick = { viewModel, message, clipboardManager ->
-                coroutineScope.launch {
-                    viewModel.setForwardMessage(message)
-                    viewModel.setScaffoldState(true)
-                }
-            }
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.delete),
-            imagePath = Res.drawable.chat_delete,
-            onClick = { viewModel, message, _ ->
-                viewModel.deleteMessage(message)
-            }
-        ),
-    )
-}
-
 
 @Composable
 fun MessageBox(
@@ -316,7 +275,9 @@ fun MessageBox(
 
                         Column(
                             horizontalAlignment =
-                            if (message.fromUser == profile.id) Alignment.End else Alignment.Start,
+
+                            //изменение для самого бокса сообщений
+                            if (message.fromUser == profile.id) Alignment.Start else Alignment.Start,
                         ) {
 
 
@@ -495,9 +456,10 @@ fun MessageBox(
 
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(4.dp))
         Row(
             horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
 
                 .fillMaxWidth().clickable(

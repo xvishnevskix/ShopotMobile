@@ -45,9 +45,6 @@ import shopot.composeapp.generated.resources.call_speaker_on
 import shopot.composeapp.generated.resources.call_video
 import shopot.composeapp.generated.resources.cancel
 import shopot.composeapp.generated.resources.chat_call
-import shopot.composeapp.generated.resources.microfon
-import shopot.composeapp.generated.resources.reject_call
-import shopot.composeapp.generated.resources.svgviewer_png_output
 
 @Composable
 fun rejectBtn(onClick: () -> Unit, size: Dp = 56.dp) {

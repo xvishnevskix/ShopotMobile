@@ -73,7 +73,6 @@ import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
-import shopot.composeapp.generated.resources.reductionArrows
 
 class CallScreen(
     private val userId: String,

@@ -8,6 +8,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,39 +33,72 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.formatTimeOnly
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.chat_forward
 import shopot.composeapp.generated.resources.double_message_check
+import shopot.composeapp.generated.resources.menu_copy
+import shopot.composeapp.generated.resources.menu_delete
+import shopot.composeapp.generated.resources.message_double_check
+import shopot.composeapp.generated.resources.message_single_check
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BlurredMessageOverlay(
+    chat: ChatItem,
     profile: ProfileDTO,
     viewModel: ChatViewModel,
     selectedMessage: MessageItem?,
     selectedMessageY: Int,
     onDismiss: () -> Unit,
 ) {
+
+    val messageSenderName = if (selectedMessage?.fromUser  == profile.id) {
+        stringResource(MokoRes.strings.you)
+    } else {
+        selectedMessage?.phone?.let {
+            val findContact = viewModel.findContactByPhone(it)
+            if (findContact != null) {
+                "${findContact.firstName} ${findContact.lastName}"
+            } else {
+                "+${selectedMessage.phone}"
+            }
+        } ?: ""
+    }
+
     selectedMessage?.let { message ->
         var visible by remember { mutableStateOf(false) }
         LaunchedEffect(Unit) {
@@ -92,6 +126,8 @@ fun BlurredMessageOverlay(
                     color = Color.Transparent
                 ) {
                     MessageBlurBox(
+                        chat = chat,
+                        messageSenderName,
                         message = message,
                         profile = profile,
                         viewModel = viewModel,
@@ -108,6 +144,8 @@ fun BlurredMessageOverlay(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MessageBlurBox(
+    chat: ChatItem,
+    messageSenderName: String,
     message: MessageItem,
     profile: ProfileDTO,
     viewModel: ChatViewModel,
@@ -133,7 +171,7 @@ fun MessageBlurBox(
         if (state) 0.dp else 200.dp
     }
 
-    val editOptions =  getEditOptions()
+    val editOptions =  getEditOptions(chatId = chat.chatId, messageSenderName = messageSenderName)
     
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -143,7 +181,7 @@ fun MessageBlurBox(
         Column(
             modifier = Modifier
                 .offset(x = firstColumnOffsetX)
-                .fillMaxWidth(0.5f),
+                .fillMaxWidth(0.8f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -155,64 +193,82 @@ fun MessageBlurBox(
                     .clickable(onClick = onClick)
 
             ) {
-                if (message.fromUser == profile.id) {
                     Surface(
                         modifier = Modifier.wrapContentSize(),
                         shape = RoundedCornerShape(
-                            topStart = 20.dp,
-                            topEnd = 20.dp,
-                            bottomEnd = 0.dp,
-                            bottomStart = 20.dp
+                            topStart = 16.dp,
+                            topEnd = 16.dp,
+                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 16.dp,
+                            bottomStart = if (message.fromUser == profile.id) 16.dp else 0.dp,
                         ),
-                        shadowElevation = 4.dp,
-                        color = Color(0xFF2A293C),
-
-                    ) {
-                        message.content?.let {
-                            MessageFormat(message, profile, onClick)
+                        color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
+                            Color.Transparent  // Прозрачный цвет для стикеров
+                        } else {
+                            if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
+                            else Color(0xFFF7F7F7)  // Цвет для сообщений от других пользователей
                         }
-                    }
-                } else {
-                    Surface(
-                        modifier = Modifier.wrapContentSize(),
-                        shape = RoundedCornerShape(
-                            topStart = 20.dp,
-                            topEnd = 20.dp,
-                            bottomEnd = 20.dp,
-                            bottomStart = 0.dp
-                        ),
-                        shadowElevation = 4.dp,
-                        color = Color(0xFFF3F4F6)
                     ) {
                         message.content?.let {
                             MessageFormat(message, profile, onClick)
                         }
                     }
                 }
-            }
+
 
 
             Row(
                 horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
                 modifier = Modifier
-                    .padding(start = 2.dp, end = 2.dp)
-                    .fillMaxWidth()
 
+                    .fillMaxWidth().clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null // Убирает эффект нажатия
+                    ) {
+
+                    }
             ) {
-                Image(
-                    modifier = Modifier
-                        .padding(
-                            start = if (message.fromUser == profile.id) 70.dp else 0.dp,
-                            top = 2.dp,
-                            end = 4.dp
+
+                if (message.created.isNotEmpty())
+                    Text(
+                        text = formatTimeOnly(message.created),
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            color = Color(0x80373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        ),
+                        modifier = Modifier.padding(),
+                    )
+
+
+                if (message.fromUser == profile.id)
+                    if (message.anotherRead) {
+                        Image(
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .size(width = 17.7.dp, height = 8.5.dp),
+                            painter = painterResource(Res.drawable.message_double_check),
+                            contentDescription = null,
                         )
-                        .size(14.dp),
-                    painter = painterResource(Res.drawable.double_message_check),
-                    contentDescription = null,
-                )
+                    } else {
+                        Image(
+                            modifier = Modifier
+                                .padding(start = 4.dp)
+                                .size(width = 12.7.dp, height = 8.5.dp),
+                            painter = painterResource(Res.drawable.message_single_check),
+                            contentDescription = null,
+                        )
+                    }
+
+
+
             }
         }
-        
+
+
+        //меню
         Column(
             modifier = Modifier
                 .offset(y = secondColumnOffsetY)
@@ -226,7 +282,7 @@ fun MessageBlurBox(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
                         .fillMaxWidth()
                         .clickable {
                             editOption.onClick(viewModel, message, clipboardManager)
@@ -236,17 +292,17 @@ fun MessageBlurBox(
                 ) {
                     Text(
                         text = editOption.text,
-                        textAlign = TextAlign.Center,
-                        fontSize = 13.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp,
-                        color = Color(0xFF000000)
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0xFF373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Image(
                         painter = painterResource(editOption.imagePath),
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp),
+                        modifier = editOption.modifier.size(18.dp),
                         colorFilter = ColorFilter.tint(Color(0xff000000))
                     )
                 }
@@ -259,4 +315,66 @@ fun MessageBlurBox(
         }
     }
 }
+
+data class EditOption(
+    val text: String,
+    val imagePath: DrawableResource,
+    val onClick:
+        (
+        viewModule: ChatViewModel,
+         message: MessageItem,
+         clipboardManager: ClipboardManager) -> Unit,
+        val chatId: String = "",
+        val messageSenderName: String = "",
+        val modifier: Modifier = Modifier
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun getEditOptions(
+    scaffoldState: BottomSheetScaffoldState? = null,
+    chatId: String,
+    messageSenderName: String,
+): List<EditOption> {
+
+    val coroutineScope = rememberCoroutineScope()
+
+    return listOf(
+
+        EditOption(
+            text = stringResource(MokoRes.strings.reply),
+            imagePath = Res.drawable.chat_forward,
+            onClick = { viewModel, message, _ ->
+                viewModel.selectMessage(chatId, message, messageSenderName)
+            },
+            modifier = Modifier.graphicsLayer(scaleX = -1f)
+        ),
+        EditOption(
+            text = stringResource(MokoRes.strings.copy),
+            imagePath = Res.drawable.menu_copy,
+            onClick = { _, message, clipboardManager ->
+                message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
+            }
+        ),
+        EditOption(
+            text = stringResource(MokoRes.strings.forward),
+            imagePath = Res.drawable.chat_forward,
+            onClick = { viewModel, message, clipboardManager ->
+                coroutineScope.launch {
+                    viewModel.setForwardMessage(message)
+                    viewModel.setScaffoldState(true)
+                }
+            }
+        ),
+        EditOption(
+            text = stringResource(MokoRes.strings.delete),
+            imagePath = Res.drawable.menu_delete,
+            onClick = { viewModel, message, _ ->
+                viewModel.deleteMessage(message)
+            }
+        ),
+
+    )
+}
+
 

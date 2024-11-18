@@ -59,10 +59,6 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_file_message
 import shopot.composeapp.generated.resources.download
-import shopot.composeapp.generated.resources.file_message_dark
-import shopot.composeapp.generated.resources.file_message_download_dark
-import shopot.composeapp.generated.resources.file_message_download_white
-import shopot.composeapp.generated.resources.file_message_white
 
 
 @Composable

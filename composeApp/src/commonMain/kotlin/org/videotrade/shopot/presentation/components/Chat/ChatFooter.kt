@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
@@ -107,6 +108,7 @@ import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -120,6 +122,8 @@ import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.chat_send_arrow
 import shopot.composeapp.generated.resources.clip
 import shopot.composeapp.generated.resources.file_message
+import shopot.composeapp.generated.resources.keyboard
+import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
 import shopot.composeapp.generated.resources.sticker_menu
 import kotlin.math.roundToInt
@@ -324,7 +328,7 @@ fun ChatFooter(
         ),
         MenuItem(
             text = stringResource(MokoRes.strings.file),
-            imagePath = Res.drawable.file_message,
+            imagePath = Res.drawable.menu_file,
             onClick = {
                 
                 scope.launch {
@@ -377,10 +381,9 @@ fun ChatFooter(
 //            }
 //        ),
     )
-    val editOptions = getEditOptions()
-    
 
-    val collapsedHeight = if (selectedMessage != null) 175.dp else 56.dp
+
+    val collapsedHeight = if (selectedMessage != null) 275.dp else 56.dp
     val collapsedselectedHeight = if (selectedMessage != null) 41.dp else 0.dp
     
     // Анимация высоты Row
@@ -389,7 +392,13 @@ fun ChatFooter(
 
 
     val maxHeight = if (selectedMessage != null) 240.dp else 200.dp // Увеличиваем максимальную высоту компонента
-    val minHeight = if (selectedMessage != null) 97.dp else 56.dp // Минимальная высота компонента
+    val minHeight = when {
+        selectedMessage != null && showMenu -> 155.dp // Укажите высоту, если оба условия истинны
+        selectedMessage != null -> 97.dp
+        showMenu -> 114.dp
+        else -> 56.dp
+    }
+
     val lineHeight = 16.dp // Высота одной строки текста в dp
     val maxLines = 8       // Максимальное количество строк текста
 
@@ -436,7 +445,7 @@ fun ChatFooter(
                 .padding(top = 10.dp, bottom = 10.dp)
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
-                .heightIn(max = 175.dp, min = 56.dp)
+                .heightIn(max = 275.dp, min = 56.dp)
                 .height(animatedHeight)
 
         ) {
@@ -510,80 +519,80 @@ fun ChatFooter(
                 }
 
 
-                Popup(
-                    alignment = Alignment.TopStart,
-                    onDismissRequest = { showMenu = false },
-                ) {
-                    AnimatedVisibility(
-                        visible = showMenu,
-                        enter = scaleIn(initialScale = 0.1f),
-                        exit = fadeOut() + scaleOut(targetScale = 0.9f)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .pointerInput(Unit) { showMenu = false }
-                                .padding(bottom = 55.dp, start = 12.dp)
-                                .fillMaxWidth(0.5f)
-                                .shadow(
-                                    elevation = 6.dp,
-                                    shape = RoundedCornerShape(8.dp),
-                                    clip = false,
-                                    ambientColor = Color.Gray,
-                                    spotColor = Color.Gray
-                                )
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.White)
-                        
-                        ) {
-                            menuItems.forEachIndexed { index, editOption ->
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .padding(
-                                            start = 16.dp,
-                                            end = 16.dp,
-                                            top = 9.dp,
-                                            bottom = 5.dp
-                                        )
-                                        .fillMaxWidth()
-                                        .pointerInput(Unit) {
-                                            editOption.onClick()
-                                            showMenu = false
-                                        }
-                                
-                                ) {
-                                    Image(
-                                        painter = painterResource(editOption.imagePath),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(25.dp),
-                                        colorFilter = ColorFilter.tint(Color(0xff000000))
-                                    )
-                                    Spacer(modifier = Modifier.width(20.dp))
-                                    Text(
-                                        text = editOption.text,
-                                        textAlign = TextAlign.Center,
-                                        fontSize = 15.sp,
-                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                        lineHeight = 20.sp,
-                                        color = Color(0xFF000000)
-                                    )
-                                }
-                                if (index < menuItems.size - 1) {
-                                    Divider(color = Color.Gray.copy(alpha = 0.12f))
-                                } else {
-                                    Spacer(modifier = Modifier.height(4.dp))
-                                }
-                            }
-                        }
-                    }
-                }
+//                Popup(
+//                    alignment = Alignment.TopStart,
+//                    onDismissRequest = { showMenu = false },
+//                ) {
+//                    AnimatedVisibility(
+//                        visible = showMenu,
+//                        enter = scaleIn(initialScale = 0.1f),
+//                        exit = fadeOut() + scaleOut(targetScale = 0.9f)
+//                    ) {
+//                        Column(
+//                            modifier = Modifier
+//                                .pointerInput(Unit) { showMenu = false }
+//                                .padding(bottom = 55.dp, start = 12.dp)
+//                                .fillMaxWidth(0.5f)
+//                                .shadow(
+//                                    elevation = 6.dp,
+//                                    shape = RoundedCornerShape(8.dp),
+//                                    clip = false,
+//                                    ambientColor = Color.Gray,
+//                                    spotColor = Color.Gray
+//                                )
+//                                .clip(RoundedCornerShape(8.dp))
+//                                .background(Color.White)
+//
+//                        ) {
+//                            menuItems.forEachIndexed { index, editOption ->
+//                                Row(
+//                                    verticalAlignment = Alignment.CenterVertically,
+//                                    modifier = Modifier
+//                                        .padding(
+//                                            start = 16.dp,
+//                                            end = 16.dp,
+//                                            top = 9.dp,
+//                                            bottom = 5.dp
+//                                        )
+//                                        .fillMaxWidth()
+//                                        .pointerInput(Unit) {
+//                                            editOption.onClick()
+//                                            showMenu = false
+//                                        }
+//
+//                                ) {
+//                                    Image(
+//                                        painter = painterResource(editOption.imagePath),
+//                                        contentDescription = null,
+//                                        modifier = Modifier.size(25.dp),
+//                                        colorFilter = ColorFilter.tint(Color(0xff000000))
+//                                    )
+//                                    Spacer(modifier = Modifier.width(20.dp))
+//                                    Text(
+//                                        text = editOption.text,
+//                                        textAlign = TextAlign.Center,
+//                                        fontSize = 15.sp,
+//                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+//                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+//                                        lineHeight = 20.sp,
+//                                        color = Color(0xFF000000)
+//                                    )
+//                                }
+//                                if (index < menuItems.size - 1) {
+//                                    Divider(color = Color.Gray.copy(alpha = 0.12f))
+//                                } else {
+//                                    Spacer(modifier = Modifier.height(4.dp))
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
                 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .heightIn(max = 175.dp, min = 60.dp)
+                        .heightIn(max = 275.dp, min = 60.dp)
 
                 ) {
                     if (isRecording) {
@@ -665,15 +674,27 @@ fun ChatFooter(
                                     .padding(end = 13.dp),
                                 contentAlignment = Alignment.Center
                             ) {
-                                Image(
-                                    painter = painterResource(Res.drawable.clip),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(width = 15.86.dp, height = 17.94.dp)
-                                        .clickable {
-                                            showMenu = true
-                                        }
-                                )
+                                if (showMenu) {
+                                    Image(
+                                        painter = painterResource(Res.drawable.keyboard),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(width = 20.dp, height = 12.dp)
+                                            .pointerInput(Unit) {
+                                                showMenu = false
+                                            }
+                                    )
+                                } else {
+                                    Image(
+                                        painter = painterResource(Res.drawable.clip),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(width = 15.86.dp, height = 17.94.dp)
+                                            .pointerInput(Unit) {
+                                                showMenu = true
+                                            }
+                                    )
+                                }
                             }
                         }
 
@@ -908,8 +929,51 @@ fun ChatFooter(
                         }
                     }
                 }
+
+
+                Crossfade(targetState = showMenu) { isMenuVisible ->
+                    if (isMenuVisible) {
+                        Row(
+                            modifier = Modifier
+                                .height(56.dp)
+                                .fillMaxWidth()
+                                .padding(horizontal = 70.dp)
+                                .padding(top = 20.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            menuItems.forEachIndexed { index, editOption ->
+                                Column(
+                                    modifier = Modifier
+                                        .size(width = 80.dp, height = 45.dp)
+                                        .pointerInput(Unit) {
+                                            editOption.onClick()
+                                            showMenu = false
+                                        },
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Image(
+                                        painter = painterResource(editOption.imagePath),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp),
+                                        colorFilter = ColorFilter.tint(Color(0xff000000))
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = editOption.text,
+                                        fontSize = 16.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                        fontWeight = FontWeight(500),
+                                        color = Color(0xFF373533),
+                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
             }
-            
+
         }
     }
 }

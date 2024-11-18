@@ -229,5 +229,6 @@
     <string name="select_language">Выбор языка</string>
     <string name="other_languages">Другие языки</string>
     <string name="you_turned_off_the_microphone">Вы выключили микрофон</string>
+    <string name="reply">Ответить</string>
 
 </resources>

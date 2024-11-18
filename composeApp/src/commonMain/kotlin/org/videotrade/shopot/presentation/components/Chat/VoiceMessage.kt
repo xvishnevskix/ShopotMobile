@@ -64,10 +64,6 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_pause
 import shopot.composeapp.generated.resources.chat_play
-import shopot.composeapp.generated.resources.voice_message_pause_dark
-import shopot.composeapp.generated.resources.voice_message_pause_white
-import shopot.composeapp.generated.resources.voice_message_play_dark
-import shopot.composeapp.generated.resources.voice_message_play_white
 import kotlin.random.Random
 
 @Composable
@@ -82,7 +78,7 @@ fun VoiceMessage(
 
     // Состояния, уникальные для каждого сообщения
     var isPlaying by remember(message.id) { mutableStateOf(false) }
-    val waveData = remember(message.id) { generateRandomWaveData(30) }
+    val waveData = remember(message.id) { generateRandomWaveData(29) }
     var audioFilePath by remember(message.id) { mutableStateOf("") }
     val audioPlayer = remember { AudioFactory.createAudioPlayer() }
     var currentTime by remember(message.id) { mutableStateOf(0) }

@@ -209,6 +209,7 @@ class ChatScreen(
                 }
 
                 BlurredMessageOverlay(
+                    chat,
                     profile,
                     viewModel,
                     selectedMessage = selectedMessage.value,

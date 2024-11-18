@@ -140,6 +140,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
 
                    Row(
                        modifier = Modifier
+                           .padding(top = 5.dp)
                            .height(100.dp)
                            .fillMaxWidth()
                            .shadow(
