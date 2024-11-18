@@ -15,6 +15,11 @@ class ChatsUseCase : KoinComponent {
     val chats: StateFlow<List<ChatItem>> get() = repository.chats
     val currentChat: StateFlow<String> get() = repository.currentChat
     
+    val isLoadingChats: StateFlow<Boolean> get() = repository.isLoadingChats
+    
+    
+    
+    
     fun getChats(): List<ChatItem> {
         
         
@@ -57,5 +62,9 @@ class ChatsUseCase : KoinComponent {
     
     fun clearData() {
         repository.clearData()
+    }
+    
+    fun setIsLoadingValue(loadingValue: Boolean) {
+        repository.setIsLoadingValue(loadingValue)
     }
 }

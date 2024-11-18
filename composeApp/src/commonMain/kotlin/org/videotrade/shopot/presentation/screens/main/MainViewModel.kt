@@ -54,8 +54,11 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     val profile = MutableStateFlow(ProfileDTO())
 
-    private val _isLoadingChats = MutableStateFlow(true)
-    val isLoadingChats: StateFlow<Boolean> get() = _isLoadingChats.asStateFlow()
+
+    
+    
+    val isLoadingChats = chatsUseCase.isLoadingChats
+    
     
     val navigator = MutableStateFlow<Navigator?>(null)
     
@@ -87,24 +90,10 @@ class MainViewModel : ViewModel(), KoinComponent {
         defaultClientWebSocketSession: DefaultClientWebSocketSession? = null,
         userId: String? = null
     ) {
-//        viewModelScope.launch {
-//            if (defaultClientWebSocketSession !== null) {
-//                chatsUseCase.getChatsInBack(defaultClientWebSocketSession, userId!!)
-//                observeUsers()
-//
-//                return@launch
-//            }
-//
-//
-//            if (wsUseCase.wsSession.value !== null && wsUseCase.wsSession.value!!.isActive) {
-//                chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
-//                observeUsers()
-//            }
-//        }
 
         viewModelScope.launch {
-//            _isLoadingChats.value = true
-//            delay(2000)
+            chatsUseCase.setIsLoadingValue(true)
+
             try {
                 if (defaultClientWebSocketSession != null) {
                     chatsUseCase.getChatsInBack(defaultClientWebSocketSession, userId!!)
@@ -116,8 +105,8 @@ class MainViewModel : ViewModel(), KoinComponent {
                     chatsUseCase.getChatsInBack(wsUseCase.wsSession.value!!, profile.value.id)
                     observeUsers()
                 }
-            } finally {
-//                _isLoadingChats.value = false
+            } catch (_: Exception) {
+            
             }
         }
         
@@ -240,26 +229,40 @@ class MainViewModel : ViewModel(), KoinComponent {
         }
     }
     
+//    fun loadUsers() {
+//        viewModelScope.launch {
+//            _isLoadingChats.value = true
+//
+//            val newChats = sortChatsByLastMessageCreated(chatsUseCase.chats.value ?: emptyList())
+//            val oldChats = _chats.value ?: emptyList() // Текущий список чатов
+//
+//            // Проверяем, изменились ли чаты
+//            if (!hasChatsChanged(oldChats, newChats)) {
+//                _isLoadingChats.value = false
+//                // Если изменений нет, выходим из функции
+//                return@launch
+//            }
+//
+//            // Устанавливаем состояние загрузки только при обновлении
+//            _isLoadingChats.value = true
+//            try {
+//                _chats.update { newChats }
+//            } finally {
+////                _isLoadingChats.value = false
+//            }
+//        }
+//    }
+    
     fun loadUsers() {
         viewModelScope.launch {
-            _isLoadingChats.value = true
-            
-            val newChats = sortChatsByLastMessageCreated(chatsUseCase.chats.value ?: emptyList())
-            val oldChats = _chats.value ?: emptyList() // Текущий список чатов
-            
-            // Проверяем, изменились ли чаты
-            if (!hasChatsChanged(oldChats, newChats)) {
-                _isLoadingChats.value = false
-                // Если изменений нет, выходим из функции
-                return@launch
-            }
-            
-            // Устанавливаем состояние загрузки только при обновлении
-            _isLoadingChats.value = true
+//           chatsUseCase.setIsLoadingValue(true)
             try {
-                _chats.update { newChats }
+                println("prrrr ${chatsUseCase.chats.value}")
+                _chats.update { chatList ->
+                    sortChatsByLastMessageCreated(chatList)
+                }
             } finally {
-                _isLoadingChats.value = false
+//                chatsUseCase.setIsLoadingValue(false)
             }
         }
     }

@@ -118,7 +118,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
                     ) {
 
-                    println("jsonElement$userId")
+                    println("start cipherShared $userId")
 
                     val jsonContent = Json.encodeToString(
                         buildJsonObject {

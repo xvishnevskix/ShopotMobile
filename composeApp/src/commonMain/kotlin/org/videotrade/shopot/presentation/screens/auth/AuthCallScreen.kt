@@ -2,23 +2,18 @@ package org.videotrade.shopot.presentation.screens.auth
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -33,13 +28,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -77,10 +69,7 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
-import org.videotrade.shopot.presentation.components.Auth.CountryPickerBottomSheet
 import org.videotrade.shopot.presentation.components.Auth.Otp
-import org.videotrade.shopot.presentation.components.Auth.PhoneInput
-import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -89,15 +78,12 @@ import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.SFProText_Semibold
 import shopot.composeapp.generated.resources.auth_logo
 
 class AuthCallScreen(private val phone: String, private val authCase: String) : Screen {
-
-
+    
+    
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -113,18 +99,18 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         var reloadSend by remember { mutableStateOf(false) }
         var isSmsMode by remember { mutableStateOf(false) }
         var isSms by remember { mutableStateOf(false) }
-
+        
         val isLoading = remember { mutableStateOf(false) }
-
+        
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
         val invalidCode = stringResource(MokoRes.strings.invalid_code)
         val sentSMSCode = stringResource(MokoRes.strings.sms_with_code_sent)
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
-
+        
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
-
+            
             when (authCase) {
                 "SignIn" -> {
                     if (phone == "+79990000000") {
@@ -168,7 +154,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         )
                     }
                 }
-
+                
                 "SignUp" -> {
                     if (phone == "+79990000000") {
                         sendSignUp(phone, navigator)
@@ -185,9 +171,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 }
             }
         }
-
-println("phone4214141 $phone")
-
+        
+        println("phone4214141 $phone")
+        
         fun startTimer() {
             coroutineScope.launch {
                 while (isRunning && time > 0) {
@@ -201,7 +187,7 @@ println("phone4214141 $phone")
                 }
             }
         }
-
+        
         fun handleError(errorMessage: String) {
             hasError.value = true
             isLoading.value = false
@@ -212,7 +198,7 @@ println("phone4214141 $phone")
                 duration = ToasterDefaults.DurationDefault,
             )
         }
-
+        
         suspend fun handleAuthCase() {
             when (authCase) {
                 "SignIn" -> sendLogin(
@@ -223,11 +209,11 @@ println("phone4214141 $phone")
                     toasterViewModel = toasterViewModel,
                     phoneNotRegistered = phoneNotRegistered
                 )
-
+                
                 "SignUp" -> sendSignUp(phone, navigator)
             }
         }
-
+        
         fun sendSms(sentSMSCode: String) {
             isSms = true
             coroutineScope.launch {
@@ -246,14 +232,14 @@ println("phone4214141 $phone")
                     val jsonElement = Json.parseToJsonElement(response)
                     val messageObject = jsonElement.jsonObject["message"]?.jsonObject
                     responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-
+                    
                     toasterViewModel.toaster.show(
                         message = sentSMSCode,
                         type = ToastType.Success,
                         duration = ToasterDefaults.DurationDefault,
                     )
-
-
+                    
+                    
                     val otpText = otpFields.joinToString("")
                     if (otpText.length == 4) {
                         if (responseState.value == otpText) {
@@ -267,27 +253,30 @@ println("phone4214141 $phone")
                 }
             }
         }
-
-        fun sendCall() {
+        
+        fun sendCall() {}
+        {
             coroutineScope.launch {
                 if (!isRunning) {
                     isRunning = true
                     startTimer()
                 }
-println("phone41421 $phone")
-                val response = sendRequestToBackend(phone,
+                println("phone41421 $phone")
+                val response = sendRequestToBackend(
+                    phone,
                     null,
                     "2fa",
                     toasterViewModel,
                     hasError = hasError,
-                    animationTrigger = animationTrigger)
+                    animationTrigger = animationTrigger
+                )
                 
                 if (response != null) {
                     val jsonString = response.bodyAsText()
                     val jsonElement = Json.parseToJsonElement(jsonString)
                     val messageObject = jsonElement.jsonObject["message"]?.jsonObject
                     responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-
+                    
                     // Проверка, что все 4 цифры введены перед проверкой
                     val otpText = otpFields.joinToString("")
                     if (otpText.length == 4) {
@@ -304,36 +293,28 @@ println("phone41421 $phone")
                 }
             }
         }
-
+        
         LaunchedEffect(Unit) {
-
+            
             if (!isRunning) {
                 isRunning = true
                 startTimer()
             }
-//            val response = sendRequestToBackend(phone, null, "2fa", toasterViewModel, hasError = hasError,
-//                animationTrigger = animationTrigger)
-//            if (response != null) {
-//                val jsonString = response.bodyAsText()
-//                val jsonElement = Json.parseToJsonElement(jsonString)
-//                val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//            }
-
+            
             sendCall()
         }
-
-
+        
+        
         val isError = remember { mutableStateOf(false) }
-
-
-
-
-
-
-
-
-
+        
+        
+        
+        
+        
+        
+        
+        
+        
         SafeArea(padding = 4.dp) {
             Box(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
@@ -342,8 +323,8 @@ println("phone41421 $phone")
                     ).imePadding(),
                 contentAlignment = Alignment.TopCenter
             ) {
-
-
+                
+                
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -360,7 +341,7 @@ println("phone41421 $phone")
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-
+                        
                         Image(
                             modifier = Modifier
                                 .size(width = 195.dp, height = 132.dp),
@@ -368,9 +349,9 @@ println("phone41421 $phone")
                             contentDescription = null,
                             contentScale = ContentScale.Crop
                         )
-
+                        
                         Spacer(modifier = Modifier.height(50.dp))
-
+                        
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth()
@@ -404,7 +385,7 @@ println("phone41421 $phone")
                                 )
                             )
                             Spacer(modifier = Modifier.height(50.dp))
-
+                            
                             Otp(otpFields, isLoading.value, hasError.value, animationTrigger.value,
                                 onOtpComplete = { otpText ->
                                     coroutineScope.launch {
@@ -418,7 +399,7 @@ println("phone41421 $phone")
                                     }
                                 }
                             )
-
+                            
                             Spacer(modifier = Modifier.height(16.dp))
                             Box(modifier = Modifier.padding(bottom = 20.dp)) {
                                 CustomButton(
@@ -462,62 +443,62 @@ suspend fun sendRequestToBackend(
     animationTrigger: MutableState<Boolean>? = null,
 ): HttpResponse? {
     val client = HttpClient(getHttpClientEngine()) { // или другой движок в зависимости от платформы
-
+    
     }
-
-
+    
+    
     try {
         val jsonContent = Json.encodeToString(
             buildJsonObject {
                 put("phoneNumber", phone.drop(1))
-
+                
                 notificationToken?.let { put("notificationToken", it) }
             }
         )
-
-
+        
+        
         println("url $url ${jsonContent}")
-
-
+        
+        
         val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
             contentType(ContentType.Application.Json)
             setBody(jsonContent)
         }
-
+        
         println("url ${response.bodyAsText()} ${jsonContent}")
-
-
+        
+        
         if (response.status.isSuccess()) {
-
+            
             return response
-
-
+            
+            
         } else {
             println("Failed to retrieve data: ${response.status.description}")
-
+            
             if (response.bodyAsText() == "User not found") {
                 if (hasError != null) {
                     hasError.value = true
                 }
                 toasterViewModel.toaster.show(
-
+                    
                     phoneNotRegistered,
                     type = ToastType.Error,
                     duration = ToasterDefaults.DurationDefault
                 )
-
+                
                 if (animationTrigger != null) {
                     animationTrigger.value = !animationTrigger.value
                 }
             }
-
+            
         }
     } catch (e: Exception) {
         println("Error111: $e")
     } finally {
         client.close()
     }
-
+    
     return null
 }
 
@@ -530,8 +511,8 @@ suspend fun sendLogin(
     toasterViewModel: CommonViewModel,
     phoneNotRegistered: String = ""
 ) {
-
-
+    
+    
     val response =
         sendRequestToBackend(
             phone,
@@ -540,26 +521,26 @@ suspend fun sendLogin(
             toasterViewModel,
             phoneNotRegistered,
         )
-
-
+    
+    
     println("sadada ${response?.bodyAsText()}")
     println("sadada ${response?.bodyAsText()}")
-
+    
     if (response != null) {
-
+        
         val jsonString = response.bodyAsText()
         val jsonElement = Json.parseToJsonElement(jsonString).jsonObject
-
-
+        
+        
         val token = jsonElement["accessToken"]?.jsonPrimitive?.content
         val refreshToken =
             jsonElement["refreshToken"]?.jsonPrimitive?.content
-
+        
         val userId =
             jsonElement["userId"]?.jsonPrimitive?.content
-
-
-
+        
+        
+        
         token?.let {
             addValueInStorage(
                 "accessToken",
@@ -572,27 +553,27 @@ suspend fun sendLogin(
                 refreshToken
             )
         }
-
-
-
+        
+        
+        
         viewModel.updateNotificationToken()
 //        navigator.push(MainScreen())
-
+        
         viewModel.startObserving()
-
+        
         сommonViewModel.cipherShared(userId, navigator)
-
-
+        
+        
     }
 }
 
 
 fun sendSignUp(phone: String, navigator: Navigator) {
-
-
+    
+    
     navigator.push(SignUpScreen(phone))
-
-
+    
+    
 }
 
 

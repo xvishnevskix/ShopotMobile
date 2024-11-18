@@ -4,6 +4,7 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.WebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -30,6 +31,10 @@ class ChatsRepositoryImpl : ChatsRepository {
     )
     
     override val currentChat: StateFlow<String> get() = _currentChat
+    
+    private val _isLoadingChats = MutableStateFlow(true)
+    
+    override val isLoadingChats: StateFlow<Boolean> get() = _isLoadingChats
     
     
     override fun getChats(): List<ChatItem> {
@@ -149,4 +154,10 @@ class ChatsRepositoryImpl : ChatsRepository {
     override fun clearData() {
         _chats.value = emptyList()
     }
+    
+    override fun setIsLoadingValue(loadingValue: Boolean) {
+        _isLoadingChats.value = loadingValue
+    }
+    
+
 }

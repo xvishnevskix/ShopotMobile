@@ -9,6 +9,7 @@ import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
@@ -83,6 +84,8 @@ suspend fun handleConnectWebSocket(
                             when (action) {
                                 "getUserChats" -> {
                                     try {
+                                        
+                                        chatsUseCase.setIsLoadingValue(false)
 
                                         println("getUserChatsgetUserChats $jsonElement")
 

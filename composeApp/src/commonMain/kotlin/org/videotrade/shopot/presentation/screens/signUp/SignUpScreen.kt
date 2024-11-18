@@ -306,7 +306,7 @@ class SignUpScreen(private val phone: String) : Screen {
 //                                            return@launch
                                                 val jsonContent = Json.encodeToString(
                                                     buildJsonObject {
-                                                        put("phoneNumber", phone)
+                                                        put("phoneNumber", phone.drop(1))
                                                         put("firstName", textState.value.firstName)
                                                         put("lastName", textState.value.lastName)
                                                         put("email", "admin.admin@gmail.com")
