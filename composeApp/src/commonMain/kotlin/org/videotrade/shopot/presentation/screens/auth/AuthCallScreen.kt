@@ -186,7 +186,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
 
-
+println("phone4214141 $phone")
 
         fun startTimer() {
             coroutineScope.launch {
@@ -274,13 +274,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     isRunning = true
                     startTimer()
                 }
-
+println("phone41421 $phone")
                 val response = sendRequestToBackend(phone,
                     null,
                     "2fa",
                     toasterViewModel,
                     hasError = hasError,
                     animationTrigger = animationTrigger)
+                
                 if (response != null) {
                     val jsonString = response.bodyAsText()
                     val jsonElement = Json.parseToJsonElement(jsonString)
@@ -450,154 +451,6 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         }
     }
 }
-//SafeArea {
-//
-//            when (authCase) {
-//                "SignIn" -> AuthHeader(stringResource(MokoRes.strings.login))
-//                "SignUp" -> AuthHeader(stringResource(MokoRes.strings.create_account))
-//            }
-//
-//            Box(
-//                modifier = Modifier.fillMaxSize(),
-//                contentAlignment = Alignment.TopCenter
-//            ) {
-//
-//
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    ) {
-//
-//
-//                        Spacer(modifier = Modifier.height(150.dp))
-//                        Text(
-//                            stringResource(MokoRes.strings.enter_last_4_digits_of_the_incoming_call),
-//                            modifier = Modifier.padding(bottom = 10.dp),
-//                            fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
-//                            fontSize = 20.sp,
-//                            textAlign = TextAlign.Center,
-//                            letterSpacing = TextUnit(0.1F, TextUnitType.Sp),
-//                            lineHeight = 24.sp,
-//                            color = Color.Black
-//
-//
-//                        )
-//                        Text(
-//                            stringResource(MokoRes.strings.you_will_receive_a_call_to_your_number_enter_the_last_4),
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 14.sp,
-//                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                            lineHeight = 24.sp,
-//                            modifier = Modifier.padding(bottom = 5.dp),
-//                            color = Color(151, 151, 151)
-//                        )
-//
-//
-//
-//                        Otp(otpFields, isLoading.value)
-//
-//
-//                        CustomButton(
-//                            stringResource(MokoRes.strings.confirm),
-//                            {
-//                                val otpText = otpFields.joinToString("")
-//
-//
-//                                coroutineScope.launch {
-//                                    isLoading.value = true
-////                                    if (
-////                                        responseState.value != otpText && !isSuccessOtp.value
-////
-////                                    ) {
-////                                        isLoading.value = false
-////                                        toasterViewModel.toaster.show(
-////                                            message = invalidCode,
-////                                            type = ToastType.Warning,
-////                                            duration = ToasterDefaults.DurationDefault,
-////                                        )
-////                                        return@launch
-////                                    }
-//
-//                                    when (authCase) {
-//
-//                                        "SignIn" -> sendLogin(
-//                                            phone,
-//                                            navigator,
-//                                            viewModel,
-//                                            сommonViewModel,
-//                                            toasterViewModel = toasterViewModel,
-//                                            phoneNotRegistered
-//                                        )
-//
-//                                        "SignUp" -> sendSignUp(phone, navigator)
-//                                    }
-//
-//                                }
-//
-//
-//                            })
-//
-//
-//                        Text(
-//                            stringResource(MokoRes.strings.send_code_via_sms),
-//                            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 15.sp,
-//                            lineHeight = 15.sp,
-//                            color = Color(0xFF000000),
-//                            textDecoration = TextDecoration.Underline,
-//                            modifier = Modifier.padding(top = 20.dp)
-//                                .clickable { navigator.push(AuthSMSScreen(phone, authCase)) }
-//                        )
-//
-//                        Spacer(modifier = Modifier.height(16.dp))
-//
-//
-//
-//                            Text(
-//                                if (!isRunning) stringResource(MokoRes.strings.send_code_again) else "${stringResource(MokoRes.strings.you_can_resend_the_code_after)} $time",
-//                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-//                                textAlign = TextAlign.Center,
-//                                fontSize = 15.sp,
-//                                lineHeight = 15.sp,
-//                                color = Color(0xFF000000),
-//                                textDecoration = if (!isRunning) TextDecoration.Underline else TextDecoration.None,
-//                                modifier = Modifier.padding(top = 10.dp)
-//                                    .clickable {
-//                                        if (!isRunning) {
-//                                            isRunning = true
-//                                            reloadSend = false
-//                                            coroutineScope.launch {
-//                                                startTimer()
-//
-//                                                val response =
-//                                                    sendRequestToBackend(phone, null, "2fa", toasterViewModel, "")
-//
-//                                                if (response != null) {
-//                                                    val jsonString = response.bodyAsText()
-//                                                    val jsonElement = Json.parseToJsonElement(jsonString)
-//                                                    val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-//                                                    responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-//
-//
-//                                                }
-//                                            }
-//                                        }
-//                                        else {
-//
-//                                        }
-//
-//
-//                                    }
-//                            )
-//                        Spacer(modifier = Modifier.height(300.dp))
-//                    }
-//                }
-//
-//
-//            }
-//
-//        }
-
 
 suspend fun sendRequestToBackend(
     phone: String,

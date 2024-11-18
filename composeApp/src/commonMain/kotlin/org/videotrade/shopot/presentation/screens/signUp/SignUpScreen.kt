@@ -301,12 +301,12 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     )
 
                                                 }
-                                                println("icon3131 ${icon}")
+                                                println("phone ${phone}")
 ////
 //                                            return@launch
                                                 val jsonContent = Json.encodeToString(
                                                     buildJsonObject {
-                                                        put("phoneNumber", phone.drop(1))
+                                                        put("phoneNumber", phone)
                                                         put("firstName", textState.value.firstName)
                                                         put("lastName", textState.value.lastName)
                                                         put("email", "admin.admin@gmail.com")
