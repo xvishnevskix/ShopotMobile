@@ -254,8 +254,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
         
-        fun sendCall() {}
-        {
+        fun sendCall() {
             coroutineScope.launch {
                 if (!isRunning) {
                     isRunning = true
