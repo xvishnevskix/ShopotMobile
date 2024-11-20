@@ -7,10 +7,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,6 +22,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffoldState
@@ -41,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
@@ -84,6 +89,7 @@ fun BlurredMessageOverlay(
     selectedMessage: MessageItem?,
     selectedMessageY: Int,
     onDismiss: () -> Unit,
+
 ) {
 
     val messageSenderName = if (selectedMessage?.fromUser  == profile.id) {
@@ -104,18 +110,22 @@ fun BlurredMessageOverlay(
         LaunchedEffect(Unit) {
             visible = true
         }
-        
+
         val alpha by animateFloatAsState(
             targetValue = if (visible) 0.5f else 0f,
             animationSpec = tween(durationMillis = 200)
         )
-        
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = alpha))
-                .clickable { onDismiss() },
+                .clickable { onDismiss() }
+            ,
         ) {
+
+
+
             Box(
                 modifier = Modifier
                     .offset(y = with(LocalDensity.current) { selectedMessageY.toDp() })
@@ -152,9 +162,10 @@ fun MessageBlurBox(
     onClick: () -> Unit,
     visible: Boolean,
     onDismiss: () -> Unit,
+
 ) {
     val clipboardManager = LocalClipboardManager.current
-    
+
     val transition = updateTransition(targetState = visible, label = "MessageBlurBoxTransition")
     val orientation: Dp = if (message.fromUser == profile.id) 100.dp else -75.dp
     val firstColumnOffsetX by transition.animateDp(
@@ -163,7 +174,7 @@ fun MessageBlurBox(
     ) { state ->
         if (state) 0.dp else orientation
     }
-    
+
     val secondColumnOffsetY by transition.animateDp(
         transitionSpec = { tween(durationMillis = 300, easing = FastOutSlowInEasing) },
         label = "SecondColumnOffsetY"
@@ -171,17 +182,32 @@ fun MessageBlurBox(
         if (state) 0.dp else 200.dp
     }
 
-    val editOptions =  getEditOptions(chatId = chat.chatId, messageSenderName = messageSenderName)
-    
+    val editOptions =  getChatEditOptions(chatId = chat.chatId, messageSenderName = messageSenderName)
+
+    val density = LocalDensity.current
+
+
+    var boxHeightDp by remember { mutableStateOf(0.dp) }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxWidth()
+            .onGloballyPositioned { layoutCoordinates ->
+                val height = with(density) { layoutCoordinates.size.height.toDp() }
+                if (height != boxHeightDp) {
+                    boxHeightDp = height
+                }
+            }
     ) {
+
+        println("boxHeightDp messageBlur ${boxHeightDp}")
+
         Column(
             modifier = Modifier
                 .offset(x = firstColumnOffsetX)
-                .fillMaxWidth(0.8f),
+                .fillMaxWidth(0.8f)
+                ,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -274,107 +300,53 @@ fun MessageBlurBox(
                 .offset(y = secondColumnOffsetY)
                 .padding(top = 4.dp)
                 .fillMaxWidth(0.5f)
-                .clip(RoundedCornerShape(8.dp))
+                .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
         ) {
             editOptions.forEachIndexed { index, editOption ->
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 10.dp)
-                        .fillMaxWidth()
-                        .clickable {
-                            editOption.onClick(viewModel, message, clipboardManager)
-                            onDismiss()
-                        }
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                            .width(197.dp)
+                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
+                            .clickable {
+                                editOption.onClick(viewModel, message, clipboardManager)
+                                onDismiss()
+                            }
 
-                ) {
-                    Text(
-                        text = editOption.text,
-                        fontSize = 16.sp,
-                        lineHeight = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                        fontWeight = FontWeight(400),
-                        color = Color(0xFF373533),
-                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    )
-                    Image(
-                        painter = painterResource(editOption.imagePath),
-                        contentDescription = null,
-                        modifier = editOption.modifier.size(18.dp),
-                        colorFilter = ColorFilter.tint(Color(0xff000000))
-                    )
-                }
-                if (index < editOptions.size - 1) {
-                    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
-                } else {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    ) {
+                        Text(
+                            text = editOption.text,
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            color = editOption.color,
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        )
+                        Image(
+                            painter = painterResource(editOption.imagePath),
+                            contentDescription = null,
+                            modifier = editOption.modifier.size(18.dp),
+                            colorFilter = ColorFilter.tint(editOption.color)
+                        )
+                    }
+//                if (index < editOptions.size - 1) {
+//                    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+//                } else {
+//                    Spacer(modifier = Modifier.height(4.dp))
+//                }
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
     }
 }
 
-data class EditOption(
-    val text: String,
-    val imagePath: DrawableResource,
-    val onClick:
-        (
-        viewModule: ChatViewModel,
-         message: MessageItem,
-         clipboardManager: ClipboardManager) -> Unit,
-        val chatId: String = "",
-        val messageSenderName: String = "",
-        val modifier: Modifier = Modifier
-)
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun getEditOptions(
-    scaffoldState: BottomSheetScaffoldState? = null,
-    chatId: String,
-    messageSenderName: String,
-): List<EditOption> {
-
-    val coroutineScope = rememberCoroutineScope()
-
-    return listOf(
-
-        EditOption(
-            text = stringResource(MokoRes.strings.reply),
-            imagePath = Res.drawable.chat_forward,
-            onClick = { viewModel, message, _ ->
-                viewModel.selectMessage(chatId, message, messageSenderName)
-            },
-            modifier = Modifier.graphicsLayer(scaleX = -1f)
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.copy),
-            imagePath = Res.drawable.menu_copy,
-            onClick = { _, message, clipboardManager ->
-                message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
-            }
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.forward),
-            imagePath = Res.drawable.chat_forward,
-            onClick = { viewModel, message, clipboardManager ->
-                coroutineScope.launch {
-                    viewModel.setForwardMessage(message)
-                    viewModel.setScaffoldState(true)
-                }
-            }
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.delete),
-            imagePath = Res.drawable.menu_delete,
-            onClick = { viewModel, message, _ ->
-                viewModel.deleteMessage(message)
-            }
-        ),
-
-    )
-}
 
 

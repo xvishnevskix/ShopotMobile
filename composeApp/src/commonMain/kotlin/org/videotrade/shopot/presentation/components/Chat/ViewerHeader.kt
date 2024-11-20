@@ -32,7 +32,7 @@ import shopot.composeapp.generated.resources.Res
 @Composable
 fun ViewerHeader(name: String, time: String = "") {
     val navigator = LocalNavigator.currentOrThrow
-    
+
     Row(
         modifier = Modifier
             .background(Color.White.copy(alpha = 0.8f))

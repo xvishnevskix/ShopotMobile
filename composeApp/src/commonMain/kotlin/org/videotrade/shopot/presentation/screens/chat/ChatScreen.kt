@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -38,6 +39,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import kotlinx.coroutines.coroutineScope
@@ -119,7 +122,8 @@ class ChatScreen(
         var hiddenMessageId by remember { mutableStateOf<String?>(null) }
 
 
-            Box(
+
+            BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(Color.White)
@@ -134,6 +138,19 @@ class ChatScreen(
                         }
                     }
             ) {
+
+                val density = LocalDensity.current
+                val screenHeightInPx = maxHeight.value * density.density // Пример, если maxHeight в Dp
+
+                // Преобразуем пиксели в Dp
+                val screenHeightInDp = with(density) {
+                    screenHeightInPx.toDp()
+                }
+
+                println("screenHeightInDp ${screenHeightInDp}")
+
+                println("screenHeightInDp selectedMessageY ${selectedMessageY}")
+
                 SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
                     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
                         Scaffold(
@@ -176,7 +193,7 @@ class ChatScreen(
                                     .padding(innerPadding),
                                 onMessageClick = { message, y ->
                                     selectedMessage.value = message
-                                    selectedMessageY = y + 150
+                                    selectedMessageY =  y + 150
                                     hiddenMessageId = message.id
                                 },
                                 hiddenMessageId = hiddenMessageId
@@ -218,9 +235,8 @@ class ChatScreen(
                         selectedMessage.value = null
                         hiddenMessageId = null
                     },
+
                 )
             }
         }
     }
-
-
