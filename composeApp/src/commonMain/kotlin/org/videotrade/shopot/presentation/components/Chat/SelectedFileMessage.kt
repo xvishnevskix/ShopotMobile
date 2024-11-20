@@ -48,6 +48,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.chat_file_message
 import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
 
@@ -73,12 +74,12 @@ fun SelectedFileMessage(selectedMessage: MessageItem, selectedMessageSenderName:
         Spacer(modifier = Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(Res.drawable.menu_file),
+                painter = painterResource(Res.drawable.chat_file_message),
                 contentDescription = "Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
 
-                    .size(15.dp),
+                    .size(width = 14.dp, height = 16.dp),
                 colorFilter = ColorFilter.tint(Color(0xFF979797))
             )
             Spacer(modifier = Modifier.width(3.dp))

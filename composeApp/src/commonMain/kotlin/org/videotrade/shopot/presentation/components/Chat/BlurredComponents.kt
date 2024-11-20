@@ -194,9 +194,11 @@ fun MessageBlurBox(
         modifier = Modifier
             .fillMaxWidth()
             .onGloballyPositioned { layoutCoordinates ->
-                val height = with(density) { layoutCoordinates.size.height.toDp() }
-                if (height != boxHeightDp) {
-                    boxHeightDp = height
+                val heightInDp = with(density) { layoutCoordinates.size.height.toDp() }
+                if (heightInDp != boxHeightDp) {
+                    boxHeightDp = heightInDp
+                    val heightInPx = with(density) { heightInDp.toPx().toInt() }
+                    viewModel.updateBoxHeight(heightInPx)
                 }
             }
     ) {
@@ -299,7 +301,7 @@ fun MessageBlurBox(
             modifier = Modifier
                 .offset(y = secondColumnOffsetY)
                 .padding(top = 4.dp)
-                .fillMaxWidth(0.5f)
+                .fillMaxWidth(0.57f)
                 .clip(RoundedCornerShape(16.dp))
                 .background(Color.White)
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
@@ -335,11 +337,6 @@ fun MessageBlurBox(
                             colorFilter = ColorFilter.tint(editOption.color)
                         )
                     }
-//                if (index < editOptions.size - 1) {
-//                    Divider(color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
-//                } else {
-//                    Spacer(modifier = Modifier.height(4.dp))
-//                }
                     Spacer(modifier = Modifier.height(8.dp))
                 }
             }

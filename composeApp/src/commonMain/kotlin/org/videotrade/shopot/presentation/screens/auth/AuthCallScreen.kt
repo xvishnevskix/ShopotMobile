@@ -319,7 +319,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 //                responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
 //            }
 
-//            sendCall()
+            sendCall()
         }
 
 

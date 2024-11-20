@@ -75,6 +75,14 @@ class ChatScreen(
         val scaffoldStickerState = rememberBottomSheetScaffoldState()
         var showStickerMenu = remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
+        val boxSelectedMessageHeight = viewModel.boxHeight.collectAsState()
+
+        val selectedMessage = remember { mutableStateOf<MessageItem?>(null) }
+        var selectedMessageY = remember { mutableStateOf(0) }
+        var hiddenMessageId = remember { mutableStateOf<String?>(null) }
+
+        val isMessageUpdated = remember { mutableStateOf(false) }
+
 
         if (chat == null) {
             mainViewModel.navigator.value?.push(ChatsScreen())
@@ -117,9 +125,7 @@ class ChatScreen(
         }
 
 
-        val selectedMessage = remember { mutableStateOf<MessageItem?>(null) }
-        var selectedMessageY by remember { mutableStateOf(0) }
-        var hiddenMessageId by remember { mutableStateOf<String?>(null) }
+
 
 
 
@@ -142,14 +148,16 @@ class ChatScreen(
                 val density = LocalDensity.current
                 val screenHeightInPx = maxHeight.value * density.density // Пример, если maxHeight в Dp
 
-                // Преобразуем пиксели в Dp
-                val screenHeightInDp = with(density) {
-                    screenHeightInPx.toDp()
-                }
+//                // Преобразуем пиксели в Dp
+//                val screenHeightInDp = with(density) {
+//                    screenHeightInPx.toDp()
+//                }
 
-                println("screenHeightInDp ${screenHeightInDp}")
-
-                println("screenHeightInDp selectedMessageY ${selectedMessageY}")
+//                println("screenHeightInPx ${screenHeightInPx}")
+//
+//                println("screenHeightInPx Box height in pixels: ${boxSelectedMessageHeight.value}")
+//
+//                println("screenHeightInPx selectedMessageY ${selectedMessageY.value}")
 
                 SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
                     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -192,11 +200,31 @@ class ChatScreen(
                                 Modifier.fillMaxSize().background(Color.White)
                                     .padding(innerPadding),
                                 onMessageClick = { message, y ->
-                                    selectedMessage.value = message
-                                    selectedMessageY =  y + 150
-                                    hiddenMessageId = message.id
+                                    // Сбрасываем текущее состояние для предотвращения конфликта
+                                    selectedMessage.value = null
+                                    selectedMessageY.value = 0
+                                    isMessageUpdated.value = false
+
+                                    scope.launch {
+
+                                        kotlinx.coroutines.delay(16)
+
+                                        // Устанавливаем новое состояние
+                                        val calculatedY = when {
+                                            boxSelectedMessageHeight.value + y > screenHeightInPx -> {
+                                                (screenHeightInPx - boxSelectedMessageHeight.value - 180).toInt()
+                                            }
+                                            y < 0 -> 150
+                                            else -> y + 100
+                                        }
+
+                                        selectedMessage.value = message
+                                        selectedMessageY.value = calculatedY
+                                        hiddenMessageId.value = message.id
+                                        isMessageUpdated.value = true
+                                    }
                                 },
-                                hiddenMessageId = hiddenMessageId
+                                hiddenMessageId = hiddenMessageId.value
                             )
                         }
 
@@ -225,18 +253,37 @@ class ChatScreen(
                     ) {}
                 }
 
-                BlurredMessageOverlay(
-                    chat,
-                    profile,
-                    viewModel,
-                    selectedMessage = selectedMessage.value,
-                    selectedMessageY = selectedMessageY,
-                    onDismiss = {
-                        selectedMessage.value = null
-                        hiddenMessageId = null
-                    },
+                if (isMessageUpdated.value && selectedMessage.value != null) {
+                    val overlayPosition = selectedMessageY.value
+                    val isWithinBounds = overlayPosition >= 0 &&
+                            overlayPosition + boxSelectedMessageHeight.value <= screenHeightInPx
 
-                )
+                    if (isWithinBounds) {
+                        BlurredMessageOverlay(
+                            chat = chat,
+                            profile = profile,
+                            viewModel = viewModel,
+                            selectedMessage = selectedMessage.value,
+                            selectedMessageY = selectedMessageY.value,
+                            onDismiss = {
+                                selectedMessage.value = null
+                                hiddenMessageId.value = null
+                            }
+                        )
+                    } else {
+
+                        scope.launch {
+                            selectedMessageY.value = when {
+                                overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
+                                overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
+                                    (screenHeightInPx - boxSelectedMessageHeight.value).toInt() -180 // нижняя граница
+                                }
+                                else -> overlayPosition
+                            }
+                            isMessageUpdated.value = true // Перезапуск
+                        }
+                    }
+                }
             }
         }
     }

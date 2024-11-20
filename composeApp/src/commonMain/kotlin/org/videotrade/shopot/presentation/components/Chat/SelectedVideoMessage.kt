@@ -61,8 +61,7 @@ fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderNam
     }
     
     Row(
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 2.dp),
+        modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         

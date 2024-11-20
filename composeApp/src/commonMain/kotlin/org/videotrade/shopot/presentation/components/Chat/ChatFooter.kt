@@ -594,7 +594,7 @@ fun ChatFooter(
                 ) {
                     if (isRecording) {
                         Row(
-                            modifier = Modifier,
+                            modifier = Modifier.width(90.dp).padding(top = 5.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
