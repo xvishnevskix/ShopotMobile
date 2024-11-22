@@ -36,18 +36,19 @@ fun ProfileChatHeader(text: String) {
 
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 40.dp, )
-                .background(Color(0xFFF3F4F6)),
+            modifier = Modifier.fillMaxWidth().padding(top = 35.dp, )
+                .background(Color.White),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(
                 Modifier.padding(start = 10.dp, end = 0.dp).width(25.dp)
             ) {
-                    BackIcon(
-                        Modifier.pointerInput(Unit) {
-                            navigator.pop()
-                        })
+
+                BackIcon(
+                    Modifier.pointerInput(Unit) {
+                        navigator.pop()
+                    })
             }
             Text(
                 text = text,

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -31,10 +32,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -54,12 +59,11 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.AudioPlayer
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.voice_message_pause_dark
-import shopot.composeapp.generated.resources.voice_message_pause_white
-import shopot.composeapp.generated.resources.voice_message_play_dark
-import shopot.composeapp.generated.resources.voice_message_play_white
+import shopot.composeapp.generated.resources.chat_pause
+import shopot.composeapp.generated.resources.chat_play
 import kotlin.random.Random
 
 @Composable
@@ -68,13 +72,13 @@ fun VoiceMessage(
     attachments: List<Attachment>
 ) {
     val scope = rememberCoroutineScope()
-    
+
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
-    
+
     // Состояния, уникальные для каждого сообщения
     var isPlaying by remember(message.id) { mutableStateOf(false) }
-    val waveData = remember(message.id) { generateRandomWaveData(50) }
+    val waveData = remember(message.id) { generateRandomWaveData(29) }
     var audioFilePath by remember(message.id) { mutableStateOf("") }
     val audioPlayer = remember { AudioFactory.createAudioPlayer() }
     var currentTime by remember(message.id) { mutableStateOf(0) }
@@ -84,7 +88,7 @@ fun VoiceMessage(
     var progress by remember(message.id) { mutableStateOf(0f) }
     var downloadJob by remember(message.id) { mutableStateOf<Job?>(null) }
     var isUpload by remember(message.id) { mutableStateOf(false) }
-    
+
     // Эффект для обновления времени воспроизведения
     LaunchedEffect(isPlaying) {
         if (isPlaying) {
@@ -104,7 +108,7 @@ fun VoiceMessage(
             }
         }
     }
-    
+
     // Эффект для загрузки или скачивания файла
     LaunchedEffect(message) {
         if (!isUpload && message.upload != null) {
@@ -124,7 +128,7 @@ fun VoiceMessage(
                         isStartCipherLoading = false
                         progress = it / 100f
                     }
-                    
+
                     fileId?.let {
                         viewModel.sendLargeFileAttachments(
                             message.content,
@@ -158,7 +162,7 @@ fun VoiceMessage(
                 val url = "${EnvironmentConfig.serverUrl}file/id/${attachments.first().fileId}"
                 val fileName = attachments.first().name
                 val fileType = attachments.first().type
-                
+
                 scope.launch {
                     isLoading = true
                     isStartCipherLoading = true
@@ -181,15 +185,15 @@ fun VoiceMessage(
             }
         }
     }
-    
+
     Row(
         modifier = Modifier
-            .widthIn(max = 204.dp)
+            .widthIn(max = 261.dp)
             .padding(
-                start = 22.dp,
-                end = 22.dp,
-                top = if (message.fromUser == profile.id) 12.dp else 7.dp,
-                bottom = 12.dp
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp,
+                top = 16.dp
             ),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -225,19 +229,46 @@ fun VoiceMessage(
                 isFromUser = message.fromUser == profile.id
             )
         }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Column(verticalArrangement = Arrangement.SpaceBetween) {
+        Spacer(modifier = Modifier.width(13.dp))
+        Box(modifier = Modifier.weight(1F)) {
             Waveform(waveData = waveData, message, profile)
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Box(modifier = Modifier.width(50.dp)) {
             Text(
                 text = if (isPlaying) formatSecondsToDuration(currentTime) else duration,
-                color = if (message.fromUser == profile.id) Color.White else Color(0xFF2A293C),
-                textAlign = TextAlign.Center,
-                fontSize = 12.sp,
-                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                lineHeight = 20.sp
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                fontWeight = FontWeight(400),
+                color = if (message.fromUser == profile.id) Color.White  else Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+            )
+        }
+    }
+}
+
+@Composable
+fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO) {
+    val minAmplitude = 0.2f // Минимальная амплитуда для каждой волны
+
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(24.dp)
+    ) {
+        val barWidth = size.width / (waveData.size * 2 - 1)
+        val maxBarHeight = size.height
+
+        waveData.forEachIndexed { index, amplitude ->
+            val adjustedAmplitude = maxOf(amplitude, minAmplitude) // Применяем минимальную амплитуду
+            val barHeight = maxBarHeight * adjustedAmplitude
+
+            drawRoundRect(
+                color = if (message.fromUser == profile.id) Color.White else Color(0xFF373533),
+                topLeft = Offset(index * 2 * barWidth, maxBarHeight / 2 - barHeight / 2),
+                size = Size(barWidth, barHeight),
+                cornerRadius = CornerRadius(barWidth / 2) // Закруглённые углы
             )
         }
     }
@@ -252,7 +283,7 @@ fun LoadingBox(
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.size(45.dp)
+        modifier = Modifier.size(24.dp)
     ) {
         if (progress !== null) {
             CircularProgressIndicator(
@@ -288,19 +319,18 @@ fun PlayPauseButton(
 ) {
     IconButton(
         onClick = onClick,
-        modifier = Modifier.size(45.dp)
+        modifier = Modifier.size(24.dp)
     ) {
         val icon = if (isPlaying) {
-            if (isFromUser) painterResource(Res.drawable.voice_message_pause_white)
-            else painterResource(Res.drawable.voice_message_pause_dark)
+            painterResource(Res.drawable.chat_pause)
         } else {
-            if (isFromUser) painterResource(Res.drawable.voice_message_play_white)
-            else painterResource(Res.drawable.voice_message_play_dark)
+            painterResource(Res.drawable.chat_play)
         }
         Image(
             painter = icon,
             contentDescription = null,
-            modifier = Modifier.size(45.dp)
+            modifier = Modifier.size(14.dp),
+            colorFilter = if (isFromUser) ColorFilter.tint(Color.White) else ColorFilter.tint(Color(0xFF373533))
         )
     }
 }
@@ -314,26 +344,7 @@ fun stopVoice(audioPlayer: AudioPlayer) {
     audioPlayer.stopPlaying()
 }
 
-@Composable
-fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO) {
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(19.dp)
-    ) {
-        val barWidth = size.width / (waveData.size * 2 - 1)
-        val maxBarHeight = size.height
-        
-        waveData.forEachIndexed { index, amplitude ->
-            val barHeight = maxBarHeight * amplitude
-            drawRect(
-                color = if (message.fromUser == profile.id) Color.White else Color(0xFF2A293C),
-                topLeft = Offset(index * 2 * barWidth, maxBarHeight / 2 - barHeight / 2),
-                size = Size(barWidth, barHeight)
-            )
-        }
-    }
-}
+
 
 fun generateRandomWaveData(size: Int): List<Float> {
     return List(size) { Random.nextFloat() }

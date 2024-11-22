@@ -42,9 +42,6 @@ import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.arrow_left
-import shopot.composeapp.generated.resources.arrowleft
-import shopot.composeapp.generated.resources.carbon_media_library
-
 
 @Composable
 fun ProfileSettingsButton(

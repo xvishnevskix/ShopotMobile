@@ -61,6 +61,7 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
 import org.videotrade.shopot.presentation.components.Contacts.CreateGroupChatHeader
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
@@ -71,9 +72,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.edit_group_name
-import kotlin.math.abs
+
 
 
 class CreateGroupSecondScreen() : Screen {
@@ -362,7 +361,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
 }
 
 @Composable
-fun ParticipantCountText(count: Int) {
+private fun ParticipantCountText(count: Int) {
     Text(
         text = getParticipantCountText(count),
         fontSize = 16.sp,
@@ -372,26 +371,6 @@ fun ParticipantCountText(count: Int) {
     )
 }
 
-@Composable
-fun getParticipantCountText(count: Int): String {
-    val forms = arrayOf(
-        stringResource(MokoRes.strings.participant),
-        stringResource(MokoRes.strings.participants_1),
-        stringResource(MokoRes.strings.participants_2)
-    )
-    return "$count ${getPluralForm(count, forms)}"
-}
-
-fun getPluralForm(number: Int, forms: Array<String>): String {
-    val n = abs(number) % 100
-    val n1 = n % 10
-    return when {
-        n in 11..19 -> forms[2]
-        n1 == 1 -> forms[0]
-        n1 in 2..4 -> forms[1]
-        else -> forms[2]
-    }
-}
 
 private fun validateGroupName(name: String, nameValidate1: String, nameValidate2: String, nameValidate4: String): String? {
     return when {

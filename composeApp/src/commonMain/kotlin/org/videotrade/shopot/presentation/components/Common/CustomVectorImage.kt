@@ -6,8 +6,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
-import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.drawer_contacts
 
 @Composable
 fun CustomVectorImage(

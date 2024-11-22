@@ -33,9 +33,7 @@ import org.jetbrains.compose.resources.painterResource
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
-import shopot.composeapp.generated.resources.arrowleft
-import shopot.composeapp.generated.resources.carbon_media_library
-import shopot.composeapp.generated.resources.video_icon
+
 
 
 @Composable

@@ -7,10 +7,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -31,6 +37,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
@@ -39,10 +47,24 @@ import shopot.composeapp.generated.resources.arrow_left
 @Composable
 fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
     val navigator = LocalNavigator.currentOrThrow
-
+    val insets = WindowInsets.statusBars.asPaddingValues()
 
     Row(
-        modifier = Modifier.background(background).fillMaxWidth().padding(top = 30.dp),
+        modifier = Modifier
+            .background(background)
+            .fillMaxWidth()
+
+            .then(
+                if (getPlatform() == Platform.Ios) {
+                    Modifier
+                        .padding(top = insets.calculateTopPadding())
+                        .padding(top = 20.dp)
+                } else {
+                    Modifier
+                        .padding(top = 35.dp)
+                }
+            )
+        ,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

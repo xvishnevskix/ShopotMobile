@@ -52,6 +52,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -76,6 +77,8 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.StickerPack
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
@@ -123,7 +126,7 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
                         .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
                         .clip(RoundedCornerShape(8.dp)),
                     height = 3.dp,
-                    color = Color(0xFF2A293C)
+                    color = Color(0xFFCAB7A3)
                 )
             }
         ) {
@@ -139,18 +142,18 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFF3F4F6))
+                        .background(Color(0xFFF7F7F7))
                         .padding(8.dp)
                         .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                 ) {
                     Text(
                         text = title,
-                        modifier = Modifier,
-                        textAlign = TextAlign.Center,
-                        fontSize = 18.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 20.sp
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(400),
+
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                 }
             }
@@ -284,7 +287,12 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                 contentAlignment = Alignment.Center
             ) {
                 Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store),
-                    color = Color.Black
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             }
         }

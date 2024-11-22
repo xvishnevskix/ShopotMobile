@@ -20,7 +20,6 @@ import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.profileNav
 import shopot.composeapp.generated.resources.profile_nav
 
 object ProfileTab : Tab {

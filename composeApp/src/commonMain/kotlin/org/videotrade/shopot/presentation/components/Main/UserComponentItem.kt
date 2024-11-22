@@ -211,11 +211,10 @@ fun UserComponentItem(
                 ) {
                     if (chat.lastMessage?.fromUser == profile.id) {
                         if (chat.lastMessage?.anotherRead == true) {
-                            Icon(
+                            Image(
                                 painter = painterResource(Res.drawable.message_double_check),
                                 contentDescription = null,
                                 modifier = Modifier.size(width = 17.7.dp, height = 8.5.dp),
-                                tint = Color(0xFFa58462)
                             )
                         } else {
                             Image(

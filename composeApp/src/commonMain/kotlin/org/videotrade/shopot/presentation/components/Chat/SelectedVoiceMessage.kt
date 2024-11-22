@@ -2,6 +2,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -14,6 +15,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
@@ -22,32 +26,37 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.call_microphone_on
+import shopot.composeapp.generated.resources.chat_micro
 import shopot.composeapp.generated.resources.menu_gallery
 
 @Composable
-fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName: String) {
+fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
 
 
     Column(
         modifier = Modifier
-            .padding(top = 5.dp, start = 16.dp, end = 16.dp, bottom = 2.dp)
     ) {
         Text(
             text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
             style = TextStyle(
-                color = Color(0xff000000),
                 fontSize = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                color = colorTitle,
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
             ),
 
             )
+        Spacer(modifier = Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(Res.drawable.call_microphone_on),
+                painter = painterResource(Res.drawable.chat_micro),
                 contentDescription = "Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -59,9 +68,12 @@ fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName
             Text(
                 text = stringResource(MokoRes.strings.voice_message),
                 style = TextStyle(
-                    color = Color(0xff979797),
                     fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0x80373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 ),
             )
 

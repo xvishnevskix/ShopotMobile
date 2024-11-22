@@ -1,16 +1,19 @@
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -28,9 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -47,12 +53,12 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.file_message_dark
-import shopot.composeapp.generated.resources.file_message_download_dark
-import shopot.composeapp.generated.resources.file_message_download_white
-import shopot.composeapp.generated.resources.file_message_white
+import shopot.composeapp.generated.resources.chat_file_message
+import shopot.composeapp.generated.resources.download
 
 
 @Composable
@@ -154,17 +160,19 @@ fun FileMessage(
     
     Row(
         modifier = Modifier
-            .widthIn(max = 204.dp)
             .padding(
-                start = 22.dp,
-                end = 22.dp,
-                top = if (message.fromUser == profile.id) 12.dp else 7.dp,
-                bottom = 12.dp
-            ),
+                start = 16.dp,
+                end = 16.dp,
+                bottom = 16.dp,
+                top = 16.dp
+            )
+            .widthIn(max = 260.dp)
+            ,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            modifier = Modifier.size(45.dp),
+            modifier = Modifier.size(36.dp).background(Color.White,
+                shape = RoundedCornerShape(8.dp)),
             contentAlignment = Alignment.Center
         ) {
             IconButton(
@@ -202,17 +210,18 @@ fun FileMessage(
                         }
                     }
                 },
-                modifier = Modifier.size(43.dp)
+                modifier = Modifier
+
             ) {
                 if (isStartCipherLoading) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier.size(45.dp)
+                        modifier = Modifier
                     ) {
                         CircularProgressIndicator(
                             color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
                             strokeWidth = 2.dp,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
                         )
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -232,7 +241,7 @@ fun FileMessage(
                             progress = progress,  // Use animated progress
                             color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
                             strokeWidth = 2.dp,
-                            modifier = Modifier.fillMaxSize()
+                            modifier = Modifier
                         )
                         Icon(
                             imageVector = Icons.Default.Close,
@@ -246,23 +255,33 @@ fun FileMessage(
                             tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
                         )
                     } else {
-                        Image(
-                            painter = painterResource(
-                                if (progress == 1f) {
-                                    if (message.fromUser == profile.id) Res.drawable.file_message_white
-                                    else Res.drawable.file_message_dark
-                                } else {
-                                    if (message.fromUser == profile.id) Res.drawable.file_message_download_white
-                                    else Res.drawable.file_message_download_dark
-                                }
+                        Box(
+                            modifier = Modifier.background(
+                                color =  Color.White
                             ),
-                            contentDescription = null,
-                            modifier = Modifier.size(45.dp).pointerInput(Unit) {
-                                println("dasdadadaaaaaa ${progress != 1f}")
-                                if (progress != 1f)
-                                    isStartCipherLoading = true
-                            },
-                        )
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(
+                                    if (progress == 1f) {
+                                        Res.drawable.chat_file_message
+                                    } else {
+                                         Res.drawable.download
+                                    }
+                                ),
+                                contentDescription = null,
+                                colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(Color(0xFFCAB7A3))  else ColorFilter.tint(Color(0xFF373533)) ,
+                                modifier = Modifier.size(
+                                    width = if (progress == 1f) 14.dp else 16.dp,
+                                    height = if (progress == 1f) 16.dp else 18.dp
+                                ).pointerInput(Unit) {
+                                    println("dasdadadaaaaaa ${progress != 1f}")
+                                    if (progress != 1f)
+                                        isStartCipherLoading = true
+                                }
+                                ,
+                            )
+                        }
                     }
                 }
             }
@@ -270,31 +289,36 @@ fun FileMessage(
         
         Spacer(modifier = Modifier.width(16.dp))
         
-        Column(verticalArrangement = Arrangement.SpaceBetween) {
+        Column(verticalArrangement = Arrangement.Top) {
             message.attachments?.get(0)?.let {
                 Text(
                     text = it.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                     color = if (message.fromUser == profile.id) Color(0xFFFFFFFF) else Color(
-                        0xFF2A293C
+                        0xFF373533
                     ),
-                    textAlign = TextAlign.Center,
                     fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             }
+
+            Spacer(modifier = Modifier.height(4.dp))
+
             if (attachments[0].size !== null) {
                 Text(
                     text = formatSize(attachments[0].size!!),
-                    color = if (message.fromUser == profile.id) Color(0xFFD7D4D4) else Color(
-                        0xFF37363F
+                    color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else Color(
+                        0x80373533
                     ),
-                    textAlign = TextAlign.Center,
-                    fontSize = 11.sp,
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    lineHeight = 20.sp
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             }
         }

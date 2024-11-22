@@ -8,7 +8,10 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -25,77 +28,162 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         )
     )
     override val contacts: StateFlow<List<ContactDTO>> get() = _contacts
-
-
+    
+    
+    //    override suspend fun fetchContacts(): List<ContactDTO>? {
+//        try {
+//
+//
+//            val newContacts = mutableListOf<ContactDTO>()
+//
+//            val contactsNative = ContactsProviderFactory.create().getContacts()
+//
+//
+//
+//
+//
+//            val contactsGet = origin().get<List<ContactDTO>>("user/getAll") ?: return null
+//
+//
+//            // Функция для нормализации номера телефона
+//            fun normalizePhoneNumber(phone: String): String {
+//                return phone.replace(Regex("[^0-9]"), "")
+//            }
+//
+//            // Преобразование контактов из backend в словарь по нормализованному номеру телефона для быстрого поиска
+//            val backendContactsMap = contactsGet.associateBy {
+//                normalizePhoneNumber(it.phone)
+//            }
+//
+//
+//            println("contactst11231 $backendContactsMap ")
+//
+//            // Сравнение контактов по нормализованному номеру телефона
+//            for (contact in contactsNative) {
+//                val normalizedPhone = normalizePhoneNumber(contact.phone)
+//
+//
+//                val backendContact = backendContactsMap[normalizedPhone]
+//
+//
+//                println("normalizedPhone $normalizedPhone $backendContactsMap")
+//
+//                if (backendContact != null) {
+//                    newContacts.add(
+//                        ContactDTO(
+//                            backendContact.id,
+//                            backendContact.login,
+//                            backendContact.email,
+//                            contact.firstName,
+//                            contact.lastName,
+//                            backendContact.description,
+//                            normalizedPhone,
+//                            backendContact.status,
+//                            icon = backendContact.icon,
+//                        )
+//                    )
+//                }
+//            }
+//
+//
+//            println("contactst $contactsGet $contactsNative")
+//            println("newContacts $newContacts")
+//
+//            _contacts.value = newContacts
+//
+//            return newContacts
+//        } catch (e: Exception) {
+//
+//            println("ERROR111: $e")
+//
+//            return null
+//
+//        }
+//
+//
+//    }
     override suspend fun fetchContacts(): List<ContactDTO>? {
         try {
-
-
+            
+            
             val newContacts = mutableListOf<ContactDTO>()
-
+            
             val contactsNative = ContactsProviderFactory.create().getContacts()
-            val contactsGet = origin().get<List<ContactDTO>>("user/getAll") ?: return null
-
-
-            // Функция для нормализации номера телефона
-            fun normalizePhoneNumber(phone: String): String {
-                return phone.replace(Regex("[^0-9]"), "")
-            }
-
-            // Преобразование контактов из backend в словарь по нормализованному номеру телефона для быстрого поиска
-            val backendContactsMap = contactsGet.associateBy {
-                normalizePhoneNumber(it.phone)
-            }
-
-
-            println("contactst11231 $backendContactsMap ")
-
-            // Сравнение контактов по нормализованному номеру телефона
-            for (contact in contactsNative) {
-                val normalizedPhone = normalizePhoneNumber(contact.phone)
-
-
-                val backendContact = backendContactsMap[normalizedPhone]
-
-
-                println("normalizedPhone $normalizedPhone $backendContactsMap")
-
-                if (backendContact != null) {
-                    newContacts.add(
-                        ContactDTO(
-                            backendContact.id,
-                            backendContact.login,
-                            backendContact.email,
-                            contact.firstName,
-                            contact.lastName,
-                            backendContact.description,
-                            normalizedPhone,
-                            backendContact.status,
-                            icon = backendContact.icon,
-                        )
-                    )
+            
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("listContacts", Json.encodeToJsonElement(contactsNative))
                 }
-            }
-
-
-            println("contactst $contactsGet $contactsNative")
-            println("newContacts $newContacts")
-
-            _contacts.value = newContacts
-
-            return newContacts
+            )
+            
+            
+            val contactsGet = origin().post("contacts/addContactsList", jsonContent) ?: return null
+            
+            
+            val jsonElement = Json.parseToJsonElement(contactsGet)
+            
+            
+            val skippedContacts =
+                jsonElement.jsonObject["skippedContacts"]?.jsonArray?.let { jsonArray ->
+                    jsonArray.map { Json.decodeFromJsonElement<ContactDTO>(it) }
+                } ?: emptyList()
+            
+            val savedContacts =
+                jsonElement.jsonObject["savedContacts"]?.jsonArray?.let { jsonArray ->
+                    jsonArray.map { Json.decodeFromJsonElement<ContactDTO>(it) }
+                } ?: emptyList()
+            
+            val sortContacts = skippedContacts + savedContacts
+            
+            
+            println("sortContacts $sortContacts")
+            
+            // Сравнение контактов по нормализованному номеру телефона
+//            for (contact in contactsNative) {
+//                val normalizedPhone = normalizePhoneNumber(contact.phone)
+//
+//
+//                val backendContact = backendContactsMap[normalizedPhone]
+//
+//
+//                println("normalizedPhone $normalizedPhone $backendContactsMap")
+//
+//                if (backendContact != null) {
+//                    newContacts.add(
+//                        ContactDTO(
+//                            backendContact.id,
+//                            backendContact.login,
+//                            backendContact.email,
+//                            contact.firstName,
+//                            contact.lastName,
+//                            backendContact.description,
+//                            normalizedPhone,
+//                            backendContact.status,
+//                            icon = backendContact.icon,
+//                        )
+//                    )
+//                }
+//            }
+//
+//
+//            println("contactst $contactsGet $contactsNative")
+//            println("newContacts $newContacts")
+            
+            _contacts.value = sortContacts
+            
+            return sortContacts
         } catch (e: Exception) {
-
+            
             println("ERROR111: $e")
-
+            
             return null
-
+            
         }
-
-
+        
+        
     }
-
-
+    
+    
     override fun getContacts(): List<ContactDTO> {
         println("contacts.value ${contacts.value}")
         return contacts.value
@@ -104,6 +192,8 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     
     override suspend fun createChat(profileId: String, contact: ContactDTO) {
         val wsUseCase: WsUseCase by inject()
+        
+        
         try {
             val jsonContentSocket = Json.encodeToString(
                 buildJsonObject {

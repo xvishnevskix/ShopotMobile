@@ -62,13 +62,10 @@ fun MessageImage(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(250.dp, 350.dp)
-                    .padding(7.dp)
+                    .padding(4.dp)
                     .clip(
                         RoundedCornerShape(
-                            topStart = 20.dp,
-                            topEnd = 20.dp,
-                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                            bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                            16.dp
                         )
                     ).clickable(
                         interactionSource = remember { MutableInteractionSource() },
@@ -91,13 +88,10 @@ fun MessageImage(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(250.dp, 350.dp)
-                    .padding(7.dp)
+                    .padding(4.dp)
                     .clip(
                         RoundedCornerShape(
-                            topStart = 20.dp,
-                            topEnd = 20.dp,
-                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                            bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                            16.dp
                         )
                     )
                     .blur(1000.dp) // Применяет блюр к изображению (значение можно настроить)
@@ -159,13 +153,12 @@ fun MessageImage(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(250.dp, 350.dp)
-                .padding(7.dp)
+                .padding(
+                   4.dp
+                )
                 .clip(
                     RoundedCornerShape(
-                        topStart = 20.dp,
-                        topEnd = 20.dp,
-                        bottomEnd = if (message.fromUser == profile.id) 0.dp else 20.dp,
-                        bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
+                        16.dp
                     )
                 ).clickable(
                     interactionSource = remember { MutableInteractionSource() },

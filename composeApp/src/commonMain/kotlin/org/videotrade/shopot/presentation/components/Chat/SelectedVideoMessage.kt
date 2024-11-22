@@ -2,6 +2,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,6 +21,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.rememberAsyncImagePainter
@@ -29,13 +33,15 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.menu_video
 
 @Composable
-fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderName: String) {
+fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
     var photoFilePath = remember { mutableStateOf("") }
     val fileProvider by remember { mutableStateOf(FileProviderFactory.create()) }
     
@@ -55,8 +61,7 @@ fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderNam
     }
     
     Row(
-        modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 2.dp),
+        modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
         
@@ -71,19 +76,23 @@ fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderNam
         
         Column(
             modifier = Modifier
-                .padding(top = 0.dp, start = 8.dp, end = 8.dp, bottom = 2.dp)
         ) {
             
             
             Text(
                 text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
                 style = TextStyle(
-                    color = Color(0xff000000),
                     fontSize = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    color = colorTitle,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 ),
                 
                 )
+
+            Spacer(modifier = Modifier.height(4.dp))
             
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
@@ -99,9 +108,12 @@ fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderNam
                 Text(
                     text = stringResource(MokoRes.strings.video),
                     style = TextStyle(
-                        color = Color(0xff979797),
                         fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        fontWeight = FontWeight(400),
+                        color = Color(0x80373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )
                 

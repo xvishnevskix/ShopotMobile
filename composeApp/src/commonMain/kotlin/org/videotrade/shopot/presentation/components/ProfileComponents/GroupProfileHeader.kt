@@ -1,9 +1,6 @@
 package org.videotrade.shopot.presentation.components.ProfileComponents
 
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,24 +10,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.BlendMode.Companion.Color
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -40,17 +26,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import kotlinx.coroutines.launch
+import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
-import shopot.composeapp.generated.resources.Montserrat_Bold
-import shopot.composeapp.generated.resources.Montserrat_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
+import org.videotrade.shopot.presentation.components.Common.BackIcon
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFProText_Regular
-import shopot.composeapp.generated.resources.check_mark
-import shopot.composeapp.generated.resources.dot_menu
+
 
 @Composable
 fun GroupProfileHeader(text: String) {
@@ -58,27 +41,32 @@ fun GroupProfileHeader(text: String) {
 
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(Color(0xFFF3F4F6)),
+            modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(Color(0xFFFFFF)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 
             ) {
-            Icon(
-                imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
-                modifier = Modifier.padding(start = 0.dp, end = 1.dp).clickable {
+            Box(
+                modifier = Modifier.padding(start = 5.dp, end = 15.dp).clickable {
                     navigator.pop()
                 },
-                tint = androidx.compose.ui.graphics.Color.Black
+            ) {
+                BackIcon()
+            }
+            Text(
+                stringResource(MokoRes.strings.members),
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                color = Color(0xFF373533),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                )
 
-            )
+            Spacer(modifier = Modifier.width(10.dp))
 
-            Image(
-                painter = painterResource(Res.drawable.dot_menu),
-                contentDescription = "Avatar",
-                modifier = Modifier.size(width = 3.dp, height = 14.dp),
-                contentScale = ContentScale.FillBounds
-            )
+
 
         }
         Box(Modifier.padding(bottom = 23.dp)) {

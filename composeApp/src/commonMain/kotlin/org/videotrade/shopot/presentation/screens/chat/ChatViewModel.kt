@@ -81,6 +81,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
         MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
     val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
         _selectedMessagesByChat.asStateFlow()
+
+    private val _boxHeight = MutableStateFlow(0)
+    val boxHeight: StateFlow<Int> = _boxHeight
     
     
     init {
@@ -143,6 +146,12 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.implementCount()
         }
     }
+
+    fun updateBoxHeight(height: Int) {
+        _boxHeight.value = height
+    }
+
+
     
 
     
@@ -606,6 +615,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
         
     }
+
+
     
     
 }

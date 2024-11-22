@@ -35,7 +35,7 @@
     <string name="gallery">Gallery</string>
     <string name="file">File</string>
     <string name="video">Video</string>
-    <string name="left_cancel">Left - cancel</string>
+    <string name="left_cancel">Left — cancel</string>
     <string name="delete">Delete</string>
     <string name="copy">Copy</string>
     <string name="forward">Forward</string>
@@ -232,6 +232,8 @@
     <string name="the_description_must_not_exceed_40_characters">The description must not exceed 40 characters</string>
     <string name="select_language">Select language</string>
     <string name="other_languages">Other languages</string>
+    <string name="you_turned_off_the_microphone">You turned off the microphone</string>
+    <string name="reply">Reply</string>
 
 
 

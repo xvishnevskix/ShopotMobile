@@ -188,7 +188,7 @@ private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
             .background(Color(255, 255, 255))
             .fillMaxWidth()
             .clickable {
-                
+                println("item41421 $item")
                 viewModel.createChat(item, tabNavigator)
                 
                 tabNavigator.current = ChatsTab

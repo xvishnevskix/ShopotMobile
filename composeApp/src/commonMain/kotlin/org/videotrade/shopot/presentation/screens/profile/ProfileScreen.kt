@@ -61,11 +61,6 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.edit_profile
-import shopot.composeapp.generated.resources.language
-import shopot.composeapp.generated.resources.log_out
-import shopot.composeapp.generated.resources.profile_design
 import shopot.composeapp.generated.resources.profile_language
 import shopot.composeapp.generated.resources.support
 

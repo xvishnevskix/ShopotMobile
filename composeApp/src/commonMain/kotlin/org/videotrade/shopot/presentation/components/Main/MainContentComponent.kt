@@ -84,7 +84,6 @@ import shopot.composeapp.generated.resources.auth_logo
 import shopot.composeapp.generated.resources.group
 import shopot.composeapp.generated.resources.message_double_check
 import shopot.composeapp.generated.resources.message_single_check
-import shopot.composeapp.generated.resources.smart_encryption
 import shopot.composeapp.generated.resources.smart_lock
 
 @OptIn(ExperimentalMaterialApi::class)

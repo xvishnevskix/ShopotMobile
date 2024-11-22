@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -79,13 +80,23 @@ class MainScreen : Screen {
                 tab = ChatsTab
             ) {
                 Scaffold(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize()
+                        .shadow(
+                            elevation = 10.dp, spotColor = Color.Black, ambientColor = Color.Black,
+                            shape = RectangleShape, // Прямоугольная форма тени
+                            clip = false // Тень выходит за границы элемента
+                        ),
                     bottomBar = {
                         BottomNavigation(
                             backgroundColor = Color.White,
 
                             modifier = Modifier
                                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+                                .shadow(
+                                    elevation = 10.dp, spotColor = Color.Black, ambientColor = Color.Black,
+                                    shape = RectangleShape, // Прямоугольная форма тени
+                                    clip = false // Тень выходит за границы элемента
+                                )
                                 .background(Color.White)
                                 .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                             ,

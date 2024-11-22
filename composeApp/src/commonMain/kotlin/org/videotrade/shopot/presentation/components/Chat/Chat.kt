@@ -37,9 +37,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
@@ -119,21 +121,21 @@ fun Chat(
         LazyColumn(
             state = listState,
             reverseLayout = true,
-            modifier = modifier.background(Color.White)
+            modifier = modifier.background(Color.White).padding(horizontal = 8.dp)
         ) {
             groupedMessages.forEach { (date, messages) ->
 
-                stickyHeader {
-                    val alpha by animateFloatAsState(
-                        targetValue = if (isScrolling) 1f else 0f,
-                        animationSpec = tween(durationMillis = 500)
-                    )
-
-                    DateHeader(
-                        date = date,
-                        modifier = Modifier.alpha(alpha)
-                    )
-                }
+//                stickyHeader {
+//                    val alpha by animateFloatAsState(
+//                        targetValue = if (isScrolling) 1f else 0f,
+//                        animationSpec = tween(durationMillis = 500)
+//                    )
+//
+//                    DateHeader(
+//                        date = date,
+//                        modifier = Modifier.alpha(alpha)
+//                    )
+//                }
 
                 items(messages) { message ->
                     var messageY by remember { mutableStateOf(0) }
