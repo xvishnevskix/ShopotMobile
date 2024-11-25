@@ -4,8 +4,10 @@ import android.app.KeyguardManager
 import android.content.Context
 import android.os.Build
 import android.os.Process
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
+import com.mmk.kmpnotifier.notification.NotifierManager
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import kotlin.system.exitProcess
 
@@ -17,9 +19,17 @@ actual fun getPlatform(): Platform {
 actual fun getBuildVersion(): Long {
     val context = getContextObj.getContext()
     val packageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
-    val versionName = packageInfo.versionName  // версия приложения
-    return packageInfo.longVersionCode
+    
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        // Для Android 9 и выше
+        packageInfo.longVersionCode
+    } else {
+        // Для Android 8.1 и ниже
+        @Suppress("DEPRECATION")
+        packageInfo.versionCode.toLong()
+    }
 }
+
 
 actual fun closeApp() {
     
@@ -51,4 +61,21 @@ actual fun setScreenLockFlags(showWhenLocked: Boolean) {
     
     activity.setShowWhenLocked(showWhenLocked)
     activity.setTurnScreenOn(showWhenLocked)
+}
+
+actual suspend fun getFbToken(): String? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        try {
+            // Попытка получить токен на SDK >= 28
+            NotifierManager.getPushNotifier().getToken()
+        } catch (e: Exception) {
+            // Обработка исключений, если не удалось получить токен
+            Log.e("FB_TOKEN", "Error retrieving FCM token", e)
+            null
+        }
+    } else {
+        // Возвращаем null для SDK < 28
+        Log.w("FB_TOKEN", "FCM token is not supported on SDK < 28")
+        null
+    }
 }

@@ -1,28 +1,19 @@
 package org.videotrade.shopot.presentation.screens.login
 
-import FAQ
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
@@ -40,10 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
@@ -52,7 +40,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -62,15 +49,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
-import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.multiplatform.LanguageSelector
+import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.CountryPickerBottomSheet
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
@@ -81,21 +66,15 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.LoginLogo
-import shopot.composeapp.generated.resources.Montserrat_Medium
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.auth_logo
-import shopot.composeapp.generated.resources.support
 
 
 class SignInScreen : Screen {
-
-
+    
+    
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
@@ -110,7 +89,7 @@ class SignInScreen : Screen {
         val animationTrigger = remember { mutableStateOf(false) }
         val keyboardController = LocalSoftwareKeyboardController.current
         var showPhoneMenu = remember { mutableStateOf(false) }
-
+        
         val textState =
             remember {
                 mutableStateOf(
@@ -119,7 +98,7 @@ class SignInScreen : Screen {
                     )
                 )
             }
-
+        
         val countries = listOf(
             "+7" to "\uD83C\uDDF7\uD83C\uDDFA   ${stringResource(MokoRes.strings.ru)}",
             "+375" to "\uD83C\uDDE7\uD83C\uDDFE   ${stringResource(MokoRes.strings.by)}",
@@ -131,26 +110,26 @@ class SignInScreen : Screen {
             "+371" to "\uD83C\uDDF1\uD83C\uDDFB   ${stringResource(MokoRes.strings.lv)}",
             "+63" to "\uD83C\uDDF5\uD83C\uDDED   ${stringResource(MokoRes.strings.ph)}"
         )
-
+        
         LaunchedEffect(showPhoneMenu) {
 //            if (showPhoneMenu.value) {
-                keyboardController?.hide()
+            keyboardController?.hide()
 //            }
         }
         DisposableEffect(showPhoneMenu.value) {
 //            if (showPhoneMenu.value) {
-                keyboardController?.hide()
+            keyboardController?.hide()
 //            }
             onDispose { }
         }
-
-
+        
+        
         SafeArea(padding = 4.dp)
         {
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
                 sheetContent = {
-
+                    
                     CountryPickerBottomSheet(
                         countries = countries,
                         showPhoneMenu = showPhoneMenu,
@@ -166,7 +145,7 @@ class SignInScreen : Screen {
                                 bottomSheetState.hide()
                             }
                         }
-
+                    
                     ) {
                         coroutineScope.launch {
                             bottomSheetState.hide()
@@ -182,8 +161,8 @@ class SignInScreen : Screen {
                         ),
                     contentAlignment = Alignment.TopCenter
                 ) {
-
-
+                    
+                    
                     Column(
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -197,7 +176,7 @@ class SignInScreen : Screen {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-
+                            
                             Image(
                                 modifier = Modifier
                                     .size(width = 195.dp, height = 132.dp),
@@ -205,9 +184,9 @@ class SignInScreen : Screen {
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop
                             )
-
+                            
                             Spacer(modifier = Modifier.height(50.dp))
-
+                            
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
@@ -238,7 +217,7 @@ class SignInScreen : Screen {
                                     )
                                 )
                                 Spacer(modifier = Modifier.height(50.dp))
-
+                                
                                 PhoneInput(
                                     textState = textState,
                                     countryCode = countryCode,
@@ -251,17 +230,18 @@ class SignInScreen : Screen {
                                     },
                                     showPhoneMenu = showPhoneMenu
                                 )
-
+                                
                                 Spacer(modifier = Modifier.height(16.dp))
                                 val requiredPhoneLength =
                                     stringResource(MokoRes.strings.required_phone_number_length)
-                                Box( modifier = Modifier.padding(bottom = 20.dp)) {
+                                Box(modifier = Modifier.padding(bottom = 20.dp)) {
                                     CustomButton(stringResource(MokoRes.strings.login), {
                                         coroutineScope.launch {
                                             val fullPhoneNumber = countryCode + textState.value.text
-                                            val phoneNumberLength = getPhoneNumberLength(countryCode)
+                                            val phoneNumberLength =
+                                                getPhoneNumberLength(countryCode)
                                             hasError.value = false
-
+                                            
                                             if (fullPhoneNumber.length < phoneNumberLength) {
                                                 hasError.value = true
                                                 toasterViewModel.toaster.show(
@@ -270,25 +250,27 @@ class SignInScreen : Screen {
                                                     duration = ToasterDefaults.DurationDefault
                                                 )
                                                 animationTrigger.value = !animationTrigger.value
-
+                                                
                                             } else {
+                                                
+                                                println("111111111")
                                                 val response =
                                                     sendRequestToBackend(
                                                         fullPhoneNumber,
-                                                        NotifierManager.getPushNotifier().getToken(),
+                                                        getFbToken(),
                                                         "auth/login",
                                                         toasterViewModel,
                                                         phoneNotRegistered,
                                                         hasError = hasError,
                                                         animationTrigger = animationTrigger
                                                     )
-
+                                                
                                                 if (response != null) {
-
+                                                    
                                                     navigator.push(
                                                         AuthCallScreen(
                                                             fullPhoneNumber,
-
+                                                            
                                                             "SignIn"
                                                         )
                                                     )
@@ -298,7 +280,7 @@ class SignInScreen : Screen {
                                     }, style = ButtonStyle.Gradient)
                                 }
                             }
-
+                            
                         }
                     }
                 }

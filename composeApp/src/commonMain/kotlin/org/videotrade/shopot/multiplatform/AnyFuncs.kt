@@ -10,6 +10,10 @@ expect fun isScreenOn(): Boolean
 
 expect fun setScreenLockFlags(showWhenLocked: Boolean)
 
+
+expect suspend fun getFbToken(): String?
+
+
 enum class Platform {
     Ios,
     Android

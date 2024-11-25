@@ -42,7 +42,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
-import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
@@ -67,6 +66,7 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.Otp
@@ -254,7 +254,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
         
-        fun sendCall(){}
+        fun sendCall() {}
         
         {
             coroutineScope.launch {
@@ -517,7 +517,7 @@ suspend fun sendLogin(
     val response =
         sendRequestToBackend(
             phone,
-            NotifierManager.getPushNotifier().getToken(),
+            getFbToken(),
             "auth/login",
             toasterViewModel,
             phoneNotRegistered,

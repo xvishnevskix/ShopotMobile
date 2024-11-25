@@ -37,6 +37,7 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
@@ -92,7 +93,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
-                    put("notificationToken", NotifierManager.getPushNotifier().getToken())
+                  put("notificationToken", getFbToken())
                 }
             )
 

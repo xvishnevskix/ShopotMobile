@@ -1,5 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
+import com.mmk.kmpnotifier.notification.NotifierManager
+
 actual fun getPlatform(): Platform {
     return Platform.Ios
 }
@@ -18,4 +20,8 @@ actual fun isScreenOn(): Boolean {
 }
 
 actual fun setScreenLockFlags(showWhenLocked: Boolean) {
+}
+
+actual suspend fun getFbToken(): String? {
+    return  NotifierManager.getPushNotifier().getToken()
 }

@@ -24,6 +24,7 @@ import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.getBuildVersion
+import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.presentation.screens.common.UpdateScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
@@ -94,7 +95,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
                 val jsonContent = Json.encodeToString(
                     buildJsonObject {
-                        put("notificationToken", NotifierManager.getPushNotifier().getToken())
+                        put("notificationToken", getFbToken())
                     }
                 )
 
@@ -226,7 +227,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
 //            val getVersion = origin().get<String>("auth/createVersion")
         val getVersion = 12
 
-        val op = getBuildVersion()
+//        val op = getBuildVersion()
         
 //        return getVersion > op
         return false
