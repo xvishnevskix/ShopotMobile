@@ -30,6 +30,14 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     override val contacts: StateFlow<List<ContactDTO>> get() = _contacts
     
     
+    private val _unregisteredContacts = MutableStateFlow<List<ContactDTO>>(
+        listOf(
+        
+        )
+    )
+    override val unregisteredContacts: StateFlow<List<ContactDTO>> get() = _unregisteredContacts
+    
+    
     //    override suspend fun fetchContacts(): List<ContactDTO>? {
 //        try {
 //
@@ -122,56 +130,23 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             val jsonElement = Json.parseToJsonElement(contactsGet)
             
+            println("contactsGet $contactsGet")
             
-            val skippedContacts =
-                jsonElement.jsonObject["skippedContacts"]?.jsonArray?.let { jsonArray ->
+            val registeredUsers =
+                jsonElement.jsonObject["registeredUsers"]?.jsonArray?.let { jsonArray ->
                     jsonArray.map { Json.decodeFromJsonElement<ContactDTO>(it) }
                 } ?: emptyList()
             
-            val savedContacts =
-                jsonElement.jsonObject["savedContacts"]?.jsonArray?.let { jsonArray ->
+            val unregisteredUsers =
+                jsonElement.jsonObject["unregisteredUsers"]?.jsonArray?.let { jsonArray ->
                     jsonArray.map { Json.decodeFromJsonElement<ContactDTO>(it) }
                 } ?: emptyList()
             
-            val sortContacts = skippedContacts + savedContacts
             
+            _unregisteredContacts.value = unregisteredUsers
+            _contacts.value = registeredUsers
             
-            println("sortContacts $sortContacts")
-            
-            // Сравнение контактов по нормализованному номеру телефона
-//            for (contact in contactsNative) {
-//                val normalizedPhone = normalizePhoneNumber(contact.phone)
-//
-//
-//                val backendContact = backendContactsMap[normalizedPhone]
-//
-//
-//                println("normalizedPhone $normalizedPhone $backendContactsMap")
-//
-//                if (backendContact != null) {
-//                    newContacts.add(
-//                        ContactDTO(
-//                            backendContact.id,
-//                            backendContact.login,
-//                            backendContact.email,
-//                            contact.firstName,
-//                            contact.lastName,
-//                            backendContact.description,
-//                            normalizedPhone,
-//                            backendContact.status,
-//                            icon = backendContact.icon,
-//                        )
-//                    )
-//                }
-//            }
-//
-//
-//            println("contactst $contactsGet $contactsNative")
-//            println("newContacts $newContacts")
-            
-            _contacts.value = sortContacts
-            
-            return sortContacts
+            return registeredUsers
         } catch (e: Exception) {
             
             println("ERROR111: $e")

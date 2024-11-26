@@ -7,6 +7,8 @@ interface ContactsRepository {
     
     val contacts: StateFlow<List<ContactDTO>>
     
+    val unregisteredContacts: StateFlow<List<ContactDTO>>
+    
     suspend fun fetchContacts(): List<ContactDTO>?
      fun getContacts(): List<ContactDTO>
     

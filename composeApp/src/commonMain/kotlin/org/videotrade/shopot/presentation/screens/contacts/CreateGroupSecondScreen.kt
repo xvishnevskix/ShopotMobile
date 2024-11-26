@@ -1,7 +1,6 @@
 package org.videotrade.shopot.presentation.screens.contacts
 
 import Avatar
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,17 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -50,29 +44,19 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
-import org.videotrade.shopot.presentation.components.Common.CustomButton
-import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
 import org.videotrade.shopot.presentation.components.Contacts.CreateGroupChatHeader
-import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
-import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.main.MainScreen
-import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-
 
 
 class CreateGroupSecondScreen() : Screen {
@@ -106,16 +90,16 @@ class CreateGroupSecondScreen() : Screen {
                 }
             }
         }
-
-
-
-            Box(
-                modifier = Modifier
-                    //background
-                    .fillMaxWidth()
-                    .background(Color(255, 255, 255))
-            ) {
-                SafeArea(padding = 0.dp) {
+        
+        
+        
+        Box(
+            modifier = Modifier
+                //background
+                .fillMaxWidth()
+                .background(Color(255, 255, 255))
+        ) {
+            SafeArea(padding = 0.dp) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -123,21 +107,21 @@ class CreateGroupSecondScreen() : Screen {
                         stringResource(MokoRes.strings.create_group),
                         order = "2",
                         onClick = {
-                            if (groupNameError.value != null) {
-                                    toasterViewModel.toaster.show(
-                                        fillInput,
-                                        type = ToastType.Error,
-                                        duration = ToasterDefaults.DurationDefault
-                                    )
-                                } else {
-                                    viewModel.createGroupChat(groupName.value)
-                                    commonViewModel.restartApp()
-                                }
+//                            if (groupNameError.value != null) {
+//                                toasterViewModel.toaster.show(
+//                                    fillInput,
+//                                    type = ToastType.Error,
+//                                    duration = ToasterDefaults.DurationDefault
+//                                )
+//                            } else {
+                            viewModel.createGroupChat(groupName.value)
+                            commonViewModel.restartApp()
+//                            }
                         }
                     )
                     LazyColumn(
                         modifier = Modifier
-
+                            
                             .fillMaxWidth()
                             .fillMaxHeight(0.8F)
                             .background(color = Color(255, 255, 255)),
@@ -159,46 +143,25 @@ class CreateGroupSecondScreen() : Screen {
                             ContactItem(item = item, viewModel)
                         }
                     }
-
-//                    Box(
-//                        modifier = Modifier.padding(top = 5.dp)
-//                    ) {
-//                        CustomButton(
-//                            stringResource(MokoRes.strings.next),
-//                            {
-//
-//                                if (groupNameError.value != null) {
-//                                    toasterViewModel.toaster.show(
-//                                        fillInput,
-//                                        type = ToastType.Error,
-//                                        duration = ToasterDefaults.DurationDefault
-//                                    )
-//                                } else {
-//                                    viewModel.createGroupChat(groupName.value)
-//                                    commonViewModel.restartApp()
-//                                }
-//
-//                            })
-//                    }
+                    
                 }
-                }
-//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
             }
+        }
     }
 }
 
 
 @Composable
 private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
-
-
+    
+    
     Box(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(4.dp))
             .background(Color(255, 255, 255))
             .fillMaxWidth()
-
+    
     ) {
         Column {
             Spacer(modifier = Modifier.height(9.dp))
@@ -245,11 +208,11 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             modifier = Modifier
                         )
-
+                        
                     }
-
+                    
                 }
-
+                
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
@@ -264,12 +227,11 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                         tint = Color(0xFF000000)
                     )
                 }
-
-
-
+                
+                
             }
             Spacer(modifier = Modifier.height(9.dp))
-
+            
         }
     }
 }
@@ -277,12 +239,13 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
 
 @Composable
 fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableState<String?>) {
-
+    
     val nameValidate1 = stringResource(MokoRes.strings.group_name_is_required)
     val nameValidate2 = stringResource(MokoRes.strings.group_name_should_not_exceed_40_characters)
-    val nameValidate3 = stringResource(MokoRes.strings.group_name_can_contain_only_letters_and_numbers)
-
-
+    val nameValidate3 =
+        stringResource(MokoRes.strings.group_name_can_contain_only_letters_and_numbers)
+    
+    
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.padding(horizontal = 16.dp)
@@ -292,8 +255,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
-
+            
             BasicTextField(
                 textStyle = TextStyle(
                     fontSize = 16.sp,
@@ -309,9 +271,14 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                 modifier = Modifier
                     .fillMaxWidth(1f),
                 value = groupName.value,
-                onValueChange = {
-                        newText -> groupName.value = newText
-                    groupNameError.value = validateGroupName(newText, nameValidate1, nameValidate2, nameValidate3) // Валидация никнейма
+                onValueChange = { newText ->
+                    groupName.value = newText
+                    groupNameError.value = validateGroupName(
+                        newText,
+                        nameValidate1,
+                        nameValidate2,
+                        nameValidate3
+                    ) // Валидация никнейма
                 },
                 decorationBox = { innerTextField ->
                     Box(
@@ -319,7 +286,11 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                             .fillMaxWidth()
                             .height(58.dp)
                             .background(Color.White, shape = RoundedCornerShape(size = 16.dp))
-                            .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                            .border(
+                                width = 1.dp,
+                                color = Color(0x33373533),
+                                shape = RoundedCornerShape(size = 16.dp)
+                            )
                             .padding(
                                 horizontal = 16.dp,
                                 vertical = 16.dp
@@ -343,9 +314,8 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                         innerTextField()
                     }
                 },
-
-
-
+                
+                
                 )
         }
         groupNameError.value?.let {
@@ -372,11 +342,16 @@ private fun ParticipantCountText(count: Int) {
 }
 
 
-private fun validateGroupName(name: String, nameValidate1: String, nameValidate2: String, nameValidate4: String): String? {
+private fun validateGroupName(
+    name: String,
+    nameValidate1: String,
+    nameValidate2: String,
+    nameValidate4: String
+): String? {
     return when {
         name.isEmpty() -> nameValidate1
         name.length > 40 -> nameValidate2
-        !name.matches(Regex("^[\\p{L}\\p{N}\\p{S}\\s]+$")) -> nameValidate4 // Добавлено поддержка эмодзи
+        !name.matches(Regex("^[a-zA-Z\\d\\s\\u1F600-\\u1F64F\\u1F300-\\u1F5FF\\u1F680-\\u1F6FF\\u2600-\\u26FF\\u2700-\\u27BF]+$")) -> nameValidate4
         else -> null
     }
 }

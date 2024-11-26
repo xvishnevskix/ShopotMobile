@@ -20,6 +20,7 @@ class ContactsViewModel() : ViewModel(),
     private val contactsUseCase: ContactsUseCase by inject()
     private val ProfileUseCase: ProfileUseCase by inject()
     
+    val unregisteredContacts = contactsUseCase.unregisteredContacts
     
     private val _contacts = MutableStateFlow<List<ContactDTO>>(emptyList())
     

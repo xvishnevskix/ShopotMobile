@@ -12,6 +12,8 @@ class ContactsUseCase : KoinComponent {
     
     val contacts: StateFlow<List<ContactDTO>> get() = repository.contacts
     
+    val unregisteredContacts: StateFlow<List<ContactDTO>> get() = repository.unregisteredContacts
+    
     
     suspend fun fetchContacts(): List<ContactDTO>? {
         return repository.fetchContacts()

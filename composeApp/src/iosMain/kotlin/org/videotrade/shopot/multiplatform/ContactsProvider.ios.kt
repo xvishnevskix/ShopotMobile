@@ -10,6 +10,8 @@ import platform.Contacts.*
 import platform.Foundation.NSError
 import platform.Foundation.NSString
 import platform.Foundation.NSLog
+import platform.UIKit.UIActivityViewController
+import platform.UIKit.UIApplication
 
 actual class ContactsProvider {
     @OptIn(ExperimentalForeignApi::class)
@@ -43,6 +45,22 @@ actual class ContactsProvider {
         }
         
         contacts
+    }
+    
+    actual fun sendMessageInvite() {
+        val message = "Приглашаем в шепот господа" // Текст сообщения
+        
+        // Создаем массив для данных, которые будем шарить
+        val itemsToShare = listOf(message)
+        
+        // Инициализируем UIActivityViewController
+        val activityViewController = UIActivityViewController(itemsToShare, applicationActivities = null)
+        
+        // Получаем текущий viewController
+        val rootViewController = UIApplication.sharedApplication.keyWindow?.rootViewController
+        
+        // Отображаем UIActivityViewController
+        rootViewController?.presentViewController(activityViewController, animated = true, completion = null)
     }
 }
 

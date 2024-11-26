@@ -2,9 +2,11 @@ package org.videotrade.shopot.multiplatform
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.provider.ContactsContract
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.videotrade.shopot.androidSpecificApi.getContextObj
 import org.videotrade.shopot.domain.model.ContactDTO
 
 actual class ContactsProvider(private val context: Context) {
@@ -27,8 +29,10 @@ actual class ContactsProvider(private val context: Context) {
         )
         
         cursor?.use {
-            val contactIdIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
-            val displayNameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val contactIdIndex =
+                it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
+            val displayNameIndex =
+                it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
             val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
             
             while (it.moveToNext()) {
@@ -44,7 +48,10 @@ actual class ContactsProvider(private val context: Context) {
                         ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME
                     ),
                     "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
-                    arrayOf(contactId.toString(), ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE),
+                    arrayOf(
+                        contactId.toString(),
+                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
+                    ),
                     null
                 )
                 
@@ -53,16 +60,37 @@ actual class ContactsProvider(private val context: Context) {
                 
                 nameCursor?.use { nc ->
                     if (nc.moveToFirst()) {
-                        firstName = nc.getString(nc.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME))
-                        lastName = nc.getString(nc.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME))
+                        firstName =
+                            nc.getString(nc.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME))
+                        lastName =
+                            nc.getString(nc.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME))
                     }
                 }
                 
-                contacts.add(ContactDTO(firstName = firstName ?: "", lastName = lastName ?: "", phone =  phone, icon = null))
+                contacts.add(
+                    ContactDTO(
+                        firstName = firstName ?: "",
+                        lastName = lastName ?: "",
+                        phone = phone,
+                        icon = null
+                    )
+                )
             }
         }
         
         contacts
+    }
+    
+    actual fun sendMessageInvite() {
+        val shareIntent = Intent().apply {
+            action = Intent.ACTION_SEND
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TEXT, "Приглашаем в шепот господа") // Текст сообщения
+        }
+        
+        // Показываем выбор приложений для отправки
+        val chooserIntent = Intent.createChooser(shareIntent, "Share via")
+        getContextObj.getActivity()?.startActivity(chooserIntent)
     }
 }
 

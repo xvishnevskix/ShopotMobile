@@ -2,9 +2,7 @@ package org.videotrade.shopot.presentation.screens.contacts
 
 import Avatar
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,27 +14,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,26 +41,18 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
-import org.videotrade.shopot.presentation.components.Common.CustomTextField
+import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Contacts.MakeGroup
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.arrow_left
-import shopot.composeapp.generated.resources.arrowleft
-import shopot.composeapp.generated.resources.create_group
-import shopot.composeapp.generated.resources.group
 
 class CreateChatScreen() : Screen {
     @Composable
@@ -77,14 +60,15 @@ class CreateChatScreen() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
+        val unregisteredContacts =
+            viewModel.unregisteredContacts.collectAsState(initial = listOf()).value
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
         
         
         
         LaunchedEffect(Unit) {
-        viewModel.getContacts()
-        
+            viewModel.getContacts()
         }
         
         println("contacts@@##@##@ $contacts")
@@ -93,25 +77,15 @@ class CreateChatScreen() : Screen {
             contacts
         } else {
             contacts.filter {
-                
-                if (it.firstName !== null) {
-                    it.firstName.contains(
-                        searchQuery.value,
-                        ignoreCase = true
-                    ) || it.phone.contains(
-                        searchQuery.value
-                    )
-                } else {
-                    
-                    false
-                }
-                
-                
+                it.firstName?.contains(searchQuery.value, ignoreCase = true) == true ||
+                        it.phone.contains(searchQuery.value)
             }
         }
-
-        val groupedContacts = filteredContacts.groupBy { it.firstName?.firstOrNull()?.uppercaseChar() ?: '#' }
-
+        
+        
+        val groupedContacts =
+            filteredContacts.groupBy { it.firstName?.firstOrNull()?.uppercaseChar() ?: '#' }
+        
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,15 +121,20 @@ class CreateChatScreen() : Screen {
                                         .fillMaxWidth()
                                         .background(Color(0xFFF7F7F7))
                                 ) {
-                                    Text(text = initial.toString(),
+                                    Text(
+                                        text = initial.toString(),
                                         textAlign = TextAlign.Start,
                                         fontSize = 16.sp,
                                         lineHeight = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
                                         color = Color(0x80373533),
-                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+                                        modifier = Modifier.padding(
+                                            horizontal = 16.dp,
+                                            vertical = 4.dp
+                                        )
+                                    )
+                                    
                                 }
                             }
                             items(contacts) { contact ->
@@ -163,20 +142,46 @@ class CreateChatScreen() : Screen {
                             }
                         }
                         item {
+                            Box(
+                                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                                    .fillMaxWidth()
+                                    .background(Color(0xFFF7F7F7))
+                            ) {
+                                Text(
+                                    text = "Пригласить в Шепот",
+                                    textAlign = TextAlign.Start,
+                                    fontSize = 16.sp,
+                                    lineHeight = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(500),
+                                    color = Color.Black,
+                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                                )
+                                
+                            }
+                        }
+                        items(unregisteredContacts) { contact ->
+                            ContactItem(viewModel, item = contact,true)
+                        }
+                        item {
                             Box(modifier = Modifier.height(70.dp))
                         }
+                        
                     }
                 }
             }
 //                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
         }
-
+        
     }
 }
 
 
 @Composable
-private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
+private fun ContactItem(
+    viewModel: ContactsViewModel, item: ContactDTO,
+    onInviteNewUsers: Boolean? = null
+) {
     val tabNavigator = LocalTabNavigator.current
     
     
@@ -188,10 +193,16 @@ private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
             .background(Color(255, 255, 255))
             .fillMaxWidth()
             .clickable {
-                println("item41421 $item")
-                viewModel.createChat(item, tabNavigator)
+                println("item41421 $onInviteNewUsers")
+                if (onInviteNewUsers == null) {
+                    viewModel.createChat(item, tabNavigator)
+                    
+                    tabNavigator.current = ChatsTab
+                } else {
+                    ContactsProviderFactory.create().sendMessageInvite()
+                }
                 
-                tabNavigator.current = ChatsTab
+                
             }
     
     ) {
@@ -243,7 +254,7 @@ private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
                         )
                         
                     }
-
+                    
                 }
             }
             Spacer(modifier = Modifier.height(9.dp))
