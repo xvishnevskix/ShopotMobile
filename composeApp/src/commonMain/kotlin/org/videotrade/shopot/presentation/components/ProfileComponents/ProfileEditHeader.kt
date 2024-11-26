@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -30,6 +32,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.arrow_left
@@ -38,10 +41,11 @@ import shopot.composeapp.generated.resources.profile_accept
 @Composable
 fun ProfileEditHeader(text: String, onClick: (() -> Unit)? = null) {
     val navigator = LocalNavigator.currentOrThrow
+    val colors = MaterialTheme.colorScheme
 
     Column {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 20.dp).background(Color(0xFFf9f9f9)),
+            modifier = Modifier.fillMaxWidth().padding(top = 20.dp).background(colors.surface),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 
@@ -50,13 +54,7 @@ fun ProfileEditHeader(text: String, onClick: (() -> Unit)? = null) {
             Box(modifier = Modifier.clickable {
                 navigator.pop()
             }.padding(start = 8.dp, end = 8.dp)) {
-                Image(
-                    modifier = Modifier
-                        .size(width = 7.dp, height = 14.dp),
-                    painter = painterResource(Res.drawable.arrow_left),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
+                BackIcon()
             }
 
             Text(
@@ -66,7 +64,7 @@ fun ProfileEditHeader(text: String, onClick: (() -> Unit)? = null) {
                 lineHeight = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
-                color = Color(0xFF373533),
+                color = colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
                 )
@@ -79,7 +77,8 @@ fun ProfileEditHeader(text: String, onClick: (() -> Unit)? = null) {
                             onClick()
                         }
                     },
-                contentScale = ContentScale.FillBounds
+                contentScale = ContentScale.FillBounds,
+                colorFilter =  ColorFilter.tint(colors.primary)
             )
         }
         Box(Modifier.padding(bottom = 23.dp)) {

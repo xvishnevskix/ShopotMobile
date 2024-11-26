@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -88,6 +89,7 @@ class ProfileScreen(
         val profileViewModel: ProfileViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
         val scope = rememberCoroutineScope()
+        val colors = MaterialTheme.colorScheme
         
         val profile = profileViewModel.profile.collectAsState().value
         
@@ -149,9 +151,9 @@ class ProfileScreen(
                 title = stringResource(MokoRes.strings.are_you_sure_you_want_to_go_out)
             )
         }
-        SafeArea(backgroundColor = Color(0xFFf9f9f9)) {
+        SafeArea(backgroundColor = colors.surface) {
             Box(
-                modifier = Modifier.fillMaxSize().background(Color(0xFFf9f9f9)),
+                modifier = Modifier.fillMaxSize().background(colors.surface),
                 contentAlignment = Alignment.TopStart,
             ) {
 
@@ -191,7 +193,7 @@ class ProfileScreen(
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             modifier = Modifier,
                         )
@@ -208,7 +210,7 @@ class ProfileScreen(
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
-                                color = Color(0x80373533),
+                                color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 modifier = Modifier.padding(end = if (profile.phone == "") 0.dp else 1.dp),
                             )
@@ -216,7 +218,7 @@ class ProfileScreen(
                             Box(
                                 modifier = Modifier.padding(start = 18.dp, end = 18.dp).clip(RoundedCornerShape(50.dp)).width(4.dp)
                                     .height(4.dp)
-                                    .background(color = Color(0x80373533)),
+                                    .background(color = colors.secondary),
                                 contentAlignment = Alignment.Center
                             ) {
 
@@ -230,7 +232,7 @@ class ProfileScreen(
                                     lineHeight = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
-                                    color = Color(0x80373533),
+                                    color = colors.secondary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 )
                             }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -52,10 +53,10 @@ fun ProfileSettingsButton(
     onClick: () -> Unit
 ) {
 
-
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
-            .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+            .border(width = 1.dp, color = colors.onSecondary, shape = RoundedCornerShape(size = 16.dp))
             .clickable{
                 onClick()
             }
@@ -89,7 +90,7 @@ fun ProfileSettingsButton(
                         painter = painterResource(drawableRes),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
-//                    colorFilter = ColorFilter.tint(Color.Gray)
+                        colorFilter =  ColorFilter.tint(colors.primary)
                     )
                 }
                 Text(
@@ -99,7 +100,7 @@ fun ProfileSettingsButton(
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
-                    color = Color(0xFF373533),
+                    color = colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                 )
             }
@@ -113,7 +114,8 @@ fun ProfileSettingsButton(
                         .size(width = 7.dp, height = 14.dp).rotate(180f),
                     painter = painterResource(Res.drawable.arrow_left),
                     contentDescription = null,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    colorFilter =  ColorFilter.tint(colors.primary)
                 )
             }
         }

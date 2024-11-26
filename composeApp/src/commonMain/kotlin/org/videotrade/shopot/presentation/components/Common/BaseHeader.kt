@@ -41,6 +41,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
 import shopot.composeapp.generated.resources.Res
@@ -75,14 +76,7 @@ fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
         Box(modifier = Modifier.background(background).clickable {
             navigator.pop()
         }.padding(start = 8.dp, end = 8.dp)) {
-            Image(
-                modifier = Modifier
-                    .size(width = 7.dp, height = 14.dp),
-                painter = painterResource(Res.drawable.arrow_left),
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                colorFilter = ColorFilter.tint(colors.primary)
-            )
+            BackIcon()
         }
         Text(
             text = text,

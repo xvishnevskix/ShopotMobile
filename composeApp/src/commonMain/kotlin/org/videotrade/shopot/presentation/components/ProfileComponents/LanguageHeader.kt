@@ -37,6 +37,7 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Regular
@@ -69,14 +70,7 @@ fun LanguageHeader(text: String) {
             Box(modifier = Modifier.clickable {
                 navigator.pop()
             }.padding(start = 8.dp, end = 8.dp)) {
-                Image(
-                    modifier = Modifier
-                        .size(width = 7.dp, height = 14.dp),
-                    painter = painterResource(Res.drawable.arrow_left),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    colorFilter =  ColorFilter.tint(colors.primary)
-                )
+                BackIcon()
             }
 
             Text(

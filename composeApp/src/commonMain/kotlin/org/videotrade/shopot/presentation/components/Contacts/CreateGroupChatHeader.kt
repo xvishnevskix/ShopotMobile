@@ -49,6 +49,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -85,13 +86,7 @@ fun CreateGroupChatHeader(
                 Box(modifier = Modifier.clickable {
                     navigator.pop()
                 }.padding(start = 8.dp, end = 8.dp)) {
-                    Image(
-                        modifier = Modifier
-                            .size(width = 7.dp, height = 14.dp),
-                        painter = painterResource(Res.drawable.arrow_left),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
+                    BackIcon()
                 }
                 Text(
                     text = text,
@@ -109,13 +104,7 @@ fun CreateGroupChatHeader(
                         onClick()
                     }.padding(start = 8.dp, end = 8.dp).rotate(180f)) {
 
-                            Image(
-                                modifier = Modifier
-                                    .size(width = 7.dp, height = 14.dp),
-                                painter = painterResource(Res.drawable.arrow_left),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop
-                            )
+                            BackIcon()
                         }
                     }
                 else {

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -20,6 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -52,12 +54,12 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
 )
 {
     val navigator = LocalNavigator.currentOrThrow
-
+    val colors = MaterialTheme.colorScheme
 
     Column {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 20.dp, )
-                .background(Color(0xFFf9f9f9)),
+                .background(colors.surface),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
 
@@ -71,7 +73,7 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
                 lineHeight = 24.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
-                color = Color(0xFF373533),
+                color = colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp)
             )
             Row(
@@ -89,6 +91,7 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
                         painter = painterResource(Res.drawable.profile_edit),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
+                        colorFilter =  ColorFilter.tint(colors.primary)
                     )
                 }
                 Box(
@@ -107,7 +110,7 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
                         painter = painterResource(Res.drawable.profile_exit),
                         contentDescription = null,
                         contentScale = ContentScale.FillBounds,
-//                    colorFilter = ColorFilter.tint(Color.Gray)
+                        colorFilter =  ColorFilter.tint(colors.error)
                     )
                 }
             }

@@ -60,6 +60,7 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
@@ -149,13 +150,7 @@ fun AuthHeader(text: String) {
         Box(modifier = Modifier.clickable {
             showDialog.value = true
         }.padding(start = 8.dp, end = 8.dp)) {
-            Image(
-                modifier = Modifier
-                    .size(width = 7.dp, height = 14.dp),
-                painter = painterResource(Res.drawable.arrow_left),
-                contentDescription = null,
-                contentScale = ContentScale.Crop
-            )
+            BackIcon()
         }
 
         Text(

@@ -109,6 +109,7 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
@@ -640,13 +641,7 @@ fun ChatFooter(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(width = 7.dp, height = 14.dp),
-                                painter = painterResource(Res.drawable.arrow_left),
-                                contentDescription = null,
-                                colorFilter = ColorFilter.tint(Color(0x80373533))
-                            )
+                            BackIcon()
                             Spacer(modifier = Modifier.width(9.dp))
                             Text(
                                 text = stringResource(MokoRes.strings.left_cancel),

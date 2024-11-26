@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -32,10 +33,10 @@ import shopot.composeapp.generated.resources.Res
 @Composable
 fun ViewerHeader(name: String, time: String = "") {
     val navigator = LocalNavigator.currentOrThrow
-
+    val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier
-            .background(Color.White.copy(alpha = 0.8f))
+            .background(colors.background.copy(alpha = 0.8f))
             .fillMaxWidth()
             .statusBarsPadding()
 //            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
