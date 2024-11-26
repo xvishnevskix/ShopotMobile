@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -75,6 +76,7 @@ class CreateGroupFirstScreen() : Screen {
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
         val toasterViewModel: CommonViewModel = koinInject()
+        val colors = MaterialTheme.colorScheme
 
         val selectParticipants = stringResource(MokoRes.strings.select_participants)
 
@@ -97,7 +99,7 @@ class CreateGroupFirstScreen() : Screen {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color(255, 255, 255))
+                .background(colors.background)
         ) {
             SafeArea(padding = 0.dp) {
                 Column(
@@ -120,9 +122,10 @@ class CreateGroupFirstScreen() : Screen {
                     LazyColumn(
                         modifier = Modifier
                             .weight(1f)
-                            .background(color = Color(255, 255, 255))
+                            .background(color = colors.background)
                     ) {
                         item {
+                            Spacer(modifier = Modifier.height(24.dp))
                             ContactsSearch(searchQuery, isSearching)
                             Spacer(modifier = Modifier.height(24.dp))
                         }
@@ -135,7 +138,7 @@ class CreateGroupFirstScreen() : Screen {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF7F7F7))
+                                        .background(colors.onBackground)
                                 ) {
                                     Text(text = initial.toString(),
                                         textAlign = TextAlign.Start,
@@ -143,7 +146,7 @@ class CreateGroupFirstScreen() : Screen {
                                         lineHeight = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
-                                        color = Color(0x80373533),
+                                        color = colors.secondary ,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
                                 }
@@ -177,12 +180,12 @@ class CreateGroupFirstScreen() : Screen {
 @Composable
 private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
     val isChecked = remember { derivedStateOf { sharedViewModel.isContactSelected(item) } }
-
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(Color(255, 255, 255))
+            .background(colors.background)
             .fillMaxWidth()
             .clickable {
                 if (!isChecked.value) {
@@ -222,7 +225,7 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -233,7 +236,7 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                             fontWeight = FontWeight(400),
-                            color = Color(0x80373533),
+                            color = colors.secondary ,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             modifier = Modifier
                         )

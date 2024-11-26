@@ -14,12 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -43,7 +45,7 @@ import shopot.composeapp.generated.resources.group
 @Composable
  fun MakeGroup(contacts: List<ContactDTO>) {
     val navigator = LocalNavigator.currentOrThrow
-
+    val colors = MaterialTheme.colorScheme
 
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
@@ -54,7 +56,7 @@ import shopot.composeapp.generated.resources.group
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = Color(0x33373533),
+                    color = colors.onSecondary,
                     shape = RoundedCornerShape(size = 16.dp)
                 )
                 .clickable {
@@ -75,7 +77,8 @@ import shopot.composeapp.generated.resources.group
                     Image(
                         painter = painterResource(Res.drawable.group),
                         contentDescription = "create group arrow",
-                        modifier = Modifier.size(width = 18.dp, height = 15.dp)
+                        modifier = Modifier.size(width = 18.dp, height = 15.dp),
+                        colorFilter =  ColorFilter.tint(colors.primary)
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
@@ -87,7 +90,7 @@ import shopot.composeapp.generated.resources.group
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                             fontWeight = FontWeight(400),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                     )
@@ -96,7 +99,8 @@ import shopot.composeapp.generated.resources.group
                     Image(
                         painter = painterResource(Res.drawable.arrow_left),
                         contentDescription = "create group arrow",
-                        modifier = Modifier.size(width = 7.dp, height = 14.dp).rotate(180f)
+                        modifier = Modifier.size(width = 7.dp, height = 14.dp).rotate(180f),
+                        colorFilter =  ColorFilter.tint(colors.primary)
                     )
                 }
             }

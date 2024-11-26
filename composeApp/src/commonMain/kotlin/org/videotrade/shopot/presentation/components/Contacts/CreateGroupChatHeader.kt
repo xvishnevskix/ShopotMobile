@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -65,10 +66,10 @@ fun CreateGroupChatHeader(
     onClick: () -> Unit,
 ) {
     val navigator = LocalNavigator.currentOrThrow
-
+    val colors = MaterialTheme.colorScheme
 
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier.background(colors.background).padding(horizontal = 16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -95,7 +96,7 @@ fun CreateGroupChatHeader(
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
-                    color = Color(0xFF373533),
+                    color = colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
                     )
@@ -116,14 +117,15 @@ fun CreateGroupChatHeader(
                                     .size(width = 15.56.dp, height = 10.61.dp),
                                 painter = painterResource(Res.drawable.profile_accept),
                                 contentDescription = null,
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Crop,
+                                colorFilter =  ColorFilter.tint(colors.primary)
                             )
                         }
                     }
             }
         }
     }
-    Box(Modifier.padding(bottom = 18.dp)) {
+    Box(Modifier) {
         CallBar()
     }
 }

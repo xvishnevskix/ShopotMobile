@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -79,7 +80,7 @@ class CreateChatScreen() : Screen {
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
-        
+        val colors = MaterialTheme.colorScheme
         
         
         LaunchedEffect(Unit) {
@@ -116,7 +117,7 @@ class CreateChatScreen() : Screen {
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(Color(0xFFF7F7F7))
+                .background(colors.surface)
         ) {
             SafeArea(padding = 0.dp) {
                 Column {
@@ -127,10 +128,11 @@ class CreateChatScreen() : Screen {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(color = Color(255, 255, 255))
+                            .background(color = colors.background)
                             .padding(bottom = 60.dp)
                     ) {
                         item {
+                            Spacer(modifier = Modifier.height(24.dp))
                             Crossfade(targetState = isSearching.value) { searching ->
                                 if (searching) {
                                     ContactsSearch(searchQuery, isSearching)
@@ -145,7 +147,7 @@ class CreateChatScreen() : Screen {
                                 Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF7F7F7))
+                                        .background(colors.onBackground)
                                 ) {
                                     Text(text = initial.toString(),
                                         textAlign = TextAlign.Start,
@@ -153,7 +155,7 @@ class CreateChatScreen() : Screen {
                                         lineHeight = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
-                                        color = Color(0x80373533),
+                                        color = colors.secondary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
                                 }
@@ -178,14 +180,14 @@ class CreateChatScreen() : Screen {
 @Composable
 private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
     val tabNavigator = LocalTabNavigator.current
-    
+    val colors = MaterialTheme.colorScheme
     
     Box(
         modifier = Modifier.padding(horizontal = 16.dp)
             .clip(
                 RoundedCornerShape(4.dp)
             )
-            .background(Color(255, 255, 255))
+            .background(colors.background)
             .fillMaxWidth()
             .clickable {
                 
@@ -226,7 +228,7 @@ private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -237,7 +239,7 @@ private fun ContactItem(viewModel: ContactsViewModel, item: ContactDTO) {
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                             fontWeight = FontWeight(400),
-                            color = Color(0x80373533),
+                            color = colors.secondary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             modifier = Modifier
                         )

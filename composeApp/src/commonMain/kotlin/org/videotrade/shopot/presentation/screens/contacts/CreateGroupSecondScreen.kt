@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -88,7 +89,8 @@ class CreateGroupSecondScreen() : Screen {
         val groupName = remember { mutableStateOf("") }
         val fillInput = stringResource(MokoRes.strings.please_fill_in_the_group_name_input_field)
         val groupNameError = remember { mutableStateOf<String?>("") }
-        
+        val colors = MaterialTheme.colorScheme
+
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             selectedContacts
         } else {
@@ -113,7 +115,7 @@ class CreateGroupSecondScreen() : Screen {
                 modifier = Modifier
                     //background
                     .fillMaxWidth()
-                    .background(Color(255, 255, 255))
+                    .background(colors.background)
             ) {
                 SafeArea(padding = 0.dp) {
                 Column(
@@ -139,7 +141,7 @@ class CreateGroupSecondScreen() : Screen {
                         modifier = Modifier
 
                             .weight(1f)
-                            .background(color = Color(255, 255, 255)),
+                            .background(color = colors.background),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         item {
@@ -192,13 +194,13 @@ class CreateGroupSecondScreen() : Screen {
 
 @Composable
 private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
-
+    val colors = MaterialTheme.colorScheme
 
     Box(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .clip(RoundedCornerShape(4.dp))
-            .background(Color(255, 255, 255))
+            .background(colors.background)
             .fillMaxWidth()
 
     ) {
@@ -232,7 +234,7 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -243,7 +245,7 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                             fontWeight = FontWeight(400),
-                            color = Color(0x80373533),
+                            color = colors.secondary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             modifier = Modifier
                         )
@@ -263,7 +265,7 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
-                        tint = Color(0xFF000000)
+                        tint = colors.primary
                     )
                 }
 
@@ -284,7 +286,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
     val nameValidate2 = stringResource(MokoRes.strings.group_name_should_not_exceed_40_characters)
     val nameValidate3 =
         stringResource(MokoRes.strings.group_name_can_contain_only_letters_and_numbers)
-
+    val colors = MaterialTheme.colorScheme
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -305,7 +307,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                     fontWeight = FontWeight(400),
                     textAlign = TextAlign.Start,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    color = Color(0xFF373533)
+                    color = colors.primary
                 ),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
@@ -326,10 +328,10 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(58.dp)
-                            .background(Color.White, shape = RoundedCornerShape(size = 16.dp))
+                            .background(colors.background, shape = RoundedCornerShape(size = 16.dp))
                             .border(
                                 width = 1.dp,
-                                color = Color(0x33373533),
+                                color = colors.onSecondary,
                                 shape = RoundedCornerShape(size = 16.dp)
                             )
                             .padding(
@@ -348,7 +350,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                                     fontWeight = FontWeight(400),
                                     textAlign = TextAlign.Start,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    color = Color(0x80373533)
+                                    color = colors.secondary
                                 )
                             )
                         }
@@ -362,7 +364,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
         groupNameError.value?.let {
             Text(
                 text = it,
-                color = Color.Red,
+                color = colors.error,
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp, top = 4.dp),
                 textAlign = TextAlign.Start
@@ -373,12 +375,15 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
 
 @Composable
 private fun ParticipantCountText(count: Int) {
+    val colors = MaterialTheme.colorScheme
     Text(
         text = getParticipantCountText(count),
         fontSize = 16.sp,
-        fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-        color = Color(0xFF000000),
-        modifier = Modifier
+        lineHeight = 16.sp,
+        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+        fontWeight = FontWeight(500),
+        color = colors.primary,
+        letterSpacing = TextUnit(0F, TextUnitType.Sp),
     )
 }
 
