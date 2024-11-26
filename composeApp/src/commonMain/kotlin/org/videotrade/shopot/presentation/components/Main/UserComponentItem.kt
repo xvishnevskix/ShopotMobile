@@ -91,44 +91,29 @@ fun UserComponentItem(
                 modifier = Modifier,
                 verticalArrangement = Arrangement.Top
             ) {
-                val fullName =
-                    listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.groupName)
-                        .joinToString(" ")
                 
                 Row() {
-                    if (chat.personal) {
-                        val displayName = fullName.ifBlank { chat.phone!! }
+                    val displayName = when {
+                        chat.personal -> "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
+                            .ifBlank { "+${chat.phone}" }
                         
-                        Text(
-                            text = displayName,
-                            textAlign = TextAlign.Start,
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                            fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                            maxLines = 1, // Ограничиваем одной строкой
-                            overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
-                            modifier = Modifier.widthIn(max = 160.dp)
-                        
-                        )
-                    } else {
-                        Text(
-                            text = fullName,
-                            textAlign = TextAlign.Start,
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                            fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                            maxLines = 1, // Ограничиваем одной строкой
-                            overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
-                            modifier = Modifier.widthIn(max = 160.dp)
-                        
-                        )
+                        else -> chat.groupName.orEmpty()
                     }
+                    
+                    Text(
+                        text = displayName,
+                        textAlign = TextAlign.Start,
+                        fontSize = 16.sp,
+                        lineHeight = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        color = Color(0xFF373533),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        maxLines = 1, // Ограничиваем одной строкой
+                        overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
+                        modifier = Modifier.widthIn(max = 160.dp)
+                    
+                    )
                     if (!chat.personal) {
                         Spacer(modifier = Modifier.width(7.dp))
                         Image(

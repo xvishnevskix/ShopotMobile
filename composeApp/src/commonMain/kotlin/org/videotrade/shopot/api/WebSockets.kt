@@ -152,7 +152,10 @@ suspend fun handleConnectWebSocket(
                                                         println("sortChat $sortChat")
                                                         chats.add(sortChat)
                                                     } else {
-                                                        chats.add(newChat)
+                                                        chats.add(newChat.copy(
+                                                            firstName = null,
+                                                            lastName = null
+                                                        ))
 
                                                     }
                                                 } else {

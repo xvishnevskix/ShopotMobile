@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -120,30 +119,17 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         size = 56.dp
                     )
                     
-                    val fullName =
-                        listOfNotNull(if (chat.personal) chat.firstName + " " + chat.lastName else chat.groupName)
-                            .joinToString(" ")
-                            .takeIf { it.isNotBlank() }
-                            ?.let {
-                                if (it.length > 35) "${it.take(32)}..." else it
-                            } ?: ""
+                    val fullName = if (chat.personal) {
+                        "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim().ifBlank { "+${chat.phone}" }
+                    } else {
+                        chat.groupName.orEmpty()
+                    }.takeIf { it.isNotBlank() }
+                        ?.let { if (it.length > 35) "${it.take(32)}..." else it }
+                        ?: ""
                     
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Spacer(modifier = Modifier.height(8.dp))
-                        if (chat.personal) {
-                            val displayName = fullName.ifBlank { chat.phone!! }
-                            
-                            Text(
-                                text = displayName,
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                                fontWeight = FontWeight(500),
-                                color = Color(0xFF373533),
-                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                            )
-                        } else {
                             Text(
                                 text = fullName,
                                 fontSize = 16.sp,
@@ -153,7 +139,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                 color = Color(0xFF373533),
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
-                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         if (!chat.personal) {
                             ParticipantCountText(groupUsers.size)

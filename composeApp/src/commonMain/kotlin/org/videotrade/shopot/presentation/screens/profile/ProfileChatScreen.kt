@@ -42,13 +42,10 @@ import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileChatHeader
-import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
 class ProfileChatScreen(private val chat: ChatItem) : Screen {
@@ -110,8 +107,14 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         }
                     )
                     Spacer(modifier = Modifier.height(24.dp))
+                    
+                    val displayName = when {
+                        chat.personal -> "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim().ifBlank { "+${chat.phone}" }
+                        else -> chat.groupName.orEmpty()
+                    }
+                    
                     Text(
-                        "${chat.firstName} ${chat.lastName}",
+                        text = displayName,
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         lineHeight = 16.sp,
@@ -140,16 +143,17 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                                 modifier = Modifier.padding(end = if (chat.phone == "") 0.dp else 1.dp),
                             )
                         }
-
+                        
                         Box(
-                            modifier = Modifier.padding(start = 18.dp, end = 18.dp).clip(RoundedCornerShape(50.dp)).width(4.dp)
+                            modifier = Modifier.padding(start = 18.dp, end = 18.dp)
+                                .clip(RoundedCornerShape(50.dp)).width(4.dp)
                                 .height(4.dp)
                                 .background(color = Color(0x80373533)),
                             contentAlignment = Alignment.Center
                         ) {
-
+                        
                         }
-
+                        
                         if (chat.chatUser?.get(0)?.login != null) {
                             Text(
                                 chat.chatUser!![0].login!!,
@@ -163,9 +167,9 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                             )
                         }
                     }
-
+                    
                     Spacer(modifier = Modifier.height(28.dp))
-
+                    
                     if (chat.chatUser?.get(0)?.description != null) {
                         Text(
                             chat.chatUser!![0].description!!,
