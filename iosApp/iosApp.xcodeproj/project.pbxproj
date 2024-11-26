@@ -406,8 +406,8 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/include\"",
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/include\"",
+					"$(SRCROOT)/../composeApp/libs/wolfssl/include",
+					"$(SRCROOT)/../composeApp/libs/liboqs/include",
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Приложению требуется доступ к камере для съемки фотографий.";
@@ -422,8 +422,8 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/libs/ios/degub\"",
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/libs/ios/debug\"",
+					"$(SRCROOT)/../composeApp/libs/liboqs/libs/ios/degub",
+					"$(SRCROOT)/../composeApp/libs/wolfssl/libs/ios/debug",
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
@@ -460,8 +460,8 @@
 				);
 				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/include\"",
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/include\"",
+					"$(SRCROOT)/../composeApp/libs/wolfssl/include",
+					"$(SRCROOT)/../composeApp/libs/liboqs/include",
 				);
 				INFOPLIST_FILE = iosApp/Info.plist;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Приложению требуется доступ к камере для съемки фотографий.";
@@ -476,8 +476,8 @@
 					"@executable_path/Frameworks",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/wolfssl/libs/ios/release\"",
-					"\"/Users/ashshura/Desktop/shopotKotlin/composeApp/libs/liboqs/libs/ios/release\"",
+					"$(SRCROOT)/../composeApp/libs/wolfssl/libs/ios/release",
+					"$(SRCROOT)/../composeApp/libs/liboqs/libs/ios/release",
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
