@@ -23,6 +23,7 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -118,8 +119,7 @@ class CreateGroupFirstScreen() : Screen {
                     )
                     LazyColumn(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.8F)
+                            .weight(1f)
                             .background(color = Color(255, 255, 255))
                     ) {
                         item {
@@ -152,6 +152,9 @@ class CreateGroupFirstScreen() : Screen {
                                 ContactItem(sharedViewModel = viewModel, item = contact)
                             }
                         }
+                        item {
+                            Spacer(modifier = Modifier.height(100.dp))
+                        }
                     }
 //                    Box(modifier = Modifier.padding(top = 5.dp)) {
 //                        CustomButton(
@@ -173,7 +176,7 @@ class CreateGroupFirstScreen() : Screen {
 
 @Composable
 private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
-    val isChecked = remember { mutableStateOf(false) }
+    val isChecked = remember { derivedStateOf { sharedViewModel.isContactSelected(item) } }
 
     Box(
         modifier = Modifier
@@ -182,8 +185,7 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
             .background(Color(255, 255, 255))
             .fillMaxWidth()
             .clickable {
-                isChecked.value = !isChecked.value
-                if (isChecked.value) {
+                if (!isChecked.value) {
                     sharedViewModel.addContact(item)
                 } else {
                     sharedViewModel.removeContact(item)
@@ -242,7 +244,6 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                 CustomCheckbox(
                     checked = isChecked.value,
                     onCheckedChange = {
-                        isChecked.value = it
                         if (it) {
                             sharedViewModel.addContact(item)
                         } else {

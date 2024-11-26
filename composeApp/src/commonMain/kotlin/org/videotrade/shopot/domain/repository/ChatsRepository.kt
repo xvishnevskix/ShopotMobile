@@ -12,6 +12,8 @@ interface ChatsRepository {
     
     val currentChat: StateFlow<String>
     
+    val isLoadingChats: StateFlow<Boolean>
+    
     
     fun getChats(): List<ChatItem>
     
@@ -29,4 +31,7 @@ interface ChatsRepository {
     fun addChats(chatsInit: MutableList<ChatItem>)
     
     fun clearData()
+    
+    fun setIsLoadingValue(loadingValue: Boolean)
+    
 }

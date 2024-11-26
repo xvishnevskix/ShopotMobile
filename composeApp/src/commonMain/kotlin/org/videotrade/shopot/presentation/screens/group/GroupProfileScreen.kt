@@ -129,7 +129,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                        modifier = Modifier.padding(horizontal = 16.dp).weight(1f)
                    ) {
                        itemsIndexed(groupUsers) { _, groupUser ->
-                           GroupUserCard(true, groupUser)
+                           GroupUserCard(groupUser = groupUser, viewModel)
                            Spacer(modifier = Modifier.height(16.dp))
                        }
                    }

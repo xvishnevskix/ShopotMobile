@@ -138,8 +138,7 @@ class CreateGroupSecondScreen() : Screen {
                     LazyColumn(
                         modifier = Modifier
 
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.8F)
+                            .weight(1f)
                             .background(color = Color(255, 255, 255)),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -157,6 +156,9 @@ class CreateGroupSecondScreen() : Screen {
                         }
                         itemsIndexed(filteredContacts) { _, item ->
                             ContactItem(item = item, viewModel)
+                        }
+                        item {
+                            Spacer(modifier = Modifier.height(100.dp))
                         }
                     }
 
@@ -280,7 +282,8 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
 
     val nameValidate1 = stringResource(MokoRes.strings.group_name_is_required)
     val nameValidate2 = stringResource(MokoRes.strings.group_name_should_not_exceed_40_characters)
-    val nameValidate3 = stringResource(MokoRes.strings.group_name_can_contain_only_letters_and_numbers)
+    val nameValidate3 =
+        stringResource(MokoRes.strings.group_name_can_contain_only_letters_and_numbers)
 
 
     Column(
@@ -309,9 +312,14 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                 modifier = Modifier
                     .fillMaxWidth(1f),
                 value = groupName.value,
-                onValueChange = {
-                        newText -> groupName.value = newText
-                    groupNameError.value = validateGroupName(newText, nameValidate1, nameValidate2, nameValidate3) // Валидация никнейма
+                onValueChange = { newText ->
+                    groupName.value = newText
+                    groupNameError.value = validateGroupName(
+                        newText,
+                        nameValidate1,
+                        nameValidate2,
+                        nameValidate3
+                    ) // Валидация никнейма
                 },
                 decorationBox = { innerTextField ->
                     Box(
@@ -319,7 +327,11 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                             .fillMaxWidth()
                             .height(58.dp)
                             .background(Color.White, shape = RoundedCornerShape(size = 16.dp))
-                            .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                            .border(
+                                width = 1.dp,
+                                color = Color(0x33373533),
+                                shape = RoundedCornerShape(size = 16.dp)
+                            )
                             .padding(
                                 horizontal = 16.dp,
                                 vertical = 16.dp
@@ -343,7 +355,6 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                         innerTextField()
                     }
                 },
-
 
 
                 )

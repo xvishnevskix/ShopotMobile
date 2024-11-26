@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.Add
@@ -84,6 +85,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntOffset
@@ -298,8 +300,9 @@ fun ChatFooter(
                                     viewModel.footerText.value,
                                     viewModel.profile.value.id,
                                     chat.id,
-                                    "image",
+                                    filePick.fileName,
                                     filePick.fileAbsolutePath,
+                                    fileData.fileType
                                 )
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
@@ -380,7 +383,7 @@ fun ChatFooter(
     )
 
 
-    val collapsedHeight = if (selectedMessage != null) 275.dp else 56.dp
+    val collapsedHeight = if (selectedMessage != null) 375.dp else 56.dp
     val collapsedselectedHeight = if (selectedMessage != null) 41.dp else 0.dp
     
     // Анимация высоты Row
@@ -390,9 +393,11 @@ fun ChatFooter(
 
     val maxHeight = if (selectedMessage != null) 240.dp else 200.dp // Увеличиваем максимальную высоту компонента
     val minHeight = when {
-        selectedMessage != null && showMenu -> 155.dp // Укажите высоту, если оба условия истинны
+//        selectedMessage != null && footerText.length  > 120 && showMenu -> 258.dp
+//        selectedMessage != null && footerText.length > 120 -> 200.dp
+        selectedMessage != null && showMenu -> 160.dp // Укажите высоту, если оба условия истинны
         selectedMessage != null -> 97.dp
-        showMenu -> 114.dp
+        showMenu -> 120.dp
         else -> 56.dp
     }
 
@@ -442,7 +447,7 @@ fun ChatFooter(
                 .padding(top = 10.dp, bottom = 10.dp)
                 .padding(horizontal = 16.dp)
                 .fillMaxWidth()
-                .heightIn(max = 275.dp, min = 56.dp)
+                .heightIn(max = 375.dp, min = 56.dp)
                 .height(animatedHeight)
 
         ) {
@@ -589,7 +594,7 @@ fun ChatFooter(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
-                        .heightIn(max = 275.dp, min = 60.dp)
+                        .heightIn(max = 375.dp, min = 60.dp)
 
                 ) {
                     if (isRecording) {
@@ -606,13 +611,16 @@ fun ChatFooter(
                                     )
                             )
                             Spacer(modifier = Modifier.width(15.dp))
-                            val hours = recordingTime / 3600
+//                            val hours = recordingTime / 3600
                             val minutes = (recordingTime % 3600) / 60
                             val seconds = recordingTime % 60
                             Text(
-                                text = "$hours:${minutes.toString().padStart(2, '0')}:${
+                                text = "${minutes.toString().padStart(2, '0')}:${
                                     seconds.toString().padStart(2, '0')
                                 }",
+                                //text = "$hours:${minutes.toString().padStart(2, '0')}:${
+                                //                                    seconds.toString().padStart(2, '0')
+                                //                                }",
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
@@ -708,15 +716,21 @@ fun ChatFooter(
                                 value = footerText,
                                 onValueChange = { newText ->
                                     if (!isRecording) {
-                                        viewModel.footerText.value = newText
+                                        viewModel.footerText.value = if (footerText.isEmpty()) {
+                                            // Преобразуем первый символ в заглавный, если поле было пустым
+                                            newText.replaceFirstChar { it.uppercase() }
+                                        } else {
+                                            newText
+                                        }
                                     }
                                 },
                                 modifier = Modifier
                                     .weight(1f)
+                                    .heightIn(max = 130.dp, min = 56.dp)
                                     .padding(16.dp),
                                 textStyle = TextStyle(
                                     fontSize = 16.sp,
-                                    lineHeight = lineHeight.value.sp, // Применяем фиксированную высоту строки
+                                    lineHeight = lineHeight.value.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     color = Color(0xFF373533),
@@ -724,6 +738,9 @@ fun ChatFooter(
                                 ),
                                 cursorBrush = SolidColor(Color.Black),
                                 visualTransformation = VisualTransformation.None,
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    capitalization = KeyboardCapitalization.Sentences // Заставляет начинать с заглавной буквы
+                                ),
                                 decorationBox = { innerTextField ->
                                     Box {
                                         if (footerText.isEmpty()) {

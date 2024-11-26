@@ -490,6 +490,13 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
+    
+     fun disconnectWs() {
+        viewModelScope.launch {
+            wsUseCase.disconnectWs()
+        }
+    }
+    
     fun replacePopCall(navigator: Navigator) {
         val navPop = navigator.pop()
         println("navPop $navPop")

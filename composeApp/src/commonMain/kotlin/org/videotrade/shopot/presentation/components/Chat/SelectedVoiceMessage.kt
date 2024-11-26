@@ -31,7 +31,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.call_microphone_on
+import shopot.composeapp.generated.resources.chat_micro
 import shopot.composeapp.generated.resources.menu_gallery
 
 @Composable
@@ -55,16 +55,16 @@ fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName
             )
         Spacer(modifier = Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(Res.drawable.call_microphone_on),
-                contentDescription = "Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-
-                    .size(14.dp),
-                colorFilter = ColorFilter.tint(Color(0xFF979797))
-            )
-            Spacer(modifier = Modifier.width(2.dp))
+//            Image(
+//                painter = painterResource(Res.drawable.chat_micro),
+//                contentDescription = "Image",
+//                contentScale = ContentScale.Crop,
+//                modifier = Modifier
+//
+//                    .size(14.dp),
+//                colorFilter = ColorFilter.tint(Color(0xFF979797))
+//            )
+//            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = stringResource(MokoRes.strings.voice_message),
                 style = TextStyle(

@@ -81,17 +81,20 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.auth_logo
+import shopot.composeapp.generated.resources.group
+import shopot.composeapp.generated.resources.message_double_check
+import shopot.composeapp.generated.resources.message_single_check
 import shopot.composeapp.generated.resources.smart_lock
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonViewModel) {
-    val chatState = mainViewModel.chats.collectAsState(initial = listOf()).value
+    val chatState = mainViewModel.chats.collectAsState().value
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
 
     val isLoading by mainViewModel.isLoadingChats.collectAsState()
-    var fakeLoading by remember { mutableStateOf(true) }
+    var fakeLoading by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
 
     val isSearching = remember { mutableStateOf(false) }
@@ -119,14 +122,15 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
     )
 
-//    LaunchedEffect(Unit) {
-//        mainViewModel.getChatsInBack()
-//    }
-    LaunchedEffect(chatState) {
-        fakeLoading = true
-        delay(300)
-        fakeLoading = false
+    LaunchedEffect(isLoading) {
+        println("Loading state is: $isLoading")
     }
+//    LaunchedEffect(chatState) {
+//        fakeLoading = true
+//        delay(300)
+//        fakeLoading = false
+//
+//    }
     
         SafeArea(backgroundColor = if (isLoading) Color.White else Color(0xFFf9f9f9)) {
             Box(modifier = Modifier.background(color = if (isLoading) Color.White else Color(0xFFf9f9f9)).fillMaxSize()) {
@@ -157,7 +161,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                             .fillMaxSize()
                             .pullRefresh(refreshState)
                     ) {
-                        if (fakeLoading || isLoading) {
+                        if (isLoading) {
                             LazyColumn(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalArrangement = Arrangement.spacedBy(16.dp)

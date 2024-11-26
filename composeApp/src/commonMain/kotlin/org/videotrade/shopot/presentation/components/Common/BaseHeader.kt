@@ -20,11 +20,13 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +50,7 @@ import shopot.composeapp.generated.resources.arrow_left
 fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
     val navigator = LocalNavigator.currentOrThrow
     val insets = WindowInsets.statusBars.asPaddingValues()
+    val colors = MaterialTheme.colorScheme
 
     Row(
         modifier = Modifier
@@ -77,7 +80,8 @@ fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
                     .size(width = 7.dp, height = 14.dp),
                 painter = painterResource(Res.drawable.arrow_left),
                 contentDescription = null,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                colorFilter = ColorFilter.tint(colors.primary)
             )
         }
         Text(
@@ -87,7 +91,7 @@ fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {
             lineHeight = 16.sp,
             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
             fontWeight = FontWeight(500),
-            color = Color(0xFF373533),
+            color = colors.primary,
             letterSpacing = TextUnit(0F, TextUnitType.Sp),
         )
 

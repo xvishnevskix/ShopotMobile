@@ -84,6 +84,13 @@ class ChatViewModel : ViewModel(), KoinComponent {
 
     private val _boxHeight = MutableStateFlow(0)
     val boxHeight: StateFlow<Int> = _boxHeight
+
+    private val _isDeleteConfirmationVisible = MutableStateFlow(false)
+    val isDeleteConfirmationVisible: StateFlow<Boolean> = _isDeleteConfirmationVisible
+
+
+    private val _messageToDelete = MutableStateFlow<MessageItem?>(null)
+    val messageToDelete: StateFlow<MessageItem?> = _messageToDelete
     
     
     init {
@@ -147,14 +154,33 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    //обновить высоту заблюренного сообщения
     fun updateBoxHeight(height: Int) {
         _boxHeight.value = height
     }
 
+    // Установить сообщение для удаления
+    fun showDeleteConfirmation(message: MessageItem) {
+        _messageToDelete.value = message
+        _isDeleteConfirmationVisible.value = true
 
-    
+    }
 
-    
+    // Скрыть окно подтверждения
+    fun dismissDeleteConfirmation() {
+        _messageToDelete.value = null
+        _isDeleteConfirmationVisible.value = false
+    }
+
+    // Удалить сообщение и закрыть окно
+    fun deleteMessageAndDismiss(onDismiss: () -> Unit,) {
+        _messageToDelete.value?.let {
+            deleteMessage(it) // Вызов существующей функции удаления
+        }
+        dismissDeleteConfirmation()
+        onDismiss()
+    }
+
 
     
     fun addFileMessage(
@@ -354,7 +380,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         fromUser: String,
         chatId: String,
         fileName: String,
-        fileAbsolutePath: String
+        fileAbsolutePath: String,
+        contentType: String,
     ) {
         viewModelScope.launch {
 //            val filePick = FileProviderFactory.create()
@@ -365,7 +392,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 content,
                 fromUser,
                 chatId,
-                "image",
+                contentType,
                 fileName,
                 fileAbsolutePath,
             )

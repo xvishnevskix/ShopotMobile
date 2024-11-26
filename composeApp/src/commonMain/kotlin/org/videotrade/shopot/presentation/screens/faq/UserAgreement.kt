@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,6 +47,7 @@ import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.BaseHeader
 import org.videotrade.shopot.presentation.components.Common.CustomButton
+import org.videotrade.shopot.presentation.components.Common.TextSection
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.SFProText_Semibold
@@ -56,17 +58,17 @@ class UserAgreement() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-
+        val colors = MaterialTheme.colorScheme
 
         Box(
             modifier = Modifier
-                .fillMaxSize().background(Color(0xFFf9f9f9))
+                .fillMaxSize().background(colors.surface)
         ) {
             Column(
                 modifier = Modifier.padding(10.dp).padding(bottom = 40.dp)
             ) {
 
-                BaseHeader("Пользовательское соглашение", Color(0xFFf9f9f9))
+                BaseHeader("Пользовательское соглашение", colors.surface)
 
                 Column(
                     modifier = Modifier
@@ -198,32 +200,6 @@ class UserAgreement() : Screen {
                     // Add additional sections here as needed
                 }
             }
-        }
-    }
-
-    @Composable
-    fun TextSection(title: String, content: List<String>) {
-        Text(
-            text = title,
-            style = TextStyle(
-                fontSize = 18.sp,
-                color = Color.Black,
-                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular))
-            ),
-            modifier = Modifier.padding(vertical = 8.dp)
-        )
-
-        content.forEach {
-            Text(
-                text = it,
-                style = TextStyle(
-                    fontSize = 15.sp,
-                    color = Color(0xFF29303C),
-                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                ),
-                modifier = Modifier
-                    .padding(vertical = 4.dp, horizontal = 16.dp)
-            )
         }
     }
 }

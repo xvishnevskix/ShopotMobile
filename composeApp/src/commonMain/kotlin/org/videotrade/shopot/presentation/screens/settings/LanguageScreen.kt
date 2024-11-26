@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -71,12 +72,12 @@ class LanguageScreen : Screen {
     @Composable
     override fun Content() {
 
-
+        val colors = MaterialTheme.colorScheme
         val storedLanguage = getValueInStorage("selected_language")
 
-        SafeArea(backgroundColor = Color.White) {
+        SafeArea(backgroundColor = colors.background) {
             Column(
-                modifier = Modifier.fillMaxWidth().background(Color.White)
+                modifier = Modifier.fillMaxWidth().background(colors.background)
             ) {
 
                 LanguageHeader(stringResource(MokoRes.strings.select_language))
@@ -100,7 +101,7 @@ class LanguageScreen : Screen {
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                        color = Color(0xFF373533)
+                        color = colors.primary
                     ),
 
 
@@ -116,7 +117,7 @@ class LanguageScreen : Screen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
-                        .background(color = Color(0xFFF7F7F7), shape = RoundedCornerShape(size = 16.dp))
+                        .background(color = colors.onBackground, shape = RoundedCornerShape(size = 16.dp))
 
                 ) {
                     println("storedLanguage ${storedLanguage}")
@@ -134,7 +135,7 @@ class LanguageScreen : Screen {
                                     fontSize = 20.sp,
                                     modifier = Modifier.padding(end = 10.dp),
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    color = Color(0xFF373533)
+                                    color = colors.primary
                                 )
                             } else {
                                 Text(
@@ -142,7 +143,7 @@ class LanguageScreen : Screen {
                                     fontSize = 20.sp,
                                     modifier = Modifier.padding(end = 10.dp),
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    color = Color(0xFF373533)
+                                    color = colors.primary
                                 )
                             }
                             if (selectedLanguage != null) {
@@ -152,7 +153,7 @@ class LanguageScreen : Screen {
                                         fontSize = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
-                                        color = Color(0xFF373533),
+                                        color = colors.primary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     )
                                 )
@@ -163,7 +164,7 @@ class LanguageScreen : Screen {
                                         fontSize = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
-                                        color = Color(0xFF373533),
+                                        color = colors.primary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     )
                                 )
@@ -177,7 +178,7 @@ class LanguageScreen : Screen {
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    color = Color(0xFF373533)
+                                    color = colors.primary
                                 )
                             )
                         } else {
@@ -188,7 +189,7 @@ class LanguageScreen : Screen {
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    color = Color(0xFF373533)
+                                    color = colors.primary
                                 )
                             )
                         }
@@ -204,7 +205,7 @@ class LanguageScreen : Screen {
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                        color = Color(0xFF373533)
+                        color = colors.primary
                     ),
 
                     )
@@ -244,9 +245,10 @@ fun LanguageItem(
     isLastItem: Boolean,
     letters: String
 ) {
+    val colors = MaterialTheme.colorScheme
     val backgroundColor = Color.Transparent
-    val borderColor = if (isSelected) Color(0xFF373533) else Color(0x33373533)
-    val textColor = if (isSelected) Color(0xFF373533) else Color(0x80373533)
+    val borderColor = if (isSelected) colors.primary else colors.secondary
+    val textColor = if (isSelected) colors.primary else colors.secondary
     val tabNavigator: TabNavigator = LocalTabNavigator.current
     val commonViewModel: CommonViewModel = koinInject()
 
@@ -256,7 +258,7 @@ fun LanguageItem(
             .height(56.dp)
             .background(color = backgroundColor, shape = RoundedCornerShape(size = 16.dp))
             .border(
-                width = if (isSelected) 0.dp else 1.dp,
+                width = 1.dp,
                 color = borderColor,
                 shape = RoundedCornerShape(size = 16.dp)
             )
@@ -281,7 +283,7 @@ fun LanguageItem(
                     fontSize = 20.sp,
                     modifier = Modifier.padding(end = 10.dp),
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    color = Color(0xFF373533)
+                    color = colors.primary
                 )
                 Text(
                     text = language,
@@ -311,65 +313,3 @@ fun LanguageItem(
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
-
-
-//@Composable
-//fun LanguageItem(language: String, translation: String, emoji: String, isSelected: Boolean, isLastItem: Boolean, letters: String,) {
-//    val alpha = if (isSelected) 1f else 0.50f
-//    val tabNavigator: TabNavigator = LocalTabNavigator.current
-//    val navigator = LocalNavigator.currentOrThrow
-//    val commonViewModel: CommonViewModel = koinInject()
-//
-//    Column(
-//        modifier = Modifier.fillMaxWidth()
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(top = 18.dp, bottom = 9.dp, start = 5.dp, end = 5.dp).clickable{
-//                    delValueInStorage("selected_language")
-//                    StringDesc.localeType = StringDesc.LocaleType.Custom(letters)
-//                    addValueInStorage("selected_language", letters)
-////                    tabNavigator.current = ChatsTab
-//                    commonViewModel.restartApp()
-//                },
-//            horizontalArrangement = Arrangement.SpaceBetween
-//        ) {
-//            Row(
-//                verticalAlignment = Alignment.CenterVertically
-//            ) {
-//                Text(
-//                    text = emoji,
-//                    fontSize = 20.sp,
-//                    modifier = Modifier.padding(end = 25.dp).alpha(alpha)
-//                )
-//                Text(
-//                    text = language,
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 20.sp,
-//                    fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                    lineHeight = 20.sp,
-//                    color = Color(0xFF000000)
-//                )
-//            }
-//            Text(
-//                text = translation,
-//                textAlign = TextAlign.Center,
-//                fontSize = 19.sp,
-//                fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                lineHeight = 20.sp,
-//                modifier = Modifier,
-//                color = Color(0xFF979797)
-//            )
-//        }
-//        if (!isLastItem) {
-//            Box(contentAlignment = Alignment.Center,
-//                modifier = Modifier.fillMaxWidth()
-//            ) {
-//                Divider(color = Color.Gray.copy(alpha = 0.42f), thickness = 1.dp, modifier = Modifier.fillMaxWidth(0.98f))
-//            }
-//        }
-//    }
-//}

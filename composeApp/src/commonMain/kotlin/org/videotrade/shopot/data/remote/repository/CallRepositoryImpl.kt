@@ -87,6 +87,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //
 //    private val turnServers = listOf(
 ////        "turn:89.221.60.156:3478",
+
 //        "turn:89.221.60.161:3478",
 //    )
 //
@@ -192,7 +193,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     override suspend fun reconnectPeerConnection() {
-        
         // Переподключение PeerConnection
         _peerConnection.value = PeerConnection(rtcConfiguration)
     }
@@ -435,6 +435,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 println("Ошибка соединения: $e")
             }
         }
+    }
+    
+    
+    override suspend fun disconnectWs() {
+        wsSession.value?.close()
     }
     
     

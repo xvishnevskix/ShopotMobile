@@ -56,11 +56,13 @@ import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.settings.LanguageScreen
+import org.videotrade.shopot.presentation.screens.settings.ThemeScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.profile_design
 import shopot.composeapp.generated.resources.profile_language
 import shopot.composeapp.generated.resources.support
 
@@ -94,16 +96,16 @@ class ProfileScreen(
         
         val navigator = LocalNavigator.currentOrThrow
         val items = listOf(
-//            ProfileSettingsItem(
-//                Res.drawable.profile_design,
-//                20.dp,
-//                20.dp,
-//                stringResource(MokoRes.strings.edit_profile)
-//            ) {
-//                navigator.push(
-//                    ProfileEditScreen()
-//                )
-//            },
+            ProfileSettingsItem(
+                Res.drawable.profile_design,
+                20.dp,
+                20.dp,
+                "Оформление"
+            ) {
+                navigator.push(
+                    ThemeScreen()
+                )
+            },
             ProfileSettingsItem(
                 Res.drawable.profile_language,
                 18.dp,

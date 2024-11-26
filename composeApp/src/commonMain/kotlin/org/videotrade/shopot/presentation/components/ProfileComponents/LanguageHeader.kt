@@ -14,11 +14,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -44,9 +46,9 @@ import shopot.composeapp.generated.resources.arrow_left
 @Composable
 fun LanguageHeader(text: String) {
     val navigator = LocalNavigator.currentOrThrow
-
+    val colors = MaterialTheme.colorScheme
     Column(
-        modifier = Modifier.background(Color.White)
+        modifier = Modifier.background(colors.background)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
@@ -72,7 +74,8 @@ fun LanguageHeader(text: String) {
                         .size(width = 7.dp, height = 14.dp),
                     painter = painterResource(Res.drawable.arrow_left),
                     contentDescription = null,
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    colorFilter =  ColorFilter.tint(colors.primary)
                 )
             }
 
@@ -82,7 +85,7 @@ fun LanguageHeader(text: String) {
                 lineHeight = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
-                color = Color(0xFF373533),
+                color = colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
             )

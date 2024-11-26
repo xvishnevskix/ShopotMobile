@@ -24,6 +24,7 @@ class ChatsScreen : Screen {
         val tabNavigator: TabNavigator = LocalTabNavigator.current
         
         
+        
         LaunchedEffect(Unit) {
             if (commonViewModel.mainNavigator.value != null) {
                 commonViewModel.setTabNavigator(tabNavigator)
@@ -31,6 +32,8 @@ class ChatsScreen : Screen {
                 
                 viewModel.getProfile()
                 viewModel.loadUsers()
+                println("AAAAAA getMessagesBack")
+                
             }
         }
         

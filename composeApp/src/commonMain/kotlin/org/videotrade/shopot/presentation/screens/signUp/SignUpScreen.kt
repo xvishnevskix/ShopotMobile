@@ -301,7 +301,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     )
 
                                                 }
-                                                println("icon3131 ${icon}")
+                                                println("phone ${phone}")
 ////
 //                                            return@launch
                                                 val jsonContent = Json.encodeToString(

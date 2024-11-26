@@ -415,7 +415,7 @@ fun MessageBox(
                             }
 
                             // Проверка на персональный чат и наличие имени отправителя
-                            if (!chat.personal && messageSenderName.isNotBlank()) {
+                            if (!chat.personal && messageSenderName.isNotBlank() && messageSenderName != stringResource(MokoRes.strings.you)) {
                                 Box(
                                     modifier = Modifier.padding(
                                         start = 16.dp,

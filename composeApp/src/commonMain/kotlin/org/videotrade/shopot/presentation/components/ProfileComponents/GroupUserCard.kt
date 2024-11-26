@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.domain.model.GroupUserDTO
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -30,10 +31,14 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 fun GroupUserCard(
-    isEdit: Boolean = true,
-    groupUser: GroupUserDTO
+    groupUser: GroupUserDTO,
+    viewModel: ChatViewModel
 ) {
-    
+
+    val inContact = groupUser.phone.let {
+      val findContact = viewModel.findContactByPhone(it)
+      findContact != null
+    }
 
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -53,25 +58,30 @@ fun GroupUserCard(
 
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    Text(
-                        "${groupUser.firstName} ${groupUser.lastName}",
-                        fontSize = 16.sp,
-                        lineHeight = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                        fontWeight = FontWeight(500),
-                        color = Color(0xFF373533),
-                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    if (inContact) {
+                        Text(
+                            "${groupUser.firstName} ${groupUser.lastName}",
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = Color(0xFF373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+
+
 
                     Text(
                         text = "+${groupUser.phone}",
                         fontSize = 16.sp,
                         lineHeight = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        fontFamily = if (inContact) FontFamily(Font(Res.font.ArsonPro_Regular)) else FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(400),
-                        color = Color(0x80373533),
+                        color = if (inContact) Color(0x80373533) else Color(0xFF373533),
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                 }

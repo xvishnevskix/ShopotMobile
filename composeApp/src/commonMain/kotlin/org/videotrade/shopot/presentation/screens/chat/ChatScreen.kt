@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -211,7 +212,7 @@ class ChatScreen(
 
                                         // Устанавливаем новое состояние
                                         val calculatedY = when {
-                                            boxSelectedMessageHeight.value + y > screenHeightInPx -> {
+                                            boxSelectedMessageHeight.value + y + 180 > screenHeightInPx -> {
                                                 (screenHeightInPx - boxSelectedMessageHeight.value - 180).toInt()
                                             }
                                             y < 0 -> 150
@@ -253,37 +254,38 @@ class ChatScreen(
                     ) {}
                 }
 
-                if (isMessageUpdated.value && selectedMessage.value != null) {
-                    val overlayPosition = selectedMessageY.value
-                    val isWithinBounds = overlayPosition >= 0 &&
-                            overlayPosition + boxSelectedMessageHeight.value <= screenHeightInPx
+                Crossfade(targetState = selectedMessage.value) { message ->
+                    if (message != null && isMessageUpdated.value) {
+                        val overlayPosition = selectedMessageY.value
+                        val isWithinBounds = overlayPosition >= 0 &&
+                                overlayPosition + boxSelectedMessageHeight.value + 180 <= screenHeightInPx
 
-                    if (isWithinBounds) {
-                        BlurredMessageOverlay(
-                            chat = chat,
-                            profile = profile,
-                            viewModel = viewModel,
-                            selectedMessage = selectedMessage.value,
-                            selectedMessageY = selectedMessageY.value,
-                            onDismiss = {
-                                selectedMessage.value = null
-                                hiddenMessageId.value = null
-                            }
-                        )
-                    } else {
-
-                        scope.launch {
-                            selectedMessageY.value = when {
-                                overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
-                                overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
-                                    (screenHeightInPx - boxSelectedMessageHeight.value).toInt() -180 // нижняя граница
+                        if (isWithinBounds) {
+                            BlurredMessageOverlay(
+                                chat = chat,
+                                profile = profile,
+                                viewModel = viewModel,
+                                selectedMessage = message,
+                                selectedMessageY = selectedMessageY.value,
+                                onDismiss = {
+                                    selectedMessage.value = null
+                                    hiddenMessageId.value = null
                                 }
-                                else -> overlayPosition
+                            )
+                        } else {
+                            scope.launch {
+                                selectedMessageY.value = when {
+                                    overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
+                                    overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
+                                        (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
+                                    }
+                                    else -> overlayPosition
+                                }
+                                isMessageUpdated.value = true // Перезапуск
                             }
-                            isMessageUpdated.value = true // Перезапуск
                         }
                     }
-                }
             }
         }
+    }
     }

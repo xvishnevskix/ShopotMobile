@@ -35,6 +35,9 @@ interface CallRepository {
     
     
     suspend fun connectionWs(userId: String)
+    
+    suspend fun disconnectWs()
+    
     suspend fun reconnectPeerConnection()
     suspend fun setOffer()
     

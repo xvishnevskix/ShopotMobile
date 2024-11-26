@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Chat
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloatAsState
@@ -26,14 +27,17 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -69,6 +73,8 @@ import org.videotrade.shopot.api.formatTimeOnly
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.presentation.components.Common.ButtonStyle
+import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
@@ -91,6 +97,9 @@ fun BlurredMessageOverlay(
     onDismiss: () -> Unit,
 
 ) {
+
+    val isDeleteConfirmationVisible by viewModel.isDeleteConfirmationVisible.collectAsState()
+
 
     val messageSenderName = if (selectedMessage?.fromUser  == profile.id) {
         stringResource(MokoRes.strings.you)
@@ -148,6 +157,51 @@ fun BlurredMessageOverlay(
                 }
             }
         }
+
+        // Подтверждающее окно для удаления
+        if (isDeleteConfirmationVisible) {
+            BottomSheetScaffold(
+                modifier = Modifier.background(Color.White),
+                containerColor = Color.White,
+                sheetDragHandle = null,
+                sheetContainerColor = Color.White,
+                sheetContent = {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Text(
+                            text = "Удалить сообщение?",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.Black,
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                        CustomButton(
+                            text = stringResource(MokoRes.strings.delete),
+                            onClick = {
+                                viewModel.deleteMessageAndDismiss(onDismiss)
+                            },
+                            style = ButtonStyle.Red
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        CustomButton(
+                            text = stringResource(MokoRes.strings.cancel),
+                            onClick = {
+                                viewModel.dismissDeleteConfirmation()
+                            },
+                            style = ButtonStyle.Gradient
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                    }
+                },
+                sheetPeekHeight = 250.dp,
+                scaffoldState = rememberBottomSheetScaffoldState(),
+            ) {}
+        }
     }
 }
 
@@ -182,12 +236,13 @@ fun MessageBlurBox(
         if (state) 0.dp else 200.dp
     }
 
-    val editOptions =  getChatEditOptions(chatId = chat.chatId, messageSenderName = messageSenderName)
+    val editOptions =  getChatEditOptions(chatId = chat.chatId, messageSenderName = messageSenderName, onDismiss = onDismiss, message = message)
 
     val density = LocalDensity.current
 
-
     var boxHeightDp by remember { mutableStateOf(0.dp) }
+
+    val isDeleteConfirmationVisible by viewModel.isDeleteConfirmationVisible.collectAsState()
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -208,8 +263,7 @@ fun MessageBlurBox(
         Column(
             modifier = Modifier
                 .offset(x = firstColumnOffsetX)
-                .fillMaxWidth(0.8f)
-                ,
+                .fillMaxWidth(0.8f),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Box(
@@ -221,26 +275,26 @@ fun MessageBlurBox(
                     .clickable(onClick = onClick)
 
             ) {
-                    Surface(
-                        modifier = Modifier.wrapContentSize(),
-                        shape = RoundedCornerShape(
-                            topStart = 16.dp,
-                            topEnd = 16.dp,
-                            bottomEnd = if (message.fromUser == profile.id) 0.dp else 16.dp,
-                            bottomStart = if (message.fromUser == profile.id) 16.dp else 0.dp,
-                        ),
-                        color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
-                            Color.Transparent  // Прозрачный цвет для стикеров
-                        } else {
-                            if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
-                            else Color(0xFFF7F7F7)  // Цвет для сообщений от других пользователей
-                        }
-                    ) {
-                        message.content?.let {
-                            MessageFormat(message, profile, onClick)
-                        }
+                Surface(
+                    modifier = Modifier.wrapContentSize(),
+                    shape = RoundedCornerShape(
+                        topStart = 16.dp,
+                        topEnd = 16.dp,
+                        bottomEnd = if (message.fromUser == profile.id) 0.dp else 16.dp,
+                        bottomStart = if (message.fromUser == profile.id) 16.dp else 0.dp,
+                    ),
+                    color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
+                        Color.Transparent  // Прозрачный цвет для стикеров
+                    } else {
+                        if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
+                        else Color(0xFFF7F7F7)  // Цвет для сообщений от других пользователей
+                    }
+                ) {
+                    message.content?.let {
+                        MessageFormat(message, profile, onClick)
                     }
                 }
+            }
 
 
 
@@ -291,53 +345,64 @@ fun MessageBlurBox(
                     }
 
 
-
             }
         }
 
 
         //меню
-        Column(
-            modifier = Modifier
-                .offset(y = secondColumnOffsetY)
-                .padding(top = 4.dp)
-                .fillMaxWidth(0.57f)
-                .clip(RoundedCornerShape(16.dp))
-                .background(Color.White)
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
-        ) {
-            editOptions.forEachIndexed { index, editOption ->
-                Column {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
-                            .width(197.dp)
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
-                            .clickable {
-                                editOption.onClick(viewModel, message, clipboardManager)
-                                onDismiss()
-                            }
+        Crossfade(targetState = isDeleteConfirmationVisible) { isVisible ->
+            if (!isVisible) {
+                Column(
+                    modifier = Modifier
+                        .offset(y = secondColumnOffsetY)
+                        .padding(top = 4.dp)
+                        .fillMaxWidth(0.57f)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color.White)
+                        .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+                ) {
+                    editOptions.forEachIndexed { index, editOption ->
+                        Column {
+                            Row(
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier
+                                    .border(
+                                        width = 1.dp,
+                                        color = Color(0x33373533),
+                                        shape = RoundedCornerShape(size = 16.dp)
+                                    )
+                                    .width(197.dp)
+                                    .padding(
+                                        start = 16.dp,
+                                        end = 16.dp,
+                                        top = 16.dp,
+                                        bottom = 16.dp
+                                    )
+                                    .clickable {
+                                        editOption.onClick(viewModel, message, clipboardManager)
+                                    }
 
-                    ) {
-                        Text(
-                            text = editOption.text,
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                            fontWeight = FontWeight(400),
-                            color = editOption.color,
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                        )
-                        Image(
-                            painter = painterResource(editOption.imagePath),
-                            contentDescription = null,
-                            modifier = editOption.modifier.size(18.dp),
-                            colorFilter = ColorFilter.tint(editOption.color)
-                        )
+                            ) {
+                                Text(
+                                    text = editOption.text,
+                                    fontSize = 16.sp,
+                                    lineHeight = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(400),
+                                    color = editOption.color,
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                )
+                                Image(
+                                    painter = painterResource(editOption.imagePath),
+                                    contentDescription = null,
+                                    modifier = editOption.modifier.size(18.dp),
+                                    colorFilter = ColorFilter.tint(editOption.color)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }

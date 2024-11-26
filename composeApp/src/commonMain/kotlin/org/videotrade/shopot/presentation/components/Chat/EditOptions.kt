@@ -27,12 +27,13 @@ data class EditOption(
         (
         viewModule: ChatViewModel,
         message: MessageItem,
-        clipboardManager: ClipboardManager
+        clipboardManager: ClipboardManager,
+
     ) -> Unit,
     val chatId: String = "",
     val messageSenderName: String = "",
     val modifier: Modifier = Modifier,
-    val color: Color = Color(0xFF373533)
+    val color: Color = Color(0xFF373533),
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,45 +42,63 @@ fun getChatEditOptions(
     scaffoldState: BottomSheetScaffoldState? = null,
     chatId: String,
     messageSenderName: String,
+    onDismiss: () -> Unit,
+    message: MessageItem? = null,
 ): List<EditOption> {
 
     val coroutineScope = rememberCoroutineScope()
 
-    return listOf(
-
-        EditOption(
-            text = stringResource(MokoRes.strings.reply),
-            imagePath = Res.drawable.chat_forward,
-            onClick = { viewModel, message, _ ->
-                viewModel.selectMessage(chatId, message, messageSenderName)
-            },
-            modifier = Modifier.graphicsLayer(scaleX = -1f)
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.copy),
-            imagePath = Res.drawable.menu_copy,
-            onClick = { _, message, clipboardManager ->
-                message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
-            }
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.forward),
-            imagePath = Res.drawable.chat_forward,
-            onClick = { viewModel, message, clipboardManager ->
-                coroutineScope.launch {
-                    viewModel.setForwardMessage(message)
-                    viewModel.setScaffoldState(true)
-                }
-            }
-        ),
-        EditOption(
-            text = stringResource(MokoRes.strings.delete),
-            imagePath = Res.drawable.menu_delete,
-            onClick = { viewModel, message, _ ->
-                viewModel.deleteMessage(message)
-            },
-            color = Color(0xFFFF3B30)
-        ),
-
+    return buildList {
+        add(
+            EditOption(
+                text = stringResource(MokoRes.strings.reply),
+                imagePath = Res.drawable.chat_forward,
+                onClick = { viewModel, message, _ ->
+                    viewModel.selectMessage(chatId, message, messageSenderName)
+                    onDismiss()
+                },
+                modifier = Modifier.graphicsLayer(scaleX = -1f)
+            )
         )
+        if (message != null) {
+            if (message.attachments == null || message.attachments?.isEmpty() == true) {
+                add(
+                    EditOption(
+                        text = stringResource(MokoRes.strings.copy),
+                        imagePath = Res.drawable.menu_copy,
+                        onClick = { _, message, clipboardManager ->
+                            message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
+                            onDismiss()
+                        }
+                    )
+                )
+            }
+        }
+
+        add(
+            EditOption(
+                text = stringResource(MokoRes.strings.forward),
+                imagePath = Res.drawable.chat_forward,
+                onClick = { viewModel, message, clipboardManager ->
+                    coroutineScope.launch {
+                        viewModel.setForwardMessage(message)
+                        viewModel.setScaffoldState(true)
+                        onDismiss()
+                    }
+                }
+            )
+        )
+        if (messageSenderName == stringResource(MokoRes.strings.you)) {
+            add(
+                EditOption(
+                    text = stringResource(MokoRes.strings.delete),
+                    imagePath = Res.drawable.menu_delete,
+                    onClick = { viewModel, message, _ ->
+                        viewModel.showDeleteConfirmation(message)
+                    },
+                    color = Color(0xFFFF3B30)
+                )
+            )
+        }
+    }
 }

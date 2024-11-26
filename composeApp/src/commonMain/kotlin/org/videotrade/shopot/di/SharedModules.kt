@@ -33,6 +33,7 @@ import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
+import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
 
 
 private val domainModule = module {
@@ -99,6 +100,8 @@ private val presentationModule = module {
     single { CommonViewModel() }
     
     single { ProfileViewModel() }
+
+    single { SettingsViewModel() }
     
     
 }
