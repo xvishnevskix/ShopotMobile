@@ -109,7 +109,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                     Spacer(modifier = Modifier.height(24.dp))
                     
                     val displayName = when {
-                        chat.personal -> "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim().ifBlank { "+${chat.phone}" }
+                        chat.personal -> "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
                         else -> chat.groupName.orEmpty()
                     }
                     

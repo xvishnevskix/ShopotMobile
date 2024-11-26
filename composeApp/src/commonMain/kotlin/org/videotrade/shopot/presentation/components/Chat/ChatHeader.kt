@@ -120,7 +120,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     )
                     
                     val fullName = if (chat.personal) {
-                        "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim().ifBlank { "+${chat.phone}" }
+                        if (chat.isSavedContact == false) "+${chat.phone}" else "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
+                            .ifBlank { "+${chat.phone}" }
                     } else {
                         chat.groupName.orEmpty()
                     }.takeIf { it.isNotBlank() }
