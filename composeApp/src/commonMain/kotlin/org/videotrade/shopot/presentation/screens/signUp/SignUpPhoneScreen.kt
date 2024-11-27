@@ -273,6 +273,7 @@ class SignUpPhoneScreen : Screen {
                                                         hasError = hasError,
                                                         animationTrigger = animationTrigger
                                                     )
+                                                
                                                 if (response == null) {
                                                     navigator.push(
                                                         AuthCallScreen(

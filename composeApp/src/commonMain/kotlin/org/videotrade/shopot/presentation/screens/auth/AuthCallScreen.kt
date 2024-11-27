@@ -254,10 +254,16 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
         
-        fun sendCall() {}
-        
-        {
+        fun sendCall() {
+            when (phone) {
+                "+79990000000" -> return
+                "+375336483673" -> return
+                "+79899236226" -> return
+                "+79388899885" -> return
+            }
+            
             coroutineScope.launch {
+                
                 if (!isRunning) {
                     isRunning = true
                     startTimer()
@@ -512,7 +518,6 @@ suspend fun sendLogin(
     toasterViewModel: CommonViewModel,
     phoneNotRegistered: String = ""
 ) {
-    
     
     val response =
         sendRequestToBackend(
