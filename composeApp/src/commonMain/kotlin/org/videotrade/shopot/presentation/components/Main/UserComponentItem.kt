@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -70,10 +71,11 @@ fun UserComponentItem(
 ) {
     val viewModel: ChatViewModel = koinInject()
     val profile = mainViewModel.profile.collectAsState().value
+    val colors = MaterialTheme.colorScheme
 
     Row(
         modifier = Modifier
-            .background(Color(0xFFf9f9f9)).fillMaxWidth().clickable {
+            .background(colors.surface).fillMaxWidth().clickable {
             mainViewModel.setCurrentChat(chat.id)
             mainViewModel.setZeroUnread(chat)
             viewModel.clearMessages()
@@ -112,7 +114,7 @@ fun UserComponentItem(
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             maxLines = 1, // Ограничиваем одной строкой
                             overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
@@ -127,7 +129,7 @@ fun UserComponentItem(
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             maxLines = 1, // Ограничиваем одной строкой
                             overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
@@ -140,7 +142,8 @@ fun UserComponentItem(
                         Image(
                             painter = painterResource(Res.drawable.group),
                             contentDescription = "Avatar",
-                            modifier = Modifier.size(width = 18.dp, height = 15.dp)
+                            modifier = Modifier.size(width = 18.dp, height = 15.dp),
+                            colorFilter =  ColorFilter.tint(colors.primary)
                         )
                     }
                 }
@@ -154,7 +157,7 @@ fun UserComponentItem(
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = Color(0xFF373533),
+                        color = colors.primary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -172,7 +175,7 @@ fun UserComponentItem(
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
-                    color = Color(0x80373533),
+                    color = colors.secondary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     maxLines = 1, // Ограничиваем одной строкой
                     overflow = TextOverflow.Ellipsis, // Устанавливаем многоточие
@@ -198,7 +201,7 @@ fun UserComponentItem(
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
-                    color = Color(0x80373533),
+                    color = colors.secondary,
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
 
                     )
@@ -221,6 +224,7 @@ fun UserComponentItem(
                                 modifier = Modifier.size(width = 12.7.dp, height = 8.5.dp),
                                 painter = painterResource(Res.drawable.message_single_check),
                                 contentDescription = null,
+                                colorFilter =  ColorFilter.tint(colors.secondary)
                             )
                         }
                     }

@@ -33,6 +33,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +49,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -92,7 +94,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val chatState = mainViewModel.chats.collectAsState().value
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
-
+    val colors = MaterialTheme.colorScheme
     val isLoading by mainViewModel.isLoadingChats.collectAsState()
     var fakeLoading by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
@@ -132,8 +134,8 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 //
 //    }
     
-        SafeArea(backgroundColor = if (isLoading) Color.White else Color(0xFFf9f9f9)) {
-            Box(modifier = Modifier.background(color = if (isLoading) Color.White else Color(0xFFf9f9f9)).fillMaxSize()) {
+        SafeArea(backgroundColor = if (isLoading) colors.background else colors.surface) {
+            Box(modifier = Modifier.background(color = if (isLoading) colors.background else colors.surface).fillMaxSize()) {
             
             Column(modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.Start
@@ -204,6 +206,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                     modifier = Modifier.size(27.dp),
                                                     painter = painterResource(Res.drawable.smart_lock),
                                                     contentDescription = null,
+                                                    colorFilter =  ColorFilter.tint(colors.primary)
                                                 )
                                             }
 
@@ -218,7 +221,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                     fontSize = 9.5.sp,
                                                     lineHeight = 10.sp,
                                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                                                    color = Color(0xFF373533),
+                                                    color = colors.primary,
                                                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                                 )
                                                 Text(
@@ -238,16 +241,16 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                 } else {
                                     item {
                                         Column(
-                                            modifier = Modifier.background(Color(0xFFf9f9f9)).padding(bottom = 20.dp)
+                                            modifier = Modifier.background(colors.surface).padding(bottom = 20.dp)
                                                 .fillMaxSize()
                                                 .size(600.dp),
                                             horizontalAlignment = Alignment.CenterHorizontally,
                                             verticalArrangement = Arrangement.Center
                                         ) {
                                             Column(
-                                                modifier = Modifier.background(Color(0xFFf9f9f9)).width(324.dp)
+                                                modifier = Modifier.background(colors.surface).width(324.dp)
                                                     .height(324.dp)
-                                                    .background(color = Color(0xFFf9f9f9), shape = RoundedCornerShape(size = 16.dp))
+                                                    .background(color = colors.surface, shape = RoundedCornerShape(size = 16.dp))
                                                 ,
                                                 verticalArrangement = Arrangement.Center,
                                                 horizontalAlignment = Alignment.CenterHorizontally
@@ -257,7 +260,8 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                         .size(width = 195.dp, height = 132.dp),
                                                     painter = painterResource(Res.drawable.auth_logo),
                                                     contentDescription = null,
-                                                    contentScale = ContentScale.Crop
+                                                    contentScale = ContentScale.Crop,
+                                                    colorFilter =  ColorFilter.tint(colors.primary)
                                                 )
                                                 Spacer(modifier = Modifier.height(56.dp))
                                                 Text(
@@ -269,7 +273,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                                     fontWeight = FontWeight(500),
                                                     textAlign = TextAlign.Center,
-                                                    color = Color(0xFF373533),
+                                                    color = colors.primary,
                                                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                                 )
                                                 Spacer(modifier = Modifier.height(8.dp))
@@ -281,7 +285,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                     fontWeight = FontWeight(400),
                                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                                     textAlign = TextAlign.Center,
-                                                    color = Color(0x80373533),
+                                                    color = colors.secondary,
                                                     maxLines = 3,
                                                 )
 
@@ -301,14 +305,15 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     }
 }
 
-val shimmerColorShades = listOf(
-    Color(0xFFEDDCCC),
-    Color(0xFFF7F7F7),
-    Color(0xFFEDDCCC),
-)
+//val shimmerColorShades = listOf(
+//    Color(0xFFEDDCCC),
+//    colors.onBackground,
+//    Color(0xFFEDDCCC),
+//)
 
 @Composable
 fun ChatSkeleton() {
+    val colors = MaterialTheme.colorScheme
     // Бесконечная анимация перелива
     val transition = rememberInfiniteTransition()
     val shimmerTranslateAnim by transition.animateFloat(
@@ -326,10 +331,9 @@ fun ChatSkeleton() {
     // Градиент для эффекта перелива
     val shimmerBrush = Brush.linearGradient(
         colors = listOf(
-            Color(0xFFF7F7F7),
-            Color(0xFFEDDCCC),
-            Color(0xFFF7F7F7),
-
+            colors.onBackground,
+            colors.onPrimary,
+            colors.onBackground,
         ),
         start = Offset.Zero,
         end = Offset(x = shimmerTranslateAnim, y = shimmerTranslateAnim) // Плавное перемещение по X и Y
@@ -349,7 +353,7 @@ fun ChatSkeleton() {
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(50.dp))
-                    .background(Color(0xFFF7F7F7))
+                    .background(colors.onBackground)
                     .size(56.dp)
             )
 
