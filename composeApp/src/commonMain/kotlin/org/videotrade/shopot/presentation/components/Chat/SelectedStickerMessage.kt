@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,8 +58,8 @@ import shopot.composeapp.generated.resources.sticker_menu
 
 @Composable
 fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
-    
-    
+
+    val colors = MaterialTheme.colorScheme
     val imagePainter = rememberImagePainter("${serverUrl}file/plain/${attachments[0].fileId}")
 
 
@@ -117,7 +118,7 @@ fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderN
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = Color(0x80373533),
+                        color = colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )

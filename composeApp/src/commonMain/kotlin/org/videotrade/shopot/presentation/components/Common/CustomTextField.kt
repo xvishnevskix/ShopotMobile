@@ -71,7 +71,7 @@ fun CustomTextField(
                         .fillMaxWidth()
                         .height(58.dp)
                         .background(colors.background, shape = RoundedCornerShape(size = 16.dp))
-                        .border(width = 1.dp, color = if (border == "gray") colors.onSecondary else colors.primary, shape = RoundedCornerShape(size = 16.dp))
+                        .border(width = 1.dp, color = if (border == "gray") colors.secondaryContainer else colors.primary, shape = RoundedCornerShape(size = 16.dp))
                         .padding(
                             horizontal = 16.dp,
                             vertical = 16.dp

@@ -265,7 +265,7 @@ class FAQ() : Screen {
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = colors.onSecondary,
+                    color = colors.secondaryContainer,
                     shape = RoundedCornerShape(size = 16.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -481,7 +481,7 @@ class FAQ() : Screen {
                     color = colors.primary
                 ),
                 modifier = Modifier
-                    .border(width = 1.dp, color = colors.onSecondary, shape = RoundedCornerShape(size = 16.dp))
+                    .border(width = 1.dp, color = colors.secondaryContainer, shape = RoundedCornerShape(size = 16.dp))
                     .fillMaxWidth(1f).background(colors.background)
                     .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
             )
@@ -543,7 +543,7 @@ class FAQ() : Screen {
                     color = colors.primary
                 ),
                 modifier = Modifier
-                    .border(width = 1.dp, color = colors.onSecondary, shape = RoundedCornerShape(size = 16.dp))
+                    .border(width = 1.dp, color = colors.secondaryContainer, shape = RoundedCornerShape(size = 16.dp))
                     .fillMaxWidth(1f).height(232.dp).background(colors.background)
                     .padding(start = 16.dp, top = 16.dp, bottom = 20.dp, end = 16.dp)
             )

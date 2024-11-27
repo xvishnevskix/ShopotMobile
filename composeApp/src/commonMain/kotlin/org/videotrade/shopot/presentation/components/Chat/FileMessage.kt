@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -67,7 +68,7 @@ fun FileMessage(
     attachments: List<Attachment>,
 ) {
     val scope = rememberCoroutineScope()
-    
+    val colors = MaterialTheme.colorScheme
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
@@ -219,7 +220,7 @@ fun FileMessage(
                         modifier = Modifier
                     ) {
                         CircularProgressIndicator(
-                            color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                            color = if (message.fromUser == profile.id) Color.White else Color(0xFF373533),
                             strokeWidth = 2.dp,
                             modifier = Modifier
                         )
@@ -232,14 +233,14 @@ fun FileMessage(
                                     isStartCipherLoading = false
                                     viewModel.deleteMessage(message)
                                 },
-                            tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
+                            tint = if (message.fromUser == profile.id) Color.White else Color(0xFF373533)
                         )
                     }
                 } else {
                     if (isLoading) {
                         CircularProgressIndicator(
                             progress = progress,  // Use animated progress
-                            color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                            color = if (message.fromUser == profile.id) Color.White else Color(0xFF373533),
                             strokeWidth = 2.dp,
                             modifier = Modifier
                         )
@@ -252,7 +253,7 @@ fun FileMessage(
                                     isLoading = false
                                     
                                 },
-                            tint = if (message.fromUser == profile.id) Color.White else Color.DarkGray
+                            tint = if (message.fromUser == profile.id) Color.White else Color(0xFF373533)
                         )
                     } else {
                         Box(
@@ -295,9 +296,7 @@ fun FileMessage(
                     text = it.name,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = if (message.fromUser == profile.id) Color(0xFFFFFFFF) else Color(
-                        0xFF373533
-                    ),
+                    color = if (message.fromUser == profile.id) Color(0xFFFFFFFF) else colors.primary,
                     fontSize = 16.sp,
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
@@ -311,9 +310,7 @@ fun FileMessage(
             if (attachments[0].size !== null) {
                 Text(
                     text = formatSize(attachments[0].size!!),
-                    color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else Color(
-                        0x80373533
-                    ),
+                    color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else colors.secondary,
                     fontSize = 16.sp,
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),

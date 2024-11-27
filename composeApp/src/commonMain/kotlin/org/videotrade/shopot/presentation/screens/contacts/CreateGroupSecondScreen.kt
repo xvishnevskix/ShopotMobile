@@ -331,7 +331,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
                             .background(colors.background, shape = RoundedCornerShape(size = 16.dp))
                             .border(
                                 width = 1.dp,
-                                color = colors.onSecondary,
+                                color = colors.secondaryContainer,
                                 shape = RoundedCornerShape(size = 16.dp)
                             )
                             .padding(

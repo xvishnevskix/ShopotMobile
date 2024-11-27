@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -54,7 +55,7 @@ import shopot.composeapp.generated.resources.menu_gallery
 
 @Composable
 fun SelectedFileMessage(selectedMessage: MessageItem, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
-
+    val colors = MaterialTheme.colorScheme
 
     Column(
         modifier = Modifier
@@ -93,7 +94,7 @@ fun SelectedFileMessage(selectedMessage: MessageItem, selectedMessageSenderName:
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = Color(0x80373533),
+                        color = colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )

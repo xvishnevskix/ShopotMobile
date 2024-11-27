@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,6 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -77,7 +79,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val callViewModel: CallViewModel = koinInject()
     val timer = callViewModel.timer.collectAsState()
     val groupUsers = viewModel.groupUsers.collectAsState().value
-
+    val colors = MaterialTheme.colorScheme
             LaunchedEffect(Unit) {
             viewModel.loadGroupUsers(chat.chatId)
         }
@@ -90,7 +92,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                 .fillMaxWidth()
                 .statusBarsPadding()
                 .padding(bottom = 10.dp)
-                .background(Color.White),
+                .background(colors.background),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             
@@ -154,7 +156,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                 fontWeight = FontWeight(500),
-                                color = Color(0xFF373533),
+                                color = colors.primary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         } else {
@@ -164,7 +166,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                 fontWeight = FontWeight(500),
-                                color = Color(0xFF373533),
+                                color = colors.primary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
@@ -261,6 +263,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                             }
 
                         ,
+                        colorFilter =  ColorFilter.tint(colors.primary)
                     )
 
 
@@ -273,13 +276,14 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 
 @Composable
 private fun ParticipantCountText(count: Int) {
+    val colors = MaterialTheme.colorScheme
     Text(
         text = getParticipantCountText(count),
         fontSize = 16.sp,
         lineHeight = 16.sp,
         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
         fontWeight = FontWeight(400),
-        color = Color(0x80373533),
+        color = colors.secondary,
         letterSpacing = TextUnit(0F, TextUnitType.Sp),
     )
 }

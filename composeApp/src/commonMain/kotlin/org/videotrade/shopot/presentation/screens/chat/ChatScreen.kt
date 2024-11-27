@@ -21,6 +21,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -77,7 +78,7 @@ class ChatScreen(
         var showStickerMenu = remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         val boxSelectedMessageHeight = viewModel.boxHeight.collectAsState()
-
+        val colors = MaterialTheme.colorScheme
         val selectedMessage = remember { mutableStateOf<MessageItem?>(null) }
         var selectedMessageY = remember { mutableStateOf(0) }
         var hiddenMessageId = remember { mutableStateOf<String?>(null) }
@@ -133,7 +134,7 @@ class ChatScreen(
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White)
+                    .background(colors.background)
                     .pointerInput(Unit) {
                         detectTapGestures {
                             scope.launch {
@@ -161,7 +162,7 @@ class ChatScreen(
 //                println("screenHeightInPx selectedMessageY ${selectedMessageY.value}")
 
                 SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
-                    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+                    Column(modifier = Modifier.fillMaxSize().background(colors.background)) {
                         Scaffold(
                             topBar = {
                                 ChatHeader(chat, viewModel, profile)
@@ -189,16 +190,16 @@ class ChatScreen(
                                         })
                                 }
                             },
-                            containerColor = Color.White,
+                            containerColor = colors.background,
 
                             modifier = Modifier
-                                .fillMaxSize().background(Color.White)
+                                .fillMaxSize().background(colors.background)
                         ) { innerPadding ->
                             Chat(
                                 viewModel,
                                 profile,
                                 chat,
-                                Modifier.fillMaxSize().background(Color.White)
+                                Modifier.fillMaxSize().background(colors.background)
                                     .padding(innerPadding),
                                 onMessageClick = { message, y ->
                                     // Сбрасываем текущее состояние для предотвращения конфликта
@@ -235,9 +236,9 @@ class ChatScreen(
                     BottomSheetModal(scaffoldForwardState)
                     //стикеры
                     BottomSheetScaffold(
-                        modifier = Modifier.background(Color(0xFFF7F7F7)),
-                        containerColor = Color(0xFFF7F7F7),
-                        sheetContainerColor = Color(0xFFF7F7F7),
+                        modifier = Modifier.background(colors.onBackground),
+                        containerColor = colors.onBackground,
+                        sheetContainerColor = colors.onBackground,
                         scaffoldState = scaffoldStickerState,
                         sheetContent = {
                             if (showStickerMenu.value) {

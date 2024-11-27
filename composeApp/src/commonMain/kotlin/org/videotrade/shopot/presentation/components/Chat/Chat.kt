@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -95,7 +96,7 @@ fun Chat(
     val messagesState = viewModel.messages.collectAsState(initial = listOf()).value
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-
+    val colors = MaterialTheme.colorScheme
     var isScrolling by remember { mutableStateOf(false) }
     var shouldShowHeader by remember { mutableStateOf(false) }
     val answerMessageId = remember { mutableStateOf<String?>(null) }
@@ -144,7 +145,7 @@ fun Chat(
         LazyColumn(
             state = listState,
             reverseLayout = true,
-            modifier = modifier.background(Color.White).padding(horizontal = 8.dp)
+            modifier = modifier.background(colors.background).padding(horizontal = 8.dp)
         ) {
             groupedMessages.forEach { (date, messages) ->
 

@@ -56,7 +56,7 @@ fun ProfileSettingsButton(
     val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
-            .border(width = 1.dp, color = colors.onSecondary, shape = RoundedCornerShape(size = 16.dp))
+            .border(width = 1.dp, color = colors.secondaryContainer, shape = RoundedCornerShape(size = 16.dp))
             .clickable{
                 onClick()
             }

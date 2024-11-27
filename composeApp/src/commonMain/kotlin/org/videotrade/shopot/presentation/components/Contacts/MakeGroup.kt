@@ -56,7 +56,7 @@ import shopot.composeapp.generated.resources.group
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = colors.onSecondary,
+                    color = colors.secondaryContainer,
                     shape = RoundedCornerShape(size = 16.dp)
                 )
                 .clickable {

@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,11 +24,12 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 fun MessageText(message: MessageItem, profile: ProfileDTO, chat: ChatItem? = null,) {
+    val colors = MaterialTheme.colorScheme
     message.content?.let {
       Text(
         text = it,
         style = TextStyle(
-            color = if (message.fromUser == profile.id) Color.White else Color(0xFF373533),
+            color = if (message.fromUser == profile.id) Color.White else colors.primary,
             fontSize = 16.sp,
             lineHeight = 16.sp,
             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
