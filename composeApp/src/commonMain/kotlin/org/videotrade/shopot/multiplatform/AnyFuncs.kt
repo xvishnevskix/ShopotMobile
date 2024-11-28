@@ -12,6 +12,9 @@ expect fun setScreenLockFlags(showWhenLocked: Boolean)
 
 
 expect suspend fun getFbToken(): String?
+expect suspend fun appUpdate()
+
+
 
 
 enum class Platform {

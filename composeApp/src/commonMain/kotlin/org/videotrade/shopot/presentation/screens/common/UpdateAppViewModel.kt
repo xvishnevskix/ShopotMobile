@@ -11,18 +11,23 @@ import org.videotrade.shopot.multiplatform.getBuildVersion
 
 class UpdateAppViewModel : ViewModel(), KoinComponent {
 
-    val profile = MutableStateFlow<ProfileDTO?>(null)
-
+    val description = MutableStateFlow("")
+    val appVersion = MutableStateFlow("")
 
     suspend fun checkVersion(): Boolean {
         val getVersion = origin().get<AppVersion>("auth/checkVersion")
 
         if (getVersion !== null) {
             val buildVersion = getBuildVersion()
+            return if (getVersion.criticalAppVersion.toLong() > buildVersion) {
+                description.value = getVersion.description
+                appVersion.value = getVersion.appVersion
+                true
+            } else {
+                false
+            }
 
-//            println("adasdada ${getVersion.criticalAppVersion.toLong() > buildVersion}")
 
-            return getVersion.criticalAppVersion.toLong() > buildVersion
         }
 
         return true

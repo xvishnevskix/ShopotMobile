@@ -2,12 +2,16 @@ package org.videotrade.shopot.multiplatform
 
 import android.app.KeyguardManager
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Process
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.RequiresApi
 import com.mmk.kmpnotifier.notification.NotifierManager
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import kotlin.system.exitProcess
 
@@ -77,5 +81,19 @@ actual suspend fun getFbToken(): String? {
         // Возвращаем null для SDK < 28
         Log.w("FB_TOKEN", "FCM token is not supported on SDK < 28")
         null
+    }
+}
+
+actual suspend fun appUpdate() {
+    // Получаем контекст из локального окруженя
+    val context = getContextObj.getActivity() as ComponentActivity
+
+    // Ссылка на страницу приложения в RuStore
+    val url = "https://www.rustore.ru/catalog/app/org.videotrade.shopot.androidApp"
+
+    // Переход в главный поток для выполнения действия UI
+    withContext(Dispatchers.Main) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
     }
 }
