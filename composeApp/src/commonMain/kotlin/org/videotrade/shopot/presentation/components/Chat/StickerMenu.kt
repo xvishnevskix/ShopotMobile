@@ -255,13 +255,12 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
     val isLoading = viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
 
-    val favoritPacks = viewModel.favoritePacks.collectAsState()
 
+    val favoriteStickerPacks = viewModel.favoriteStickerPacks.collectAsState()
 
-    println("favoritePacks ${favoritPacks.value}")
-
+    // Запрашиваем избранные пакеты, если их еще нет
     LaunchedEffect(Unit) {
-        viewModel.downloadStickerPacks(reset = true)
+        viewModel.getFavoritePacks()
     }
 
     LaunchedEffect(listState) {
@@ -279,21 +278,22 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
             }
     }
 
-    val favoritePacks = stickerPacks.value.filter { it.favorite }
-
     Box(modifier = Modifier.fillMaxSize().background(colors.surface)) {
 
-        if (isLoading.value && favoritePacks.isEmpty()) {
+        // Показать индикатор загрузки, если пакеты еще не загружены
+        if (isLoading.value && favoriteStickerPacks.value.isEmpty()) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color = colors.primary
             )
-        } else if (!isLoading.value && favoritePacks.isEmpty()) {
+        } else if (!isLoading.value && favoriteStickerPacks.value.isEmpty()) {
+            // Показать сообщение, если нет избранных пакетов
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
-                Text(text = stringResource(MokoRes.strings.add_stickers_from_the_store),
+                Text(
+                    text = stringResource(MokoRes.strings.add_stickers_from_the_store),
                     fontSize = 16.sp,
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
@@ -304,8 +304,8 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
             }
         }
 
-
-        if (favoritePacks.isNotEmpty()) {
+        // Если есть избранные пакеты, отображаем их
+        if (favoriteStickerPacks.value.isNotEmpty()) {
             LazyColumn(
                 state = listState,
                 modifier = Modifier
@@ -315,7 +315,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                     .padding(vertical = 4.dp, horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                items(favoritePacks) { pack ->
+                items(favoriteStickerPacks.value) { pack -> // Изменение: используем favoriteStickerPacks
                     Column {
                         Row(
                             horizontalArrangement = Arrangement.SpaceBetween,
@@ -354,6 +354,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                             }
                         }
 
+                        // Отображаем стикеры из пакета
                         pack.fileIds.chunked(5).forEach { rowStickers ->
                             Row(
                                 modifier = Modifier
@@ -363,8 +364,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                             ) {
                                 rowStickers.forEach { sticker ->
                                     if (sticker != null) {
-                                        StickerItem(sticker, viewModel, chat)
-                                        {
+                                        StickerItem(sticker, viewModel, chat) {
                                             onStickerClick(sticker)
                                         }
                                     }
@@ -374,8 +374,8 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                     }
                 }
 
-
-                if (isLoading.value && favoritePacks.isNotEmpty()) {
+                // Показать индикатор загрузки при прокрутке
+                if (isLoading.value && favoriteStickerPacks.value.isNotEmpty()) {
                     item {
                         Box(
                             modifier = Modifier
@@ -398,11 +398,10 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
 fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem, onStickerClick: (String) -> Unit) {
     val colors = MaterialTheme.colorScheme
     val stickerPacks = viewModel.stickerPacks.collectAsState()
-    val favoritePacks = viewModel.favoritePacks.collectAsState()
     val isLoading = viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
 
-    println("favoritePacks ${favoritePacks.value}")
+
 
 
     LaunchedEffect(Unit) {
