@@ -303,7 +303,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 startTimer()
             }
             
-//            sendCall()
+            sendCall()
         }
         
         
