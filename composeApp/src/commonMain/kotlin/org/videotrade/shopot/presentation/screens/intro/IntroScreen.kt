@@ -41,11 +41,6 @@ class IntroScreen : Screen {
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
 
-
-        LaunchedEffect(key1 = Unit) {
-//            clearAllNotifications()
-        }
-
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {
                 navigator.push(MainScreen())

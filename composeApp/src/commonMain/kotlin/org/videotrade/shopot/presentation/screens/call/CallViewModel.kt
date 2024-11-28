@@ -46,6 +46,7 @@ import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
 class CallViewModel() : ViewModel(), KoinComponent {
@@ -469,9 +470,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
                 val profileCase = profileUseCase.downloadProfile()
                 
                 if (profileCase == null) {
-                    delValueInStorage("accessToken")
-                    delValueInStorage("refreshToken")
                     
+                    navigator.push(WelcomeScreen())
                     return@launch
                     
                 } else {

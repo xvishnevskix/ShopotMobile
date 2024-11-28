@@ -145,8 +145,8 @@ class IntroViewModel : ViewModel(), KoinComponent {
             println("profileCase $profileCase")
 
             if (profileCase == null) {
-                delValueInStorage("accessToken")
-                delValueInStorage("refreshToken")
+                navigator.push(WelcomeScreen())
+
 
                 return@launch
 
