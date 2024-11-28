@@ -111,7 +111,6 @@ class WelcomeScreen : Screen {
             contentVisible = true
         }
 
-        SafeArea(padding = 0.dp) {
 
             Box(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
@@ -237,6 +236,5 @@ class WelcomeScreen : Screen {
                     }
                 }
 
-            }
         }
     }

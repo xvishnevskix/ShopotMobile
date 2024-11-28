@@ -27,7 +27,6 @@ import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.NetworkListener
-import org.videotrade.shopot.multiplatform.TestFileHelperListener
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -103,10 +102,6 @@ private val presentationModule = module {
     single { ProfileViewModel() }
     
     single { NetworkListener(get()) }
-    single { TestFileHelperListener(get()) }
-    
-    
-    
     
 }
 

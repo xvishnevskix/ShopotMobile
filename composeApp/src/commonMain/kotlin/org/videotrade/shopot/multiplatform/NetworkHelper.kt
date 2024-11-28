@@ -6,7 +6,3 @@ interface NetworkHelper {
     fun unregisterListener()
 }
 
-
-interface TestFileHelper {
-    fun getPrint()
-}

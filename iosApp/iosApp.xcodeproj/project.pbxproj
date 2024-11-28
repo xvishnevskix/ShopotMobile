@@ -20,7 +20,6 @@
 		4BA72F9D2C36AFA800CCBE12 /* libwolfssl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4BA72F9C2C36AFA800CCBE12 /* libwolfssl.a */; };
 		4BA72FAB2C3726D800CCBE12 /* SwiftEncryptionWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BA72FAA2C3726D800CCBE12 /* SwiftEncryptionWrapper.swift */; };
 		4BAEB3882CF877710046252D /* IosNetworkHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEB3872CF877710046252D /* IosNetworkHelper.swift */; };
-		4BAEB38C2CF8953A0046252D /* IosTestFileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BAEB38B2CF8953A0046252D /* IosTestFileHelper.swift */; };
 		4BBB6F182C14A1F100C72863 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB6F172C14A1F100C72863 /* GoogleService-Info.plist */; };
 		4BBB6F1D2C14A94200C72863 /* FirebaseInstallations in Frameworks */ = {isa = PBXBuildFile; productRef = 4BBB6F1C2C14A94200C72863 /* FirebaseInstallations */; };
 		4BBB6F1F2C14A94200C72863 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 4BBB6F1E2C14A94200C72863 /* FirebaseMessaging */; };
@@ -48,7 +47,6 @@
 		4BA72F9C2C36AFA800CCBE12 /* libwolfssl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libwolfssl.a; path = ../composeApp/libs/wolfssl/libs/ios/release/libwolfssl.a; sourceTree = "<group>"; };
 		4BA72FAA2C3726D800CCBE12 /* SwiftEncryptionWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SwiftEncryptionWrapper.swift; path = iosApp/cipherFuncs/SwiftEncryptionWrapper.swift; sourceTree = "<group>"; };
 		4BAEB3872CF877710046252D /* IosNetworkHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosNetworkHelper.swift; sourceTree = "<group>"; };
-		4BAEB38B2CF8953A0046252D /* IosTestFileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosTestFileHelper.swift; sourceTree = "<group>"; };
 		4BBB6F172C14A1F100C72863 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4BBB6F202C14ACB800C72863 /* iosApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iosApp.entitlements; sourceTree = "<group>"; };
 		A93A953729CC810C00F8E227 /* shopot.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = shopot.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,7 +101,6 @@
 			isa = PBXGroup;
 			children = (
 				4BAEB3872CF877710046252D /* IosNetworkHelper.swift */,
-				4BAEB38B2CF8953A0046252D /* IosTestFileHelper.swift */,
 			);
 			path = iosSpecificFiles;
 			sourceTree = "<group>";
@@ -280,7 +277,6 @@
 				4BA72F922C36AB9000CCBE12 /* SharedSecret.m in Sources */,
 				4BAEB3882CF877710046252D /* IosNetworkHelper.swift in Sources */,
 				4BA72FAB2C3726D800CCBE12 /* SwiftEncryptionWrapper.swift in Sources */,
-				4BAEB38C2CF8953A0046252D /* IosTestFileHelper.swift in Sources */,
 				4B7C65B62C3820BC00429124 /* WolfsslModule.m in Sources */,
 				A93A953B29CC810C00F8E227 /* iosApp.swift in Sources */,
 			);

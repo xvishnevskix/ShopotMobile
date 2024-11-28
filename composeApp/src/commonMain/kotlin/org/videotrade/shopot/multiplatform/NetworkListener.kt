@@ -26,12 +26,6 @@ class NetworkListener(private val helper: NetworkHelper) {
     }.distinctUntilChanged().flowOn(Dispatchers.IO)
 }
 
-class TestFileHelperListener(private val helper: TestFileHelper) {
-    fun getPrintCommon() {
-        helper.getPrint()
-    }
-}
-
 sealed class NetworkStatus {
     data object Connected : NetworkStatus()
     data object Disconnected : NetworkStatus()

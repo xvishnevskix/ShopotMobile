@@ -14,22 +14,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         KoinHelperKt.doInitKoin(
             cipherInterface: IOChecker() as CipherInterface, // Реализация CipherInterface
             appComponent: IosApplicationComponent(
-                networkHelper: IosNetworkHelper() as NetworkHelper, // Реализация NetworkHelper
-                testFileHelper: IosTestFileHelper() as TestFileHelper // Реализация NetworkHelper
+                networkHelper: IosNetworkHelper() as NetworkHelper
             ),
             additionalModules: [], // Пустой список дополнительных модулей
             appDeclaration: { _ in } // Пустая декларация приложения
         )
         
-        
-//        KoinHelperKt.initKoinIos(
-//            cipherInterface: IOChecker() as CipherInterface, // Реализация CipherInterface
-//            appComponent: IosApplicationComponent(
-//                networkHelper: IosNetworkHelper() as NetworkHelper // Реализация NetworkHelper
-//            ),
-//            additionalModules: [], // Пустой список дополнительных модулей
-//            appDeclaration: { _ in } // Пустая декларация приложения
-//        )
+
     }
 
     func application(

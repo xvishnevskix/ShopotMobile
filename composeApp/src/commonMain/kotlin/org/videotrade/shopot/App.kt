@@ -34,8 +34,8 @@ internal fun App() = AppTheme {
             setScreenLockFlags(false)
             
             Navigator(
-//                IntroScreen()
-                TestScreen()
+                IntroScreen()
+//                TestScreen()
             ) { navigator ->
                 SlideTransition(navigator)
             }

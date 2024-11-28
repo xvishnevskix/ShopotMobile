@@ -143,13 +143,18 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
                             when (action) {
                                 "answerPublicKey" -> {
+                                    println("1111111")
+                                    
                                     val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                                    println("222222")
 
                                     val publicKeyString =
                                         jsonElement.jsonObject["publicKey"]?.jsonPrimitive?.content
+                                    println("1111111")
 
                                     val publicKeyBytes =
                                         publicKeyString?.decodeBase64()?.toByteArray()
+                                    println("1111111")
 
                                     println("publicKeyBytes ${publicKeyBytes?.encodeBase64()}")
 

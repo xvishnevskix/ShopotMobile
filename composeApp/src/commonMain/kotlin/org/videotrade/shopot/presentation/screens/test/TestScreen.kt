@@ -11,7 +11,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.NetworkListener
 import org.videotrade.shopot.multiplatform.NetworkStatus
-import org.videotrade.shopot.multiplatform.TestFileHelperListener
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 class TestScreen : Screen {
@@ -19,18 +18,11 @@ class TestScreen : Screen {
     override fun Content() {
         
         val networkListener: NetworkListener = koinInject()
-        val testFileHelperListener: TestFileHelperListener = koinInject()
-        
         val networkStatus by networkListener.networkStatus.collectAsState(NetworkStatus.Connected)
         
         SafeArea {
             
             Column {
-                Button(onClick = {
-                    testFileHelperListener.getPrintCommon()
-                }, content = {
-                    Text("")
-                })
             }
             Text(
                 text = networkStatus.toString(), color = Color.Black,
