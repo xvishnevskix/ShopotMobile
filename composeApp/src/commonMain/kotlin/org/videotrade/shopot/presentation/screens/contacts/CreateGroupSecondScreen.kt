@@ -38,6 +38,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -300,6 +301,7 @@ fun CreateGroupInput(groupName: MutableState<String>, groupNameError: MutableSta
 
 
             BasicTextField(
+                cursorBrush = SolidColor(colors.primary),
                 textStyle = TextStyle(
                     fontSize = 16.sp,
                     lineHeight = 16.sp,

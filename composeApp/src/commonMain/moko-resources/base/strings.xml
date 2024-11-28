@@ -235,6 +235,8 @@
     <string name="you_turned_off_the_microphone">You turned off the microphone</string>
     <string name="reply">Reply</string>
 
+    <string name="delete_message">Delete message?</string>
+    <string name="create_your_first_chat">Create your first chat</string>
 
 
 

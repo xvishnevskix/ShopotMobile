@@ -76,6 +76,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
@@ -97,7 +98,7 @@ fun BlurredMessageOverlay(
     onDismiss: () -> Unit,
 
 ) {
-
+    val colors = MaterialTheme.colorScheme
     val isDeleteConfirmationVisible by viewModel.isDeleteConfirmationVisible.collectAsState()
 
 
@@ -161,10 +162,10 @@ fun BlurredMessageOverlay(
         // Подтверждающее окно для удаления
         if (isDeleteConfirmationVisible) {
             BottomSheetScaffold(
-                modifier = Modifier.background(Color.White),
-                containerColor = Color.White,
+                modifier = Modifier.background(colors.background),
+                containerColor = colors.background,
                 sheetDragHandle = null,
-                sheetContainerColor = Color.White,
+                sheetContainerColor = colors.background,
                 sheetContent = {
                     Column(
                         modifier = Modifier
@@ -173,10 +174,16 @@ fun BlurredMessageOverlay(
                     ) {
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
-                            text = "Удалить сообщение?",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.Black,
+                            text = stringResource(
+                                MokoRes.strings.delete_message
+                            ),
+                            textAlign = TextAlign.Center,
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = colors.primary,
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         CustomButton(
@@ -219,7 +226,7 @@ fun MessageBlurBox(
 
 ) {
     val clipboardManager = LocalClipboardManager.current
-
+    val colors = MaterialTheme.colorScheme
     val transition = updateTransition(targetState = visible, label = "MessageBlurBoxTransition")
     val orientation: Dp = if (message.fromUser == profile.id) 100.dp else -75.dp
     val firstColumnOffsetX by transition.animateDp(
@@ -287,7 +294,7 @@ fun MessageBlurBox(
                         Color.Transparent  // Прозрачный цвет для стикеров
                     } else {
                         if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
-                        else Color(0xFFF7F7F7)  // Цвет для сообщений от других пользователей
+                        else colors.onBackground  // Цвет для сообщений от других пользователей
                     }
                 ) {
                     message.content?.let {
@@ -318,7 +325,7 @@ fun MessageBlurBox(
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                             fontWeight = FontWeight(400),
-                            color = Color(0x80373533),
+                            color = colors.secondary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         ),
                         modifier = Modifier.padding(),
@@ -341,6 +348,7 @@ fun MessageBlurBox(
                                 .size(width = 12.7.dp, height = 8.5.dp),
                             painter = painterResource(Res.drawable.message_single_check),
                             contentDescription = null,
+                            colorFilter =  ColorFilter.tint(colors.secondary)
                         )
                     }
 
@@ -358,7 +366,7 @@ fun MessageBlurBox(
                         .padding(top = 4.dp)
                         .fillMaxWidth(0.57f)
                         .clip(RoundedCornerShape(16.dp))
-                        .background(Color.White)
+                        .background(colors.background)
                         .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
                 ) {
                     editOptions.forEachIndexed { index, editOption ->
@@ -369,7 +377,7 @@ fun MessageBlurBox(
                                 modifier = Modifier
                                     .border(
                                         width = 1.dp,
-                                        color = Color(0x33373533),
+                                        color = colors.onSecondary,
                                         shape = RoundedCornerShape(size = 16.dp)
                                     )
                                     .width(197.dp)

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,7 +35,7 @@ fun GroupUserCard(
     groupUser: GroupUserDTO,
     viewModel: ChatViewModel
 ) {
-
+    val colors = MaterialTheme.colorScheme
     val inContact = groupUser.phone.let {
       val findContact = viewModel.findContactByPhone(it)
       findContact != null
@@ -66,7 +67,7 @@ fun GroupUserCard(
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                         Spacer(modifier = Modifier.height(8.dp))
@@ -81,7 +82,7 @@ fun GroupUserCard(
                         lineHeight = 16.sp,
                         fontFamily = if (inContact) FontFamily(Font(Res.font.ArsonPro_Regular)) else FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(400),
-                        color = if (inContact) Color(0x80373533) else Color(0xFF373533),
+                        color = if (inContact) colors.secondary else colors.primary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                 }

@@ -56,6 +56,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -146,7 +147,7 @@ fun ChatFooter(
     onStickerButtonClick: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    
+    val colors = MaterialTheme.colorScheme
     
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
@@ -426,7 +427,7 @@ fun ChatFooter(
         modifier = Modifier
 
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
-            .background(Color.White)
+            .background(colors.background)
             .then(
                 if (getPlatform() == Platform.Ios) {
                     Modifier
@@ -462,7 +463,7 @@ fun ChatFooter(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(selectedHeight)
-                                .background(Color.White),
+                                .background(colors.background),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         )
@@ -513,7 +514,7 @@ fun ChatFooter(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Close",
                                     tint = Color(0xFFCAB7A3),
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(20.dp),
                                 )
                             }
                         }
@@ -626,7 +627,7 @@ fun ChatFooter(
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
-                                color = Color(0x80373533),
+                                color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
@@ -641,7 +642,14 @@ fun ChatFooter(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            BackIcon()
+                            Image(
+                                modifier = Modifier
+                                    .size(width = 7.dp, height = 14.dp),
+                                painter = painterResource(Res.drawable.arrow_left),
+                                contentDescription = null,
+                                contentScale = ContentScale.Crop,
+                                colorFilter =  ColorFilter.tint(colors.secondary)
+                            )
                             Spacer(modifier = Modifier.width(9.dp))
                             Text(
                                 text = stringResource(MokoRes.strings.left_cancel),
@@ -649,7 +657,7 @@ fun ChatFooter(
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
-                                color = Color(0x80373533),
+                                color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
@@ -671,7 +679,7 @@ fun ChatFooter(
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .padding(end = 13.dp),
+                                    .padding(end = 13.dp).width(20.dp),
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (showMenu) {
@@ -682,7 +690,8 @@ fun ChatFooter(
                                             .size(width = 20.dp, height = 12.dp)
                                             .pointerInput(Unit) {
                                                 showMenu = false
-                                            }
+                                            },
+                                        colorFilter =  ColorFilter.tint(colors.primary)
                                     )
                                 } else {
                                     Image(
@@ -692,7 +701,8 @@ fun ChatFooter(
                                             .size(width = 15.86.dp, height = 17.94.dp)
                                             .pointerInput(Unit) {
                                                 showMenu = true
-                                            }
+                                            },
+                                        colorFilter =  ColorFilter.tint(colors.primary)
                                     )
                                 }
                             }
@@ -701,7 +711,7 @@ fun ChatFooter(
                         Row(
                             modifier = Modifier
                                 .weight(1f)
-                                .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
+                                .border(width = 1.dp, color = colors.onSecondary, shape = RoundedCornerShape(size = 16.dp))
                                 .animateContentSize()
                         ) {
 
@@ -728,10 +738,10 @@ fun ChatFooter(
                                     lineHeight = lineHeight.value.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
-                                    color = Color(0xFF373533),
+                                    color = colors.primary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 ),
-                                cursorBrush = SolidColor(Color.Black),
+                                cursorBrush = SolidColor(colors.primary),
                                 visualTransformation = VisualTransformation.None,
                                 keyboardOptions = KeyboardOptions.Default.copy(
                                     capitalization = KeyboardCapitalization.Sentences // Заставляет начинать с заглавной буквы
@@ -745,7 +755,7 @@ fun ChatFooter(
                                                 lineHeight = lineHeight.value.sp,
                                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                                 fontWeight = FontWeight(400),
-                                                color = Color(0x80373533),
+                                                color = colors.secondary,
                                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                             )
                                         }
@@ -770,6 +780,7 @@ fun ChatFooter(
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
                                             .size(18.dp)
+                                        ,colorFilter =  ColorFilter.tint(colors.secondary)
                                     )
                                 }
                             }
@@ -923,7 +934,7 @@ fun ChatFooter(
                                     }
                                     .scale(1f + (offset.x / 850f))
                                     .background(
-                                        color = if (isRecording) Color(0xFFCAB7A3) else Color.White,
+                                        color = if (isRecording) Color(0xFFCAB7A3) else colors.background,
                                         shape = RoundedCornerShape(size = 16.dp)
                                     ),
                                 contentAlignment = Alignment.Center
@@ -932,7 +943,7 @@ fun ChatFooter(
                                     painter = painterResource(Res.drawable.chat_micro),
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,
-                                    colorFilter = if (!isRecording) ColorFilter.tint(Color(0xFF373533)) else ColorFilter.tint(Color.White)
+                                    colorFilter = if (!isRecording) ColorFilter.tint(colors.primary) else ColorFilter.tint(Color.White)
                                 )
                             }
                         }
@@ -964,7 +975,7 @@ fun ChatFooter(
                                         painter = painterResource(editOption.imagePath),
                                         contentDescription = null,
                                         modifier = Modifier.size(16.dp),
-                                        colorFilter = ColorFilter.tint(Color(0xff000000))
+                                        colorFilter = ColorFilter.tint(colors.primary)
                                     )
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
@@ -973,7 +984,7 @@ fun ChatFooter(
                                         lineHeight = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                         fontWeight = FontWeight(500),
-                                        color = Color(0xFF373533),
+                                        color = colors.primary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     )
                                 }

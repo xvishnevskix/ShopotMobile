@@ -57,7 +57,12 @@ import shopot.composeapp.generated.resources.sticker1
 import shopot.composeapp.generated.resources.sticker_menu
 
 @Composable
-fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
+fun SelectedStickerMessage(
+    attachments: List<Attachment>,
+    selectedMessageSenderName: String,
+    colorTitle: Color = Color.Black,
+    isFromUser: Boolean,
+) {
 
     val colors = MaterialTheme.colorScheme
     val imagePainter = rememberImagePainter("${serverUrl}file/plain/${attachments[0].fileId}")
@@ -66,7 +71,7 @@ fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderN
 
     Row(
         modifier = Modifier
-            .padding(start = 10.dp, end = 10.dp, top = 2.dp),
+            .padding(start = 1.dp, end = 5.dp, top = 0.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -79,6 +84,8 @@ fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderN
                 .size(40.dp, 40.dp)
         )
 
+
+        Spacer(modifier = Modifier.width(8.dp))
 
         Column(
             modifier = Modifier
@@ -101,16 +108,16 @@ fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderN
             Spacer(modifier = Modifier.height(4.dp))
 
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(Res.drawable.sticker_menu),
-                    contentDescription = "Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-
-                        .size(20.dp),
-                    colorFilter = ColorFilter.tint(Color(0xFF979797))
-                )
-                Spacer(modifier = Modifier.width(2.dp))
+//                Image(
+//                    painter = painterResource(Res.drawable.sticker_menu),
+//                    contentDescription = "Image",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//
+//                        .size(20.dp),
+//                    colorFilter = ColorFilter.tint(Color(0xFF979797))
+//                )
+//                Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = stringResource(MokoRes.strings.sticker),
                     style = TextStyle(
@@ -118,7 +125,11 @@ fun SelectedStickerMessage(attachments: List<Attachment>, selectedMessageSenderN
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = colors.secondary,
+                        color = if (isFromUser)
+                            colors.onTertiary
+
+                        else
+                            colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )

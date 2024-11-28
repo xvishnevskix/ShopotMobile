@@ -36,7 +36,12 @@ import shopot.composeapp.generated.resources.chat_micro
 import shopot.composeapp.generated.resources.menu_gallery
 
 @Composable
-fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
+fun SelectedVoiceMessage(
+    selectedMessage: MessageItem,
+    selectedMessageSenderName: String,
+    colorTitle: Color = Color.Black,
+    isFromUser: Boolean,
+) {
     val colors = MaterialTheme.colorScheme
 
     Column(
@@ -73,7 +78,11 @@ fun SelectedVoiceMessage(selectedMessage: MessageItem, selectedMessageSenderName
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
-                    color = colors.secondary,
+                    color = if (isFromUser)
+                        colors.onTertiary
+
+                    else
+                        colors.secondary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 ),
             )

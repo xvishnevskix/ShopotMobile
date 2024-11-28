@@ -15,6 +15,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,18 +31,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.flow.collectLatest
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Main.ForwardingComponentItem
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 
@@ -51,6 +56,7 @@ fun BottomSheetModal(scaffoldState: BottomSheetScaffoldState) {
     val chatViewModel: ChatViewModel = koinInject()
     val mainViewModel: MainViewModel = koinInject()
     val commonViewModel: CommonViewModel = koinInject()
+    val colors = MaterialTheme.colorScheme
     
     val chatState = mainViewModel.chats.collectAsState(initial = listOf()).value
     
@@ -65,13 +71,13 @@ fun BottomSheetModal(scaffoldState: BottomSheetScaffoldState) {
     
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
-        sheetContainerColor = Color(0xFFF3F4F6),
+        sheetContainerColor = colors.surface,
         sheetContent = {
             // Контент модального окна
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF3F4F6))
+                    .background(colors.surface)
                     .height(800.dp) // Высота окна
                     .padding(16.dp)
             ) {
@@ -109,14 +115,14 @@ fun BottomSheetModal(scaffoldState: BottomSheetScaffoldState) {
                             ) {
                                 Row {
                                     Text(
-                                        "Создайте новый чат",
+                                        stringResource(MokoRes.strings.create_your_first_chat),
                                         modifier = Modifier,
-                                        textAlign = TextAlign.Center,
-                                        fontSize = 20.sp,
-                                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                        lineHeight = 20.sp,
-                                        color = Color(0xFF979797)
+                                        fontSize = 16.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                        fontWeight = FontWeight(500),
+                                        color = colors.primary,
+                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     )
                                 }
                             }

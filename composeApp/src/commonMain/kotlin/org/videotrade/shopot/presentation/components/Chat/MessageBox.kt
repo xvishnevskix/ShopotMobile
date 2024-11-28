@@ -366,7 +366,8 @@ fun MessageBox(
                                         SelectedMessageFormat(
                                             it,
                                             profile,
-                                            viewModel
+                                            viewModel,
+                                            message,
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
@@ -515,6 +516,7 @@ fun MessageBox(
                             .size(width = 12.7.dp, height = 8.5.dp),
                         painter = painterResource(Res.drawable.message_single_check),
                         contentDescription = null,
+                        colorFilter =  ColorFilter.tint(colors.secondary)
                     )
                 }
 
@@ -588,16 +590,17 @@ fun MessageFormat(
 
 @Composable
 fun SelectedMessageFormat(
-    message: MessageItem,
+    selectedMessage: MessageItem,
     profile: ProfileDTO? = null,
     viewModel: ChatViewModel,
+    message: MessageItem? = null,
     isFromFooter: Boolean = false
 ) {
     val colors = MaterialTheme.colorScheme
     val theme = getThemeMode()
     val messageAnswerName =
-        message.phone?.let { phone ->
-            if (message.fromUser == profile?.id) {
+        selectedMessage.phone?.let { phone ->
+            if (selectedMessage.fromUser == profile?.id) {
                 stringResource(MokoRes.strings.you)
             } else {
                 val findContact = viewModel.findContactByPhone(phone)
@@ -609,38 +612,43 @@ fun SelectedMessageFormat(
             }
         } ?: ""
 
+    val isFromUser = message?.fromUser == profile?.id
+
     val colorTitle = if (isFromFooter) Color(0xFFCAB7A3) else {
-        if (theme == ThemeMode.LIGHT) colors.primary else colors.inversePrimary
+        if (isFromUser)
+            colors.inversePrimary
+        else
+            colors.primary
     }
 
-    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+    if (selectedMessage.attachments == null || selectedMessage.attachments?.isEmpty() == true) {
         if (profile != null) {
-            SelectedMessageText(message, messageAnswerName, colorTitle)
+            SelectedMessageText(selectedMessage, messageAnswerName, colorTitle, isFromUser)
         }
     } else {
 
-        when (message.attachments!![0].type) {
+        when (selectedMessage.attachments!![0].type) {
             "audio/mp4" -> {
-                SelectedVoiceMessage(message, messageAnswerName, colorTitle)
+                SelectedVoiceMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
             }
 
             "image" -> {
-                SelectedMessageImage(message.attachments!!, messageAnswerName, colorTitle)
+                SelectedMessageImage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
 //                SelectedStickerMessage(message.attachments!!, messageAnswerName)
 
             }
 
             "video" -> {
-                SelectedVideoMessage(message.attachments!!, messageAnswerName, colorTitle)
+                SelectedVideoMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
 
             }
             
             "sticker" -> {
-                SelectedStickerMessage(message.attachments!!, messageAnswerName, colorTitle)
+                SelectedStickerMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
             }
 
             else -> {
-                SelectedFileMessage(message, messageAnswerName, colorTitle)
+                SelectedFileMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
             }
         }
 

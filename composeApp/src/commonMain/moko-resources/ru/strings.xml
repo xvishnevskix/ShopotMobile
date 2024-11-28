@@ -231,4 +231,7 @@
     <string name="you_turned_off_the_microphone">Вы выключили микрофон</string>
     <string name="reply">Ответить</string>
 
+    <string name="delete_message">Удалить сообщение?</string>
+    <string name="create_your_first_chat">Создайте свой первый чат</string>
+
 </resources>

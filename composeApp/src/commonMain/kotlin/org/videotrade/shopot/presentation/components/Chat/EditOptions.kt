@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.components.Chat
 
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -47,6 +48,7 @@ fun getChatEditOptions(
 ): List<EditOption> {
 
     val coroutineScope = rememberCoroutineScope()
+    val colors = MaterialTheme.colorScheme
 
     return buildList {
         add(
@@ -57,7 +59,8 @@ fun getChatEditOptions(
                     viewModel.selectMessage(chatId, message, messageSenderName)
                     onDismiss()
                 },
-                modifier = Modifier.graphicsLayer(scaleX = -1f)
+                modifier = Modifier.graphicsLayer(scaleX = -1f),
+                color = colors.primary
             )
         )
         if (message != null) {
@@ -69,7 +72,8 @@ fun getChatEditOptions(
                         onClick = { _, message, clipboardManager ->
                             message.content?.let { clipboardManager.setText(AnnotatedString(it)) }
                             onDismiss()
-                        }
+                        },
+                        color = colors.primary
                     )
                 )
             }
@@ -85,7 +89,8 @@ fun getChatEditOptions(
                         viewModel.setScaffoldState(true)
                         onDismiss()
                     }
-                }
+                },
+                color = colors.primary
             )
         )
         if (messageSenderName == stringResource(MokoRes.strings.you)) {
@@ -96,7 +101,7 @@ fun getChatEditOptions(
                     onClick = { viewModel, message, _ ->
                         viewModel.showDeleteConfirmation(message)
                     },
-                    color = Color(0xFFFF3B30)
+                    color = colors.error
                 )
             )
         }

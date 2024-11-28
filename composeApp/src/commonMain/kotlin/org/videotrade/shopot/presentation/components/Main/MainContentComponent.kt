@@ -278,7 +278,9 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                 )
                                                 Spacer(modifier = Modifier.height(8.dp))
                                                 Text(
-                                                    "Создайте свой первый чат",
+                                                    stringResource(
+                                                        MokoRes.strings.create_your_first_chat
+                                                    ),
                                                     fontSize = 15.sp,
                                                     lineHeight = 15.sp,
                                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),

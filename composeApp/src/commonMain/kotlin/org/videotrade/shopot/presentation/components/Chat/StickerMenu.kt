@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -104,14 +105,14 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
         derivedStateOf { pagerState.currentPage }
     }
     val viewModel: ChatViewModel = koinInject()
-
+    val colors = MaterialTheme.colorScheme
 
 
 
     Column(modifier = Modifier
         .fillMaxHeight(0.5f)
         .fillMaxWidth()
-        .background(Color(0xFFF3F4F6))
+        .background(colors.surface)
     )
     {
         val coroutineScope = rememberCoroutineScope()
@@ -133,8 +134,8 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
             tabTitles.forEachIndexed { index, title ->
                 Tab(
                     selected = selectedTabIndex.value == index,
-                    selectedContentColor = Color(0xFF29303C),
-                    unselectedContentColor = Color(0xFFA9A8AA),
+                    selectedContentColor = colors.primary,
+                    unselectedContentColor = colors.secondary,
                     onClick = {
                         coroutineScope.launch {
                             pagerState.animateScrollToPage(index)
@@ -142,7 +143,7 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFF7F7F7))
+                        .background(colors.surface)
                         .padding(8.dp)
                         .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                 ) {
@@ -177,7 +178,7 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
 
 @Composable
 fun StickerItem(stickerId: String, viewModel: ChatViewModel = koinInject(), chat: ChatItem, onClick: (String) -> Unit) {
-
+    val colors = MaterialTheme.colorScheme
     val imagePainter = if (stickerId.isNullOrBlank()) {
         painterResource(Res.drawable.sticker1)
     } else {
@@ -206,6 +207,7 @@ fun StickerItem(stickerId: String, viewModel: ChatViewModel = koinInject(), chat
 
 @Composable
 fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewModel = koinInject(), chat: ChatItem) {
+    val colors = MaterialTheme.colorScheme
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
@@ -222,7 +224,7 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMo
                     fontSize = 19.sp,
                     lineHeight = 20.sp,
                     letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    color = Color(0xFF000000),
+                    color = colors.primary,
                     modifier = Modifier
                         .padding(horizontal = 5.dp)
                         .padding(bottom = 10.dp)
@@ -248,10 +250,15 @@ fun RecentStickersContent(stickerPacks: List<StickerPack>, viewModel: ChatViewMo
 
 @Composable
 fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem, onStickerClick: (String) -> Unit) {
-
+    val colors = MaterialTheme.colorScheme
     val stickerPacks = viewModel.stickerPacks.collectAsState()
     val isLoading = viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
+
+    val favoritPacks = viewModel.favoritePacks.collectAsState()
+
+
+    println("favoritePacks ${favoritPacks.value}")
 
     LaunchedEffect(Unit) {
         viewModel.downloadStickerPacks(reset = true)
@@ -274,12 +281,12 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
 
     val favoritePacks = stickerPacks.value.filter { it.favorite }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color(0xFFF3F4F6))) {
+    Box(modifier = Modifier.fillMaxSize().background(colors.surface)) {
 
         if (isLoading.value && favoritePacks.isEmpty()) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
-                color = Color(0xFF2A293C)
+                color = colors.primary
             )
         } else if (!isLoading.value && favoritePacks.isEmpty()) {
             Box(
@@ -291,7 +298,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
-                    color = Color(0xFF373533),
+                    color = colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             }
@@ -304,8 +311,9 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight()
-                    .background(Color(0xFFF3F4F6))
-                    .padding(vertical = 4.dp, horizontal = 16.dp)
+                    .background(colors.surface)
+                    .padding(vertical = 4.dp, horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(favoritePacks) { pack ->
                     Column {
@@ -324,7 +332,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                                 fontSize = 19.sp,
                                 lineHeight = 20.sp,
                                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                color = Color(0xFF000000),
+                                color = colors.primary,
                                 modifier = Modifier
                                     .padding(horizontal = 5.dp)
                                     .padding(bottom = 10.dp)
@@ -337,7 +345,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                                 Icon(
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Close",
-                                    tint = Color(0xFF979797),
+                                    tint = colors.secondary,
                                     modifier = Modifier
                                         .clickable {
                                             viewModel.removePackFromFavorites(pack.packId)
@@ -351,7 +359,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.Start
+                                horizontalArrangement = Arrangement.Center
                             ) {
                                 rowStickers.forEach { sticker ->
                                     if (sticker != null) {
@@ -376,7 +384,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
-                                color = Color(0xFF2A293C)
+                                color = colors.primary
                             )
                         }
                     }
@@ -388,10 +396,13 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
 
 @Composable
 fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem, onStickerClick: (String) -> Unit) {
-
+    val colors = MaterialTheme.colorScheme
     val stickerPacks = viewModel.stickerPacks.collectAsState()
+    val favoritePacks = viewModel.favoritePacks.collectAsState()
     val isLoading = viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
+
+    println("favoritePacks ${favoritePacks.value}")
 
 
     LaunchedEffect(Unit) {
@@ -419,7 +430,7 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem
         if (isLoading.value && stickerPacks.value.isEmpty()) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
-                color = Color(0xFF2A293C)
+                color = colors.primary
             )
         }
 
@@ -428,7 +439,8 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(vertical = 4.dp, horizontal = 16.dp)
+                .padding(vertical = 4.dp, horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(stickerPacks.value) { pack ->
                 Column {
@@ -447,14 +459,14 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem
                             fontSize = 19.sp,
                             lineHeight = 20.sp,
                             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            color = Color(0xFF000000)
+                            color = colors.primary
                         )
 
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .size(20.dp)
-                                .background(Color(0xFF2A293C)),
+                                .background(Color(0xFFBBA796)),
                             contentAlignment = Alignment.Center
                         ) {
                             if (pack.favorite) {
@@ -488,7 +500,7 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.Start
+                            horizontalArrangement = Arrangement.Center
                         ) {
                             rowStickers.forEach { sticker ->
                                 if (sticker != null) {
@@ -511,7 +523,7 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem
                         contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator(
-                            color = Color(0xFF2A293C)
+                            color = colors.primary
                         )
                     }
                 }

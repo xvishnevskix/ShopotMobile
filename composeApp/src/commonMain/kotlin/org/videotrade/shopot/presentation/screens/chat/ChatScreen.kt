@@ -15,6 +15,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TopAppBar
@@ -236,9 +238,27 @@ class ChatScreen(
                     BottomSheetModal(scaffoldForwardState)
                     //стикеры
                     BottomSheetScaffold(
-                        modifier = Modifier.background(colors.onBackground),
-                        containerColor = colors.onBackground,
-                        sheetContainerColor = colors.onBackground,
+                        sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                        sheetDragHandle = {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(36.dp)
+                                    .background(color = colors.surface, shape = RoundedCornerShape(topEnd = 30.dp, topStart = 30.dp))
+                                    .align(Alignment.Center)
+                                ,
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    Modifier.padding(top = 11.dp).height(3.5.dp).width(35.dp).background(color = colors.secondary, shape = RoundedCornerShape(12.dp))
+                                )
+                            }
+                        },
+                        modifier = Modifier.background(colors.surface),
+                        containerColor = colors.surface,
+                        sheetContainerColor = colors.surface,
+                        sheetContentColor = colors.surface,
+                        sheetShadowElevation = 16.dp,
                         scaffoldState = scaffoldStickerState,
                         sheetContent = {
                             if (showStickerMenu.value) {

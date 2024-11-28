@@ -47,7 +47,12 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.menu_gallery
 
 @Composable
-fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
+fun SelectedMessageImage(
+    attachments: List<Attachment>,
+    selectedMessageSenderName: String,
+    colorTitle: Color = Color.Black,
+    isFromUser: Boolean,
+) {
     val navigator = LocalNavigator.currentOrThrow
     val colors = MaterialTheme.colorScheme
     val imagePainter = remember { mutableStateOf<Painter?>(null) }
@@ -149,7 +154,11 @@ fun SelectedMessageImage(attachments: List<Attachment>, selectedMessageSenderNam
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                             fontWeight = FontWeight(400),
-                            color = colors.secondary,
+                            color = if (isFromUser)
+                                colors.onTertiary
+
+                            else
+                                colors.secondary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         ),
                     )

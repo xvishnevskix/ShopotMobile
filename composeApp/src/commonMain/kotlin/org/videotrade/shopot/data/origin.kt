@@ -46,8 +46,10 @@ class origin {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
-            
-            
+
+            println("tokennn ${token}")
+
+
             println("bodyAsTextbodyAsText ${response.bodyAsText()} ${response.status}")
             
             

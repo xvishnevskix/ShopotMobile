@@ -15,10 +15,11 @@ fun AppTheme(
     val colors = if (darkTheme) {
         darkColorScheme(
             primary = Color(0xFFFFFFFF),
-            inversePrimary = Color(0xFF373533),
+            inversePrimary = Color(0xFF373533) ,
             secondary = Color(0x80FFFFFF),
             onSecondary  = Color(0x4DFFFFFF),
             tertiary = Color(0x80FFFFFF),
+            onTertiary = Color(0x80373533),
             background = Color(0xFF373533),
             surface = Color(0xFF373533),
             secondaryContainer = Color(0x1AFFFFFF),
@@ -34,8 +35,8 @@ fun AppTheme(
             inversePrimary = Color(0xFFFFFFFF),
             secondary = Color(0x80373533),
             onSecondary = Color(0x80373533),
-//            onSecondaryContainer = ,
             tertiary = Color(0xFFF7F7F7),
+            onTertiary = Color(0xFFFFFFFF),
             background = Color(0xFFFFFFFF),
             surface = Color(0xFFf9f9f9),
             secondaryContainer  = Color(0x33373533),

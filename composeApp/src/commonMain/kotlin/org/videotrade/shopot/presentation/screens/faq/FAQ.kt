@@ -68,6 +68,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -453,6 +454,7 @@ class FAQ() : Screen {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
+                cursorBrush = SolidColor(colors.primary),
                 value = email.value,
                 onValueChange = { email.value = it },
                 decorationBox = { innerTextField ->
@@ -515,6 +517,7 @@ class FAQ() : Screen {
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
+                cursorBrush = SolidColor(colors.primary),
                 value = description.value,
                 onValueChange = { description.value = it },
                 decorationBox = { innerTextField ->

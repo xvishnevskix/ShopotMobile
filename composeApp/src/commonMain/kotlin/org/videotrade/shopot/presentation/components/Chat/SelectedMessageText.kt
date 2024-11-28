@@ -32,7 +32,13 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
-fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
+fun SelectedMessageText(
+    selectedMessage: MessageItem,
+    selectedMessageSenderName: String,
+    colorTitle: Color = Color.Black,
+    isFromUser: Boolean,
+
+) {
     val colors = MaterialTheme.colorScheme
     val theme = getThemeMode()
 
@@ -62,7 +68,11 @@ fun SelectedMessageText(selectedMessage: MessageItem, selectedMessageSenderName:
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
-                    color = if (theme == ThemeMode.LIGHT) Color(0x80373533) else colors.secondary,
+                    color = if (isFromUser)
+                        colors.onTertiary
+
+                    else
+                        colors.secondary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             )
