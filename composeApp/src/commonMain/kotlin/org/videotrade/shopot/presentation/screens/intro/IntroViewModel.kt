@@ -11,12 +11,15 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.domain.model.AppVersion
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
@@ -222,16 +225,6 @@ class IntroViewModel : ViewModel(), KoinComponent {
         isObserving.value = true
     }
 
-
-    suspend fun checkVersion(): Boolean {
-//            val getVersion = origin().get<String>("auth/createVersion")
-        val getVersion = 12
-
-//        val op = getBuildVersion()
-        
-//        return getVersion > op
-        return false
-    }
 }
 
 

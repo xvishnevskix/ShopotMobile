@@ -24,6 +24,7 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.clearAllNotifications
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.common.UpdateAppViewModel
 import org.videotrade.shopot.presentation.screens.common.UpdateScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
@@ -39,6 +40,7 @@ class IntroScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
+        val updateAppViewModel: UpdateAppViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
 
         LaunchedEffect(key1 = Unit) {
@@ -53,7 +55,7 @@ class IntroScreen : Screen {
             try {
 
                 val isCheckVersion =
-                    viewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
+                    updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
 
                 if (isCheckVersion) {
                     navigator.push(UpdateScreen())
