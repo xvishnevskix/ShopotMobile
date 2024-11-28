@@ -27,6 +27,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -44,6 +45,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
@@ -75,10 +77,10 @@ fun Otp(
 
 
     val offsetX = remember { Animatable(0f) }
-
+    val colors = MaterialTheme.colorScheme
     // Цвет бордера: красный, если ошибка, иначе серый
     val borderColor by animateColorAsState(
-        targetValue = if (hasError) Color(0xFFFF3B30) else Color(0x33373533),
+        targetValue = if (hasError) colors.error else colors.onSecondary,
         animationSpec = tween(durationMillis = 300)
     )
 
@@ -131,11 +133,12 @@ fun Otp(
                         .offset(x = offsetX.value.dp)
                         .size(width = 60.dp, height = 56.dp) // Размер для каждого квадрата
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.White)
+                        .background(colors.background)
                         .border(1.dp, color = borderColor, RoundedCornerShape(16.dp)), // Добавляем границу
                     contentAlignment = Alignment.Center
                 ) {
                     BasicTextField(
+                        cursorBrush = SolidColor(colors.primary),
                         value = otpFields[index],
                         onValueChange = { input ->
                             val filteredInput = input.filter { it.isDigit() }
@@ -153,7 +156,7 @@ fun Otp(
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
 
                             textAlign = TextAlign.Center,
-                            color = Color(0xFF373533)
+                            color = colors.primary
                         ),
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.NumberPassword,
@@ -189,6 +192,7 @@ fun Otp(
 
 @Composable
 fun LoadingDots() {
+    val colors = MaterialTheme.colorScheme
     val infiniteTransition = rememberInfiniteTransition()
     val animations = (0..3).map { index ->
         infiniteTransition.animateFloat(
@@ -214,13 +218,13 @@ fun LoadingDots() {
                 modifier = Modifier
                     .size(width = 60.dp, height = 56.dp) // Размер для каждого квадрата
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color.White)
+                    .background(colors.background)
                     .border(1.dp, Color(0xFFDDDDDD), RoundedCornerShape(16.dp)), // Добавляем границу
                 contentAlignment = Alignment.Center
             ) {
                 Canvas(modifier = Modifier.size(10.dp)) {
                     drawCircle(
-                        color = Color(0x80373533),
+                        color = colors.secondary,
                         radius = size.minDimension / 2,
                         center = center.copy(y = center.y - offsetY)
                     )
@@ -230,60 +234,3 @@ fun LoadingDots() {
         }
     }
 }
-
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun Otp(otpFields: SnapshotStateList<String>) {
-//
-//    Box(
-//        modifier = Modifier
-//            .padding(top = 45.dp, bottom = 45.dp)
-//            .shadow(1.dp, RoundedCornerShape(10.dp))
-//            .clip(RoundedCornerShape(10.dp))
-//            .background(Color.White),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        val focusRequesters = List(4) { FocusRequester() }
-//
-//        Row(Modifier.padding(10.dp)) {
-//            otpFields.forEachIndexed { index, _ ->
-//                OutlinedTextField(
-//                    value = otpFields[index],
-//                    onValueChange = { input ->
-//                        // Фильтруем ввод так, чтобы оставались только цифры от 0 до 9
-//                        val filteredInput = input.filter { it.isDigit() }
-//                        if (filteredInput.length <= 1) {
-//                            otpFields[index] = filteredInput
-//
-//                            if (filteredInput.isNotEmpty() && index < focusRequesters.size - 1) {
-//                                focusRequesters[index + 1].requestFocus()
-//                            }
-//                        }
-//                    },
-//                    singleLine = true,
-//                    textStyle = TextStyle(textAlign = TextAlign.Center, fontSize = 18.sp),
-//                    keyboardOptions = KeyboardOptions.Default.copy(
-//                        keyboardType = KeyboardType.NumberPassword,
-//                        imeAction = ImeAction.None // Отключаем кнопки "Далее" и т.п.
-//                    ),
-//                    modifier = Modifier
-//                        .focusRequester(focusRequesters[index])
-//                        .size(50.dp)
-//                        .background(Color.Transparent),
-//                    colors = TextFieldDefaults.outlinedTextFieldColors(
-//                        unfocusedBorderColor = Color.Transparent,
-//                        focusedBorderColor = Color.Transparent
-//                    ),
-//                    visualTransformation = VisualTransformation.None // Отключаем визуальную трансформацию
-//                )
-//
-//                if (index < focusRequesters.size - 1) Spacer(modifier = Modifier.width(8.dp))
-//            }
-//        }
-//
-//        DisposableEffect(Unit) {
-//            focusRequesters[0].requestFocus()
-//            onDispose { }
-//        }
-//    }
-//}

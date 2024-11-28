@@ -53,6 +53,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.components.Common.ReconnectionBar
 import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
@@ -270,6 +271,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             }
             
         }
+        ReconnectionBar()
         CallBar()
     }
 }

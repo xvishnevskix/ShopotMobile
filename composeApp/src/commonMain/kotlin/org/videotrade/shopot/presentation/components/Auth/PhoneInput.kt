@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Divider
@@ -36,6 +36,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextRange
@@ -80,13 +82,13 @@ fun PhoneInput(
     animationTrigger: Boolean,
     showPhoneMenu: MutableState<Boolean>
 ) {
-
+    val colors = MaterialTheme.colorScheme
     // Анимация смещения для "тряски"
     val offsetX = remember { Animatable(0f) }
 
     // Цвет бордера: красный, если ошибка, иначе серый
     val borderColor by animateColorAsState(
-        targetValue = if (hasError) Color(0xFFFF3B30) else Color(0x33373533),
+        targetValue = if (hasError) colors.error else colors.onSecondary,
         animationSpec = tween(durationMillis = 300)
     )
 
@@ -125,7 +127,7 @@ fun PhoneInput(
                 .offset(x = offsetX.value.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(16.dp))
-                .background(Color(0xFFFFFFFF))
+                .background(colors.background)
                 .width(161.dp)
                 .height(56.dp)
                 .padding(start = 20.dp, top = 20.dp, bottom = 20.dp, end = 20.dp)
@@ -137,13 +139,14 @@ fun PhoneInput(
                         fontSize = 16.sp,
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                        color = Color(0x80373533)
+                        color = colors.secondary
                     ),
                     modifier = Modifier
                 )
             }
 
             BasicTextField(
+                cursorBrush = SolidColor(colors.primary),
                 value = textState.value,
                 onValueChange = { newTextValue ->
                     // Оставляем только цифры в номере
@@ -161,7 +164,7 @@ fun PhoneInput(
                     fontSize = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     lineHeight = 16.sp,
-                    color = Color(0xFF373533),
+                    color = colors.primary,
                 ),
                 modifier = Modifier.fillMaxSize()
             )
@@ -176,12 +179,13 @@ fun CountryPicker(
     showPhoneMenu: MutableState<Boolean>
 
 ) {
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .height(56.dp)
             .width(93.dp)
-            .background(Color(0xFFF7F7F7))
+            .background(colors.onBackground)
             .clickable {
                 onCountrySelected()
                 showPhoneMenu.value = !showPhoneMenu.value
@@ -206,7 +210,7 @@ fun CountryPicker(
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 lineHeight = 16.sp,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                color = Color(0xFF373533),
+                color = colors.primary,
             )
 
 //                Icon(
@@ -223,7 +227,8 @@ fun CountryPicker(
                     .size(width = 5.dp, height = 12.dp),
                 painter = painterResource(Res.drawable.arrow_left),
                 contentDescription = null,
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                colorFilter =  ColorFilter.tint(colors.primary)
             )
 
 //                DropdownMenu(
@@ -274,11 +279,14 @@ fun CountryPickerBottomSheet(
     onBackClick: () -> Unit,
 
 ) {
+    val colors = MaterialTheme.colorScheme
     Column(
         modifier = Modifier
+            .background(colors.background)
             .fillMaxWidth()
             .padding(16.dp)
             .fillMaxHeight(1f)
+
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 30.dp, start = 16.dp, end = 16.dp),
@@ -303,7 +311,7 @@ fun CountryPickerBottomSheet(
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    color = Color(0xFF373533)
+                    color = colors.primary
                 )
             )
 
@@ -324,7 +332,7 @@ fun CountryPickerBottomSheet(
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    color = Color(0xFF373533)
+                    color = colors.primary
                 )
             )
 
@@ -337,7 +345,7 @@ fun CountryPickerBottomSheet(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
-                    .background(color = Color(0xFFF7F7F7), shape = RoundedCornerShape(size = 16.dp))
+                    .background(color = colors.onBackground, shape = RoundedCornerShape(size = 16.dp))
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -355,7 +363,7 @@ fun CountryPickerBottomSheet(
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                color = Color(0xFF373533)
+                                color = colors.primary
                             )
                         )
                         Text(
@@ -367,7 +375,7 @@ fun CountryPickerBottomSheet(
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                color = Color(0xFF373533)
+                                color = colors.primary
                             )
                         )
                     }
@@ -390,7 +398,7 @@ fun CountryPickerBottomSheet(
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    color = Color(0xFF373533)
+                    color = colors.primary
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -399,9 +407,9 @@ fun CountryPickerBottomSheet(
                     countries.forEach { country ->
                         val (flag, countryName) = country.second.split("   ", limit = 2)
                         val isSelected = country.first == selectedCountryCode
-                        val textColor = if (isSelected) Color(0xFF373533) else Color(0x80373533)
+                        val textColor = if (isSelected) colors.primary else colors.secondary
                         val borderColor =
-                            if (isSelected) Color(0xFF373533) else Color(0x33373533) // rgba(55, 53, 51, 0.2)
+                            if (isSelected) colors.primary else colors.onSecondary // rgba(55, 53, 51, 0.2)
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -439,7 +447,7 @@ fun CountryPickerBottomSheet(
                                             fontWeight = FontWeight(400),
                                             textAlign = TextAlign.Start,
                                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                            color = Color(0xFF373533)
+                                            color = colors.primary
                                         )
                                     )
                                     Spacer(modifier = Modifier.width(10.dp))

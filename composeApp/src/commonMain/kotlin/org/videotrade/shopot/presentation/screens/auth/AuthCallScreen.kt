@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -87,6 +89,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val colors = MaterialTheme.colorScheme
         val responseState = remember { mutableStateOf<String?>("1111") }
         val otpFields = remember { mutableStateListOf("", "", "", "") }
         val isSuccessOtp = remember { mutableStateOf(false) }
@@ -300,7 +303,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 startTimer()
             }
             
-            sendCall()
+//            sendCall()
         }
         
         
@@ -314,11 +317,11 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         
         
         
-        SafeArea(padding = 4.dp) {
+        SafeArea(padding = 4.dp, backgroundColor = colors.background) {
             Box(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
                     .background(
-                        Color.White
+                        colors.background
                     ).imePadding(),
                 contentAlignment = Alignment.TopCenter
             ) {
@@ -346,7 +349,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 .size(width = 195.dp, height = 132.dp),
                             painter = painterResource(Res.drawable.auth_logo),
                             contentDescription = null,
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop,
+                            colorFilter =  ColorFilter.tint(colors.primary)
+
                         )
                         
                         Spacer(modifier = Modifier.height(50.dp))
@@ -363,7 +368,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                     fontWeight = FontWeight(500),
                                     textAlign = TextAlign.Center,
-                                    color = Color(0xFF373533),
+                                    color = colors.primary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                 )
                             )
@@ -379,7 +384,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     textAlign = TextAlign.Center,
-                                    color = Color(0x80373533),
+                                    color = colors.secondary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                 )
                             )

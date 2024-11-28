@@ -24,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -113,7 +115,7 @@ class SignUpScreen(private val phone: String) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
-
+        val colors = MaterialTheme.colorScheme
         val scope = rememberCoroutineScope()
         val textState = remember { mutableStateOf(SignUpTextState()) }
         val byteArray = remember { mutableStateOf<ByteArray?>(null) }
@@ -142,7 +144,7 @@ class SignUpScreen(private val phone: String) : Screen {
         val nickValidate4 =
             stringResource(MokoRes.strings.nickname_can_contain_only_letters_and_numbers)
 
-        SafeArea(padding = 4.dp) {
+        SafeArea(padding = 4.dp, backgroundColor = colors.background) {
             Column(
                 modifier = Modifier
                     .imePadding()
@@ -198,19 +200,21 @@ class SignUpScreen(private val phone: String) : Screen {
                                         .clip(RoundedCornerShape(50))
                                         .width(128.dp)
                                         .height(128.dp)
-                                        .background(color = Color(0xFFF7F7F7)),
+                                        .background(color = colors.onBackground),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Image(
                                         painter = painterResource(Res.drawable.human),
                                         contentDescription = "Edit",
-                                        modifier = Modifier.size(60.dp)
+                                        modifier = Modifier.size(60.dp),
+                                        colorFilter =  ColorFilter.tint(colors.primary)
                                     )
                                 }
                                 Image(
                                     painter = painterResource(Res.drawable.pencil_in_circle),
                                     contentDescription = "Edit",
-                                    modifier = Modifier.size(24.dp).align(Alignment.BottomEnd)
+                                    modifier = Modifier.size(24.dp).align(Alignment.BottomEnd),
+                                    colorFilter =  ColorFilter.tint(colors.primary)
                                 )
                             }
 
@@ -386,84 +390,6 @@ class SignUpScreen(private val phone: String) : Screen {
         }
     }
 
-//    @Composable
-//    fun TextFieldWithTitle(
-//        title: String,
-//        value: String,
-//        onValueChange: (String) -> Unit,
-//        placeholder: String,
-//        error: String? = null
-//    ) {
-//        Column(
-//            modifier = Modifier.padding(top = 7.dp),
-//        ) {
-//            Text(
-//                title,
-//                fontSize = 16.sp,
-//                lineHeight = 16.sp,
-//                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-//                fontWeight = FontWeight(500),
-//                textAlign = TextAlign.Center,
-//                color = Color(0xFF373533),
-//                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                modifier = Modifier.padding(
-//                    top = 5.dp,
-//                    bottom = 8.dp,
-//                ),
-//
-//            )
-//            BasicTextField(
-//                value = value,
-//                onValueChange = onValueChange,
-//                decorationBox = { innerTextField ->
-//                    if (value.isEmpty()) {
-//                        Text(
-//                            text = placeholder, style = TextStyle(
-//                                fontSize = 16.sp,
-//                                lineHeight = 16.sp,
-//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                                fontWeight = FontWeight(400),
-//                                textAlign = TextAlign.Start,
-//                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                                color = Color(0x80373533)
-//                            )
-//                        )
-//                    }
-//                    innerTextField()
-//                },
-//                textStyle = TextStyle(
-//                    fontSize = 16.sp,
-//                    lineHeight = 16.sp,
-//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                    fontWeight = FontWeight(400),
-//                    textAlign = TextAlign.Start,
-//                    color = Color(0xFF373533)
-//                ),
-//                singleLine = true,
-//                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-//                modifier = Modifier
-//
-//                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
-//                    .fillMaxWidth(0.95f).background(Color(0xFFFFFFFF))
-//                    .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
-//            )
-//
-//            error?.let {
-//                Text(
-//                    text = it,
-//                    color = Color.Red,
-//                    fontSize = 12.sp,
-//                    lineHeight = 12.sp,
-//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                    fontWeight = FontWeight(400),
-//                    textAlign = TextAlign.Center,
-//                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
-//                )
-//            }
-//        }
-//    }
-//}
 
 
 

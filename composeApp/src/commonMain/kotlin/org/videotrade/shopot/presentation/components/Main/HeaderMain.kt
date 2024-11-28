@@ -45,6 +45,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import org.videotrade.shopot.presentation.components.Common.ReconnectionBar
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import org.videotrade.shopot.presentation.tabs.ContactsTab
@@ -126,9 +127,11 @@ fun HeaderMain(isSearching: MutableState<Boolean>,) {
         }
 
         }
-        Box(modifier = Modifier.padding(top = 5.dp)) {
+        Box(Modifier.padding(top = 2.dp)) {
+            ReconnectionBar()
             CallBar()
         }
+
     }
 
 }

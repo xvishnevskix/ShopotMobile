@@ -16,6 +16,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -79,10 +80,11 @@ import shopot.composeapp.generated.resources.auth_logo
 fun AuthHeader(text: String) {
     val navigator = LocalNavigator.currentOrThrow
     val showDialog = remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
 
     if (showDialog.value) {
         AlertDialog(
-            containerColor = Color(0xFFF3F4F6),
+            containerColor = Color(0xFFf9f9f9),
             onDismissRequest = {
                 showDialog.value = false
             },
@@ -94,12 +96,13 @@ fun AuthHeader(text: String) {
                             MokoRes.strings.you_will_be_returned_to_the_initial_login_screen
                         )
                     }",
-                    fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
                     textAlign = TextAlign.Center,
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                    color = Color(0xFF000000)
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
 
             },
@@ -139,14 +142,7 @@ fun AuthHeader(text: String) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-//        Icon(
-//            imageVector = Icons.Default.ArrowBack,
-//            contentDescription = "Back",
-//            modifier = Modifier.padding(end = 8.dp).clickable {
-//                showDialog = true
-//            }.width(20.dp),
-//            tint = Color.Black
-//        )
+
         Box(modifier = Modifier.clickable {
             showDialog.value = true
         }.padding(start = 8.dp, end = 8.dp)) {
@@ -161,7 +157,7 @@ fun AuthHeader(text: String) {
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
-                color = Color(0xFF373533)
+                color = colors.primary
             )
         )
 

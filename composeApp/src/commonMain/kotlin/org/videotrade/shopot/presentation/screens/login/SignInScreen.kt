@@ -29,6 +29,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
@@ -99,6 +101,7 @@ class SignInScreen : Screen {
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
+        val colors = MaterialTheme.colorScheme
         val navigator = LocalNavigator.currentOrThrow
         val toasterViewModel: CommonViewModel = koinInject()
         val coroutineScope = rememberCoroutineScope()
@@ -145,7 +148,7 @@ class SignInScreen : Screen {
         }
 
 
-        SafeArea(padding = 4.dp)
+        SafeArea(padding = 4.dp, backgroundColor = colors.background)
         {
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
@@ -178,7 +181,7 @@ class SignInScreen : Screen {
                 Box(
                     modifier = Modifier.fillMaxWidth().fillMaxHeight()
                         .background(
-                            Color.White
+                            colors.background
                         ),
                     contentAlignment = Alignment.TopCenter
                 ) {
@@ -203,7 +206,8 @@ class SignInScreen : Screen {
                                     .size(width = 195.dp, height = 132.dp),
                                 painter = painterResource(Res.drawable.auth_logo),
                                 contentDescription = null,
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Crop,
+                                colorFilter =  ColorFilter.tint(colors.primary)
                             )
 
                             Spacer(modifier = Modifier.height(50.dp))
@@ -220,7 +224,7 @@ class SignInScreen : Screen {
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                         fontWeight = FontWeight(500),
                                         textAlign = TextAlign.Center,
-                                        color = Color(0xFF373533),
+                                        color = colors.primary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                     )
                                 )
@@ -233,7 +237,7 @@ class SignInScreen : Screen {
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
                                         textAlign = TextAlign.Center,
-                                        color = Color(0x80373533),
+                                        color = colors.secondary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                     )
                                 )

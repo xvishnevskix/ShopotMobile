@@ -233,5 +233,6 @@
 
     <string name="delete_message">Удалить сообщение?</string>
     <string name="create_your_first_chat">Создайте свой первый чат</string>
-
+    <string name="back_to_conversation">Вернуться к разговору</string>
+    <string name="restoring_the_connection">Восстанавливаем соединение...</string>
 </resources>

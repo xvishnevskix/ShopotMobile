@@ -237,6 +237,8 @@
 
     <string name="delete_message">Delete message?</string>
     <string name="create_your_first_chat">Create your first chat</string>
+    <string name="back_to_conversation">Back to conversation</string>
+    <string name="restoring_the_connection">Restoring the connection...</string>
 
 
 
