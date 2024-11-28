@@ -1,0 +1,38 @@
+package org.videotrade.shopot.multiplatform
+
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+
+// NetworkListener.kt
+class NetworkListener(private val helper: NetworkHelper) {
+    val networkStatus: Flow<NetworkStatus> = callbackFlow {
+        helper.registerListener(
+            onNetworkAvailable = {
+                trySend(NetworkStatus.Connected)
+            },
+            onNetworkLost = {
+                trySend(NetworkStatus.Disconnected)
+            }
+        )
+        
+        awaitClose {
+            helper.unregisterListener()
+        }
+    }.distinctUntilChanged().flowOn(Dispatchers.IO)
+}
+
+class TestFileHelperListener(private val helper: TestFileHelper) {
+    fun getPrintCommon() {
+        helper.getPrint()
+    }
+}
+
+sealed class NetworkStatus {
+    data object Connected : NetworkStatus()
+    data object Disconnected : NetworkStatus()
+}

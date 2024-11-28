@@ -9,7 +9,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -17,13 +16,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getSystemService
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import com.google.firebase.Firebase
 import com.google.firebase.initialize
 import com.mmk.kmpnotifier.notification.NotifierManager
@@ -45,7 +39,7 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.NotificationHelper.createNotificationChannel
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
-import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.multiplatform.platformModule
 
 
 class AndroidApp : Application() {
@@ -68,9 +62,8 @@ class AndroidApp : Application() {
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
         }
-        
 
-        
+
 //        if (!Settings.canDrawOverlays(this)) {
 //            val intent = Intent(
 //                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -81,10 +74,12 @@ class AndroidApp : Application() {
 //        }
         
         
-        
         initializeFactories(this)
         startKoin {
             modules(getSharedModules() + provideEncapsulateChecker())
+            
+            modules(platformModule)
+            
         }
         INSTANCE = this
         
@@ -203,7 +198,7 @@ open class AppActivity : ComponentActivity() {
             // Возвращаем null, так как выполнение функции должно быть прервано до получения разрешения
 //                return@withContext null
         }
-    
+        
     }
     
     private fun initializeProviders() {
@@ -240,6 +235,7 @@ open class AppActivity : ComponentActivity() {
 
 
 fun deleteNotification(context: Context) {
-    val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.cancel(3)
 }

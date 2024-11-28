@@ -5,3 +5,8 @@ interface NetworkHelper {
     fun registerListener(onNetworkAvailable: () -> Unit, onNetworkLost: () -> Unit)
     fun unregisterListener()
 }
+
+
+interface TestFileHelper {
+    fun getPrint()
+}
