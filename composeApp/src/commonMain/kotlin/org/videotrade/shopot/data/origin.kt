@@ -47,8 +47,6 @@ class origin {
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
 
-            println("tokennn ${token}")
-
 
             println("bodyAsTextbodyAsText ${response.bodyAsText()} ${response.status}")
             
