@@ -102,7 +102,7 @@ class ProfileScreen(
                 Res.drawable.profile_design,
                 20.dp,
                 20.dp,
-                "Оформление"
+                stringResource(MokoRes.strings.design)
             ) {
                 navigator.push(
                     ThemeScreen()

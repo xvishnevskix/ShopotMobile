@@ -85,14 +85,14 @@ class ThemeScreen : Screen {
                 modifier = Modifier.fillMaxWidth().background(colors.background)
             ) {
 
-                BaseHeader("Оформление", background = colors.background)
+                BaseHeader(stringResource(MokoRes.strings.design), background = colors.background)
 
 
 
                 Spacer(modifier = Modifier.height(36.dp))
 
                 Text(
-                    text = "Режим",
+                    text = stringResource(MokoRes.strings.mode),
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
@@ -148,7 +148,7 @@ class ThemeScreen : Screen {
                                 )
                             }
                             Text(
-                                "Ночной режим",
+                                stringResource(MokoRes.strings.night_mode),
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
