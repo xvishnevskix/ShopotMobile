@@ -53,18 +53,33 @@ kotlin {
         }
     }
     
+//    listOf(
+//        iosX64 { configureWebRtcCinterops() },
+//        iosArm64 { configureWebRtcCinterops() },
+//        iosSimulatorArm64 { configureWebRtcCinterops() }
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            export("io.github.mirzemehdi:kmpnotifier:1.0.0")
+//            export(libs.resources)
+//            baseName = "ComposeApp"
+//            isStatic = true
+//        }
+//    }
+    
     listOf(
         iosX64 { configureWebRtcCinterops() },
         iosArm64 { configureWebRtcCinterops() },
         iosSimulatorArm64 { configureWebRtcCinterops() }
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
-            export("io.github.mirzemehdi:kmpnotifier:1.0.0")
-            export(libs.resources)
             baseName = "ComposeApp"
-            isStatic = true
+            isStatic = true // Уберите, если проблемы сохраняются
+            export("io.github.mirzemehdi:kmpnotifier:1.0.0")
+            export("com.example:resources:1.0.0") // Замените, если `libs.resources` не работает
         }
     }
+    
+
     
     sourceSets {
         
