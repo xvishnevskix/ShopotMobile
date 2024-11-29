@@ -62,7 +62,7 @@ class MainScreen : Screen {
     override fun Content() {
         val commonViewModel: CommonViewModel = koinInject()
         val navigator = LocalNavigator.currentOrThrow
-
+        val colors = MaterialTheme.colorScheme
         
         
         LaunchedEffect(Unit) {
@@ -88,7 +88,7 @@ class MainScreen : Screen {
                         ),
                     bottomBar = {
                         BottomNavigation(
-                            backgroundColor = Color.White,
+                            backgroundColor = colors.background,
 
                             modifier = Modifier
                                 .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
@@ -97,7 +97,7 @@ class MainScreen : Screen {
                                     shape = RectangleShape, // Прямоугольная форма тени
                                     clip = false // Тень выходит за границы элемента
                                 )
-                                .background(Color.White)
+                                .background(colors.background)
                                 .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                             ,
 
@@ -124,7 +124,8 @@ class MainScreen : Screen {
 @Composable
 private fun RowScope.TabNavigationItem(tab: Tab, width: Dp, height: Dp) {
     val tabNavigator: TabNavigator = LocalTabNavigator.current
-    
+    val colors = MaterialTheme.colorScheme
+
     BottomNavigationItem(
         selected = tabNavigator.current == tab,
         onClick = { tabNavigator.current = tab },
@@ -140,7 +141,7 @@ private fun RowScope.TabNavigationItem(tab: Tab, width: Dp, height: Dp) {
                         .padding(bottom = 5.dp),
                     painter = icon,
                     contentDescription = tab.options.title,
-                    tint = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else Color(0xFF373533)
+                    tint = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else colors.primary
                 )
                 }
             }
@@ -154,7 +155,7 @@ private fun RowScope.TabNavigationItem(tab: Tab, width: Dp, height: Dp) {
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
-                    color = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else Color(0xFF373533),
+                    color = if (tabNavigator.current == tab) Color(0xFFCAB7A3) else colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                 )
 

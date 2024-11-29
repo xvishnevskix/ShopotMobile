@@ -20,6 +20,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -58,11 +59,11 @@ fun CreateChatHeader(
     isSearching: MutableState<Boolean>,
 ) {
     val navigator = LocalNavigator.currentOrThrow
-    
+    val colors = MaterialTheme.colorScheme
 
     
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier.background(colors.background).padding(horizontal = 16.dp)
     ) {
         Row(
             modifier = Modifier
@@ -71,60 +72,6 @@ fun CreateChatHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-//            Crossfade(targetState = isSearching.value) { searching ->
-//                if (searching) {
-//                    Row(
-//                        modifier = Modifier.fillMaxWidth(),
-//                        verticalAlignment = Alignment.CenterVertically,
-//                        horizontalArrangement = Arrangement.SpaceBetween
-//                    ) {
-//                        BasicTextField(
-//                            value = searchQuery.value,
-//                            onValueChange = { newText -> searchQuery.value = newText },
-//                            singleLine = true,
-//                            textStyle = textStyle,
-//                            cursorBrush = SolidColor(androidx.compose.ui.graphics.Color.Black),
-//                            modifier = Modifier
-//                                .weight(1f)
-//                                .height(35.dp)
-//                                .background(androidx.compose.ui.graphics.Color.Transparent)
-//                                .padding(start = 0.dp, end = 0.dp),
-//                            decorationBox = { innerTextField ->
-//                                Box(
-//                                    modifier = Modifier
-//                                        .background(androidx.compose.ui.graphics.Color.Transparent)
-//                                        .padding(8.dp)
-//                                ) {
-//                                    if (searchQuery.value.isEmpty()) {
-//                                        Text(
-//                                            stringResource(MokoRes.strings.enter_name_or_phone),
-//                                            style = textStyle.copy(color = androidx.compose.ui.graphics.Color.Gray)
-//                                        )
-//                                    }
-//                                    innerTextField()
-//                                }
-//                            }
-//                        )
-//
-//                        val rotationAngle by animateFloatAsState(
-//                            targetValue = if (searching) 270f else 0f,
-//                            animationSpec = tween(durationMillis = 10000, easing = LinearEasing)
-//                        )
-//
-//                        Icon(
-//                            imageVector = Icons.Default.Close,
-//                            contentDescription = "Close",
-//                            tint = Color(0xFF000000),
-//                            modifier = Modifier
-//                                .padding()
-//                                .pointerInput(Unit) {
-//                                    isSearching.value = false
-//                                    searchQuery.value = ""
-//                                }
-//                                .rotate(rotationAngle)
-//                        )
-//                    }
-//                } else {
                     Row(
                         modifier = Modifier.fillMaxWidth().height(35.dp),
                         verticalAlignment = Alignment.CenterVertically,
@@ -138,7 +85,7 @@ fun CreateChatHeader(
                             lineHeight = 24.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
-                            color = Color(0xFF373533),
+                            color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
                         )
@@ -153,14 +100,14 @@ fun CreateChatHeader(
                                        .pointerInput(Unit) {
                                            isSearching.value = true
                                        },
-                                   colorFilter = ColorFilter.tint(Color(0xff000000))
+                                   colorFilter =  ColorFilter.tint(colors.primary)
                                )
                            }
                        }
                     }
             }
         }
-        Box(Modifier.padding(bottom = 18.dp)) {
+        Box(Modifier.background(colors.background)) {
             CallBar()
         }
 }

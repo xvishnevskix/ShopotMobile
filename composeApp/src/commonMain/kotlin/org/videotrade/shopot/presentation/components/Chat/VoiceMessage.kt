@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -72,7 +73,7 @@ fun VoiceMessage(
     attachments: List<Attachment>
 ) {
     val scope = rememberCoroutineScope()
-
+    val colors = MaterialTheme.colorScheme
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
 
@@ -200,7 +201,7 @@ fun VoiceMessage(
         if (isStartCipherLoading) {
             LoadingBox(
                 isLoading = isStartCipherLoading,
-                color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                color = if (message.fromUser == profile.id) Color.White else colors.primary,
                 onCancel = {
                     isStartCipherLoading = false
                     viewModel.deleteMessage(message)
@@ -210,7 +211,7 @@ fun VoiceMessage(
             LoadingBox(
                 isLoading = isLoading,
                 progress = progress,
-                color = if (message.fromUser == profile.id) Color.White else Color.DarkGray,
+                color = if (message.fromUser == profile.id) Color.White else colors.primary,
                 onCancel = {
                     isLoading = false
                 }
@@ -241,7 +242,7 @@ fun VoiceMessage(
                 lineHeight = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                 fontWeight = FontWeight(400),
-                color = if (message.fromUser == profile.id) Color.White  else Color(0xFF373533),
+                color = if (message.fromUser == profile.id) Color.White  else colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
             )
         }
@@ -251,7 +252,7 @@ fun VoiceMessage(
 @Composable
 fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO) {
     val minAmplitude = 0.2f // Минимальная амплитуда для каждой волны
-
+    val colors = MaterialTheme.colorScheme
     Canvas(
         modifier = Modifier
             .fillMaxWidth()
@@ -265,7 +266,7 @@ fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO) {
             val barHeight = maxBarHeight * adjustedAmplitude
 
             drawRoundRect(
-                color = if (message.fromUser == profile.id) Color.White else Color(0xFF373533),
+                color = if (message.fromUser == profile.id) Color.White else colors.primary,
                 topLeft = Offset(index * 2 * barWidth, maxBarHeight / 2 - barHeight / 2),
                 size = Size(barWidth, barHeight),
                 cornerRadius = CornerRadius(barWidth / 2) // Закруглённые углы
@@ -281,6 +282,7 @@ fun LoadingBox(
     color: Color,
     onCancel: () -> Unit
 ) {
+
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(24.dp)
@@ -304,7 +306,7 @@ fun LoadingBox(
             imageVector = Icons.Default.Close,
             contentDescription = "Close",
             modifier = Modifier
-                .padding()
+                .padding(1.dp)
                 .clickable(onClick = onCancel),
             tint = color
         )
@@ -317,6 +319,7 @@ fun PlayPauseButton(
     onClick: () -> Unit,
     isFromUser: Boolean
 ) {
+    val colors = MaterialTheme.colorScheme
     IconButton(
         onClick = onClick,
         modifier = Modifier.size(24.dp)
@@ -330,7 +333,7 @@ fun PlayPauseButton(
             painter = icon,
             contentDescription = null,
             modifier = Modifier.size(14.dp),
-            colorFilter = if (isFromUser) ColorFilter.tint(Color.White) else ColorFilter.tint(Color(0xFF373533))
+            colorFilter = if (isFromUser) ColorFilter.tint(Color.White) else ColorFilter.tint(colors.primary)
         )
     }
 }

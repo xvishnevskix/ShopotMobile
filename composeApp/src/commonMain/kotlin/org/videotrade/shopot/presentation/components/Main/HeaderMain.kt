@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DrawerState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -44,6 +45,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import org.videotrade.shopot.presentation.components.Common.ReconnectionBar
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import org.videotrade.shopot.presentation.tabs.ContactsTab
@@ -60,7 +62,7 @@ import shopot.composeapp.generated.resources.search_icon
 fun HeaderMain(isSearching: MutableState<Boolean>,) {
     val interactionSource =
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
-
+    val colors = MaterialTheme.colorScheme
     val tabNavigator = LocalTabNavigator.current
 
     Column {
@@ -79,7 +81,7 @@ fun HeaderMain(isSearching: MutableState<Boolean>,) {
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,
-                     color = Color(0xFF373533),
+                     color = colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
 
                 )
@@ -102,7 +104,7 @@ fun HeaderMain(isSearching: MutableState<Boolean>,) {
 
                                 .size(18.dp)
                                 ,
-                            colorFilter = ColorFilter.tint(Color(0xff000000))
+                            colorFilter =  ColorFilter.tint(colors.primary)
                         )
                     }
                 }
@@ -119,15 +121,17 @@ fun HeaderMain(isSearching: MutableState<Boolean>,) {
                     modifier = Modifier
                         .size(18.dp)
                     ,
-                    colorFilter = ColorFilter.tint(Color(0xff000000))
+                    colorFilter =  ColorFilter.tint(colors.primary)
                 )
             }
         }
 
         }
-        Box(modifier = Modifier.padding(top = 5.dp)) {
+        Box(Modifier.padding(top = 2.dp)) {
+            ReconnectionBar()
             CallBar()
         }
+
     }
 
 }

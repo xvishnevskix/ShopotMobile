@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -42,10 +43,13 @@ import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileChatHeader
+import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
+import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
 class ProfileChatScreen(private val chat: ChatItem) : Screen {
@@ -59,8 +63,8 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
         }
-        println("sssssss ${chat.userId}")
-        
+        val colors = MaterialTheme.colorScheme
+
         val tabs = ProfileMediaTabs.entries.map { tab ->
             org.videotrade.shopot.presentation.screens.group.TabInfo(
                 title = stringResource(tab.titleResId),
@@ -72,7 +76,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
         
         
         Box(
-            modifier = Modifier.fillMaxSize().background(Color.White),
+            modifier = Modifier.fillMaxSize().background(colors.background),
             contentAlignment = Alignment.TopStart
         ) {
             
@@ -81,7 +85,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color.White)
+                        .background(colors.background)
                         .padding(16.dp)
                 ) {
                     ProfileChatHeader(stringResource(MokoRes.strings.profile))
@@ -107,20 +111,14 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         }
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-                    
-                    val displayName = when {
-                        chat.personal -> "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
-                        else -> chat.groupName.orEmpty()
-                    }
-                    
                     Text(
-                        text = displayName,
+                        "${chat.firstName} ${chat.lastName}",
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
-                        color = Color(0xFF373533),
+                        color = colors.primary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         modifier = Modifier,
                     )
@@ -138,22 +136,21 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
-                                color = Color(0x80373533),
+                                color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 modifier = Modifier.padding(end = if (chat.phone == "") 0.dp else 1.dp),
                             )
                         }
-                        
+
                         Box(
-                            modifier = Modifier.padding(start = 18.dp, end = 18.dp)
-                                .clip(RoundedCornerShape(50.dp)).width(4.dp)
+                            modifier = Modifier.padding(start = 18.dp, end = 18.dp).clip(RoundedCornerShape(50.dp)).width(4.dp)
                                 .height(4.dp)
-                                .background(color = Color(0x80373533)),
+                                .background(color = colors.secondary),
                             contentAlignment = Alignment.Center
                         ) {
-                        
+
                         }
-                        
+
                         if (chat.chatUser?.get(0)?.login != null) {
                             Text(
                                 chat.chatUser!![0].login!!,
@@ -162,14 +159,14 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
-                                color = Color(0x80373533),
+                                color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
                     }
-                    
+
                     Spacer(modifier = Modifier.height(28.dp))
-                    
+
                     if (chat.chatUser?.get(0)?.description != null) {
                         Text(
                             chat.chatUser!![0].description!!,
@@ -183,234 +180,15 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         )
                     }
                     Spacer(modifier = Modifier.height(56.dp))
-//                    Text(
-//                        "${chat.firstName} ${chat.lastName}",
-//                        textAlign = TextAlign.Center,
-//                        fontSize = 16.sp,
-//                        lineHeight = 16.sp,
-//                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-//                        fontWeight = FontWeight(500),
-//                        color = Color(0xFF373533),
-//                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                    )
-//                    Row(
-//                        horizontalArrangement = Arrangement.SpaceAround,
-//                        modifier = Modifier.padding(bottom = 24.dp),
-//                    ) {
-//                        chat.phone?.let {
-//                            Text(
-//                                it,
-//                                textAlign = TextAlign.Center,
-//                                fontSize = 16.sp,
-//                                lineHeight = 16.sp,
-//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                                fontWeight = FontWeight(400),
-//                                color = Color(0x80373533),
-//                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                                modifier = Modifier.padding(end = if (chat.phone == "") 0.dp else 1.dp),
-//                            )
-//                        }
 //
-//                        if (chat.chatUser?.get(0)?.login != null) {
-//                            Text(
-//                                chat.chatUser!![0].login!!,
-//                                textAlign = TextAlign.Center,
-//                                fontSize = 16.sp,
-//                                lineHeight = 16.sp,
-//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                                fontWeight = FontWeight(400),
-//                                color = Color(0x80373533),
-//                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                            )
-//                        }
-//                    }
-//
-//
-//                    if (chat.chatUser?.get(0)?.description != null) {
-//                        Text(
-//                            chat.chatUser!![0].description!!,
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 16.sp,
-//                            lineHeight = 16.sp,
-//                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-//                            fontWeight = FontWeight(500),
-//                            color = Color(0xFFCAB7A3),
-//                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                        )
-//                    }
-
-
-//                        Row(
-//                            modifier = Modifier
-//                                .padding(start = 5.dp, end = 5.dp, top = 10.dp, bottom = 20.dp)
-//                                .fillMaxWidth(),
-//                            horizontalArrangement = Arrangement.SpaceBetween
-//                        ) {
-//                            GroupShortButton(
-//                                drawableRes = Res.drawable.video_icon,
-//                                width = 22.5.dp,
-//                                height = 15.dp,
-//                                text = stringResource(MokoRes.strings.video_call),
-//                                onClick = {}
-//
-//                            )
-//                            GroupShortButton(
-//                                drawableRes = Res.drawable.call,
-//                                width = 16.dp,
-//                                height = 16.dp,
-//                                text = stringResource(MokoRes.strings.call),
-//                                onClick = {}
-//                            )
-//                            GroupShortButton(
-//                                drawableRes = Res.drawable.notification,
-//                                width = 18.dp,
-//                                height = 15.dp,
-//                                text = stringResource(MokoRes.strings.notifications),
-//                                onClick = {}
-//                            )
-//                            GroupShortButton(
-//                                drawableRes = Res.drawable.search_icon,
-//                                width = 16.85.dp,
-//                                height = 16.85.dp,
-//                                text = stringResource(MokoRes.strings.search),
-//                                onClick = {}
-//                            )
-//                        }
                 }
                 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-//                    profile.description?.let {
-//                        Text(
-//                            it,
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 14.sp,
-//                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-//                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                            lineHeight = 20.sp,
-//                            modifier = Modifier.padding(top = 10.dp),
-//                            color = Color(0xFF000000)
-//                        )
-//                    }
-//                    Text(
-//                        "Июль, 2024",
-//                        textAlign = TextAlign.Center,
-//                        fontSize = 16.sp,
-//                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                        lineHeight = 20.sp,
-//                        modifier = Modifier.padding(top = 5.dp),
-//                        color = Color(0xFF979797)
-//                    )
                 }
 
-//                Scaffold(
-//
-//                ) {
-//                    Column(
-//                        modifier = Modifier
-//                            .fillMaxSize()
-//                            .padding(top = 5.dp),
-//                        horizontalAlignment = Alignment.CenterHorizontally
-//
-//                    ) {
-//                        TabRow(
-//                            selectedTabIndex = selectedTabIndex.value,
-//                            modifier = Modifier.fillMaxWidth(0.95F),
-//                            indicator = @Composable { tabPositions ->
-//                                TabRowDefaults.SecondaryIndicator(
-//                                    modifier = Modifier
-//                                        .tabIndicatorOffset(tabPositions[selectedTabIndex.value])
-//                                        .clip(RoundedCornerShape(8.dp)),
-//                                    height = 3.dp,
-//                                    color = Color(0xFF29303C),
-//
-//                                    )
-//                            }
-//
-//                        ) {
-//                            ProfileMediaTabs.entries.forEachIndexed { index, currentTab ->
-//
-//                                val tabInfo = tabs[index]
-//
-//
-//                                Tab(
-//                                    modifier = Modifier.fillMaxWidth().padding(0.dp).clip(
-//                                        RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)),
-//                                    selected = selectedTabIndex.value == index,
-//                                    selectedContentColor = Color(0xFF29303C),
-//                                    unselectedContentColor = Color(0xFFA9A8AA),
-//
-//                                    onClick = {
-//                                        scope.launch {
-//                                            pagerState.animateScrollToPage(currentTab.ordinal)
-//                                        }
-//                                    },
-//
-//                                    text = {
-//                                        Text(
-//                                            modifier = Modifier.wrapContentWidth(),
-//                                            text = tabInfo.title,
-//                                            textAlign = TextAlign.Start,
-//                                            fontSize = 15.sp,
-//                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-//                                            letterSpacing = TextUnit(-1.3F, TextUnitType.Sp),
-//                                            lineHeight = 15.sp,
-//                                            softWrap = false
-//                                        )
-//                                    },
-//                                )
-//                            }
-//                        }
-//
-//                        HorizontalPager(
-//                            state = pagerState,
-//                            modifier = Modifier
-//                                .fillMaxWidth()
-//                                .weight(1f)
-//                                .padding(top = 0.dp)
-//                        ) {
-//                            Box(
-//                                modifier = Modifier.fillMaxSize(),
-//
-//                                contentAlignment = Alignment.TopCenter,
-//                            ) {
-//                                val selectedTab = tabs[selectedTabIndex.value]
-////                                Text( text = Tabs.entries[selectedTabIndex.value].text)
-//
-//                                if (selectedTab.text == stringResource(MokoRes.strings.media)) {
-//                                    LazyColumn(
-//                                        verticalArrangement = Arrangement.Top,
-//                                        horizontalAlignment = Alignment.CenterHorizontally,
-//                                        modifier = Modifier.fillMaxSize()
-//                                    ) {
-//                                        item {
-//
-//                                        }
-//                                    }
-//                                } else {
-//                                    Box(
-//                                        modifier = Modifier.fillMaxHeight(0.7F),
-//                                        contentAlignment = Alignment.Center
-//                                    ) {
-//                                        Text(
-//                                            text = selectedTab.text,
-//                                            fontSize = 15.sp,
-//                                            fontFamily = FontFamily(Font(Res.font.SFProText_Semibold)),
-//                                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                                            lineHeight = 24.sp,
-//                                            textDecoration = TextDecoration.Underline,
-//                                            color = Color(0xFF808080)
-//                                        )
-//                                    }
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-            
             }
         }
         

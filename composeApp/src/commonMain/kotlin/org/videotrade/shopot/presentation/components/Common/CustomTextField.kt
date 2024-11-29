@@ -10,11 +10,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -38,6 +40,9 @@ fun CustomTextField(
     error: String? = null,
     border: String = "gray"
 ) {
+
+    val colors = MaterialTheme.colorScheme
+
     Column(
         modifier = Modifier.padding(),
     ) {
@@ -49,7 +54,7 @@ fun CustomTextField(
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
-                color = Color(0xFF373533),
+                color = colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 modifier = Modifier.padding(
                     top = 5.dp,
@@ -66,8 +71,8 @@ fun CustomTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(58.dp)
-                        .background(Color.White, shape = RoundedCornerShape(size = 16.dp))
-                        .border(width = 1.dp, color = if (border == "gray") Color(0x33373533) else Color(0xFF373533), shape = RoundedCornerShape(size = 16.dp))
+                        .background(colors.background, shape = RoundedCornerShape(size = 16.dp))
+                        .border(width = 1.dp, color = if (border == "gray") colors.secondaryContainer else colors.primary, shape = RoundedCornerShape(size = 16.dp))
                         .padding(
                             horizontal = 16.dp,
                             vertical = 16.dp
@@ -84,7 +89,7 @@ fun CustomTextField(
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                color = Color(0x80373533)
+                                color = colors.secondary
                             )
                         )
                     }
@@ -98,19 +103,20 @@ fun CustomTextField(
                 fontWeight = FontWeight(400),
                 textAlign = TextAlign.Start,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                color = Color(0xFF373533)
+                color = colors.primary
             ),
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             modifier = Modifier
-                .fillMaxWidth(1f)
+                .fillMaxWidth(1f),
+            cursorBrush = SolidColor(colors.primary)
         )
 
 
         error?.let {
             Text(
                 text = it,
-                color = Color.Red,
+                color = colors.error,
                 fontSize = 12.sp,
                 lineHeight = 12.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),

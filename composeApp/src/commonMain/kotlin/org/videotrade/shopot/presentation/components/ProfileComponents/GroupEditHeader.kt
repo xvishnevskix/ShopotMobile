@@ -33,6 +33,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.group.GroupEditScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -64,13 +65,7 @@ fun GroupEditHeader(text: String, onClick: (() -> Unit)? = null) {
             Box(modifier = Modifier.clickable {
                 navigator.pop()
             }.padding(start = 8.dp, end = 8.dp)) {
-                Image(
-                    modifier = Modifier
-                        .size(width = 7.dp, height = 14.dp),
-                    painter = painterResource(Res.drawable.arrow_left),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop
-                )
+                BackIcon()
             }
 
             Text(

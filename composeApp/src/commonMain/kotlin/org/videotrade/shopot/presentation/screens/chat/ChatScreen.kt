@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -14,12 +15,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.TopAppBar
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
@@ -76,7 +80,7 @@ class ChatScreen(
         var showStickerMenu = remember { mutableStateOf(false) }
         val scope = rememberCoroutineScope()
         val boxSelectedMessageHeight = viewModel.boxHeight.collectAsState()
-
+        val colors = MaterialTheme.colorScheme
         val selectedMessage = remember { mutableStateOf<MessageItem?>(null) }
         var selectedMessageY = remember { mutableStateOf(0) }
         var hiddenMessageId = remember { mutableStateOf<String?>(null) }
@@ -132,7 +136,7 @@ class ChatScreen(
             BoxWithConstraints(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color.White)
+                    .background(colors.background)
                     .pointerInput(Unit) {
                         detectTapGestures {
                             scope.launch {
@@ -160,7 +164,7 @@ class ChatScreen(
 //                println("screenHeightInPx selectedMessageY ${selectedMessageY.value}")
 
                 SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
-                    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+                    Column(modifier = Modifier.fillMaxSize().background(colors.background)) {
                         Scaffold(
                             topBar = {
                                 ChatHeader(chat, viewModel, profile)
@@ -188,18 +192,41 @@ class ChatScreen(
                                         })
                                 }
                             },
-                            containerColor = Color.White,
+                            containerColor = colors.background,
 
                             modifier = Modifier
-                                .fillMaxSize().background(Color.White)
+                                .fillMaxSize().background(colors.background)
                         ) { innerPadding ->
                             Chat(
                                 viewModel,
                                 profile,
                                 chat,
-                                Modifier.fillMaxSize().background(Color.White)
+                                Modifier.fillMaxSize().background(colors.background)
                                     .padding(innerPadding),
                                 onMessageClick = { message, y ->
+                                    // Сбрасываем текущее состояние для предотвращения конфликта
+                                    selectedMessage.value = null
+                                    selectedMessageY.value = 0
+                                    isMessageUpdated.value = false
+
+                                    scope.launch {
+
+                                        kotlinx.coroutines.delay(16)
+
+                                        // Устанавливаем новое состояние
+                                        val calculatedY = when {
+                                            boxSelectedMessageHeight.value + y + 180 > screenHeightInPx -> {
+                                                (screenHeightInPx - boxSelectedMessageHeight.value - 180).toInt()
+                                            }
+                                            y < 0 -> 150
+                                            else -> y + 100
+                                        }
+
+                                        selectedMessage.value = message
+                                        selectedMessageY.value = calculatedY
+                                        hiddenMessageId.value = message.id
+                                        isMessageUpdated.value = true
+                                    }
                                     // Сбрасываем текущее состояние для предотвращения конфликта
                                     selectedMessage.value = null
                                     selectedMessageY.value = 0
@@ -237,6 +264,27 @@ class ChatScreen(
                         modifier = Modifier.background(Color(0xFFF7F7F7)),
                         containerColor = Color(0xFFF7F7F7),
                         sheetContainerColor = Color(0xFFF7F7F7),
+                        sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
+                        sheetDragHandle = {
+                            Box(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(36.dp)
+                                    .background(color = colors.surface, shape = RoundedCornerShape(topEnd = 30.dp, topStart = 30.dp))
+                                    .align(Alignment.Center)
+                                ,
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Box(
+                                    Modifier.padding(top = 11.dp).height(3.5.dp).width(35.dp).background(color = colors.secondary, shape = RoundedCornerShape(12.dp))
+                                )
+                            }
+                        },
+                        modifier = Modifier.background(colors.surface),
+                        containerColor = colors.surface,
+                        sheetContainerColor = colors.surface,
+                        sheetContentColor = colors.surface,
+                        sheetShadowElevation = 16.dp,
                         scaffoldState = scaffoldStickerState,
                         sheetContent = {
                             if (showStickerMenu.value) {
@@ -284,6 +332,39 @@ class ChatScreen(
                         }
                     }
                 }
+                Crossfade(targetState = selectedMessage.value) { message ->
+                    if (message != null && isMessageUpdated.value) {
+                        val overlayPosition = selectedMessageY.value
+                        val isWithinBounds = overlayPosition >= 0 &&
+                                overlayPosition + boxSelectedMessageHeight.value + 180 <= screenHeightInPx
+
+                        if (isWithinBounds) {
+                            BlurredMessageOverlay(
+                                chat = chat,
+                                profile = profile,
+                                viewModel = viewModel,
+                                selectedMessage = message,
+                                selectedMessageY = selectedMessageY.value,
+                                onDismiss = {
+                                    selectedMessage.value = null
+                                    hiddenMessageId.value = null
+                                }
+                            )
+                        } else {
+                            scope.launch {
+                                selectedMessageY.value = when {
+                                    overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
+                                    overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
+                                        (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
+                                    }
+                                    else -> overlayPosition
+                                }
+                                isMessageUpdated.value = true // Перезапуск
+                            }
+                        }
+                    }
             }
         }
     }
+
+

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -53,8 +54,13 @@ import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
 
 @Composable
-fun SelectedFileMessage(selectedMessage: MessageItem, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
-
+fun SelectedFileMessage(
+    selectedMessage: MessageItem,
+    selectedMessageSenderName: String,
+    colorTitle: Color = Color.Black,
+    isFromUser: Boolean,
+) {
+    val colors = MaterialTheme.colorScheme
 
     Column(
         modifier = Modifier
@@ -73,16 +79,16 @@ fun SelectedFileMessage(selectedMessage: MessageItem, selectedMessageSenderName:
             )
         Spacer(modifier = Modifier.height(4.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(Res.drawable.chat_file_message),
-                contentDescription = "Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-
-                    .size(width = 14.dp, height = 16.dp),
-                colorFilter = ColorFilter.tint(Color(0xFF979797))
-            )
-            Spacer(modifier = Modifier.width(3.dp))
+//            Image(
+//                painter = painterResource(Res.drawable.chat_file_message),
+//                contentDescription = "Image",
+//                contentScale = ContentScale.Crop,
+//                modifier = Modifier
+//
+//                    .size(width = 14.dp, height = 16.dp),
+//                colorFilter = ColorFilter.tint(Color(0xFF979797))
+//            )
+//            Spacer(modifier = Modifier.width(3.dp))
             selectedMessage.attachments?.get(0)?.let {
                 Text(
                     text = it.name,
@@ -93,7 +99,11 @@ fun SelectedFileMessage(selectedMessage: MessageItem, selectedMessageSenderName:
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = Color(0x80373533),
+                        color = if (isFromUser)
+                            colors.onTertiary
+
+                        else
+                            colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )

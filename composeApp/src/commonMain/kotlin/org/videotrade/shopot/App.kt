@@ -18,29 +18,34 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.settings.AppTheme
+import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
-import org.videotrade.shopot.theme.AppTheme
 
 @Composable
-internal fun App() = AppTheme {
+internal fun App()  {
     val viewModel: MainViewModel = koinInject()
     val commonViewModel: CommonViewModel = koinInject()
     val callViewModel: CallViewModel = koinInject()
-    
-    KoinContext {
-        if (callViewModel.isCallBackground.value) {
-            isActiveCall(callViewModel)
-        } else {
-            setScreenLockFlags(false)
-            
-            Navigator(
-                IntroScreen()
+    val settingsViewModel: SettingsViewModel = koinInject()
+    val isDarkTheme by settingsViewModel.isDarkTheme
+
+    AppTheme(darkTheme = isDarkTheme) {
+        KoinContext {
+            if (callViewModel.isCallBackground.value) {
+                isActiveCall(callViewModel)
+            } else {
+                setScreenLockFlags(false)
+
+                Navigator(
+                    IntroScreen()
 //                TestScreen()
-            ) { navigator ->
-                SlideTransition(navigator)
+                ) { navigator ->
+                    SlideTransition(navigator)
+                }
             }
+
         }
-        
     }
 }
 

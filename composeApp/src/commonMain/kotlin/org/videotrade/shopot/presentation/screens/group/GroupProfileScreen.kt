@@ -21,6 +21,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -75,7 +76,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
         val scope = rememberCoroutineScope()
         val viewModel: ChatViewModel = koinInject()
         val groupUsers = viewModel.groupUsers.collectAsState().value
-        
+        val colors = MaterialTheme.colorScheme
 
 
 //        LaunchedEffect(Unit) {
@@ -83,7 +84,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
 //        }
 
            Box(
-               modifier = Modifier.fillMaxSize(1f).background(Color.White),
+               modifier = Modifier.fillMaxSize(1f).background(colors.background),
                contentAlignment = Alignment.TopStart
            ) {
 
@@ -93,7 +94,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                        modifier = Modifier
                            .padding(horizontal = 24.dp)
                            .fillMaxWidth()
-                           .background(Color.White)
+                           .background(colors.background)
                    ) {
                        GroupProfileHeader(stringResource(MokoRes.strings.edit))
 //                    Avatar(
@@ -129,7 +130,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                        modifier = Modifier.padding(horizontal = 16.dp).weight(1f)
                    ) {
                        itemsIndexed(groupUsers) { _, groupUser ->
-                           GroupUserCard(true, groupUser)
+                           GroupUserCard(groupUser = groupUser, viewModel)
                            Spacer(modifier = Modifier.height(16.dp))
                        }
                    }
@@ -146,7 +147,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                            clip = false,
                            ambientColor = Color.Gray,
                            spotColor = Color.Gray
-                       ).background(Color.White).padding(top = 28.dp),
+                       ).background(colors.background).padding(top = 28.dp),
                        horizontalArrangement = Arrangement.Center
                    ) {
                        ParticipantCountText(groupUsers.size)
@@ -159,6 +160,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
 
 @Composable
 private fun ParticipantCountText(count: Int) {
+    val colors = MaterialTheme.colorScheme
     Text(
         text = getParticipantCountText(count),
         textAlign = TextAlign.Center,
@@ -166,7 +168,7 @@ private fun ParticipantCountText(count: Int) {
         lineHeight = 16.sp,
         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
         fontWeight = FontWeight(500),
-        color = Color(0xFF373533),
+        color = colors.primary,
         letterSpacing = TextUnit(0F, TextUnitType.Sp),
     )
 }

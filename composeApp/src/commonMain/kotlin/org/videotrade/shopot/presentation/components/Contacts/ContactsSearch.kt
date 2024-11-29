@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
@@ -37,7 +38,7 @@ fun ContactsSearch(
     isSearching: MutableState<Boolean>,
     padding: Dp = 16.dp
     ) {
-
+    val colors = MaterialTheme.colorScheme
     Column(
         modifier = Modifier.padding(horizontal = padding).fillMaxWidth()
     ) {
@@ -67,7 +68,7 @@ fun ContactsSearch(
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
-                    color = Color(0xFF373533),
+                    color = colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             }

@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -41,10 +42,15 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.menu_video
 
 @Composable
-fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderName: String, colorTitle: Color = Color.Black) {
+fun SelectedVideoMessage(
+    attachments: List<Attachment>,
+    selectedMessageSenderName: String,
+    colorTitle: Color = Color.Black,
+    isFromUser: Boolean,
+) {
     var photoFilePath = remember { mutableStateOf("") }
     val fileProvider by remember { mutableStateOf(FileProviderFactory.create()) }
-    
+    val colors = MaterialTheme.colorScheme
     val imagePainter = rememberAsyncImagePainter(photoFilePath.value)
     
     LaunchedEffect(Unit) {
@@ -95,16 +101,16 @@ fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderNam
             Spacer(modifier = Modifier.height(4.dp))
             
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(Res.drawable.menu_video),
-                    contentDescription = "Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        
-                        .size(20.dp),
-                    colorFilter = ColorFilter.tint(Color(0xFF979797))
-                )
-                Spacer(modifier = Modifier.width(2.dp))
+//                Image(
+//                    painter = painterResource(Res.drawable.menu_video),
+//                    contentDescription = "Image",
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//
+//                        .size(20.dp),
+//                    colorFilter = ColorFilter.tint(Color(0xFF979797))
+//                )
+//                Spacer(modifier = Modifier.width(2.dp))
                 Text(
                     text = stringResource(MokoRes.strings.video),
                     style = TextStyle(
@@ -112,7 +118,11 @@ fun SelectedVideoMessage(attachments: List<Attachment>, selectedMessageSenderNam
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = Color(0x80373533),
+                        color = if (isFromUser)
+                            colors.onTertiary
+
+                        else
+                            colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )

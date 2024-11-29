@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,6 +36,7 @@ import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 @Composable
 fun DateHeader(date: List<Int>, modifier: Modifier = Modifier) {
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = modifier
             .padding(horizontal = 16.dp)
@@ -50,7 +52,7 @@ fun DateHeader(date: List<Int>, modifier: Modifier = Modifier) {
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .background(Color(0x33373533))
+                        .background(colors.onSecondary)
                         .height(1.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -60,14 +62,14 @@ fun DateHeader(date: List<Int>, modifier: Modifier = Modifier) {
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
-                    color = Color(0x33373533),
+                    color = colors.onSecondary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .background(Color(0x33373533))
+                        .background(colors.onSecondary)
                         .height(1.dp)
                 )
             }

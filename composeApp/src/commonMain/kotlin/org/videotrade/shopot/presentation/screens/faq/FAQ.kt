@@ -52,6 +52,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -66,6 +67,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -158,7 +161,7 @@ class FAQ() : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val coroutineScope = rememberCoroutineScope()
 
-
+        val colors = MaterialTheme.colorScheme
         val modalVisible = remember { mutableStateOf(false) }
         val isMessageSent = remember { mutableStateOf(false) }
         val loading = remember { mutableStateOf(false) }
@@ -166,7 +169,7 @@ class FAQ() : Screen {
         val email = remember { mutableStateOf("") }
         val description = remember { mutableStateOf("") }
 
-        Box(modifier = Modifier.fillMaxSize().background(Color(0xFFf9f9f9))) {
+        Box(modifier = Modifier.fillMaxSize().background(colors.surface)) {
 
 
 
@@ -176,7 +179,7 @@ class FAQ() : Screen {
             ) {
 
                 Column {
-                    BaseHeader(stringResource(MokoRes.strings.support), Color(0xFFf9f9f9))
+                    BaseHeader(stringResource(MokoRes.strings.support), colors.surface)
 
                     Spacer(modifier = Modifier.fillMaxHeight(0.05F))
 
@@ -187,7 +190,7 @@ class FAQ() : Screen {
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
                         textAlign = TextAlign.Center,
-                        color = Color(0xFF373533),
+                        color = colors.primary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Spacer(modifier = Modifier.height(12.dp))
@@ -256,13 +259,14 @@ class FAQ() : Screen {
 
     @Composable
     fun PolicyItem(text: String, onClick: () -> Unit) {
+        val colors = MaterialTheme.colorScheme
         Box(
             modifier = Modifier
                 .padding(top = 4.dp, bottom = 4.dp)
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
-                    color = Color(0x33373533),
+                    color = colors.secondaryContainer,
                     shape = RoundedCornerShape(size = 16.dp)
                 ),
             contentAlignment = Alignment.Center
@@ -273,12 +277,12 @@ class FAQ() : Screen {
                     .clickable(onClick = onClick)
                     .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp),
                 style = TextStyle(
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                     lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
                     textAlign = TextAlign.Center,
-                    color = Color(0xFF373533),
+                    color = colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 )
             )
@@ -297,6 +301,7 @@ class FAQ() : Screen {
     ) {
         var isEmailValid by remember { mutableStateOf(true) }
         var isDescValid by remember { mutableStateOf(true) }
+        val colors = MaterialTheme.colorScheme
 
         Box(
             modifier = Modifier
@@ -312,7 +317,7 @@ class FAQ() : Screen {
                 ) {
                     Column(
                         modifier = Modifier
-                            .background(Color.White)
+                            .background(colors.background)
                             .padding(5.dp)
                             .fillMaxWidth()
                     ) {
@@ -325,7 +330,7 @@ class FAQ() : Screen {
 
                                     imageVector = Icons.Default.Close,
                                     contentDescription = "Close",
-                                    tint = Color(0xFF000000),
+                                    tint = colors.primary,
                                     modifier = Modifier
                                         .size(15.dp)
 
@@ -360,7 +365,7 @@ class FAQ() : Screen {
                                     .fillMaxWidth()
                                     .padding(top = 20.dp, bottom = 20.dp)
                             ) {
-                                CircularProgressIndicator(color = Color(0xFF979797))
+                                CircularProgressIndicator(color = colors.surface)
                             }
                         } else {
 
@@ -368,7 +373,7 @@ class FAQ() : Screen {
                                 Column(
                                     modifier = Modifier.width(324.dp)
                                         .height(324.dp)
-                                        .background(color = Color(0xFFFFFFFF), shape = RoundedCornerShape(size = 16.dp))
+                                        .background(color = colors.background, shape = RoundedCornerShape(size = 16.dp))
                                         ,
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
@@ -378,7 +383,8 @@ class FAQ() : Screen {
                                             .size(width = 128.dp, height = 86.dp),
                                         painter = painterResource(Res.drawable.auth_logo),
                                         contentDescription = null,
-                                        contentScale = ContentScale.Crop
+                                        contentScale = ContentScale.Crop,
+                                        colorFilter =  ColorFilter.tint(colors.primary)
                                     )
                                     Spacer(modifier = Modifier.height(32.dp))
                                     Text(
@@ -390,7 +396,7 @@ class FAQ() : Screen {
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                         fontWeight = FontWeight(500),
                                         textAlign = TextAlign.Center,
-                                        color = Color(0xFF373533),
+                                        color = colors.primary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                     )
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -403,7 +409,7 @@ class FAQ() : Screen {
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
                                         textAlign = TextAlign.Center,
-                                        color = Color(0x80373533),
+                                        color = colors.secondary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         maxLines = 3,
                                     )
@@ -415,9 +421,13 @@ class FAQ() : Screen {
                                     text = stringResource(
                                         MokoRes.strings.an_error_occurred_please_try_again
                                     ),
-                                    fontSize = 14.sp,
+                                    fontSize = 16.sp,
+                                    lineHeight = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(400),
+                                    color = colors.primary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    modifier = Modifier.padding(vertical = 15.dp)
+                                    modifier = Modifier.padding(vertical = 15.dp, horizontal = 16.dp)
                                 )
                             }
 
@@ -430,6 +440,7 @@ class FAQ() : Screen {
 
     @Composable
     fun EmailInput(email: MutableState<String>, isEmailValid: Boolean) {
+        val colors = MaterialTheme.colorScheme
         Column {
             Text(
                 stringResource(MokoRes.strings.your_email),
@@ -438,11 +449,12 @@ class FAQ() : Screen {
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
-                color = Color(0xFF373533),
+                color = colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
+                cursorBrush = SolidColor(colors.primary),
                 value = email.value,
                 onValueChange = { email.value = it },
                 decorationBox = { innerTextField ->
@@ -455,7 +467,7 @@ class FAQ() : Screen {
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
-                                color = Color(0x80373533),
+                                color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
@@ -468,18 +480,20 @@ class FAQ() : Screen {
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
                     textAlign = TextAlign.Start,
-                    color = Color(0xFF373533)
+                    color = colors.primary
                 ),
                 modifier = Modifier
-                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
-                    .fillMaxWidth(1f).background(Color(0xFFFFFFFF))
+                    .border(width = 1.dp, color = colors.secondaryContainer, shape = RoundedCornerShape(size = 16.dp))
+                    .fillMaxWidth(1f).background(colors.background)
                     .padding(start = 16.dp, top = 20.dp, bottom = 20.dp)
             )
             if (!isEmailValid) {
                 Text(
                     stringResource(MokoRes.strings.please_enter_a_valid_email),
-                    color = Color.Red,
+                    color = colors.error,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontSize = 12.sp,
+                    lineHeight = 16.sp,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     modifier = Modifier.padding(top = 5.dp)
                 )
@@ -489,6 +503,7 @@ class FAQ() : Screen {
 
     @Composable
     fun DescriptionInput(description: MutableState<String>, isDescValid: Boolean) {
+        val colors = MaterialTheme.colorScheme
         Column {
             Text(
                 stringResource(MokoRes.strings.appeal),
@@ -497,11 +512,12 @@ class FAQ() : Screen {
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 textAlign = TextAlign.Center,
-                color = Color(0xFF373533),
+                color = colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             BasicTextField(
+                cursorBrush = SolidColor(colors.primary),
                 value = description.value,
                 onValueChange = { description.value = it },
                 decorationBox = { innerTextField ->
@@ -514,7 +530,7 @@ class FAQ() : Screen {
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 textAlign = TextAlign.Start,
-                                color = Color(0x80373533),
+                                color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
@@ -527,18 +543,20 @@ class FAQ() : Screen {
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
                     textAlign = TextAlign.Start,
-                    color = Color(0xFF373533)
+                    color = colors.primary
                 ),
                 modifier = Modifier
-                    .border(width = 1.dp, color = Color(0x33373533), shape = RoundedCornerShape(size = 16.dp))
-                    .fillMaxWidth(1f).height(232.dp).background(Color(0xFFFFFFFF))
+                    .border(width = 1.dp, color = colors.secondaryContainer, shape = RoundedCornerShape(size = 16.dp))
+                    .fillMaxWidth(1f).height(232.dp).background(colors.background)
                     .padding(start = 16.dp, top = 16.dp, bottom = 20.dp, end = 16.dp)
             )
             if (!isDescValid) {
                 Text(
                     text = stringResource(MokoRes.strings.don_not_forget_to_describe_the_problem),
-                    color = Color.Red,
+                    color = colors.error,
                     fontSize = 12.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     modifier = Modifier.padding(top = 5.dp)
                 )

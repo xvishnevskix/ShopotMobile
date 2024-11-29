@@ -37,6 +37,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.BottomSheetScaffoldState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -83,6 +84,8 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import org.videotrade.shopot.presentation.screens.settings.ThemeMode
+import org.videotrade.shopot.presentation.screens.settings.getThemeMode
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
@@ -123,6 +126,21 @@ fun MessageBox(
         animationSpec = tween(durationMillis = 500)
     )
     val focusManager = LocalFocusManager.current
+    val colors = MaterialTheme.colorScheme
+    val theme = getThemeMode()
+
+
+
+//    LaunchedEffect(Unit) {
+//        message.phone?.let {
+//            val findContact = viewModel.findContactByPhone(it)
+//
+//            if (findContact != null) {
+//                messageSenderName.value = "${findContact.firstName} ${findContact.lastName}"
+//            }
+//        }
+//    }
+
 
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
@@ -186,7 +204,7 @@ fun MessageBox(
                         .alpha(iconOpacity)
                         .clip(RoundedCornerShape(50.dp))
                         .size(35.dp).background(
-                            Color(0xFF2A293C)
+                            colors.primary
                                 .copy(alpha = 0.1f)
                         ),
                     contentAlignment = Alignment.Center
@@ -196,7 +214,7 @@ fun MessageBox(
                         contentDescription = null,
                         modifier = Modifier
                             .size(23.dp),
-                        tint = Color.Black
+                        tint = colors.primary
                     )
                 }
             }
@@ -254,7 +272,7 @@ fun MessageBox(
                             Color.Transparent  // Прозрачный цвет для стикеров
                         } else {
                             if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
-                            else Color(0xFFF7F7F7)  // Цвет для сообщений от других пользователей
+                            else colors.onBackground  // Цвет для сообщений от других пользователей
                         }
 
 
@@ -287,7 +305,7 @@ fun MessageBox(
                                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                                         .height(56.dp)
                                         .background(
-                                            color = if (message.fromUser == profile.id) Color(0x4DFFFFFF) else Color(0xFFFFFFFF),
+                                            color = if (message.fromUser == profile.id) Color(0x4DFFFFFF) else colors.background,
                                             shape = RoundedCornerShape(size = 8.dp))
                                         .wrapContentHeight()
                                         .clickable {
@@ -332,7 +350,13 @@ fun MessageBox(
                                         .width(6.dp)
                                         .height(56.dp)
                                         .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
-                                        .background(color = if (message.fromUser == profile.id) Color.White else Color(0xFFCAB7A3))) {
+                                        .background(color =
+                                        if (message.fromUser == profile.id)
+                                            if (theme == ThemeMode.LIGHT) Color.White else Color(0xFF373533)
+                                        else
+                                            Color(0xFFCAB7A3)))
+
+                                    {
 
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
@@ -342,7 +366,8 @@ fun MessageBox(
                                         SelectedMessageFormat(
                                             it,
                                             profile,
-                                            viewModel
+                                            viewModel,
+                                            message,
                                         )
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
@@ -385,7 +410,7 @@ fun MessageBox(
                                         modifier = Modifier.size(width = 16.5.dp, height = 11.5.dp),
                                         painter = painterResource(Res.drawable.chat_forward),
                                         contentDescription = null,
-                                        colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(Color(0xFFF7F7F7)) else ColorFilter.tint(Color(0x80373533))
+                                        colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(Color(0xFFF7F7F7)) else ColorFilter.tint(colors.tertiary)
                                     )
 
                                     Spacer(modifier = Modifier.width(7.dp))
@@ -396,7 +421,7 @@ fun MessageBox(
                                             lineHeight = 16.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                             fontWeight = FontWeight(400),
-                                            color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else Color(0x80373533),
+                                            color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else colors.tertiary,
                                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         ),
                                     )
@@ -404,7 +429,7 @@ fun MessageBox(
                             }
 
                             // Проверка на персональный чат и наличие имени отправителя
-                            if (!chat.personal && messageSenderName.isNotBlank()) {
+                            if (!chat.personal && messageSenderName.isNotBlank() && messageSenderName != stringResource(MokoRes.strings.you)) {
                                 Box(
                                     modifier = Modifier.padding(
                                         start = 16.dp,
@@ -468,7 +493,7 @@ fun MessageBox(
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = Color(0x80373533),
+                        color = colors.onSecondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                     modifier = Modifier.padding(),
@@ -491,6 +516,7 @@ fun MessageBox(
                             .size(width = 12.7.dp, height = 8.5.dp),
                         painter = painterResource(Res.drawable.message_single_check),
                         contentDescription = null,
+                        colorFilter =  ColorFilter.tint(colors.secondary)
                     )
                 }
 
@@ -564,15 +590,17 @@ fun MessageFormat(
 
 @Composable
 fun SelectedMessageFormat(
-    message: MessageItem,
+    selectedMessage: MessageItem,
     profile: ProfileDTO? = null,
     viewModel: ChatViewModel,
+    message: MessageItem? = null,
     isFromFooter: Boolean = false
 ) {
-
+    val colors = MaterialTheme.colorScheme
+    val theme = getThemeMode()
     val messageAnswerName =
-        message.phone?.let { phone ->
-            if (message.fromUser == profile?.id) {
+        selectedMessage.phone?.let { phone ->
+            if (selectedMessage.fromUser == profile?.id) {
                 stringResource(MokoRes.strings.you)
             } else {
                 val findContact = viewModel.findContactByPhone(phone)
@@ -584,36 +612,43 @@ fun SelectedMessageFormat(
             }
         } ?: ""
 
-    val colorTitle = if (isFromFooter) Color(0xFFCAB7A3) else Color(0xFF373533)
+    val isFromUser = message?.fromUser == profile?.id
 
-    if (message.attachments == null || message.attachments?.isEmpty() == true) {
+    val colorTitle = if (isFromFooter) Color(0xFFCAB7A3) else {
+        if (isFromUser)
+            colors.inversePrimary
+        else
+            colors.primary
+    }
+
+    if (selectedMessage.attachments == null || selectedMessage.attachments?.isEmpty() == true) {
         if (profile != null) {
-            SelectedMessageText(message, messageAnswerName, colorTitle)
+            SelectedMessageText(selectedMessage, messageAnswerName, colorTitle, isFromUser)
         }
     } else {
 
-        when (message.attachments!![0].type) {
+        when (selectedMessage.attachments!![0].type) {
             "audio/mp4" -> {
-                SelectedVoiceMessage(message, messageAnswerName, colorTitle)
+                SelectedVoiceMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
             }
 
             "image" -> {
-                SelectedMessageImage(message.attachments!!, messageAnswerName, colorTitle)
+                SelectedMessageImage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
 //                SelectedStickerMessage(message.attachments!!, messageAnswerName)
 
             }
 
             "video" -> {
-                SelectedVideoMessage(message.attachments!!, messageAnswerName, colorTitle)
+                SelectedVideoMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
 
             }
             
             "sticker" -> {
-                SelectedStickerMessage(message.attachments!!, messageAnswerName, colorTitle)
+                SelectedStickerMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
             }
 
             else -> {
-                SelectedFileMessage(message, messageAnswerName, colorTitle)
+                SelectedFileMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
             }
         }
 

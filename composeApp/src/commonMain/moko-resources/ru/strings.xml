@@ -231,4 +231,12 @@
     <string name="you_turned_off_the_microphone">Вы выключили микрофон</string>
     <string name="reply">Ответить</string>
 
+    <string name="delete_message">Удалить сообщение?</string>
+    <string name="create_your_first_chat">Создайте свой первый чат</string>
+    <string name="back_to_conversation">Вернуться к разговору</string>
+    <string name="restoring_the_connection">Восстанавливаем соединение...</string>
+
+    <string name="night_mode">Ночной режим</string>
+    <string name="design">Оформление</string>
+    <string name="mode">Режим</string>
 </resources>

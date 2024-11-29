@@ -21,6 +21,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -33,6 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
@@ -80,6 +82,7 @@ class SignUpPhoneScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val colors = MaterialTheme.colorScheme
         val responseState = remember { mutableStateOf<String?>(null) }
         val isSuccessOtp = remember { mutableStateOf<Boolean>(false) }
         val coroutineScope = rememberCoroutineScope()
@@ -128,7 +131,7 @@ class SignUpPhoneScreen : Screen {
 
 
 
-        SafeArea(padding = 4.dp)
+        SafeArea(padding = 4.dp, backgroundColor = colors.background)
         {
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
@@ -162,7 +165,7 @@ class SignUpPhoneScreen : Screen {
                 Box(
                     modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
                         .background(
-                            Color.White
+                            colors.background
                         ),
                     contentAlignment = Alignment.TopCenter
                 ) {
@@ -187,7 +190,8 @@ class SignUpPhoneScreen : Screen {
                                     .size(width = 195.dp, height = 132.dp),
                                 painter = painterResource(Res.drawable.auth_logo),
                                 contentDescription = null,
-                                contentScale = ContentScale.Crop
+                                contentScale = ContentScale.Crop,
+                                colorFilter =  ColorFilter.tint(colors.primary)
                             )
 
                             Spacer(modifier = Modifier.height(50.dp))
@@ -204,7 +208,7 @@ class SignUpPhoneScreen : Screen {
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                         fontWeight = FontWeight(500),
                                         textAlign = TextAlign.Center,
-                                        color = Color(0xFF373533),
+                                        color = colors.primary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                     )
                                 )
@@ -217,7 +221,7 @@ class SignUpPhoneScreen : Screen {
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
                                         textAlign = TextAlign.Center,
-                                        color = Color(0x80373533),
+                                        color = colors.secondary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                     )
                                 )

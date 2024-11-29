@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +42,8 @@ fun ModalDialogWithoutText(
     dismissText: String = "Отмена"
 ) {
     val scope = rememberCoroutineScope()
+    val colors = MaterialTheme.colorScheme
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -55,7 +58,7 @@ fun ModalDialogWithoutText(
             ) {
                 Column(
                     modifier = Modifier
-                        .background(Color.White)
+                        .background(colors.background)
                         .padding(20.dp)
                         .fillMaxWidth()
                 ) {
@@ -66,7 +69,7 @@ fun ModalDialogWithoutText(
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
-                        color = Color(0xFF373533),
+                        color = colors.primary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Spacer(modifier = Modifier.height(24.dp))
@@ -105,6 +108,7 @@ fun ModalDialogWithText(
     dismissText: String = "Отмена"
 ) {
     val scope = rememberCoroutineScope()
+    val colors = MaterialTheme.colorScheme
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -119,7 +123,7 @@ fun ModalDialogWithText(
             ) {
                 Column(
                     modifier = Modifier
-                        .background(Color.White)
+                        .background(colors.background)
                         .padding(30.dp)
                         .fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -132,7 +136,7 @@ fun ModalDialogWithText(
                         lineHeight = 24.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
-                        color = Color(0xFF373533),
+                        color = colors.primary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Spacer(modifier = Modifier.height(8.dp))
@@ -143,7 +147,7 @@ fun ModalDialogWithText(
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = Color(0x80373533),
+                        color = colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                     Spacer(modifier = Modifier.height(40.dp))

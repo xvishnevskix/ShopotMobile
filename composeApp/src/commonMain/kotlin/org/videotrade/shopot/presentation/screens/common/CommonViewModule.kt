@@ -39,6 +39,7 @@ import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
@@ -143,18 +144,13 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
                             when (action) {
                                 "answerPublicKey" -> {
-                                    println("1111111")
-                                    
                                     val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                                    println("222222")
 
                                     val publicKeyString =
                                         jsonElement.jsonObject["publicKey"]?.jsonPrimitive?.content
-                                    println("1111111")
 
                                     val publicKeyBytes =
                                         publicKeyString?.decodeBase64()?.toByteArray()
-                                    println("1111111")
 
                                     println("publicKeyBytes ${publicKeyBytes?.encodeBase64()}")
 

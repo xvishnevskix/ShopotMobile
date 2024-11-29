@@ -20,6 +20,7 @@ fun StickerMessage(
     imageId: String,
 ) {
     val imagePainter = getImageStorage(imageId, imageId, false)
+
     
     if (imagePainter.value !== null)
         Image(

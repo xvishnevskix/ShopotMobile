@@ -76,7 +76,10 @@ class ContactsViewModel() : ViewModel(),
             contactsUseCase.createGroupChat(idUsers, groupName)
         }
     }
-    
+
+    fun isContactSelected(contact: ContactDTO): Boolean {
+        return selectedContacts.contains(contact)
+    }
     
     fun addContact(contact: ContactDTO) {
         if (!selectedContacts.contains(contact)) {

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -86,7 +87,7 @@ class CallScreen(
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        
+        val colors = MaterialTheme.colorScheme
         val viewModel: CallViewModel = koinInject()
         val mainViewModel: MainViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
@@ -281,7 +282,7 @@ class CallScreen(
 //            )
 //        }
         
-        Box(modifier = Modifier.fillMaxSize().safeContentPadding()) {
+        Box(modifier = Modifier.background(colors.background).fillMaxSize().safeContentPadding()) {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -308,7 +309,7 @@ class CallScreen(
                         lineHeight = 24.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
-                        color = Color(0xFF373533),
+                        color = colors.primary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
 
@@ -334,7 +335,7 @@ class CallScreen(
                         },
                         modifier = Modifier
                             .align(Alignment.CenterHorizontally),
-                        color = Color(0x80373533),
+                        color = colors.secondary,
                         fontSize = 16.sp,
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
@@ -394,7 +395,7 @@ class CallScreen(
                                     lineHeight = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
-                                    color = Color(0x80373533),
+                                    color = colors.secondary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                 )
                                 Spacer(modifier = Modifier.height(24.dp))

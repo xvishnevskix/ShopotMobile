@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -69,7 +71,10 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
+import org.videotrade.shopot.presentation.components.Auth.CountryPickerBottomSheet
 import org.videotrade.shopot.presentation.components.Auth.Otp
+import org.videotrade.shopot.presentation.components.Auth.PhoneInput
+import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -78,15 +83,19 @@ import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
+import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.SFProText_Semibold
 import shopot.composeapp.generated.resources.auth_logo
 
 class AuthCallScreen(private val phone: String, private val authCase: String) : Screen {
-    
-    
+
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val colors = MaterialTheme.colorScheme
         val responseState = remember { mutableStateOf<String?>("1111") }
         val otpFields = remember { mutableStateListOf("", "", "", "") }
         val isSuccessOtp = remember { mutableStateOf(false) }
@@ -99,18 +108,18 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         var reloadSend by remember { mutableStateOf(false) }
         var isSmsMode by remember { mutableStateOf(false) }
         var isSms by remember { mutableStateOf(false) }
-        
+
         val isLoading = remember { mutableStateOf(false) }
-        
+
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
         val invalidCode = stringResource(MokoRes.strings.invalid_code)
         val sentSMSCode = stringResource(MokoRes.strings.sms_with_code_sent)
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
-        
+
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
-            
+
             when (authCase) {
                 "SignIn" -> {
                     if (phone == "+79990000000") {
@@ -154,7 +163,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         )
                     }
                 }
-                
+
                 "SignUp" -> {
                     if (phone == "+79990000000") {
                         sendSignUp(phone, navigator)
@@ -171,9 +180,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 }
             }
         }
-        
-        println("phone4214141 $phone")
-        
+
+
+
         fun startTimer() {
             coroutineScope.launch {
                 while (isRunning && time > 0) {
@@ -187,7 +196,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 }
             }
         }
-        
+
         fun handleError(errorMessage: String) {
             hasError.value = true
             isLoading.value = false
@@ -198,7 +207,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 duration = ToasterDefaults.DurationDefault,
             )
         }
-        
+
         suspend fun handleAuthCase() {
             when (authCase) {
                 "SignIn" -> sendLogin(
@@ -209,11 +218,11 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     toasterViewModel = toasterViewModel,
                     phoneNotRegistered = phoneNotRegistered
                 )
-                
+
                 "SignUp" -> sendSignUp(phone, navigator)
             }
         }
-        
+
         fun sendSms(sentSMSCode: String) {
             isSms = true
             coroutineScope.launch {
@@ -263,14 +272,12 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
             
             coroutineScope.launch {
-                
                 if (!isRunning) {
                     isRunning = true
                     startTimer()
                 }
-                println("phone41421 $phone")
-                val response = sendRequestToBackend(
-                    phone,
+
+                val response = sendRequestToBackend(phone,
                     null,
                     "2fa",
                     toasterViewModel,
@@ -307,26 +314,25 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 isRunning = true
                 startTimer()
             }
-            
             sendCall()
         }
         
         
         val isError = remember { mutableStateOf(false) }
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
+
+
+
+
+
+
+
+
         SafeArea(padding = 4.dp) {
             Box(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
                     .background(
-                        Color.White
+                        colors.background
                     ).imePadding(),
                 contentAlignment = Alignment.TopCenter
             ) {
@@ -354,7 +360,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 .size(width = 195.dp, height = 132.dp),
                             painter = painterResource(Res.drawable.auth_logo),
                             contentDescription = null,
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop,
+                            colorFilter =  ColorFilter.tint(colors.primary)
+
                         )
                         
                         Spacer(modifier = Modifier.height(50.dp))
@@ -371,7 +379,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                     fontWeight = FontWeight(500),
                                     textAlign = TextAlign.Center,
-                                    color = Color(0xFF373533),
+                                    color = colors.primary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                 )
                             )
@@ -387,7 +395,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     textAlign = TextAlign.Center,
-                                    color = Color(0x80373533),
+                                    color = colors.secondary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp)
                                 )
                             )
@@ -450,10 +458,10 @@ suspend fun sendRequestToBackend(
     animationTrigger: MutableState<Boolean>? = null,
 ): HttpResponse? {
     val client = HttpClient(getHttpClientEngine()) { // или другой движок в зависимости от платформы
-    
+
     }
-    
-    
+
+
     try {
         val jsonContent = Json.encodeToString(
             buildJsonObject {

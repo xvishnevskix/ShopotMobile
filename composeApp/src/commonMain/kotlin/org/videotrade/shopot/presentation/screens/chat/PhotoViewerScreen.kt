@@ -11,6 +11,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -46,12 +47,13 @@ class PhotoViewerScreen(
         var offset by remember { mutableStateOf(Offset.Zero) }
         var imageSize by remember { mutableStateOf(IntSize.Zero) }
         var isHeaderVisible by remember { mutableStateOf(true) }
+        val colors = MaterialTheme.colorScheme
         
         
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
+                .background(colors.background)
         ) {
             Image(
                 painter = imagePainter.value!!,

@@ -84,6 +84,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
 
     private val _boxHeight = MutableStateFlow(0)
     val boxHeight: StateFlow<Int> = _boxHeight
+
+    private val _isDeleteConfirmationVisible = MutableStateFlow(false)
+    val isDeleteConfirmationVisible: StateFlow<Boolean> = _isDeleteConfirmationVisible
+
+
+    private val _messageToDelete = MutableStateFlow<MessageItem?>(null)
+    val messageToDelete: StateFlow<MessageItem?> = _messageToDelete
+
+    private val _boxHeight = MutableStateFlow(0)
+    val boxHeight: StateFlow<Int> = _boxHeight
     
     
     init {
@@ -147,14 +157,35 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    //обновить высоту заблюренного сообщения
     fun updateBoxHeight(height: Int) {
         _boxHeight.value = height
     }
 
-
     
 
-    
+    // Установить сообщение для удаления
+    fun showDeleteConfirmation(message: MessageItem) {
+        _messageToDelete.value = message
+        _isDeleteConfirmationVisible.value = true
+
+    }
+
+    // Скрыть окно подтверждения
+    fun dismissDeleteConfirmation() {
+        _messageToDelete.value = null
+        _isDeleteConfirmationVisible.value = false
+    }
+
+    // Удалить сообщение и закрыть окно
+    fun deleteMessageAndDismiss(onDismiss: () -> Unit,) {
+        _messageToDelete.value?.let {
+            deleteMessage(it) // Вызов существующей функции удаления
+        }
+        dismissDeleteConfirmation()
+        onDismiss()
+    }
+
 
     
     fun addFileMessage(
@@ -523,17 +554,16 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
-    
-    private val _favoritePacks =
-        MutableStateFlow<List<FavoritePack>>(emptyList()) // Состояние для избранных паков
-    val favoritePacks: StateFlow<List<FavoritePack>> get() = _favoritePacks
+
+    private val _favoriteStickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
+    val favoriteStickerPacks: StateFlow<List<StickerPack>> = _favoriteStickerPacks
     
     private val _stickerPack =
         MutableStateFlow(StickerPack("", "", false, emptyList()))  // Исправление здесь
     val stickerPack: StateFlow<StickerPack> get() = _stickerPack
     
     private var currentPage = 0
-    private val pageSize = 3
+    private val pageSize = 2
     private var isLastPage = false
     private var _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -559,28 +589,37 @@ class ChatViewModel : ViewModel(), KoinComponent {
             _isLoading.value = false
         }
     }
-    
-    fun getPack(packId: String) {
-        viewModelScope.launch {
-            val stickerPack = stickerUseCase.getPack(packId) ?: return@launch
-            _stickerPack.value = stickerPack
-        }
-    }
-    
+
     fun getFavoritePacks() {
         viewModelScope.launch {
+            // Получаем список избранных пакетов (из базы данных или API)
             val favoritePackList = stickerUseCase.getFavoritePacks()
-            _favoritePacks.value = favoritePackList ?: emptyList()
+
+            // Загружаем информацию о каждом пакете по ID
+            val packs = favoritePackList?.mapNotNull { favoritePack ->
+                getPack(favoritePack.packId) // Метод для загрузки пакета по его ID
+            }
+
+            _favoriteStickerPacks.value = packs ?: emptyList() // Обновляем состояние
         }
+    }
+
+    // Функция для получения пакета по его ID
+    private suspend fun getPack(packId: String): StickerPack? {
+        return stickerUseCase.getPack(packId)
     }
     
     fun removePackFromFavorites(packId: String) {
         viewModelScope.launch {
             val success = stickerUseCase.removePackFromFavorites(packId)
             if (success) {
+
                 _stickerPacks.value = _stickerPacks.value.map { pack ->
                     if (pack.packId == packId) pack.copy(favorite = false) else pack
                 }
+
+                _favoriteStickerPacks.value = _favoriteStickerPacks.value.filter { it.packId != packId }
+
                 println("Pack successfully removed from favorites")
             } else {
                 println("Failed to remove pack from favorites")
@@ -615,8 +654,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
         
     }
-
-
     
     
 }
