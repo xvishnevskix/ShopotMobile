@@ -44,7 +44,7 @@ fun DateHeader(date: List<Int>, modifier: Modifier = Modifier) {
         contentAlignment = Alignment.Center
     ) {
         Column {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(5.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
@@ -73,7 +73,7 @@ fun DateHeader(date: List<Int>, modifier: Modifier = Modifier) {
                         .height(1.dp)
                 )
             }
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(2.dp))
         }
     }
 }

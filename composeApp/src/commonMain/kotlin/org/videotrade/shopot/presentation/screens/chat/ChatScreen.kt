@@ -111,7 +111,6 @@ class ChatScreen(
         LaunchedEffect(key1 = viewModel) {
             viewModel.getProfile()
             viewModel.getMessagesBack(chat.id)
-
         }
 
         DisposableEffect(Unit) {
@@ -261,9 +260,9 @@ class ChatScreen(
                     BottomSheetModal(scaffoldForwardState)
                     //стикеры
                     BottomSheetScaffold(
-                        modifier = Modifier.background(Color(0xFFF7F7F7)),
-                        containerColor = Color(0xFFF7F7F7),
-                        sheetContainerColor = Color(0xFFF7F7F7),
+                        modifier = Modifier.background(colors.surface),
+                        containerColor = colors.surface,
+                        sheetContainerColor = colors.surface,
                         sheetShape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp),
                         sheetDragHandle = {
                             Box(
@@ -280,9 +279,6 @@ class ChatScreen(
                                 )
                             }
                         },
-                        modifier = Modifier.background(colors.surface),
-                        containerColor = colors.surface,
-                        sheetContainerColor = colors.surface,
                         sheetContentColor = colors.surface,
                         sheetShadowElevation = 16.dp,
                         scaffoldState = scaffoldStickerState,
@@ -365,6 +361,6 @@ class ChatScreen(
                     }
             }
         }
-    }
+    }}
 
 

@@ -91,10 +91,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
 
     private val _messageToDelete = MutableStateFlow<MessageItem?>(null)
     val messageToDelete: StateFlow<MessageItem?> = _messageToDelete
-
-    private val _boxHeight = MutableStateFlow(0)
-    val boxHeight: StateFlow<Int> = _boxHeight
-    
     
     init {
         

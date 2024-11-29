@@ -15,11 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,31 +29,33 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.components.Common.ReconnectionBar
+import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.group.GroupProfileScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileChatScreen
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.chat_call
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,9 +69,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val timer = callViewModel.timer.collectAsState()
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
-            LaunchedEffect(Unit) {
-            viewModel.loadGroupUsers(chat.chatId)
-        }
     
     Column {
         Row(
@@ -139,15 +134,15 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     Spacer(modifier = Modifier.width(12.dp))
                     Column {
                         Spacer(modifier = Modifier.height(8.dp))
-                            Text(
-                                text = fullName,
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                                fontWeight = FontWeight(500),
-                                color = colors.primary,
-                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                            )
+                        Text(
+                            text = fullName,
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontWeight = FontWeight(500),
+                            color = colors.primary,
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        )
                         Spacer(modifier = Modifier.height(8.dp))
                         if (!chat.personal) {
                             ParticipantCountText(groupUsers.size)
@@ -229,19 +224,17 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                             )
                                         }
 //
-
+                                    
                                     } catch (e: Exception) {
                                         println("ERROR : $e")
-
+                                        
                                     }
                                 }
                                 println("userID : ${chat.userId}")
-
-
-                            }
-
-                        ,
-                        colorFilter =  ColorFilter.tint(colors.primary)
+                                
+                                
+                            },
+                        colorFilter = ColorFilter.tint(colors.primary)
                     )
             }
             

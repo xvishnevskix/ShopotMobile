@@ -425,7 +425,6 @@ fun ChatFooter(
 
     Box(
         modifier = Modifier
-
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
             .background(colors.background)
             .then(

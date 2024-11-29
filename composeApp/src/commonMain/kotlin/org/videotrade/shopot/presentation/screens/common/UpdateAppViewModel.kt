@@ -22,7 +22,9 @@ class UpdateAppViewModel : ViewModel(), KoinComponent {
             return if (getVersion.criticalAppVersion.toLong() > buildVersion) {
                 description.value = getVersion.description
                 appVersion.value = getVersion.appVersion
-                true
+                false
+                
+//                true
             } else {
                 false
             }

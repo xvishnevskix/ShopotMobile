@@ -159,28 +159,31 @@ class CreateChatScreen() : Screen {
                                 ContactItem(viewModel, item = contact)
                             }
                         }
-                        item {
-                            Box(
-                                modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
-                                    .fillMaxWidth()
-                                    .background(Color(0xFFF7F7F7))
-                            ) {
-                                Text(
-                                    text = "Пригласить в Шепот",
-                                    textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                    fontWeight = FontWeight(500),
-                                    color = Color.Black,
-                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                )
-                                
+                        if(unregisteredContacts.isNotEmpty()) {
+                            item {
+                                Box(
+                                    modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+                                        .fillMaxWidth()
+                                        .background(Color(0xFFF7F7F7))
+                                ) {
+                                    Text(
+                                        text = "Пригласить в Шепот",
+                                        textAlign = TextAlign.Start,
+                                        fontSize = 16.sp,
+                                        lineHeight = 16.sp,
+                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                        fontWeight = FontWeight(500),
+                                        color = Color.Black,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                                    )
+                                    
+                                }
+                            }
+                            items(unregisteredContacts) { contact ->
+                                ContactItem(viewModel, item = contact,true)
                             }
                         }
-                        items(unregisteredContacts) { contact ->
-                            ContactItem(viewModel, item = contact,true)
-                        }
+
                         item {
                             Box(modifier = Modifier.height(70.dp))
                         }
