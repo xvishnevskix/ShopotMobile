@@ -25,6 +25,7 @@ class AndroidNetworkHelper(context: Context) : NetworkHelper {
     }
     
     override fun unregisterListener() {
+        
         networkCallback?.let { connectivityManager.unregisterNetworkCallback(it) }
     }
 }

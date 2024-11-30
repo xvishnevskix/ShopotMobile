@@ -18,7 +18,7 @@ class TestScreen : Screen {
     override fun Content() {
         
         val networkListener: NetworkListener = koinInject()
-        val networkStatus by networkListener.networkStatus.collectAsState(NetworkStatus.Connected)
+        val networkStatus by networkListener.networkStatus.collectAsState(NetworkStatus.Disconnected)
         
         SafeArea {
             

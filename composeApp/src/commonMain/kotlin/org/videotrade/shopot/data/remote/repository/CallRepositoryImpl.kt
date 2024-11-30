@@ -70,6 +70,7 @@ import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import kotlin.random.Random
 
@@ -940,7 +941,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 
                 if (currentScreen is CallScreen) {
                     // Вы на экране CallScreen
-                    navigator.push(MainScreen())
+                    
+                    println("MainScreen $navigator")
+                    navigator.push(IntroScreen())
                     
                     println("Мы на экране CallScreen")
                 } else if (currentScreen is MainScreen) {

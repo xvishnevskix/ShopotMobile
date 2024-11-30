@@ -164,7 +164,7 @@ class CreateChatScreen() : Screen {
                                 Box(
                                     modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
                                         .fillMaxWidth()
-                                        .background(Color(0xFFF7F7F7))
+                                        .background(colors.onBackground)
                                 ) {
                                     Text(
                                         text = "Пригласить в Шепот",
@@ -173,7 +173,7 @@ class CreateChatScreen() : Screen {
                                         lineHeight = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(500),
-                                        color = Color.Black,
+                                        color = colors.secondary,
                                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
                                     )
                                     

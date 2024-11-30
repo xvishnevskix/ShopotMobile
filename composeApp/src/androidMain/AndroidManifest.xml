@@ -74,13 +74,6 @@
             android:exported="true"
             android:foregroundServiceType="phoneCall" />
 
-        <!-- Дополнительный Foreground Service -->
-        <!--        <service-->
-        <!--            android:name=".androidSpecificApi.ForegroundService"-->
-        <!--            android:foregroundServiceType="dataSync|connectedDevice"-->
-        <!--            android:exported="true"-->
-        <!--            tools:ignore="ForegroundServicePermission" />-->
-
     </application>
 
 </manifest>

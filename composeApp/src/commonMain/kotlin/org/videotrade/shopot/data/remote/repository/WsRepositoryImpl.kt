@@ -48,6 +48,7 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
     
     override suspend fun disconnectWs() {
 //        clearData()
+        isConnected.value = false
         _wsSession.value?.close()
         
     }

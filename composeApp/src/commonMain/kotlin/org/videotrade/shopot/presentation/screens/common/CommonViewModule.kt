@@ -1,5 +1,7 @@
 package org.videotrade.shopot.presentation.screens.common
 
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.dokar.sonner.ToasterState
@@ -15,6 +17,9 @@ import io.ktor.utils.io.core.toByteArray
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -60,6 +65,25 @@ class CommonViewModel : ViewModel(), KoinComponent {
     
     val appIsActive = MutableStateFlow(false)
     
+    private val _isReconnectionWs = MutableStateFlow(false)
+    
+    val isReconnectionWs: StateFlow<Boolean> = _isReconnectionWs
+    
+    fun setIsReconnectionWs(activeValue: Boolean) {
+        println("Setting isReconnectionWs to $activeValue")
+        _isReconnectionWs.value = activeValue
+    }
+    
+    init {
+        isReconnectionWs.onEach {
+            println("isReconnectionWs updated: $it")
+            
+            if(it) {
+                wsUseCase.disconnectWs()
+            }
+        }.launchIn(viewModelScope) // Подпишитесь на изменения
+    }
+    
     
     fun setAppIsActive(activeValue: Boolean) {
         appIsActive.value = activeValue
@@ -81,9 +105,13 @@ class CommonViewModel : ViewModel(), KoinComponent {
         tabNavigator.value = value
     }
 
-    fun connectionWs(navigator: Navigator) {
+    fun connectionWs() {
         viewModelScope.launch {
-            wsUseCase.connectionWs("11111", navigator)
+            val profileId = getValueInStorage("profileId")
+            
+            if (profileId != null) {
+                mainNavigator.value?.let { wsUseCase.connectionWs(profileId, it) }
+            }
         }
     }
 

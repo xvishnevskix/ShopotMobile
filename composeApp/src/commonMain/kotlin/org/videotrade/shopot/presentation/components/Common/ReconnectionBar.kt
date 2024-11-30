@@ -43,6 +43,8 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.multiplatform.NetworkListener
+import org.videotrade.shopot.multiplatform.NetworkStatus
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -52,8 +54,14 @@ import shopot.composeapp.generated.resources.Res
 
 @Composable
 fun ReconnectionBar() {
+    val commonViewModel: CommonViewModel = koinInject()
+    
+    val isReconnectionWs = commonViewModel.isReconnectionWs.collectAsState()
+    val networkListener: NetworkListener = koinInject()
+    
+    val networkStatus by networkListener.networkStatus.collectAsState(NetworkStatus.Connected)
+    
 
-    val isReconnection = remember { mutableStateOf(false) }
     val colors = MaterialTheme.colorScheme
     val rotationAngle by animateFloatAsState(
         targetValue = 360f,
@@ -66,9 +74,7 @@ fun ReconnectionBar() {
             repeatMode = RepeatMode.Restart
         )
     )
-
-
-    if (isReconnection.value) {
+    if (networkStatus == NetworkStatus.Disconnected) {
         Row(
             modifier = Modifier
                 .shadow(16.dp)
@@ -85,7 +91,7 @@ fun ReconnectionBar() {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-
+            
 
             Text(
                 text = stringResource(MokoRes.strings.restoring_the_connection),

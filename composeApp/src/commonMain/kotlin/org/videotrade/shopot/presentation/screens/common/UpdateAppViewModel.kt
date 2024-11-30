@@ -32,7 +32,7 @@ class UpdateAppViewModel : ViewModel(), KoinComponent {
 
         }
 
-        return true
+        return false
     }
 }
 

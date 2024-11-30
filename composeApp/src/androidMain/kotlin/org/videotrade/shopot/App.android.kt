@@ -64,14 +64,14 @@ class AndroidApp : Application() {
         }
 
 
-//        if (!Settings.canDrawOverlays(this)) {
-//            val intent = Intent(
-//                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-//                Uri.parse("package:$packageName")
-//            )
-//            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-//            startActivity(intent)
-//        }
+        if (!Settings.canDrawOverlays(this)) {
+            val intent = Intent(
+                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                Uri.parse("package:$packageName")
+            )
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+        }
         
         
         initializeFactories(this)
@@ -174,20 +174,6 @@ open class AppActivity : ComponentActivity() {
             App()
         }
 
-
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            val channelId = "default_channel_id"
-//            val channel = NotificationChannel(
-//                channelId,
-//                "Incoming Call Channel",
-//                NotificationManager.IMPORTANCE_HIGH
-//            ).apply {
-//                description = "Канал для входящих вызовов"
-//            }
-//            val notificationManager = getSystemService(NotificationManager::class.java)
-//            notificationManager?.createNotificationChannel(channel)
-//        }
-        
         if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             // Запрашиваем разрешение, если его нет
             requestPermissions(
@@ -195,8 +181,6 @@ open class AppActivity : ComponentActivity() {
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                 1001
             )
-            // Возвращаем null, так как выполнение функции должно быть прервано до получения разрешения
-//                return@withContext null
         }
         
     }
