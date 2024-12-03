@@ -151,16 +151,6 @@ class ChatScreen(
                 val density = LocalDensity.current
                 val screenHeightInPx = maxHeight.value * density.density // Пример, если maxHeight в Dp
 
-//                // Преобразуем пиксели в Dp
-//                val screenHeightInDp = with(density) {
-//                    screenHeightInPx.toDp()
-//                }
-
-//                println("screenHeightInPx ${screenHeightInPx}")
-//
-//                println("screenHeightInPx Box height in pixels: ${boxSelectedMessageHeight.value}")
-//
-//                println("screenHeightInPx selectedMessageY ${selectedMessageY.value}")
 
                 SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
                     Column(modifier = Modifier.fillMaxSize().background(colors.background)) {

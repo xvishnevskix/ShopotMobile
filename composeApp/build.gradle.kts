@@ -165,8 +165,8 @@ android {
         targetSdk = 34
         
         applicationId = "org.videotrade.shopot.androidApp"
-        versionCode = 15
-        versionName = "1.0.5"
+        versionCode = 16
+        versionName = "1.0.6"
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         

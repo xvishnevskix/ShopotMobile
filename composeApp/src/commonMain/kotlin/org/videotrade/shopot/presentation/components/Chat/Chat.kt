@@ -160,10 +160,10 @@ fun Chat(
                         modifier = Modifier.alpha(alpha)
                     )
                 }
-
-                items(messages) { message ->
+                
+                items(messages, key = { message -> message.id }) { message ->
                     var messageY by remember { mutableStateOf(0) }
-                    val isVisible = message.id != hiddenMessageId
+                    val isVisible = remember { message.id != hiddenMessageId }
 
                     // Определяем имя отправителя сообщения
                     val messageSenderName = if (message.fromUser == profile.id) {
@@ -203,41 +203,41 @@ fun Chat(
 
 
     } else {
-//        if (isVisible) {
-//            Column(
-//                modifier = Modifier.fillMaxSize(1f),
-//                horizontalAlignment = Alignment.CenterHorizontally,
-//                verticalArrangement = Arrangement.Center
-//            ) {
-//                Image(
-//                    modifier = Modifier.size(width =  128.dp, height = 86.dp),
-//                    painter = painterResource(Res.drawable.auth_logo),
-//                    contentDescription = null,
-//                )
-//                Spacer(modifier = Modifier.height(40.dp))
-//                Text(
-//                    "Сообщений пока нет...",
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 24.sp,
-//                    lineHeight = 24.sp,
-//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-//                    fontWeight = FontWeight(500),
-//                    color = Color(0xFF373533),
-//                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                )
-//                Spacer(modifier = Modifier.height(8.dp))
-//                Text(
-//                    "Отправьте сообщение",
-//                    textAlign = TextAlign.Center,
-//                    fontSize = 16.sp,
-//                    lineHeight = 16.sp,
-//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                    fontWeight = FontWeight(400),
-//                    color = Color(0x80373533),
-//                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                )
-//            }
-//        }
+        if (isVisible) {
+            Column(
+                modifier = Modifier.fillMaxSize(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Image(
+                    modifier = Modifier.size(width =  128.dp, height = 86.dp),
+                    painter = painterResource(Res.drawable.auth_logo),
+                    contentDescription = null,
+                )
+                Spacer(modifier = Modifier.height(40.dp))
+                Text(
+                    "Сообщений пока нет...",
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp,
+                    lineHeight = 24.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    color = Color(0xFF373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    "Отправьте сообщение",
+                    textAlign = TextAlign.Center,
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color = Color(0x80373533),
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                )
+            }
+        }
     }
 }
 
