@@ -328,7 +328,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
 
 
 
-        SafeArea(padding = 4.dp) {
+        SafeArea(padding = 4.dp, backgroundColor = colors.background) {
             Box(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
                     .background(

@@ -731,7 +731,8 @@ fun ChatFooter(
                                 modifier = Modifier
                                     .weight(1f)
                                     .heightIn(max = 130.dp, min = 56.dp)
-                                    .padding(16.dp),
+                                    .padding(16.dp)
+                                    .fillMaxWidth(), // Для обеспечения выравнивания по ширине
                                 textStyle = TextStyle(
                                     fontSize = 16.sp,
                                     lineHeight = lineHeight.value.sp,
@@ -739,6 +740,7 @@ fun ChatFooter(
                                     fontWeight = FontWeight(400),
                                     color = colors.primary,
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                    textAlign = TextAlign.Start
                                 ),
                                 cursorBrush = SolidColor(colors.primary),
                                 visualTransformation = VisualTransformation.None,
@@ -746,7 +748,10 @@ fun ChatFooter(
                                     capitalization = KeyboardCapitalization.Sentences // Заставляет начинать с заглавной буквы
                                 ),
                                 decorationBox = { innerTextField ->
-                                    Box {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(), // Обеспечивает выравнивание текста по центру
+                                        contentAlignment = Alignment.CenterStart // Центрируем внутреннее поле
+                                    ) {
                                         if (footerText.isEmpty()) {
                                             Text(
                                                 stringResource(MokoRes.strings.write_message),
@@ -756,9 +761,10 @@ fun ChatFooter(
                                                 fontWeight = FontWeight(400),
                                                 color = colors.secondary,
                                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                                textAlign = TextAlign.Start
                                             )
                                         }
-                                        innerTextField()
+                                        innerTextField() // Вставка текстового поля в Box
                                     }
                                 },
                             )

@@ -85,7 +85,7 @@ actual class ContactsProvider(private val context: Context) {
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, "Приглашаем в шепот господа") // Текст сообщения
+            putExtra(Intent.EXTRA_TEXT, "Приглашаем в шепот, господа") // Текст сообщения
         }
         
         // Показываем выбор приложений для отправки

@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.screens.contacts
 
 import Avatar
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +60,7 @@ import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
+import org.videotrade.shopot.presentation.components.Contacts.InviteContacts
 import org.videotrade.shopot.presentation.components.Contacts.MakeGroup
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.tabs.ChatsTab
@@ -99,6 +101,8 @@ class CreateChatScreen() : Screen {
                         it.phone.contains(searchQuery.value)
             }
         }
+
+        val sortedUnregisteredContacts = unregisteredContacts.sortedBy { it.firstName }
         
         
         val groupedContacts =
@@ -111,29 +115,45 @@ class CreateChatScreen() : Screen {
                 .background(colors.surface)
         ) {
             SafeArea(padding = 0.dp) {
-                Column {
+                Column(
+                    Modifier.background(colors.background)
+                ) {
                     CreateChatHeader(
                         text = stringResource(MokoRes.strings.contacts),
                         isSearching = isSearching,
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Column(modifier = Modifier
+                        .animateContentSize()) {
+                        Crossfade(targetState = isSearching.value) { searching ->
+                            if (searching) {
+                                Column() {
+                                    ContactsSearch(searchQuery, isSearching)
+
+                                }
+                            } else {
+                                Column(Modifier.animateContentSize()) {
+                                    MakeGroup(contacts)
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    InviteContacts(unregisteredContacts)
+                                }
+
+                            }
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                     LazyColumn(
                         modifier = Modifier
+                            .animateContentSize()
                             .fillMaxSize()
                             .background(color = colors.background)
                             .padding(bottom = 60.dp)
+
                     ) {
-                        item {
-                            Spacer(modifier = Modifier.height(24.dp))
-                            Crossfade(targetState = isSearching.value) { searching ->
-                                if (searching) {
-                                    ContactsSearch(searchQuery, isSearching)
-                                } else {
-                                    MakeGroup(contacts)
-                                }
-                            }
-                            Spacer(modifier = Modifier.height(24.dp))
-                        }
                         groupedContacts.forEach { (initial, contacts) ->
+                            item {
+
+                            }
                             item {
                                 Box(
                                     modifier = Modifier
@@ -159,30 +179,30 @@ class CreateChatScreen() : Screen {
                                 ContactItem(viewModel, item = contact)
                             }
                         }
-                        if(unregisteredContacts.isNotEmpty()) {
-                            item {
-                                Box(
-                                    modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
-                                        .fillMaxWidth()
-                                        .background(colors.onBackground)
-                                ) {
-                                    Text(
-                                        text = "Пригласить в Шепот",
-                                        textAlign = TextAlign.Start,
-                                        fontSize = 16.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                        fontWeight = FontWeight(500),
-                                        color = colors.secondary,
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-                                    )
-                                    
-                                }
-                            }
-                            items(unregisteredContacts) { contact ->
-                                ContactItem(viewModel, item = contact,true)
-                            }
-                        }
+//                        if(sortedUnregisteredContacts.isNotEmpty()) {
+//                            item {
+//                                Box(
+//                                    modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
+//                                        .fillMaxWidth()
+//                                        .background(colors.onBackground)
+//                                ) {
+//                                    Text(
+//                                        text = stringResource(MokoRes.strings.invite_to_shopot),
+//                                        textAlign = TextAlign.Start,
+//                                        fontSize = 16.sp,
+//                                        lineHeight = 16.sp,
+//                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                                        fontWeight = FontWeight(500),
+//                                        color = colors.secondary,
+//                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+//                                    )
+//
+//                                }
+//                            }
+//                            items(sortedUnregisteredContacts) { contact ->
+//                                ContactItem(viewModel, item = contact,true)
+//                            }
+//                        }
 
                         item {
                             Box(modifier = Modifier.height(70.dp))

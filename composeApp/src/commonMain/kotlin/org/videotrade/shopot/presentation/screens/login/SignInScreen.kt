@@ -41,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -114,6 +115,9 @@ class SignInScreen : Screen {
         val keyboardController = LocalSoftwareKeyboardController.current
         var showPhoneMenu = remember { mutableStateOf(false) }
 
+        val scrollState = rememberScrollState()
+        val focusRequester = remember { FocusRequester() }
+
         val textState =
             remember {
                 mutableStateOf(
@@ -146,6 +150,12 @@ class SignInScreen : Screen {
 //            }
             onDispose { }
         }
+
+        LaunchedEffect(focusRequester) {
+            focusRequester.requestFocus()
+            scrollState.scrollTo(scrollState.maxValue)
+        }
+
 
 
         SafeArea(padding = 4.dp, backgroundColor = colors.background)
@@ -192,11 +202,15 @@ class SignInScreen : Screen {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .imePadding()
+
                     ) {
                         AuthHeader(stringResource(MokoRes.strings.login))
                         Column(
-                            modifier = Modifier.safeContentPadding().fillMaxWidth()
-                                .fillMaxHeight(0.85f).verticalScroll(rememberScrollState()),
+                            modifier = Modifier
+                                .safeContentPadding()
+                                .fillMaxWidth()
+                                .fillMaxHeight(1f)
+                                .verticalScroll(scrollState),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -253,7 +267,9 @@ class SignInScreen : Screen {
                                             bottomSheetState.show()
                                         }
                                     },
-                                    showPhoneMenu = showPhoneMenu
+                                    showPhoneMenu = showPhoneMenu,
+                                    scrollState = scrollState, // Передаем ScrollState
+                                    focusRequester = focusRequester
                                 )
 
                                 Spacer(modifier = Modifier.height(16.dp))

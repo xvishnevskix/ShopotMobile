@@ -33,6 +33,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -92,6 +93,8 @@ class SignUpPhoneScreen : Screen {
         var countryCode by remember { mutableStateOf("+7") }
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
+        val scrollState = rememberScrollState()
+        val focusRequester = remember { FocusRequester() }
         val bottomSheetState =
             rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -127,6 +130,10 @@ class SignUpPhoneScreen : Screen {
                 keyboardController?.hide()
             }
             onDispose { }
+        }
+        LaunchedEffect(focusRequester) {
+            focusRequester.requestFocus()
+            scrollState.scrollTo(scrollState.maxValue)
         }
 
 
@@ -179,8 +186,11 @@ class SignUpPhoneScreen : Screen {
                     ) {
                         AuthHeader(stringResource(MokoRes.strings.create_account))
                         Column(
-                            modifier = Modifier.safeContentPadding().fillMaxWidth()
-                                .fillMaxHeight(0.85f).verticalScroll(rememberScrollState()),
+                            modifier = Modifier
+                                .safeContentPadding()
+                                .fillMaxWidth()
+                                .fillMaxHeight(1f)
+                                .verticalScroll(scrollState),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -238,6 +248,8 @@ class SignUpPhoneScreen : Screen {
                                         }
                                     },
                                     showPhoneMenu = showPhoneMenu,
+                                    scrollState = scrollState, // Передаем ScrollState
+                                    focusRequester = focusRequester
                                 )
 
                                 Spacer(modifier = Modifier.height(16.dp))

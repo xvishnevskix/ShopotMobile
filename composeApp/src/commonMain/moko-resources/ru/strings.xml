@@ -238,5 +238,9 @@
 
     <string name="night_mode">Ночной режим</string>
     <string name="design">Оформление</string>
+    <string name="invite">Пригласить</string>
     <string name="mode">Режим</string>
+    <string name="invite_to_shopot">Пригласить в Шёпот</string>
+
+
 </resources>
