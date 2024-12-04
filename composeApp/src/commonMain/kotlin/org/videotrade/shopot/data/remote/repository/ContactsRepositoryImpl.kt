@@ -1,5 +1,6 @@
 package org.videotrade.shopot.data.remote.repository
 
+import co.touchlab.kermit.Logger
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -112,10 +113,6 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
 //    }
     override suspend fun fetchContacts(): List<ContactDTO>? {
         try {
-            
-            
-            val newContacts = mutableListOf<ContactDTO>()
-            
             val contactsNative = ContactsProviderFactory.create().getContacts()
             
             val jsonContent = Json.encodeToString(
@@ -130,7 +127,6 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             val jsonElement = Json.parseToJsonElement(contactsGet)
             
-            println("contactsGet $contactsGet")
             
             val registeredUsers =
                 jsonElement.jsonObject["registeredUsers"]?.jsonArray?.let { jsonArray ->

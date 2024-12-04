@@ -15,62 +15,33 @@ actual class ContactsProvider(private val context: Context) {
         val contacts = mutableListOf<ContactDTO>()
         
         val projection = arrayOf(
-            ContactsContract.CommonDataKinds.Phone.CONTACT_ID,
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME,
             ContactsContract.CommonDataKinds.Phone.NUMBER
         )
         
+        // Условие фильтрации для получения только видимых контактов
+        val selection = "${ContactsContract.Contacts.IN_VISIBLE_GROUP} = 1"
+        
         val cursor = context.contentResolver.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
             projection,
-            null,
+            selection,
             null,
             null
         )
         
         cursor?.use {
-            val contactIdIndex =
-                it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
-            val displayNameIndex =
-                it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
+            val displayNameIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME)
             val numberIndex = it.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
             
             while (it.moveToNext()) {
-                val contactId = it.getLong(contactIdIndex)
                 val displayName = it.getString(displayNameIndex)
                 val phone = it.getString(numberIndex)
                 
-                // Теперь получим firstName и lastName
-                val nameCursor = context.contentResolver.query(
-                    ContactsContract.Data.CONTENT_URI,
-                    arrayOf(
-                        ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-                        ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME
-                    ),
-                    "${ContactsContract.Data.CONTACT_ID} = ? AND ${ContactsContract.Data.MIMETYPE} = ?",
-                    arrayOf(
-                        contactId.toString(),
-                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
-                    ),
-                    null
-                )
-                
-                var firstName: String? = null
-                var lastName: String? = null
-                
-                nameCursor?.use { nc ->
-                    if (nc.moveToFirst()) {
-                        firstName =
-                            nc.getString(nc.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME))
-                        lastName =
-                            nc.getString(nc.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME))
-                    }
-                }
-                
                 contacts.add(
                     ContactDTO(
-                        firstName = firstName ?: "",
-                        lastName = lastName ?: "",
+                        firstName = displayName ?: "",
+                        lastName = "",
                         phone = phone,
                         icon = null
                     )
