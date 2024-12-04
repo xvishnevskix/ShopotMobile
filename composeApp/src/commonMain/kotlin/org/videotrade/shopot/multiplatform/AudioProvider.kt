@@ -1,5 +1,7 @@
 package org.videotrade.shopot.multiplatform
 
+import androidx.compose.runtime.MutableState
+
 expect class AudioRecorder {
     fun startRecording(outputFilePath: String)
     fun stopRecording(getDir: Boolean): String?
@@ -7,7 +9,7 @@ expect class AudioRecorder {
 
 
 expect class AudioPlayer {
-    fun startPlaying(filePath: String)
+    fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>)
     fun stopPlaying()
     
     fun getAudioDuration(filePath: String, fileName: String): String?

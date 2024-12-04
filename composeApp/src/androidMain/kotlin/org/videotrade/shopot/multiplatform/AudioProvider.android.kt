@@ -9,6 +9,7 @@ import android.media.AudioManager.ADJUST_UNMUTE
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import androidx.compose.runtime.MutableState
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import java.io.File
 import java.io.FileInputStream
@@ -121,7 +122,7 @@ actual class AudioRecorder(private val context: Context) {
 actual class AudioPlayer(private val applicationContext: Context) {
     private var mediaPlayer: MediaPlayer? = null
     
-    actual fun startPlaying(filePath: String) {
+    actual fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>) {
         try {
             // Получение экземпляра AudioManager
             val audioManager =
@@ -131,10 +132,23 @@ actual class AudioPlayer(private val applicationContext: Context) {
             audioManager.mode = AudioManager.MODE_NORMAL
             audioManager.isSpeakerphoneOn = true
             println("filePath $filePath")
+            
+            // Создание и настройка MediaPlayer
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(filePath)
                 prepare()
                 start()
+                
+                // Установка слушателя завершения воспроизведения
+                setOnCompletionListener {
+                    println("Playback completed")
+                    isPlaying.value = false
+                    mediaPlayer = null
+                    // Здесь можно выполнить дополнительные действия, например:
+                    // - Уведомить пользователя
+                    // - Очистить ресурсы
+                    // - Начать воспроизведение следующего трека
+                }
             }
         } catch (e: Exception) {
             println("error $e")
@@ -155,15 +169,18 @@ actual class AudioPlayer(private val applicationContext: Context) {
                 retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             retriever.release()
             
-            val milliseconds = durationStr?.toLongOrNull() ?: 0L
+            // Получение длительности в миллисекундах и добавление 500 мс
+            val milliseconds = (durationStr?.toLongOrNull() ?: 0L) + 500
             val totalSeconds = milliseconds / 1000
             val minutes = totalSeconds / 60
             val seconds = totalSeconds % 60
+            
             return String.format("%02d:%02d", minutes, seconds)
         } catch (e: Exception) {
             return null
         }
     }
+
 }
 
 actual object AudioFactory {

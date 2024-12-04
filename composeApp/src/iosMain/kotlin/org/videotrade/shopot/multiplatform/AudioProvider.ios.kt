@@ -1,5 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
+import androidx.compose.runtime.MutableState
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCObjectVar
@@ -9,6 +10,7 @@ import kotlinx.cinterop.ptr
 import kotlinx.cinterop.refTo
 import kotlinx.cinterop.value
 import platform.AVFAudio.AVAudioPlayer
+import platform.AVFAudio.AVAudioPlayerDelegateProtocol
 import platform.AVFAudio.AVAudioQualityHigh
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
@@ -31,6 +33,7 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSThread
 import platform.Foundation.NSURL
 import platform.darwin.DISPATCH_TIME_FOREVER
+import platform.darwin.NSObject
 import platform.darwin.dispatch_semaphore_create
 import platform.darwin.dispatch_semaphore_signal
 import platform.darwin.dispatch_semaphore_wait
@@ -155,7 +158,7 @@ actual class AudioPlayer {
     private var audioPlayer: AVAudioPlayer? = null
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-    actual fun startPlaying(filePath: String) {
+    actual fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>) {
         println("Start playing with filePath: $filePath")
         val audioURL = NSURL.fileURLWithPath(filePath)
         
@@ -181,21 +184,38 @@ actual class AudioPlayer {
                     return@memScoped
                 }
                 
+                // Устанавливаем делегат
+                player.delegate = object : NSObject(), AVAudioPlayerDelegateProtocol {
+                    override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
+                        println("Playback finished. Successfully: $successfully")
+                        isPlaying.value = false // Обновляем состояние
+                    }
+                    
+                    override fun audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+                        println("Playback error: ${error?.localizedDescription}")
+                        isPlaying.value = false // Обновляем состояние
+                    }
+                }
+                
                 audioPlayer = player.apply {
                     if (prepareToPlay()) {
                         println("Prepared to play")
                         if (play()) {
                             println("Playing started")
+                            isPlaying.value = true // Устанавливаем состояние "воспроизведение начато"
                         } else {
                             println("Failed to start playing")
+                            isPlaying.value = false
                         }
                     } else {
                         println("Failed to prepare to play")
+                        isPlaying.value = false
                     }
                 }
             } catch (e: Exception) {
                 println("Exception while initializing AVAudioPlayer: ${e.message}")
                 e.printStackTrace()
+                isPlaying.value = false
                 audioPlayer = null
             }
         }

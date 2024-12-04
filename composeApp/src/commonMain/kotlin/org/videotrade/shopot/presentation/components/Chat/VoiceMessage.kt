@@ -3,9 +3,7 @@ package org.videotrade.shopot.presentation.components.Chat
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -25,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,7 +31,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -41,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -62,7 +58,6 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_pause
 import shopot.composeapp.generated.resources.chat_play
 import kotlin.random.Random
@@ -78,7 +73,7 @@ fun VoiceMessage(
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
 
     // Состояния, уникальные для каждого сообщения
-    var isPlaying by remember(message.id) { mutableStateOf(false) }
+    var isPlaying = remember(message.id) { mutableStateOf(false) }
     val waveData = remember(message.id) { generateRandomWaveData(29) }
     var audioFilePath by remember(message.id) { mutableStateOf("") }
     val audioPlayer = remember { AudioFactory.createAudioPlayer() }
@@ -91,15 +86,11 @@ fun VoiceMessage(
     var isUpload by remember(message.id) { mutableStateOf(false) }
 
     // Эффект для обновления времени воспроизведения
-    LaunchedEffect(isPlaying) {
-        if (isPlaying) {
-            while (currentTime > 0 && isPlaying) {
+    LaunchedEffect(isPlaying.value) {
+        if (isPlaying.value) {
+            while (currentTime > 0 && isPlaying.value) {
                 delay(1000L)
                 currentTime--
-            }
-            if (currentTime <= 0) {
-                stopVoice(audioPlayer)
-                isPlaying = false
             }
         } else {
             if (duration.isNotBlank()) {
@@ -218,11 +209,11 @@ fun VoiceMessage(
             )
         } else {
             PlayPauseButton(
-                isPlaying = isPlaying,
+                isPlaying = isPlaying.value,
                 onClick = {
-                    isPlaying = !isPlaying
-                    if (isPlaying) {
-                        playVoice(audioPlayer, audioFilePath)
+                    isPlaying.value = !isPlaying.value
+                    if (isPlaying.value) {
+                        playVoice(audioPlayer, audioFilePath, isPlaying)
                     } else {
                         stopVoice(audioPlayer)
                     }
@@ -237,7 +228,7 @@ fun VoiceMessage(
         Spacer(modifier = Modifier.width(8.dp))
         Box(modifier = Modifier.width(50.dp)) {
             Text(
-                text = if (isPlaying) formatSecondsToDuration(currentTime) else duration,
+                text = if (isPlaying.value) formatSecondsToDuration(currentTime) else duration,
                 fontSize = 16.sp,
                 lineHeight = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
@@ -339,8 +330,8 @@ fun PlayPauseButton(
 }
 
 
-fun playVoice(audioPlayer: AudioPlayer, audioFilePath: String) {
-    audioPlayer.startPlaying(audioFilePath)
+fun playVoice(audioPlayer: AudioPlayer, audioFilePath: String, isPlaying: MutableState<Boolean>) {
+    audioPlayer.startPlaying(audioFilePath,isPlaying)
 }
 
 fun stopVoice(audioPlayer: AudioPlayer) {
