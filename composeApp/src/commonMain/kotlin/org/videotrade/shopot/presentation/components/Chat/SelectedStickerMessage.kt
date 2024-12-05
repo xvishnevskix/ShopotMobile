@@ -42,7 +42,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -65,7 +65,7 @@ fun SelectedStickerMessage(
 ) {
 
     val colors = MaterialTheme.colorScheme
-    val imagePainter = rememberImagePainter("${serverUrl}file/plain/${attachments[0].fileId}")
+    val imagePainter = rememberImagePainter("${SERVER_URL}file/plain/${attachments[0].fileId}")
 
 
 

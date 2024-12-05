@@ -54,7 +54,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
@@ -123,7 +123,7 @@ class CallScreen(
         val imagePainter = if (userIcon.isNullOrBlank()) {
             painterResource(Res.drawable.person)
         } else {
-            rememberImagePainter("${serverUrl}file/plain/${userIcon}")
+            rememberImagePainter("${SERVER_URL}file/plain/${userIcon}")
         }
         
         LaunchedEffect(Unit) {

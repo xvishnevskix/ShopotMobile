@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.imageAsync
@@ -86,7 +86,7 @@ fun getImageStorage(imageId: String?, imageName: String?, isCipher: Boolean): St
             }
         }
     } else {
-        imagePainter.value = rememberImagePainter(url = "${serverUrl}file/plain/$imageId")
+        imagePainter.value = rememberImagePainter(url = "${SERVER_URL}file/plain/$imageId")
     }
   
     return imagePainter

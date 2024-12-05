@@ -151,7 +151,7 @@ fun VoiceMessage(
                 }
             } else {
                 val audioFile = FileProviderFactory.create()
-                val url = "${EnvironmentConfig.serverUrl}file/id/${attachments.first().fileId}"
+                val url = "${EnvironmentConfig.SERVER_URL}file/id/${attachments.first().fileId}"
                 val fileName = attachments.first().name
                 val fileType = attachments.first().type
 

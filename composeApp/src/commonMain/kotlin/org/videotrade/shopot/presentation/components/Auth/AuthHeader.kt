@@ -56,7 +56,7 @@ import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ReloadRes

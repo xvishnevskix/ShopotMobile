@@ -380,7 +380,7 @@ actual class FileProvider(private val applicationContext: Context) {
         try {
             val token = getValueInStorage("accessToken")
             
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+            val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
                 setBody(MultiPartFormDataContent(
                     formData {
                         append(
@@ -708,7 +708,7 @@ actual class FileProvider(private val applicationContext: Context) {
             val cipherFile = File(cipherFilePath)
             
             
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+            val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
                 setBody(
                     MultiPartFormDataContent(
                         formData {
@@ -871,7 +871,7 @@ actual class FileProvider(private val applicationContext: Context) {
             try {
                 val token = getValueInStorage("accessToken")
                 
-                val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
                     setBody(MultiPartFormDataContent(
                         formData {
                             // Первый файл

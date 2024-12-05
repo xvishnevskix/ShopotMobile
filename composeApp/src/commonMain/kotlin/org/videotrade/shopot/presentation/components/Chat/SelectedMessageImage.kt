@@ -71,7 +71,7 @@ fun SelectedMessageImage(
         val imageState = remember { mutableStateOf(imagePainter) }
         
         val url =
-            "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+            "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
         LaunchedEffect(attachments[0].fileId) {
             val fileId = attachments[0].fileId
             val fileType = attachments[0].type

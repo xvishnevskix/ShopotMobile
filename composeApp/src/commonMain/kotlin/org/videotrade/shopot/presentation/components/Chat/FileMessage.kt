@@ -144,7 +144,7 @@ fun FileMessage(
         
         
         println("fileId ${message.attachments?.get(0)?.fileId}")
-        val url = "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+        val url = "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
         val fileName = attachments[0].name
         println("fileName $fileName")
         
@@ -188,7 +188,7 @@ fun FileMessage(
                             isLoading = true
                             
                             val url =
-                                "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+                                "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
                             
                             downloadJob = scope.launch {
                                 isLoading = true

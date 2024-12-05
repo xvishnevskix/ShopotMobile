@@ -39,7 +39,7 @@ import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import com.seiko.imageloader.rememberImagePainter
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.formatTimeOnly
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.VideoPlayer

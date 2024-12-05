@@ -54,8 +54,8 @@ class IntroScreen : Screen {
         LaunchedEffect(key1 = Unit) {
             try {
 
-                val isCheckVersion =
-                    updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
+                val isCheckVersion = false
+//                    updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
 
                 if (isCheckVersion) {
                     navigator.push(UpdateScreen())

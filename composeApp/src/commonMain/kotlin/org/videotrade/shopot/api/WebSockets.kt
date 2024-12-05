@@ -17,7 +17,7 @@ import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.usecase.ChatUseCase
@@ -55,7 +55,7 @@ suspend fun handleConnectWebSocket(
         try {
             httpClient.webSocket(
                 method = HttpMethod.Get,
-                host = webSocketsUrl,
+                host = WEB_SOCKETS_URL,
                 port = 5050,
                 path = "/chat?userId=$userId",
 

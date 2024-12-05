@@ -75,7 +75,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.StickerPack
@@ -187,7 +187,7 @@ fun StickerItem(stickerId: String, viewModel: ChatViewModel = koinInject(), chat
     val imagePainter = if (stickerId.isNullOrBlank()) {
         painterResource(Res.drawable.sticker1)
     } else {
-        rememberImagePainter("${serverUrl}file/plain/$stickerId")
+        rememberImagePainter("${SERVER_URL}file/plain/$stickerId")
     }
 
     Column(
@@ -199,7 +199,7 @@ fun StickerItem(stickerId: String, viewModel: ChatViewModel = koinInject(), chat
     ) {
         println("Я СТИКЕР $stickerId")
         println("Я СТИКЕР $imagePainter")
-        println("Я СТИКЕР ${serverUrl}file/plain/$stickerId")
+        println("Я СТИКЕР ${SERVER_URL}file/plain/$stickerId")
         Image(
             painter = imagePainter,
             contentDescription = null,

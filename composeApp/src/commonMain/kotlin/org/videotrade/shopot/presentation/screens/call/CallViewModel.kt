@@ -33,7 +33,7 @@ import okio.ByteString.Companion.decodeBase64
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
@@ -365,7 +365,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
             try {
                 httpClient.webSocket(
                     method = HttpMethod.Get,
-                    host = webSocketsUrl,
+                    host = WEB_SOCKETS_URL,
                     port = 3050,
                     path = "/crypto?userId=$userId",
                     

@@ -24,7 +24,7 @@ fun CustomImage(
     val imagePainter = if (icon == null) {
         painterResource(Res.drawable.person)
     } else {
-        rememberImagePainter("${EnvironmentConfig.serverUrl}file/id/$icon")
+        rememberImagePainter("${EnvironmentConfig.SERVER_URL}file/id/$icon")
 //        rememberImagePainter("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTE5fPhctwNLodS9VmAniEw_UiLWHgKs0fs1w&s")
     }
     

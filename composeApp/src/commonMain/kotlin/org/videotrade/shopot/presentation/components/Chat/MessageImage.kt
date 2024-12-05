@@ -24,7 +24,7 @@ import coil3.compose.rememberAsyncImagePainter
 import getImageStorage
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -119,7 +119,7 @@ fun MessageImage(
         
         val navigator = LocalNavigator.current
         val url =
-            "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+            "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
         LaunchedEffect(attachments[0].fileId) {
             val fileId = attachments[0].fileId
             val fileType = attachments[0].type

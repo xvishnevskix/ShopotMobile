@@ -289,7 +289,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
 //            }
 //        )
 //
-//        val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+//        val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
 //            contentType(ContentType.Application.Json)
 //            setBody(jsonContent)
 //        }

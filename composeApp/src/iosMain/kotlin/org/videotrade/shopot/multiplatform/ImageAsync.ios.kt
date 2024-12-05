@@ -21,7 +21,7 @@ import org.jetbrains.skia.ColorSpace
 import org.jetbrains.skia.ColorType
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.ImageInfo
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
 import platform.CoreFoundation.CFDataGetBytePtr
 import platform.CoreFoundation.CFDataGetLength
@@ -87,7 +87,7 @@ private suspend fun downloadImageInCache(imageId: String): String? {
             ?: throw IllegalStateException("Access token is missing")
         
         // Подготовка запроса для скачивания файла
-        client.prepareGet("${serverUrl}file/plain/$imageId") {
+        client.prepareGet("${SERVER_URL}file/plain/$imageId") {
             header("Authorization", "Bearer $token")
         }.execute { httpResponse ->
             val fileManager = NSFileManager.defaultManager

@@ -654,7 +654,7 @@ actual class FileProvider {
             val token = getValueInStorage("accessToken")
             println("77777")
             
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+            val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
                 body = MultiPartFormDataContent(
                     formData {
                         append("file",
@@ -911,7 +911,7 @@ actual class FileProvider {
             try {
                 val token = getValueInStorage("accessToken")
                 
-                val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+                val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
                     setBody(MultiPartFormDataContent(
                         formData {
  
@@ -1166,7 +1166,7 @@ actual class FileProvider {
             val cipherFile = NSData.dataWithContentsOfURL(file) ?: return null
             
             
-            val response: HttpResponse = client.post("${EnvironmentConfig.serverUrl}$url") {
+            val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
                 setBody(
                     MultiPartFormDataContent(
                         formData {

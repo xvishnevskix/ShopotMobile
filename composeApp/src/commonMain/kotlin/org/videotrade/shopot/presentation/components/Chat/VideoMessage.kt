@@ -84,7 +84,7 @@ fun VideoMessage(
             val existingPhotoFile = fileProvider.existingFileInDir(photoFileName, "image")
 
             val url =
-                "${EnvironmentConfig.serverUrl}file/id/${attachments[0].photoId}"
+                "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].photoId}"
 
             if (!existingPhotoFile.isNullOrBlank()) {
                 photoFilePath.value = existingPhotoFile
@@ -223,7 +223,7 @@ fun VideoMessage(
 //                        }
 
                             val url =
-                                "${EnvironmentConfig.serverUrl}file/id/${attachments[0].fileId}"
+                                "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
 
                             isLoading.value = true
                             isBlurred.value = true

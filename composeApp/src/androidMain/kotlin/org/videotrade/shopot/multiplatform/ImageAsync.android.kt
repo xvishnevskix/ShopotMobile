@@ -13,7 +13,7 @@ import io.ktor.util.InternalAPI
 import io.ktor.utils.io.jvm.javaio.copyTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.videotrade.shopot.api.EnvironmentConfig.serverUrl
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
 import java.io.File
 
@@ -36,7 +36,7 @@ actual suspend fun imageAsync(imageId: String, imageName: String, isCipher: Bool
                 println("imageExist $imageExist")
                 
                 imageExist ?: fileProvider.downloadCipherFile(
-                    "${serverUrl}file/id/$imageId",
+                    "${SERVER_URL}file/id/$imageId",
                     "image",
                     imageId,
                     "image"
@@ -102,7 +102,7 @@ private suspend fun downloadImageInCache(imageId: String): String? {
             ?: throw IllegalStateException("Access token is missing")
         
         // Подготовка запроса для скачивания файла
-        client.prepareGet("${serverUrl}file/plain/$imageId") {
+        client.prepareGet("${SERVER_URL}file/plain/$imageId") {
             header("Authorization", "Bearer $token")
         }.execute { httpResponse ->
             // Получение файла, в который будет сохранено содержимое ответа

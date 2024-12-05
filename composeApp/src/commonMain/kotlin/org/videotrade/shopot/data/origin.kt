@@ -40,9 +40,9 @@ class origin {
             val token = getValueInStorage("accessToken")
             
             
-            println("url ${EnvironmentConfig.serverUrl}$url")
+            println("url ${EnvironmentConfig.SERVER_URL}$url")
             
-            val response: HttpResponse = client.get("${EnvironmentConfig.serverUrl}$url") {
+            val response: HttpResponse = client.get("${EnvironmentConfig.SERVER_URL}$url") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $token")
             }
@@ -87,10 +87,10 @@ class origin {
         
         try {
             val token = getValueInStorage("accessToken")
-            println("url ${EnvironmentConfig.serverUrl}$url")
+            println("url ${EnvironmentConfig.SERVER_URL}$url")
 
             val response: HttpResponse =
-                client.post("${EnvironmentConfig.serverUrl}$url") {
+                client.post("${EnvironmentConfig.SERVER_URL}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
@@ -127,10 +127,10 @@ class origin {
     ): String? {
         return try {
             val token = getValueInStorage("accessToken")
-            println("url ${EnvironmentConfig.serverUrl}$url")
+            println("url ${EnvironmentConfig.SERVER_URL}$url")
 
             val response: HttpResponse =
-                client.post("${EnvironmentConfig.serverUrl}$url") {
+                client.post("${EnvironmentConfig.SERVER_URL}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     headers.forEach { (key, value) ->
@@ -166,7 +166,7 @@ class origin {
             val token = getValueInStorage("accessToken")
             
             val response: HttpResponse =
-                client.put("${EnvironmentConfig.serverUrl}$url") {
+                client.put("${EnvironmentConfig.SERVER_URL}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
@@ -215,7 +215,7 @@ class origin {
             println("response11 ")
             
             val response: HttpResponse =
-                client.post("${EnvironmentConfig.serverUrl}auth/refresh-token") {
+                client.post("${EnvironmentConfig.SERVER_URL}auth/refresh-token") {
                     contentType(ContentType.Application.Json)
                     setBody(jsonContent)
                 }
@@ -259,9 +259,9 @@ class origin {
     ): Boolean {
         return try {
             val token = getValueInStorage("accessToken")
-            println("url ${EnvironmentConfig.serverUrl}$url")
+            println("url ${EnvironmentConfig.SERVER_URL}$url")
 
-            val response: HttpResponse = client.delete("${EnvironmentConfig.serverUrl}$url") {
+            val response: HttpResponse = client.delete("${EnvironmentConfig.SERVER_URL}$url") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $token")
                 headers.forEach { (key, value) ->

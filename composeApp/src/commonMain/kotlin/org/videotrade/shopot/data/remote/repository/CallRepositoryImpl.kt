@@ -53,7 +53,7 @@ import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.api.EnvironmentConfig.webSocketsUrl
+import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
@@ -215,7 +215,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             try {
                 httpClient.webSocket(
                     method = HttpMethod.Get,
-                    host = webSocketsUrl,
+                    host = WEB_SOCKETS_URL,
                     port = 3006,
                     path = "/ws?callerId=${userId}",
                 ) {
