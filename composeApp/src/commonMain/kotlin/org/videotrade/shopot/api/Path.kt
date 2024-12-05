@@ -10,5 +10,8 @@ object EnvironmentConfig {
    
     const val serverUrl: String = "https://videotradedev.ru/api/"
     const val webSocketsUrl: String = "videotradedev.ru"
+    
+//    const val serverUrl: String = "https://gateway-backend.videotradedev2.ru/api/"
+//    const val webSocketsUrl: String = "message-backend.videotradedev2.ru"
 }
 
