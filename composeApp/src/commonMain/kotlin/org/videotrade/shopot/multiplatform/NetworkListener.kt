@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.common.NetworkErrorScreen
 
 // NetworkListener.kt
 class NetworkListener(private val helper: NetworkHelper) {
@@ -21,10 +22,13 @@ class NetworkListener(private val helper: NetworkHelper) {
         helper.registerListener(
             onNetworkAvailable = {
                 CoroutineScope(Dispatchers.Main).launch {
+                    println("asdadsdadaads onNetworkAvailable")
+                    
                     if (commonViewModel.isReconnectionWs.value) {
                         commonViewModel.connectionWs()
                     }
                     commonViewModel.setIsReconnectionWs(false)
+                    
                 }
                 trySend(NetworkStatus.Connected)
             },
@@ -35,8 +39,8 @@ class NetworkListener(private val helper: NetworkHelper) {
                 trySend(NetworkStatus.Disconnected)
             }
         )
-
-
+        
+        
         
         awaitClose {
             helper.unregisterListener()

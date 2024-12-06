@@ -12,12 +12,18 @@ class AndroidNetworkHelper(context: Context) : NetworkHelper {
     override fun registerListener(onNetworkAvailable: () -> Unit, onNetworkLost: () -> Unit) {
         networkCallback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
+                println("asdadsdadaads onAvailable")
+                
                 onNetworkAvailable()
             }
             override fun onUnavailable() {
+                println("asdadsdadaads onUnavailable")
+                
                 onNetworkLost()
             }
             override fun onLost(network: Network) {
+                println("asdadsdadaads onLost")
+                
                 onNetworkLost()
             }
         }

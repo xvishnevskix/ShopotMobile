@@ -242,5 +242,13 @@
     <string name="mode">Режим</string>
     <string name="invite_to_shopot">Пригласить в Шёпот</string>
 
+    <string name="network_title">Ошибка соединения</string>
+    <string name="network_simple_title">Пожалуйста, проверьте подключение к сети Wi-Fi или мобильному интернету. Возможно, сервер временно недоступен.</string>
+    <string name="network_button_title">Попытаться снова</string>
+
+
+
+
+
 
 </resources>

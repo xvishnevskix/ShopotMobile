@@ -21,22 +21,31 @@ class IOSAppLifecycleObserver : AppLifecycleObserver, KoinComponent {
     private val wsUseCase: WsUseCase by inject()
     private val commonUseCase: CommonUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
+    private val networkHelper: NetworkHelper by inject() // DI для NetworkHelper
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
+    
+    private val networkListener: NetworkListener by lazy {
+        NetworkListener(networkHelper)
+    }
+    
+    init {
+        coroutineScope.launch {
+            networkListener.networkStatus.collect { _ ->
+            }
+        }
+    }
     
     override fun onAppBackgrounded() {
         coroutineScope.launch {
-            println("iOS: Приложение свернуто disconnect")
+            println("iOS: App moved to background - disconnect")
         }
     }
     
     override fun onAppForegrounded() {
-        
-        println("iOS: Приложение развернуто ${wsUseCase.wsSession.value?.isActive}")
-        
+        println("iOS: App moved to foreground - checking WebSocket connection")
         if (commonUseCase.mainNavigator.value !== null && wsUseCase.wsSession.value?.isActive == false) {
             wsUseCase.setConnection(false)
-            println("iOS: Reconnect")
-            
+            println("iOS: Reconnecting WebSocket")
             coroutineScope.launch {
                 wsUseCase.connectionWs(
                     profileUseCase.getProfile().id,

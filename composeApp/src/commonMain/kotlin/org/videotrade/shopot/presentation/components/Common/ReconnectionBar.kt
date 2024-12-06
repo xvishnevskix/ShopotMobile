@@ -61,7 +61,6 @@ fun ReconnectionBar() {
     
     val networkStatus by networkListener.networkStatus.collectAsState(NetworkStatus.Connected)
     
-
     val colors = MaterialTheme.colorScheme
     val rotationAngle by animateFloatAsState(
         targetValue = 360f,
@@ -74,7 +73,7 @@ fun ReconnectionBar() {
             repeatMode = RepeatMode.Restart
         )
     )
-    if (networkStatus == NetworkStatus.Disconnected) {
+    if (isReconnectionWs.value) {
         Row(
             modifier = Modifier
                 .shadow(16.dp)

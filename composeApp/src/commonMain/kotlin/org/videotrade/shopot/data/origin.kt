@@ -1,6 +1,6 @@
 package org.videotrade.shopot.data
 
-import androidx.compose.runtime.MutableState
+import cafe.adriel.voyager.navigator.Navigator
 import io.ktor.client.HttpClient
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -24,10 +24,10 @@ import kotlinx.serialization.json.put
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.domain.model.FileDTO
 import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.presentation.screens.common.NetworkErrorScreen
 
 class origin {
     val client =
@@ -196,7 +196,7 @@ class origin {
     
     
     @OptIn(InternalAPI::class)
-    suspend inline fun reloadTokens(): String? {
+    suspend inline fun reloadTokens(navigator: Navigator): String? {
         val client = HttpClient(getHttpClientEngine())
         
         try {
@@ -245,7 +245,9 @@ class origin {
                 
             }
         } catch (e: Exception) {
-            println("Error222: $e")
+            
+            println("Error2: $e")
+            navigator.replace(NetworkErrorScreen())
         } finally {
             client.close()
         }
