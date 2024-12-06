@@ -48,7 +48,7 @@ actual class ContactsProvider {
     }
     
     actual fun sendMessageInvite() {
-        val message = "Приглашаем в шепот господа" // Текст сообщения
+        val message = "Приглашаем в шепот, господа" // Текст сообщения
         
         // Создаем массив для данных, которые будем шарить
         val itemsToShare = listOf(message)

@@ -5,6 +5,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -36,6 +37,8 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.pointer.pointerInput
@@ -51,6 +54,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
@@ -80,7 +84,9 @@ fun PhoneInput(
     hasError: Boolean,
     onCountrySelected: () -> Unit,
     animationTrigger: Boolean,
-    showPhoneMenu: MutableState<Boolean>
+    showPhoneMenu: MutableState<Boolean>,
+    scrollState: ScrollState,
+    focusRequester: FocusRequester = remember { FocusRequester() }
 ) {
     val colors = MaterialTheme.colorScheme
     // Анимация смещения для "тряски"
@@ -108,6 +114,12 @@ fun PhoneInput(
                 }
             )
         }
+    }
+
+    LaunchedEffect(focusRequester) {
+        delay(500)
+        focusRequester.requestFocus()
+        scrollState.scrollTo(scrollState.maxValue)
     }
 
     Row(
@@ -149,7 +161,6 @@ fun PhoneInput(
                 cursorBrush = SolidColor(colors.primary),
                 value = textState.value,
                 onValueChange = { newTextValue ->
-                    // Оставляем только цифры в номере
                     val newText = newTextValue.text.filter { char -> char.isDigit() }
                     val cursorPosition = newText.length
                     if (newText.length <= (getPhoneNumberLength(countryCode) - countryCode.length)) {
@@ -166,7 +177,9 @@ fun PhoneInput(
                     lineHeight = 16.sp,
                     color = colors.primary,
                 ),
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .fillMaxSize()
+                    .focusRequester(focusRequester) // Применяем FocusRequester
             )
         }
     }

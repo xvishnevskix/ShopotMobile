@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
@@ -406,13 +407,9 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem
     val isLoading = viewModel.isLoading.collectAsState()
     val listState = rememberLazyListState()
 
-
-
-
     LaunchedEffect(Unit) {
         viewModel.downloadStickerPacks(reset = true)
     }
-
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.layoutInfo.visibleItemsInfo }
@@ -499,18 +496,17 @@ fun StoreStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatItem
                         }
                     }
 
-                    pack.fileIds.chunked(5).forEach { rowStickers ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 8.dp),
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            rowStickers.forEach { sticker ->
-                                if (sticker != null) {
-                                    StickerItem(sticker, viewModel, chat) {
-                                        onStickerClick(sticker)
-                                    }
+                    // Горизонтально прокручиваемый Row для каждого пакета стикеров
+                    LazyRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(pack.fileIds) { sticker ->
+                            if (sticker != null) {
+                                StickerItem(sticker, viewModel, chat) {
+                                    onStickerClick(sticker)
                                 }
                             }
                         }

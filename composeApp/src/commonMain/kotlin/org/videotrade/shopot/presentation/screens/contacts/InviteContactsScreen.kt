@@ -2,7 +2,10 @@ package org.videotrade.shopot.presentation.screens.contacts
 
 import Avatar
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,23 +17,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,165 +50,166 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.Toast
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.InternalResourceApi
-import org.jetbrains.compose.resources.StringResource
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
-import org.videotrade.shopot.presentation.components.Common.CustomButton
-import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
+import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
-import org.videotrade.shopot.presentation.components.Contacts.CreateGroupChatHeader
+import org.videotrade.shopot.presentation.components.Contacts.InviteContactsHeader
+import org.videotrade.shopot.presentation.components.Contacts.MakeGroup
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import shopot.composeapp.generated.resources.arrow_left
+import shopot.composeapp.generated.resources.arrowleft
+import shopot.composeapp.generated.resources.create_group
+import shopot.composeapp.generated.resources.group
+import shopot.composeapp.generated.resources.invite_contact
 
-
-class CreateGroupFirstScreen() : Screen {
-    @OptIn(InternalResourceApi::class)
+class InviteContactsScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
-        val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
-        val selectedContacts = viewModel.selectedContacts
+        val unregisteredContacts =
+            viewModel.unregisteredContacts.collectAsState(initial = listOf()).value
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
-        val toasterViewModel: CommonViewModel = koinInject()
         val colors = MaterialTheme.colorScheme
 
-        val selectParticipants = stringResource(MokoRes.strings.select_participants)
 
-        viewModel.fetchContacts()
-
-        val filteredContacts = if (searchQuery.value.isEmpty()) {
-            contacts
-        } else {
-            contacts.filter {
-                if (it.firstName !== null) {
-                    it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(searchQuery.value)
-                } else {
-                    false
-                }
-            }
+        LaunchedEffect(Unit) {
+            viewModel.getContacts()
         }
 
-        val groupedContacts = filteredContacts.groupBy { it.firstName?.firstOrNull()?.uppercaseChar() ?: '#' }
+
+        val filteredContacts = unregisteredContacts
+            .sortedBy { it.firstName }
+            .filter {
+                searchQuery.value.isEmpty() ||
+                        it.firstName?.contains(searchQuery.value, ignoreCase = true) == true ||
+                        it.phone.contains(searchQuery.value)
+            }
+
+
+
+
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colors.background)
+                .fillMaxHeight()
+                .background(colors.surface)
         ) {
             SafeArea(padding = 0.dp) {
                 Column(
-                    modifier = Modifier.background(colors.background)
+                    Modifier.background(colors.background)
                 ) {
-                    CreateGroupChatHeader(
-                        stringResource(MokoRes.strings.create_group),
-                        order = "1",
-                        onClick = {
-                            if (selectedContacts.isEmpty()) {
-                                toasterViewModel.toaster.show(
-                                    message = selectParticipants,
-                                    type = ToastType.Error,
-                                    duration = ToasterDefaults.DurationDefault
-                                )
-                            } else {
-                                navigator.push(CreateGroupSecondScreen())
+                    InviteContactsHeader(
+                        isSearching = isSearching,
+                    )
+                        Column(
+                            modifier = Modifier.animateContentSize()
+                        ) {
+                            Crossfade(targetState = isSearching.value) { searching ->
+                                if (searching) {
+                                    Column {
+                                        Spacer(modifier = Modifier.height(16.dp))
+                                        ContactsSearch(searchQuery, isSearching)
+                                    }
+                                }
                             }
                         }
-                    )
 
-                    Spacer(modifier = Modifier.height(24.dp))
-                    ContactsSearch(searchQuery, isSearching)
-                    Spacer(modifier = Modifier.height(24.dp))
+
+
 
                     LazyColumn(
                         modifier = Modifier
-                            .weight(1f)
+                            .fillMaxSize()
                             .background(color = colors.background)
+                            .padding(bottom = 60.dp)
                     ) {
-                        item {
 
-                        }
-
-//                        itemsIndexed(filteredContacts) { _, item ->
-//                            ChatItem(item = item, sharedViewModel = viewModel)
-//                        }
-                        groupedContacts.forEach { (initial, contacts) ->
+                        if(unregisteredContacts.isNotEmpty()) {
                             item {
                                 Box(
-                                    modifier = Modifier
+                                    modifier = Modifier.padding(top = 20.dp, bottom = 10.dp)
                                         .fillMaxWidth()
                                         .background(colors.onBackground)
                                 ) {
-                                    Text(text = initial.toString(),
+                                    Text(
+                                        text = stringResource(MokoRes.strings.invite_to_shopot),
                                         textAlign = TextAlign.Start,
                                         fontSize = 16.sp,
                                         lineHeight = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                        fontWeight = FontWeight(400),
-                                        color = colors.secondary ,
-                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+                                        fontWeight = FontWeight(500),
+                                        color = colors.secondary,
+                                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                                    )
+
                                 }
                             }
-                            items(contacts) { contact ->
-                                ContactItem(sharedViewModel = viewModel, item = contact)
+                            items(filteredContacts) { contact ->
+                                ContactItem(viewModel, item = contact,true)
                             }
                         }
+
                         item {
-                            Spacer(modifier = Modifier.height(100.dp))
+                            Box(modifier = Modifier.height(70.dp))
                         }
                     }
-//                    Box(modifier = Modifier.padding(top = 5.dp)) {
-//                        CustomButton(
-//                            stringResource(MokoRes.strings.next),
-//                            {
-//                                if (selectedContacts.isEmpty()) {
-////                                    Toast.makeText(context, "Выберите участников", Toast.LENGTH_SHORT).show()
-//                                } else {
-//                                    navigator.push(CreateGroupSecondScreen())
-//                                }
-//                            }
-//                        )
-//                    }
                 }
             }
+//                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
         }
+
     }
 }
 
+
 @Composable
-private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
-    val isChecked = remember { derivedStateOf { sharedViewModel.isContactSelected(item) } }
+private fun ContactItem(
+    viewModel: ContactsViewModel, item: ContactDTO,
+    onInviteNewUsers: Boolean? = null
+) {
+    val tabNavigator = LocalTabNavigator.current
     val colors = MaterialTheme.colorScheme
+
     Box(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(4.dp))
+        modifier = Modifier.padding(horizontal = 16.dp)
+            .clip(
+                RoundedCornerShape(4.dp)
+            )
             .background(colors.background)
             .fillMaxWidth()
             .clickable {
-                if (!isChecked.value) {
-                    sharedViewModel.addContact(item)
+                println("item41421 $onInviteNewUsers")
+                if (onInviteNewUsers == null) {
+                    viewModel.createChat(item, tabNavigator)
+
+                    tabNavigator.current = ChatsTab
                 } else {
-                    sharedViewModel.removeContact(item)
+                    ContactsProviderFactory.create().sendMessageInvite()
                 }
+
+
             }
+
     ) {
-        Column {
+        Column(
+        ) {
             Spacer(modifier = Modifier.height(9.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -240,7 +250,7 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                             fontWeight = FontWeight(400),
-                            color = colors.secondary ,
+                            color = colors.secondary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             modifier = Modifier
                         )
@@ -248,21 +258,19 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                     }
 
                 }
-                CustomCheckbox(
-                    checked = isChecked.value,
-                    onCheckedChange = {
-                        if (it) {
-                            sharedViewModel.addContact(item)
-                        } else {
-                            sharedViewModel.removeContact(item)
-                        }
-                    },
-                    backgroundColor = Color(0xFF2A293C),
-                    checkmarkColor = Color.White
-                )
+
+                Box {
+                    Image(
+                        painter = painterResource(Res.drawable.invite_contact),
+                        contentDescription = "Invite",
+                        modifier = Modifier
+                            .size(width = 19.dp, height = 15.dp)
+                            ,
+                    )
+                }
+
             }
             Spacer(modifier = Modifier.height(9.dp))
-
         }
     }
 }

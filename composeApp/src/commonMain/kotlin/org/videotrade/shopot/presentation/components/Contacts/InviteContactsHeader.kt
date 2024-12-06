@@ -1,4 +1,5 @@
-package org.videotrade.shopot.presentation.components.ProfileComponents
+package org.videotrade.shopot.presentation.components.Contacts
+
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.LinearEasing
@@ -6,6 +7,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -47,6 +49,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
+import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.contacts.InviteContactsScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Medium
@@ -56,8 +59,8 @@ import shopot.composeapp.generated.resources.invite_contact
 import shopot.composeapp.generated.resources.search_icon
 
 @Composable
-fun CreateChatHeader(
-    text: String,
+fun InviteContactsHeader(
+//    text: String,
     isSearching: MutableState<Boolean>,
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -79,45 +82,38 @@ fun CreateChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-
+                Box(modifier = Modifier.clickable {
+                    navigator.pop()
+                }.padding(start = 8.dp, end = 8.dp)) {
+                    BackIcon()
+                }
                 Text(
-                    text = text,
+                    text = stringResource(MokoRes.strings.invite),
                     textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
-                    lineHeight = 24.sp,
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     color = colors.primary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
 
                     )
-                Crossfade(targetState = isSearching.value) { searching ->
-                    if (!searching) {
-                        Row(
-                            verticalAlignment = Alignment.Top
-                        ) {
-
-//                            Image(
-//                                painter = painterResource(Res.drawable.invite_contact),
-//                                contentDescription = "Invite",
-//                                modifier = Modifier
-//                                    .size(20.dp)
-//                                    .pointerInput(Unit) {
-//                                        navigator.push(InviteContactsScreen())
-//                                    },
-//                                colorFilter = ColorFilter.tint(colors.primary)
-//                            )
-//                            Spacer(Modifier.width(16.dp))
-                            Image(
-                                painter = painterResource(Res.drawable.search_icon),
-                                contentDescription = "Search",
-                                modifier = Modifier
-                                    .size(18.dp)
-                                    .pointerInput(Unit) {
-                                        isSearching.value = true
-                                    },
-                                colorFilter = ColorFilter.tint(colors.primary)
-                            )
+                Box(Modifier.size(20.dp)) {
+                    Crossfade(targetState = isSearching.value) { searching ->
+                        if (!searching) {
+                            Row {
+                                Image(
+                                    painter = painterResource(Res.drawable.search_icon),
+                                    contentDescription = "Search",
+                                    modifier = Modifier
+                                        .padding(end = 2.dp)
+                                        .size(18.dp)
+                                        .pointerInput(Unit) {
+                                            isSearching.value = true
+                                        },
+                                    colorFilter = ColorFilter.tint(colors.primary)
+                                )
+                            }
                         }
                     }
                 }
