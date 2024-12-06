@@ -10,7 +10,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import coil3.compose.rememberAsyncImagePainter
 import getImageStorage
+import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.domain.model.MessageItem
 
 
@@ -19,12 +21,14 @@ fun StickerMessage(
     message: MessageItem,
     imageId: String,
 ) {
-    val imagePainter = getImageStorage(imageId, imageId, false)
-
+//    val imagePainter = getImageStorage(imageId, imageId, false)
     
-    if (imagePainter.value !== null)
+    val imagePainter = rememberAsyncImagePainter("${SERVER_URL}file/plain/$imageId")
+    
+    
+//    if (imagePainter.value !== null)
         Image(
-            painter = imagePainter.value!!,
+            painter = imagePainter,
             contentDescription = "Image",
             contentScale = ContentScale.Fit,
             modifier = Modifier

@@ -25,7 +25,7 @@ import org.videotrade.shopot.multiplatform.imageAsync
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
-val avatarCache = LruCache<String, ImageBitmap>(100) // Кэш для 100 аватарок
+val avatarCache = LruCache<String, ImageBitmap>(5000) // Кэш для 100 аватарок
 
 @Composable
 fun Avatar(

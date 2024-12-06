@@ -188,7 +188,7 @@ fun StickerItem(stickerId: String, viewModel: ChatViewModel = koinInject(), chat
     val imagePainter = if (stickerId.isNullOrBlank()) {
         painterResource(Res.drawable.sticker1)
     } else {
-        rememberImagePainter("${SERVER_URL}file/plain/$stickerId")
+        rememberAsyncImagePainter("${SERVER_URL}file/plain/$stickerId")
     }
 
     Column(

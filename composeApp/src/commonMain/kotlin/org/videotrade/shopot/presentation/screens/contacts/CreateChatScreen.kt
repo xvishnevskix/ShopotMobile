@@ -127,9 +127,8 @@ class CreateChatScreen() : Screen {
                         .animateContentSize()) {
                         Crossfade(targetState = isSearching.value) { searching ->
                             if (searching) {
-                                Column() {
+                                Column {
                                     ContactsSearch(searchQuery, isSearching)
-
                                 }
                             } else {
                                 Column(Modifier.animateContentSize()) {
