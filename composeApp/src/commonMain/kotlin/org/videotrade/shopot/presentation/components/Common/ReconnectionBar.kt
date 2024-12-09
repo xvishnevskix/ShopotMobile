@@ -55,7 +55,6 @@ import shopot.composeapp.generated.resources.Res
 @Composable
 fun ReconnectionBar() {
     val commonViewModel: CommonViewModel = koinInject()
-    
     val isReconnectionWs = commonViewModel.isReconnectionWs.collectAsState()
     val networkListener: NetworkListener = koinInject()
     

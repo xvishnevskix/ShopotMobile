@@ -34,10 +34,13 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.dokar.sonner.ToastType
+import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.multiplatform.checkNetwork
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
@@ -60,8 +63,7 @@ class NetworkErrorScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val colors = MaterialTheme.colorScheme
-        
-        
+        val commonViewModel : CommonViewModel = koinInject()
         
         SafeArea(padding = 4.dp, backgroundColor = colors.background) {
             Box(
@@ -129,6 +131,12 @@ class NetworkErrorScreen : Screen {
                             CustomButton(stringResource(MokoRes.strings.network_button_title), {
                                 if (checkNetwork()) {
                                     navigator.replace(IntroScreen())
+                                } else {
+                                    commonViewModel.toaster.show(
+                                        "Не удалось подключиьтся к сети",
+                                        type = ToastType.Error,
+                                        duration = ToasterDefaults.DurationDefault
+                                    )
                                 }
                             
                             }, style = ButtonStyle.Gradient)
