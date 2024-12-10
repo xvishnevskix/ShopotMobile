@@ -2,19 +2,31 @@ package org.videotrade.shopot.presentation.screens.intro
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -24,8 +36,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.AppInitializer
@@ -39,6 +53,7 @@ import org.videotrade.shopot.presentation.screens.common.UpdateAppViewModel
 import org.videotrade.shopot.presentation.screens.common.UpdateScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.permissions.PermissionsScreen
+import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.auth_logo
 
@@ -133,13 +148,39 @@ class IntroScreen : Screen {
             contentAlignment = Alignment.Center
         ) {
             
-            Image(
-                modifier = Modifier
-                    .size(width = 195.dp, height = 132.dp),
-                painter = painterResource(Res.drawable.auth_logo),
-                contentDescription = null,
-                
-                )
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                Box {
+
+                }
+                Image(
+                    modifier = Modifier
+                        .size(width = 195.dp, height = 132.dp),
+                    painter = painterResource(Res.drawable.auth_logo),
+                    contentDescription = null,
+
+                    )
+                Box(
+                    modifier = Modifier.padding(bottom = 80.dp)
+                ) {
+
+                    Text(
+                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
+                        style = TextStyle(
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            textAlign = TextAlign.Center,
+                            color = Color(0x80373533),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        )
+                    )
+                }
+            }
             
         }
         
