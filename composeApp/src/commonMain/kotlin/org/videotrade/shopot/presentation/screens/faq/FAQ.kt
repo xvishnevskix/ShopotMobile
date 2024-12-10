@@ -222,7 +222,7 @@ class FAQ() : Screen {
                         modifier = Modifier
                             .fillMaxWidth()
 
-                            ,
+                        ,
                         contentAlignment = Alignment.BottomCenter
                     ) {
                         CustomButton(stringResource(MokoRes.strings.ask_question), {
@@ -237,7 +237,8 @@ class FAQ() : Screen {
                     ) {
 
                         Text(
-                            text = "${MokoRes.strings.app_version}: alpha~1.0.6",
+//                            text = "${MokoRes.strings.app_version}: alpha~1.0.6",
+                            text = "App Version: alpha~1.0.6",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
@@ -400,7 +401,7 @@ class FAQ() : Screen {
                                     modifier = Modifier.width(324.dp)
                                         .height(324.dp)
                                         .background(color = colors.background, shape = RoundedCornerShape(size = 16.dp))
-                                        ,
+                                    ,
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {

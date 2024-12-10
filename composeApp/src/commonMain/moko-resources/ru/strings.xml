@@ -246,6 +246,7 @@
     <string name="network_simple_title">Пожалуйста, проверьте подключение к сети Wi-Fi или мобильному интернету. Возможно, сервер временно недоступен.</string>
     <string name="network_button_title">Попытаться снова</string>
 
+
     <string name="app_version">Версия приложения</string>
 
 

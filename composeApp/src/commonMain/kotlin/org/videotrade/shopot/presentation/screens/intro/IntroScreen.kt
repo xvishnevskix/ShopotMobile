@@ -59,22 +59,22 @@ import shopot.composeapp.generated.resources.auth_logo
 
 
 class IntroScreen : Screen {
-    
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: IntroViewModel = koinInject()
         val updateAppViewModel: UpdateAppViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
-        
+
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {
                 navigator.push(MainScreen())
             }
         }
-        
+
         AppInitializer()
-        
+
         LaunchedEffect(key1 = Unit) {
             try {
 
@@ -129,9 +129,9 @@ class IntroScreen : Screen {
             }
 
         }
-        
-        
-        
+
+
+
         Box(
             modifier = Modifier.fillMaxSize()
                 .background(
@@ -147,7 +147,7 @@ class IntroScreen : Screen {
                 ),
             contentAlignment = Alignment.Center
         ) {
-            
+
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -168,7 +168,8 @@ class IntroScreen : Screen {
                 ) {
 
                     Text(
-                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
+//                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
+                        text = "App Version: alpha~1.0.6",
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
@@ -181,10 +182,10 @@ class IntroScreen : Screen {
                     )
                 }
             }
-            
+
         }
-        
+
     }
-    
-    
+
+
 }
