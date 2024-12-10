@@ -1,7 +1,9 @@
 [versions]
+compressor = "3.0.1"
 filekitCompose = "0.7.0"
 filekitCore = "0.7.0"
 firebaseBom = "33.1.1"
+itext7Core = "7.2.6"
 kermit = "2.0.3"
 kmpnotifier = "1.0.0"
 kotlin = "1.9.23"
@@ -48,6 +50,7 @@ firebaseMessagingKtx = "24.0.1"
 androidx-lifecycle-process = { module = "androidx.lifecycle:lifecycle-process", version.ref = "lifecycleRuntimeKtx" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
+compressor = { module = "id.zelory:compressor", version.ref = "compressor" }
 firebase-messaging-ktx = { group = "com.google.firebase", name = "firebase-messaging-ktx", version.ref = "firebaseMessagingKtx" }
 
 
@@ -60,6 +63,7 @@ firebase-common = { module = "dev.gitlive:firebase-common", version.ref = "fireb
 androidx-activityCompose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 androidx-testManifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidx-uiTest" }
 androidx-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidx-uiTest" }
+itext7-core = { module = "com.itextpdf:itext7-core", version.ref = "itext7Core" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
 kmpnotifier = { module = "io.github.mirzemehdi:kmpnotifier", version.ref = "kmpnotifier" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }

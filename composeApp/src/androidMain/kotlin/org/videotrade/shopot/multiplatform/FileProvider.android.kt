@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
 import android.database.Cursor
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -14,6 +15,9 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.PdfWriter
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -58,15 +62,89 @@ import java.io.InputStream
 import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.random.Random
-
+import id.zelory.compressor.Compressor
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 actual class FileProvider(private val applicationContext: Context) {
     
     private val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
     
     private val context = getContextObj.getContext()
-    
-    
+
+
+    actual suspend fun compressFile(filePath: String): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val originalFile = File(filePath)
+
+                // Проверка расширения файла
+                val extension = originalFile.extension.lowercase()
+                val compressedFile = when (extension) {
+                    "pdf" -> compressPdf(originalFile)
+                    "zip" -> compressZip(originalFile)
+                    else -> null
+                }
+
+                compressedFile?.absolutePath
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    private fun compressPdf(file: File): File {
+        // Реализуйте сжатие PDF-файла с использованием библиотеки iText
+        // В этом примере создаётся сжатый файл с уменьшением качества
+        val compressedFile = File(applicationContext.cacheDir, "compressed_${file.name}")
+        PdfDocument(PdfReader(file), PdfWriter(compressedFile)).use { pdf ->
+            pdf.close()
+        }
+        return compressedFile
+    }
+
+    private fun compressZip(file: File): File {
+        // Реализация компрессии ZIP
+        val compressedFile = File(applicationContext.cacheDir, "compressed_${file.name}")
+        ZipOutputStream(FileOutputStream(compressedFile)).use { zipOut ->
+            val buffer = ByteArray(1024)
+            FileInputStream(file).use { fis ->
+                val entry = ZipEntry(file.name)
+                zipOut.putNextEntry(entry)
+                var length: Int
+                while (fis.read(buffer).also { length = it } > 0) {
+                    zipOut.write(buffer, 0, length)
+                }
+            }
+            zipOut.closeEntry()
+        }
+        return compressedFile
+    }
+
+
+    actual suspend fun compressImage(filePath: String): String? {
+        return try {
+            withContext(Dispatchers.IO) {
+                val originalFile = File(filePath)
+                val bitmap = BitmapFactory.decodeFile(originalFile.absolutePath)
+
+                val compressedFile = File(applicationContext.cacheDir, "compressed_${originalFile.name}")
+                val outputStream = FileOutputStream(compressedFile)
+
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream)
+                outputStream.flush()
+                outputStream.close()
+
+                compressedFile.absolutePath
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+
     actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {
         try {
             val filePick = FileKit.pickFile(

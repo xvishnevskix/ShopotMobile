@@ -129,6 +129,7 @@ kotlin {
             implementation(libs.coil.network.ktor)
             api(libs.resources)
             api(libs.resources.compose) // for compose multiplatfor
+            implementation(libs.compressor)
         }
         
         commonTest.dependencies {
@@ -148,6 +149,7 @@ kotlin {
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.lifecycle.process)
+            implementation(libs.itext7.core) // Добавлено для работы с PDF
         }
         
         iosMain.dependencies {

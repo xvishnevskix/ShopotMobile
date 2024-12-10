@@ -287,25 +287,33 @@ fun ChatFooter(
 //                    "image",
 //                    "jpg",
 //                )
-                
+
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
                             .pickGallery()
-                        
+
                         if (filePick !== null) {
-                            val fileData =
-                                FileProviderFactory.create().getFileData(filePick.fileContentPath)
-                            
+                            val fileProvider = FileProviderFactory.create()
+
+                            val fileData = fileProvider.getFileData(filePick.fileContentPath)
+
                             if (fileData?.fileType?.substringBefore("/") == "image") {
-                                viewModel.sendImage(
-                                    viewModel.footerText.value,
-                                    viewModel.profile.value.id,
-                                    chat.id,
-                                    filePick.fileName,
-                                    filePick.fileAbsolutePath,
-                                    fileData.fileType
-                                )
+                                // Сжимаем изображение
+                                val compressedFilePath = fileProvider.compressImage(filePick.fileAbsolutePath)
+
+                                if (compressedFilePath != null) {
+                                    viewModel.sendImage(
+                                        content = viewModel.footerText.value,
+                                        fromUser = viewModel.profile.value.id,
+                                        chatId = chat.id,
+                                        fileName = filePick.fileName,
+                                        fileAbsolutePath = compressedFilePath,
+                                        contentType = fileData.fileType
+                                    )
+                                } else {
+                                    println("Ошибка при сжатии изображения")
+                                }
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
                                     viewModel.addFileMessage(
@@ -317,14 +325,14 @@ fun ChatFooter(
                                     )
                                 }
                             }
-                            
+
                         }
-                        
-                        
+
+
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
-                    
+
                 }
             }
         ),
