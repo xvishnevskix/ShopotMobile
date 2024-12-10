@@ -208,7 +208,6 @@ class origin {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("refreshToken", refreshToken)
-                    
                 }
             )
             

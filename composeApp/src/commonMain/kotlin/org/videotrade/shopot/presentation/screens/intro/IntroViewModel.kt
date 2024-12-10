@@ -180,31 +180,9 @@ class IntroViewModel : ViewModel(), KoinComponent {
                         println("wsSessionIntro $wsSessionNew")
 
                         stopObserving()
-
-//                        val jsonContent = Json.encodeToString(
-//                            buildJsonObject {
-//                                put("action", "getUserChats")
-//                                put("userId", profile.value?.id)
-//                            }
-//                        )
-//
-//                        try {
-//
-//                            println("jsonContent $jsonContent")
-//
-//                            wsSessionNew.send(Frame.Text(jsonContent))
-//
-//                            navigator.value?.replace(MainScreen())
-//
-//                            println("Message sent successfully")
-//                        } catch (e: Exception) {
-//                            println("Failed to send message: ${e.message}")
-//                        }
-//
                         chatsUseCase.getChatsInBack(wsSessionNew, profile.value!!.id)
 
                         navigator.value?.replaceAll(MainScreen())
-//                        navigator.value?.replace(TestScreen())
 
 
                     }
