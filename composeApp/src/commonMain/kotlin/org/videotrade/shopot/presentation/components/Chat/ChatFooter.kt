@@ -5,7 +5,6 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -18,8 +17,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -43,17 +40,13 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -72,9 +65,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -95,7 +86,6 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
-import androidx.compose.ui.window.Popup
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
 import kotlinx.coroutines.delay
@@ -110,19 +100,15 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getAndSaveFirstFrame
 import org.videotrade.shopot.multiplatform.getPlatform
-import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.arrow_left
 import shopot.composeapp.generated.resources.chat_forward
 import shopot.composeapp.generated.resources.chat_micro
-import shopot.composeapp.generated.resources.chat_microphone
 import shopot.composeapp.generated.resources.chat_send_arrow
 import shopot.composeapp.generated.resources.clip
-import shopot.composeapp.generated.resources.file_message
 import shopot.composeapp.generated.resources.keyboard
 import shopot.composeapp.generated.resources.menu_file
 import shopot.composeapp.generated.resources.menu_gallery
@@ -160,6 +146,7 @@ fun ChatFooter(
     var offset by remember { mutableStateOf(Offset.Zero) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val footerText by viewModel.footerText.collectAsState()
+    val isStopAndSendVoice = remember { mutableStateOf(false) }
     
     
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
@@ -169,6 +156,16 @@ fun ChatFooter(
     val profile = viewModel.profile.collectAsState().value
     val selectedMessage = selectedMessagePair?.first
     val selectedMessageSenderName = selectedMessagePair?.second
+    
+    LaunchedEffect(isStopAndSendVoice.value) {
+        if (isStopAndSendVoice.value) {
+            println("isStopAndSendVoice")
+            viewModel.sendVoice(chat, voiceName)
+            
+            isStopAndSendVoice.value = false
+        }
+    }
+    
     
     LaunchedEffect(isRecording) {
         if (isRecording) {
@@ -383,17 +380,18 @@ fun ChatFooter(
 //            }
 //        ),
     )
-
-
+    
+    
     val collapsedHeight = if (selectedMessage != null) 375.dp else 56.dp
     val collapsedselectedHeight = if (selectedMessage != null) 41.dp else 0.dp
     
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
-
-
-    val maxHeight = if (selectedMessage != null) 240.dp else 200.dp // Увеличиваем максимальную высоту компонента
+    
+    
+    val maxHeight =
+        if (selectedMessage != null) 240.dp else 200.dp // Увеличиваем максимальную высоту компонента
     val minHeight = when {
 //        selectedMessage != null && footerText.length  > 120 && showMenu -> 258.dp
 //        selectedMessage != null && footerText.length > 120 -> 200.dp
@@ -402,27 +400,28 @@ fun ChatFooter(
         showMenu -> 120.dp
         else -> 56.dp
     }
-
+    
     val lineHeight = 16.dp // Высота одной строки текста в dp
     val maxLines = 8       // Максимальное количество строк текста
-
+    
     // Рассчитываем количество строк на основе текста
     val calculatedLines = remember(footerText) {
         val totalLines = footerText.split("\n").size
-        val approximateLines = (footerText.length / 20).coerceAtLeast(1) // Примерно 20 символов на строку
+        val approximateLines =
+            (footerText.length / 20).coerceAtLeast(1) // Примерно 20 символов на строку
         totalLines.coerceAtLeast(approximateLines)
     }.coerceAtMost(maxLines)
-
+    
     // Высота на основе количества строк
     val targetHeight = minHeight + calculatedLines * lineHeight
-
+    
     // Ограничиваем высоту максимумом
     val finalHeight = targetHeight.coerceAtMost(maxHeight)
-
+    
     // Анимируем высоту
     val animatedHeight by animateDpAsState(targetValue = finalHeight)
-
-
+    
+    
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
@@ -438,8 +437,8 @@ fun ChatFooter(
                         .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                 }
             )
-
-
+    
+    
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -450,12 +449,12 @@ fun ChatFooter(
                 .fillMaxWidth()
                 .heightIn(max = 375.dp, min = 56.dp)
                 .height(animatedHeight)
-
+        
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
+                
                 if (selectedMessage != null && selectedMessageSenderName != null) {
                     Column {
                         Row(
@@ -466,9 +465,9 @@ fun ChatFooter(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         )
-
+                        
                         {
-
+                            
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
@@ -487,14 +486,14 @@ fun ChatFooter(
                                         .fillMaxHeight()
                                         .background(Color(0xFFCAB7A3))
                                 ) {
-
+                                
                                 }
                             }
-
+                            
                             Spacer(modifier = Modifier.width(16.dp))
-
+                            
                             Box(modifier = Modifier.weight(1f)) {
-
+                                
                                 SelectedMessageFormat(
                                     selectedMessage,
                                     profile,
@@ -502,7 +501,7 @@ fun ChatFooter(
                                     isFromFooter = true
                                 )
                             }
-
+                            
                             Box(
                                 modifier = Modifier.fillMaxHeight().width(60.dp)
                                     .pointerInput(Unit) {
@@ -596,7 +595,7 @@ fun ChatFooter(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .heightIn(max = 375.dp, min = 60.dp)
-
+                
                 ) {
                     if (isRecording) {
                         Row(
@@ -636,8 +635,7 @@ fun ChatFooter(
                                 .padding(start = 40.dp)
                                 .fillMaxWidth(0.65f)
                                 .offset(x = (textOffset + swipeOffset.value).dp)
-                                .alpha(1f + (swipeOffset.value / 100f))
-                            ,
+                                .alpha(1f + (swipeOffset.value / 100f)),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
@@ -647,7 +645,7 @@ fun ChatFooter(
                                 painter = painterResource(Res.drawable.arrow_left),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                colorFilter =  ColorFilter.tint(colors.secondary)
+                                colorFilter = ColorFilter.tint(colors.secondary)
                             )
                             Spacer(modifier = Modifier.width(9.dp))
                             Text(
@@ -661,14 +659,13 @@ fun ChatFooter(
                             )
                         }
                     }
-
-
+                    
+                    
                     Row(
                         modifier = Modifier
                             .alpha(if (isRecording) 0f else 1f)
                             .weight(1f)
-                            .animateContentSize()
-                            ,
+                            .animateContentSize(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         AnimatedVisibility(
@@ -690,7 +687,7 @@ fun ChatFooter(
                                             .pointerInput(Unit) {
                                                 showMenu = false
                                             },
-                                        colorFilter =  ColorFilter.tint(colors.primary)
+                                        colorFilter = ColorFilter.tint(colors.primary)
                                     )
                                 } else {
                                     Image(
@@ -701,21 +698,24 @@ fun ChatFooter(
                                             .pointerInput(Unit) {
                                                 showMenu = true
                                             },
-                                        colorFilter =  ColorFilter.tint(colors.primary)
+                                        colorFilter = ColorFilter.tint(colors.primary)
                                     )
                                 }
                             }
                         }
-
+                        
                         Row(
                             modifier = Modifier
                                 .weight(1f)
-                                .border(width = 1.dp, color = colors.onSecondary, shape = RoundedCornerShape(size = 16.dp))
+                                .border(
+                                    width = 1.dp,
+                                    color = colors.onSecondary,
+                                    shape = RoundedCornerShape(size = 16.dp)
+                                )
                                 .animateContentSize()
                         ) {
-
-
-
+                            
+                            
                             BasicTextField(
                                 value = footerText,
                                 onValueChange = { newText ->
@@ -768,7 +768,7 @@ fun ChatFooter(
                                     }
                                 },
                             )
-
+                            
                             if (!isRecording) {
                                 Box(
                                     contentAlignment = Alignment.CenterEnd,
@@ -784,19 +784,19 @@ fun ChatFooter(
                                         contentDescription = null,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier
-                                            .size(18.dp)
-                                        ,colorFilter =  ColorFilter.tint(colors.secondary)
+                                            .size(18.dp),
+                                        colorFilter = ColorFilter.tint(colors.secondary)
                                     )
                                 }
                             }
-
+                            
                         }
                         Spacer(modifier = Modifier.width(12.dp))
-
-
+                        
+                        
                     }
-
-
+                    
+                    
                     val boxSize by animateDpAsState(
                         targetValue = if (footerText.isNotEmpty()) 56.dp else 50.dp,
                         animationSpec = tween(
@@ -804,10 +804,10 @@ fun ChatFooter(
                             easing = FastOutSlowInEasing // Плавное увеличение
                         )
                     )
-
+                    
                     val isFooterTextNotEmpty = footerText.isNotEmpty()
-
-
+                    
+                    
                     AnimatedVisibility(
                         visible = isFooterTextNotEmpty,
                         enter = fadeIn(animationSpec = tween(100)) + expandIn(expandFrom = Alignment.Center),
@@ -815,9 +815,11 @@ fun ChatFooter(
                     ) {
                         Box(
                             modifier = Modifier
-                                .background(color = Color(0xFFCAB7A3), shape = RoundedCornerShape(size = 16.dp))
-                                .size(boxSize)
-                                ,
+                                .background(
+                                    color = Color(0xFFCAB7A3),
+                                    shape = RoundedCornerShape(size = 16.dp)
+                                )
+                                .size(boxSize),
                             contentAlignment = Alignment.Center
                         ) {
                             Image(
@@ -843,7 +845,7 @@ fun ChatFooter(
                             )
                         }
                     }
-
+                    
                     AnimatedVisibility(
                         visible = !isFooterTextNotEmpty,
                         enter = fadeIn(animationSpec = tween(300)) + expandIn(expandFrom = Alignment.Center),
@@ -869,11 +871,10 @@ fun ChatFooter(
                                                 println("Drag send")
                                                 val seconds = recordingTime % 60
                                                 if (seconds > 1) {
-                                                    val fileDir = audioRecorder.stopRecording(true)
-                                                    if (fileDir != null) {
-                                                        isStartRecording = false
-                                                        viewModel.sendVoice(fileDir, chat, voiceName)
-                                                    }
+                                                    isStartRecording = false
+                                                    isStopAndSendVoice.value = true
+
+//                                                        viewModel.sendVoice(fileDir, chat, voiceName)
                                                 }
                                                 viewModel.setIsRecording(false)
                                                 offset = Offset.Zero
@@ -886,7 +887,8 @@ fun ChatFooter(
                                         onDrag = { change, dragAmount ->
                                             change.consume()
                                             val newOffset = Offset(
-                                                x = (offset.x + dragAmount.x).coerceAtLeast(-200f).coerceAtMost(0f),
+                                                x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
+                                                    .coerceAtMost(0f),
                                                 y = offset.y
                                             )
                                             if (newOffset.x <= -200f) {
@@ -904,11 +906,13 @@ fun ChatFooter(
                                             println("Tap detected")
                                             val seconds = recordingTime % 60
                                             if (seconds > 1) {
-                                                val fileDir = audioRecorder.stopRecording(true)
-                                                if (fileDir != null) {
-                                                    isStartRecording = false
-                                                    viewModel.sendVoice(fileDir, chat, voiceName)
-                                                }
+//                                                val fileDir = audioRecorder.stopRecording(true)
+//                                                if (fileDir != null) {
+                                                isStartRecording = false
+                                                
+                                                isStopAndSendVoice.value = true
+//                                                    viewModel.sendVoice(fileDir, chat, voiceName)
+//                                                }
                                             }
                                             viewModel.setIsRecording(false)
                                             recordingTime = 0
@@ -928,7 +932,7 @@ fun ChatFooter(
                             } else {
                                 Modifier.size(width = 30.dp, height = 30.dp)
                             }
-
+                            
                             Box(
                                 modifier = sizeModifier
                                     .offset {
@@ -948,14 +952,16 @@ fun ChatFooter(
                                     painter = painterResource(Res.drawable.chat_micro),
                                     contentDescription = null,
                                     contentScale = ContentScale.Crop,
-                                    colorFilter = if (!isRecording) ColorFilter.tint(colors.primary) else ColorFilter.tint(Color.White)
+                                    colorFilter = if (!isRecording) ColorFilter.tint(colors.primary) else ColorFilter.tint(
+                                        Color.White
+                                    )
                                 )
                             }
                         }
                     }
                 }
-
-
+                
+                
                 Crossfade(targetState = showMenu) { isMenuVisible ->
                     if (isMenuVisible) {
                         Row(
@@ -998,7 +1004,7 @@ fun ChatFooter(
                     }
                 }
             }
-
+            
         }
     }
 }
