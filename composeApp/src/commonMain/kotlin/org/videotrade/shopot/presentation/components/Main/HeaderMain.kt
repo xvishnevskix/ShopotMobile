@@ -72,6 +72,7 @@ import org.videotrade.shopot.presentation.tabs.ContactsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.add_main
+import shopot.composeapp.generated.resources.logo_circle_gr
 import shopot.composeapp.generated.resources.pepe
 import shopot.composeapp.generated.resources.search_icon
 
@@ -199,6 +200,7 @@ fun StoryCircle(
         Box(
             modifier = Modifier
                 .fillMaxSize()
+
                 .border(
                     BorderStroke(2.dp, borderBrush), // Толщина и цвет границы
                     shape = CircleShape
@@ -206,14 +208,16 @@ fun StoryCircle(
                 .padding(4.dp) // Внутренний отступ для изображения
         ) {
             // Внутренний круг с изображением
-            Image(
-                painter = painterResource(Res.drawable.pepe),
-                contentDescription = "Story Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .clip(CircleShape) // Скругление до формы круга
-                    .fillMaxSize()     // Заполнение всего доступного пространства
-            )
+            Box() {
+                Image(
+                    painter = painterResource(Res.drawable.logo_circle_gr),
+                    contentDescription = "Story Image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .clip(CircleShape) // Скругление до формы круга
+                        .fillMaxSize()     // Заполнение всего доступного пространства
+                )
+            }
         }
     }
 }
@@ -289,7 +293,7 @@ fun StoryViewer(
                     Image(
                         painter = painterResource(stories[page]),
                         contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                        contentScale = ContentScale.FillBounds,
                         modifier = Modifier.fillMaxSize()
                     )
 

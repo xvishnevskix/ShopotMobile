@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -72,6 +73,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.auth_logo
+import shopot.composeapp.generated.resources.govno_peredelyvay
 import shopot.composeapp.generated.resources.pepe
 import shopot.composeapp.generated.resources.smart_lock
 import shopot.composeapp.generated.resources.sticker1
@@ -94,7 +96,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val stories = listOf(
         Res.drawable.pepe,
         Res.drawable.sticker1,
-        Res.drawable.pepe,
+        Res.drawable.govno_peredelyvay,
     )
 
     val filteredChats = if (searchQuery.value.isEmpty()) {
@@ -142,17 +144,23 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                 )
 
 
-                Crossfade(targetState = isSearching.value) { searching ->
-                    if (searching) {
-                        Column {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            ContactsSearch(searchQuery, isSearching, padding = 0.dp)
+                Column(
+                    modifier = Modifier.animateContentSize()
+                ) {
+                    Crossfade(targetState = isSearching.value) { searching ->
+                        if (searching) {
+                            Column(
+                                modifier = Modifier.animateContentSize()
+                            ) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                ContactsSearch(searchQuery, isSearching, padding = 0.dp)
+                            }
                         }
                     }
                 }
                 
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.animateContentSize().weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Spacer(modifier = Modifier.height(24.dp))
