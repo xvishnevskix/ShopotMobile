@@ -16,6 +16,7 @@ kotlinxSerializationJson = "1.6.3"
 ktorClientCore = "2.3.11"
 ktorClientDarwin = "2.3.11"
 lifecycleRuntimeKtx = "2.8.2"
+lz4Java = "1.8.0"
 peekabooUi = "0.5.2"
 resources = "0.24.1"
 sonner = "0.3.6"
@@ -72,6 +73,7 @@ image-loader-v181 = { module = "io.github.qdsfdhvh:image-loader", version.ref = 
 
 ktor-client-core-v200 = { module = "io.ktor:ktor-client-core", version.ref = "ktorClientCore" }
 ktor-client-darwin-v200 = { module = "io.ktor:ktor-client-darwin", version.ref = "ktorClientDarwin" }
+lz4-java = { module = "org.lz4:lz4-java", version.ref = "lz4Java" }
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekabooUi" }
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekabooUi" }
 resources = { module = "dev.icerock.moko:resources", version.ref = "resources" }

@@ -148,7 +148,7 @@ fun ChatFooter(
 ) {
     val scope = rememberCoroutineScope()
     val colors = MaterialTheme.colorScheme
-    
+
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
@@ -160,26 +160,26 @@ fun ChatFooter(
     var offset by remember { mutableStateOf(Offset.Zero) }
     val keyboardController = LocalSoftwareKeyboardController.current
     val footerText by viewModel.footerText.collectAsState()
-    
-    
+
+
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
-    
+
     val selectedMessagePair = viewModel.selectedMessagesByChat.collectAsState().value[chat.chatId]
     val profile = viewModel.profile.collectAsState().value
     val selectedMessage = selectedMessagePair?.first
     val selectedMessageSenderName = selectedMessagePair?.second
-    
+
     LaunchedEffect(isRecording) {
         if (isRecording) {
             while (isRecording) {
                 delay(1000L)
-                
+
                 recordingTime++
-                
+
                 var seconds = recordingTime
                 seconds++
-                
+
                 if (seconds > 1) {
                     if (!isStartRecording) {
                         scope.launch {
@@ -194,48 +194,48 @@ fun ChatFooter(
                                         voiceName,
                                         "audio/mp4"
                                     ) // Генерация пути к файлу
-                                
+
                                 println("audioFilePathNew $audioFilePathNew")
-                                
+
                                 if (audioFilePathNew != null) {
                                     voicePath = audioFilePathNew
-                                    
+
                                     audioRecorder.startRecording(audioFilePathNew)
                                 }
                                 isStartRecording = true
                             } else {
-                                
+
                                 println("perStop")
-                                
+
                                 viewModel.setIsRecording(false)
-                                
+
                                 audioRecorder.stopRecording(false)
                                 offset = Offset.Zero
                             }
                         }
                     }
-                    
+
                 }
             }
         } else {
             recordingTime = 0
         }
     }
-    
+
     LaunchedEffect(showStickerMenu) {
         if (showStickerMenu.value) {
             keyboardController?.hide()
         }
     }
-    
+
     DisposableEffect(showStickerMenu.value) {
         if (showStickerMenu.value) {
             keyboardController?.hide()
         }
         onDispose { }
     }
-    
-    
+
+
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -245,7 +245,7 @@ fun ChatFooter(
             repeatMode = RepeatMode.Reverse
         )
     )
-    
+
     val textOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -15f,
@@ -274,7 +274,7 @@ fun ChatFooter(
 //            }
 //        }
 //    )
-    
+
     val menuItems = listOf(
         MenuItem(
             text = stringResource(MokoRes.strings.gallery),
@@ -290,31 +290,43 @@ fun ChatFooter(
 
                 scope.launch {
                     try {
-                        val filePick = FileProviderFactory.create()
-                            .pickGallery()
+                        val filePick = FileProviderFactory.create().pickGallery()
 
-                        if (filePick !== null) {
+                        if (filePick != null) {
                             val fileProvider = FileProviderFactory.create()
-
                             val fileData = fileProvider.getFileData(filePick.fileContentPath)
 
+                            // Проверяем тип файла
                             if (fileData?.fileType?.substringBefore("/") == "image") {
-                                // Сжимаем изображение
-                                val compressedFilePath = fileProvider.compressImage(filePick.fileAbsolutePath)
-
-                                if (compressedFilePath != null) {
+                                // Если платформа Android
+                                if (getPlatform() == Platform.Android) {
+                                    // Сжимаем изображение
+                                    val compressedFilePath = fileProvider.compressImage(filePick.fileAbsolutePath)
+                                    if (compressedFilePath != null) {
+                                        viewModel.sendImage(
+                                            content = viewModel.footerText.value,
+                                            fromUser = viewModel.profile.value.id,
+                                            chatId = chat.id,
+                                            fileName = filePick.fileName,
+                                            fileAbsolutePath = compressedFilePath,
+                                            contentType = fileData.fileType
+                                        )
+                                    } else {
+                                        println("Ошибка при сжатии изображения")
+                                    }
+                                } else {
+                                    // Для других платформ отправляем оригинальный файл
                                     viewModel.sendImage(
                                         content = viewModel.footerText.value,
                                         fromUser = viewModel.profile.value.id,
                                         chatId = chat.id,
                                         fileName = filePick.fileName,
-                                        fileAbsolutePath = compressedFilePath,
+                                        fileAbsolutePath = filePick.fileAbsolutePath,
                                         contentType = fileData.fileType
                                     )
-                                } else {
-                                    println("Ошибка при сжатии изображения")
                                 }
                             } else {
+                                // Обработка видеофайлов
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
                                     viewModel.addFileMessage(
                                         chat,
@@ -325,43 +337,172 @@ fun ChatFooter(
                                     )
                                 }
                             }
-
                         }
-
 
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
-
                 }
+
+//                scope.launch {
+//                    try {
+//                        val filePick = FileProviderFactory.create()
+//                            .pickGallery()
+//
+//                        if (filePick !== null) {
+//                            val fileData =
+//                                FileProviderFactory.create().getFileData(filePick.fileContentPath)
+//
+//                            if (fileData?.fileType?.substringBefore("/") == "image") {
+//                                viewModel.sendImage(
+//                                    viewModel.footerText.value,
+//                                    viewModel.profile.value.id,
+//                                    chat.id,
+//                                    filePick.fileName,
+//                                    filePick.fileAbsolutePath,
+//                                    fileData.fileType
+//                                )
+//                            } else {
+//                                getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
+//                                    viewModel.addFileMessage(
+//                                        chat,
+//                                        "video",
+//                                        filePick,
+//                                        photoPath,
+//                                        photoName,
+//                                    )
+//                                }
+//                            }
+//
+//                        }
+//
+//
+//                    } catch (e: Exception) {
+//                        println("Error: ${e.message}")
+//                    }
+//
+//                }
+
+
+
+
+
+//                scope.launch {
+//                    try {
+//                        val filePick = FileProviderFactory.create().pickGallery()
+//
+//                        if (filePick != null) {
+//                            val fileProvider = FileProviderFactory.create()
+//                            val fileData = fileProvider.getFileData(filePick.fileContentPath)
+//
+//                            if (fileData?.fileType?.substringBefore("/") == "image") {
+//                                // Используем LZ4-компрессию
+//                                val compressedFilePath = fileProvider.compressFile(filePick.fileAbsolutePath)
+//                                println("compressedFilePath footer ${compressedFilePath}")
+//                                if (compressedFilePath != null) {
+//                                    viewModel.sendImage(
+//                                        content = viewModel.footerText.value,
+//                                        fromUser = viewModel.profile.value.id,
+//                                        chatId = chat.id,
+//                                        fileName = filePick.fileName,
+//                                        fileAbsolutePath = compressedFilePath, // Передаём сжатый файл
+//                                        contentType = fileData.fileType
+//                                    )
+//                                } else {
+//                                    println("Ошибка при сжатии файла через LZ4")
+//                                }
+//                            } else {
+//                                // Видео или другие типы файлов
+//                                getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
+//                                    viewModel.addFileMessage(
+//                                        chat,
+//                                        "video",
+//                                        filePick,
+//                                        photoPath,
+//                                        photoName,
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    } catch (e: Exception) {
+//                        println("Error: ${e.message}")
+//                    }
+//                }
+
+
+
+
             }
         ),
+//        MenuItem(
+//            text = stringResource(MokoRes.strings.file),
+//            imagePath = Res.drawable.menu_file,
+//            onClick = {
+//                scope.launch {
+//                    try {
+//                        val filePick = FileProviderFactory.create()
+//                            .pickFile(PickerType.File(listOf("pdf", "zip")))
+//
+//                        if (filePick != null) {
+//                            val filePath = filePick.fileContentPath
+//
+//                            // Сжимаем файл
+//                            val compressedFilePath = FileProviderFactory.create().compressFile(filePath)
+//
+//                            if (compressedFilePath != null) {
+//                                val compressedFileData =
+//                                    FileProviderFactory.create().getFileData(compressedFilePath)
+//
+//                                if (compressedFileData != null) {
+//                                    viewModel.addFileMessage(chat, compressedFileData.fileType, filePick)
+//                                } else {
+//                                    println("Failed to retrieve compressed file data.")
+//                                }
+//                            } else {
+//                                println("File compression failed or format not supported.")
+//                                println("${compressedFilePath} compressedFilePath")
+//                            }
+//                        }
+//                    } catch (e: Exception) {
+//                        println("Error: ${e.message}")
+//                    }
+//                }
+//            }
+//        ),
+
+
+
+
         MenuItem(
-            text = stringResource(MokoRes.strings.file),
-            imagePath = Res.drawable.menu_file,
-            onClick = {
-                
-                scope.launch {
-                    try {
-                        val filePick = FileProviderFactory.create()
-                            .pickFile(PickerType.File(listOf("pdf", "zip")))
-                        
-                        if (filePick !== null) {
-                            val fileData =
-                                FileProviderFactory.create().getFileData(filePick.fileContentPath)
-                            
-                            if (fileData !== null) {
-                                viewModel.addFileMessage(chat, fileData.fileType, filePick)
+                    text = stringResource(MokoRes.strings.file),
+                    imagePath = Res.drawable.menu_file,
+                    onClick = {
+
+                        scope.launch {
+                            try {
+                                val filePick = FileProviderFactory.create()
+                                    .pickFile(PickerType.File(listOf("pdf", "zip")))
+
+                                if (filePick !== null) {
+                                    val fileData =
+                                        FileProviderFactory.create().getFileData(filePick.fileContentPath)
+
+                                    if (fileData !== null) {
+                                        viewModel.addFileMessage(chat, fileData.fileType, filePick)
+                                    }
+                                }
+
+
+                            } catch (e: Exception) {
+                                println("Error: ${e.message}")
                             }
                         }
-                        
-                        
-                    } catch (e: Exception) {
-                        println("Error: ${e.message}")
                     }
-                }
-            }
-        ),
+                ),
+
+
+
+
 //        MenuItem(
 //            text = stringResource(MokoRes.strings.video),
 //            imagePath = Res.drawable.menu_video,
@@ -395,7 +536,7 @@ fun ChatFooter(
 
     val collapsedHeight = if (selectedMessage != null) 375.dp else 56.dp
     val collapsedselectedHeight = if (selectedMessage != null) 41.dp else 0.dp
-    
+
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
@@ -598,7 +739,7 @@ fun ChatFooter(
 //                        }
 //                    }
 //                }
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -638,7 +779,7 @@ fun ChatFooter(
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
                         }
-                        
+
                         Row(
                             modifier = Modifier
                                 .padding(start = 40.dp)

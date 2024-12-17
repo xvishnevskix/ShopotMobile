@@ -15,9 +15,13 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.font.PdfFontFactory
+import com.itextpdf.kernel.pdf.CompressionConstants
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.kernel.pdf.WriterProperties
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -63,7 +67,10 @@ import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import id.zelory.compressor.Compressor
+import net.jpountz.lz4.LZ4Factory
+import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
 
 actual class FileProvider(private val applicationContext: Context) {
@@ -76,48 +83,91 @@ actual class FileProvider(private val applicationContext: Context) {
     actual suspend fun compressFile(filePath: String): String? {
         return withContext(Dispatchers.IO) {
             try {
-                val originalFile = File(filePath)
+                val file = if (filePath.startsWith("content://")) {
+                    val uri = Uri.parse(filePath)
 
-                // Проверка расширения файла
-                val extension = originalFile.extension.lowercase()
-                val compressedFile = when (extension) {
-                    "pdf" -> compressPdf(originalFile)
-                    "zip" -> compressZip(originalFile)
-                    else -> null
+
+
+                    val tempFile = File(applicationContext.cacheDir, "temp_${System.currentTimeMillis()}")
+                    applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
+                        tempFile.outputStream().use { outputStream ->
+                            inputStream.copyTo(outputStream)
+                        }
+                    }
+                    tempFile
+                } else {
+                    File(filePath)
+                }
+
+                if (!file.exists() || file.extension.isEmpty()) {
+                    println("File does not exist or has no extension.")
+                    return@withContext null
+                }
+
+                val compressedFile = when (file.extension.lowercase()) {
+                    "pdf" -> compressPdf(file) // Метод сжатия PDF
+                    "zip" -> compressZip(file) // Метод сжатия ZIP
+                    else -> {
+                        println("Unsupported file format: ${file.extension}")
+                        null
+                    }
+                }
+
+                if (compressedFile == null) {
+                    println("Compression failed for file: ${file.name}")
                 }
 
                 compressedFile?.absolutePath
             } catch (e: Exception) {
-                e.printStackTrace()
+                println("Error during file compression: ${e.message}")
                 null
             }
         }
     }
 
     private fun compressPdf(file: File): File {
-        // Реализуйте сжатие PDF-файла с использованием библиотеки iText
-        // В этом примере создаётся сжатый файл с уменьшением качества
         val compressedFile = File(applicationContext.cacheDir, "compressed_${file.name}")
-        PdfDocument(PdfReader(file), PdfWriter(compressedFile)).use { pdf ->
-            pdf.close()
+        try {
+            val reader = PdfReader(file)
+            val writer = PdfWriter(
+                FileOutputStream(compressedFile),
+                WriterProperties().setCompressionLevel(CompressionConstants.BEST_COMPRESSION)
+            )
+            val pdfDocument = PdfDocument(reader, writer)
+
+            // Удаление ненужных объектов, оптимизация структуры
+            for (page in 1..pdfDocument.numberOfPages) {
+                pdfDocument.getPage(page).flush()
+            }
+
+            pdfDocument.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return compressedFile
     }
 
     private fun compressZip(file: File): File {
-        // Реализация компрессии ZIP
         val compressedFile = File(applicationContext.cacheDir, "compressed_${file.name}")
-        ZipOutputStream(FileOutputStream(compressedFile)).use { zipOut ->
-            val buffer = ByteArray(1024)
-            FileInputStream(file).use { fis ->
-                val entry = ZipEntry(file.name)
-                zipOut.putNextEntry(entry)
-                var length: Int
-                while (fis.read(buffer).also { length = it } > 0) {
-                    zipOut.write(buffer, 0, length)
+        val buffer = ByteArray(1024)
+        try {
+            ZipInputStream(FileInputStream(file)).use { zis ->
+                ZipOutputStream(FileOutputStream(compressedFile)).use { zos ->
+                    zos.setLevel(9) // Максимальный уровень сжатия
+                    var entry: ZipEntry?
+                    while (zis.nextEntry.also { entry = it } != null) {
+                        val newEntry = ZipEntry(entry!!.name)
+                        zos.putNextEntry(newEntry)
+                        var length: Int
+                        while (zis.read(buffer).also { length = it } > 0) {
+                            zos.write(buffer, 0, length)
+                        }
+                        zos.closeEntry()
+                    }
                 }
             }
-            zipOut.closeEntry()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
         return compressedFile
     }
@@ -143,6 +193,50 @@ actual class FileProvider(private val applicationContext: Context) {
             null
         }
     }
+
+    actual suspend fun compressFileWithLength(filePath: String): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val inputFile = File(filePath)
+                if (!inputFile.exists()) {
+                    println("File not found: $filePath")
+                    return@withContext null
+                }
+
+                val factory = LZ4Factory.fastestInstance()
+                val compressor = factory.fastCompressor()
+
+                val inputBytes = inputFile.readBytes()
+                val originalLength = inputBytes.size
+                val maxCompressedLength = compressor.maxCompressedLength(originalLength)
+                val compressedBytes = ByteArray(maxCompressedLength)
+
+                val compressedSize = compressor.compress(inputBytes, 0, originalLength, compressedBytes, 0, maxCompressedLength)
+
+                // Сохраняем длину оригинальных данных + сжатые данные в файл
+                val compressedFile = File(inputFile.parent, "compressed_${inputFile.name}.lz4")
+                compressedFile.outputStream().use { outputStream ->
+                    // Сохраняем длину оригинальных данных
+                    outputStream.write(originalLength.toByteArray())
+                    // Сохраняем сжатые данные
+                    outputStream.write(compressedBytes, 0, compressedSize)
+                }
+                println("File compressed name: ${compressedFile.name}")
+                println("File compressed successfully: ${compressedFile.absolutePath}")
+                compressedFile.absolutePath
+            } catch (e: Exception) {
+                e.printStackTrace()
+                null
+            }
+        }
+    }
+
+    // Утилита для конвертации Int в байты
+    fun Int.toByteArray(): ByteArray {
+        return ByteBuffer.allocate(4).putInt(this).array()
+    }
+
+
 
 
     actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {
@@ -1057,8 +1151,8 @@ actual class FileProvider(private val applicationContext: Context) {
         }
         return null
     }
-    
-    
+
+
 }
 
 

@@ -150,6 +150,7 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.lifecycle.process)
             implementation(libs.itext7.core) // Добавлено для работы с PDF
+            implementation(libs.lz4.java)
         }
         
         iosMain.dependencies {
