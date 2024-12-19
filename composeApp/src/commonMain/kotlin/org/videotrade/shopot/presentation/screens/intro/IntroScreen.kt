@@ -80,7 +80,8 @@ class IntroScreen : Screen {
 
 
                 if (checkNetwork()) {
-                    val isCheckVersion = updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
+                    val isCheckVersion = false
+//                        updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
 
                     if (isCheckVersion) {
                         navigator.push(UpdateScreen())

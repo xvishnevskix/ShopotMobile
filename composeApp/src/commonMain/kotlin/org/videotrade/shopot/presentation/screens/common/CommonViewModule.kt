@@ -129,10 +129,12 @@ class CommonViewModel : ViewModel(), KoinComponent {
     
     fun cipherShared(userId: String?, navigator: Navigator) {
         viewModelScope.launch {
-            val httpClient = HttpClient {
-                install(WebSockets)
-            }
+            println("cipherShared")
             try {
+                val httpClient = HttpClient {
+                    install(WebSockets)
+                }
+
                 httpClient.webSocket(
                     method = HttpMethod.Get,
                     host = WEB_SOCKETS_URL,
@@ -193,10 +195,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                         
                                         println(
                                             "successSharedSecret111 ${
-                                                EncapsulationFileResult(
-                                                    result.sharedSecret,
-                                                    result.sharedSecret
-                                                )
+                                                result.sharedSecret.encodeBase64()
                                             }"
                                         )
                                         

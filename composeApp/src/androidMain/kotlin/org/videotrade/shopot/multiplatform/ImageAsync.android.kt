@@ -10,9 +10,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.header
 import io.ktor.client.request.prepareGet
 import io.ktor.util.InternalAPI
+import io.ktor.util.decodeBase64Bytes
 import io.ktor.utils.io.jvm.javaio.copyTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
 import java.io.File
@@ -92,28 +94,59 @@ fun byteArrayToCorrectedImageBitmap(byteArray: ByteArray, filePath: String): Ima
 @OptIn(InternalAPI::class)
 private suspend fun downloadImageInCache(imageId: String): String? {
     val client = HttpClient(getHttpClientEngine())
-    val filePath =
-        FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
-    
+
     println("starting download")
     
     try {
         val token = getValueInStorage("accessToken")
             ?: throw IllegalStateException("Access token is missing")
+
+        val cipherPath = FileProviderFactory.create().createNewFileWithApp(
+            imageId.substringBeforeLast(".", imageId),
+            "cipher"
+        ) ?: return null
+
+        val filePath =
+            FileProviderFactory.create().createNewFileWithApp(imageId, "image") ?: return null
         
         // Подготовка запроса для скачивания файла
-        client.prepareGet("${SERVER_URL}file/plain/$imageId") {
+        client.prepareGet("${SERVER_URL}file/id/$imageId") {
             header("Authorization", "Bearer $token")
         }.execute { httpResponse ->
             // Получение файла, в который будет сохранено содержимое ответа
-            val file = File(filePath)
-            
+            val file = File(cipherPath)
+
             // Открытие потока для записи в файл
             file.outputStream().use { fileOutputStream ->
                 // Копирование содержимого ответа в файл
                 httpResponse.content.copyTo(fileOutputStream)
             }
-            
+
+
+            val sharedSecret = getValueInStorage("sharedSecret")?.decodeBase64Bytes()
+            val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+
+            val block = httpResponse.headers["block"]?.decodeBase64Bytes()
+            val authTag = httpResponse.headers["authTag"]?.decodeBase64Bytes()
+
+
+            if (block != null && authTag != null && sharedSecret != null) {
+                val result3 = cipherWrapper.decupsChachaFileCommon(
+                    cipherPath,
+                    filePath,
+                    block,
+                    authTag,
+                    sharedSecret
+                )
+
+                if (result3 != null) {
+                    file.delete()
+                    println("encupsChachaFileResult $result3")
+                }
+            } else {
+                println("Decryption parameters are missing: block=$block, authTag=$authTag, sharedSecret=$sharedSecret")
+            }
+
             println("Image successfully downloaded and saved to: $filePath")
         }
         
