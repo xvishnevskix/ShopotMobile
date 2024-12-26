@@ -334,7 +334,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
     }
     
-    fun sendVoice(fileDir: String, chat: ChatItem, voiceName: String) {
+    fun sendVoice(chat: ChatItem, voiceName: String) {
+        val fileDir = audioRecorder.value.stopRecording(true) ?: return
+        
         val fileSize =
             FileProviderFactory.create().getFileSizeFromUri(fileDir)
         

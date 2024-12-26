@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.domain.model.NewsItem
+import org.videotrade.shopot.multiplatform.openUrl
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import shopot.composeapp.generated.resources.Res
@@ -288,7 +289,7 @@ fun StoryViewer(
                                     news.actionUrl
                                 }
                             } else {
-
+                                openUrl(news.actionUrl)
                             }
                         }
                     }

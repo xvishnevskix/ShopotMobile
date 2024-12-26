@@ -113,11 +113,7 @@ class ChatScreen(
                 mainViewModel.setCurrentChat("")
             }
         }
-        
-        
-        
-        
-        
+
         
         BoxWithConstraints(
             modifier = Modifier
@@ -137,8 +133,7 @@ class ChatScreen(
             
             val density = LocalDensity.current
             val screenHeightInPx = maxHeight.value * density.density // Пример, если maxHeight в Dp
-            
-            
+
             SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
                 Column(modifier = Modifier.fillMaxSize().background(colors.background)) {
                     Scaffold(

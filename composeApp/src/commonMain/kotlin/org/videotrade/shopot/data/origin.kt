@@ -32,16 +32,16 @@ import org.videotrade.shopot.presentation.screens.common.NetworkErrorScreen
 class origin {
     val client =
         HttpClient(getHttpClientEngine()) // Инициализация HTTP клиента, возможно вам стоит инициализировать его вне этой функции, чтобы использовать пул соединений
-    
-    
+
+
     suspend inline fun <reified T> get(url: String): T? {
-        
+
         try {
             val token = getValueInStorage("accessToken")
-            
-            
+
+
             println("url ${EnvironmentConfig.SERVER_URL}$url")
-            
+
             val response: HttpResponse = client.get("${EnvironmentConfig.SERVER_URL}$url") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $token")
@@ -49,26 +49,26 @@ class origin {
 
 
             println("bodyAsTextbodyAsText ${response.bodyAsText()} ${response.status}")
-            
-            
+
+
             if (
                 response.status == HttpStatusCode(401, "Unauthorized")
             ) {
                 return null
-                
+
             }
-            
-            
+
+
             if (response.status.isSuccess()) {
-                
-                
+
+
                 val responseData: T = Json.decodeFromString(response.bodyAsText())
-                
-                
+
+
                 return responseData
             } else {
-                
-                
+
+
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
         } catch (e: Exception) {
@@ -78,13 +78,13 @@ class origin {
         }
         return null
     }
-    
-    
+
+
     suspend inline fun post(
         url: String,
         data: String
     ): String? {
-        
+
         try {
             val token = getValueInStorage("accessToken")
             println("url ${EnvironmentConfig.SERVER_URL}$url")
@@ -98,24 +98,24 @@ class origin {
 
             println("Отправляем данные: $data")
             println("response.bodyAsText() ${response.bodyAsText()}")
-            
+
             if (response.status.isSuccess()) {
-                
-                
+
+
                 return response.bodyAsText()
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
         } catch (e: Exception) {
-            
+
             println("Error1111: $e")
-            
+
             return null
-            
+
         } finally {
             client.close()
         }
-        
+
         return null
     }
 
@@ -155,103 +155,110 @@ class origin {
             client.close()
         }
     }
-    
-    
+
+
     suspend inline fun put(
         url: String,
         data: String
     ): HttpResponse? {
-        
+
         try {
             val token = getValueInStorage("accessToken")
-            
+
             val response: HttpResponse =
                 client.put("${EnvironmentConfig.SERVER_URL}$url") {
                     contentType(ContentType.Application.Json)
                     header(HttpHeaders.Authorization, "Bearer $token")
                     setBody(data)
                 }
-            
-            
+
+
             println("response.bodyAsText() ${response.bodyAsText()}")
-            
+
             if (response.status.isSuccess()) {
-                
+
                 return response
-                
+
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
-                
+
                 return null
-                
+
             }
         } catch (e: Exception) {
             println("Error: $e")
             return null
-            
+
         } finally {
             client.close()
         }
     }
-    
-    
+
+
     @OptIn(InternalAPI::class)
     suspend inline fun reloadTokens(navigator: Navigator): String? {
         val client = HttpClient(getHttpClientEngine())
-        
+
         try {
-            
-            
+
+
             val refreshToken = getValueInStorage("refreshToken")
-            
-            
+
+
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("refreshToken", refreshToken)
-                    
                 }
             )
-            
+
             println("response11 ")
-            
+
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.SERVER_URL}auth/refresh-token") {
                     contentType(ContentType.Application.Json)
                     setBody(jsonContent)
                 }
-            
+
             println("response11 ${response.bodyAsText()}")
-            
-            
-            
+
+
+
             if (response.status.isSuccess()) {
                 val responseData: ReloadRes = Json.decodeFromString(response.bodyAsText())
-                
+
+                if (responseData.deviceId !== null) {
+                    addValueInStorage(
+                        "deviceId",
+                        responseData.deviceId
+                    )
+                }
+
+
                 addValueInStorage(
                     "accessToken",
                     responseData.accessToken
                 )
-                
+
                 addValueInStorage(
                     "refreshToken",
                     responseData.refreshToken
                 )
-                
+
                 return responseData.userId
-                
+
             } else {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
                 return null
-                
+
             }
         } catch (e: Exception) {
-            
+
             println("Error2: $e")
             navigator.replace(NetworkErrorScreen())
         } finally {
             client.close()
         }
-        
+
         return null
     }
 
@@ -275,7 +282,7 @@ class origin {
                 // Успешное удаление, сервер возвращает 204 No Content
                 true
             } else {
-                
+
                 println("Failed to delete: ${response.status.description} ${response.request}")
                 false
             }
@@ -286,8 +293,8 @@ class origin {
             client.close()
         }
     }
-    
-    
+
+
     suspend fun sendImageFile(
         fileDir: String? = null,
         contentType: String,
@@ -308,7 +315,6 @@ class origin {
             null
         }
     }
-    
 
-    
+
 }

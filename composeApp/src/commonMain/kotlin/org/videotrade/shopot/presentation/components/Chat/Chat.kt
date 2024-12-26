@@ -162,6 +162,10 @@ fun Chat(
                 }
                 
                 items(messages, key = { message -> message.id }) { message ->
+
+                    println("Message ID: ${message.id}")
+
+
                     var messageY by remember { mutableStateOf(0) }
                     val isVisible = remember { message.id != hiddenMessageId }
 

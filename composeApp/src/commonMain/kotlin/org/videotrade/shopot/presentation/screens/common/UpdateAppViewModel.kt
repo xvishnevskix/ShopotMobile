@@ -12,41 +12,40 @@ import org.videotrade.shopot.multiplatform.getPlatform
 
 
 class UpdateAppViewModel : ViewModel(), KoinComponent {
-    
+
     val description = MutableStateFlow("")
     val appVersion = MutableStateFlow("")
-    
+
     suspend fun checkVersion(): Boolean {
         try {
             val getVersion = origin().get<AppVersion>("auth/checkVersion")
-            
+            println("getVersion $getVersion")
             if (getPlatform() == Platform.Android) {
-                
+
                 if (getVersion !== null) {
                     val buildVersion = getBuildVersion()
                     return if (getVersion.criticalAppVersion.toLong() > buildVersion) {
                         description.value = getVersion.description
                         appVersion.value = getVersion.appVersion
-                        false
 
-//                true
+                        true
                     } else {
                         false
                     }
                 }
-                
+
                 return false
-                
+
             }
-            
-            
+
+
             return false
         } catch (e: Exception) {
-            
+
             return false
-            
+
         }
-        
+
     }
 }
 

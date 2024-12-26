@@ -241,14 +241,14 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     val jsonElement = Json.parseToJsonElement(response)
                     val messageObject = jsonElement.jsonObject["message"]?.jsonObject
                     responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-                    
+
                     toasterViewModel.toaster.show(
                         message = sentSMSCode,
                         type = ToastType.Success,
                         duration = ToasterDefaults.DurationDefault,
                     )
-                    
-                    
+
+
                     val otpText = otpFields.joinToString("")
                     if (otpText.length == 4) {
                         if (responseState.value == otpText) {
@@ -262,7 +262,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 }
             }
         }
-        
+
         fun sendCall() {
             when (phone) {
                 "+79990000000" -> return
@@ -270,27 +270,28 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 "+79899236226" -> return
                 "+79388899885" -> return
             }
-            
+
             coroutineScope.launch {
                 if (!isRunning) {
                     isRunning = true
                     startTimer()
                 }
 
-                val response = sendRequestToBackend(phone,
+                val response = sendRequestToBackend(
+                    phone,
                     null,
                     "2fa",
                     toasterViewModel,
                     hasError = hasError,
                     animationTrigger = animationTrigger
                 )
-                
+
                 if (response != null) {
                     val jsonString = response.bodyAsText()
                     val jsonElement = Json.parseToJsonElement(jsonString)
                     val messageObject = jsonElement.jsonObject["message"]?.jsonObject
                     responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-                    
+
                     // Проверка, что все 4 цифры введены перед проверкой
                     val otpText = otpFields.joinToString("")
                     if (otpText.length == 4) {
@@ -307,17 +308,17 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                 }
             }
         }
-        
+
         LaunchedEffect(Unit) {
-            
+
             if (!isRunning) {
                 isRunning = true
                 startTimer()
             }
             sendCall()
         }
-        
-        
+
+
         val isError = remember { mutableStateOf(false) }
 
 
@@ -336,8 +337,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     ).imePadding(),
                 contentAlignment = Alignment.TopCenter
             ) {
-                
-                
+
+
                 Column(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -354,19 +355,19 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        
+
                         Image(
                             modifier = Modifier
                                 .size(width = 195.dp, height = 132.dp),
                             painter = painterResource(Res.drawable.auth_logo),
                             contentDescription = null,
                             contentScale = ContentScale.Crop,
-                            colorFilter =  ColorFilter.tint(colors.primary)
+                            colorFilter = ColorFilter.tint(colors.primary)
 
                         )
-                        
+
                         Spacer(modifier = Modifier.height(50.dp))
-                        
+
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.fillMaxWidth()
@@ -400,7 +401,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 )
                             )
                             Spacer(modifier = Modifier.height(50.dp))
-                            
+
                             Otp(otpFields, isLoading.value, hasError.value, animationTrigger.value,
                                 onOtpComplete = { otpText ->
                                     coroutineScope.launch {
@@ -414,7 +415,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     }
                                 }
                             )
-                            
+
                             Spacer(modifier = Modifier.height(16.dp))
                             Box(modifier = Modifier.padding(bottom = 20.dp)) {
                                 CustomButton(
@@ -466,54 +467,54 @@ suspend fun sendRequestToBackend(
         val jsonContent = Json.encodeToString(
             buildJsonObject {
                 put("phoneNumber", phone.drop(1))
-                
+
                 notificationToken?.let { put("notificationToken", it) }
             }
         )
-        
-        
+
+
         println("url $url ${jsonContent}")
-        
-        
+
+
         val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
             contentType(ContentType.Application.Json)
             setBody(jsonContent)
         }
-        
+
         println("url ${response.bodyAsText()} ${jsonContent}")
-        
-        
+
+
         if (response.status.isSuccess()) {
-            
+
             return response
-            
-            
+
+
         } else {
             println("Failed to retrieve data: ${response.status.description}")
-            
+
             if (response.bodyAsText() == "User not found") {
                 if (hasError != null) {
                     hasError.value = true
                 }
                 toasterViewModel.toaster.show(
-                    
+
                     phoneNotRegistered,
                     type = ToastType.Error,
                     duration = ToasterDefaults.DurationDefault
                 )
-                
+
                 if (animationTrigger != null) {
                     animationTrigger.value = !animationTrigger.value
                 }
             }
-            
+
         }
     } catch (e: Exception) {
         println("Error111: $e")
     } finally {
         client.close()
     }
-    
+
     return null
 }
 
@@ -526,7 +527,7 @@ suspend fun sendLogin(
     toasterViewModel: CommonViewModel,
     phoneNotRegistered: String = ""
 ) {
-    
+
     val response =
         sendRequestToBackend(
             phone,
@@ -535,26 +536,29 @@ suspend fun sendLogin(
             toasterViewModel,
             phoneNotRegistered,
         )
-    
-    
+
+
     println("sadada ${response?.bodyAsText()}")
     println("sadada ${response?.bodyAsText()}")
-    
+
     if (response != null) {
-        
+
         val jsonString = response.bodyAsText()
         val jsonElement = Json.parseToJsonElement(jsonString).jsonObject
-        
-        
+        println("jsonElement00000Login $jsonElement")
+
         val token = jsonElement["accessToken"]?.jsonPrimitive?.content
         val refreshToken =
             jsonElement["refreshToken"]?.jsonPrimitive?.content
-        
+
+        val deviceId =
+            jsonElement["deviceId"]?.jsonPrimitive?.content
+
         val userId =
             jsonElement["userId"]?.jsonPrimitive?.content
-        
-        
-        
+
+
+
         token?.let {
             addValueInStorage(
                 "accessToken",
@@ -567,27 +571,33 @@ suspend fun sendLogin(
                 refreshToken
             )
         }
-        
-        
-        
+
+        deviceId?.let {
+            addValueInStorage(
+                "deviceId",
+                it
+            )
+        }
+
+
         viewModel.updateNotificationToken()
 //        navigator.push(MainScreen())
-        
+
         viewModel.startObserving()
-        
+
         сommonViewModel.cipherShared(userId, navigator)
-        
-        
+
+
     }
 }
 
 
 fun sendSignUp(phone: String, navigator: Navigator) {
-    
-    
+
+
     navigator.push(SignUpScreen(phone))
-    
-    
+
+
 }
 
 

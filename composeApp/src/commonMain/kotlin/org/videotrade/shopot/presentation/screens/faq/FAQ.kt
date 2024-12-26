@@ -126,7 +126,7 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", message)
+            put("message", "$message \\n App Version: 1.0.6")
         }.toString()
 
         println("Отправка email с данными: $jsonContent")
@@ -213,16 +213,43 @@ class FAQ() : Screen {
                 }
 
 
-                Box(
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-
-                        .safeDrawingPadding(),
-                    contentAlignment = Alignment.BottomCenter
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    CustomButton(stringResource(MokoRes.strings.ask_question), {
-                        modalVisible.value = true
-                    }, style = ButtonStyle.Gradient)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+
+                        ,
+                        contentAlignment = Alignment.BottomCenter
+                    ) {
+                        CustomButton(stringResource(MokoRes.strings.ask_question), {
+                            modalVisible.value = true
+                        }, style = ButtonStyle.Gradient)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .safeDrawingPadding()
+                            .padding()
+                    ) {
+
+                        Text(
+//                            text = "${MokoRes.strings.app_version}: alpha~1.0.6",
+                            text = "App Version: alpha~1.0.6",
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                textAlign = TextAlign.Center,
+                                color = colors.secondary,
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                            )
+                        )
+                    }
                 }
 
 
@@ -374,7 +401,7 @@ class FAQ() : Screen {
                                     modifier = Modifier.width(324.dp)
                                         .height(324.dp)
                                         .background(color = colors.background, shape = RoundedCornerShape(size = 16.dp))
-                                        ,
+                                    ,
                                     verticalArrangement = Arrangement.Center,
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {

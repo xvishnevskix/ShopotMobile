@@ -168,8 +168,8 @@ android {
         targetSdk = 34
         
         applicationId = "org.videotrade.shopot.androidApp"
-        versionCode = 16
-        versionName = "1.0.6"
+        versionCode = 17
+        versionName = "1.0.7"
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
@@ -225,37 +225,8 @@ android {
 multiplatformResources {
     resourcesPackage.set("org.videotrade.shopot") // required
     resourcesClassName.set("MokoRes") // optional, default MR
-//    iosBaseLocalizationRegion = "en"
-//    iosBaseLocalizationRegion = "ru"
-    
-//    resourcesVisibility.set(MRVisibility.Internal) // optional, default Public
-//    iosBaseLocalizationRegion.set("en") // optional, default "en"
-//    iosMinimalDeploymentTarget.set("11.0") // optional, default "9.0"
 }
-//
-//tasks.getByName("preBuild") {
-//    dependsOn("generateMRcommonMain")
-//}
-//
-//configurations {
-//    create("resolvableMetadataCompilationApi") {
-//        extendsFrom(configurations.getByName("metadataCompilationApi"))
-//        isCanBeResolved = true
-//        isCanBeConsumed = false
-//    }
-//}
-//
-//tasks.register("someTask") {
-//    doLast {
-//        val dependencies =
-//            configurations.getByName("resolvableMetadataCompilationApi").resolvedConfiguration.resolvedArtifacts
-//        // Используйте зависимости...
-//    }
-//}
-//
-//tasks.withType<dev.icerock.gradle.tasks.GenerateMultiplatformResourcesTask> {
-//    outputs.upToDateWhen { false }
-//}
+
 
 dependencies {
     implementation(libs.androidx.animation.core.android)
