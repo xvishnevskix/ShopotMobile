@@ -64,10 +64,12 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.ReconnectionBar
+import org.videotrade.shopot.presentation.components.Main.News.StoryCircle
 import org.videotrade.shopot.presentation.tabs.ContactsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
@@ -77,325 +79,95 @@ import shopot.composeapp.generated.resources.pepe
 import shopot.composeapp.generated.resources.search_icon
 
 @Composable
-fun HeaderMain(isSearching: MutableState<Boolean>, onStoryClick: () -> Unit) {
-    val interactionSource =
-        remember { MutableInteractionSource() }  // Создаем источник взаимодействия
+fun HeaderMain(
+    isSearching: MutableState<Boolean>,
+    news: List<NewsItem>,
+    onStoryClick: (NewsItem) -> Unit
+) {
     val colors = MaterialTheme.colorScheme
     val tabNavigator = LocalTabNavigator.current
-
-
 
     Column {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
-
-            ) {
-
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        stringResource(MokoRes.strings.chats),
-                        fontSize = 24.sp,
-                        lineHeight = 24.sp,
-                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                        fontWeight = FontWeight(500),
-                        textAlign = TextAlign.Center,
-                        color = colors.primary,
-                        letterSpacing = TextUnit(0F, TextUnitType.Sp)
-
-                    )
-                    Spacer(modifier = Modifier.width(11.dp))
-                    Row {
-                        StoryCircle(
-                            isSeen = false,
-                            onClick = onStoryClick
-                        )
-
-                    }
-                }
-
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
         ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    stringResource(MokoRes.strings.chats),
+                    fontSize = 24.sp,
+                    lineHeight = 24.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    textAlign = TextAlign.Center,
+                    color = colors.primary,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
+                )
+                Spacer(modifier = Modifier.width(11.dp))
 
-            Crossfade(targetState = isSearching.value) { searching ->
-                if (!searching) {
-                    Box(modifier = Modifier.padding(horizontal = 5.dp).pointerInput(Unit) {
-                        isSearching.value = true
-                    }) {
-                        Image(
-                            painter = painterResource(Res.drawable.search_icon),
-                            contentDescription = "Search",
-                            modifier = Modifier
-
-                                .size(18.dp)
-                                ,
-                            colorFilter =  ColorFilter.tint(colors.primary)
-                        )
+                // Отображаем StoryCircle для каждой новости
+                if (news.isNotEmpty()) {
+                    Row {
+                        news.forEach { newsItem ->
+                            StoryCircle(
+                                isSeen = newsItem.viewed,
+                                imageId = newsItem.imageIds.firstOrNull(),
+                                onClick = {
+                                    onStoryClick(newsItem) // Передача текущей новости в onStoryClick
+                                }
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                        }
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.width(11.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Crossfade(targetState = isSearching.value) { searching ->
+                    if (!searching) {
+                        Box(modifier = Modifier.padding(horizontal = 5.dp).pointerInput(Unit) {
+                            isSearching.value = true
+                        }) {
+                            Image(
+                                painter = painterResource(Res.drawable.search_icon),
+                                contentDescription = "Search",
+                                modifier = Modifier.size(18.dp),
+                                colorFilter = ColorFilter.tint(colors.primary)
+                            )
+                        }
+                    }
+                }
 
-            Box(modifier = Modifier.padding(horizontal = 5.dp).pointerInput(Unit) {
-                tabNavigator.current = ContactsTab
-            }) {
-                Image(
-                    painter = painterResource(Res.drawable.add_main),
-                    contentDescription = "Search",
-                    modifier = Modifier
-                        .size(18.dp)
-                    ,
-                    colorFilter =  ColorFilter.tint(colors.primary)
-                )
+                Spacer(modifier = Modifier.width(11.dp))
+
+                Box(modifier = Modifier.padding(horizontal = 5.dp).pointerInput(Unit) {
+                    tabNavigator.current = ContactsTab
+                }) {
+                    Image(
+                        painter = painterResource(Res.drawable.add_main),
+                        contentDescription = "Search",
+                        modifier = Modifier.size(18.dp),
+                        colorFilter = ColorFilter.tint(colors.primary)
+                    )
+                }
             }
         }
 
-        }
         Box(Modifier.padding(top = 2.dp)) {
             ReconnectionBar()
             CallBar()
         }
-
-
-    }
-
-}
-
-
-@Composable
-fun StoryCircle(
-    isSeen: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    val gradientBrush = Brush.linearGradient(
-        colors = listOf(
-            Color(0xFF145A32), // Тёмно-зелёный
-            Color(0xFF32D74B), // Основной зелёный
-            Color(0xFF145A32),  // Повтор тёмно-зелёного
-
-        )
-    )
-    val borderBrush = if (isSeen) Brush.linearGradient() else gradientBrush// Цвет внешнего кружка
-
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .size(36.dp)
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ) { onClick() },// Размер общего кружка
-    ) {
-        // Внешний круг с границей
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-
-                .border(
-                    BorderStroke(2.dp, borderBrush), // Толщина и цвет границы
-                    shape = CircleShape
-                )
-                .padding(4.dp) // Внутренний отступ для изображения
-        ) {
-            // Внутренний круг с изображением
-            Box() {
-                Image(
-                    painter = painterResource(Res.drawable.logo_circle_gr),
-                    contentDescription = "Story Image",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(CircleShape) // Скругление до формы круга
-                        .fillMaxSize()     // Заполнение всего доступного пространства
-                )
-            }
-        }
     }
 }
 
 
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun StoryViewer(
-    stories: List<DrawableResource>, // Список ресурсов для историй
-    onClose: () -> Unit
-) {
-    val pagerState = rememberPagerState(pageCount = { stories.size })
-    val scope = rememberCoroutineScope()
-
-    // Хранение прогресса для каждой истории
-    val progressList = remember { mutableStateListOf(*Array(stories.size) { 0f }) }
-    var isPaused by remember { mutableStateOf(false) }
-    val storyDuration = 5000L
-
-    // Управление прогрессом текущей истории
-    LaunchedEffect(pagerState.currentPage, isPaused) {
-        if (!isPaused) {
-            val progressStep = 30f / storyDuration // Шаг прогресса: меньше шаг для длинных историй
-
-            // Сбрасываем правые истории
-            for (i in pagerState.currentPage + 1 until progressList.size) {
-                progressList[i] = 0f
-            }
-
-            // Прогресс текущей истории
-            while (progressList[pagerState.currentPage] < 1f) {
-                delay(30) // Шаг времени обновления прогресса
-                if (!isPaused) {
-                    progressList[pagerState.currentPage] += progressStep
-                }
-            }
-
-            // Переход вперёд
-            if (pagerState.currentPage < stories.size - 1) {
-                scope.launch {
-                    pagerState.scrollToPage(pagerState.currentPage + 1)
-                }
-            } else {
-                onClose() // Закрыть сторис
-            }
-        }
-    }
-
-    Dialog(onDismissRequest = onClose) {
-        Box(
-            modifier = Modifier
-                .clip(RoundedCornerShape(16.dp))
-                .fillMaxSize()
-                .background(Color.Black)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onPress = {
-                            isPaused = true
-                            tryAwaitRelease()
-                            isPaused = false
-                        }
-                    )
-                }
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-                userScrollEnabled = false
-            ) { page ->
-                Box(modifier = Modifier.fillMaxSize()) {
-                    // Фоновое изображение
-                    Image(
-                        painter = painterResource(stories[page]),
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.fillMaxSize()
-                    )
-
-                    // Прогресс-бары
-                    Row(
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp, vertical = 8.dp)
-                            .fillMaxWidth()
-                            .height(4.dp)
-                            .align(Alignment.TopCenter)
-                    ) {
-                        progressList.forEachIndexed { index, progress ->
-                            LinearProgressIndicator(
-                                progress = progress.coerceIn(0f, 1f),
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 1.dp)
-                                    .clip(RoundedCornerShape(50)),
-                                color = if (index <= pagerState.currentPage) Color.White else Color.Gray
-                            )
-                        }
-                    }
-
-                    // Левая область для перехода назад
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(75.dp)
-                            .align(Alignment.CenterStart)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                scope.launch {
-                                    if (pagerState.currentPage > 0) {
-                                        progressList[pagerState.currentPage - 1] = 0f // Сбрасываем прогресс предыдущего
-                                        pagerState.scrollToPage(pagerState.currentPage - 1) // Переход назад
-                                    }
-                                }
-                            }
-                    )
-
-                    // Правая область для перехода вперёд
-                    Box(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .width(75.dp)
-                            .align(Alignment.CenterEnd)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                scope.launch {
-                                    if (pagerState.currentPage < stories.size - 1) {
-                                        progressList[pagerState.currentPage] = 1f // Завершаем текущий прогресс
-                                        pagerState.scrollToPage(pagerState.currentPage + 1) // Переход вперёд
-                                    } else {
-                                        onClose()
-                                    }
-                                }
-                            }
-                    )
-
-                    // Кнопка закрытия
-                    Text(
-                        "✕",
-                        fontSize = 20.sp,
-                        color = Color.White,
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(16.dp)
-                            .clickable { onClose() }
-                    )
-                }
-            }
-
-            // Кнопка по центру внизу
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-                    .align(Alignment.BottomCenter),
-                contentAlignment = Alignment.Center
-            ) {
-                CustomButton(
-                    text = stringResource(MokoRes.strings.next),
-                    style = ButtonStyle.Gradient,
-                    onClick = {
-                        scope.launch {
-                            if (pagerState.currentPage < stories.size - 1) {
-                                progressList[pagerState.currentPage] = 1f // Завершаем текущий прогресс
-                                pagerState.scrollToPage(pagerState.currentPage + 1) // Переход вперёд
-                            } else {
-                                onClose()
-                            }
-                        }
-                    }
-                )
-            }
-        }
-    }
-}
 
 
 

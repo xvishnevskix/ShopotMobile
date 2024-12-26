@@ -61,12 +61,17 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
+import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
+import org.videotrade.shopot.presentation.components.Main.News.StoryViewer
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
@@ -88,16 +93,20 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val isLoading by mainViewModel.isLoadingChats.collectAsState()
     var fakeLoading by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
+    val newsViewModel: NewsViewModel = koinInject()
+
 
     val isSearching = remember { mutableStateOf(false) }
     val searchQuery = remember { mutableStateOf("") }
-    var showStoryViewer by remember { mutableStateOf(false) } // Состояние для StoryViewer
 
-    val stories = listOf(
-        Res.drawable.pepe,
-        Res.drawable.sticker1,
-        Res.drawable.govno_peredelyvay,
-    )
+    val newsState = newsViewModel.news.collectAsState().value
+    val updateNewsState = newsViewModel.updateNews.collectAsState().value
+    var showNewsViewer by remember { mutableStateOf(false) }
+    var showNewsUpdateViewer by remember { mutableStateOf(false) }// Состояние для StoryViewer для actual
+    var selectedNews: NewsItem? by remember { mutableStateOf(null) }
+    var selectedUpdateNews: NewsItem? by remember { mutableStateOf(null) }
+
+
 
     val filteredChats = if (searchQuery.value.isEmpty()) {
         chatState
@@ -121,9 +130,40 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
     )
 
-    LaunchedEffect(isLoading) {
-        println("Loading state is: $isLoading")
+    val version = "1.0.7"
+
+    LaunchedEffect(Unit) {
+        // Сначала загружаем `update` новости
+        println("Fetching update news")
+        newsViewModel.getNewsByAppearance("update")
+
+        // Затем загружаем `actual` новости
+        println("Fetching actual news")
+        newsViewModel.getNewsByAppearance("actual")
     }
+
+    var isProcessingUpdate by remember { mutableStateOf(false) }
+
+// Обработка новостей из `update`
+    LaunchedEffect(updateNewsState) {
+        if (!isProcessingUpdate) {
+            isProcessingUpdate = true
+            println("Checking update news")
+            val newsToShow = updateNewsState.find {
+                it.appearance == "update" && !it.viewed && it.version == version
+            }
+            if (newsToShow != null) {
+                println("Showing update news: $newsToShow")
+                selectedUpdateNews = newsToShow
+                showNewsUpdateViewer = true
+
+            }
+            isProcessingUpdate = false
+        }
+    }
+
+// Обработка новостей из `actual`
+
 //    LaunchedEffect(chatState) {
 //        fakeLoading = true
 //        delay(300)
@@ -137,9 +177,12 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
             Column(modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.Start
                 ) {
-                HeaderMain(isSearching,
-                     onStoryClick = {
-                        showStoryViewer = true // Показать истории
+                HeaderMain(
+                    isSearching = remember { mutableStateOf(false) },
+                    news = newsState,
+                    onStoryClick = { newsItem ->
+                        selectedNews = newsItem
+                        showNewsViewer = true
                     }
                 )
 
@@ -312,9 +355,30 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
         
     }
-    if (showStoryViewer) {
-        StoryViewer(stories = stories, onClose = { showStoryViewer = false })
+    if (showNewsUpdateViewer && selectedUpdateNews != null) {
+        StoryViewer(
+            news = selectedUpdateNews!!,
+            onClose = {  showNewsUpdateViewer = false },
+            newsViewModel,
+        )
     }
+
+    // StoryViewer для `actual` новостей
+    if (showNewsViewer && selectedNews != null) {
+        StoryViewer(
+            news = selectedNews!!,
+            onClose = { showNewsViewer = false },
+            newsViewModel,
+        )
+    }
+//    if (isLoadingNews) {
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            CircularProgressIndicator()
+//        }
+//    }
 }
 
 //val shimmerColorShades = listOf(

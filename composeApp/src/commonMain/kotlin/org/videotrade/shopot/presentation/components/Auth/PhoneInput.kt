@@ -141,7 +141,7 @@ fun PhoneInput(
                 .border(width = 1.dp, color = borderColor, shape = RoundedCornerShape(16.dp))
                 .background(colors.background)
                 .width(161.dp)
-                .height(56.dp)
+                .height(57.dp)
                 .padding(start = 20.dp, top = 20.dp, bottom = 20.dp, end = 20.dp)
         ) {
             if (textState.value.text.isEmpty()) {
@@ -196,7 +196,7 @@ fun CountryPicker(
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
-            .height(56.dp)
+            .height(57.dp)
             .width(93.dp)
             .background(colors.onBackground)
             .clickable {
@@ -357,7 +357,7 @@ fun CountryPickerBottomSheet(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp)
+                    .height(57.dp)
                     .background(color = colors.onBackground, shape = RoundedCornerShape(size = 16.dp))
             ) {
                 Row(
@@ -426,7 +426,7 @@ fun CountryPickerBottomSheet(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(56.dp)
+                                .height(57.dp)
                                 .background(color = Color.Transparent)
                                 .border(
                                     width = 1.dp,

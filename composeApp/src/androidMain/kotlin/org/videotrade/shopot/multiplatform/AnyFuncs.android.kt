@@ -97,3 +97,10 @@ actual suspend fun appUpdate() {
         context.startActivity(intent)
     }
 }
+
+actual fun openUrl(url: String) {
+    val context = getContextObj.getContext()
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Убедитесь, что intent запускает новую задачу
+    context.startActivity(intent)
+}

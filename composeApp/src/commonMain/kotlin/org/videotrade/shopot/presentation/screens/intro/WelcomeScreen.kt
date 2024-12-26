@@ -62,6 +62,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.multiplatform.LanguageSelector
+import org.videotrade.shopot.multiplatform.openUrl
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
 import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
@@ -200,6 +201,12 @@ class WelcomeScreen : Screen {
                                 CustomButton(stringResource(MokoRes.strings.registration), {
                                     navigator.push(SignUpPhoneScreen())
                                 }, style = ButtonStyle.Outline)
+                                CustomButton(
+                                    text = "Open Link",
+                                    onClick = {
+                                        openUrl("https://www.videotrade.ru/")
+                                    }
+                                )
                             }
 
                     }
