@@ -290,9 +290,9 @@ class MainViewModel : ViewModel(), KoinComponent {
             
             delValueInStorage("accessToken")
             delValueInStorage("refreshToken")
-            
-            
-            
+
+
+            commonViewModel.delSharedSecret()
             navigator.replace(WelcomeScreen())
             
         }

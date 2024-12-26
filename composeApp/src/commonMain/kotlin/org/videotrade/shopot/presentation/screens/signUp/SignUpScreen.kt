@@ -78,6 +78,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -361,7 +362,12 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         responseData.refreshToken
                                                     )
 
-
+                                                    responseData.deviceId?.let {
+                                                        addValueInStorage(
+                                                            "deviceId",
+                                                            it
+                                                        )
+                                                    }
 
                                                     viewModel.updateNotificationToken()
 

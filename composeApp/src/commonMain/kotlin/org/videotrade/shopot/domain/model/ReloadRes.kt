@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class ReloadRes(
     val accessToken: String,
     val refreshToken: String,
-    val userId: String
-
+    val userId: String,
+    val deviceId: String? = null
 )
 
