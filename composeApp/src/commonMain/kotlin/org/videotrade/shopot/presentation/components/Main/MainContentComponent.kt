@@ -66,6 +66,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.BuildConfig
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -100,7 +101,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val searchQuery = remember { mutableStateOf("") }
 
     val newsState = newsViewModel.news.collectAsState().value
-    val updateNewsState = newsViewModel.updateNews.collectAsState().value
+    val onceNewsState = newsViewModel.onceNews.collectAsState().value
     var showNewsViewer by remember { mutableStateOf(false) }
     var showNewsUpdateViewer by remember { mutableStateOf(false) }// Состояние для StoryViewer для actual
     var selectedNews: NewsItem? by remember { mutableStateOf(null) }
@@ -130,12 +131,12 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
     )
 
-    val version = "1.0.7"
+    val version = "App Version: ${BuildConfig.VERSION_NAME}"
 
     LaunchedEffect(Unit) {
-        // Сначала загружаем `update` новости
-        println("Fetching update news")
-        newsViewModel.getNewsByAppearance("update")
+        // Сначала загружаем `once` новости
+        println("Fetching once news")
+        newsViewModel.getNewsByAppearance("once")
 
         // Затем загружаем `actual` новости
         println("Fetching actual news")
@@ -144,16 +145,16 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
     var isProcessingUpdate by remember { mutableStateOf(false) }
 
-// Обработка новостей из `update`
-    LaunchedEffect(updateNewsState) {
+// Обработка новостей из `once`
+    LaunchedEffect(onceNewsState) {
         if (!isProcessingUpdate) {
             isProcessingUpdate = true
-            println("Checking update news")
-            val newsToShow = updateNewsState.find {
-                it.appearance == "update" && !it.viewed && it.version == version
+            println("Checking once news")
+            val newsToShow = onceNewsState.find {
+                it.appearance == "once" && !it.viewed && it.version == BuildConfig.VERSION_NAME
             }
             if (newsToShow != null) {
-                println("Showing update news: $newsToShow")
+                println("Showing once news: $newsToShow")
                 selectedUpdateNews = newsToShow
                 showNewsUpdateViewer = true
 

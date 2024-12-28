@@ -78,8 +78,14 @@ kotlin {
             export("com.example:resources:1.0.0") // Замените, если `libs.resources` не работает
         }
     }
-    
 
+    sourceSets {
+
+        commonMain {
+            val versionName = project.findProperty("VERSION_NAME") as String
+            kotlin.srcDir("build/generated/kotlin")
+        }
+    }
     
     sourceSets {
         
@@ -159,6 +165,22 @@ kotlin {
     }
 }
 
+
+tasks.register("generateCommonBuildConfig") {
+    val versionName = project.findProperty("VERSION_NAME") as String
+
+    val generatedSrcDir = File(buildDir, "generated/kotlin") // Генерация константы.
+    generatedSrcDir.mkdirs()
+
+    File(generatedSrcDir, "BuildConfig.kt").writeText("""
+        package org.videotrade.shopot
+        
+        object BuildConfig {
+            const val VERSION_NAME = "$versionName"
+        }
+    """.trimIndent())
+}
+
 android {
     namespace = "org.videotrade.shopot"
     compileSdk = 34
@@ -170,7 +192,7 @@ android {
         applicationId = "org.videotrade.shopot.androidApp"
         versionCode = 17
         versionName = "1.0.7"
-        
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         externalNativeBuild {

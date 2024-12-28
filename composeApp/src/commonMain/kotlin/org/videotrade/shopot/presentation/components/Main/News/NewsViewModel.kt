@@ -17,19 +17,19 @@ class NewsViewModel : ViewModel(), KoinComponent {
     private val _news = MutableStateFlow<List<NewsItem>>(emptyList()) // Для actual
     val news: StateFlow<List<NewsItem>> get() = _news
 
-    private val _updateNews = MutableStateFlow<List<NewsItem>>(emptyList()) // Для update
-    val updateNews: StateFlow<List<NewsItem>> get() = _updateNews
+    private val _onceNews = MutableStateFlow<List<NewsItem>>(emptyList()) // Для once
+    val onceNews: StateFlow<List<NewsItem>> get() = _onceNews
 
     private val _isLoadingActualNews = MutableStateFlow(false)
     val isLoadingActualNews: StateFlow<Boolean> get() = _isLoadingActualNews
 
-    private val _isLoadingUpdateNews = MutableStateFlow(false)
-    val isLoadingUpdateNews: StateFlow<Boolean> get() = _isLoadingUpdateNews
+    private val _isLoadingOnceNews = MutableStateFlow(false)
+    val isLoadingOnceNews: StateFlow<Boolean> get() = _isLoadingOnceNews
 
     fun getNewsByAppearance(appearance: String) {
         val isLoadingState = when (appearance) {
             "actual" -> _isLoadingActualNews
-            "update" -> _isLoadingUpdateNews
+            "once" -> _isLoadingOnceNews
             else -> return
         }
 
@@ -43,7 +43,7 @@ class NewsViewModel : ViewModel(), KoinComponent {
                 }
                 when (appearance) {
                     "actual" -> _news.value = fetchedNews ?: emptyList()
-                    "update" -> _updateNews.value = fetchedNews ?: emptyList()
+                    "once" -> _onceNews.value = fetchedNews ?: emptyList()
                 }
             } catch (e: Exception) {
                 println("Error fetching $appearance news: ${e.message}")
@@ -60,7 +60,7 @@ class NewsViewModel : ViewModel(), KoinComponent {
                 _news.value = _news.value.map {
                     if (it.id == newsId) it.copy(viewed = true) else it
                 }
-                _updateNews.value = _updateNews.value.map {
+                _onceNews.value = _onceNews.value.map {
                     if (it.id == newsId) it.copy(viewed = true) else it
                 }
             }

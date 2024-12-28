@@ -101,6 +101,7 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.BuildConfig
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.BaseHeader
@@ -126,7 +127,7 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", "$message \\n App Version: 1.0.6")
+            put("message", "$message \\n App Version: ${BuildConfig.VERSION_NAME}")
         }.toString()
 
         println("Отправка email с данными: $jsonContent")
@@ -238,7 +239,7 @@ class FAQ() : Screen {
 
                         Text(
 //                            text = "${MokoRes.strings.app_version}: alpha~1.0.6",
-                            text = "App Version: alpha~1.0.6",
+                            text = "App Version: alpha~${BuildConfig.VERSION_NAME}",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,

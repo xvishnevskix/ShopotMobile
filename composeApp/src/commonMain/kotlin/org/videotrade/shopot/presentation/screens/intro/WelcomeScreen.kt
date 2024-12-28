@@ -201,12 +201,6 @@ class WelcomeScreen : Screen {
                                 CustomButton(stringResource(MokoRes.strings.registration), {
                                     navigator.push(SignUpPhoneScreen())
                                 }, style = ButtonStyle.Outline)
-                                CustomButton(
-                                    text = "Open Link",
-                                    onClick = {
-                                        openUrl("https://www.videotrade.ru/")
-                                    }
-                                )
                             }
 
                     }
