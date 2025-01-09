@@ -103,9 +103,9 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val newsState = newsViewModel.news.collectAsState().value
     val onceNewsState = newsViewModel.onceNews.collectAsState().value
     var showNewsViewer by remember { mutableStateOf(false) }
-    var showNewsUpdateViewer by remember { mutableStateOf(false) }// Состояние для StoryViewer для actual
+    var showNewsOnceViewer by remember { mutableStateOf(false) }// Состояние для StoryViewer для actual
     var selectedNews: NewsItem? by remember { mutableStateOf(null) }
-    var selectedUpdateNews: NewsItem? by remember { mutableStateOf(null) }
+    var selectedOnceNews: NewsItem? by remember { mutableStateOf(null) }
 
 
 
@@ -131,15 +131,9 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
     )
 
-    val version = "App Version: ${BuildConfig.VERSION_NAME}"
 
     LaunchedEffect(Unit) {
-        // Сначала загружаем `once` новости
-        println("Fetching once news")
         newsViewModel.getNewsByAppearance("once")
-
-        // Затем загружаем `actual` новости
-        println("Fetching actual news")
         newsViewModel.getNewsByAppearance("actual")
     }
 
@@ -147,30 +141,19 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
 // Обработка новостей из `once`
     LaunchedEffect(onceNewsState) {
-        if (!isProcessingUpdate) {
-            isProcessingUpdate = true
-            println("Checking once news")
+        if (!showNewsOnceViewer) {
             val newsToShow = onceNewsState.find {
-                it.appearance == "once" && !it.viewed && it.version == BuildConfig.VERSION_NAME
+                it.appearance == "once" && !it.viewed &&
+                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
             }
             if (newsToShow != null) {
-                println("Showing once news: $newsToShow")
-                selectedUpdateNews = newsToShow
-                showNewsUpdateViewer = true
-
+                selectedOnceNews = newsToShow
+                showNewsOnceViewer = true
             }
-            isProcessingUpdate = false
         }
     }
 
-// Обработка новостей из `actual`
 
-//    LaunchedEffect(chatState) {
-//        fakeLoading = true
-//        delay(300)
-//        fakeLoading = false
-//
-//    }
     
         SafeArea(backgroundColor = if (isLoading) colors.background else colors.surface) {
             Box(modifier = Modifier.background(color = if (isLoading) colors.background else colors.surface).fillMaxSize()) {
@@ -179,7 +162,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                 horizontalAlignment = Alignment.Start
                 ) {
                 HeaderMain(
-                    isSearching = remember { mutableStateOf(false) },
+                    isSearching = isSearching,
                     news = newsState,
                     onStoryClick = { newsItem ->
                         selectedNews = newsItem
@@ -193,6 +176,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                 ) {
                     Crossfade(targetState = isSearching.value) { searching ->
                         if (searching) {
+                            println("Search state: $searching")
                             Column(
                                 modifier = Modifier.animateContentSize()
                             ) {
@@ -356,11 +340,16 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
         
     }
-    if (showNewsUpdateViewer && selectedUpdateNews != null) {
+
+    if (showNewsOnceViewer && selectedOnceNews != null) {
         StoryViewer(
-            news = selectedUpdateNews!!,
-            onClose = {  showNewsUpdateViewer = false },
-            newsViewModel,
+            news = selectedOnceNews!!,
+            onClose = {
+                showNewsOnceViewer = false
+                newsViewModel.markNewsAsViewed(selectedOnceNews!!.id)
+                selectedOnceNews = null
+            },
+            newsViewModel
         )
     }
 
@@ -382,11 +371,6 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 //    }
 }
 
-//val shimmerColorShades = listOf(
-//    Color(0xFFEDDCCC),
-//    colors.onBackground,
-//    Color(0xFFEDDCCC),
-//)
 
 @Composable
 fun ChatSkeleton() {

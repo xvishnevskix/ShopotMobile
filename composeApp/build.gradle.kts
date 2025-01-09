@@ -78,14 +78,6 @@ kotlin {
             export("com.example:resources:1.0.0") // Замените, если `libs.resources` не работает
         }
     }
-
-    sourceSets {
-
-        commonMain {
-            val versionName = project.findProperty("VERSION_NAME") as String
-            kotlin.srcDir("build/generated/kotlin")
-        }
-    }
     
     sourceSets {
         
@@ -136,6 +128,11 @@ kotlin {
             api(libs.resources)
             api(libs.resources.compose) // for compose multiplatfor
             implementation(libs.compressor)
+        }
+
+        commonMain {
+            val versionName = project.findProperty("VERSION_NAME") as String
+            kotlin.srcDir("build/generated/kotlin")
         }
         
         commonTest.dependencies {

@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 
@@ -87,6 +89,8 @@ fun HeaderMain(
     val colors = MaterialTheme.colorScheme
     val tabNavigator = LocalTabNavigator.current
 
+    println("Search state: ${isSearching.value}")
+
     Column {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
@@ -95,7 +99,8 @@ fun HeaderMain(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.weight(1f)
             ) {
                 Text(
                     stringResource(MokoRes.strings.chats),
@@ -110,20 +115,27 @@ fun HeaderMain(
                 Spacer(modifier = Modifier.width(11.dp))
 
                 // Отображаем StoryCircle для каждой новости
-                if (news.isNotEmpty()) {
-                    Row {
-                        news.forEach { newsItem ->
-                            StoryCircle(
-                                isSeen = newsItem.viewed,
-                                imageId = newsItem.imageIds.firstOrNull(),
-                                onClick = {
-                                    onStoryClick(newsItem) // Передача текущей новости в onStoryClick
-                                }
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    if (news.isNotEmpty()) {
+                        LazyRow(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        ) {
+                            items(news) { newsItem ->
+                                StoryCircle(
+                                    isSeen = newsItem.viewed,
+                                    imageId = newsItem.imageIds.firstOrNull(),
+                                    onClick = {
+                                        onStoryClick(newsItem)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
+                Spacer(modifier = Modifier.width(11.dp))
             }
 
             Row(
@@ -132,9 +144,11 @@ fun HeaderMain(
             ) {
                 Crossfade(targetState = isSearching.value) { searching ->
                     if (!searching) {
-                        Box(modifier = Modifier.padding(horizontal = 5.dp).pointerInput(Unit) {
-                            isSearching.value = true
-                        }) {
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 5.dp)
+                                .clickable { isSearching.value = true }
+                        ) {
                             Image(
                                 painter = painterResource(Res.drawable.search_icon),
                                 contentDescription = "Search",
