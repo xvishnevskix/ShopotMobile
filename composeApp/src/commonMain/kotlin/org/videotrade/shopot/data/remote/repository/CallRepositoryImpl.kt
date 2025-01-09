@@ -943,7 +943,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     // Вы на экране CallScreen
                     
                     println("MainScreen $navigator")
-                    navigator.push(IntroScreen())
+                    navigator.push(MainScreen())
                     
                     println("Мы на экране CallScreen")
                 } else if (currentScreen is MainScreen) {
