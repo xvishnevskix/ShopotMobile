@@ -130,6 +130,7 @@ kotlin {
             implementation(libs.compressor)
         }
 
+        //Для версии приложения
         commonMain {
             val versionName = project.findProperty("VERSION_NAME") as String
             kotlin.srcDir("build/generated/kotlin")
