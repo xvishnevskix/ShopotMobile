@@ -849,23 +849,28 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    override suspend fun rejectCall(userId: String): Boolean {
+    override suspend fun rejectCall(userId: String, chatId: String, duration: String, calleeId: String): Boolean {
         try {
             
             
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("type", "rejectCall")
-                    put("userId", userId)
+                    put("callerId", userId) //кто звонит
+                    put("calleeId", calleeId) // кому звонят
+                    put("chatId", chatId)
+                    put("duration", duration)
                 }
             )
+
+
             
             
             
             setIsIncomingCall(false)
             
             wsSession.value?.send(Frame.Text(jsonContent))
-            println("rejectCall13")
+            println("${jsonContent} rejectCall13")
             
             rejectCallAnswer()
             

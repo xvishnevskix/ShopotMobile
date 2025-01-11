@@ -130,7 +130,10 @@ fun BlurredMessageOverlay(
             modifier = Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = alpha))
-                .clickable { onDismiss() }
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null // Убирает эффект нажатия
+                ) { onDismiss() }
             ,
         ) {
 
@@ -387,7 +390,10 @@ fun MessageBlurBox(
                                         top = 16.dp,
                                         bottom = 16.dp
                                     )
-                                    .clickable {
+                                    .clickable(
+                                        interactionSource = remember { MutableInteractionSource() },
+                                        indication = null // Убирает эффект нажатия
+                                    ) {
                                         editOption.onClick(viewModel, message, clipboardManager)
                                     }
 

@@ -69,7 +69,12 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val timer = callViewModel.timer.collectAsState()
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
-    
+
+    println("sadasdasdasdgsdfsd ${chat.userId}")
+    println("sadasdasdasdgsdfsd profile ${profile.id}")
+
+    println("sadasdasdasdgsdfsd ${chat.chatUser!![0].id}")
+
     Column {
         Row(
             modifier = Modifier
@@ -194,6 +199,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                             chat.firstName!!,
                                             chat.lastName!!,
                                             chat.phone!!,
+                                            chatId = chat.chatId,
+                                            callerId = profile.id
                                         )
 //
 //                                    if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
@@ -219,7 +226,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                                     chat.firstName!!,
                                                     chat.lastName!!,
                                                     chat.phone!!,
-                                                    sendCall = true
+                                                    sendCall = true,
+                                                    chat.chatId,
+                                                    profile.id
                                                 )
                                             )
                                         }

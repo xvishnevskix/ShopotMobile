@@ -56,6 +56,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
@@ -82,8 +83,10 @@ class CallScreen(
     private val userLastName: String,
     private val userPhone: String,
     private val sendCall: Boolean? = null,
+    private val chatId: String? = null,
+    private val callerId: String? = null
 ) : Screen {
-    
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -99,37 +102,37 @@ class CallScreen(
         val isIncomingCall by viewModel.isIncomingCall.collectAsState()
         val timerValue = viewModel.timer.collectAsState()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
-        
+
         val hasExecuted = remember { mutableStateOf(false) }
-        
+
         val callState = remember { mutableStateOf("") }
-        
+
         LaunchedEffect(Unit) {
             println("isIncomingCall4142 ${isIncomingCall}")
             println("isCallBackground4142 ${isCallBackground}")
-            
+
             setScreenLockFlags(true)
         }
-        
-        
+
+
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
-        
+
         val musicPlayer = remember { AudioFactory.createMusicPlayer()  }
-        
+
         var isPlaying by remember { mutableStateOf(false) }
-        
-        
+
+
         val imagePainter = if (userIcon.isNullOrBlank()) {
             painterResource(Res.drawable.person)
         } else {
             rememberImagePainter("${SERVER_URL}file/plain/${userIcon}")
         }
-        
+
         LaunchedEffect(Unit) {
             onResumeCallActivity(navigator)
         }
-        
+
         LaunchedEffect(Unit) {
             if (isIncomingCall) {
                 musicPlayer.play("callee", true, MusicType.Ringtone)
@@ -138,37 +141,37 @@ class CallScreen(
                 musicPlayer.play("caller", true,  MusicType.Ringtone)
                 isPlaying = true
             }
-            
+
         }
-        
+
         LaunchedEffect(isCallActive) {
             if (isCallActive) {
                 musicPlayer.stop()
                 isPlaying = false
             }
         }
-        
+
         DisposableEffect(Unit) {
             onDispose {
-                
+
                 println("DisposableEffect")
                 setScreenLockFlags(false)
-                
+
                 if (
                     isPlaying
                 ) {
                     musicPlayer.stop()
                     isPlaying = false
                 }
-                
-                
+
+
             }
         }
-        
-        
+
+
         if (isIncomingCall) {
             println("isIncomingCallCase")
-            
+
             LaunchedEffect(isConnectedWebrtc) {
                 println("isConnectedWebrtc $isConnectedWebrtc")
                 if (isConnectedWebrtc) {
@@ -178,19 +181,19 @@ class CallScreen(
             }
         } else if (isCallBackground) {
             println("isCallBackgroundCase")
-            
+
             val profileId = getValueInStorage("profileId")
-            
+
             LaunchedEffect(Unit) {
                 if (profileId != null) {
                     commonViewModel.mainNavigator.value = navigator
                     viewModel.checkUserShared(profileId, navigator)
-                    
+
                 }
             }
-            
+
             LaunchedEffect(isConnectedWs) {
-                
+
                 println("isConnectedWs $isConnectedWs")
                 if (isConnectedWs) {
 //                    viewModel.setIsCallBackground(false)
@@ -199,20 +202,20 @@ class CallScreen(
             }
         } else {
             LaunchedEffect(isConnectedWs) {
-                
+
                 println("Call")
-                
+
                 if (sendCall == true) {
                     if (!isCallActive)
                         if (isConnectedWs) {
                             viewModel.initCall(userId)
                         }
                 }
-                
+
             }
         }
-        
-        
+
+
         val callIncoming: String = stringResource(MokoRes.strings.call_incoming)
         val connectionEstablishmentInProgress: String =
             stringResource(MokoRes.strings.connection_establishment_in_progress)
@@ -221,47 +224,47 @@ class CallScreen(
         val errorOccurredWhileEstablishingConnection: String =
             stringResource(MokoRes.strings.error_occurred_while_establishing_connection)
         val connectionWasClosed: String = stringResource(MokoRes.strings.connection_was_closed)
-        
-        
+
+
         LaunchedEffect(callStateView) {
             when (callStateView) {
                 PeerConnectionState.New -> callState.value = callIncoming
                 PeerConnectionState.Connecting -> callState.value =
                     connectionEstablishmentInProgress
-                
-     
-                
+
+
+
                 PeerConnectionState.Connected -> {
                     callState.value = connectionEstablished
                     delay(500)
-                    
+
                     if (!isCallActive && isConnectedWebrtc) {
-                        
+
                         println("AASDASDAS")
                         viewModel.startTimer(userIcon)
                         viewModel.setIsCallActive(true)
                         isCallActiveNatific()
                     }
-                    
+
                 }
-                
+
                 PeerConnectionState.Disconnected -> callState.value = connectionWasBroken
-                
+
                 PeerConnectionState.Failed -> callState.value =
                     errorOccurredWhileEstablishingConnection
-                
-                
-                
+
+
+
                 else -> callState.value = callIncoming
-                
-                
+
+
 //                PeerConnectionState.Closed -> callState.value = connectionWasClosed
-            
+
             }
-            
+
         }
-        
-        
+
+
 //        Image(
 //            painter = imagePainter,
 //            contentDescription = "image",
@@ -281,7 +284,7 @@ class CallScreen(
 //                    }
 //            )
 //        }
-        
+
         Box(modifier = Modifier.background(colors.background).fillMaxSize().safeContentPadding()) {
             Column(
                 modifier = Modifier
@@ -417,7 +420,11 @@ class CallScreen(
                                     .padding(horizontal = 30.dp)
                             ) {
                                 rejectBtn({
-                                    viewModel.rejectCall(userId)
+                                    if (chatId != null) {
+                                        if (callerId != null) {
+                                            viewModel.rejectCall(userId, chatId, timerValue.value)
+                                        }
+                                    }
                                 }, size = 72.dp)
                                 aceptBtn(size = 72.dp, onClick = {
                                     viewModel.initWebrtc()
@@ -448,7 +455,11 @@ class CallScreen(
                                 Spacer(modifier = Modifier.width(15.dp))
 
                                 rejectBtn({
-                                    viewModel.rejectCall(userId)
+                                    if (chatId != null) {
+                                        if (callerId != null) {
+                                            viewModel.rejectCall(userId, chatId, timerValue.value)
+                                        }
+                                    }
                                 }, size = 56.dp)
 //
                             }

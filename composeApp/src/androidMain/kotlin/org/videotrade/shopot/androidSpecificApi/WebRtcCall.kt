@@ -297,7 +297,7 @@ class CallActionReceiver : BroadcastReceiver() {
             "ACTION_DECLINE_CALL" -> {
                 println("Вызов отклонен")
                 try {
-                    callViewModel.rejectCall(callViewModel.getOtherUserId())
+                    callViewModel.rejectCall(callViewModel.getOtherUserId(), "22222", "")
                     callViewModel.disconnectWs()
                     
                     // Остановка Foreground Service
@@ -317,7 +317,7 @@ class CallActionReceiver : BroadcastReceiver() {
                 println("Звонок завершен")
                 // Завершение активности
                 try {
-                    callViewModel.rejectCall(callViewModel.getOtherUserId())
+                    callViewModel.rejectCall(callViewModel.getOtherUserId(), "11111", "")
                     
                     callViewModel.disconnectWs()
                     

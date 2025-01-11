@@ -134,6 +134,7 @@ kotlin {
         commonMain {
             val versionName = project.findProperty("VERSION_NAME") as String
             kotlin.srcDir("build/generated/kotlin")
+
         }
         
         commonTest.dependencies {

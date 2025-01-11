@@ -50,6 +50,24 @@ fun getChatEditOptions(
     val coroutineScope = rememberCoroutineScope()
     val colors = MaterialTheme.colorScheme
 
+    // Если это звонок, то оставляем только reply
+    if (message != null) {
+        if (message.callInfo != null && message.callInfo!!.isNotEmpty()) {
+            return listOf(
+                EditOption(
+                    text = stringResource(MokoRes.strings.reply),
+                    imagePath = Res.drawable.chat_forward,
+                    onClick = { viewModel, message, _ ->
+                        viewModel.selectMessage(chatId, message, messageSenderName)
+                        onDismiss()
+                    },
+                    modifier = Modifier.graphicsLayer(scaleX = -1f),
+                    color = colors.primary
+                )
+            )
+        }
+    }
+
     return buildList {
         add(
             EditOption(

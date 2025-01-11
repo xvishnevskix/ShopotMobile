@@ -64,7 +64,7 @@ interface CallRepository {
     
     fun answerCallBackground()
     
-    suspend fun rejectCall(userId: String): Boolean
+    suspend fun rejectCall(userId: String, chatId: String, duration: String, calleeId: String): Boolean
     
     fun clearData()
     

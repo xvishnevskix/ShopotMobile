@@ -262,13 +262,15 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.answerCallBackground()
     }
     
-    fun rejectCall(userId: String) {
+    fun rejectCall(calleeId: String, chatId: String, duration: String) {
         viewModelScope.launch {
             clearNotificationsForChannel("OngoingCallChannel")
             stopTimer()
             setIsCallActive(false)
-            
-            val isRejectCall = callUseCase.rejectCall(userId)
+
+
+            val userId = profileUseCase.getProfile().id
+            val isRejectCall = callUseCase.rejectCall(userId, chatId, duration, calleeId)
 
             if (isRejectCall) {
                 val navigator = commonViewModel.mainNavigator.value

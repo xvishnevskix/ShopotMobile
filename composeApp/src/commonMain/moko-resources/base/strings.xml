@@ -251,7 +251,22 @@
 
     <string name="app_version">App Version</string>
 
+    <string name="call_status_canceled">Canceled</string>
+    <string name="call_status_outgoing">Outgoing</string>
+    <string name="call_status_missed">Missed</string>
+    <string name="call_status_incoming">Incoming</string>
 
+    <string name="hour_singular">hour</string>
+    <string name="hour_few">hours</string>
+    <string name="hour_plural">hours</string>
+
+    <string name="minute_singular">minute</string>
+    <string name="minute_few">minutes</string>
+    <string name="minute_plural">minutes</string>
+
+    <string name="second_singular">second</string>
+    <string name="second_few">seconds</string>
+    <string name="second_plural">seconds</string>
 
 
 

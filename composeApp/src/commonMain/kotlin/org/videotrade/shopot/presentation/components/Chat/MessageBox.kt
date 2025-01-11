@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -34,8 +33,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.BottomSheetScaffoldState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -46,22 +43,17 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -74,12 +66,10 @@ import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.formatTimeOnly
-import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -89,17 +79,10 @@ import org.videotrade.shopot.presentation.screens.settings.getThemeMode
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.chat_copy
-import shopot.composeapp.generated.resources.chat_delete
 import shopot.composeapp.generated.resources.chat_forward
 import shopot.composeapp.generated.resources.chat_reply
-import shopot.composeapp.generated.resources.double_message_check
-import shopot.composeapp.generated.resources.menu_copy
-import shopot.composeapp.generated.resources.menu_delete
 import shopot.composeapp.generated.resources.message_double_check
 import shopot.composeapp.generated.resources.message_single_check
-import shopot.composeapp.generated.resources.single_message_check
 
 @Composable
 fun MessageBox(
@@ -536,53 +519,49 @@ fun MessageFormat(
     messageSenderName: String? = null,
     chat: ChatItem? = null
 ) {
-    if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        MessageText(message, profile)
-//        FileMessage(message, )
-    } else {
-
-        when (message.attachments!![0].type) {
-
-            "audio/mp4" -> {
-                VoiceMessage(
-                    message,
-                    message.attachments!!
-                )
-            }
-
-            "image" -> {
-                MessageImage(
-                    message, profile,
-                    message.attachments!!,
-                    messageSenderName
-                )
-
-            }
-            
-            "video" -> {
-                VideoMessage(
-                    message,
-                    message.attachments!!,
-                    messageSenderName
-                )
-            }
-
-            "sticker" -> {
-                StickerMessage(
-                    message,
-                    message.attachments!![0].fileId
+    when {
+        message.callInfo != null && message.callInfo!!.isNotEmpty() -> {
+            CallMessage(message.callInfo!!)
+        }
+        message.attachments == null || message.attachments?.isEmpty() == true -> {
+            MessageText(message, profile)
+        }
+        else -> {
+            when (message.attachments!![0].type) {
+                "audio/mp4" -> {
+                    VoiceMessage(
+                        message,
+                        message.attachments!!
                     )
-            }
-
-            else -> {
-                FileMessage(
-                    message,
-                    message.attachments!!
-                )
+                }
+                "image" -> {
+                    MessageImage(
+                        message, profile,
+                        message.attachments!!,
+                        messageSenderName
+                    )
+                }
+                "video" -> {
+                    VideoMessage(
+                        message,
+                        message.attachments!!,
+                        messageSenderName
+                    )
+                }
+                "sticker" -> {
+                    StickerMessage(
+                        message,
+                        message.attachments!![0].fileId
+                    )
+                }
+                else -> {
+                    FileMessage(
+                        message,
+                        message.attachments!!
+                    )
+                }
             }
         }
-
-
     }
 
 }
@@ -597,7 +576,6 @@ fun SelectedMessageFormat(
     isFromFooter: Boolean = false
 ) {
     val colors = MaterialTheme.colorScheme
-    val theme = getThemeMode()
     val messageAnswerName =
         selectedMessage.phone?.let { phone ->
             if (selectedMessage.fromUser == profile?.id) {
@@ -621,38 +599,40 @@ fun SelectedMessageFormat(
             colors.primary
     }
 
-    if (selectedMessage.attachments == null || selectedMessage.attachments?.isEmpty() == true) {
-        if (profile != null) {
-            SelectedMessageText(selectedMessage, messageAnswerName, colorTitle, isFromUser)
+    when {
+
+        selectedMessage.callInfo != null && selectedMessage.callInfo!!.isNotEmpty() -> {
+            SelectedCallMessage(
+                selectedMessage,
+                messageAnswerName,
+                colorTitle,
+                isFromUser
+            )
         }
-    } else {
-
-        when (selectedMessage.attachments!![0].type) {
-            "audio/mp4" -> {
-                SelectedVoiceMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
-            }
-
-            "image" -> {
-                SelectedMessageImage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
-//                SelectedStickerMessage(message.attachments!!, messageAnswerName)
-
-            }
-
-            "video" -> {
-                SelectedVideoMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
-
-            }
-            
-            "sticker" -> {
-                SelectedStickerMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
-            }
-
-            else -> {
-                SelectedFileMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
+        // Обработка текстовых сообщений
+        selectedMessage.attachments == null || selectedMessage.attachments?.isEmpty() == true -> {
+            if (profile != null) {
+                SelectedMessageText(selectedMessage, messageAnswerName, colorTitle, isFromUser)
             }
         }
-
-
+        else -> {
+            when (selectedMessage.attachments!![0].type) {
+                "audio/mp4" -> {
+                    SelectedVoiceMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
+                }
+                "image" -> {
+                    SelectedMessageImage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
+                }
+                "video" -> {
+                    SelectedVideoMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
+                }
+                "sticker" -> {
+                    SelectedStickerMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
+                }
+                else -> {
+                    SelectedFileMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
+                }
+            }
+        }
     }
-
 }
