@@ -122,7 +122,7 @@ actual class AudioRecorder(private val context: Context) {
 actual class AudioPlayer(private val applicationContext: Context) {
     private var mediaPlayer: MediaPlayer? = null
     
-    actual fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>) {
+    actual fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>): Boolean {
         try {
             // Получение экземпляра AudioManager
             val audioManager =
@@ -150,8 +150,12 @@ actual class AudioPlayer(private val applicationContext: Context) {
                     // - Начать воспроизведение следующего трека
                 }
             }
+            
+            return true
+            
         } catch (e: Exception) {
             println("error $e")
+            return false
         }
     }
     

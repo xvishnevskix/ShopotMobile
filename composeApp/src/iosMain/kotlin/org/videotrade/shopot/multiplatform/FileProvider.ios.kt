@@ -80,9 +80,24 @@ import platform.UIKit.UIApplication
 import platform.UIKit.UIDocumentPickerDelegateProtocol
 import platform.UIKit.UIDocumentPickerViewController
 import platform.darwin.NSObject
+import kotlin.Boolean
+import kotlin.ByteArray
+import kotlin.Exception
+import kotlin.Float
+import kotlin.IllegalArgumentException
+import kotlin.IllegalStateException
+import kotlin.Int
+import kotlin.Long
+import kotlin.NullPointerException
+import kotlin.OptIn
+import kotlin.String
+import kotlin.TODO
+import kotlin.Unit
+import kotlin.let
 import kotlin.math.roundToInt
 import kotlin.random.Random
-import platform.Foundation.*
+import kotlin.run
+import kotlin.toULong
 
 actual class FileProvider {
     private val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
@@ -296,6 +311,7 @@ actual class FileProvider {
         }
         return true
     }
+    
     @OptIn(ExperimentalForeignApi::class)
     fun copyFileToDocuments(filePath: String, destinationFilename: String): Boolean {
         return try {
@@ -394,6 +410,7 @@ actual class FileProvider {
                 NSCachesDirectory,
                 NSUserDomainMask
             ).firstOrNull() as NSURL?
+            
             "image" -> NSFileManager.defaultManager.URLsForDirectory(
                 NSDocumentDirectory,
                 NSUserDomainMask
@@ -491,39 +508,40 @@ actual class FileProvider {
         onProgress: (Float) -> Unit
     ): String? {
         val client = HttpClient(Darwin)
-        
-        println("starting decrypt")
+        println("Starting downloadCipherFile")
         
         try {
-            
             val token = getValueInStorage("accessToken")
-            println("starting decrypt1 ${Random.nextInt(1, 10000).toString() + filename}")
+            val sharedSecret = getValueInStorage("sharedSecret")?.decodeBase64Bytes()
+                ?: throw IllegalArgumentException("Shared secret is missing or invalid")
+            println("Access token and shared secret retrieved")
             
             val fileDirectory = createNewFileWithApp(
-                filename.substringBeforeLast(
-                    ".",
-                    filename
-                ), "cipher"
-            ) ?: return null
+                filename.substringBeforeLast(".", filename),
+                "cipher"
+            ) ?: throw IllegalStateException("Failed to create cipher file")
             
-            val dectyptFilePath = createNewFileWithApp(
-                filename,
-                dirType
-            ) ?: return null
+            val decryptFilePath = createNewFileWithApp(filename, dirType)
+                ?: throw IllegalStateException("Failed to create decrypt file")
             
             var filePath = ""
             
-            client.prepareGet(url) { header("Authorization", "Bearer $token") }
-                .execute { httpResponse ->
-                    val channel: ByteReadChannel = httpResponse.body()
-                    val totalBytes = httpResponse.contentLength() ?: -1L
-                    val file = NSURL.fileURLWithPath(fileDirectory)
-                    val outputStream = NSOutputStream.outputStreamWithURL(file, true)
-                    
-                    val block = httpResponse.headers["block"]
-                    val authTag = httpResponse.headers["authTag"]
-                    
-                    outputStream?.open()
+            client.prepareGet(url) {
+                header("Authorization", "Bearer $token")
+            }.execute { httpResponse ->
+                val channel: ByteReadChannel = httpResponse.body()
+                val totalBytes = httpResponse.contentLength() ?: -1L
+                val file = NSURL.fileURLWithPath(fileDirectory)
+                val outputStream = NSOutputStream.outputStreamWithURL(file, true)
+                    ?: throw IllegalStateException("Failed to create output stream")
+                
+                val block = httpResponse.headers["block"]?.decodeBase64Bytes()
+                    ?: throw IllegalArgumentException("Missing or invalid 'block' header")
+                val authTag = httpResponse.headers["authTag"]?.decodeBase64Bytes()
+                    ?: throw IllegalArgumentException("Missing or invalid 'authTag' header")
+                
+                try {
+                    outputStream.open()
                     val buffer = ByteArray(8192)
                     var bytesCopied: Long = 0
                     var bytesRead: Int
@@ -537,63 +555,68 @@ actual class FileProvider {
                                 bytes = pinnedBuffer.addressOf(0),
                                 length = bytesRead.toULong()
                             )
-                            outputStream?.write(nsData.bytes?.reinterpret(), nsData.length)
+                            if (nsData != null) {
+                                outputStream.write(nsData.bytes?.reinterpret(), nsData.length)
+                            } else {
+                                throw IllegalStateException("Failed to create NSData for writing")
+                            }
                         }
                         bytesCopied += bytesRead
                         
                         if (totalBytes != -1L) {
-                            val progress =
-                                (bytesCopied.toDouble() / totalBytes * 100).roundToInt() / 100f
+                            val progress = (bytesCopied.toDouble() / totalBytes).toFloat()
                             onProgress(progress)
                         }
                     }
-                    val sharedSecret = getValueInStorage("sharedSecret")
                     
                     val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
                     
-                    println("filenameDown ${filename}")
-                    
-                    
-                    val result3 =
-                        cipherWrapper.decupsChachaFileCommon(
+                    println("Decrypting file $filename")
+                    try {
+                        val resultPath = cipherWrapper.decupsChachaFileCommon(
                             fileDirectory,
-                            dectyptFilePath,
-                            block?.decodeBase64Bytes()!!,
-                            authTag?.decodeBase64Bytes()!!,
-                            sharedSecret?.decodeBase64Bytes()!!
-                        )
-                    
-                    
-                    if (result3 !== null) {
+                            decryptFilePath,
+                            block,
+                            authTag,
+                            sharedSecret
+                        ) ?: throw IllegalStateException("Decryption failed")
                         
-                        println("encupsChachaFileResult $result3")
-                        
-                        
-                        
-                        if (dirType !== "audio/mp4" && dirType !== "image") {
-                            savePickedFile(result3, filename)
-                            
+                        if (dirType != "audio/mp4" && dirType != "image") {
+                            savePickedFile(resultPath, filename)
                         }
                         
-                        filePath = result3
+                        filePath = resultPath
+                        println("File successfully saved at $filePath")
+                        onProgress(1f) // Устанавливаем прогресс на 100%
+                    } catch (e: Exception) {
+                        println("Error during decryption: ${e.message}")
+                        e.printStackTrace()
+                        
+                        // Удаляем временные файлы только в случае ошибки
+                        deleteFile(fileDirectory)
+                        deleteFile(decryptFilePath)
+                        
+                        throw e
+                    } finally {
+                        println("Decryption process finished")
                     }
-                    
-                    
-                    
-                    outputStream?.close()
-                    onProgress(1f) // Устанавливаем прогресс на 100% после завершения загрузки
-                    println("Файл сохранен в ${file.path}")
+                } finally {
+                    outputStream.close()
+                    println("Output stream closed")
                 }
-            
+            }
             return filePath
             
         } catch (e: Exception) {
-            println("Error file $e")
+            println("Error during file download: ${e.message}")
+            e.printStackTrace()
             return null
         } finally {
             client.close()
+            println("HTTP client closed")
         }
     }
+
     
     
     @OptIn(InternalAPI::class)
@@ -900,7 +923,7 @@ actual class FileProvider {
         )
         
         if (encupsChachaVideoResult !== null && encupsChachaPhotoResult !== null) {
-
+            
             
             val videoFile = NSURL.fileURLWithPath(cipherVideoPath)
             val photoFile = NSURL.fileURLWithPath(cipherPhotoPath)
@@ -914,12 +937,15 @@ actual class FileProvider {
                 val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
                     setBody(MultiPartFormDataContent(
                         formData {
- 
+                            
                             formData {
                                 append("videoFile", videoFileData.toByteArray(),
                                     Headers.build {
                                         append(HttpHeaders.ContentType, "mp4")
-                                        append(HttpHeaders.ContentDisposition, "filename=\"$videoName\"")
+                                        append(
+                                            HttpHeaders.ContentDisposition,
+                                            "filename=\"$videoName\""
+                                        )
                                     }
                                 )
                                 
@@ -937,7 +963,10 @@ actual class FileProvider {
                                 append("preloadFile", photoFileData.toByteArray(),
                                     Headers.build {
                                         append(HttpHeaders.ContentType, "image")
-                                        append(HttpHeaders.ContentDisposition, "filename=\"$photoName\"")
+                                        append(
+                                            HttpHeaders.ContentDisposition,
+                                            "filename=\"$photoName\""
+                                        )
                                     }
                                 )
                                 
@@ -1008,28 +1037,67 @@ actual class FileProvider {
     actual fun createNewFileWithApp(fileName: String, fileType: String): String? {
         // Получаем путь к каталогу для хранения файла в зависимости от типа файла
         val directoryPath = when (fileType) {
-            "audio" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            "audio" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Audio"
             }
-            "video" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "video" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Video"
             }
-            "image" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "image" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Images"
             }
-            "document" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "document" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Documents"
             }
-            "zip" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "zip" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Zips"
             }
-            "cipher" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "cipher" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/CipherFiles"
             }
-            "cache" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "cache" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/CacheFiles"
             }
-            else -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            else -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Others"
             }
         }
@@ -1071,28 +1139,67 @@ actual class FileProvider {
         
         // Определяем каталог для сохранения файла в зависимости от типа файла
         val directoryPath = when (fileType) {
-            "audio" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            "audio" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Audio"
             }
-            "video" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "video" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Video"
             }
-            "image" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "image" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Images"
             }
-            "document" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "document" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Documents"
             }
-            "zip" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "zip" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Zips"
             }
-            "cipher" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "cipher" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/CipherFiles"
             }
-            "cache" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "cache" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/CacheFiles"
             }
-            else -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            else -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Others"
             }
         }
@@ -1141,7 +1248,8 @@ actual class FileProvider {
             }
         }
         
-        println("$fileDirectory $fileType $filename"
+        println(
+            "$fileDirectory $fileType $filename"
         )
         try {
             val token = getValueInStorage("accessToken")
@@ -1235,28 +1343,67 @@ actual class FileProvider {
     actual fun existingFileInDir(fileName: String, fileType: String): String? {
         // Определяем каталог для поиска файла в зависимости от типа файла
         val directoryPath = when (fileType) {
-            "audio" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            "audio" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Audio"
             }
-            "video" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "video" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Video"
             }
-            "image" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "image" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Images"
             }
-            "document" -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "document" -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Documents"
             }
-            "zip" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "zip" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Zips"
             }
-            "cipher" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "cipher" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/CipherFiles"
             }
-            "cache" -> NSSearchPathForDirectoriesInDomains(NSCachesDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            "cache" -> NSSearchPathForDirectoriesInDomains(
+                NSCachesDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/CacheFiles"
             }
-            else -> NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, true).firstOrNull()?.let {
+            
+            else -> NSSearchPathForDirectoriesInDomains(
+                NSDocumentDirectory,
+                NSUserDomainMask,
+                true
+            ).firstOrNull()?.let {
                 "$it/Others"
             }
         }
@@ -1307,6 +1454,6 @@ fun deleteFile(filePath: String): Boolean {
         }
     } else {
         println("Файл не найден: $filePath")
-      return  false
+        return false
     }
 }

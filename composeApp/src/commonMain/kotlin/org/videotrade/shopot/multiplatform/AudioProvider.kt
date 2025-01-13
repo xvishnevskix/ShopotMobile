@@ -9,7 +9,7 @@ expect class AudioRecorder {
 
 
 expect class AudioPlayer {
-    fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>)
+    fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>): Boolean
     fun stopPlaying()
     
     fun getAudioDuration(filePath: String, fileName: String): String?

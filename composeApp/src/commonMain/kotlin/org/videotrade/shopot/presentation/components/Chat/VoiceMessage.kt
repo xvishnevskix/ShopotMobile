@@ -71,7 +71,7 @@ fun VoiceMessage(
     val colors = MaterialTheme.colorScheme
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
-
+    
     // Состояния, уникальные для каждого сообщения
     var isPlaying = remember(message.id) { mutableStateOf(false) }
     val waveData = remember(message.id) { generateRandomWaveData(29) }
@@ -84,7 +84,7 @@ fun VoiceMessage(
     var progress by remember(message.id) { mutableStateOf(0f) }
     var downloadJob by remember(message.id) { mutableStateOf<Job?>(null) }
     var isUpload by remember(message.id) { mutableStateOf(false) }
-
+    
     // Эффект для обновления времени воспроизведения
     LaunchedEffect(isPlaying.value) {
         if (isPlaying.value) {
@@ -100,9 +100,10 @@ fun VoiceMessage(
             }
         }
     }
-
+    
     // Эффект для загрузки или скачивания файла
-    LaunchedEffect(message) {
+    LaunchedEffect(message.id) {
+        println("message.idSSSSS ${message.id}")
         if (!isUpload && message.upload != null) {
             downloadJob = scope.launch {
                 isLoading = true
@@ -120,7 +121,7 @@ fun VoiceMessage(
                         isStartCipherLoading = false
                         progress = it / 100f
                     }
-
+                    
                     fileId?.let {
                         viewModel.sendLargeFileAttachments(
                             message.content,
@@ -138,6 +139,7 @@ fun VoiceMessage(
                 progress = 1f
             }
         } else {
+            println("AAAAAdsada")
             val existingFile = FileProviderFactory.create()
                 .existingFileInDir(attachments.first().name, attachments.first().type)
             if (!existingFile.isNullOrBlank()) {
@@ -154,15 +156,19 @@ fun VoiceMessage(
                 val url = "${EnvironmentConfig.SERVER_URL}file/id/${attachments.first().fileId}"
                 val fileName = attachments.first().name
                 val fileType = attachments.first().type
-
+                
                 scope.launch {
                     isLoading = true
                     isStartCipherLoading = true
+                    println(" start AAAAA")
                     val pathResult =
                         audioFile.downloadCipherFile(url, fileType, fileName, "audio/mp4") {
                             isStartCipherLoading = false
                             progress = it / 100f
                         }
+                    
+                    println(" end AAAAA")
+                    
                     pathResult?.let {
                         audioFilePath = it
                         audioPlayer.getAudioDuration(it, fileName)?.let { durationString ->
@@ -177,7 +183,7 @@ fun VoiceMessage(
             }
         }
     }
-
+    
     Row(
         modifier = Modifier
             .widthIn(max = 261.dp)
@@ -233,7 +239,7 @@ fun VoiceMessage(
                 lineHeight = 16.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                 fontWeight = FontWeight(400),
-                color = if (message.fromUser == profile.id) Color.White  else colors.primary,
+                color = if (message.fromUser == profile.id) Color.White else colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
             )
         }
@@ -251,11 +257,12 @@ fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO) {
     ) {
         val barWidth = size.width / (waveData.size * 2 - 1)
         val maxBarHeight = size.height
-
+        
         waveData.forEachIndexed { index, amplitude ->
-            val adjustedAmplitude = maxOf(amplitude, minAmplitude) // Применяем минимальную амплитуду
+            val adjustedAmplitude =
+                maxOf(amplitude, minAmplitude) // Применяем минимальную амплитуду
             val barHeight = maxBarHeight * adjustedAmplitude
-
+            
             drawRoundRect(
                 color = if (message.fromUser == profile.id) Color.White else colors.primary,
                 topLeft = Offset(index * 2 * barWidth, maxBarHeight / 2 - barHeight / 2),
@@ -273,7 +280,7 @@ fun LoadingBox(
     color: Color,
     onCancel: () -> Unit
 ) {
-
+    
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.size(24.dp)
@@ -331,13 +338,12 @@ fun PlayPauseButton(
 
 
 fun playVoice(audioPlayer: AudioPlayer, audioFilePath: String, isPlaying: MutableState<Boolean>) {
-    audioPlayer.startPlaying(audioFilePath,isPlaying)
+    audioPlayer.startPlaying(audioFilePath, isPlaying)
 }
 
 fun stopVoice(audioPlayer: AudioPlayer) {
     audioPlayer.stopPlaying()
 }
-
 
 
 fun generateRandomWaveData(size: Int): List<Float> {
