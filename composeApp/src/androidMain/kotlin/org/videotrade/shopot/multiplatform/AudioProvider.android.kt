@@ -25,13 +25,16 @@ actual class AudioRecorder(private val context: Context) {
         
         outputFile = outputFilePath
         mediaRecorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-            setOutputFile(outputFile)
-            prepare()
-            start()
+            setAudioSource(MediaRecorder.AudioSource.MIC) // Используем микрофон
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4) // Формат файла MPEG-4
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC) // Кодек AAC (широкая поддержка)
+            setAudioEncodingBitRate(128000) // Битрейт 128 kbps
+            setAudioSamplingRate(44100) // Частота дискретизации 44.1 kHz
+            setOutputFile(outputFile) // Путь к файлу
+            prepare() // Подготовка
+            start() // Начало записи
         }
+
     }
     
     actual fun stopRecording(getDir: Boolean): String? {

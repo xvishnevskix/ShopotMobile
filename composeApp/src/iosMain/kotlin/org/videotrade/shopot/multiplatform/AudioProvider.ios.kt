@@ -158,85 +158,84 @@ actual class AudioPlayer {
     private var audioPlayer: AVAudioPlayer? = null
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
-    actual fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>): Boolean
-    {
+    actual fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>): Boolean {
         println("Start playing with filePath: $filePath")
         val audioURL = NSURL.fileURLWithPath(filePath)
         
+        // Проверяем существование файла
+        if (!NSFileManager.defaultManager.fileExistsAtPath(filePath)) {
+            println("File does not exist at path: $filePath")
+            isPlaying.value = false
+            return false
+        }
+        
         memScoped {
             val errorPtr = alloc<ObjCObjectVar<NSError?>>()
-            println("Allocated error pointer")
             
             try {
-                println("Initializing AVAudioPlayer")
-                
-                // Настройка аудиосессии для использования основного динамика
+                println("Initializing AVAudioSession")
                 val audioSession = AVAudioSession.sharedInstance()
-                println("Retrieved shared audio session instance")
-                
                 audioSession.setCategory(AVAudioSessionCategoryPlayback, error = errorPtr.ptr)
-                println("Set audio session category to Playback")
-                
-                audioSession.setActive(true, error = errorPtr.ptr)
-                println("Activated audio session")
                 
                 if (errorPtr.value != null) {
-                    println("Error setting audio session: ${errorPtr.value?.localizedDescription}")
-                    return@memScoped
+                    println("Error setting audio session category: ${errorPtr.value?.localizedDescription}")
+                    isPlaying.value = false
+                    return false
                 }
                 
+                audioSession.setActive(true, error = errorPtr.ptr)
+                if (errorPtr.value != null) {
+                    println("Error activating audio session: ${errorPtr.value?.localizedDescription}")
+                    isPlaying.value = false
+                    return false
+                }
+                
+                println("Initializing AVAudioPlayer")
                 val player = AVAudioPlayer(audioURL, errorPtr.ptr)
-                println("Initialized AVAudioPlayer with audioURL")
                 
                 if (errorPtr.value != null) {
                     println("Error initializing AVAudioPlayer: ${errorPtr.value?.localizedDescription}")
-                    return@memScoped
+                    isPlaying.value = false
+                    return false
                 }
                 
-                // Устанавливаем делегат
-                println("Setting AVAudioPlayer delegate")
                 player.delegate = object : NSObject(), AVAudioPlayerDelegateProtocol {
                     override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
                         println("Playback finished. Successfully: $successfully")
-                        isPlaying.value = false // Обновляем состояние
+                        isPlaying.value = false
                     }
                     
                     override fun audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
-                        println("Playback error: ${error?.localizedDescription}")
-                        isPlaying.value = false // Обновляем состояние
+                        println("Playback error occurred: ${error?.localizedDescription}")
+                        isPlaying.value = false
                     }
                 }
                 
-                println("Setting up audioPlayer")
-                audioPlayer = player.apply {
-                    println("Preparing to play audio")
-                    if (prepareToPlay()) {
-                        println("Audio prepared successfully")
-                        if (play()) {
-                            println("Audio playback started successfully")
-                            isPlaying.value = true // Устанавливаем состояние "воспроизведение начато"
-                            return true
-                        } else {
-                            println("Failed to start playing audio")
-                            isPlaying.value = false
-                            return false
-                        }
+                println("Preparing to play")
+                if (player.prepareToPlay()) {
+                    println("Prepared successfully")
+                    if (player.play()) {
+                        println("Playback started")
+                        isPlaying.value = true
                     } else {
-                        println("Failed to prepare audio for playback")
+                        println("Failed to start playback")
                         isPlaying.value = false
                     }
+                } else {
+                    println("Failed to prepare audio player")
+                    isPlaying.value = false
                 }
             } catch (e: Exception) {
                 println("Exception while initializing AVAudioPlayer: ${e.message}")
                 e.printStackTrace()
                 isPlaying.value = false
-                audioPlayer = null
                 return false
             }
         }
-        println("Exiting startPlaying function")
-        return false
+        
+        return true
     }
+
     
     actual fun stopPlaying() {
         println("Stop playing")
