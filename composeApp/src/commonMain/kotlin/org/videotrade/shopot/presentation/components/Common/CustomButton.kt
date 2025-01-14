@@ -2,12 +2,17 @@ package org.videotrade.shopot.presentation.components.Common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,9 +47,10 @@ fun CustomButton(
     height: Dp = 56.dp,
     style: ButtonStyle = ButtonStyle.Primary,
     disabled: Boolean = false,
+    isLoading: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
-
+    val colors = MaterialTheme.colorScheme
     val backgroundColor: Color
     val textColor: Color
     val buttonShape: Shape = RoundedCornerShape(16.dp)
@@ -107,14 +113,25 @@ fun CustomButton(
                 shape = buttonShape
             )
     ) {
-        Text(
-            text = text,
-            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-            textAlign = TextAlign.Center,
-            fontSize = 16.sp,
-            lineHeight = 16.sp,
-            color = if (disabled) Color(0x80373533) else textColor,
-        )
+        if (isLoading) {
+            Box(
+                modifier = Modifier.size(38.dp)
+            ) {
+                CircularProgressIndicator(
+                    color = Color.White,
+                    strokeWidth = 3.dp
+                )
+            }
+        } else {
+            Text(
+                text = text,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                textAlign = TextAlign.Center,
+                fontSize = 16.sp,
+                lineHeight = 16.sp,
+                color = if (disabled) Color(0x80373533) else textColor,
+            )
+        }
     }
 }
 

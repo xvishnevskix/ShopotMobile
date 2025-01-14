@@ -114,7 +114,7 @@ class SignInScreen : Screen {
         val animationTrigger = remember { mutableStateOf(false) }
         val keyboardController = LocalSoftwareKeyboardController.current
         var showPhoneMenu = remember { mutableStateOf(false) }
-
+        val isLoading = remember { mutableStateOf(false) }
         val scrollState = rememberScrollState()
         val focusRequester = remember { FocusRequester() }
 
@@ -277,45 +277,53 @@ class SignInScreen : Screen {
                                     stringResource(MokoRes.strings.required_phone_number_length)
                                 Box( modifier = Modifier.padding(bottom = 20.dp)) {
                                     CustomButton(stringResource(MokoRes.strings.login), {
+                                        isLoading.value = true
                                         coroutineScope.launch {
-                                            val fullPhoneNumber = countryCode + textState.value.text
-                                            val phoneNumberLength = getPhoneNumberLength(countryCode)
-                                            hasError.value = false
+                                            try {
+                                                val fullPhoneNumber = countryCode + textState.value.text
+                                                val phoneNumberLength = getPhoneNumberLength(countryCode)
+                                                hasError.value = false
 
-                                            if (fullPhoneNumber.length < phoneNumberLength) {
-                                                hasError.value = true
-                                                toasterViewModel.toaster.show(
-                                                    "$requiredPhoneLength $phoneNumberLength",
-                                                    type = ToastType.Error,
-                                                    duration = ToasterDefaults.DurationDefault
-                                                )
-                                                animationTrigger.value = !animationTrigger.value
-
-                                            } else {
-                                                val response =
-                                                    sendRequestToBackend(
-                                                        fullPhoneNumber,
-                                                        NotifierManager.getPushNotifier().getToken(),
-                                                        "auth/login",
-                                                        toasterViewModel,
-                                                        phoneNotRegistered,
-                                                        hasError = hasError,
-                                                        animationTrigger = animationTrigger
+                                                if (fullPhoneNumber.length < phoneNumberLength) {
+                                                    hasError.value = true
+                                                    toasterViewModel.toaster.show(
+                                                        "$requiredPhoneLength $phoneNumberLength",
+                                                        type = ToastType.Error,
+                                                        duration = ToasterDefaults.DurationDefault
                                                     )
+                                                    animationTrigger.value = !animationTrigger.value
 
-                                                if (response != null) {
-
-                                                    navigator.push(
-                                                        AuthCallScreen(
+                                                } else {
+                                                    val response =
+                                                        sendRequestToBackend(
                                                             fullPhoneNumber,
-
-                                                            "SignIn"
+                                                            NotifierManager.getPushNotifier().getToken(),
+                                                            "auth/login",
+                                                            toasterViewModel,
+                                                            phoneNotRegistered,
+                                                            hasError = hasError,
+                                                            animationTrigger = animationTrigger
                                                         )
-                                                    )
+
+                                                    if (response != null) {
+
+                                                        navigator.push(
+                                                            AuthCallScreen(
+                                                                fullPhoneNumber,
+
+                                                                "SignIn"
+                                                            )
+                                                        )
+                                                    }
                                                 }
+                                            } finally {
+                                                isLoading.value = false // Выключаем загрузку
                                             }
                                         }
-                                    }, style = ButtonStyle.Gradient)
+                                    }, style = ButtonStyle.Gradient,
+                                        isLoading = isLoading.value
+                                    )
+
                                 }
                             }
 
@@ -325,139 +333,6 @@ class SignInScreen : Screen {
             }
         }
     }
-
-//        SafeArea {
-//
-//            Box(
-//                modifier = Modifier.fillMaxSize(),
-//                contentAlignment = Alignment.Center
-//            ) {
-//
-//
-//                LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-//                    item {
-//                        Image(
-//                            modifier = Modifier
-//                                .size(220.dp),
-//                            painter = painterResource(Res.drawable.LoginLogo),
-//                            contentDescription = null,
-//                            contentScale = ContentScale.Crop
-//                        )
-//
-//                        Text(
-//                            stringResource(MokoRes.strings.greeting),
-//                            fontSize = 28.sp,
-//                            fontFamily = FontFamily(Font(Res.font.Montserrat_SemiBold)),
-//                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                            lineHeight = 20.sp,
-//                            modifier = Modifier.padding(bottom = 5.dp),
-//                            color = Color.Black
-//
-//                        )
-//                        Text(
-//                            stringResource(MokoRes.strings.to_continue_please_log_in),
-//                            textAlign = TextAlign.Center,
-//                            fontSize = 18.sp,
-//                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-//                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-//                            lineHeight = 24.sp,
-//                            modifier = Modifier.padding(bottom = 5.dp),
-//                            fontWeight = FontWeight.W400,
-//                            color = Color(151, 151, 151)
-//                        )
-//
-//
-//
-//
-//                        Box(modifier = Modifier.padding(top = 25.dp, bottom = 25.dp)) {
-//                            PhoneInput(textState)
-//                        }
-//
-//                        val requiredPhoneLength = stringResource(MokoRes.strings.required_phone_number_length)
-//                        CustomButton(
-//                            stringResource(MokoRes.strings.login),
-//                            {
-//                                coroutineScope.launch {
-//                                    val response =
-//                                        sendRequestToBackend(textState.value.text, NotifierManager.getPushNotifier().getToken(), "auth/login", toasterViewModel, phoneNotRegistered)
-//
-//                                    val countryCode = textState.value.text.takeWhile { it.isDigit() || it == '+' }
-//                                    val phoneNumberLength = getPhoneNumberLength(countryCode)
-//                                    if (textState.value.text.length < phoneNumberLength) {
-//                                            toasterViewModel.toaster.show(
-//                                                "$requiredPhoneLength $phoneNumberLength",
-//                                                type = ToastType.Error,
-//                                                duration = ToasterDefaults.DurationDefault
-//                                            )
-//                                    }
-//
-//                                    else if (response != null) {
-//                                        navigator.push(
-//                                            AuthCallScreen(
-//                                                textState.value.text,
-//
-//                                                "SignIn"
-//                                            )
-//                                        )
-//                                    }
-//                                }
-//
-//
-//                            })
-////                        LanguageSelector()
-//                        Spacer(modifier = Modifier.height(154.dp))
-//
-//                        Row(
-//                            modifier = Modifier.padding(10.dp).fillMaxWidth()
-//                                .clickable { navigator.push(SignUpPhoneScreen()) },
-//                            horizontalArrangement = Arrangement.Center
-//                        ) {
-//                            Text(
-//                                stringResource(MokoRes.strings.do_not_have_an_account_yet),
-//                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-//                                textAlign = TextAlign.Center,
-//                                fontSize = 12.sp,
-//                                lineHeight = 15.sp,
-//                                color = Color(0xFF979797),
-//                            )
-//                            Text(
-//                                " " + stringResource(MokoRes.strings.sign_up),
-//                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-//                                textAlign = TextAlign.Center,
-//                                fontSize = 12.sp,
-//                                lineHeight = 15.sp,
-//                                color = Color(0xFF000000),
-//                                textDecoration = TextDecoration.Underline
-//                            )
-//
-//                        }
-//                        Row(
-//                            modifier = Modifier.padding().fillMaxWidth().safeDrawingPadding()
-//                                .clickable {
-//                                    navigator.push(FAQ())
-//                                           },
-//                            horizontalArrangement = Arrangement.Center
-//                        ) {
-//                            Text(
-//                                stringResource(MokoRes.strings.support),
-//                                fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-//                                textAlign = TextAlign.Center,
-//                                fontSize = 12.sp,
-//                                lineHeight = 15.sp,
-//                                color = Color(0xFF000000),
-//                                textDecoration = TextDecoration.Underline
-//                            )
-//
-//                        }
-//                    }
-//
-//                }
-//
-//
-//            }
-//
-//        }
-
 }
 
 

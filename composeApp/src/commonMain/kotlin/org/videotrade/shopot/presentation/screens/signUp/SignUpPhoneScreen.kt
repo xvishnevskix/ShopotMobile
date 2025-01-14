@@ -106,6 +106,7 @@ class SignUpPhoneScreen : Screen {
                 )
             )
         }
+        val isLoading = remember { mutableStateOf(false) }
 
 
         val countries = listOf(
@@ -260,58 +261,63 @@ class SignUpPhoneScreen : Screen {
                                 Box( modifier = Modifier.padding(bottom = 20.dp)) {
                                     CustomButton(stringResource(MokoRes.strings.send_code), {
                                         coroutineScope.launch {
-                                            val fullPhoneNumber = countryCode + phone.value.text
+                                            isLoading.value = true
+                                            try {
+                                                val fullPhoneNumber = countryCode + phone.value.text
 
-
-
-                                            val phoneNumberLength =
-                                                getPhoneNumberLength(countryCode)
-                                            hasError.value = false
-
-                                            if (fullPhoneNumber.length < phoneNumberLength) {
-                                                hasError.value = true
-                                                toasterViewModel.toaster.show(
-                                                    "$requiredPhoneLength $phoneNumberLength",
-                                                    type = ToastType.Error,
-                                                    duration = ToasterDefaults.DurationDefault
-                                                )
-                                                animationTrigger.value = !animationTrigger.value
-
-                                            } else {
-                                                val response =
-                                                    sendRequestToBackend(
-                                                        fullPhoneNumber,
-                                                        NotifierManager.getPushNotifier()
-                                                            .getToken(),
-                                                        "auth/login",
-                                                        toasterViewModel,
-                                                        sendCode,
-                                                        hasError = hasError,
-                                                        animationTrigger = animationTrigger
-                                                    )
-                                                
-                                                if (response == null) {
-                                                    navigator.push(
-                                                        AuthCallScreen(
-                                                            fullPhoneNumber,
-                                                            "SignUp"
-                                                        )
-                                                    )
-                                                }
+                                                val phoneNumberLength =
+                                                    getPhoneNumberLength(countryCode)
                                                 hasError.value = false
-                                                if (response != null) {
+
+                                                if (fullPhoneNumber.length < phoneNumberLength) {
                                                     hasError.value = true
                                                     toasterViewModel.toaster.show(
-                                                        phoneRegistered,
+                                                        "$requiredPhoneLength $phoneNumberLength",
                                                         type = ToastType.Error,
                                                         duration = ToasterDefaults.DurationDefault
                                                     )
                                                     animationTrigger.value = !animationTrigger.value
-                                                }
 
+                                                } else {
+                                                    val response =
+                                                        sendRequestToBackend(
+                                                            fullPhoneNumber,
+                                                            NotifierManager.getPushNotifier()
+                                                                .getToken(),
+                                                            "auth/login",
+                                                            toasterViewModel,
+                                                            sendCode,
+                                                            hasError = hasError,
+                                                            animationTrigger = animationTrigger
+                                                        )
+
+                                                    if (response == null) {
+                                                        navigator.push(
+                                                            AuthCallScreen(
+                                                                fullPhoneNumber,
+                                                                "SignUp"
+                                                            )
+                                                        )
+                                                    }
+                                                    hasError.value = false
+                                                    if (response != null) {
+                                                        hasError.value = true
+                                                        toasterViewModel.toaster.show(
+                                                            phoneRegistered,
+                                                            type = ToastType.Error,
+                                                            duration = ToasterDefaults.DurationDefault
+                                                        )
+                                                        animationTrigger.value = !animationTrigger.value
+                                                    }
+
+                                                }
+                                            } finally {
+                                                isLoading.value = false
                                             }
                                         }
-                                    }, style = ButtonStyle.Gradient)
+                                    }, style = ButtonStyle.Gradient,
+                                        isLoading = isLoading.value
+                                    )
                                 }
                             }
 

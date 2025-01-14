@@ -77,7 +77,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 class CallScreen(
-    private val caleeId: String,
+    private val calleeId: String,
     private val userIcon: String? = null,
     private val userFirstName: String,
     private val userLastName: String,
@@ -207,7 +207,7 @@ class CallScreen(
                 if (sendCall == true) {
                     if (!isCallActive)
                         if (isConnectedWs) {
-                            viewModel.initCall(caleeId)
+                            viewModel.initCall(calleeId)
                         }
                 }
 
@@ -407,7 +407,7 @@ class CallScreen(
                                     .padding(horizontal = 30.dp)
                             ) {
                                 rejectBtn({
-                                            viewModel.rejectCall(caleeId, "")
+                                            viewModel.rejectCall(calleeId, timerValue.value)
 
                                 }, size = 72.dp)
                                 aceptBtn(size = 72.dp, onClick = {
@@ -441,7 +441,7 @@ class CallScreen(
                                 rejectBtn({
 
 
-                                        viewModel.rejectCall(caleeId, timerValue.value)
+                                        viewModel.rejectCall(calleeId, timerValue.value)
 
 
                                 }, size = 56.dp)

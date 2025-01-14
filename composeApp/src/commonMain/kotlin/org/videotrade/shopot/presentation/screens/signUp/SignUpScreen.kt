@@ -124,6 +124,7 @@ class SignUpScreen(private val phone: String) : Screen {
         val сommonViewModel: CommonViewModel = koinInject()
         var image by remember { mutableStateOf<PlatformFilePick?>(null) }
         val toasterViewModel: CommonViewModel = koinInject()
+        val isLoading = remember { mutableStateOf(false) }
 
         val firstNameError = remember { mutableStateOf<String?>("") }
         val lastNameError = remember { mutableStateOf<String?>("") }
@@ -296,7 +297,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                     } else {
                                         scope.launch {
                                             val client = HttpClient(getHttpClientEngine())
-
+                                            isLoading.value = true
                                             try {
                                                 val icon = image?.let {
                                                     origin().sendImageFile(
@@ -382,11 +383,13 @@ class SignUpScreen(private val phone: String) : Screen {
                                             } catch (e: Exception) {
                                                 e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
                                             } finally {
+                                                isLoading.value = false
                                                 client.close()
                                             }
                                         }
                                     }
-                                }, style = ButtonStyle.Gradient
+                                }, style = ButtonStyle.Gradient,
+                                isLoading = isLoading.value
                             )
                         }
 
