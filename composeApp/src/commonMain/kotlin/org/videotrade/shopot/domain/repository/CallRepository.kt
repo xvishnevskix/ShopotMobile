@@ -64,7 +64,7 @@ interface CallRepository {
     
     fun answerCallBackground()
     
-    suspend fun rejectCall(userId: String, chatId: String, duration: String, calleeId: String): Boolean
+    suspend fun rejectCall(calleeId: String, duration: String): Boolean
     
     fun clearData()
     
@@ -75,5 +75,9 @@ interface CallRepository {
     fun setIsCallActive(isCallActive: Boolean)
     
     fun setOtherUserId(newOtherUserId: String)
+
+    fun setChatId(chatId: String)
+
+    fun setCalleeId(calleeId: String)
     
 }

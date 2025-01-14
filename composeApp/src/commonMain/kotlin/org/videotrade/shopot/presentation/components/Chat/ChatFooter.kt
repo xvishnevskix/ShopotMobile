@@ -18,11 +18,13 @@ import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +33,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -632,31 +635,39 @@ fun ChatFooter(
                         
                         Row(
                             modifier = Modifier
-                                .padding(start = 40.dp)
+                                .padding(start = 10.dp,end = 10.dp)
                                 .fillMaxWidth(0.65f)
-                                .offset(x = (textOffset + swipeOffset.value).dp)
-                                .alpha(1f + (swipeOffset.value / 100f)),
+
+                                .offset(x = swipeOffset.value.dp) // Смещение зависит от `swipeOffset`
+                                .alpha(1f + (swipeOffset.value / 50f)),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            Image(
-                                modifier = Modifier
-                                    .size(width = 7.dp, height = 14.dp),
-                                painter = painterResource(Res.drawable.arrow_left),
-                                contentDescription = null,
-                                contentScale = ContentScale.Crop,
-                                colorFilter = ColorFilter.tint(colors.secondary)
-                            )
-                            Spacer(modifier = Modifier.width(9.dp))
-                            Text(
-                                text = stringResource(MokoRes.strings.left_cancel),
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                fontWeight = FontWeight(400),
-                                color = colors.secondary,
-                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                            )
+                            Row(
+                                modifier = Modifier.offset(x = (textOffset + swipeOffset.value).dp)
+                                    .alpha(1f + (swipeOffset.value / 100f)),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Image(
+                                    modifier = Modifier
+                                        .size(width = 7.dp, height = 14.dp),
+                                    painter = painterResource(Res.drawable.arrow_left),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    colorFilter = ColorFilter.tint(colors.secondary)
+                                )
+                                Spacer(modifier = Modifier.width(9.dp))
+                                Text(
+                                    text = stringResource(MokoRes.strings.left_cancel),
+                                    fontSize = 16.sp,
+                                    lineHeight = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(400),
+                                    color = colors.secondary,
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                )
+                            }
                         }
                     }
                     
@@ -845,7 +856,7 @@ fun ChatFooter(
                             )
                         }
                     }
-                    
+
                     AnimatedVisibility(
                         visible = !isFooterTextNotEmpty,
                         enter = fadeIn(animationSpec = tween(300)) + expandIn(expandFrom = Alignment.Center),
@@ -866,37 +877,49 @@ fun ChatFooter(
                                         },
                                         onDragEnd = {
                                             println("Drag ended")
-                                            isDragging = false
-                                            if (offset.x > -200f) {
-                                                println("Drag send")
-                                                val seconds = recordingTime % 60
-                                                if (seconds > 1) {
-                                                    isStartRecording = false
-                                                    isStopAndSendVoice.value = true
-
-//                                                        viewModel.sendVoice(fileDir, chat, voiceName)
+                                            if (offset.x <= -200f) {
+                                                // Сбрасываем состояние
+                                                println("Swipe complete, resetting button")
+                                                viewModel.setIsRecording(false)
+                                                audioRecorder.stopRecording(false)
+                                                isStartRecording = false
+                                                offset = Offset.Zero
+                                                scope.launch {
+                                                    swipeOffset.snapTo(0f) // Сбрасываем смещение
                                                 }
-                                                viewModel.setIsRecording(false)
-                                                offset = Offset.Zero
                                             } else {
-                                                println("Drag stop")
-                                                viewModel.setIsRecording(false)
-                                                offset = Offset.Zero
+                                                println("Swipe not complete, resetting position")
+                                                scope.launch {
+                                                    offset = Offset.Zero // Возвращаем кнопку на место
+                                                    swipeOffset.animateTo(0f)
+                                                }
                                             }
+                                            isDragging = false // Обязательно сбрасываем
                                         },
                                         onDrag = { change, dragAmount ->
                                             change.consume()
                                             val newOffset = Offset(
-                                                x = (offset.x + dragAmount.x).coerceAtLeast(-200f)
-                                                    .coerceAtMost(0f),
+                                                x = (offset.x + dragAmount.x).coerceAtLeast(-200f).coerceAtMost(0f),
                                                 y = offset.y
                                             )
+                                            scope.launch {
+                                                swipeOffset.snapTo(
+                                                    (swipeOffset.value + dragAmount.x/4).coerceIn(-50f, 0f) // Ограничиваем диапазон
+                                                )
+                                            }
                                             if (newOffset.x <= -200f) {
+                                                println("Swipe reached the end, resetting state")
+                                                // Принудительно завершаем взаимодействие
                                                 viewModel.setIsRecording(false)
                                                 audioRecorder.stopRecording(false)
+                                                isStartRecording = false
                                                 offset = Offset.Zero
+                                                scope.launch {
+                                                    swipeOffset.snapTo(0f)
+                                                }
+                                            } else {
+                                                offset = newOffset
                                             }
-                                            offset = newOffset
                                         }
                                     )
                                 }
@@ -906,13 +929,8 @@ fun ChatFooter(
                                             println("Tap detected")
                                             val seconds = recordingTime % 60
                                             if (seconds > 1) {
-//                                                val fileDir = audioRecorder.stopRecording(true)
-//                                                if (fileDir != null) {
                                                 isStartRecording = false
-                                                
                                                 isStopAndSendVoice.value = true
-//                                                    viewModel.sendVoice(fileDir, chat, voiceName)
-//                                                }
                                             }
                                             viewModel.setIsRecording(false)
                                             recordingTime = 0
@@ -927,38 +945,72 @@ fun ChatFooter(
                                     )
                                 }
                         ) {
-                            val sizeModifier = if (isRecording) {
-                                Modifier.size(width = 56.dp, height = 56.dp)
-                            } else {
-                                Modifier.size(width = 30.dp, height = 30.dp)
-                            }
-                            
-                            Box(
-                                modifier = sizeModifier
-                                    .offset {
-                                        IntOffset(
-                                            offset.x.roundToInt(),
-                                            offset.y.roundToInt()
-                                        )
-                                    }
-                                    .scale(1f + (offset.x / 850f))
-                                    .background(
-                                        color = if (isRecording) Color(0xFFCAB7A3) else colors.background,
-                                        shape = RoundedCornerShape(size = 16.dp)
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(Res.drawable.chat_micro),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    colorFilter = if (!isRecording) ColorFilter.tint(colors.primary) else ColorFilter.tint(
-                                        Color.White
-                                    )
+                            val infiniteTransition = rememberInfiniteTransition()
+
+                            // Анимация прозрачности волны
+                            val waveAlpha by infiniteTransition.animateFloat(
+                                initialValue = 0.1f,
+                                targetValue = 0.5f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(durationMillis = 1200, easing = LinearOutSlowInEasing),
+                                    repeatMode = RepeatMode.Reverse
                                 )
+                            )
+
+                            // Анимация масштаба волны
+                            val waveScale by infiniteTransition.animateFloat(
+                                initialValue = 1.07f,
+                                targetValue = 1.15f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(durationMillis = 1200, easing = LinearOutSlowInEasing),
+                                    repeatMode = RepeatMode.Reverse
+                                )
+                            )
+
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .offset { IntOffset(offset.x.roundToInt(), offset.y.roundToInt()) } // Используем ваш offset
+                            ) {
+                                if (isRecording) {
+                                    // Волна вокруг кнопки
+                                    Box(
+                                        modifier = Modifier
+                                            .size(56.dp) // Размер волны равен размеру кнопки
+                                            .scale(waveScale) // Анимация масштаба волны
+                                            .background(
+                                                color = Color(0xFFCAB7A3).copy(alpha = waveAlpha),
+                                                shape = RoundedCornerShape(16.dp) // Квадратная форма волны
+                                            )
+                                    )
+                                }
+
+                                // Фиксированная кнопка записи
+                                Box(
+                                    modifier = Modifier
+                                        .size(56.dp) // Фиксированный размер кнопки
+                                        .background(
+                                            color = if (isRecording) Color(0xFFCAB7A3) else Color.Transparent,
+                                            shape = RoundedCornerShape(16.dp)
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = painterResource(Res.drawable.chat_micro),
+                                        contentDescription = null,
+                                        contentScale = ContentScale.Crop,
+                                        colorFilter = if (!isRecording) ColorFilter.tint(colors.primary) else ColorFilter.tint(
+                                            Color.White
+                                        ),
+                                        modifier = Modifier.background(Color.Transparent)
+                                    )
+                                }
                             }
                         }
                     }
+
+
                 }
                 
                 

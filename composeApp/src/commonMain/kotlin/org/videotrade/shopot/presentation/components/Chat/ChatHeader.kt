@@ -193,14 +193,15 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 //                            )
 //
                                         callViewModel.initWebrtc()
+                                        callViewModel.setChatId(chat.chatId)
+                                        callViewModel.setCalleeId(chat.userId)
                                         callViewModel.callScreenInfo.value = CallScreen(
                                             chat.userId,
                                             chat.icon,
                                             chat.firstName!!,
                                             chat.lastName!!,
                                             chat.phone!!,
-                                            chatId = chat.chatId,
-                                            callerId = profile.id
+
                                         )
 //
 //                                    if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
@@ -227,8 +228,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                                     chat.lastName!!,
                                                     chat.phone!!,
                                                     sendCall = true,
-                                                    chat.chatId,
-                                                    profile.id
+
                                                 )
                                             )
                                         }

@@ -77,14 +77,13 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 class CallScreen(
-    private val userId: String,
+    private val caleeId: String,
     private val userIcon: String? = null,
     private val userFirstName: String,
     private val userLastName: String,
     private val userPhone: String,
     private val sendCall: Boolean? = null,
-    private val chatId: String? = null,
-    private val callerId: String? = null
+
 ) : Screen {
 
     @Composable
@@ -208,7 +207,7 @@ class CallScreen(
                 if (sendCall == true) {
                     if (!isCallActive)
                         if (isConnectedWs) {
-                            viewModel.initCall(userId)
+                            viewModel.initCall(caleeId)
                         }
                 }
 
@@ -321,18 +320,6 @@ class CallScreen(
                     Text(
                         text = if (isIncomingCall) stringResource(MokoRes.strings.incoming_call) else if (isCallActive) {
                             timerValue.value
-//                    val hours = secondsElapsed / 3600
-//                    val minutes = (secondsElapsed % 3600) / 60
-//                    val seconds = secondsElapsed % 60
-//                    if (hours > 0) {
-//                        "${hours.toString().padStart(2, '0')}:${
-//                            minutes.toString().padStart(2, '0')
-//                        }:${seconds.toString().padStart(2, '0')}"
-//                    } else {
-//                        "${minutes.toString().padStart(2, '0')}:${
-//                            seconds.toString().padStart(2, '0')
-//                        }"
-//                    }
                         } else {
                             callState.value
                         },
@@ -373,7 +360,7 @@ class CallScreen(
 //                rejectBtn({
 //
 //                    println("rejectBtn")
-//                    viewModel.rejectCall(navigator, userId)
+//                    viewModel.rejectCall(navigator, caleeId)
 //
 //
 //                }, "Завершить")
@@ -420,11 +407,8 @@ class CallScreen(
                                     .padding(horizontal = 30.dp)
                             ) {
                                 rejectBtn({
-                                    if (chatId != null) {
-                                        if (callerId != null) {
-                                            viewModel.rejectCall(userId, chatId, timerValue.value)
-                                        }
-                                    }
+                                            viewModel.rejectCall(caleeId, "")
+
                                 }, size = 72.dp)
                                 aceptBtn(size = 72.dp, onClick = {
                                     viewModel.initWebrtc()
@@ -455,11 +439,11 @@ class CallScreen(
                                 Spacer(modifier = Modifier.width(15.dp))
 
                                 rejectBtn({
-                                    if (chatId != null) {
-                                        if (callerId != null) {
-                                            viewModel.rejectCall(userId, chatId, timerValue.value)
-                                        }
-                                    }
+
+
+                                        viewModel.rejectCall(caleeId, timerValue.value)
+
+
                                 }, size = 56.dp)
 //
                             }

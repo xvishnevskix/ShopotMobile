@@ -126,6 +126,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         timerJob?.cancel()
         isTimerRunning.value = false
         timerJob = null
+        _timer.value = "00:00:00"
     }
     
     
@@ -262,7 +263,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.answerCallBackground()
     }
     
-    fun rejectCall(calleeId: String, chatId: String, duration: String) {
+    fun rejectCall(calleeId: String, duration: String) {
         viewModelScope.launch {
             clearNotificationsForChannel("OngoingCallChannel")
             stopTimer()
@@ -270,7 +271,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
 
 
             val userId = profileUseCase.getProfile().id
-            val isRejectCall = callUseCase.rejectCall(userId, chatId, duration, calleeId)
+            val isRejectCall = callUseCase.rejectCall(calleeId, duration)
 
             if (isRejectCall) {
                 val navigator = commonViewModel.mainNavigator.value
@@ -510,5 +511,13 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun setOtherUserId(newOtherUserId: String) {
         callUseCase.setOtherUserId(newOtherUserId)
+    }
+
+    fun setChatId(chatId: String) {
+        callUseCase.setChatId(chatId)
+    }
+
+    fun setCalleeId(calleeId: String) {
+        callUseCase.setCalleeId(calleeId)
     }
 }

@@ -519,9 +519,11 @@ fun MessageFormat(
     messageSenderName: String? = null,
     chat: ChatItem? = null
 ) {
+    val isFromUser = message.fromUser == profile.id
+
     when {
         message.callInfo != null && message.callInfo!!.isNotEmpty() -> {
-            CallMessage(message.callInfo!!)
+            CallMessage(message.callInfo!!, isFromUser)
         }
         message.attachments == null || message.attachments?.isEmpty() == true -> {
             MessageText(message, profile)

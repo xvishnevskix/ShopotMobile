@@ -29,6 +29,7 @@ data class ChatItem(
     var sortedDate: List<Int> = emptyList(),
     var chatUser: List<ChatUser>? = null,
     var isSavedContact : Boolean? = null,
+    var isCall: Boolean? = null,
     
 )
 

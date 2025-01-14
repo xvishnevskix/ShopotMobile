@@ -72,6 +72,7 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 import kotlin.random.Random
 
 class CallRepositoryImpl : CallRepository, KoinComponent {
@@ -146,9 +147,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     private val otherUserId = mutableStateOf("")
-    
+
     
     private val isCall = mutableStateOf(false)
+
+    private var isCallRejected = false
     
     private val _isCallActive = MutableStateFlow(false)
     override val isCallActive: StateFlow<Boolean> get() = _isCallActive
@@ -164,6 +167,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
+
+    private val _calleeId = MutableStateFlow("")
+    private val calleeId: StateFlow<String> get() = _calleeId
+
+    private val _chatId = MutableStateFlow("")
+    val chatId: StateFlow<String> get() = _chatId
     
     
     private val offer = MutableStateFlow<SessionDescription?>(null)
@@ -377,8 +386,15 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         val callViewModel: CallViewModel =
                                             KoinPlatform.getKoin().get()
+
+                                        val profileViewModel: ProfileViewModel =
+                                            KoinPlatform.getKoin().get()
                                         
                                         val currentScreen = navigator?.lastItem
+
+                                        val userID = profileViewModel.profile.value.id
+
+                                        val duration = callViewModel.timer.value
                                         
                                         callViewModel.stopTimer()
                                         
@@ -387,36 +403,47 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         if (isScreenOn()) {
                                             
                                             if (_isIncomingCall.value) {
+                                                println("rejectCallAnswer() ${_isIncomingCall.value}")
                                                 if (currentScreen is CallScreen) {
                                                     // Вы на экране CallScreen
                                                     navigator?.push(MainScreen())
                                                     
-                                                    println("Мы на экране CallScreen")
+                                                    println("Мы на экране CallScreen 1")
                                                 } else if (currentScreen is MainScreen) {
                                                     // Вы на экране MainScreen
-                                                    println("Мы на экране MainScreen")
+                                                    println("Мы на экране MainScreen 1")
                                                 }
                                             }
-                                            
-                                            if (isCall.value)
-                                                rejectCallAnswer()
+
+                                            if (isCall.value) {
+                                                rejectCallAnswer(
+                                                    userId = userID,
+                                                    chatId = chatId.value,
+                                                    duration = duration,
+                                                    calleeId = calleeId.value
+                                                    )
+                                                println("rejectCallAnswer() 1")
+                                            }
+
+
                                             
                                             
                                             if (isConnectedWebrtc.value) {
-                                                
+                                                println("rejectCallAnswer() ${isConnectedWebrtc.value}")
                                                 if (currentScreen is CallScreen) {
                                                     // Вы на экране CallScreen
                                                     navigator?.push(MainScreen())
                                                     
-                                                    println("Мы на экране CallScreen")
+                                                    println("Мы на экране CallScreen 2")
                                                 } else if (currentScreen is MainScreen) {
                                                     // Вы на экране MainScreen
-                                                    println("Мы на экране MainScreen")
+                                                    println("Мы на экране MainScreen 2")
                                                 }
                                                 
                                             }
                                         } else {
                                             rejectCallAnswer()
+                                            println("rejectCallAnswer() 2")
                                         }
                                         
                                         
@@ -847,18 +874,31 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         }
         
     }
+
     
-    
-    override suspend fun rejectCall(userId: String, chatId: String, duration: String, calleeId: String): Boolean {
+    override suspend fun rejectCall(calleeId: String, duration: String): Boolean {
+
+        if (isCallRejected) {
+            println("Call already rejected, skipping duplicate request")
+            return false // Пропускаем повторный вызов
+        }
+
+        isCallRejected = true // Помечаем вызов как выполненный
+
+        val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
+        val profileViewModel: ProfileViewModel = KoinPlatform.getKoin().get()
+        val userID = profileViewModel.profile.value.id
+
+
+
         try {
-            
-            
+
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("type", "rejectCall")
-                    put("callerId", userId) //кто звонит
+                    put("callerId", userID) //кто звонит
                     put("calleeId", calleeId) // кому звонят
-                    put("chatId", chatId)
+                    put("chatId", chatId.value)
                     put("duration", duration)
                 }
             )
@@ -872,7 +912,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             wsSession.value?.send(Frame.Text(jsonContent))
             println("${jsonContent} rejectCall13")
             
-            rejectCallAnswer()
+            rejectCallAnswer(
+                userId = userID, calleeId = _calleeId.value, chatId = _chatId.value, duration = duration
+            )
             
             println("rejectCall134")
             
@@ -885,11 +927,42 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             navigator?.push(MainScreen())
             return false
             
+        } finally {
+            isCallRejected = false
         }
     }
     
     
-    private fun rejectCallAnswer() {
+    private suspend fun rejectCallAnswer(userId: String? = null, calleeId: String? = null, chatId: String? = null, duration: String? = null) {
+        try {
+            if (!_isIncomingCall.value) {
+                // Убедиться, что сообщение отправляется только один раз
+                if (isCallRejected) {
+                    println("Call answer already rejected, skipping duplicate request")
+                    return
+                }
+
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("type", "rejectCall")
+                        put("callerId", userId)
+                        put("calleeId", calleeId)
+                        put("chatId", chatId)
+                        put("duration", duration)
+                    }
+                )
+                wsSession.value?.send(Frame.Text(jsonContent))
+                println("${jsonContent} callEnded")
+            }
+
+            // Очистка ресурсов
+
+        } catch (e: Exception) {
+            println("Error in rejectCallAnswer: $e")
+        } finally {
+            isCallRejected = false // Сбрасываем флаг после выполнения
+        }
+
         try {
             // Проверяем, инициализирован ли peerConnection
             val currentPeerConnection = _peerConnection.value
@@ -934,7 +1007,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _callState.value = PeerConnectionState.New
             isMuted.value = false
             println("rejectCallAnswer5")
-            
+            _chatId.value = ""
+            _calleeId.value = ""
             _peerConnection.value = PeerConnection(rtcConfiguration)
             
             
@@ -948,7 +1022,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     // Вы на экране CallScreen
                     
                     println("MainScreen $navigator")
-                    navigator.push(IntroScreen())
+                    navigator.push(MainScreen())
                     
                     println("Мы на экране CallScreen")
                 } else if (currentScreen is MainScreen) {
@@ -987,7 +1061,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _wsSession.value = null
         _iceState.value = IceConnectionState.New
         _callState.value = PeerConnectionState.New
-        
+        _chatId.value = ""
+        _calleeId.value = ""
         isMuted.value = false
     }
     
@@ -1006,6 +1081,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override fun setOtherUserId(newOtherUserId: String) {
         otherUserId.value = newOtherUserId
+    }
+
+    override fun setChatId(chatId: String) {
+        _chatId.value = chatId
+    }
+
+    override fun setCalleeId(calleeId: String) {
+        _calleeId.value = calleeId
     }
     
     

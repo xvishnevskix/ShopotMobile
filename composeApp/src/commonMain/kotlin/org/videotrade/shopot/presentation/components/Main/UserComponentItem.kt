@@ -42,6 +42,7 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.presentation.components.Chat.getCallStatusString
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -62,6 +63,8 @@ fun UserComponentItem(
     val viewModel: ChatViewModel = koinInject()
     val profile = mainViewModel.profile.collectAsState().value
     val colors = MaterialTheme.colorScheme
+
+
     
     Row(
         modifier = Modifier
@@ -140,7 +143,7 @@ fun UserComponentItem(
                         )
                     }
                 }
-                
+                println("${chat.lastMessage} chat.lastMessage?.fromUser")
                 if (chat.lastMessage?.fromUser == profile.id) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
@@ -267,16 +270,20 @@ fun UserComponentItem(
 
 @Composable
 fun MessageContent(message: MessageItem): String {
-    return if (message.attachments == null || message.attachments?.isEmpty() == true) {
-        message.content ?: stringResource(MokoRes.strings.start_conversation)
-    } else {
-        
-        when (message.attachments!![0].type) {
-            "audio/mp4" -> stringResource(MokoRes.strings.audio)
-            "image" -> stringResource(MokoRes.strings.photo)
-            else -> stringResource(MokoRes.strings.file)
+    return when {
+        message.callInfo != null -> {
+            getCallStatusString(message.callInfo!![0].status)
         }
-        
-        
+        message.attachments == null || message.attachments?.isEmpty() == true -> {
+            message.content ?: stringResource(MokoRes.strings.start_conversation)
+        }
+        else -> {
+            when (message.attachments!![0].type) {
+                "audio/mp4" -> stringResource(MokoRes.strings.audio)
+                "image" -> stringResource(MokoRes.strings.photo)
+                else -> stringResource(MokoRes.strings.file)
+            }
+        }
     }
 }
+

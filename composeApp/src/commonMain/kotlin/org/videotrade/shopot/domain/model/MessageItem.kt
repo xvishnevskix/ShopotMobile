@@ -20,7 +20,6 @@ data class MessageItem(
     var phone: String? = null,
     var upload: Boolean? = null,
     var uploadId: String? = null,
-    var isCall: Boolean? = null,
     var callInfo: List<CallInfo>? = null
 )
 

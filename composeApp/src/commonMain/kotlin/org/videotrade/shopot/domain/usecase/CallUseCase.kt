@@ -94,8 +94,8 @@ class CallUseCase : KoinComponent {
     }
     
     
-    suspend fun rejectCall(userId: String, chatId: String, duration: String, calleeId: String): Boolean {
-        return repository.rejectCall(userId, chatId, duration, calleeId)
+    suspend fun rejectCall(calleeId: String, duration: String): Boolean {
+        return repository.rejectCall(calleeId, duration )
     }
 
     
@@ -122,6 +122,13 @@ class CallUseCase : KoinComponent {
     fun setOtherUserId(newOtherUserId: String) {
         return repository.setOtherUserId(newOtherUserId)
     }
-    
+
+    fun setChatId(chatId: String) {
+        return repository.setChatId(chatId)
+    }
+
+    fun setCalleeId(calleeId: String) {
+        return repository.setCalleeId(calleeId)
+    }
     
 }

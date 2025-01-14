@@ -31,6 +31,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.CallInfo
+import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
@@ -39,8 +40,10 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chat_call
 
 @Composable
-fun CallMessage(callDetails: List<CallInfo>) {
+fun CallMessage(callInfo: List<CallInfo>, isFromUser: Boolean,) {
     val colors = MaterialTheme.colorScheme
+
+        println("${callInfo} callInfocallInfo")
 
         Column(
             modifier = Modifier.padding(
@@ -58,15 +61,9 @@ fun CallMessage(callDetails: List<CallInfo>) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = when (callDetails[0].status) {
-                            "Отменённый" -> stringResource(MokoRes.strings.call_status_canceled)
-                            "Исходящий" -> stringResource(MokoRes.strings.call_status_outgoing)
-                            "Пропущенный" -> stringResource(MokoRes.strings.call_status_missed)
-                            "Входящий" -> stringResource(MokoRes.strings.call_status_incoming)
-                            else -> callDetails[0].status // Для непредвиденных значений
-                        },
+                        text = getCallStatusString(callInfo[0].status),
                         style = TextStyle(
-                            color = colors.primary,
+                            color = if (isFromUser) Color(0xFFFFFFFF) else colors.primary,
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
@@ -77,12 +74,12 @@ fun CallMessage(callDetails: List<CallInfo>) {
                     )
 
 
-                    if (callDetails[0].callDuration != "00:00:00") {
+                    if (callInfo[0].callDuration != "00:00:00") {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = formatCallDuration(callDetails[0].callDuration),
+                            text = formatCallDuration(callInfo[0].callDuration),
                             style = TextStyle(
-                                color =  colors.secondary,
+                                color =  if (isFromUser) Color(0xFFF7F7F7) else colors.secondary,
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
@@ -100,7 +97,7 @@ fun CallMessage(callDetails: List<CallInfo>) {
                     contentDescription = null,
                     modifier = Modifier
                         .size(18.dp),
-                    colorFilter = ColorFilter.tint(colors.primary)
+                    colorFilter = if (isFromUser) ColorFilter.tint(Color(0xFFFFFFFF))  else ColorFilter.tint(colors.primary)
                 )
             }
 
@@ -148,5 +145,16 @@ fun formatCallDuration(duration: String): String {
         hours > 0 -> "$hours ${getHoursText(hours)}"
         minutes > 0 -> "$minutes ${getMinutesText(minutes)}"
         else -> "$seconds ${getSecondsText(seconds)}"
+    }
+}
+
+@Composable
+fun getCallStatusString(callStatus: String): String {
+    return when (callStatus) {
+        "Отменённый" -> stringResource(MokoRes.strings.call_status_canceled)
+        "Исходящий" -> stringResource(MokoRes.strings.call_status_outgoing)
+        "Пропущенный" -> stringResource(MokoRes.strings.call_status_missed)
+        "Входящий" -> stringResource(MokoRes.strings.call_status_incoming)
+        else -> callStatus // Для непредвиденных значений
     }
 }
