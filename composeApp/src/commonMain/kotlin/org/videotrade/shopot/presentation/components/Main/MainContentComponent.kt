@@ -66,7 +66,6 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
-import org.videotrade.shopot.BuildConfig
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -141,16 +140,16 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
 // Обработка новостей из `once`
     LaunchedEffect(onceNewsState) {
-        if (!showNewsOnceViewer) {
-            val newsToShow = onceNewsState.find {
-                it.appearance == "once" && !it.viewed &&
-                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
-            }
-            if (newsToShow != null) {
-                selectedOnceNews = newsToShow
-                showNewsOnceViewer = true
-            }
-        }
+//        if (!showNewsOnceViewer) {
+//            val newsToShow = onceNewsState.find {
+//                it.appearance == "once" && !it.viewed &&
+//                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
+//            }
+//            if (newsToShow != null) {
+//                selectedOnceNews = newsToShow
+//                showNewsOnceViewer = true
+//            }
+//        }
     }
 
 
