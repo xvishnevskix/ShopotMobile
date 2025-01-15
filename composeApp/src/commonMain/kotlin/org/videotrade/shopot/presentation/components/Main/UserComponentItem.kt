@@ -272,7 +272,7 @@ fun UserComponentItem(
 fun MessageContent(message: MessageItem): String {
     return when {
         message.callInfo != null -> {
-            getCallStatusString(message.callInfo!![0].status)
+            getCallStatusString(message.callInfo!!.status)
         }
         message.attachments == null || message.attachments?.isEmpty() == true -> {
             message.content ?: stringResource(MokoRes.strings.start_conversation)

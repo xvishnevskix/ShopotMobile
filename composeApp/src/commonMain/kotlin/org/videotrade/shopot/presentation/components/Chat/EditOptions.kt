@@ -52,7 +52,7 @@ fun getChatEditOptions(
 
     // Если это звонок, то оставляем только reply
     if (message != null) {
-        if (message.callInfo != null && message.callInfo!!.isNotEmpty()) {
+        if (message.callInfo != null) {
             return buildList {
                 add(
                     EditOption(

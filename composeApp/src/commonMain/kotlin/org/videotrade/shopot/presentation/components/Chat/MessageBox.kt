@@ -522,7 +522,7 @@ fun MessageFormat(
     val isFromUser = message.fromUser == profile.id
 
     when {
-        message.callInfo != null && message.callInfo!!.isNotEmpty() -> {
+        message.callInfo != null  -> {
             CallMessage(message.callInfo!!, isFromUser)
         }
         message.attachments == null || message.attachments?.isEmpty() == true -> {
@@ -603,7 +603,7 @@ fun SelectedMessageFormat(
 
     when {
 
-        selectedMessage.callInfo != null && selectedMessage.callInfo!!.isNotEmpty() -> {
+        selectedMessage.callInfo != null  -> {
             SelectedCallMessage(
                 selectedMessage,
                 messageAnswerName,

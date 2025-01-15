@@ -72,7 +72,7 @@ fun SelectedCallMessage(
                 colorFilter = ColorFilter.tint(colors.secondary)
             )
             Spacer(Modifier.width(8.dp))
-            selectedMessage.callInfo?.get(0)?.let {
+            selectedMessage.callInfo?.let {
                 Text(
                     text = it.status,
                     maxLines = 1, // Ограничение до одной строки

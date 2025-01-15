@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -17,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -26,21 +24,17 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.CallInfo
-import org.videotrade.shopot.domain.model.MessageItem
-import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
-import org.videotrade.shopot.presentation.screens.call.CallScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chat_call
 
 @Composable
-fun CallMessage(callInfo: List<CallInfo>, isFromUser: Boolean,) {
+fun CallMessage(callInfo: CallInfo, isFromUser: Boolean,) {
     val colors = MaterialTheme.colorScheme
 
         println("${callInfo} callInfocallInfo")
@@ -61,7 +55,7 @@ fun CallMessage(callInfo: List<CallInfo>, isFromUser: Boolean,) {
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = getCallStatusString(callInfo[0].status),
+                        text = getCallStatusString(callInfo.status),
                         style = TextStyle(
                             color = if (isFromUser) Color(0xFFFFFFFF) else colors.primary,
                             fontSize = 16.sp,
@@ -74,10 +68,10 @@ fun CallMessage(callInfo: List<CallInfo>, isFromUser: Boolean,) {
                     )
 
 
-                    if (callInfo[0].callDuration != "00:00:00") {
+                    if (callInfo.callDuration != "00:00:00") {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = formatCallDuration(callInfo[0].callDuration),
+                            text = formatCallDuration(callInfo.callDuration),
                             style = TextStyle(
                                 color =  if (isFromUser) Color(0xFFF7F7F7) else colors.secondary,
                                 fontSize = 16.sp,
