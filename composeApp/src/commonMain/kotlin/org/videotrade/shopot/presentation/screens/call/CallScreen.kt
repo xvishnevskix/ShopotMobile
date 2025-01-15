@@ -133,10 +133,10 @@ class CallScreen(
         
         LaunchedEffect(Unit) {
             if (isIncomingCall) {
-                musicPlayer.play("callee", true, MusicType.Ringtone)
+//                musicPlayer.play("callee", true, MusicType.Ringtone)
                 isPlaying = true
             } else {
-                musicPlayer.play("caller", true,  MusicType.Ringtone)
+//                musicPlayer.play("caller", true,  MusicType.Ringtone)
                 isPlaying = true
             }
             
@@ -418,7 +418,7 @@ class CallScreen(
                                     .padding(horizontal = 30.dp)
                             ) {
                                 rejectBtn({
-                                    viewModel.rejectCall(calleeId)
+                                    viewModel.rejectCall(calleeId, timerValue.value)
                                 }, size = 72.dp)
                                 aceptBtn(size = 72.dp, onClick = {
                                     viewModel.initWebrtc()
