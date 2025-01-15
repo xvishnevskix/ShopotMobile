@@ -418,7 +418,7 @@ class CallScreen(
                                     .padding(horizontal = 30.dp)
                             ) {
                                 rejectBtn({
-                                    viewModel.rejectCall(userId)
+                                    viewModel.rejectCall(calleeId)
                                 }, size = 72.dp)
                                 aceptBtn(size = 72.dp, onClick = {
                                     viewModel.initWebrtc()
