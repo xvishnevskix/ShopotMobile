@@ -15,14 +15,19 @@ import platform.AVFAudio.AVAudioQualityHigh
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
 import platform.AVFAudio.AVAudioSessionCategoryAmbient
+import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetooth
+import platform.AVFAudio.AVAudioSessionCategoryOptionDefaultToSpeaker
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
 import platform.AVFAudio.AVAudioSessionCategorySoloAmbient
 import platform.AVFAudio.AVAudioSessionModeDefault
+import platform.AVFAudio.AVAudioSessionModeVideoChat
+import platform.AVFAudio.AVAudioSessionModeVoiceChat
 import platform.AVFAudio.AVEncoderAudioQualityKey
 import platform.AVFAudio.AVFormatIDKey
 import platform.AVFAudio.AVNumberOfChannelsKey
 import platform.AVFAudio.AVSampleRateKey
+import platform.AVFAudio.currentRoute
 import platform.AVFAudio.setActive
 import platform.AVFoundation.AVAsset
 import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
@@ -345,5 +350,38 @@ actual class MusicPlayer {
     
     actual fun isPlaying(): Boolean {
         return audioPlayer?.playing ?: false
+    }
+}
+
+@OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+actual fun configureAudioSession() {
+    val audioSession = AVAudioSession.sharedInstance()
+    memScoped {
+        val error = alloc<ObjCObjectVar<NSError?>>()
+        
+        // Настраиваем категорию аудиосессии
+        val success = audioSession.setCategory(
+            AVAudioSessionCategoryPlayAndRecord,
+            mode = AVAudioSessionModeVoiceChat,
+            options = AVAudioSessionCategoryOptionDefaultToSpeaker or AVAudioSessionCategoryOptionAllowBluetooth,
+            error.ptr
+        )
+        
+        if (!success) {
+            println("Error configuring audio session category: ${error.value?.localizedDescription}")
+            return@memScoped
+        }
+        
+        // Проверяем текущий маршрут аудио
+        val currentRoute = audioSession.currentRoute
+        println("Audio session current route: $currentRoute")
+        
+        // Принудительно активируем аудиосессию
+        val isActive = audioSession.setActive(true, error.ptr)
+        if (!isActive) {
+            println("Error activating audio session: ${error.value?.localizedDescription}")
+        } else {
+            println("Audio session activated successfully")
+        }
     }
 }

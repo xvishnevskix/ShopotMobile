@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -66,6 +67,7 @@ import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.closeApp
+import org.videotrade.shopot.multiplatform.configureAudioSession
 import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
@@ -462,9 +464,15 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             val cameraPer = PermissionsProviderFactory.create()
                 .getPermission("microphone")
-//
-//            if (cameraPer) {
+            
+            configureAudioSession()
             val stream = MediaDevices.getUserMedia(audio = true)
+            
+            println("Faileddadasdasda $stream")
+            
+            if (stream == null) {
+                println("Failed to obtain audio stream")
+            }
             
             localStream.value = stream
             
@@ -561,6 +569,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         awaitCancellation()  // Поддерживаем корутину активной
         
     }
+    
+    
     
     override suspend fun getWsSession(): DefaultClientWebSocketSession? {
         return wsSession.value
@@ -1004,4 +1014,25 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
+}
+
+
+
+suspend fun initializeAudioSessionAndStream(): MediaStream? {
+    return withContext(Dispatchers.IO) {
+        try {
+            configureAudioSession() // Настраиваем аудиосессию
+            println("Audio session configured, obtaining MediaStream...")
+            val stream = MediaDevices.getUserMedia(audio = true) // Получаем аудиопоток
+            if (stream == null) {
+                println("Failed to obtain audio stream")
+            } else {
+                println("Audio stream obtained: $stream")
+            }
+            stream
+        } catch (e: Exception) {
+            println("Error initializing audio session or stream: ${e.message}")
+            null
+        }
+    }
 }

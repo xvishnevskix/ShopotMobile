@@ -35,3 +35,6 @@ enum class MusicType {
     Notification,
     Ringtone
 }
+
+
+expect fun configureAudioSession()

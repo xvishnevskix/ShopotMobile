@@ -320,3 +320,6 @@ actual class MusicPlayer {
         return mediaPlayer?.isPlaying ?: false
     }
 }
+
+actual fun configureAudioSession() {
+}
