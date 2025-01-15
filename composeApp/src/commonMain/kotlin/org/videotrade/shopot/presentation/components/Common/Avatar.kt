@@ -3,6 +3,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -10,6 +11,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
@@ -22,6 +24,7 @@ import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.imageAsync
+import shopot.composeapp.generated.resources.Avatar
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
@@ -37,7 +40,7 @@ fun Avatar(
     },
     contentScale: ContentScale = ContentScale.Crop,
 ) {
-    val placeholderPainter = painterResource(Res.drawable.person)
+    val placeholderPainter = painterResource(Res.drawable.Avatar)
     
     val imagePainter = if (icon.isNullOrBlank()) {
         remember { mutableStateOf(placeholderPainter) }
@@ -47,8 +50,8 @@ fun Avatar(
     
     
     Surface(
-        modifier = modifier,
-        shape = CircleShape,
+        modifier = modifier.clip(RoundedCornerShape(16.dp)),
+//        shape = CircleShape,
     ) {
         Image(
             painter = imagePainter.value ?: painterResource(Res.drawable.person),

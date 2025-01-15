@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.components.Main
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -15,7 +16,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +31,6 @@ import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,7 +53,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -68,25 +65,23 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.api.formatTimestamp
+import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
-import org.videotrade.shopot.presentation.components.Contacts.MakeGroup
-import org.videotrade.shopot.presentation.screens.chat.ChatScreen
+import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
+import org.videotrade.shopot.presentation.components.Main.News.StoryViewer
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.auth_logo
-import shopot.composeapp.generated.resources.group
-import shopot.composeapp.generated.resources.message_double_check
-import shopot.composeapp.generated.resources.message_single_check
+import shopot.composeapp.generated.resources.govno_peredelyvay
+import shopot.composeapp.generated.resources.pepe
 import shopot.composeapp.generated.resources.smart_lock
+import shopot.composeapp.generated.resources.sticker1
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -98,9 +93,20 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val isLoading by mainViewModel.isLoadingChats.collectAsState()
     var fakeLoading by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
+    val newsViewModel: NewsViewModel = koinInject()
+
 
     val isSearching = remember { mutableStateOf(false) }
     val searchQuery = remember { mutableStateOf("") }
+
+    val newsState = newsViewModel.news.collectAsState().value
+    val onceNewsState = newsViewModel.onceNews.collectAsState().value
+    var showNewsViewer by remember { mutableStateOf(false) }
+    var showNewsOnceViewer by remember { mutableStateOf(false) }// Состояние для StoryViewer для actual
+    var selectedNews: NewsItem? by remember { mutableStateOf(null) }
+    var selectedOnceNews: NewsItem? by remember { mutableStateOf(null) }
+
+
 
     val filteredChats = if (searchQuery.value.isEmpty()) {
         chatState
@@ -124,15 +130,29 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
     )
 
-    LaunchedEffect(isLoading) {
-        println("Loading state is: $isLoading")
+
+    LaunchedEffect(Unit) {
+        newsViewModel.getNewsByAppearance("once")
+        newsViewModel.getNewsByAppearance("actual")
     }
-//    LaunchedEffect(chatState) {
-//        fakeLoading = true
-//        delay(300)
-//        fakeLoading = false
-//
-//    }
+
+    var isProcessingUpdate by remember { mutableStateOf(false) }
+
+// Обработка новостей из `once`
+    LaunchedEffect(onceNewsState) {
+//        if (!showNewsOnceViewer) {
+//            val newsToShow = onceNewsState.find {
+//                it.appearance == "once" && !it.viewed &&
+//                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
+//            }
+//            if (newsToShow != null) {
+//                selectedOnceNews = newsToShow
+//                showNewsOnceViewer = true
+//            }
+//        }
+    }
+
+
     
         SafeArea(backgroundColor = if (isLoading) colors.background else colors.surface) {
             Box(modifier = Modifier.background(color = if (isLoading) colors.background else colors.surface).fillMaxSize()) {
@@ -140,20 +160,34 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
             Column(modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.Start
                 ) {
-                HeaderMain(isSearching)
+                HeaderMain(
+                    isSearching = isSearching,
+                    news = newsState,
+                    onStoryClick = { newsItem ->
+                        selectedNews = newsItem
+                        showNewsViewer = true
+                    }
+                )
 
 
-                Crossfade(targetState = isSearching.value) { searching ->
-                    if (searching) {
-                        Column {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            ContactsSearch(searchQuery, isSearching, padding = 0.dp)
+                Column(
+                    modifier = Modifier.animateContentSize()
+                ) {
+                    Crossfade(targetState = isSearching.value) { searching ->
+                        if (searching) {
+                            println("Search state: $searching")
+                            Column(
+                                modifier = Modifier.animateContentSize()
+                            ) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                ContactsSearch(searchQuery, isSearching, padding = 0.dp)
+                            }
                         }
                     }
                 }
                 
                 Column(
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.animateContentSize().weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Spacer(modifier = Modifier.height(24.dp))
@@ -305,13 +339,37 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         }
         
     }
+
+    if (showNewsOnceViewer && selectedOnceNews != null) {
+        StoryViewer(
+            news = selectedOnceNews!!,
+            onClose = {
+                showNewsOnceViewer = false
+                newsViewModel.markNewsAsViewed(selectedOnceNews!!.id)
+                selectedOnceNews = null
+            },
+            newsViewModel
+        )
+    }
+
+    // StoryViewer для `actual` новостей
+    if (showNewsViewer && selectedNews != null) {
+        StoryViewer(
+            news = selectedNews!!,
+            onClose = { showNewsViewer = false },
+            newsViewModel,
+        )
+    }
+//    if (isLoadingNews) {
+//        Box(
+//            modifier = Modifier.fillMaxSize(),
+//            contentAlignment = Alignment.Center
+//        ) {
+//            CircularProgressIndicator()
+//        }
+//    }
 }
 
-//val shimmerColorShades = listOf(
-//    Color(0xFFEDDCCC),
-//    colors.onBackground,
-//    Color(0xFFEDDCCC),
-//)
 
 @Composable
 fun ChatSkeleton() {

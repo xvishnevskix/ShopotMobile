@@ -20,7 +20,7 @@ data class MessageItem(
     var phone: String? = null,
     var upload: Boolean? = null,
     var uploadId: String? = null,
-    var callInfo: Array<String>? = null,
+    var callInfo: CallInfo? = null,
 )
 
 
@@ -39,6 +39,13 @@ data class Attachment(
     var photoId: String? = null,
     var size: Long? = null,
 
+)
+
+@Serializable
+data class CallInfo(
+    val callerId: String,      // ID пользователя
+    val status: String,        // Статус звонка: "Accept" или "Rejected"
+    val callDuration: String     // Длительность в секундах
 )
 
 

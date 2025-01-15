@@ -223,42 +223,50 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
         }
 
+
+
         fun sendSms(sentSMSCode: String) {
             isSms = true
             coroutineScope.launch {
-                if (!isRunning) {
-                    isRunning = true
-                    startTimer()
-                }
-                val jsonContent = Json.encodeToString(
-                    buildJsonObject {
-                        put("phoneNumber", phone.drop(1))
-                        put("is_sms", true)
-                    }
-                )
-                val response = origin().post("2fa", jsonContent)
-                if (response != null) {
-                    val jsonElement = Json.parseToJsonElement(response)
-                    val messageObject = jsonElement.jsonObject["message"]?.jsonObject
-                    responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
+                try {
+                    if (!isRunning && time == 30) {
+                        if (!isRunning) {
+                            isRunning = true
+                            startTimer()
+                        }
+                        val jsonContent = Json.encodeToString(
+                            buildJsonObject {
+                                put("phoneNumber", phone.drop(1))
+                                put("is_sms", true)
+                            }
+                        )
+                        val response = origin().post("2fa", jsonContent)
+                        if (response != null) {
+                            val jsonElement = Json.parseToJsonElement(response)
+                            val messageObject = jsonElement.jsonObject["message"]?.jsonObject
+                            responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
 
-                    toasterViewModel.toaster.show(
-                        message = sentSMSCode,
-                        type = ToastType.Success,
-                        duration = ToasterDefaults.DurationDefault,
-                    )
+                            toasterViewModel.toaster.show(
+                                message = sentSMSCode,
+                                type = ToastType.Success,
+                                duration = ToasterDefaults.DurationDefault,
+                            )
 
 
-                    val otpText = otpFields.joinToString("")
-                    if (otpText.length == 4) {
-                        if (responseState.value == otpText) {
-                            handleAuthCase()
+                            val otpText = otpFields.joinToString("")
+                            if (otpText.length == 4) {
+                                if (responseState.value == otpText) {
+                                    handleAuthCase()
+                                } else {
+                                    handleError(invalidCode)
+                                }
+                            }
                         } else {
                             handleError(invalidCode)
                         }
                     }
-                } else {
-                    handleError(invalidCode)
+                } catch (e: Exception) {
+                    println("${e} sendSms Exception")
                 }
             }
         }
@@ -317,12 +325,6 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
             }
             sendCall()
         }
-
-
-        val isError = remember { mutableStateOf(false) }
-
-
-
 
 
 
@@ -432,9 +434,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     },
                                     {
                                         if (isSmsMode) {
-                                            sendSms(sentSMSCode)
+                                                sendSms(sentSMSCode)
                                         } else {
-                                            sendCall()
+//                                            sendCall()
                                         }
                                     },
                                     style = ButtonStyle.Gradient,

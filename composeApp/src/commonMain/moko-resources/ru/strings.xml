@@ -249,6 +249,23 @@
 
     <string name="app_version">Версия приложения</string>
 
+    <string name="call_status_canceled">Отменённый</string>
+    <string name="call_status_outgoing">Исходящий</string>
+    <string name="call_status_missed">Пропущенный</string>
+    <string name="call_status_incoming">Входящий</string>
+
+    <string name="hour_singular">час</string>
+    <string name="hour_few">часа</string>
+    <string name="hour_plural">часов</string>
+
+    <string name="minute_singular">минута</string>
+    <string name="minute_few">минуты</string>
+    <string name="minute_plural">минут</string>
+
+    <string name="second_singular">секунда</string>
+    <string name="second_few">секунды</string>
+    <string name="second_plural">секунд</string>
+
 
 
 

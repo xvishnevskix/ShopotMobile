@@ -71,6 +71,11 @@ expect class FileProvider {
     suspend fun delFile(fileDirectory: String): Boolean
     
     suspend fun loadBitmapFromFile(filePath: String): ImageBitmap?
+
+    suspend fun compressImage(filePath: String): String?
+    suspend fun compressFile(filePath: String): String?
+    suspend fun compressFileWithLength(filePath: String): String?
+
 }
 
 expect object FileProviderFactory {

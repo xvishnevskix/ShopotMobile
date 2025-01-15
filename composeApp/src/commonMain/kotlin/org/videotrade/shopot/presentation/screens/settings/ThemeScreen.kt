@@ -4,6 +4,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,9 +32,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
@@ -110,15 +114,17 @@ class ThemeScreen : Screen {
 
                 Box(
                     modifier = Modifier
+                        .clip(RoundedCornerShape(size = 16.dp))
                         .border(width = 1.dp, color = colors.primary, shape = RoundedCornerShape(size = 16.dp))
-                        .clickable{
-
-                        }
                         .background(Color.Transparent)
                         .fillMaxWidth()
                         .height(56.dp)
                         .padding(16.dp)
-                    ,
+                        .pointerInput(Unit) {
+                            detectTapGestures(
+                                onTap = { viewModel.toggleTheme() } // Обработка касания
+                            )
+                        },
                     contentAlignment = Alignment.Center
                 ) {
                     Row(
@@ -130,17 +136,16 @@ class ThemeScreen : Screen {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
-                                modifier = Modifier.width(35.dp).padding(end = 12.dp),
+                                modifier = Modifier
+                                    .width(35.dp)
+                                    .padding(end = 12.dp),
                                 contentAlignment = Alignment.CenterStart
                             ) {
                                 Image(
-                                    modifier = Modifier
-
-                                        .size(17.61.dp),
+                                    modifier = Modifier.size(17.61.dp),
                                     painter = painterResource(Res.drawable.half_moon),
                                     contentDescription = null,
                                     contentScale = ContentScale.FillBounds,
@@ -159,8 +164,8 @@ class ThemeScreen : Screen {
                             )
                         }
                         Row(
-                            verticalAlignment = Alignment.CenterVertically
-                            , modifier = Modifier
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
                         ) {
                             Switch(
                                 checked = isDarkTheme,
@@ -170,10 +175,10 @@ class ThemeScreen : Screen {
                                     uncheckedThumbColor = Color.White
                                 )
                             )
-
                         }
                     }
                 }
+
 
             }
         }

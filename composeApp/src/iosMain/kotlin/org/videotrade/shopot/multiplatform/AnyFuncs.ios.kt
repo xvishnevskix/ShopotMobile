@@ -42,3 +42,12 @@ actual suspend fun appUpdate() {
         UIApplication.sharedApplication.openURL(it)
     }
 }
+
+actual fun openUrl(url: String) {
+    val nsUrl = NSURL.URLWithString(url)
+    if (nsUrl != null) {
+        UIApplication.sharedApplication.openURL(nsUrl)
+    } else {
+        println("Invalid URL: $url")
+    }
+}

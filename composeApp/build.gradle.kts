@@ -79,8 +79,6 @@ kotlin {
         }
     }
     
-
-    
     sourceSets {
         
         all {
@@ -129,6 +127,14 @@ kotlin {
             implementation(libs.coil.network.ktor)
             api(libs.resources)
             api(libs.resources.compose) // for compose multiplatfor
+            implementation(libs.compressor)
+        }
+
+        //Для версии приложения
+        commonMain {
+            val versionName = project.findProperty("VERSION_NAME") as String
+            kotlin.srcDir("build/generated/kotlin")
+
         }
         
         commonTest.dependencies {
@@ -148,12 +154,30 @@ kotlin {
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.lifecycle.process)
+            implementation(libs.itext7.core) // Добавлено для работы с PDF
+            implementation(libs.lz4.java)
         }
         
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
         }
     }
+}
+
+
+tasks.register("generateCommonBuildConfig") {
+    val versionName = project.findProperty("VERSION_NAME") as String
+
+    val generatedSrcDir = File(buildDir, "generated/kotlin") // Генерация константы.
+    generatedSrcDir.mkdirs()
+
+    File(generatedSrcDir, "BuildConfig.kt").writeText("""
+        package org.videotrade.shopot
+        
+        object BuildConfig {
+            const val VERSION_NAME = "$versionName"
+        }
+    """.trimIndent())
 }
 
 android {
@@ -167,7 +191,7 @@ android {
         applicationId = "org.videotrade.shopot.androidApp"
         versionCode = 17
         versionName = "1.0.7"
-        
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         externalNativeBuild {

@@ -8,6 +8,7 @@ import org.videotrade.shopot.data.remote.repository.ContactsRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.ProfileRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.ChatsRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.CommonRepositoryImpl
+import org.videotrade.shopot.data.remote.repository.NewsRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.StickerRepositoryImpl
 import org.videotrade.shopot.data.remote.repository.WsRepositoryImpl
 import org.videotrade.shopot.domain.repository.CallRepository
@@ -16,6 +17,7 @@ import org.videotrade.shopot.domain.repository.ContactsRepository
 import org.videotrade.shopot.domain.repository.ProfileRepository
 import org.videotrade.shopot.domain.repository.ChatsRepository
 import org.videotrade.shopot.domain.repository.CommonRepository
+import org.videotrade.shopot.domain.repository.NewsRepository
 import org.videotrade.shopot.domain.repository.StickerRepository
 import org.videotrade.shopot.domain.repository.WsRepository
 import org.videotrade.shopot.domain.usecase.CallUseCase
@@ -24,9 +26,11 @@ import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.CommonUseCase
+import org.videotrade.shopot.domain.usecase.NewsUseCase
 import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.NetworkListener
+import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -47,6 +51,7 @@ private val domainModule = module {
     factory { ContactsUseCase() }
     factory { CommonUseCase() }
     factory { StickerUseCase() }
+    factory { NewsUseCase() }
     
 }
 
@@ -99,6 +104,11 @@ private val presentationModule = module {
     single<StickerRepository> {
         StickerRepositoryImpl()
     }
+
+    single<NewsRepository> {
+        NewsRepositoryImpl()
+    }
+
     single { CommonViewModel() }
 
     single { ProfileViewModel() }
@@ -108,6 +118,8 @@ private val presentationModule = module {
     single { SettingsViewModel() }
     
     single { NetworkListener(get()) }
+
+    single { NewsViewModel() }
 }
 
 private fun getAllModules() = listOf(

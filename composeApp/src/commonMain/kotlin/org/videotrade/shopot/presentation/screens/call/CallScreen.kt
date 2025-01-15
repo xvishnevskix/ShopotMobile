@@ -56,6 +56,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
@@ -76,12 +77,13 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
 
 class CallScreen(
-    private val userId: String,
+    private val calleeId: String,
     private val userIcon: String? = null,
     private val userFirstName: String,
     private val userLastName: String,
     private val userPhone: String,
     private val sendCall: Boolean? = null,
+
 ) : Screen {
     
     @Composable
@@ -116,7 +118,6 @@ class CallScreen(
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
-        
         var isPlaying by remember { mutableStateOf(false) }
         
         
@@ -132,10 +133,10 @@ class CallScreen(
         
         LaunchedEffect(Unit) {
             if (isIncomingCall) {
-//                musicPlayer.play("callee", true, MusicType.Ringtone)
+                musicPlayer.play("callee", true, MusicType.Ringtone)
                 isPlaying = true
             } else {
-//                musicPlayer.play("caller", true,  MusicType.Ringtone)
+                musicPlayer.play("caller", true,  MusicType.Ringtone)
                 isPlaying = true
             }
             
@@ -157,7 +158,6 @@ class CallScreen(
                 if (
                     isPlaying
                 ) {
-                    
                     musicPlayer.stop()
                     isPlaying = false
                 }
@@ -206,7 +206,7 @@ class CallScreen(
                 if (sendCall == true) {
                     if (!isCallActive)
                         if (isConnectedWs) {
-                            viewModel.initCall(userId)
+                            viewModel.initCall(calleeId)
                         }
                 }
                 
@@ -449,7 +449,11 @@ class CallScreen(
                                 Spacer(modifier = Modifier.width(15.dp))
 
                                 rejectBtn({
-                                    viewModel.rejectCall(userId)
+
+
+                                        viewModel.rejectCall(calleeId, timerValue.value)
+
+
                                 }, size = 56.dp)
 //
                             }
