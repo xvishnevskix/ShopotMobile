@@ -64,6 +64,7 @@ import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.closeApp
@@ -465,7 +466,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             val cameraPer = PermissionsProviderFactory.create()
                 .getPermission("microphone")
             
-            configureAudioSession()
+ 
             val stream = MediaDevices.getUserMedia(audio = true)
             
             println("Faileddadasdasda $stream")
@@ -549,6 +550,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .onEach { state ->
                     Logger.d { "peerState111 onConnectionStateChange: $state" }
                     
+                    AudioFactory.createAudioPlayer().stopAllAudioStreams()
                     
                     _callState.value = state
                     
@@ -746,6 +748,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     setIsIncomingCall(false)
                     
+                    
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     println("Message sent successfully")
                 } catch (e: Exception) {
@@ -837,9 +840,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 setIsIncomingCall(false)
                                 
                                 
-                                Logger.d {
-                                    "answerCallMessage $jsonMessage"
-                                }
+                                println("answerCallMessage $jsonMessage")
                                 
                                 wsSession.value?.send(Frame.Text(jsonMessage))
                                 
@@ -871,6 +872,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             )
             
             
+            println("rejectCalaaa $jsonContent")
             
             setIsIncomingCall(false)
             

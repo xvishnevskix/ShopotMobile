@@ -14,6 +14,8 @@ expect class AudioPlayer {
     
     fun getAudioDuration(filePath: String, fileName: String): String?
     
+    fun stopAllAudioStreams()
+    
 }
 
 

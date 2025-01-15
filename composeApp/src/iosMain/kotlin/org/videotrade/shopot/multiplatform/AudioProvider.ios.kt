@@ -281,6 +281,33 @@ actual class AudioPlayer {
     companion object {
         private const val AVKeyValueStatusLoaded: Long = 2
     }
+    
+    
+    @OptIn(ExperimentalForeignApi::class)
+    actual fun stopAllAudioStreams() {
+        try {
+            val audioSession = AVAudioSession.sharedInstance()
+            
+            memScoped {
+                val error = alloc<ObjCObjectVar<NSError?>>()
+                
+                // Деактивируем текущую аудиосессию, уведомляя другие приложения
+                val success = audioSession.setActive(
+                    false,
+                    withFlags = 1L, // Уведомить другие приложения о деактивации
+                    error = error.ptr
+                )
+                
+                if (!success) {
+                    println("Ошибка при деактивации аудиосессии: ${error.value?.localizedDescription}")
+                } else {
+                    println("Все аудиопотоки остановлены успешно.")
+                }
+            }
+        } catch (e: Exception) {
+            println("Ошибка при остановке всех аудиопотоков: ${e.message}")
+        }
+    }
 }
 
 actual object AudioFactory {
@@ -351,6 +378,8 @@ actual class MusicPlayer {
     actual fun isPlaying(): Boolean {
         return audioPlayer?.playing ?: false
     }
+    
+
 }
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)

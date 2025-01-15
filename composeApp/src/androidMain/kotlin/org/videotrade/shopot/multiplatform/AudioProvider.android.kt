@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.app.NotificationManager
 import android.content.Context
 import android.media.AudioAttributes
+import android.media.AudioFocusRequest
 import android.media.AudioManager
 import android.media.AudioManager.ADJUST_UNMUTE
 import android.media.MediaMetadataRetriever
 import android.media.MediaPlayer
 import android.media.MediaRecorder
+import android.os.Build
 import androidx.compose.runtime.MutableState
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import java.io.File
@@ -187,6 +189,31 @@ actual class AudioPlayer(private val applicationContext: Context) {
             return null
         }
     }
+    
+    
+    actual fun stopAllAudioStreams() {
+        try {
+            val audioManager = applicationContext.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            
+            // Останавливаем воспроизведение медиа на уровне системы
+            audioManager.requestAudioFocus(
+                AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                    .setOnAudioFocusChangeListener { focusChange ->
+                        when (focusChange) {
+                            AudioManager.AUDIOFOCUS_LOSS -> println("Аудиофокус потерян.")
+                            AudioManager.AUDIOFOCUS_GAIN -> println("Аудиофокус восстановлен.")
+                            else -> println("Состояние аудиофокуса изменено.")
+                        }
+                    }
+                    .build()
+            )
+            
+            println("Все аудиопотоки остановлены успешно.")
+        } catch (e: Exception) {
+            println("Ошибка при остановке всех аудиопотоков: ${e.message}")
+        }
+    }
+
 
 }
 
@@ -210,6 +237,7 @@ actual object AudioFactory {
     actual fun createMusicPlayer(): MusicPlayer {
         return MusicPlayer()
     }
+    
 }
 
 
@@ -300,6 +328,7 @@ actual class MusicPlayer {
         } catch (e: Exception) {
             println("e: $e")
         }
+        
     }
     
     // Метод для остановки воспроизведения музыки
@@ -319,6 +348,8 @@ actual class MusicPlayer {
     actual fun isPlaying(): Boolean {
         return mediaPlayer?.isPlaying ?: false
     }
+    
+    
 }
 
 actual fun configureAudioSession() {

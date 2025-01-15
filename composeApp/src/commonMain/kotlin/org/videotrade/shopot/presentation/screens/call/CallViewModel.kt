@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.screens.call
 
+import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
@@ -42,8 +43,10 @@ import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
+import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
@@ -103,6 +106,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
     val userIcon: StateFlow<String?> get() = _userIcon
     
     val callScreenInfo = MutableStateFlow<Screen?>(null)
+    
+    val musicPlayer: StateFlow<MusicPlayer> = MutableStateFlow(AudioFactory.createMusicPlayer())
+    
     
     private fun updateUserIcon(icon: String?) {
         _userIcon.value = icon
@@ -167,6 +173,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
             .onEach { callStateNew ->
                 if (isObserving.value) {
                     _callState.value = callStateNew
+                    musicPlayer.value.stop()
                     println("callStateNew $callStateNew")
                 }
             }

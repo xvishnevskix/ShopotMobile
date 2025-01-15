@@ -99,6 +99,7 @@ class CallScreen(
         val isIncomingCall by viewModel.isIncomingCall.collectAsState()
         val timerValue = viewModel.timer.collectAsState()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
+        val musicPlayer by viewModel.musicPlayer.collectAsState()
         
         val hasExecuted = remember { mutableStateOf(false) }
         
@@ -115,7 +116,6 @@ class CallScreen(
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
-        val musicPlayer = remember { AudioFactory.createMusicPlayer()  }
         
         var isPlaying by remember { mutableStateOf(false) }
         
@@ -132,10 +132,10 @@ class CallScreen(
         
         LaunchedEffect(Unit) {
             if (isIncomingCall) {
-                musicPlayer.play("callee", true, MusicType.Ringtone)
+//                musicPlayer.play("callee", true, MusicType.Ringtone)
                 isPlaying = true
             } else {
-                musicPlayer.play("caller", true,  MusicType.Ringtone)
+//                musicPlayer.play("caller", true,  MusicType.Ringtone)
                 isPlaying = true
             }
             
@@ -157,6 +157,7 @@ class CallScreen(
                 if (
                     isPlaying
                 ) {
+                    
                     musicPlayer.stop()
                     isPlaying = false
                 }
