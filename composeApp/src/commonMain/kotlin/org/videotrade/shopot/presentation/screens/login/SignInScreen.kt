@@ -109,6 +109,8 @@ class SignInScreen : Screen {
         val bottomSheetState =
             rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         var countryCode by remember { mutableStateOf("+7") }
+        val defaultCountry = stringResource(MokoRes.strings.ru)
+        var selectedCountryName by remember { mutableStateOf(defaultCountry) }
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
@@ -130,6 +132,7 @@ class SignInScreen : Screen {
         val countries = listOf(
             "+7" to "\uD83C\uDDF7\uD83C\uDDFA   ${stringResource(MokoRes.strings.ru)}",
             "+375" to "\uD83C\uDDE7\uD83C\uDDFE   ${stringResource(MokoRes.strings.by)}",
+            "+7" to "\uD83C\uDDF0\uD83C\uDDFF   ${stringResource(MokoRes.strings.kz)}",
             "+374" to "\uD83C\uDDE6\uD83C\uDDF2   ${stringResource(MokoRes.strings.am)}",
             "+996" to "\uD83C\uDDF0\uD83C\uDDEC   ${stringResource(MokoRes.strings.kg)}",
             "+992" to "\uD83C\uDDF9\uD83C\uDDEF   ${stringResource(MokoRes.strings.tj)}",
@@ -168,8 +171,10 @@ class SignInScreen : Screen {
                         countries = countries,
                         showPhoneMenu = showPhoneMenu,
                         selectedCountryCode = countryCode,
-                        onCountrySelected = { selectedCode ->
+                        selectedCountryName = selectedCountryName,
+                        onCountrySelected = { selectedCode, selectedName ->
                             countryCode = selectedCode
+                            selectedCountryName = selectedName
                             val currentNumber = textState.value.text
                             textState.value = TextFieldValue(
                                 text = currentNumber,
@@ -178,7 +183,7 @@ class SignInScreen : Screen {
                             coroutineScope.launch {
                                 bottomSheetState.hide()
                             }
-                        }
+                        },
 
                     ) {
                         coroutineScope.launch {
