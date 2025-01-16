@@ -638,6 +638,11 @@ suspend fun handleConnectWebSocket(
                                 }
 
 
+                                "newLastMessage" -> {
+//                                    val messageJson =
+//                                        jsonElement.jsonObject["message"]?.jsonObject
+                                    println("newLastMessage$jsonElement")
+                                }
                             }
                         }
                     }
