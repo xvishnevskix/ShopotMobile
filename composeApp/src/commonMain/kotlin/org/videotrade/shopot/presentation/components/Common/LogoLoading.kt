@@ -40,20 +40,19 @@ fun LogoLoading() {
 
     Box(
         modifier = Modifier
-            .size(65.dp, 30.dp) // Жёстко заданный размер Box
-
+            .size(65.dp, 30.dp)
     ) {
         Canvas(
             modifier = Modifier
-                .fillMaxSize() // Canvas занимает всё пространство Box
+                .fillMaxSize()
 
         ) {
-            // Масштабирование для корректного отображения внутри Canvas
-            val scaleX = size.width / 195f
-            val scaleY = size.height / 132f
+
+//            val scaleX = size.width / 195f
+//            val scaleY = size.height / 132f
 
             scale(2.7f, 2.7f) {
-                // Путь 1
+                // Палка 1
                 val path1 = Path().apply {
                     moveTo(136.5f, 0f)
                     cubicTo(138.98f, 0f, 141f, 1.97f, 141f, 4.4f)
@@ -70,7 +69,7 @@ fun LogoLoading() {
                 }
                 drawPath(path1, Color(0xFF373533), style = Fill)
 
-                // Путь 2
+                // Палка 2
                 val path2 = Path().apply {
                     moveTo(163.5f, 0f)
                     cubicTo(165.98f, 0f, 168f, 1.97f, 168f, 4.4f)
@@ -87,7 +86,7 @@ fun LogoLoading() {
                 }
                 drawPath(path2, Color(0xFF373533), style = Fill)
 
-                // Путь 3
+                // Палка 3
                 val path3 = Path().apply {
                     moveTo(190.5f, 0f)
                     cubicTo(192.98f, 0f, 195f, 1.97f, 195f, 4.4f)
@@ -104,7 +103,7 @@ fun LogoLoading() {
                 }
                 drawPath(path3, Color(0xFF373533), style = Fill)
 
-                // Анимируемый путь 4
+                // Анимируемая точка 4
                 translate(top = offsetY.value - 25f) { // начальное смещение сверху
                     val path4 = Path().apply {
                         addOval(
@@ -119,7 +118,7 @@ fun LogoLoading() {
                     drawPath(path4, Color(0xFF373533), style = Fill)
                 }
 
-                // Путь 5 (статичный круг)
+                // Статичный круг 5
                 val path5 = Path().apply {
                     addOval(
                         androidx.compose.ui.geometry.Rect(
