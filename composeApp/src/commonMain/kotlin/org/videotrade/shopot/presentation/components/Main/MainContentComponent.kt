@@ -102,7 +102,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val newsState = newsViewModel.news.collectAsState().value
     val onceNewsState = newsViewModel.onceNews.collectAsState().value
     var showNewsViewer by remember { mutableStateOf(false) }
-    var showNewsOnceViewer by remember { mutableStateOf(false) }// Состояние для StoryViewer для actual
+    var showNewsOnceViewer by remember { mutableStateOf(false) }
     var selectedNews: NewsItem? by remember { mutableStateOf(null) }
     var selectedOnceNews: NewsItem? by remember { mutableStateOf(null) }
 
@@ -140,16 +140,16 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
 // Обработка новостей из `once`
     LaunchedEffect(onceNewsState) {
-//        if (!showNewsOnceViewer) {
-//            val newsToShow = onceNewsState.find {
-//                it.appearance == "once" && !it.viewed &&
-//                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
-//            }
-//            if (newsToShow != null) {
-//                selectedOnceNews = newsToShow
-//                showNewsOnceViewer = true
-//            }
-//        }
+        if (!showNewsOnceViewer) {
+            val newsToShow = onceNewsState.find {
+                it.appearance == "once" && !it.viewed &&
+                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
+            }
+            if (newsToShow != null) {
+                selectedOnceNews = newsToShow
+                showNewsOnceViewer = true
+            }
+        }
     }
 
 

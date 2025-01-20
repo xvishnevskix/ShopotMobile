@@ -134,7 +134,6 @@ kotlin {
         commonMain {
             val versionName = project.findProperty("VERSION_NAME") as String
             kotlin.srcDir("build/generated/kotlin")
-
         }
         
         commonTest.dependencies {
@@ -165,15 +164,14 @@ kotlin {
 }
 
 
-tasks.register("generateCommonBuildConfig") {
-    val versionName = project.findProperty("VERSION_NAME") as String
+tasks.register("generateBuildConfig") {
+    val versionName = project.findProperty("VERSION_NAME") ?: "1.0.8"
 
-    val generatedSrcDir = File(buildDir, "generated/kotlin") // Генерация константы.
-    generatedSrcDir.mkdirs()
+    val outputDir = File(buildDir, "generated/kotlin")
+    outputDir.mkdirs()
 
-    File(generatedSrcDir, "BuildConfig.kt").writeText("""
-        package org.videotrade.shopot
-        
+    val buildConfigFile = File(outputDir, "BuildConfig.kt")
+    buildConfigFile.writeText("""
         object BuildConfig {
             const val VERSION_NAME = "$versionName"
         }

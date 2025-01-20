@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil3.compose.rememberAsyncImagePainter
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
@@ -92,7 +93,7 @@ fun StoryCircle(
                 .fillMaxSize()
                 .border(
                     BorderStroke(2.dp, gradientBrush),
-                    shape = CircleShape
+                    shape = RoundedCornerShape(12.dp)
                 )
                 .padding(4.dp)
         ) {
@@ -101,7 +102,7 @@ fun StoryCircle(
                 contentDescription = "Story Image",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(8.dp))
                     .fillMaxSize()
             )
         }
@@ -157,9 +158,13 @@ fun StoryViewer(
         }
     }
 
-    Dialog(onDismissRequest = onClose) {
+    Dialog(
+        onDismissRequest = onClose,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Box(
             modifier = Modifier
+                .padding(4.dp)
                 .clip(RoundedCornerShape(16.dp))
                 .fillMaxSize()
                 .background(Color.Black)
@@ -261,6 +266,7 @@ fun StoryViewer(
                         color = Color.White,
                         modifier = Modifier
                             .align(Alignment.TopEnd)
+                            .padding(top = 8.dp)
                             .padding(16.dp)
                             .clickable { onClose() }
                     )
