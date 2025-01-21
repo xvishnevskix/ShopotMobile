@@ -293,15 +293,13 @@ class SignUpPhoneScreen : Screen {
                                                             serverUnavailable = serverUnavailable
                                                         )
 
-                                                    if (response != null) {
-                                                        if (response.status.description != "Service Unavailable") {
-                                                            navigator.push(
-                                                                AuthCallScreen(
-                                                                    fullPhoneNumber,
-                                                                    "SignUp"
-                                                                )
+                                                    if (response == null) {
+                                                        navigator.push(
+                                                            AuthCallScreen(
+                                                                fullPhoneNumber,
+                                                                "SignUp"
                                                             )
-                                                        }
+                                                        )
                                                     }
                                                     hasError.value = false
                                                     if (response != null) {
