@@ -148,6 +148,7 @@
     <string name="please_fill_in_all_input_fields">Please fill in all input fields</string>
     <string name="phone_number_is_already_registered">The phone number is already registered</string>
     <string name="required_phone_number_length">Required phone number length: </string>
+    <string name="the_server_is_temporarily_unavailable">The server is temporarily unavailable</string>
 
     <string name="name_is_required">Name is required</string>
     <string name="name_must_contain_only_letters">The name must contain only letters</string>

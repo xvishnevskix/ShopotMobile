@@ -114,6 +114,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
         val invalidCode = stringResource(MokoRes.strings.invalid_code)
         val sentSMSCode = stringResource(MokoRes.strings.sms_with_code_sent)
+        val serverUnavailable = stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
 
@@ -130,6 +131,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             сommonViewModel,
                             toasterViewModel = toasterViewModel,
                             phoneNotRegistered,
+                            serverUnavailable,
                         )
                     }
                     if (phone == "+79899236226") {
@@ -140,6 +142,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             сommonViewModel,
                             toasterViewModel = toasterViewModel,
                             phoneNotRegistered,
+                            serverUnavailable,
                         )
                     }
                     if (phone == "+79388899885") {
@@ -150,6 +153,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             сommonViewModel,
                             toasterViewModel = toasterViewModel,
                             phoneNotRegistered,
+                            serverUnavailable,
                         )
                     }
                     if (phone == "+375336483673") {
@@ -160,6 +164,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                             сommonViewModel,
                             toasterViewModel = toasterViewModel,
                             phoneNotRegistered,
+                            serverUnavailable,
                         )
                     }
                 }
@@ -216,7 +221,8 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     viewModel,
                     сommonViewModel = сommonViewModel,
                     toasterViewModel = toasterViewModel,
-                    phoneNotRegistered = phoneNotRegistered
+                    phoneNotRegistered = phoneNotRegistered,
+                    serverUnavailable = serverUnavailable,
                 )
 
                 "SignUp" -> sendSignUp(phone, navigator)
@@ -291,7 +297,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     "2fa",
                     toasterViewModel,
                     hasError = hasError,
-                    animationTrigger = animationTrigger
+                    animationTrigger = animationTrigger,
+                    phoneNotRegistered = phoneNotRegistered,
+                    serverUnavailable = serverUnavailable
                 )
 
                 if (response != null) {
@@ -457,6 +465,7 @@ suspend fun sendRequestToBackend(
     url: String,
     toasterViewModel: CommonViewModel,
     phoneNotRegistered: String = "Номер телефона не зарегистрирован",
+    serverUnavailable: String = "Сервер временно недоступен",
     hasError: MutableState<Boolean>? = null,
     animationTrigger: MutableState<Boolean>? = null,
 ): HttpResponse? {
@@ -508,6 +517,13 @@ suspend fun sendRequestToBackend(
                 if (animationTrigger != null) {
                     animationTrigger.value = !animationTrigger.value
                 }
+            } else if (response.status.description == "Service Unavailable") {
+                toasterViewModel.toaster.show(
+
+                    serverUnavailable,
+                    type = ToastType.Error,
+                    duration = ToasterDefaults.DurationDefault
+                )
             }
 
         }
@@ -527,7 +543,8 @@ suspend fun sendLogin(
     viewModel: IntroViewModel,
     сommonViewModel: CommonViewModel,
     toasterViewModel: CommonViewModel,
-    phoneNotRegistered: String = ""
+    phoneNotRegistered: String = "Номер телефона не зарегистрирован",
+    serverUnavailable: String = "Сервер временно недоступен",
 ) {
 
     val response =
@@ -536,7 +553,8 @@ suspend fun sendLogin(
             getFbToken(),
             "auth/login",
             toasterViewModel,
-            phoneNotRegistered,
+            phoneNotRegistered = phoneNotRegistered,
+            serverUnavailable = serverUnavailable
         )
 
 

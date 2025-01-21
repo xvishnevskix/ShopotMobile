@@ -110,6 +110,8 @@ class SignInScreen : Screen {
             rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
         var countryCode by remember { mutableStateOf("+7") }
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
+        val serverUnavailable = stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
+
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -302,7 +304,8 @@ class SignInScreen : Screen {
                                                             toasterViewModel,
                                                             phoneNotRegistered,
                                                             hasError = hasError,
-                                                            animationTrigger = animationTrigger
+                                                            animationTrigger = animationTrigger,
+                                                            serverUnavailable = serverUnavailable
                                                         )
 
                                                     if (response != null) {

@@ -144,6 +144,7 @@
     <string name="please_fill_in_all_input_fields">Заполните все поля</string>
     <string name="phone_number_is_already_registered">Номер телефона уже зарегистрирован</string>
     <string name="required_phone_number_length">Необходимая длина номера телефона: </string>
+    <string name="the_server_is_temporarily_unavailable">Cервер временно недоступен</string>
 
     <string name="name_is_required">Имя обязательно для заполнения</string>
     <string name="name_must_contain_only_letters">Имя должно содержать только буквы</string>

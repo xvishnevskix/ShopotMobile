@@ -90,6 +90,7 @@ class SignUpPhoneScreen : Screen {
         val toasterViewModel: CommonViewModel = koinInject()
         val sendCode = stringResource(MokoRes.strings.code_sent)
         val phoneRegistered = stringResource(MokoRes.strings.phone_number_is_already_registered)
+        val serverUnavailable = stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
         var countryCode by remember { mutableStateOf("+7") }
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
@@ -288,16 +289,19 @@ class SignUpPhoneScreen : Screen {
                                                             toasterViewModel,
                                                             sendCode,
                                                             hasError = hasError,
-                                                            animationTrigger = animationTrigger
+                                                            animationTrigger = animationTrigger,
+                                                            serverUnavailable = serverUnavailable
                                                         )
 
-                                                    if (response == null) {
-                                                        navigator.push(
-                                                            AuthCallScreen(
-                                                                fullPhoneNumber,
-                                                                "SignUp"
+                                                    if (response != null) {
+                                                        if (response.status.description != "Service Unavailable") {
+                                                            navigator.push(
+                                                                AuthCallScreen(
+                                                                    fullPhoneNumber,
+                                                                    "SignUp"
+                                                                )
                                                             )
-                                                        )
+                                                        }
                                                     }
                                                     hasError.value = false
                                                     if (response != null) {
