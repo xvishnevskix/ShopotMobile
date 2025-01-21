@@ -288,7 +288,8 @@ fun CountryPickerBottomSheet(
     showPhoneMenu: MutableState<Boolean>,
     countries: List<Pair<String, String>>,
     selectedCountryCode: String,
-    onCountrySelected: (String) -> Unit,
+    selectedCountryName: String, // Изменение здесь
+    onCountrySelected: (String, String) -> Unit, // Теперь возвращает код и название
     onBackClick: () -> Unit,
 
 ) {
@@ -351,7 +352,10 @@ fun CountryPickerBottomSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            val selectedCountry = countries.find { it.first == selectedCountryCode }
+            val selectedCountry = countries.find {
+                val (_, countryName) = it.second.split("   ", limit = 2)
+                countryName == selectedCountryName
+            }
 
 
             Box(
@@ -419,10 +423,13 @@ fun CountryPickerBottomSheet(
                 item {
                     countries.forEach { country ->
                         val (flag, countryName) = country.second.split("   ", limit = 2)
-                        val isSelected = country.first == selectedCountryCode
+                        val isSelected = countryName == selectedCountryName
                         val textColor = if (isSelected) colors.primary else colors.secondary
                         val borderColor =
                             if (isSelected) colors.primary else colors.onSecondary // rgba(55, 53, 51, 0.2)
+
+                        println("${countryName} ountryNameountryNameountryName")
+
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -439,8 +446,9 @@ fun CountryPickerBottomSheet(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 modifier = Modifier
                                     .clickable {
-                                        onCountrySelected(country.first)
+                                        onCountrySelected(country.first, countryName)
                                     }
+
                                     .fillMaxWidth()
                                     .padding(
                                         start = 16.dp,
