@@ -401,7 +401,9 @@ suspend fun handleConnectWebSocket(
                                         val chatIdJson =
                                             jsonElement.jsonObject["chatId"]?.jsonPrimitive?.content
 
-                                        println("messagePoka $messageIdJson")
+                                        val lastMessageJson =
+                                            jsonElement.jsonObject["lastMessage"]?.jsonObject
+
 
 //                                        chatsUseCase.updateLastMessageChat(messageNew)
 
@@ -412,43 +414,27 @@ suspend fun handleConnectWebSocket(
                                             )
                                         }// Инициализация сообщений
 
-                                    } catch (e: Exception) {
 
-                                        Logger.d("ErrorDellMess: $e")
-                                    }
+                                        val message: MessageItem =
+                                            Json.decodeFromString(lastMessageJson.toString())
+                                        var messageNew = message
 
-
-                                }
-
-                                "messageRemoved" -> {
-                                    try {
-
-
-                                        println("messagePoka $jsonElement")
-
-                                        val messageJson =
-                                            jsonElement.jsonObject["message"]?.jsonObject
-
-
-
-                                        if (messageJson != null) {
-
-
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
-
-
-                                            chatUseCase.delMessage(message)// Инициализация сообщений
+                                        // Декодируем content, если оно не пустое
+                                        if (!message.content.isNullOrBlank()) {
+                                            val decups =
+                                                decupsMessage(message.content, cipherWrapper)
+                                            messageNew = messageNew.copy(content = decups)
                                         }
 
+
+                                        println("messageNew $messageNew")
+
+                                        chatsUseCase.updateLastMessageChat(messageNew)
+
                                     } catch (e: Exception) {
-
-                                        Logger.d("Error228: $e")
+                                        Logger.d("ErrorDellMess: $e")
                                     }
-
-
                                 }
-
 
                                 "messageReadNotification" -> {
                                     try {
@@ -638,9 +624,15 @@ suspend fun handleConnectWebSocket(
                                 }
 
 
-                                "newLastMessage" -> {
-//                                    val messageJson =
-//                                        jsonElement.jsonObject["message"]?.jsonObject
+                                "updateLastMessage" -> {
+                                    val messageJson =
+                                        jsonElement.jsonObject["lastMessage"]?.jsonObject
+
+                                    val message: MessageItem =
+                                        Json.decodeFromString(messageJson.toString())
+
+                                    chatsUseCase.updateLastMessageChat(message)
+
                                     println("newLastMessage$jsonElement")
                                 }
                             }
