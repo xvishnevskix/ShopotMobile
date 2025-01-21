@@ -289,10 +289,9 @@ fun CountryPickerBottomSheet(
     countries: List<Pair<String, String>>,
     selectedCountryCode: String,
     selectedCountryName: String, // Изменение здесь
-    onCountrySelected: (String, String) -> Unit, // Теперь возвращает код и название
+    onCountrySelected:  (String, String) -> Unit, // Теперь возвращает код и название
     onBackClick: () -> Unit,
-
-) {
+    ) {
     val colors = MaterialTheme.colorScheme
     Column(
         modifier = Modifier

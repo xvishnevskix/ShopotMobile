@@ -70,10 +70,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
 
-    println("sadasdasdasdgsdfsd ${chat.userId}")
-    println("sadasdasdasdgsdfsd profile ${profile.id}")
-
-    println("sadasdasdasdgsdfsd ${chat.chatUser!![0].id}")
 
     Column {
         Row(

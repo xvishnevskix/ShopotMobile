@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
@@ -34,7 +33,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -70,10 +68,10 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.login.CountryName
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFProText_Semibold
 import shopot.composeapp.generated.resources.auth_logo
 
 class SignUpPhoneScreen : Screen {
@@ -109,6 +107,7 @@ class SignUpPhoneScreen : Screen {
             )
         }
         val isLoading = remember { mutableStateOf(false) }
+        var selectCountryName by remember { mutableStateOf(CountryName.RU) }
 
 
         val countries = listOf(
@@ -147,6 +146,7 @@ class SignUpPhoneScreen : Screen {
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
                 sheetContent = {
+                    val kzString = stringResource(MokoRes.strings.kz)
 
                     CountryPickerBottomSheet(
                         countries = countries,
@@ -155,7 +155,9 @@ class SignUpPhoneScreen : Screen {
                         selectedCountryName = selectedCountryName,
                         onCountrySelected = { selectedCode, selectedName ->
                             countryCode = selectedCode
-                            selectedCountryName = selectedName
+                            when (selectedName) {
+                                kzString -> selectCountryName = CountryName.KZ
+                            }
                             val currentNumber = phone.value.text
                             phone.value = TextFieldValue(
                                 text = currentNumber,
@@ -207,7 +209,7 @@ class SignUpPhoneScreen : Screen {
                                 painter = painterResource(Res.drawable.auth_logo),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                colorFilter =  ColorFilter.tint(colors.primary)
+                                colorFilter = ColorFilter.tint(colors.primary)
                             )
 
                             Spacer(modifier = Modifier.height(50.dp))
@@ -263,64 +265,73 @@ class SignUpPhoneScreen : Screen {
                                     stringResource(MokoRes.strings.required_phone_number_length)
 
 
-                                Box( modifier = Modifier.padding(bottom = 20.dp)) {
-                                    CustomButton(stringResource(MokoRes.strings.send_code), {
-                                        coroutineScope.launch {
-                                            isLoading.value = true
-                                            try {
-                                                val fullPhoneNumber = countryCode + phone.value.text
+                                Box(modifier = Modifier.padding(bottom = 20.dp)) {
+                                    CustomButton(
+                                        stringResource(MokoRes.strings.send_code), {
+                                            coroutineScope.launch {
+                                                isLoading.value = true
+                                                try {
+                                                    val fullPhoneNumber =
+                                                        countryCode + phone.value.text
 
-                                                val phoneNumberLength =
-                                                    getPhoneNumberLength(countryCode)
-                                                hasError.value = false
-
-                                                if (fullPhoneNumber.length < phoneNumberLength) {
-                                                    hasError.value = true
-                                                    toasterViewModel.toaster.show(
-                                                        "$requiredPhoneLength $phoneNumberLength",
-                                                        type = ToastType.Error,
-                                                        duration = ToasterDefaults.DurationDefault
-                                                    )
-                                                    animationTrigger.value = !animationTrigger.value
-
-                                                } else {
-                                                    val response =
-                                                        sendRequestToBackend(
-                                                            fullPhoneNumber,
-                                                            NotifierManager.getPushNotifier()
-                                                                .getToken(),
-                                                            "auth/login",
-                                                            toasterViewModel,
-                                                            sendCode,
-                                                            hasError = hasError,
-                                                            animationTrigger = animationTrigger
-                                                        )
-
-                                                    if (response == null) {
-                                                        navigator.push(
-                                                            AuthCallScreen(
-                                                                fullPhoneNumber,
-                                                                "SignUp"
-                                                            )
-                                                        )
-                                                    }
+                                                    val phoneNumberLength =
+                                                        getPhoneNumberLength(countryCode)
                                                     hasError.value = false
-                                                    if (response != null) {
+
+                                                    if (fullPhoneNumber.length < phoneNumberLength) {
                                                         hasError.value = true
                                                         toasterViewModel.toaster.show(
-                                                            phoneRegistered,
+                                                            "$requiredPhoneLength $phoneNumberLength",
                                                             type = ToastType.Error,
                                                             duration = ToasterDefaults.DurationDefault
                                                         )
-                                                        animationTrigger.value = !animationTrigger.value
-                                                    }
+                                                        animationTrigger.value =
+                                                            !animationTrigger.value
 
+                                                    } else {
+                                                        println("response")
+
+                                                        val response =
+                                                            sendRequestToBackend(
+                                                                fullPhoneNumber,
+                                                                NotifierManager.getPushNotifier()
+                                                                    .getToken(),
+                                                                "auth/login",
+                                                                toasterViewModel,
+                                                                sendCode,
+                                                                hasError = hasError,
+                                                                animationTrigger = animationTrigger
+                                                            )
+
+                                                        println("response41144114 $response $selectCountryName")
+
+                                                        if (response == null) {
+                                                            navigator.push(
+                                                                AuthCallScreen(
+                                                                    fullPhoneNumber,
+                                                                    "SignUp",
+                                                                    selectCountryName
+                                                                )
+                                                            )
+                                                        }
+                                                        hasError.value = false
+                                                        if (response != null) {
+                                                            hasError.value = true
+                                                            toasterViewModel.toaster.show(
+                                                                phoneRegistered,
+                                                                type = ToastType.Error,
+                                                                duration = ToasterDefaults.DurationDefault
+                                                            )
+                                                            animationTrigger.value =
+                                                                !animationTrigger.value
+                                                        }
+
+                                                    }
+                                                } finally {
+                                                    isLoading.value = false
                                                 }
-                                            } finally {
-                                                isLoading.value = false
                                             }
-                                        }
-                                    }, style = ButtonStyle.Gradient,
+                                        }, style = ButtonStyle.Gradient,
                                         isLoading = isLoading.value
                                     )
                                 }

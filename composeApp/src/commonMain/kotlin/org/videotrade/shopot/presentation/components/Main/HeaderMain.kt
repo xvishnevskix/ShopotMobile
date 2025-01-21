@@ -118,22 +118,22 @@ fun HeaderMain(
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (news.isNotEmpty()) {
-                        LazyRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        ) {
-                            items(news) { newsItem ->
-                                StoryCircle(
-                                    isSeen = newsItem.viewed,
-                                    imageId = newsItem.imageIds.firstOrNull(),
-                                    onClick = {
-                                        onStoryClick(newsItem)
-                                    }
-                                )
-                            }
-                        }
-                    }
+//                    if (news.isNotEmpty()) {
+//                        LazyRow(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+//                        ) {
+//                            items(news) { newsItem ->
+//                                StoryCircle(
+//                                    isSeen = newsItem.viewed,
+//                                    imageId = newsItem.imageIds.firstOrNull(),
+//                                    onClick = {
+//                                        onStoryClick(newsItem)
+//                                    }
+//                                )
+//                            }
+//                        }
+//                    }
                 }
                 Spacer(modifier = Modifier.width(11.dp))
             }

@@ -27,7 +27,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
@@ -71,25 +70,24 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
-import org.videotrade.shopot.presentation.components.Auth.CountryPickerBottomSheet
 import org.videotrade.shopot.presentation.components.Auth.Otp
-import org.videotrade.shopot.presentation.components.Auth.PhoneInput
-import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
+import org.videotrade.shopot.presentation.screens.login.CountryName
 import org.videotrade.shopot.presentation.screens.signUp.SignUpScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.SFProText_Semibold
 import shopot.composeapp.generated.resources.auth_logo
 
-class AuthCallScreen(private val phone: String, private val authCase: String) : Screen {
+class AuthCallScreen(
+    private val phone: String,
+    private val authCase: String,
+    private val selectCountryName: CountryName
+) : Screen {
 
 
     @Composable
@@ -224,7 +222,6 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         }
 
 
-
         fun sendSms(sentSMSCode: String) {
             isSms = true
             coroutineScope.launch {
@@ -240,7 +237,11 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                 put("is_sms", true)
                             }
                         )
-                        val response = origin().post("2fa", jsonContent)
+
+                        val url = if (selectCountryName == CountryName.KZ) "2fa/kz" else "2fa"
+
+                        val response = origin().post(url, jsonContent)
+
                         if (response != null) {
                             val jsonElement = Json.parseToJsonElement(response)
                             val messageObject = jsonElement.jsonObject["message"]?.jsonObject
@@ -272,6 +273,9 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
         }
 
         fun sendCall() {
+
+            println("sendCall")
+
             when (phone) {
                 "+79990000000" -> return
                 "+375336483673" -> return
@@ -285,14 +289,18 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                     startTimer()
                 }
 
+                val url = if (selectCountryName == CountryName.KZ) "2fa/kz" else "2fa"
+
                 val response = sendRequestToBackend(
                     phone,
                     null,
-                    "2fa",
+                    url,
                     toasterViewModel,
                     hasError = hasError,
                     animationTrigger = animationTrigger
                 )
+
+                println("responseSendCall $response")
 
                 if (response != null) {
                     val jsonString = response.bodyAsText()
@@ -434,7 +442,7 @@ class AuthCallScreen(private val phone: String, private val authCase: String) : 
                                     },
                                     {
                                         if (isSmsMode) {
-                                                sendSms(sentSMSCode)
+                                            sendSms(sentSMSCode)
                                         } else {
 //                                            sendCall()
                                         }
@@ -464,12 +472,10 @@ suspend fun sendRequestToBackend(
 
     }
 
-
     try {
         val jsonContent = Json.encodeToString(
             buildJsonObject {
                 put("phoneNumber", phone.drop(1))
-
                 notificationToken?.let { put("notificationToken", it) }
             }
         )
@@ -529,6 +535,7 @@ suspend fun sendLogin(
     toasterViewModel: CommonViewModel,
     phoneNotRegistered: String = ""
 ) {
+    println("sendLogin")
 
     val response =
         sendRequestToBackend(
@@ -595,10 +602,7 @@ suspend fun sendLogin(
 
 
 fun sendSignUp(phone: String, navigator: Navigator) {
-
-
     navigator.push(SignUpScreen(phone))
-
 
 }
 

@@ -1,28 +1,19 @@
 package org.videotrade.shopot.presentation.screens.login
 
-import FAQ
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
@@ -42,11 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
@@ -55,7 +42,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -67,13 +53,11 @@ import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
 import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.CountryPickerBottomSheet
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
@@ -84,16 +68,10 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.signUp.SignUpPhoneScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.LoginLogo
-import shopot.composeapp.generated.resources.Montserrat_Medium
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
 import shopot.composeapp.generated.resources.auth_logo
-import shopot.composeapp.generated.resources.support
 
 
 class SignInScreen : Screen {
@@ -119,6 +97,8 @@ class SignInScreen : Screen {
         val isLoading = remember { mutableStateOf(false) }
         val scrollState = rememberScrollState()
         val focusRequester = remember { FocusRequester() }
+        var selectCountryName by remember { mutableStateOf(CountryName.RU) }
+
 
         val textState =
             remember {
@@ -144,12 +124,12 @@ class SignInScreen : Screen {
 
         LaunchedEffect(showPhoneMenu) {
 //            if (showPhoneMenu.value) {
-                keyboardController?.hide()
+            keyboardController?.hide()
 //            }
         }
         DisposableEffect(showPhoneMenu.value) {
 //            if (showPhoneMenu.value) {
-                keyboardController?.hide()
+            keyboardController?.hide()
 //            }
             onDispose { }
         }
@@ -163,16 +143,22 @@ class SignInScreen : Screen {
 
         SafeArea(padding = 4.dp, backgroundColor = colors.background)
         {
+            val kzString = stringResource(MokoRes.strings.kz)
+
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
                 sheetContent = {
-
                     CountryPickerBottomSheet(
                         countries = countries,
                         showPhoneMenu = showPhoneMenu,
                         selectedCountryCode = countryCode,
                         selectedCountryName = selectedCountryName,
                         onCountrySelected = { selectedCode, selectedName ->
+                            println("selectedName $selectedName")
+                            when (selectedName) {
+                                kzString -> selectCountryName = CountryName.KZ
+                            }
+
                             countryCode = selectedCode
                             selectedCountryName = selectedName
                             val currentNumber = textState.value.text
@@ -184,7 +170,6 @@ class SignInScreen : Screen {
                                 bottomSheetState.hide()
                             }
                         },
-
                     ) {
                         coroutineScope.launch {
                             bottomSheetState.hide()
@@ -226,7 +211,7 @@ class SignInScreen : Screen {
                                 painter = painterResource(Res.drawable.auth_logo),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                colorFilter =  ColorFilter.tint(colors.primary)
+                                colorFilter = ColorFilter.tint(colors.primary)
                             )
 
                             Spacer(modifier = Modifier.height(50.dp))
@@ -280,57 +265,62 @@ class SignInScreen : Screen {
                                 Spacer(modifier = Modifier.height(16.dp))
                                 val requiredPhoneLength =
                                     stringResource(MokoRes.strings.required_phone_number_length)
-                                Box( modifier = Modifier.padding(bottom = 20.dp)) {
-                                    CustomButton(stringResource(MokoRes.strings.login), {
-                                        isLoading.value = true
-                                        coroutineScope.launch {
-                                            try {
-                                                val fullPhoneNumber = countryCode + textState.value.text
-                                                val phoneNumberLength = getPhoneNumberLength(countryCode)
-                                                hasError.value = false
+                                Box(modifier = Modifier.padding(bottom = 20.dp)) {
+                                    CustomButton(
+                                        stringResource(MokoRes.strings.login), {
+                                            isLoading.value = true
+                                            coroutineScope.launch {
+                                                try {
+                                                    val fullPhoneNumber =
+                                                        countryCode + textState.value.text
+                                                    val phoneNumberLength =
+                                                        getPhoneNumberLength(countryCode)
+                                                    hasError.value = false
 
-                                                if (fullPhoneNumber.length < phoneNumberLength) {
-                                                    hasError.value = true
-                                                    toasterViewModel.toaster.show(
-                                                        "$requiredPhoneLength $phoneNumberLength",
-                                                        type = ToastType.Error,
-                                                        duration = ToasterDefaults.DurationDefault
-                                                    )
-                                                    animationTrigger.value = !animationTrigger.value
-
-                                                } else {
-                                                    val response =
-                                                        sendRequestToBackend(
-                                                            fullPhoneNumber,
-                                                            NotifierManager.getPushNotifier().getToken(),
-                                                            "auth/login",
-                                                            toasterViewModel,
-                                                            phoneNotRegistered,
-                                                            hasError = hasError,
-                                                            animationTrigger = animationTrigger
+                                                    if (fullPhoneNumber.length < phoneNumberLength) {
+                                                        hasError.value = true
+                                                        toasterViewModel.toaster.show(
+                                                            "$requiredPhoneLength $phoneNumberLength",
+                                                            type = ToastType.Error,
+                                                            duration = ToasterDefaults.DurationDefault
                                                         )
+                                                        animationTrigger.value =
+                                                            !animationTrigger.value
 
-                                                    if (response != null) {
-
-                                                        navigator.push(
-                                                            AuthCallScreen(
+                                                    } else {
+                                                        val response =
+                                                            sendRequestToBackend(
                                                                 fullPhoneNumber,
-
-                                                                "SignIn"
+                                                                NotifierManager.getPushNotifier()
+                                                                    .getToken(),
+                                                                "auth/login",
+                                                                toasterViewModel,
+                                                                phoneNotRegistered,
+                                                                hasError = hasError,
+                                                                animationTrigger = animationTrigger
                                                             )
-                                                        )
+
+                                                        if (response != null) {
+                                                            navigator.push(
+                                                                AuthCallScreen(
+                                                                    fullPhoneNumber,
+                                                                    "SignIn",
+                                                                    selectCountryName
+                                                                )
+                                                            )
+                                                        }
                                                     }
+                                                } finally {
+                                                    isLoading.value = false // Выключаем загрузку
                                                 }
-                                            } finally {
-                                                isLoading.value = false // Выключаем загрузку
                                             }
-                                        }
-                                    }, style = ButtonStyle.Gradient,
+                                        }, style = ButtonStyle.Gradient,
                                         isLoading = isLoading.value
                                     )
 
                                 }
                             }
+
 
                         }
                     }
@@ -341,6 +331,17 @@ class SignInScreen : Screen {
 }
 
 
-
+enum class CountryName {
+    KZ,
+    RU,
+    BLR,  // Беларусь
+    ARM,  // Армения
+    KGZ,  // Кыргызстан
+    TJK,  // Таджикистан
+    GEO,  // Грузия
+    UZB,  // Узбекистан
+    LVA,  // Латвия
+    PHL   // Филиппины
+}
 
 
