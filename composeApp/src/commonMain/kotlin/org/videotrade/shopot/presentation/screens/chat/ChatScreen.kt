@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -39,6 +44,8 @@ import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Chat.BlurredMessageOverlay
 import org.videotrade.shopot.presentation.components.Chat.Chat
 import org.videotrade.shopot.presentation.components.Chat.ChatFooter
@@ -134,9 +141,20 @@ class ChatScreen(
             val density = LocalDensity.current
             val screenHeightInPx = maxHeight.value * density.density // Пример, если maxHeight в Dp
 
-            SafeArea(isBlurred = selectedMessage.value != null, 0.dp) {
-                Column(modifier = Modifier.fillMaxSize().background(colors.background)) {
-                    Scaffold(
+                
+                val blurRadius = if (selectedMessage.value != null) 20.dp else 0.dp
+                
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize().background(backgroundColor)
+                        .blur(blurRadius)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(colors.background)
+                            .imePadding() // Например, если нужны отступы для содержимого
+                    ) {                    Scaffold(
                         topBar = {
                             ChatHeader(chat, viewModel, profile)
                             
