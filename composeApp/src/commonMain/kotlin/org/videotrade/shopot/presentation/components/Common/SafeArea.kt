@@ -34,14 +34,10 @@ fun SafeArea(
             .fillMaxSize().background(backgroundColor)
             .blur(blurRadius)
             .then(
-                if (getPlatform() == Platform.Ios) {
-                    Modifier.safeContentPadding()
-                } else {
                     if (padding != null) Modifier.padding(padding) else Modifier.padding(
                         start = 20.dp,
                         end = 20.dp
                     ).statusBarsPadding()
-                }
             )
     ) {
         Toaster(state = toasterViewModel.toaster)

@@ -120,7 +120,7 @@ class CreateGroupSecondScreen() : Screen {
                     .fillMaxWidth()
                     .background(colors.background)
             ) {
-                SafeArea(padding = 0.dp) {
+                SafeArea(padding = 15.dp) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {

@@ -111,7 +111,7 @@ class InviteContactsScreen() : Screen {
                 .fillMaxHeight()
                 .background(colors.surface)
         ) {
-            SafeArea(padding = 0.dp) {
+            SafeArea(padding = 15.dp) {
                 Column(
                     Modifier.background(colors.background)
                 ) {
