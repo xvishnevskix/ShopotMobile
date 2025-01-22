@@ -412,7 +412,7 @@ fun ChatSkeleton() {
             // Круглый элемент скелетона
             Box(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50.dp))
+                    .clip(RoundedCornerShape(16.dp))
                     .background(colors.onBackground)
                     .size(56.dp)
             )
