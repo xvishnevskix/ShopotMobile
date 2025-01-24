@@ -451,7 +451,7 @@ fun ChatFooter(
 
     val lockOffsetY = remember { mutableStateOf(-50f) }
 
-    println("activeAxis: ${activeAxis} ")
+
 // Общее смещение с учетом свайпа и анимации
     val totalLockOffsetY = lockOffsetY.value.dp + animationOffset.dp
 
@@ -940,7 +940,16 @@ fun ChatFooter(
                                                                 offset = Offset.Zero // Возвращаем кнопку на место
                                                                 swipeOffset.animateTo(0f)
                                                                 lockOffsetY.value = -50f // Сбрасываем положение lock
+
                                                             }
+                                                            val seconds = recordingTime % 60
+                                                            if (seconds > 1) {
+                                                                isStartRecording = false
+                                                                isStopAndSendVoice.value = true
+                                                            }
+                                                            viewModel.setIsRecording(false)
+                                                            recordingTime = 0
+                                                            isDragging = false
                                                         }
                                                     }
                                                     if (offset == Offset.Zero) {

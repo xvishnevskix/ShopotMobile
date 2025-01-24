@@ -281,6 +281,7 @@ fun MessageContent(message: MessageItem): String {
             when (message.attachments!![0].type) {
                 "audio/mp4" -> stringResource(MokoRes.strings.audio)
                 "image" -> stringResource(MokoRes.strings.photo)
+                "sticker" -> stringResource(MokoRes.strings.sticker)
                 else -> stringResource(MokoRes.strings.file)
             }
         }
