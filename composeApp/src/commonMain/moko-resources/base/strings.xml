@@ -158,7 +158,7 @@
     <string name="nickname_is_required">Nickname is required</string>
     <string name="nickname_must_contain_at_least_6_characters">Nickname must contain at least 6 characters</string>
     <string name="nickname_should_not_exceed_30_characters">Nickname should not exceed 30 characters</string>
-    <string name="nickname_can_contain_only_letters_and_numbers">Nickname can contain only letters and numbers</string>
+    <string name="nickname_can_contain_only_letters_and_numbers">Nickname can contain only Latin letters and numbers</string>
 
     <string name="are_you_sure_you_want_to_go_out">Are you sure you want to go out?</string>
     <string name="you_will_be_returned_to_the_initial_login_screen">You will be returned to the initial login screen</string>
