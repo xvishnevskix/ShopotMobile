@@ -18,6 +18,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.firebase.Firebase
 import com.google.firebase.initialize
 import com.mmk.kmpnotifier.notification.NotifierManager
@@ -169,7 +171,21 @@ open class AppActivity : ComponentActivity() {
         
         enableEdgeToEdge()
         initializeProviders()
-        
+
+
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // Изменяем цвет навигационной панели
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT // Устанавливаем прозрачный цвет
+
+// Устанавливаем флаг для управления прозрачностью
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+// Настройка поведения и стиля иконок
+        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+        insetsController.isAppearanceLightNavigationBars = false // Устанавливаем светлые или тёмные иконки
+
+
         setContent {
             App()
         }

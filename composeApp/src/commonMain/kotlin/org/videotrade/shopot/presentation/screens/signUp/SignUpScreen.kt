@@ -158,12 +158,14 @@ class SignUpScreen(private val phone: String) : Screen {
                     contentAlignment = Alignment.TopCenter
                 ) {
                     Column(
-                        modifier = Modifier.padding(top = 50.dp).fillMaxSize().verticalScroll(
+                        modifier = Modifier.padding(top = 10.dp).fillMaxSize().verticalScroll(
                             rememberScrollState()
                         ),
                         horizontalAlignment = Alignment.CenterHorizontally,
 
                         ) {
+
+                        Spacer(Modifier.height(40.dp))
 
                         Box(modifier = Modifier.clickable {
                             scope.launch {
@@ -276,14 +278,14 @@ class SignUpScreen(private val phone: String) : Screen {
                                 placeholder = stringResource(MokoRes.strings.come_up_nickname),
                                 error = nicknameError.value
                             )
-                            Spacer(modifier = Modifier.height(80.dp))
+                            Spacer(modifier = Modifier.height(40.dp))
 
 
                         }
 
 
                         Box(
-                            modifier = Modifier.padding(top = 20.dp, bottom = 20.dp)
+                            modifier = Modifier.padding(bottom = 80.dp)
                         ) {
                             CustomButton(
                                 stringResource(MokoRes.strings.create_account),

@@ -57,7 +57,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chat_call
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val interactionSource =
@@ -70,10 +70,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
 
-    println("sadasdasdasdgsdfsd ${chat.userId}")
-    println("sadasdasdasdgsdfsd profile ${profile.id}")
-
-    println("sadasdasdasdgsdfsd ${chat.chatUser!![0].id}")
 
     Column {
         Row(
@@ -219,7 +215,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 //                                    }
                                         
                                         if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
-                                            println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
                                             commonViewModel.mainNavigator.value?.push(
                                                 CallScreen(
                                                     chat.userId,
@@ -239,7 +234,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                         
                                     }
                                 }
-                                println("userID : ${chat.userId}")
+
                                 
                                 
                             },
