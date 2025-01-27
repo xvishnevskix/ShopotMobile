@@ -70,6 +70,7 @@ import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
 import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.login.CountryName
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
@@ -92,6 +93,8 @@ class SignUpPhoneScreen : Screen {
         val phoneRegistered = stringResource(MokoRes.strings.phone_number_is_already_registered)
         val serverUnavailable = stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
         var countryCode by remember { mutableStateOf("+7") }
+        val defaultCountry = stringResource(MokoRes.strings.ru)
+        var selectedCountryName by remember { mutableStateOf(defaultCountry) }
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
         val scrollState = rememberScrollState()
@@ -108,11 +111,13 @@ class SignUpPhoneScreen : Screen {
             )
         }
         val isLoading = remember { mutableStateOf(false) }
+        var selectCountryName by remember { mutableStateOf(CountryName.RU) }
 
 
         val countries = listOf(
             "+7" to "\uD83C\uDDF7\uD83C\uDDFA   ${stringResource(MokoRes.strings.ru)}",
             "+375" to "\uD83C\uDDE7\uD83C\uDDFE   ${stringResource(MokoRes.strings.by)}",
+            "+7" to "\uD83C\uDDF0\uD83C\uDDFF   ${stringResource(MokoRes.strings.kz)}",
             "+374" to "\uD83C\uDDE6\uD83C\uDDF2   ${stringResource(MokoRes.strings.am)}",
             "+996" to "\uD83C\uDDF0\uD83C\uDDEC   ${stringResource(MokoRes.strings.kg)}",
             "+992" to "\uD83C\uDDF9\uD83C\uDDEF   ${stringResource(MokoRes.strings.tj)}",
@@ -145,13 +150,18 @@ class SignUpPhoneScreen : Screen {
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
                 sheetContent = {
+                    val kzString = stringResource(MokoRes.strings.kz)
 
                     CountryPickerBottomSheet(
                         countries = countries,
                         showPhoneMenu = showPhoneMenu,
                         selectedCountryCode = countryCode,
-                        onCountrySelected = { selectedCode ->
+                        selectedCountryName = selectedCountryName,
+                        onCountrySelected = { selectedCode, selectedName ->
                             countryCode = selectedCode
+                            when (selectedName) {
+                                kzString -> selectCountryName = CountryName.KZ
+                            }
                             val currentNumber = phone.value.text
                             phone.value = TextFieldValue(
                                 text = currentNumber,
@@ -289,15 +299,15 @@ class SignUpPhoneScreen : Screen {
                                                             toasterViewModel,
                                                             sendCode,
                                                             hasError = hasError,
-                                                            animationTrigger = animationTrigger,
-                                                            serverUnavailable = serverUnavailable
+                                                            animationTrigger = animationTrigger
                                                         )
 
                                                     if (response == null) {
                                                         navigator.push(
                                                             AuthCallScreen(
                                                                 fullPhoneNumber,
-                                                                "SignUp"
+                                                                "SignUp",
+                                                                selectCountryName
                                                             )
                                                         )
                                                     }

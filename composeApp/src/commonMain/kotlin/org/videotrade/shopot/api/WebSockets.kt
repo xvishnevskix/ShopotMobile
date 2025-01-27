@@ -84,7 +84,7 @@ suspend fun handleConnectWebSocket(
                             when (action) {
                                 "getUserChats" -> {
                                     try {
-                                        
+
                                         chatsUseCase.setIsLoadingValue(false)
 
                                         println("getUserChatsgetUserChats $jsonElement")
@@ -197,21 +197,29 @@ suspend fun handleConnectWebSocket(
 
                                                 // Декодируем content, если оно не пустое
                                                 if (!message.content.isNullOrBlank()) {
-                                                    val decups = decupsMessage(message.content, cipherWrapper)
+                                                    val decups = decupsMessage(
+                                                        message.content,
+                                                        cipherWrapper
+                                                    )
                                                     messageNew = messageNew.copy(content = decups)
                                                 }
 
                                                 // Декодируем answerMessage.content, если оно не пустое
                                                 message.answerMessage?.let { answerMessage ->
                                                     if (!answerMessage.content.isNullOrBlank()) {
-                                                        val decupsAnswerMessage = decupsMessage(answerMessage.content, cipherWrapper)
+                                                        val decupsAnswerMessage = decupsMessage(
+                                                            answerMessage.content,
+                                                            cipherWrapper
+                                                        )
                                                         if (decupsAnswerMessage != null) {
-                                                            val updatedAnswerMessage = answerMessage.copy(content = decupsAnswerMessage)
-                                                            messageNew = messageNew.copy(answerMessage = updatedAnswerMessage)
+                                                            val updatedAnswerMessage =
+                                                                answerMessage.copy(content = decupsAnswerMessage)
+                                                            messageNew =
+                                                                messageNew.copy(answerMessage = updatedAnswerMessage)
                                                         }
                                                     }
                                                 }
-8
+                                                8
                                                 messages.add(messageNew)
 
                                             }
@@ -230,28 +238,36 @@ suspend fun handleConnectWebSocket(
 
                                 "messageSent" -> {
                                     try {
-                                        val messageJson = jsonElement.jsonObject["message"]?.jsonObject
+                                        val messageJson =
+                                            jsonElement.jsonObject["message"]?.jsonObject
 
                                         if (messageJson != null) {
                                             println("ttttaaaaa $messageJson")
                                             println("currentChat ${chatsUseCase.currentChat.value}")
 
-                                            val message: MessageItem = Json.decodeFromString(messageJson.toString())
+                                            val message: MessageItem =
+                                                Json.decodeFromString(messageJson.toString())
                                             var messageNew = message
 
                                             // Декодируем content, если оно не пустое
                                             if (!message.content.isNullOrBlank()) {
-                                                val decups = decupsMessage(message.content, cipherWrapper)
+                                                val decups =
+                                                    decupsMessage(message.content, cipherWrapper)
                                                 messageNew = messageNew.copy(content = decups)
                                             }
 
                                             // Декодируем answerMessage.content, если оно не пустое
                                             message.answerMessage?.let { answerMessage ->
                                                 if (!answerMessage.content.isNullOrBlank()) {
-                                                    val decupsAnswerMessage = decupsMessage(answerMessage.content, cipherWrapper)
+                                                    val decupsAnswerMessage = decupsMessage(
+                                                        answerMessage.content,
+                                                        cipherWrapper
+                                                    )
                                                     if (decupsAnswerMessage != null) {
-                                                        val updatedAnswerMessage = answerMessage.copy(content = decupsAnswerMessage)
-                                                        messageNew = messageNew.copy(answerMessage = updatedAnswerMessage)
+                                                        val updatedAnswerMessage =
+                                                            answerMessage.copy(content = decupsAnswerMessage)
+                                                        messageNew =
+                                                            messageNew.copy(answerMessage = updatedAnswerMessage)
                                                     }
                                                 }
                                             }
@@ -263,13 +279,17 @@ suspend fun handleConnectWebSocket(
 
                                             // Обновляем последнее сообщение в чате
                                             chatsUseCase.updateLastMessageChat(messageNew)
-                                             val musicPlayer = AudioFactory.createMusicPlayer()
-                                            
-                                            
-                                            if(message.fromUser != userId) {
-                                                musicPlayer.play("newmess", false,  MusicType.Notification)
+                                            val musicPlayer = AudioFactory.createMusicPlayer()
+
+
+                                            if (message.fromUser != userId) {
+                                                musicPlayer.play(
+                                                    "newmess",
+                                                    false,
+                                                    MusicType.Notification
+                                                )
                                             }
-                                            
+
                                         }
 
                                     } catch (e: Exception) {
@@ -347,16 +367,21 @@ suspend fun handleConnectWebSocket(
                                             }
 
                                             chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
-                                            
-                                            
+
+
                                             val musicPlayer = AudioFactory.createMusicPlayer()
-                                            
+
                                             println("(message.fromUser ${message.fromUser} ${userId}")
-                                            
-                                            
-                                            if(message.fromUser != userId) {
-                                                musicPlayer.play("newmess", false, MusicType.Notification)
-                                            }                                     }
+
+
+                                            if (message.fromUser != userId) {
+                                                musicPlayer.play(
+                                                    "newmess",
+                                                    false,
+                                                    MusicType.Notification
+                                                )
+                                            }
+                                        }
 
                                     } catch (e: Exception) {
 
@@ -367,69 +392,49 @@ suspend fun handleConnectWebSocket(
 
                                 "messageDeleted" -> {
                                     try {
-
-
                                         println("messagePoka $jsonElement")
 
-                                        val dataJson =
-                                            jsonElement.jsonObject["data"]?.jsonObject
+                                        val messageIdJson =
+                                            jsonElement.jsonObject["messageId"]?.jsonPrimitive?.content
 
 
+                                        val chatIdJson =
+                                            jsonElement.jsonObject["chatId"]?.jsonPrimitive?.content
 
-                                        if (dataJson != null) {
-
-                                            val messageJson =
-                                                jsonElement.jsonObject["data"]?.jsonObject
-
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
+                                        val lastMessageJson =
+                                            jsonElement.jsonObject["lastMessage"]?.jsonObject
 
 
-                                            println("messagePoka $message")
+//                                        chatsUseCase.updateLastMessageChat(messageNew)
+
+                                        if (messageIdJson != null && chatIdJson != null) {
+                                            chatUseCase.delMessageById(
+                                                messageIdJson,
+                                                chatIdJson
+                                            )
+                                        }// Инициализация сообщений
 
 
-                                            chatUseCase.addMessage(message)// Инициализация сообщений
+                                        val message: MessageItem =
+                                            Json.decodeFromString(lastMessageJson.toString())
+                                        var messageNew = message
 
-
+                                        // Декодируем content, если оно не пустое
+                                        if (!message.content.isNullOrBlank()) {
+                                            val decups =
+                                                decupsMessage(message.content, cipherWrapper)
+                                            messageNew = messageNew.copy(content = decups)
                                         }
 
-                                    } catch (e: Exception) {
 
-                                        Logger.d("Error228: $e")
-                                    }
+                                        println("messageNew $messageNew")
 
-
-                                }
-
-                                "messageRemoved" -> {
-                                    try {
-
-
-                                        println("messagePoka $jsonElement")
-
-                                        val messageJson =
-                                            jsonElement.jsonObject["message"]?.jsonObject
-
-
-
-                                        if (messageJson != null) {
-
-
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
-
-
-                                            chatUseCase.delMessage(message)// Инициализация сообщений
-                                        }
+                                        chatsUseCase.updateLastMessageChat(messageNew)
 
                                     } catch (e: Exception) {
-
-                                        Logger.d("Error228: $e")
+                                        Logger.d("ErrorDellMess: $e")
                                     }
-
-
                                 }
-
 
                                 "messageReadNotification" -> {
                                     try {
@@ -597,14 +602,19 @@ suspend fun handleConnectWebSocket(
                                             }
 
                                             chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
-                                            
+
                                             val musicPlayer = AudioFactory.createMusicPlayer()
-                                            
+
                                             println("(message.fromUser ${message.fromUser} ${userId}")
-                                            
-                                            if(message.fromUser != userId) {
-                                                musicPlayer.play("newmess", false, MusicType.Notification)
-                                            }                                       }
+
+                                            if (message.fromUser != userId) {
+                                                musicPlayer.play(
+                                                    "newmess",
+                                                    false,
+                                                    MusicType.Notification
+                                                )
+                                            }
+                                        }
 
                                     } catch (e: Exception) {
 
@@ -614,17 +624,17 @@ suspend fun handleConnectWebSocket(
                                 }
 
 
-//                                    {
-//
-//                                    val messageJson =
-//                                        jsonElement.jsonObject["message"]?.jsonObject
-//
-//                                    val message =
-//                                        Json.decodeFromString<MessageItem>(messageJson.toString())
-//
-//                                    chatUseCase.addMessage(message)
-//                                }
+                                "updateLastMessage" -> {
+                                    val messageJson =
+                                        jsonElement.jsonObject["lastMessage"]?.jsonObject
 
+                                    val message: MessageItem =
+                                        Json.decodeFromString(messageJson.toString())
+
+                                    chatsUseCase.updateLastMessageChat(message)
+
+                                    println("newLastMessage$jsonElement")
+                                }
                             }
                         }
                     }

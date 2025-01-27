@@ -12,11 +12,16 @@ import kotlinx.serialization.json.encodeToJsonElement
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatRepository
 import org.videotrade.shopot.domain.usecase.WsUseCase
 
 class ChatRepositoryImpl : ChatRepository, KoinComponent {
+    private val _currentChat = MutableStateFlow<ChatItem?>(null)
+    override val currentChat: StateFlow<ChatItem?> get() = _currentChat.asStateFlow()
+
+
     private val _messages = MutableStateFlow<List<MessageItem>>(
         emptyList()
     )
@@ -232,6 +237,13 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         }
     }
 
+    override fun delMessageById(messageId: String, chatId: String) {
+        if (chatId == currentChat.value?.id)
+            _messages.value = _messages.value.filter { it.id != messageId }
+
+    }
+
+
     override fun clearMessages() {
         setMessagePage(0)
         _messages.value = emptyList()
@@ -240,5 +252,10 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
 
     override fun clearData() {
         _messages.value = emptyList()
+    }
+
+
+    override fun setCurrentChat(chat: ChatItem) {
+        _currentChat.value = chat
     }
 }

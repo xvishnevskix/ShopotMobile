@@ -45,6 +45,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
     private val musicPlayer = AudioFactory.createMusicPlayer()
+
+    val currentChat = chatUseCase.currentChat
    
     val footerText = MutableStateFlow("")
     
@@ -55,10 +57,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
     
     val profile = MutableStateFlow(ProfileDTO())
-    
-    
-    val _currentChat = MutableStateFlow<ChatItem?>(null)
-    val currentChat: StateFlow<ChatItem?> get() = _currentChat.asStateFlow()
+
+
     
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     
@@ -121,7 +121,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     fun setCurrentChat(chat: ChatItem) {
-        _currentChat.value = chat
+        chatUseCase.setCurrentChat(chat)
     }
     
     fun setIsRecording(isRecordingNew: Boolean) {

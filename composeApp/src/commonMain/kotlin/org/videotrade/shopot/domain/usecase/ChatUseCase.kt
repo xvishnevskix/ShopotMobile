@@ -3,12 +3,14 @@ package org.videotrade.shopot.domain.usecase
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.repository.ChatRepository
 
 class ChatUseCase : KoinComponent {
     private val repository: ChatRepository by inject()
 
+    val currentChat: StateFlow<ChatItem?> get() = repository.currentChat
 
     fun setMessagePage(page: Int) {
         return repository.setMessagePage(page)
@@ -42,6 +44,10 @@ class ChatUseCase : KoinComponent {
 
     suspend fun delMessage(message: MessageItem) {
         return repository.delMessage(message)
+    }
+
+    fun delMessageById(messageId: String, chatId: String) {
+        return repository.delMessageById(messageId, chatId)
     }
 
 
@@ -88,5 +94,10 @@ class ChatUseCase : KoinComponent {
 
     fun clearData() {
         repository.clearData()
+    }
+
+
+    fun setCurrentChat(chat: ChatItem) {
+        return repository.setCurrentChat(chat)
     }
 }

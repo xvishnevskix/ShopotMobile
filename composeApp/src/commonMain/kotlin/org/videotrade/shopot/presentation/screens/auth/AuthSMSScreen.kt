@@ -107,6 +107,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                 }
             )
             val response = origin().post("2fa", jsonContent)
+
             if (response != null) {
                 val jsonElement = Json.parseToJsonElement(response)
                 println("jsonElement41414 $jsonElement")
@@ -128,8 +129,6 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
 
 
         val otpFields = remember { mutableStateListOf("", "", "", "") }
-
-
 
 
         SafeArea {
@@ -180,7 +179,6 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                                     isLoading.value = true
                                     if (
                                         responseState.value != otpText && !isSuccessOtp.value
-
                                     ) {
                                         isLoading.value = false
                                         toasterViewModel.toaster.show(

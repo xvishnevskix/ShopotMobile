@@ -1428,6 +1428,18 @@ actual class FileProvider {
         }
     }
     
+    actual suspend fun compressImage(filePath: String): String? {
+        TODO("Not yet implemented")
+    }
+    
+    actual suspend fun compressFile(filePath: String): String? {
+        TODO("Not yet implemented")
+    }
+    
+    actual suspend fun compressFileWithLength(filePath: String): String? {
+        TODO("Not yet implemented")
+    }
+    
 }
 
 actual object FileProviderFactory {
