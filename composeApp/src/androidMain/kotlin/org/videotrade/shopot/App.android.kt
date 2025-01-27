@@ -8,14 +8,22 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -42,6 +50,7 @@ import org.videotrade.shopot.multiplatform.NotificationHelper.createNotification
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
 import org.videotrade.shopot.multiplatform.platformModule
+import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
 
 
 class AndroidApp : Application() {
@@ -56,7 +65,7 @@ class AndroidApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
-        
+
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         if (!pm.isIgnoringBatteryOptimizations(packageName)) {
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
@@ -146,10 +155,14 @@ class AndroidApp : Application() {
 }
 
 
-open class AppActivity : ComponentActivity() {
+open class AppActivity : ComponentActivity(), SensorEventListener {
     private var permissionResultCallback: ((Int, Boolean) -> Unit)? = null
-    
-    
+
+    private lateinit var sensorManager: SensorManager
+    private var proximitySensor: Sensor? = null
+    private var isProximitySensorEnabled = false
+    val isScreenDimmed = mutableStateOf(false)
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -160,6 +173,17 @@ open class AppActivity : ComponentActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
+        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
+
+        if (proximitySensor == null) {
+            Log.e("ProximitySensor", "Датчик приближения недоступен на этом устройстве")
+        } else {
+            setProximitySensorEnabled(true) // Включаем датчик
+        }
+
+
         getContextObj.initializeActivity(this)
         createNotificationChannel(this)
         
@@ -223,6 +247,56 @@ open class AppActivity : ComponentActivity() {
         } else {
             callback(requestCode, true)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isProximitySensorEnabled) {
+            proximitySensor?.also { sensor ->
+                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        setProximitySensorEnabled(false) // Отключаем датчик, если он включен
+    }
+
+    val settingsViewModel: SettingsViewModel by viewModels()
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_PROXIMITY) {
+            val isNear = event.values[0] < (proximitySensor?.maximumRange ?: 0f)
+            Log.d("ProximitySensor", "isNear: $isNear")
+            settingsViewModel.setScreenDimmed(isNear) // Обновляем состояние ViewModel
+            Log.d("ProximitySensor", "isScreenDimmed: ${settingsViewModel.isScreenDimmed.value}")
+            isScreenDimmed.value = isNear
+            if (isNear) {
+                Log.d("ProximitySensor", "Экран затемняется")
+                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            } else {
+                Log.d("ProximitySensor", "Экран возвращается в нормальное состояние")
+                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+            }
+        }
+    }
+
+    fun setProximitySensorEnabled(enabled: Boolean) {
+        isProximitySensorEnabled = enabled
+        if (enabled) {
+            proximitySensor?.also { sensor ->
+                Log.d("ProximitySensor", "Регистрируем слушатель датчика")
+                sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
+            }
+        } else {
+            Log.d("ProximitySensor", "Отменяем регистрацию слушателя датчика")
+            sensorManager.unregisterListener(this)
+        }
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        // Метод не используется, можно оставить пустым
     }
     
     companion object {

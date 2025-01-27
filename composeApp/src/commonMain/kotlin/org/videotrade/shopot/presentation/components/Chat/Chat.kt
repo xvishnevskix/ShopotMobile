@@ -22,9 +22,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.BottomSheetScaffoldState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -101,18 +104,22 @@ fun Chat(
     var shouldShowHeader by remember { mutableStateOf(false) }
     val answerMessageId = remember { mutableStateOf<String?>(null) }
 
-    // TODO надо будет сделать загрузку при запросе сообщений
+    var isLoading by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(false) }
-
+    var numberOfDays by remember { mutableStateOf(1) }
 
 
 
     if (messagesState.isNotEmpty()) {
-        val groupedMessages = messagesState.groupBy { message ->
-            message.created.subList(0, 3)
+        val groupedMessages by derivedStateOf {
+            messagesState.groupBy { message ->
+                "${message.created[0]}-${message.created[1].toString().padStart(2, '0')}-${message.created[2].toString().padStart(2, '0')}"
+            }
         }
-        val numberOfDays = groupedMessages.size
 
+        println("groupedMessages: ${groupedMessages.values.size}")
+
+        numberOfDays = groupedMessages.values.size
 
         LaunchedEffect(listState) {
             snapshotFlow { listState.isScrollInProgress }
@@ -133,9 +140,18 @@ fun Chat(
                 .distinctUntilChanged()
                 .collect { visibleItems ->
                     if (viewModel.messages.value.size > 23) {
-                        if (visibleItems.isNotEmpty() && visibleItems.last().index == viewModel.messages.value.size - 1 + numberOfDays) {
+                        println("viewModel.messages.value.size: ${viewModel.messages.value.size}")
+                        println("visibleItems.last().index: ${visibleItems.last().index}")
+
+
+                        val totalItems = viewModel.messages.value.size + numberOfDays
+                        println("numberOfDays ${numberOfDays}")
+                        println("totalItems ${totalItems}")
+                        if (visibleItems.isNotEmpty() && visibleItems.last().index == totalItems - 1) {
+                            isLoading = true
                             coroutineScope.launch {
                                 viewModel.getMessagesBack(chat.chatId)
+                                isLoading = false
                             }
                         }
                     }
@@ -148,7 +164,7 @@ fun Chat(
             modifier = modifier.background(colors.background).padding(horizontal = 8.dp)
         ) {
             groupedMessages.forEach { (date, messages) ->
-
+                println("Group: $date, Messages: ${messages.size}")
                 stickyHeader {
                     val alpha by animateFloatAsState(
                         targetValue = if (isScrolling) 1f else 0f,
@@ -156,7 +172,7 @@ fun Chat(
                     )
 
                     DateHeader(
-                        date = date,
+                        date = messages[0].created,
                         modifier = Modifier.alpha(alpha)
                     )
                 }
@@ -183,6 +199,8 @@ fun Chat(
                         } ?: ""
                     }
 
+                    println("message.created: ${message.created}")
+
                     MessageBox(
                         viewModel = viewModel,
                         message = message,
@@ -202,46 +220,61 @@ fun Chat(
                         messagesState = messagesState
                     )
                 }
+
             }
+//            if (isLoading) {
+//                item {
+//                    Box(
+//                        modifier = Modifier.fillMaxWidth()
+//                            .padding(16.dp),
+//                        contentAlignment = Alignment.Center
+//                    ) {
+//                        CircularProgressIndicator(
+//                            color = Color(0xFFCAB7A3),
+//                            modifier = Modifier.size(32.dp)
+//                        )
+//                    }
+//                }
+//            }
         }
 
 
     } else {
-        if (isVisible) {
-            Column(
-                modifier = Modifier.fillMaxSize(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Image(
-                    modifier = Modifier.size(width =  128.dp, height = 86.dp),
-                    painter = painterResource(Res.drawable.auth_logo),
-                    contentDescription = null,
-                )
-                Spacer(modifier = Modifier.height(40.dp))
-                Text(
-                    "Сообщений пока нет...",
-                    textAlign = TextAlign.Center,
-                    fontSize = 24.sp,
-                    lineHeight = 24.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                    fontWeight = FontWeight(500),
-                    color = Color(0xFF373533),
-                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    "Отправьте сообщение",
-                    textAlign = TextAlign.Center,
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                    fontWeight = FontWeight(400),
-                    color = Color(0x80373533),
-                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                )
-            }
-        }
+//        if (isVisible) {
+//            Column(
+//                modifier = Modifier.fillMaxSize(1f),
+//                horizontalAlignment = Alignment.CenterHorizontally,
+//                verticalArrangement = Arrangement.Center
+//            ) {
+//                Image(
+//                    modifier = Modifier.size(width =  128.dp, height = 86.dp),
+//                    painter = painterResource(Res.drawable.auth_logo),
+//                    contentDescription = null,
+//                )
+//                Spacer(modifier = Modifier.height(40.dp))
+//                Text(
+//                    "Сообщений пока нет...",
+//                    textAlign = TextAlign.Center,
+//                    fontSize = 24.sp,
+//                    lineHeight = 24.sp,
+//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+//                    fontWeight = FontWeight(500),
+//                    color = Color(0xFF373533),
+//                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                )
+//                Spacer(modifier = Modifier.height(8.dp))
+//                Text(
+//                    "Отправьте сообщение",
+//                    textAlign = TextAlign.Center,
+//                    fontSize = 16.sp,
+//                    lineHeight = 16.sp,
+//                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                    fontWeight = FontWeight(400),
+//                    color = Color(0x80373533),
+//                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                )
+//            }
+//        }
     }
 }
 
