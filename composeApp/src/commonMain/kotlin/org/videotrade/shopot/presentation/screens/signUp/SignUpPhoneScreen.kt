@@ -158,10 +158,11 @@ class SignUpPhoneScreen : Screen {
                         selectedCountryCode = countryCode,
                         selectedCountryName = selectedCountryName,
                         onCountrySelected = { selectedCode, selectedName ->
-                            countryCode = selectedCode
                             when (selectedName) {
                                 kzString -> selectCountryName = CountryName.KZ
                             }
+                            countryCode = selectedCode
+                            selectedCountryName = selectedName
                             val currentNumber = phone.value.text
                             phone.value = TextFieldValue(
                                 text = currentNumber,
