@@ -106,18 +106,16 @@ fun Chat(
 
     var isLoading by remember { mutableStateOf(false) }
     var isVisible by remember { mutableStateOf(false) }
-    var numberOfDays by remember { mutableStateOf(1) }
+    var numberOfDays by remember { mutableStateOf(0) }
 
 
 
     if (messagesState.isNotEmpty()) {
-        val groupedMessages by derivedStateOf {
-            messagesState.groupBy { message ->
-                "${message.created[0]}-${message.created[1].toString().padStart(2, '0')}-${message.created[2].toString().padStart(2, '0')}"
-            }
-        }
+        val groupedMessages = messagesState.groupBy { message ->
+            message.created.subList(0, 3)
+}
 
-        println("groupedMessages: ${groupedMessages.values.size}")
+            println("groupedMessages: ${groupedMessages.values.size}")
 
         numberOfDays = groupedMessages.values.size
 
@@ -172,7 +170,7 @@ fun Chat(
                     )
 
                     DateHeader(
-                        date = messages[0].created,
+                        date = date,
                         modifier = Modifier.alpha(alpha)
                     )
                 }
