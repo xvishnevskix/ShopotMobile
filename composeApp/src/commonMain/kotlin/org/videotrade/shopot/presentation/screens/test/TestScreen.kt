@@ -7,6 +7,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,24 +37,32 @@ class TestScreen : Screen {
 
         val audioRecorder = remember { AudioFactory.createAudioRecorder() }
         val audioPlayer = remember { AudioFactory.createAudioPlayer() }
-        
+        val settingsViewModel: SettingsViewModel = koinInject()
         var isRecording by remember { mutableStateOf(false) }
         var audioFilePath by remember { mutableStateOf("") }
         var audioFileName by remember { mutableStateOf("") }
         var fileId by remember { mutableStateOf("") }
 
-        val settingsViewModel: SettingsViewModel = koinInject()
 
-        val isScreenDimmed = remember { mutableStateOf(false) }
-        val sad = settingsViewModel.isScreenDimmed.value
         val sharedSecret = getValueInStorage("sharedSecret")
 
+        LaunchedEffect(Unit) {
+            settingsViewModel.setProximitySensorEnabled(true)
+            println("ProximitySensor Включаем датчик приближения")
+        }
+
+        DisposableEffect(Unit) {
+            println("ProximitySensor Отключаем датчик приближения")
+            onDispose {
+                settingsViewModel.setProximitySensorEnabled(false)
+            }
+        }
         
         MaterialTheme {
             SafeArea {
                 Column(
                     Modifier.fillMaxSize()
-                        .background(if (sad) Color.Black else Color.Yellow)
+
 
                 ) {
                     Button(
@@ -128,6 +138,18 @@ class TestScreen : Screen {
                         }
                     ) {
                         Text("getDurr Audio")
+                    }
+
+
+                    Button(
+                        onClick = {
+                            val newState = !settingsViewModel.isProximitySensorEnabled.value
+                            settingsViewModel.setProximitySensorEnabled(newState)
+                            println("ProximitySensor переключили состояние: $newState")
+
+                        }
+                    ) {
+                        Text("Switch sensor")
                     }
                 }
             }

@@ -163,6 +163,9 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
     private var isProximitySensorEnabled = false
     val isScreenDimmed = mutableStateOf(false)
 
+    private lateinit var powerManager: PowerManager
+    private var wakeLock: PowerManager.WakeLock? = null
+
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted: Boolean ->
@@ -174,8 +177,11 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
+
+        powerManager = getSystemService(POWER_SERVICE) as PowerManager
 
         if (proximitySensor == null) {
             Log.e("ProximitySensor", "Датчик приближения недоступен на этом устройстве")
@@ -260,39 +266,64 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
 
     override fun onPause() {
         super.onPause()
-        setProximitySensorEnabled(false) // Отключаем датчик, если он включен
+        setProximitySensorEnabled(false)
+        turnOnScreen()
     }
 
     val settingsViewModel: SettingsViewModel by viewModels()
 
     override fun onSensorChanged(event: SensorEvent?) {
+        Log.d("ProximitySensor", "onSensorChanged вызван")
+        Log.d("ProximitySensor", "onSensorChanged вызван ${settingsViewModel.isProximitySensorEnabled.value}")
+        if (!settingsViewModel.isProximitySensorEnabled.value) return
+
         if (event?.sensor?.type == Sensor.TYPE_PROXIMITY) {
             val isNear = event.values[0] < (proximitySensor?.maximumRange ?: 0f)
             Log.d("ProximitySensor", "isNear: $isNear")
-            settingsViewModel.setScreenDimmed(isNear) // Обновляем состояние ViewModel
-            Log.d("ProximitySensor", "isScreenDimmed: ${settingsViewModel.isScreenDimmed.value}")
+
+            Log.d("ProximitySensor", "isScreenDimmed: ${isNear}")
             isScreenDimmed.value = isNear
             if (isNear) {
                 Log.d("ProximitySensor", "Экран затемняется")
-                window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                turnOffScreen()
             } else {
                 Log.d("ProximitySensor", "Экран возвращается в нормальное состояние")
-                window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                turnOnScreen()
             }
         }
     }
 
     fun setProximitySensorEnabled(enabled: Boolean) {
         isProximitySensorEnabled = enabled
+        Log.d("ProximitySensor", "setProximitySensorEnabled: $enabled")
         if (enabled) {
             proximitySensor?.also { sensor ->
                 Log.d("ProximitySensor", "Регистрируем слушатель датчика")
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
-            }
+            } ?: Log.e("ProximitySensor", "Датчик приближения отсутствует")
         } else {
             Log.d("ProximitySensor", "Отменяем регистрацию слушателя датчика")
             sensorManager.unregisterListener(this)
         }
+    }
+
+    private fun turnOffScreen() {
+        if (wakeLock == null) {
+            wakeLock = powerManager.newWakeLock(
+                PowerManager.PROXIMITY_SCREEN_OFF_WAKE_LOCK,
+                "AppActivity:WakeLock"
+            )
+            wakeLock?.acquire()
+            Log.d("ProximitySensor", "Экран выключен (WakeLock acquired)")
+        }
+    }
+
+    private fun turnOnScreen() {
+        if (wakeLock?.isHeld == true) {
+            wakeLock?.release()
+            Log.d("ProximitySensor", "Экран включён (WakeLock released)")
+        }
+        wakeLock = null
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {

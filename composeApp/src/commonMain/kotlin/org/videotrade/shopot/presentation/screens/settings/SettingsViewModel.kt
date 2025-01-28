@@ -14,9 +14,12 @@ class SettingsViewModel : ViewModel() {
     private val _isDarkTheme = mutableStateOf(getThemeMode() == ThemeMode.DARK)
     val isDarkTheme: State<Boolean> = _isDarkTheme
 
-    private val _isScreenDimmed = MutableStateFlow(false)
-    val isScreenDimmed: StateFlow<Boolean> = _isScreenDimmed.asStateFlow()
+    private val _isProximitySensorEnabled = MutableStateFlow(false)
+    val isProximitySensorEnabled: StateFlow<Boolean> = _isProximitySensorEnabled.asStateFlow()
 
+    fun setProximitySensorEnabled(enabled: Boolean) {
+        _isProximitySensorEnabled.value = enabled
+    }
 
     fun toggleTheme() {
         val newThemeMode = if (_isDarkTheme.value) ThemeMode.LIGHT else ThemeMode.DARK
@@ -24,11 +27,6 @@ class SettingsViewModel : ViewModel() {
         saveThemeMode(newThemeMode)
     }
 
-    fun setScreenDimmed(dimmed: Boolean) {
-        viewModelScope.launch {
-            _isScreenDimmed.emit(dimmed)
-        }
-    }
 }
 
 fun saveThemeMode(mode: ThemeMode) {
