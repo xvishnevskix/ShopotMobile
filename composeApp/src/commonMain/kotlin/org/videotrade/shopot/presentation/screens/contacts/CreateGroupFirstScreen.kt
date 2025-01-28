@@ -51,6 +51,8 @@ import org.jetbrains.compose.resources.StringResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -101,7 +103,7 @@ class CreateGroupFirstScreen() : Screen {
                 .fillMaxWidth()
                 .background(colors.background)
         ) {
-            SafeArea(padding = 15.dp) {
+            SafeArea(padding = if (getPlatform() == Platform.Android) 0.dp else 16.dp) {
                 Column(
                     modifier = Modifier.background(colors.background)
                 ) {

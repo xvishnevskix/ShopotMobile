@@ -60,6 +60,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -120,7 +122,7 @@ class CreateGroupSecondScreen() : Screen {
                     .fillMaxWidth()
                     .background(colors.background)
             ) {
-                SafeArea(padding = 15.dp) {
+                SafeArea(padding = if (getPlatform() == Platform.Android) 0.dp else 16.dp) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -128,16 +130,16 @@ class CreateGroupSecondScreen() : Screen {
                         stringResource(MokoRes.strings.create_group),
                         order = "2",
                         onClick = {
-//                            if (groupNameError.value != null) {
-//                                toasterViewModel.toaster.show(
-//                                    fillInput,
-//                                    type = ToastType.Error,
-//                                    duration = ToasterDefaults.DurationDefault
-//                                )
-//                            } else {
+                            if (groupNameError.value != null) {
+                                toasterViewModel.toaster.show(
+                                    fillInput,
+                                    type = ToastType.Error,
+                                    duration = ToasterDefaults.DurationDefault
+                                )
+                            } else {
                             viewModel.createGroupChat(groupName.value)
                             commonViewModel.restartApp()
-//                            }
+                            }
                         }
                     )
                     LazyColumn(

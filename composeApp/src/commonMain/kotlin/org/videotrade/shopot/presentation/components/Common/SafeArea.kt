@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -22,13 +23,13 @@ import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 fun SafeArea(
     isBlurred: Boolean = false,
     padding: Dp? = null,
-    backgroundColor: Color = Color.White,
+    backgroundColor: Color =  MaterialTheme.colorScheme.background,
     content: @Composable () -> Unit,
 
 ) {
     val blurRadius = if (isBlurred) 20.dp else 0.dp
     val toasterViewModel: CommonViewModel = koinInject()
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize().background(backgroundColor)

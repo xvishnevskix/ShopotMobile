@@ -57,6 +57,8 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
@@ -114,7 +116,9 @@ class CreateChatScreen() : Screen {
                 .fillMaxHeight()
                 .background(colors.surface)
         ) {
-            SafeArea(padding = 15.dp) {
+            SafeArea(padding = if (getPlatform() == Platform.Android) 0.dp else 16.dp)
+
+            {
                 Column(
                     Modifier.background(colors.background)
                 ) {

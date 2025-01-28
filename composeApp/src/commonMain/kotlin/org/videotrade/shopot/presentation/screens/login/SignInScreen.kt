@@ -304,7 +304,8 @@ class SignInScreen : Screen {
                                                             toasterViewModel,
                                                             phoneNotRegistered,
                                                             hasError = hasError,
-                                                            animationTrigger = animationTrigger
+                                                            animationTrigger = animationTrigger,
+                                                            serverUnavailable = serverUnavailable
                                                         )
 
                                                         if (response != null) {

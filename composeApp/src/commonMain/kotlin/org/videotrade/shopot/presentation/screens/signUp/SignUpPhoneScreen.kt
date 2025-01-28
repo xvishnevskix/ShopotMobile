@@ -300,7 +300,8 @@ class SignUpPhoneScreen : Screen {
                                                             toasterViewModel,
                                                             sendCode,
                                                             hasError = hasError,
-                                                            animationTrigger = animationTrigger
+                                                            animationTrigger = animationTrigger,
+                                                            serverUnavailable = serverUnavailable
                                                         )
 
                                                     if (response == null) {
