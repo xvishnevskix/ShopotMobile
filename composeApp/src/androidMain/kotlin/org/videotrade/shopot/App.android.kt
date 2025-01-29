@@ -23,6 +23,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat.requestPermissions
 import androidx.core.content.ContextCompat
@@ -33,6 +36,7 @@ import com.google.firebase.initialize
 import com.mmk.kmpnotifier.notification.NotifierManager
 import com.mmk.kmpnotifier.notification.configuration.NotificationPlatformConfiguration
 import io.github.vinceglb.filekit.core.FileKit
+import org.koin.compose.koinInject
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -217,6 +221,15 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
 
 
         setContent {
+            val settingsViewModel: SettingsViewModel = koinInject()  // ✅ Получаем ViewModel здесь
+            val isProximityEnabled by settingsViewModel.isProximitySensorEnabled.collectAsState()
+
+            //  Подписка на изменения состояния датчика
+            LaunchedEffect(isProximityEnabled) {
+                Log.d("ProximitySensor", "Состояние датчика изменилось: $isProximityEnabled")
+                setProximitySensorEnabled(isProximityEnabled)
+            }
+
             App()
         }
 
@@ -255,9 +268,11 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
         }
     }
 
+    val settingsViewModel: SettingsViewModel by viewModels()
+
     override fun onResume() {
         super.onResume()
-        if (isProximitySensorEnabled) {
+        if (settingsViewModel.isProximitySensorEnabled.value) {
             proximitySensor?.also { sensor ->
                 sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_NORMAL)
             }
@@ -270,13 +285,14 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
         turnOnScreen()
     }
 
-    val settingsViewModel: SettingsViewModel by viewModels()
 
+
+    //действия при приближении к датчику
     override fun onSensorChanged(event: SensorEvent?) {
+
+        if (!settingsViewModel.isProximitySensorEnabled.value) return
         Log.d("ProximitySensor", "onSensorChanged вызван")
         Log.d("ProximitySensor", "onSensorChanged вызван ${settingsViewModel.isProximitySensorEnabled.value}")
-        if (!settingsViewModel.isProximitySensorEnabled.value) return
-
         if (event?.sensor?.type == Sensor.TYPE_PROXIMITY) {
             val isNear = event.values[0] < (proximitySensor?.maximumRange ?: 0f)
             Log.d("ProximitySensor", "isNear: $isNear")
@@ -293,8 +309,9 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
         }
     }
 
+    // включение/отключение датчика
     fun setProximitySensorEnabled(enabled: Boolean) {
-        isProximitySensorEnabled = enabled
+        settingsViewModel.setProximitySensorEnabled(enabled)
         Log.d("ProximitySensor", "setProximitySensorEnabled: $enabled")
         if (enabled) {
             proximitySensor?.also { sensor ->
@@ -327,7 +344,7 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        // Метод не используется, можно оставить пустым
+
     }
     
     companion object {

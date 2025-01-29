@@ -38,8 +38,8 @@ internal fun App()  {
                 setScreenLockFlags(false)
 
                 Navigator(
-//                    IntroScreen()
-                TestScreen()
+                    IntroScreen()
+//                TestScreen()
                 ) { navigator ->
                     SlideTransition(navigator)
                 }

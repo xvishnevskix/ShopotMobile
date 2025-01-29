@@ -69,6 +69,7 @@ import org.videotrade.shopot.presentation.components.Call.rejectBtn
 import org.videotrade.shopot.presentation.components.Call.speakerBtn
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_Regular
@@ -93,6 +94,7 @@ class CallScreen(
         val viewModel: CallViewModel = koinInject()
         val mainViewModel: MainViewModel = koinInject()
         val commonViewModel: CommonViewModel = koinInject()
+        val settingsViewModel: SettingsViewModel = koinInject()
         val callStateView by viewModel.callState.collectAsState()
         val isCallActive by viewModel.isCallActive.collectAsState()
         val isConnectedWs by viewModel.isConnectedWs.collectAsState()
@@ -113,7 +115,18 @@ class CallScreen(
             
             setScreenLockFlags(true)
         }
-        
+
+        LaunchedEffect(Unit) {
+            settingsViewModel.setProximitySensorEnabled(true)
+            println("ProximitySensor Включаем датчик приближения")
+        }
+
+        DisposableEffect(Unit) {
+            println("ProximitySensor Отключаем датчик приближения")
+            onDispose {
+                settingsViewModel.setProximitySensorEnabled(false)
+            }
+        }
         
         val isSwitchToSpeaker = remember { mutableStateOf(true) }
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
