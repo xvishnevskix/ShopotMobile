@@ -874,8 +874,10 @@ fun ChatFooter(
                                     modifier = Modifier.pointerInput(Unit) {
                                         detectTapGestures(onTap = {
                                             if (footerText.isNotBlank()) {
+                                                //обрезаем пробелы в конце и начале текста
+                                                val trimmedText = footerText.trim()
                                                 viewModel.sendMessage(
-                                                    content = footerText,
+                                                    content = trimmedText,
                                                     fromUser = viewModel.profile.value.id,
                                                     chatId = chat.id,
                                                     notificationToken = chat.notificationToken,
