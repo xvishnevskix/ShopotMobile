@@ -19,6 +19,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -52,6 +53,7 @@ import shopot.composeapp.generated.resources.group
     ) {
         Box(
             modifier = Modifier
+                .clip(RoundedCornerShape(16.dp))
                 .height(58.dp)
                 .fillMaxWidth()
                 .border(

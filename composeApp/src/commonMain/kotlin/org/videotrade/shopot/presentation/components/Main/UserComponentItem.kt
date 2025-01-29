@@ -68,6 +68,7 @@ fun UserComponentItem(
     
     Row(
         modifier = Modifier
+            .clip(RoundedCornerShape(2.dp))
             .background(colors.surface).fillMaxWidth().clickable {
                 mainViewModel.setCurrentChat(chat.id)
                 mainViewModel.setZeroUnread(chat)
@@ -78,7 +79,7 @@ fun UserComponentItem(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
             
             Avatar(
