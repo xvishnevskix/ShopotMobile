@@ -24,6 +24,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
@@ -307,9 +308,11 @@ fun CountryPickerBottomSheet(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
 
-            Box(modifier = Modifier.clickable {
+            Box(modifier = Modifier
+                .clip(CircleShape
+                ).clickable {
                 onBackClick()
-            }.padding(start = 8.dp, end = 8.dp)) {
+            }.padding(12.dp)) {
                 BackIcon()
             }
 

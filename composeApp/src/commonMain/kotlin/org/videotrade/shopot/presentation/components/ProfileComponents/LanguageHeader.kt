@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
@@ -67,9 +69,9 @@ fun LanguageHeader(text: String) {
 //                tint = Color.Black
 //            )
 
-            Box(modifier = Modifier.clickable {
+            Box(modifier = Modifier.clip(CircleShape).clickable {
                 navigator.pop()
-            }.padding(start = 8.dp, end = 8.dp)) {
+            }.padding(12.dp)) {
                 BackIcon()
             }
 
