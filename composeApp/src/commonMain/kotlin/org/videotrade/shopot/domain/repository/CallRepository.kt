@@ -4,6 +4,7 @@ import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.PeerConnectionState
+import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
@@ -39,7 +40,6 @@ interface CallRepository {
     suspend fun disconnectWs()
     
     suspend fun reconnectPeerConnection()
-    suspend fun setOffer()
     
     
     suspend fun getWsSession(): DefaultClientWebSocketSession?
@@ -75,9 +75,10 @@ interface CallRepository {
     fun setIsCallActive(isCallActive: Boolean)
     
     fun setOtherUserId(newOtherUserId: String)
-
+    
     fun setChatId(chatId: String)
-
+    
     fun setCalleeId(calleeId: String)
     
+    fun setOffer(sessionDescription: SessionDescription)
 }

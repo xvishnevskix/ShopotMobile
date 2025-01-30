@@ -30,6 +30,7 @@ import org.videotrade.shopot.domain.usecase.NewsUseCase
 import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.NetworkListener
+import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -120,6 +121,9 @@ private val presentationModule = module {
     single { NetworkListener(get()) }
 
     single { NewsViewModel() }
+    
+    single { SwiftFuncsClass(get()) }
+    
 }
 
 private fun getAllModules() = listOf(

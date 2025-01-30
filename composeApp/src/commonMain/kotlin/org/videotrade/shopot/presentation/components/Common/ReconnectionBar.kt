@@ -58,6 +58,7 @@ fun ReconnectionBar() {
     val isReconnectionWs = commonViewModel.isReconnectionWs.collectAsState()
     val networkListener: NetworkListener = koinInject()
     
+    
     val networkStatus by networkListener.networkStatus.collectAsState(NetworkStatus.Connected)
     
     val colors = MaterialTheme.colorScheme

@@ -166,7 +166,7 @@ class CallForegroundService : Service() {
         val notificationBuilder = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Входящий звонок")
             .setContentText("Входящий вызов")
-            .setSmallIcon(R.drawable.home_black)
+//            .setSmallIcon(R.drawable.home_black)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_CALL)
         

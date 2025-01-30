@@ -4,6 +4,7 @@ import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
 import com.shepeliev.webrtckmp.PeerConnectionState
+import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
@@ -38,9 +39,8 @@ class CallUseCase : KoinComponent {
     }
     
     
-    suspend fun setOffer() {
-        
-        return repository.setOffer()
+     fun setOffer(sessionDescription: SessionDescription) {
+        return repository.setOffer(sessionDescription)
     }
     
 

@@ -8,6 +8,7 @@ import org.videotrade.shopot.di.getSharedModules
 import org.videotrade.shopot.multiplatform.CipherInterface
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.IosApplicationComponent
+import org.videotrade.shopot.multiplatform.SwiftFuncsIos
 import org.videotrade.shopot.multiplatform.platformModule
 
 internal fun provideEncapsulateChecker(cipherInterface: CipherInterface): Module = module {
@@ -17,6 +18,7 @@ internal fun provideEncapsulateChecker(cipherInterface: CipherInterface): Module
 fun doInitKoin(
     cipherInterface: CipherInterface,
     appComponent: IosApplicationComponent,
+    swiftFuncs: SwiftFuncsIos,
     additionalModules: List<Module> = listOf(),
     appDeclaration: KoinAppDeclaration = {},
 ) {
@@ -25,7 +27,10 @@ fun doInitKoin(
         modules(
             additionalModules + getSharedModules() + listOf(
                 provideEncapsulateChecker(cipherInterface), // Добавляем модуль для CipherInterface
-                module { single { appComponent } },         // Добавляем модуль для IosApplicationComponent
+                module {
+                    single { appComponent }
+                    single { swiftFuncs }
+                       },         // Добавляем модуль для IosApplicationComponent
                 platformModule,                             // Добавляем платформозависимый модуль
             )
         )

@@ -5,4 +5,5 @@ import org.koin.dsl.module
 
 actual val platformModule = module {
     single<NetworkHelper> { get<IosApplicationComponent>().networkHelper }
+    single<SwiftFuncsHelper> { get<SwiftFuncsIos>().swiftFuncsHelper }
 }

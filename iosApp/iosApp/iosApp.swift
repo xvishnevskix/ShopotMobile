@@ -3,24 +3,29 @@ import ComposeApp
 import Firebase
 import FirebaseCore
 import FirebaseMessaging
+import PushKit
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     var window: UIWindow?
     private var appLifecycleObserver: AppLifecycleObserver?
+    private var pushRegistry: PKPushRegistry!
+    private var pushKitHandler: PushKitHandler!
+    private var callManager: CallManager!
 
     override init() {
         super.init()
         KoinHelperKt.doInitKoin(
-            cipherInterface: IOChecker() as CipherInterface, // Реализация CipherInterface
+            cipherInterface: IOChecker() as CipherInterface,
             appComponent: IosApplicationComponent(
                 networkHelper: IosNetworkHelper() as NetworkHelper
             ),
-            additionalModules: [], // Пустой список дополнительных модулей
-            appDeclaration: { _ in } // Пустая декларация приложения
+            swiftFuncs: SwiftFuncsIos(
+                swiftFuncsHelper: IosSwiftFuncsHelper() as SwiftFuncsHelper
+            ),
+            additionalModules: [],
+            appDeclaration: { _ in }
         )
-        
-
     }
 
     func application(
@@ -28,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
-        FirebaseApp.configure() // Инициализация Firebase
+        FirebaseApp.configure()
 
         window = UIWindow(frame: UIScreen.main.bounds)
         if let window = window {
@@ -38,10 +43,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         requestNotificationAuthorization(application)
 
+        // Инициализация CallManager и PushKitHandler
+        callManager = CallManager()
+        pushKitHandler = PushKitHandler(callManager: callManager)
+
+        setupPushKit()
+
         appLifecycleObserver = ComposeApp.AppLifecycleObserver_iosKt.getAppLifecycleObserver()
 
-        // Инициализация NotifierManager с добавлением параметра askNotificationPermissionOnStart
-        NotifierManager.shared.initialize(configuration: NotificationPlatformConfigurationIos(showPushNotification: true, askNotificationPermissionOnStart: true))
+        NotifierManager.shared.initialize(
+            configuration: NotificationPlatformConfigurationIos(showPushNotification: true, askNotificationPermissionOnStart: true)
+        )
 
         return true
     }
@@ -53,28 +65,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                     application.registerForRemoteNotifications()
                 }
             } else {
-//                print("Разрешение на уведомления отклонено: \(String(describing: error?.localizedDescription))")
+                print("Разрешение на уведомления отклонено: \(String(describing: error?.localizedDescription))")
             }
         }
     }
 
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         Messaging.messaging().apnsToken = deviceToken
-//        print("Токен устройства APNS: \(deviceToken.map { String(format: "%02.2hhx", $0) }.joined())")
-        
-        // Получение FCM-токена и регистрация в Firebase
         Messaging.messaging().token { fcmToken, error in
             if let error = error {
-//                print("Ошибка получения FCM токена: \(error)")
+                print("Ошибка получения FCM токена: \(error)")
             } else if let fcmToken = fcmToken {
-//                print("FCM токен: \(fcmToken)")
-                // Отправьте fcmToken на ваш сервер, чтобы использовать его для отправки уведомлений
+                print("FCM токен: \(fcmToken)")
             }
         }
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-//        print("Не удалось зарегистрироваться для удаленных уведомлений: \(error.localizedDescription)")
+        print("Не удалось зарегистрироваться для удаленных уведомлений: \(error.localizedDescription)")
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -85,15 +93,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         appLifecycleObserver?.onAppBackgrounded()
     }
 
-    // Реализация методов UNUserNotificationCenterDelegate, если необходимо
-    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-//        print("Получено уведомление при активном приложении: \(notification.request.content.userInfo)")
-        completionHandler([.alert, .sound, .badge])
-    }
-
-    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-//        print("Пользователь открыл уведомление: \(response.notification.request.content.userInfo)")
-        NotifierManager.shared.onApplicationDidReceiveRemoteNotification(userInfo: response.notification.request.content.userInfo)
-        completionHandler()
+    private func setupPushKit() {
+        pushRegistry = PKPushRegistry(queue: DispatchQueue.main)
+        pushRegistry.delegate = pushKitHandler
+        pushRegistry.desiredPushTypes = [.voIP]
     }
 }

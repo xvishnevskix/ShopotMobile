@@ -5,119 +5,91 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
+import io.ktor.client.HttpClient
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.client.statement.request
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.koin.compose.koinInject
-import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.multiplatform.AudioFactory
-import org.videotrade.shopot.multiplatform.FileProviderFactory
-import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.SwiftFuncsClass
+import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import kotlin.random.Random
 
 class TestScreen : Screen {
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
-        val commonViewModel: CommonViewModel = koinInject()
-        val audioRecorder = remember { AudioFactory.createAudioRecorder() }
-        val audioPlayer = remember { AudioFactory.createAudioPlayer() }
         
-        var isRecording by remember { mutableStateOf(false) }
-        var audioFilePath by remember { mutableStateOf("") }
-        var audioFileName by remember { mutableStateOf("") }
-        var fileId by remember { mutableStateOf("") }
-
-        
-        val sharedSecret = getValueInStorage("sharedSecret")
-        
+        val swiftFuncsClass: SwiftFuncsClass = koinInject()
         
         MaterialTheme {
             SafeArea {
                 Column {
-                    Button(
-                        onClick = {
-                            
-                            scope.launch {
-                                val microphonePer =
-                                    PermissionsProviderFactory.create().getPermission("microphone")
-                                
-                                println("microphonePer $microphonePer")
-                                if (microphonePer) {
-                                    if (isRecording) {
-                                        val stopByte = audioRecorder.stopRecording(true)
-                                        
-                                        if (stopByte !== null) {
-                                            audioFilePath = stopByte
-                                        }
-                                        
-                                        println("microphonePer ${stopByte}")
-                                        
-                                        isRecording = false
-                                    } else {
-                                        val fileName = "${Random.nextInt(1, 10000)}audio_record.m4a"
-                                        val audioFilePathNew = FileProviderFactory.create()
-                                            .createNewFileWithApp(
-                                                fileName,
-                                                "audio/mp4"
-                                            ) // Генерация пути к файлу
-                                        
-                                        
-                                        audioFileName = fileName
-                                        
-                                        if (audioFilePathNew != null) {
-//                                            audioFilePath = audioFilePathNew
-                                            
-                                            audioRecorder.startRecording(audioFilePathNew)
-                                            
-                                            
-                                        }
-                                        println("audioFilePathNew $audioFilePathNew")
-                                        
-                                        isRecording = true
-                                    }
-                                }
-                            }
+                    Button(onClick = {
+                        
+                        // Создаем объект opSSS, передавая реализацию
+//                            val ops = swiftFuncsClass.sendAA()
+                        scope.launch {
+                            val client = sendCall()
                         }
-                    ) {
+                        
+                    }) {
                         Text(
-                            if (isRecording) "Stop Recording" else "Start Recording",
-                            color = Color.Black
+                            "Start Recording", color = Color.Black
                         )
                     }
                     
-                    Button(
-                        onClick = {
-//                            audioPlayer.startPlaying(audioFilePath, isPlaying)
-                                
-                        }
-                    ) {
-                        Text("Play Audio")
-                    }
-                    
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                val audioRecorderaa =
-                                    audioPlayer.getAudioDuration(audioFilePath, audioFileName)
-                                
-                                
-                                println("audioRecorder $audioRecorderaa")
-                                
-                            }
-                        }
-                    ) {
-                        Text("getDurr Audio")
-                    }
                 }
             }
         }
+    }
+}
+
+
+suspend fun sendCall() {
+    try {
+        
+        val client = HttpClient(getHttpClientEngine())
+        
+        val jsonContent = Json.encodeToString(buildJsonObject {
+            put(
+                "deviceToken",
+                "808f2ae7ade15325d8b35347c18f461393ce6725e3f677f9fa3070aa4a1f758f51a2ff6e3c721e8e32ce4cb5559466a94934b82d2da475efe4bdb0a8c04d7cdd570bbfc430711e620dc5ac75677b09d9"
+            )
+            put("callerName", "Test Call")
+            put("callerId", "1234")
+        })
+        
+        
+        val response: HttpResponse = client.post("http://192.168.1.118:3000/send-voip-notification") {
+            contentType(ContentType.Application.Json)
+            setBody(jsonContent)
+        }
+        
+        println("response.bodyAsText() ${response.bodyAsText()}")
+        
+        if (response.status.isSuccess()) {
+            
+            println("response.bodyAsText() ${response.bodyAsText()}")
+            
+        } else {
+            println("Failed to retrieve data: ${response.status.description} ${response.request}")
+        }
+    } catch (e: Exception) {
+        
+        println("Error1111: $e")
+        
     }
 }
