@@ -65,6 +65,7 @@ import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Contacts.InviteContacts
 import org.videotrade.shopot.presentation.components.Contacts.MakeGroup
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
+import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
@@ -81,6 +82,7 @@ class CreateChatScreen() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
+        val viewModelProfile: ProfileViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
         val unregisteredContacts =
             viewModel.unregisteredContacts.collectAsState(initial = listOf()).value
@@ -94,14 +96,12 @@ class CreateChatScreen() : Screen {
         }
         
         println("contacts@@##@##@ $contacts")
-        
-        val filteredContacts = if (searchQuery.value.isEmpty()) {
-            contacts
-        } else {
-            contacts.filter {
-                it.firstName?.contains(searchQuery.value, ignoreCase = true) == true ||
-                        it.phone.contains(searchQuery.value)
-            }
+
+        val filteredContacts = contacts.filter { contact ->
+            contact.phone != viewModelProfile.profile.value.phone &&
+                    (searchQuery.value.isEmpty() ||
+                            (contact.firstName?.contains(searchQuery.value, ignoreCase = true) == true ||
+                                    contact.phone.contains(searchQuery.value)))
         }
 
         val sortedUnregisteredContacts = unregisteredContacts.sortedBy { it.firstName }

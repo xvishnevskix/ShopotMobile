@@ -60,6 +60,7 @@ import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Contacts.CreateGroupChatHeader
 import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -73,6 +74,7 @@ class CreateGroupFirstScreen() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
+        val viewModelProfile: ProfileViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
         val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
@@ -84,16 +86,12 @@ class CreateGroupFirstScreen() : Screen {
 
         viewModel.fetchContacts()
 
-        val filteredContacts = if (searchQuery.value.isEmpty()) {
-            contacts
-        } else {
-            contacts.filter {
-                if (it.firstName !== null) {
-                    it.firstName.contains(searchQuery.value, ignoreCase = true) || it.phone.contains(searchQuery.value)
-                } else {
-                    false
-                }
-            }
+
+        val filteredContacts = contacts.filter { contact ->
+            contact.phone != viewModelProfile.profile.value.phone &&
+                    (searchQuery.value.isEmpty() ||
+                            (contact.firstName?.contains(searchQuery.value, ignoreCase = true) == true ||
+                                    contact.phone.contains(searchQuery.value)))
         }
 
         val groupedContacts = filteredContacts.groupBy { it.firstName?.firstOrNull()?.uppercaseChar() ?: '#' }

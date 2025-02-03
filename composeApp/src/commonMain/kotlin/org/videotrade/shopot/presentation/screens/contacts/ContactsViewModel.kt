@@ -71,10 +71,14 @@ class ContactsViewModel() : ViewModel(),
     
     fun createGroupChat(groupName: String) {
         viewModelScope.launch {
-            val idUsers = selectedContacts.map { it.id }.toMutableList()
-            idUsers.add(ProfileUseCase.getProfile().id)
-            contactsUseCase.createGroupChat(idUsers, groupName)
-            clearSelectedContacts()
+            try {
+                val idUsers = selectedContacts.map { it.id }.toMutableList()
+                idUsers.add(ProfileUseCase.getProfile().id)
+                contactsUseCase.createGroupChat(idUsers, groupName)
+            }
+            finally {
+                clearSelectedContacts()
+            }
         }
     }
 
