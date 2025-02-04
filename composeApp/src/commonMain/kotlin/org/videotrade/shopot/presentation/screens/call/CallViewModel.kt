@@ -47,7 +47,10 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.MusicPlayer
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
+import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.multiplatform.iosCall.GetCallInfoDto
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
@@ -84,6 +87,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
     private var isObserving = MutableStateFlow(true)
     
     var answerData = MutableStateFlow<JsonObject?>(null)
+    
+    var iosCallData = MutableStateFlow<GetCallInfoDto?>(null)
     
     val isScreenOn = MutableStateFlow(false)
     
@@ -145,6 +150,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun setAnswerData(JsonObject: JsonObject?) {
         answerData.value = JsonObject
+    }
+    
+    fun setIosCallData(callInfo: GetCallInfoDto) {
+        iosCallData.value = callInfo
     }
     
     fun setIsScreenOn(isScreenOnNew: Boolean) {
@@ -272,12 +281,14 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun rejectCall(calleeId: String, duration: String) {
         viewModelScope.launch {
-            clearNotificationsForChannel("OngoingCallChannel")
+
+            if(getPlatform() == Platform.Android) {
+                clearNotificationsForChannel("OngoingCallChannel")
+            }
+            
             stopTimer()
             setIsCallActive(false)
 
-
-            val userId = profileUseCase.getProfile().id
             val isRejectCall = callUseCase.rejectCall(calleeId, duration)
 
             if (isRejectCall) {

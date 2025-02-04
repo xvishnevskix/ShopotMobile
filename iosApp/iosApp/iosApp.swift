@@ -15,6 +15,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     override init() {
         super.init()
+
+        // Инициализация Koin с правильными модулями
         KoinHelperKt.doInitKoin(
             cipherInterface: IOChecker() as CipherInterface,
             appComponent: IosApplicationComponent(
@@ -23,9 +25,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             swiftFuncs: SwiftFuncsIos(
                 swiftFuncsHelper: IosSwiftFuncsHelper() as SwiftFuncsHelper
             ),
-            additionalModules: [],
+            additionalModules: SharedModulesKt.getSharedModules(),
             appDeclaration: { _ in }
         )
+
+        // ✅ Получаем CallHandler через Koin
+        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+        
+        // ✅ Передаем Koin-инициализированный CallHandler в CallManager
+        self.callManager = CallManager(callHandler: callHandler)
+        
+        // ✅ Передаем CallManager в PushKitHandler
+        pushKitHandler = PushKitHandler(callManager: callManager)
     }
 
     func application(
@@ -42,10 +53,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
 
         requestNotificationAuthorization(application)
-
-        // Инициализация CallManager и PushKitHandler
-        callManager = CallManager()
-        pushKitHandler = PushKitHandler(callManager: callManager)
 
         setupPushKit()
 

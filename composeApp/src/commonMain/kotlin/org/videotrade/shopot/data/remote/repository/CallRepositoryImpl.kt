@@ -991,6 +991,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             setIsIncomingCall(false)
             
+            
+            println("rejectCalWsSession ${wsSession.value}")
+            
             wsSession.value?.send(Frame.Text(jsonContent))
             println("${jsonContent} rejectCall13")
             
@@ -1006,7 +1009,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             return true
             
         } catch (e: Exception) {
-            println(e)
+            println("errorRejectCall: $e")
             val navigator = commonViewModel.mainNavigator.value
             
             navigator?.push(MainScreen())

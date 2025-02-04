@@ -123,6 +123,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
         onRefresh = {
             scope.launch {
                 // Имитируем обновление данных
+                println("commonViewModel.mainNavigator.value ${commonViewModel.mainNavigator.value}")
                 refreshing = true
                 mainViewModel.getChatsInBack()
                 refreshing = false

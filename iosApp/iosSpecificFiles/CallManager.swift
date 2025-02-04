@@ -1,9 +1,3 @@
-//
-//  CallManager.swift
-//  iosApp
-//
-//  Created by Aslanbek Abubakarov on 23.01.2025.
-//
 import Foundation
 import CallKit
 import ComposeApp
@@ -11,10 +5,12 @@ import ComposeApp
 class CallManager: NSObject {
     let callController = CXCallController()
     let provider: CXProvider
+    private let callHandler: CallHandler
 
-    override init() {
+    init(callHandler: CallHandler) {
+        self.callHandler = callHandler
+
         let configuration: CXProviderConfiguration
-
         if #available(iOS 14.0, *) {
             configuration = CXProviderConfiguration(localizedName: Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ?? "YourAppName")
         } else {
@@ -34,7 +30,7 @@ class CallManager: NSObject {
     func reportIncomingCall(uuid: UUID, handle: String, hasVideo: Bool = false, callId: String) {
         Task {
             do {
-                let callInfo = try await CallHandler().getCallInfo(callId: callId)
+                let callInfo = try await callHandler.getCallInfo(callId: callId)
                 if let callInfo = callInfo {
                     print("Call info retrieved successfully: \(callInfo)")
                 } else {
@@ -44,7 +40,6 @@ class CallManager: NSObject {
                 print("Failed to retrieve call info: \(error)")
             }
         }
-
 
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: handle)
@@ -60,7 +55,6 @@ class CallManager: NSObject {
         }
     }
 
-
     func endCall(uuid: UUID) {
         let endCallAction = CXEndCallAction(call: uuid)
         let transaction = CXTransaction(action: endCallAction)
@@ -72,6 +66,7 @@ class CallManager: NSObject {
     }
 }
 
+// MARK: - CXProviderDelegate
 extension CallManager: CXProviderDelegate {
     func providerDidReset(_ provider: CXProvider) {
         print("Provider reset - Clean up ongoing calls")
@@ -79,16 +74,18 @@ extension CallManager: CXProviderDelegate {
 
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         print("Call answered")
-        
-        CallHandler().startWebRTCSession(callId: "1")
 
+        DispatchQueue.main.async {
+            self.callHandler.startWebRTCSession(callId: "1")
+        }
         action.fulfill()
-        // Здесь вы можете начать WebRTC-сессию
     }
 
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         print("Call ended")
+        
+        self.callHandler.rejectCallIos()
+
         action.fulfill()
-        // Завершите WebRTC-сессию
     }
 }

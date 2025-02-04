@@ -31,6 +31,7 @@ import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.NetworkListener
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
+import org.videotrade.shopot.multiplatform.iosCall.CallHandler
 import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -62,9 +63,6 @@ private val presentationModule = module {
         WsRepositoryImpl()
     }
     
-    
-    
-    
     single<ChatsRepository> {
         ChatsRepositoryImpl()
     }
@@ -79,19 +77,15 @@ private val presentationModule = module {
     single { MainViewModel() }
     single { IntroViewModel() }
     
-    
-    
     single<ChatRepository> {
         ChatRepositoryImpl()
     }
     single { ChatViewModel() }
     
-    
     single<CallRepository> {
         CallRepositoryImpl()
     }
     single { CallViewModel() }
-    
     
     single<ContactsRepository> {
         ContactsRepositoryImpl()
@@ -101,29 +95,24 @@ private val presentationModule = module {
     single<CommonRepository> {
         CommonRepositoryImpl()
     }
-
+    
     single<StickerRepository> {
         StickerRepositoryImpl()
     }
-
+    
     single<NewsRepository> {
         NewsRepositoryImpl()
     }
-
+    
     single { CommonViewModel() }
-
     single { ProfileViewModel() }
-    
     single { UpdateAppViewModel() }
-    
     single { SettingsViewModel() }
-    
     single { NetworkListener(get()) }
-
     single { NewsViewModel() }
-    
     single { SwiftFuncsClass(get()) }
     
+    single<CallHandler> { CallHandler }
 }
 
 private fun getAllModules() = listOf(
