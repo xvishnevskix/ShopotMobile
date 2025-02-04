@@ -28,18 +28,18 @@ class CallManager: NSObject {
     
     @MainActor
     func reportIncomingCall(uuid: UUID, handle: String, hasVideo: Bool = false, callId: String) {
-        Task {
-            do {
-                let callInfo = try await callHandler.getCallInfo(callId: callId)
-                if let callInfo = callInfo {
-                    print("Call info retrieved successfully: \(callInfo)")
-                } else {
-                    print("Call info is nil")
-                }
-            } catch {
-                print("Failed to retrieve call info: \(error)")
-            }
-        }
+//        Task {
+//            do {
+//                let callInfo = try await callHandler.getCallInfo(callId: callId)
+//                if let callInfo = callInfo {
+//                    print("Call info retrieved successfully: \(callInfo)")
+//                } else {
+//                    print("Call info is nil")
+//                }
+//            } catch {
+//                print("Failed to retrieve call info: \(error)")
+//            }
+//        }
 
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: handle)

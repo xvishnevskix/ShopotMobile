@@ -4,6 +4,7 @@ import Firebase
 import FirebaseCore
 import FirebaseMessaging
 import PushKit
+import os.log
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -16,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     override init() {
         super.init()
 
-        // Инициализация Koin с правильными модулями
+        // Инициализация Koin
         KoinHelperKt.doInitKoin(
             cipherInterface: IOChecker() as CipherInterface,
             appComponent: IosApplicationComponent(
@@ -32,11 +33,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // ✅ Получаем CallHandler через Koin
         let callHandler: CallHandler = KoinHelperKt.getCallHandler()
         
-        // ✅ Передаем Koin-инициализированный CallHandler в CallManager
+        // ✅ Передаем CallHandler в CallManager
         self.callManager = CallManager(callHandler: callHandler)
-        
-        // ✅ Передаем CallManager в PushKitHandler
-        pushKitHandler = PushKitHandler(callManager: callManager)
     }
 
     func application(
@@ -45,22 +43,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
+        Messaging.messaging().delegate = nil // <-- Отключаем обработку FCM
 
         window = UIWindow(frame: UIScreen.main.bounds)
         if let window = window {
             window.rootViewController = MainKt.MainViewController()
             window.makeKeyAndVisible()
         }
+        
+        Logger.log("✅ Приложение запущено!")
+
+        // ✅ Инициализация PushKitHandler только здесь
+        pushKitHandler = PushKitHandler(callManager: callManager)
+        
+//        Logger.readLogs()
 
         requestNotificationAuthorization(application)
-
-        setupPushKit()
 
         appLifecycleObserver = ComposeApp.AppLifecycleObserver_iosKt.getAppLifecycleObserver()
 
         NotifierManager.shared.initialize(
             configuration: NotificationPlatformConfigurationIos(showPushNotification: true, askNotificationPermissionOnStart: true)
         )
+        print("APNs settings: \(UserDefaults.standard.dictionaryRepresentation())")
 
         return true
     }
@@ -98,11 +103,5 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func applicationWillResignActive(_ application: UIApplication) {
         appLifecycleObserver?.onAppBackgrounded()
-    }
-
-    private func setupPushKit() {
-        pushRegistry = PKPushRegistry(queue: DispatchQueue.main)
-        pushRegistry.delegate = pushKitHandler
-        pushRegistry.desiredPushTypes = [.voIP]
     }
 }

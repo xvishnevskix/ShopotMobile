@@ -36,20 +36,12 @@ fun doInitKoin(
         platformModule
     )
     
-    println("✅ Загружаемые модули в Koin:")
-    allModules.forEach { module ->
-        println("🔹 Модуль: $module")
-    }
-    
     startKoin {
         appDeclaration()
         modules(allModules)
     }
     
-    // Проверка зарегистрированных зависимостей
-    val koin = getKoin()
-    val registeredDefinitions = koin.instanceRegistry.instances.keys
-    println("✅ Зарегистрированные зависимости в Koin: $registeredDefinitions")
+
 }
 
 

@@ -32,15 +32,12 @@ class TestScreen : Screen {
     override fun Content() {
         val scope = rememberCoroutineScope()
         
-        val swiftFuncsClass: SwiftFuncsClass = koinInject()
         
         MaterialTheme {
             SafeArea {
                 Column {
                     Button(onClick = {
-                        
-                        // Создаем объект opSSS, передавая реализацию
-//                            val ops = swiftFuncsClass.sendAA()
+
                         scope.launch {
                             val client = sendCall()
                         }
