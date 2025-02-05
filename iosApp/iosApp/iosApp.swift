@@ -13,7 +13,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     private var pushRegistry: PKPushRegistry!
     private var pushKitHandler: PushKitHandler!
     private var callManager: CallManager!
-
+    
+    
     override init() {
         super.init()
 
@@ -52,9 +53,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         Logger.log("✅ Приложение запущено!")
+        
+        if let storedToken = UserDefaults.standard.string(forKey: "VoIPToken") {
+            print("🔄 Загруженный VoIP Token: \(storedToken)")
+        } else {
+            print("⚠️ VoIP Token отсутствует!")
+        }
 
-        // ✅ Инициализация PushKitHandler только здесь
-        pushKitHandler = PushKitHandler(callManager: callManager)
+
+
+        // В методе didFinishLaunchingWithOptions:
+        self.pushKitHandler = PushKitHandler(callManager: callManager)
+
         
 //        Logger.readLogs()
 
@@ -103,5 +113,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     func applicationWillResignActive(_ application: UIApplication) {
         appLifecycleObserver?.onAppBackgrounded()
+    }
+    
+    // Реализация методов UNUserNotificationCenterDelegate, если необходимо
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+//        print("Получено уведомление при активном приложении: \(notification.request.content.userInfo)")
+        completionHandler([.alert, .sound, .badge])
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        //        print("Пользователь открыл уведомление: \(response.notification.request.content.userInfo)")
+        NotifierManager.shared.onApplicationDidReceiveRemoteNotification(userInfo: response.notification.request.content.userInfo)
+        completionHandler()
     }
 }

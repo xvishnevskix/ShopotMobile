@@ -12,9 +12,9 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate {
     }
 
     func registerForPushKit() {
-        let pushRegistry = PKPushRegistry(queue: DispatchQueue.main)
-        pushRegistry.delegate = self
-        pushRegistry.desiredPushTypes = [.voIP]
+        self.pushRegistry = PKPushRegistry(queue: DispatchQueue.main)
+        self.pushRegistry.delegate = self
+        self.pushRegistry.desiredPushTypes = [.voIP]
         print("✅ PushKit зарегистрирован и подписан на VoIP уведомления!")
     }
 
@@ -22,6 +22,10 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate {
     func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
         let voipToken = pushCredentials.token.map { String(format: "%02x", $0) }.joined()
         print("📲 Новый VoIP Token: \(voipToken)")
+
+        // ✅ Сохраняем VoIP токен в UserDefaults
+        UserDefaults.standard.set(voipToken, forKey: "VoIPToken")
+        UserDefaults.standard.synchronize()
     }
 
 
