@@ -19,29 +19,27 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate {
     }
 
     // 📲 Получаем VoIP Token
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        print("🔔 VoIP push получен в фоне!")
-        print("📦 Payload: \(payload.dictionaryPayload)")
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
+        let voipToken = pushCredentials.token.map { String(format: "%02x", $0) }.joined()
+        print("📲 Новый VoIP Token: \(voipToken)")
 
-        DispatchQueue.main.async {
-            let callUUID = UUID()
-            let callerName = payload.dictionaryPayload["callerName"] as? String ?? "Unknown Caller"
-            self.callManager.reportIncomingCall(uuid: callUUID, handle: callerName, hasVideo: false, callId: "12345")
-        }
-
-        completion()
+        // Сохраняем токен (для отправки на сервер)
+        UserDefaults.standard.set(voipToken, forKey: "VoIPToken")
+        UserDefaults.standard.synchronize()
     }
 
-
-    // 🔔 Получаем входящий звонок (PushKit)
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        print("🔔 PushKit получил VoIP push!")
+        print("🔔 VoIP push получен!")
         print("📦 Payload: \(payload.dictionaryPayload)")
 
-        os_log("🔔 VoIP push получен! Payload: %@", log: OSLog(subsystem: "com.videotrade.shopot", category: "PushKit"), type: .info, payload.dictionaryPayload.description)
+        let callUUID = UUID()
+        let callerName = payload.dictionaryPayload["callerName"] as? String ?? "Unknown Caller"
+        let callId = payload.dictionaryPayload["callId"] as? String ?? "0"
 
-        handleIncomingCall(payload: payload)
-        completion()
+        // ❗️ ВАЖНО: Вызов CallKit ДОЛЖЕН быть сразу, без задержек
+        self.callManager.reportIncomingCall(uuid: callUUID, handle: callerName, hasVideo: false, callId: callId)
+
+        completion() // Сообщаем iOS, что push обработан
     }
 
     func handleIncomingCall(payload: PKPushPayload) {
