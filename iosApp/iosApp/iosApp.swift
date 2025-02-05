@@ -18,6 +18,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     override init() {
         super.init()
 
+        
+
         // Инициализация Koin
         KoinHelperKt.doInitKoin(
             cipherInterface: IOChecker() as CipherInterface,
@@ -25,19 +27,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 networkHelper: IosNetworkHelper() as NetworkHelper
             ),
             swiftFuncs: SwiftFuncsIos(
-                swiftFuncsHelper: IosSwiftFuncsHelper() as SwiftFuncsHelper
-            ),
+                  swiftFuncsHelper: IosSwiftFuncsHelper(callManager: callManager) as SwiftFuncsHelper // ✅ Передаём callManager
+              ),
             additionalModules: SharedModulesKt.getSharedModules(),
             appDeclaration: { _ in }
         )
 
-//        // ✅ Получаем CallHandler через Koin
-//        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
-//        
-//        // ✅ Передаем CallHandler в CallManager
-//        self.callManager = CallManager(callHandler: callHandler)
-        
-        self.callManager = CallManager()  // Инициализируем CallKit
+        // ✅ Получаем CallHandler через Koin
+        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+
+        // ✅ Передаем CallHandler в CallManager
+        self.callManager = CallManager(callHandler: callHandler)
+
 
     }
 

@@ -61,6 +61,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
 import org.videotrade.shopot.multiplatform.MusicType
+import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
@@ -767,6 +768,7 @@ class CallIosScreen(
                     
                     
                     Row {
+                        val swiftFuncsClass: SwiftFuncsClass = koinInject()
                         
                         if (isIncomingCall) {
                             Row(
@@ -811,6 +813,9 @@ class CallIosScreen(
                                     
                                     
                                     viewModel.rejectCall(calleeId, timerValue.value)
+                                    
+                                    
+                                    swiftFuncsClass.sendAA()
                                     
                                     
                                 }, size = 56.dp)

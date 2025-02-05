@@ -4,6 +4,8 @@ import com.mmk.kmpnotifier.notification.NotifierManager
 import platform.Foundation.NSBundle
 import platform.Foundation.NSURL
 import platform.UIKit.UIApplication
+import platform.Foundation.NSUUID
+import platform.darwin.NSObject
 
 actual fun getPlatform(): Platform {
     return Platform.Ios
@@ -51,3 +53,6 @@ actual fun openUrl(url: String) {
         println("Invalid URL: $url")
     }
 }
+
+
+

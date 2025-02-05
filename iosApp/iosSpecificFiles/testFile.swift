@@ -2,11 +2,23 @@ import Foundation
 import ComposeApp
 
 class IosSwiftFuncsHelper : SwiftFuncsHelper {
+    private let callManager: CallManager
 
-    func testFunc() { 
+    init(callManager: CallManager) {
+        self.callManager = callManager
+    }
+
+    func testFunc() {
         print("ADDADAD")
     }
+
+    @objc func endCall() {
+        print("🔴 Завершаем звонок из IosSwiftFuncsHelper")
+
+        callManager.endAllCalls() // ✅ Вызываем метод у переданного объекта CallManager
+    }
 }
+
 
 class Logger {
     static let logFileName = "app_logs.txt"
@@ -43,3 +55,4 @@ class Logger {
         return "No logs found"
     }
 }
+

@@ -113,6 +113,9 @@ private val presentationModule = module {
     single { SwiftFuncsClass(get()) }
     
     single<CallHandler> { CallHandler }
+    
+    
+    
 }
 
 private fun getAllModules() = listOf(
