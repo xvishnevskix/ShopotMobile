@@ -17,8 +17,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     override init() {
         super.init()
-
         
+        // ✅ Передаем CallHandler в CallManager
+        self.callManager = CallManager()
 
         // Инициализация Koin
         KoinHelperKt.doInitKoin(
@@ -33,11 +34,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             appDeclaration: { _ in }
         )
 
-        // ✅ Получаем CallHandler через Koin
-        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
 
-        // ✅ Передаем CallHandler в CallManager
-        self.callManager = CallManager(callHandler: callHandler)
 
 
     }

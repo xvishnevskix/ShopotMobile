@@ -5,29 +5,27 @@ import ComposeApp
 class CallManager: NSObject {
     let callController = CXCallController()
     let provider: CXProvider
-    private let callHandler: CallHandler
+
     
-
-    init(callHandler: CallHandler) { // ✅ Теперь передаем callHandler при создании объекта
-        self.callHandler = callHandler // ✅ Инициализируем callHandler перед super.init()
-
+    override  init() {
         let configuration = CXProviderConfiguration(localizedName: "My VoIP App")
         configuration.supportsVideo = true
         configuration.maximumCallsPerCallGroup = 1
         configuration.supportedHandleTypes = [.phoneNumber, .generic]
 
         provider = CXProvider(configuration: configuration)
-        super.init() // ✅ Теперь super.init() вызывается после инициализации callHandler
+        super.init() // ✅ Вызываем init родительского класса
 
         provider.setDelegate(self, queue: nil)
     }
     
     // 📞 Показываем входящий звонок на экране
     func reportIncomingCall(uuid: UUID, handle: String, hasVideo: Bool, callId: String) {
-        DispatchQueue.main.async { // ✅ Важно: Kotlin suspend-функции вызываем только в главном потоке!
+        DispatchQueue.main.async {
             Task {
                 do {
-                    let callInfo = try await self.callHandler.getCallInfo(callId: callId)
+                    let callHandler = KoinHelperKt.getCallHandler() // ✅ Берем CallHandler из Koin внутри метода
+                    let callInfo = try await callHandler.getCallInfo(callId: callId)
                     if let callInfo = callInfo {
                         print("Call info retrieved successfully: \(callInfo)")
                     } else {
@@ -65,7 +63,6 @@ class CallManager: NSObject {
     
     @objc func endAllCalls() {
         print("🔴 Завершаем все звонки")
-
         let transactions = callController.callObserver.calls
 
         for call in transactions {
@@ -85,7 +82,6 @@ class CallManager: NSObject {
             print("⚠️ Нет активных звонков для завершения")
         }
     }
-
 }
 
 // MARK: - CXProviderDelegate
@@ -96,18 +92,22 @@ extension CallManager: CXProviderDelegate {
 
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         print("Call answered")
+        
+        // ✅ Получаем CallHandler через Koin внутри метода
+        let callHandler = KoinHelperKt.getCallHandler()
 
         DispatchQueue.main.async {
-            self.callHandler.startWebRTCSession(callId: "1")
+          callHandler.startWebRTCSession(callId: "1")
         }
         action.fulfill()
     }
 
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         print("Call ended")
+
+        let callHandler = KoinHelperKt.getCallHandler() // ✅ Вызываем Koin внутри метода
+        callHandler.rejectCallIos()
         
-        self.callHandler.rejectCallIos()
         action.fulfill()
     }
 }
-
