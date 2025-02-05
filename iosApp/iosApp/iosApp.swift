@@ -31,11 +31,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             appDeclaration: { _ in }
         )
 
-        // ✅ Получаем CallHandler через Koin
-        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+//        // ✅ Получаем CallHandler через Koin
+//        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+//        
+//        // ✅ Передаем CallHandler в CallManager
+//        self.callManager = CallManager(callHandler: callHandler)
         
-        // ✅ Передаем CallHandler в CallManager
-        self.callManager = CallManager(callHandler: callHandler)
+        self.callManager = CallManager()  // Инициализируем CallKit
+
     }
 
     func application(
@@ -52,18 +55,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             window.makeKeyAndVisible()
         }
         
-        Logger.log("✅ Приложение запущено!")
-        
-        if let storedToken = UserDefaults.standard.string(forKey: "VoIPToken") {
-            print("🔄 Загруженный VoIP Token: \(storedToken)")
-        } else {
-            print("⚠️ VoIP Token отсутствует!")
-        }
-
-
+        UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
 
         // В методе didFinishLaunchingWithOptions:
-        self.pushKitHandler = PushKitHandler(callManager: callManager)
+        self.pushKitHandler = PushKitHandler(callManager: callManager)  // Запускаем VoIP push
 
         
 //        Logger.readLogs()
