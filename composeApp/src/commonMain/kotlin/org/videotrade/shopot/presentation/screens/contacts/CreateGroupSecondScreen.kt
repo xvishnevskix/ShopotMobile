@@ -52,9 +52,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -72,6 +74,7 @@ import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -95,7 +98,8 @@ class CreateGroupSecondScreen() : Screen {
         val fillInput = stringResource(MokoRes.strings.please_fill_in_the_group_name_input_field)
         val groupNameError = remember { mutableStateOf<String?>("") }
         val colors = MaterialTheme.colorScheme
-
+        val tabNavigator = LocalTabNavigator.current
+        val mainViewModel: MainViewModel = koinInject()
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             selectedContacts
         } else {
@@ -138,7 +142,9 @@ class CreateGroupSecondScreen() : Screen {
                                 )
                             } else {
                             viewModel.createGroupChat(groupName.value)
-                            commonViewModel.restartApp()
+                                tabNavigator.current = ChatsTab
+                                commonViewModel.restartApp()
+                                mainViewModel.getChatsInBack()
                             }
                         }
                     )

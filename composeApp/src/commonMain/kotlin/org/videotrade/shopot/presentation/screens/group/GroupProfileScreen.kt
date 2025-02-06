@@ -169,7 +169,9 @@ private fun ParticipantCountText(count: Int) {
         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
         fontWeight = FontWeight(500),
         color = colors.primary,
-        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+        letterSpacing = TextUnit(0F, TextUnitType.Sp)
+        ,
+        modifier = Modifier.padding(start = 12.dp)
     )
 }
 

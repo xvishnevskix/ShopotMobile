@@ -47,12 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -69,6 +72,7 @@ fun CreateGroupChatHeader(
 ) {
     val navigator = LocalNavigator.currentOrThrow
     val colors = MaterialTheme.colorScheme
+
 
     Column(
         modifier = Modifier.background(colors.background).padding(horizontal = 16.dp)
@@ -117,6 +121,7 @@ fun CreateGroupChatHeader(
                 else {
                     Box(modifier = Modifier.clip(CircleShape).clickable {
                         onClick()
+
                     }.padding(8.dp)) {
                             Image(
                                 modifier = Modifier
