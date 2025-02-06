@@ -22,55 +22,39 @@ class CallManager: NSObject {
 
     // 📞 Показываем входящий звонок на экране
     func reportIncomingCall(uuid: UUID, handle: String, hasVideo: Bool, callId: String) {
-        Logger.log("📦 push:2 ")
-//
-//        DispatchQueue.main.async {
-//            Task {
-//                do {
-//                    Logger.log("📦 Payload:4 ")
-//
-//                    let callHandler = KoinHelperKt.getCallHandler() // ✅ Берем CallHandler из Koin внутри метода
-//                    Logger.log("📦 Payload:15 ")
-//
-//                    let callInfo = try await callHandler.getCallInfo(callId: callId)
-//                    Logger.log("📦 Payload:16 ")
-//
-//                    if let callInfo = callInfo {
-//                        Logger.log("Call info retrieved successfully: \(callInfo)")
-//                    } else {
-//                        Logger.log("Call info is nil")
-//                    }
-//                } catch {
-//                    Logger.log("Failed to retrieve call info: \(error)")
-//                }
-//            }
-//        }
-
-        Logger.log("📦 push:3 ")
-
+        Logger.log("📦 push:2 - Начинаем обработку входящего вызова")
+        
+        // 🔍 Логируем входящие данные
+        Logger.log("📞 Входящий вызов UUID: \(uuid)")
+        Logger.log("📞 Вызов от: \(handle)")
+        Logger.log("📞 callId: \(callId)")
+        
         let update = CXCallUpdate()
-        Logger.log("📦 push:4 ")
+        
+        Logger.log("📦 push:4 - Создан CXCallUpdate")
 
         update.remoteHandle = CXHandle(type: .generic, value: handle)
-        
-        Logger.log("📦 push:5 ")
-
         update.hasVideo = hasVideo
         update.localizedCallerName = handle
-        Logger.log("📦 push:6 ")
 
-        provider.reportNewIncomingCall(with: uuid, update: update) { error in
-            if let error = error {
-                Logger.log("❌ Ошибка отображения звонка: \(error.localizedDescription)")
-            } else {
-                Logger.log("📞 Входящий звонок отображен!")
+        Logger.log("📦 push:6 - Готовимся к reportNewIncomingCall")
+
+//        DispatchQueue.main.async {
+            Logger.log("📦 push:6 - Вызываем reportNewIncomingCall в CallKit")
+
+            self.provider.reportNewIncomingCall(with: uuid, update: update) { error in
+                if let error = error {
+                    Logger.log("❌ Ошибка отображения звонка: \(error.localizedDescription)")
+                } else {
+                    Logger.log("📞 Входящий звонок успешно отображен!")
+                }
             }
-        }
-        
-        Logger.log("📦 push:7 ")
+//        }
 
-        
+        Logger.log("📦 push:6 - Код после DispatchQueue.main.async")
+
     }
+
 
     func endCall(uuid: UUID) {
         let endCallAction = CXEndCallAction(call: uuid)
@@ -113,34 +97,21 @@ extension CallManager: CXProviderDelegate {
 
 
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
+        Logger.log("📞 Вызов принят через CallKit!")
 
-        // 2️⃣ Гарантируем, что CallKit знает о принятии вызова
+        DispatchQueue.main.async {
+            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = scene.windows.first {
+                Logger.log("✅ Открываем главный экран после принятия звонка")
+                window.rootViewController = MainKt.MainViewController()
+                window.makeKeyAndVisible()
+            } else {
+                Logger.log("⚠️ Ошибка: не удалось найти window")
+            }
+        }
+        
         action.fulfill()
-
-//        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { // ⏳ Даем время загрузиться приложению
-//            if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
-//               let window = scene.windows.first {
-//                print("✅ Меняем rootViewController на MainViewController")
-//                window.rootViewController = MainKt.MainViewController()
-//                window.makeKeyAndVisible()
-//            } else {
-//                print("⚠️ Не удалось получить windowScene")
-//            }
-//
-//            // 4️⃣ Запускаем WebRTC после небольшой задержки
-//            Task {
-//                do {
-//                    let callHandler = KoinHelperKt.getCallHandler()
-//                    print("⏳ Запуск WebRTC-сессии...")
-//                    try await callHandler.startWebRTCSession(callId: "123") // 👈 Убедись, что callId правильный
-//                    print("✅ WebRTC-сессия успешно запущена")
-//                } catch {
-//                    print("❌ Ошибка при запуске WebRTC: \(error.localizedDescription)")
-//                }
-//            }
-//        }
     }
-
 
 
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {

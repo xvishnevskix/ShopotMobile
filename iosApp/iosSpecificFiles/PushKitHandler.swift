@@ -30,26 +30,39 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate {
 //        UserDefaults.standard.synchronize()
     }
 
+ 
     func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         Logger.log("🔔 VoIP push получен!")
         Logger.log("📦 Payload: \(payload.dictionaryPayload)")
+
         activateAudioSession()
 
         let callUUID = UUID()
         let callerName = payload.dictionaryPayload["callerName"] as? String ?? "Unknown Caller"
         let callId = payload.dictionaryPayload["callId"] as? String ?? "0"
-        
-        Logger.log("📦 push:1 ")
+
+        Logger.log("📦 push:1 - Разбираем payload")
+        Logger.log("📞 callerName: \(callerName)")
+        Logger.log("📞 callId: \(callId)")
 
         // 🔹 Принудительно держим приложение живым
-        UIApplication.shared.beginBackgroundTask {
+        var backgroundTask: UIBackgroundTaskIdentifier = .invalid
+        backgroundTask = UIApplication.shared.beginBackgroundTask {
             Logger.log("⚠️ Background task expired")
+            UIApplication.shared.endBackgroundTask(backgroundTask)
         }
+
+        Logger.log("📦 push:2 - Запускаем обработку звонка")
+
         // ❗️ ВАЖНО: Вызов CallKit ДОЛЖЕН быть сразу, без задержек
         self.callManager.reportIncomingCall(uuid: callUUID, handle: callerName, hasVideo: false, callId: callId)
-        
-        Logger.log("📦 push:end ")
 
+        Logger.log("📦 push:end - Завершение pushRegistry")
+        
+        // Завершаем background task, если он активен
+        if backgroundTask != .invalid {
+            UIApplication.shared.endBackgroundTask(backgroundTask)
+        }
 
         completion() // Сообщаем iOS, что push обработан
     }

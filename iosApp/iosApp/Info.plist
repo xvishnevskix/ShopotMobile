@@ -2,10 +2,20 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>org.videotrade.shopot.iosApp</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleIconName</key>
 	<string>AppIcon</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>ru</string>
+		<string>es</string>
+	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 	<key>NSAppTransportSecurity</key>
@@ -21,32 +31,6 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>UIBackgroundModes</key>
-	<array>
-	    <string>voip</string>
-		<string>fetch</string>
-		<string>processing</string>
-		<string>remote-notification</string>
-	</array>
-	<key>aps-environment</key>
-	<string>development</string>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>org.videotrade.shopot.iosApp</string>
-	</array>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Мы используем ваш микрофон для записи аудио.</string>
 	<key>NSUbiquitousContainers</key>
 	<dict>
 		<key>iCloud.com.yourcompany.yourapp</key>
@@ -59,11 +43,15 @@
 	</dict>
 	<key>NSUbiquitousUsageDescription</key>
 	<string>Ваше приложение использует iCloud для доступа к документам.</string>
-	<key>CFBundleLocalizations</key>
+	<key>UIBackgroundModes</key>
 	<array>
-		<string>en</string>
-		<string>ru</string>
-		<string>es</string>
+		<string>audio</string>
+		<string>fetch</string>
+		<string>processing</string>
+		<string>remote-notification</string>
+		<string>voip</string>
 	</array>
+	<key>aps-environment</key>
+	<string>development</string>
 </dict>
 </plist>
