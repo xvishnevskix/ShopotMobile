@@ -5,6 +5,7 @@ import FirebaseCore
 import FirebaseMessaging
 import PushKit
 import os.log
+import AVFoundation // ✅ Добавляем импорт
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -43,6 +44,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+//        let audioSession = AVAudioSession.sharedInstance()
+//           do {
+//               try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .defaultToSpeaker])
+//               try audioSession.setActive(true)
+//               print("✅ Аудиосессия активирована при старте приложения")
+//           } catch {
+//               print("❌ Ошибка при активации аудиосессии: \(error.localizedDescription)")
+//           }
+//
+        
         UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
         Messaging.messaging().delegate = nil // <-- Отключаем обработку FCM
@@ -59,7 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         self.pushKitHandler = PushKitHandler(callManager: callManager)  // Запускаем VoIP push
 
         
-//        Logger.readLogs()
+        Logger.readLogs()
 
         requestNotificationAuthorization(application)
 
@@ -68,7 +79,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NotifierManager.shared.initialize(
             configuration: NotificationPlatformConfigurationIos(showPushNotification: true, askNotificationPermissionOnStart: true)
         )
-        print("APNs settings: \(UserDefaults.standard.dictionaryRepresentation())")
 
         return true
     }
