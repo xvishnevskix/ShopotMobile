@@ -70,6 +70,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
 
+    if (!chat.personal) {
+        viewModel.loadGroupUsers(chat.chatId)
+    }
 
     Column {
         Row(
@@ -111,7 +114,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                             navigator.push(ProfileChatScreen(chat))
                         } else {
                             
-                            viewModel.loadGroupUsers(chat.chatId)
+//                            viewModel.loadGroupUsers(chat.chatId)
                             navigator.push(GroupProfileScreen(profile, chat))
                             
                         }
@@ -250,13 +253,15 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 
 @Composable
 private fun ParticipantCountText(count: Int) {
+    val colors = MaterialTheme.colorScheme
+
     Text(
         text = getParticipantCountText(count),
         fontSize = 16.sp,
         lineHeight = 16.sp,
         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
         fontWeight = FontWeight(400),
-        color = Color(0x80373533),
+        color = colors.secondary,
         letterSpacing = TextUnit(0F, TextUnitType.Sp),
     )
 }
