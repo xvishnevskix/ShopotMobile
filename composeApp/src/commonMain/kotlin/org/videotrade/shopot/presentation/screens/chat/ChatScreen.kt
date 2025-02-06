@@ -281,71 +281,71 @@ class ChatScreen(
                 ) {}
             }
             
-//            if (isMessageUpdated.value && selectedMessage.value != null) {
-//                val overlayPosition = selectedMessageY.value
-//                val isWithinBounds = overlayPosition >= 0 &&
-//                        overlayPosition + boxSelectedMessageHeight.value <= screenHeightInPx
-//
-//                if (isWithinBounds) {
-//                    BlurredMessageOverlay(
-//                        chat = chat,
-//                        profile = profile,
-//                        viewModel = viewModel,
-//                        selectedMessage = selectedMessage.value,
-//                        selectedMessageY = selectedMessageY.value,
-//                        onDismiss = {
-//                            selectedMessage.value = null
-//                            hiddenMessageId.value = null
-//                        }
-//                    )
-//                } else {
-//
-//                    scope.launch {
-//                        selectedMessageY.value = when {
-//                            overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
-//                            overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
-//                                (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
-//                            }
-//
-//                            else -> overlayPosition
-//                        }
-//                        isMessageUpdated.value = true // Перезапуск
-//                    }
-//                }
-//            }
-//            Crossfade(targetState = selectedMessage.value) { message ->
-//                if (message != null && isMessageUpdated.value) {
-//                    val overlayPosition = selectedMessageY.value
-//                    val isWithinBounds = overlayPosition >= 0 &&
-//                            overlayPosition + boxSelectedMessageHeight.value + 180 <= screenHeightInPx
-//
-//                    if (isWithinBounds) {
-//                        BlurredMessageOverlay(
-//                            chat = chat,
-//                            profile = profile,
-//                            viewModel = viewModel,
-//                            selectedMessage = message,
-//                            selectedMessageY = selectedMessageY.value,
-//                            onDismiss = {
-//                                selectedMessage.value = null
-//                                hiddenMessageId.value = null
-//                            }
-//                        )
-//                    } else {
-//                        scope.launch {
-//                            selectedMessageY.value = when {
-//                                overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
-//                                overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
-//                                    (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
-//                                }
-//
-//                                else -> overlayPosition
-//                            }
-//                            isMessageUpdated.value = true // Перезапуск
-//                        }
-//                    }
-//                }
-//            }
+            if (isMessageUpdated.value && selectedMessage.value != null) {
+                val overlayPosition = selectedMessageY.value
+                val isWithinBounds = overlayPosition >= 0 &&
+                        overlayPosition + boxSelectedMessageHeight.value <= screenHeightInPx
+
+                if (isWithinBounds) {
+                    BlurredMessageOverlay(
+                        chat = chat,
+                        profile = profile,
+                        viewModel = viewModel,
+                        selectedMessage = selectedMessage.value,
+                        selectedMessageY = selectedMessageY.value,
+                        onDismiss = {
+                            selectedMessage.value = null
+                            hiddenMessageId.value = null
+                        }
+                    )
+                } else {
+
+                    scope.launch {
+                        selectedMessageY.value = when {
+                            overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
+                            overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
+                                (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
+                            }
+
+                            else -> overlayPosition
+                        }
+                        isMessageUpdated.value = true // Перезапуск
+                    }
+                }
+            }
+            Crossfade(targetState = selectedMessage.value) { message ->
+                if (message != null && isMessageUpdated.value) {
+                    val overlayPosition = selectedMessageY.value
+                    val isWithinBounds = overlayPosition >= 0 &&
+                            overlayPosition + boxSelectedMessageHeight.value + 180 <= screenHeightInPx
+
+                    if (isWithinBounds) {
+                        BlurredMessageOverlay(
+                            chat = chat,
+                            profile = profile,
+                            viewModel = viewModel,
+                            selectedMessage = message,
+                            selectedMessageY = selectedMessageY.value,
+                            onDismiss = {
+                                selectedMessage.value = null
+                                hiddenMessageId.value = null
+                            }
+                        )
+                    } else {
+                        scope.launch {
+                            selectedMessageY.value = when {
+                                overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
+                                overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
+                                    (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
+                                }
+
+                                else -> overlayPosition
+                            }
+                            isMessageUpdated.value = true // Перезапуск
+                        }
+                    }
+                }
+            }
         }
     }
 }
