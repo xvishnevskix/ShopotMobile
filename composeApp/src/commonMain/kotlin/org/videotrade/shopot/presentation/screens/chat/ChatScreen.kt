@@ -235,7 +235,7 @@ class ChatScreen(
                 
                 
                 //пересылка сообщений
-//                BottomSheetModal(scaffoldForwardState)
+                BottomSheetModal(scaffoldForwardState)
                 //стикеры
                 BottomSheetScaffold(
                     modifier = Modifier.background(colors.surface),
