@@ -91,6 +91,13 @@ class ChatViewModel : ViewModel(), KoinComponent {
 
     private val _messageToDelete = MutableStateFlow<MessageItem?>(null)
     val messageToDelete: StateFlow<MessageItem?> = _messageToDelete
+
+    private val _currentPlayingMessage = MutableStateFlow<String?>(null)
+    val currentPlayingMessage: StateFlow<String?> = _currentPlayingMessage
+
+    private val _voiceMessages = MutableStateFlow<List<MessageItem>>(emptyList())
+    val voiceMessages: StateFlow<List<MessageItem>> = _voiceMessages
+
     
     init {
         
@@ -181,6 +188,13 @@ class ChatViewModel : ViewModel(), KoinComponent {
         dismissDeleteConfirmation()
         onDismiss()
     }
+
+
+
+    fun setPlayingMessage(messageId: String?) {
+        _currentPlayingMessage.value = messageId
+    }
+
 
 
     
