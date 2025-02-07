@@ -5,6 +5,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
@@ -23,6 +24,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.compose.koinInject
+import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -32,6 +34,12 @@ class TestScreen : Screen {
     override fun Content() {
         val scope = rememberCoroutineScope()
         
+        
+        LaunchedEffect(Unit){
+            val cameraPer =
+                PermissionsProviderFactory.create()
+                    .getPermission("microphone")
+        }
         
         MaterialTheme {
             SafeArea {
