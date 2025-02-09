@@ -381,7 +381,7 @@ private fun validateGroupName(
     nameValidate4: String
 ): String? {
     return when {
-        name.isEmpty() -> nameValidate1
+        name.isBlank() -> nameValidate1
         name.length > 40 -> nameValidate2
         !name.matches(Regex("^[\\p{L}\\p{N}\\p{S}\\s]+$")) -> nameValidate4 // Добавлено поддержка эмодзи
         else -> null
