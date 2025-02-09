@@ -49,7 +49,10 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.util.InternalAPI
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -276,18 +279,10 @@ class SignUpScreen(private val phone: String) : Screen {
                                         scope.launch {
                                             val client = HttpClient(getHttpClientEngine())
                                             isLoading.value = true
-                                            try {
-                                                val icon = image?.let {
-                                                    origin().sendImageFile(
-                                                        image!!.fileAbsolutePath,
-                                                        "image", image!!.fileName,
-                                                        true
-                                                    )
 
-                                                }
-                                                println("phone ${phone}")
-////
-//                                            return@launch
+                                            try {
+
+
                                                 val jsonContent = Json.encodeToString(
                                                     buildJsonObject {
                                                         put("phoneNumber", phone.drop(1))
@@ -300,7 +295,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         )
                                                         put("login", textState.value.nickname)
                                                         put("status", "active")
-                                                        put("icon", icon)
+
                                                     }
                                                 )
 
@@ -314,7 +309,9 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     }
 
 
-                                                println("responseresponse ${response.bodyAsText()}")
+                                                println("Ответ от сервера: ${response.bodyAsText()}")
+                                                val responseData: ReloadRes = Json.decodeFromString(response.bodyAsText())
+                                                val userId = responseData.userId
 
                                                 if (response.status.value == 500) {
                                                     toasterViewModel.toaster.show(
@@ -356,6 +353,45 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         responseData.userId,
                                                         navigator
                                                     )
+
+                                                    println("Начало загрузки аватарки...")
+                                                    val icon = image?.let {
+                                                        withContext(Dispatchers.IO) { // Запускаем в другом потоке
+                                                            val uploadedImageUrl = origin().sendImageFile(
+                                                                it.fileAbsolutePath, "image", it.fileName, true
+                                                            )
+                                                            println("Аватарка загружена: $uploadedImageUrl")
+                                                            uploadedImageUrl
+                                                        }
+
+                                                    }
+
+                                                    if (icon != null) {
+                                                        println("Обновляем профиль с новой аватаркой...")
+
+                                                        val updateProfileJson = Json.encodeToString(
+                                                            buildJsonObject {
+                                                                put("userId", userId)
+                                                                put("icon", icon)
+                                                            }
+                                                        )
+
+                                                        val updateResponse: HttpResponse = client.post("${SERVER_URL}user/update-profile") {
+                                                            contentType(ContentType.Application.Json)
+                                                            setBody(updateProfileJson)
+                                                        }
+
+                                                        if (updateResponse.status.isSuccess()) {
+                                                            println("Аватарка успешно привязана к пользователю!")
+                                                        } else {
+                                                            println("Ошибка обновления профиля с аватаркой: ${updateResponse.bodyAsText()}")
+                                                        }
+                                                    } else {
+                                                        println("Аватарка не загружена, пропускаем обновление профиля.")
+                                                    }
+
+                                                    println("Аватарка загружена: $icon")
+                                                    println("phone ${phone}")
 
                                                 }
                                             } catch (e: Exception) {
