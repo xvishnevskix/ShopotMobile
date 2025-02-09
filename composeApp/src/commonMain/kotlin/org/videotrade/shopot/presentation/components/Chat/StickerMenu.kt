@@ -318,7 +318,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                     .fillMaxWidth()
                     .fillMaxHeight()
                     .background(colors.surface)
-                    .padding(vertical = 4.dp, horizontal = 16.dp),
+                    .padding(vertical = 4.dp, horizontal = 4.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 items(favoriteStickerPacks.value) { pack -> // Изменение: используем favoriteStickerPacks
@@ -328,8 +328,8 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                             verticalAlignment = Alignment.Top,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 5.dp)
-                                .padding(bottom = 10.dp)
+                                .padding(horizontal = 2.dp)
+                                .padding(bottom = 8.dp)
                         ) {
                             Text(
                                 text = pack.name,
@@ -340,7 +340,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                                 letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
                                 color = colors.primary,
                                 modifier = Modifier
-                                    .padding(horizontal = 5.dp)
+                                    .padding(horizontal = 4.dp)
                                     .padding(bottom = 10.dp)
                             )
 
@@ -365,7 +365,7 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
+                                    .padding(vertical = 4.dp),
                                 horizontalArrangement = Arrangement.Center
                             ) {
                                 rowStickers.forEach { sticker ->
