@@ -6,12 +6,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -115,6 +118,8 @@ class AuthCallScreen(
         val serverUnavailable = stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
+
+        val scrollState = rememberScrollState()
 
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
@@ -325,6 +330,7 @@ class AuthCallScreen(
                             handleError(invalidCode)
                         }
                     }
+//                    handleAuthCase()
                 } else {
                     if (authCase == "SignIn") {
                         handleError(invalidCode)
@@ -352,7 +358,9 @@ class AuthCallScreen(
                 modifier = Modifier.fillMaxWidth().fillMaxHeight(1F)
                     .background(
                         colors.background
-                    ).imePadding(),
+                    )
+                    .imePadding()
+                ,
                 contentAlignment = Alignment.TopCenter
             ) {
 
@@ -361,7 +369,7 @@ class AuthCallScreen(
                     verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.fillMaxWidth()
-                        .imePadding()
+
                 ) {
                     when (authCase) {
                         "SignIn" -> AuthHeader(stringResource(MokoRes.strings.login))
@@ -369,7 +377,7 @@ class AuthCallScreen(
                     }
                     Column(
                         modifier = Modifier.fillMaxWidth()
-                            .fillMaxHeight(0.85f).verticalScroll(rememberScrollState()),
+                            .fillMaxHeight().verticalScroll(scrollState),
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
