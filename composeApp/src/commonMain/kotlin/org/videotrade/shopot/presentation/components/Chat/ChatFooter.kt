@@ -843,14 +843,16 @@ fun ChatFooter(
 
 
                         val boxSize by animateDpAsState(
-                            targetValue = if (footerText.isNotEmpty()) 56.dp else 50.dp,
+                            targetValue = 56.dp
+//                            if (footerText.isNotEmpty()) 56.dp else 50.dp
+                            ,
                             animationSpec = tween(
                                 durationMillis = 100, // Длительность анимации
                                 easing = FastOutSlowInEasing // Плавное увеличение
                             )
                         )
 
-                        val isFooterTextNotEmpty = footerText.isNotEmpty()
+                        val isFooterTextNotEmpty = footerText.isNotBlank()
 
 
                         AnimatedVisibility(
