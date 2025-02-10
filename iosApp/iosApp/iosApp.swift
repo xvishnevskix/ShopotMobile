@@ -12,15 +12,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var window: UIWindow?
     private var appLifecycleObserver: AppLifecycleObserver?
     private var pushRegistry: PKPushRegistry!
-    private var pushKitHandler: PushKitHandler!
-    private var callManager: CallManager!
-    
     
     override init() {
         super.init()
-        
-        // ✅ Передаем CallHandler в CallManager
-        self.callManager = CallManager()
 
         // Инициализация Koin
         KoinHelperKt.doInitKoin(
@@ -29,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 networkHelper: IosNetworkHelper() as NetworkHelper
             ),
             swiftFuncs: SwiftFuncsIos(
-                  swiftFuncsHelper: IosSwiftFuncsHelper(callManager: callManager) as SwiftFuncsHelper // ✅ Передаём callManager
+                  swiftFuncsHelper: IosSwiftFuncsHelper() as SwiftFuncsHelper // ✅ Передаём callManager
               ),
             additionalModules: SharedModulesKt.getSharedModules(),
             appDeclaration: { _ in }
@@ -44,34 +38,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-//        let audioSession = AVAudioSession.sharedInstance()
-//           do {
-//               try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .defaultToSpeaker])
-//               try audioSession.setActive(true)
-//               print("✅ Аудиосессия активирована при старте приложения")
-//           } catch {
-//               print("❌ Ошибка при активации аудиосессии: \(error.localizedDescription)")
-//           }
-//
-        
         UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
         Messaging.messaging().delegate = nil // <-- Отключаем обработку FCM
 
         window = UIWindow(frame: UIScreen.main.bounds)
-        if let window = window {
-            window.rootViewController = MainKt.MainViewController()
-            window.makeKeyAndVisible()
-        }
-        
-//        UIApplication.shared.setMinimumBackgroundFetchInterval(UIApplication.backgroundFetchIntervalMinimum)
+        let voipViewController = VoIPViewController()
+        window?.rootViewController = voipViewController
+        window?.makeKeyAndVisible()
 
-        // В методе didFinishLaunchingWithOptions:
-        self.pushKitHandler = PushKitHandler(callManager: callManager)  // Запускаем VoIP push
-
-        
         Logger.readLogs()
-
         requestNotificationAuthorization(application)
 
         appLifecycleObserver = ComposeApp.AppLifecycleObserver_iosKt.getAppLifecycleObserver()
@@ -82,6 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         return true
     }
+
 
     func requestNotificationAuthorization(_ application: UIApplication) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
