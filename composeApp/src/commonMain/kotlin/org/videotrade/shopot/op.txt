@@ -1,0 +1,7 @@
+curl -v -d @voip_payload.json \
+  --header "apns-topic: com.PushKitTutorial.testCall.voip" \
+  --header "authorization: bearer eyJhbGciOiJFUzI1NiIsImtpZCI6IjRGTVhOMjQ4SDgiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJGQVpGOVo1Q1JXIiwiaWF0IjoxNzM5MTg0ODgyfQ.eKCBIxNkr44Onl6X6ntCgBfGeOV6Yxquf3ye4jVQoYcXFr5yXN-ZwoQAVb4Jl13ZVLQW__vDFIEJorpHRtmjyQ" \
+  --header "apns-push-type: voip" \
+  --header "apns-priority: 10" \
+  --header "apns-expiration: 0" \
+  --http2 https://api.sandbox.push.apple.com/3/device/a01f99ffef1452dec3f24b30caca87fd5f0645a317aee58dd3886949f7afe1dc

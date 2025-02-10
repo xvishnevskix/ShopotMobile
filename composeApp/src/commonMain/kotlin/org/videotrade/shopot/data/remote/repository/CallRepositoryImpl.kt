@@ -476,6 +476,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         println("peerConnection.value ${peerConnection.value}")
         
+        val stream = MediaDevices.getUserMedia(audio = true)
+        
+        
         if (peerConnection.value !== null) {
             
             
@@ -483,7 +486,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .getPermission("microphone")
             
             
-            val stream = MediaDevices.getUserMedia(audio = true)
             
             println("Faileddadasdasda $stream")
             

@@ -10,6 +10,7 @@
 		4B240E922CCA33440029233D /* message.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B240E902CCA33440029233D /* message.mp3 */; };
 		4B240E932CCA33440029233D /* newmess.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B240E912CCA33440029233D /* newmess.mp3 */; };
 		4B25B1ED2BEE1AF800AAB866 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 4B25B1EC2BEE1AF800AAB866 /* WebRTC */; };
+		4B4CF34D2D5A0E2700198918 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4CF34C2D5A0E2700198918 /* ViewController.swift */; };
 		4B7C65B62C3820BC00429124 /* WolfsslModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7C65B52C3820BC00429124 /* WolfsslModule.m */; };
 		4B810CCB2C8B2139007795B2 /* callee.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B810CCA2C8B2139007795B2 /* callee.mp3 */; };
 		4B810CCD2C8B2142007795B2 /* caller.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B810CCC2C8B2142007795B2 /* caller.mp3 */; };
@@ -36,6 +37,7 @@
 		4B240E912CCA33440029233D /* newmess.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = newmess.mp3; sourceTree = "<group>"; };
 		4B25B1E52BEDA00A00AAB866 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4B25B1E72BEDA1A600AAB866 /* Specs */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Specs; path = "../../../Library/Developer/Xcode/DerivedData/iosApp-aqpjntnwydssvpbfaxdymfedbggc/SourcePackages/checkouts/Specs"; sourceTree = "<group>"; };
+		4B4CF34C2D5A0E2700198918 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		4B7C65B52C3820BC00429124 /* WolfsslModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WolfsslModule.m; path = iosApp/cipherFuncs/WolfsslModule.m; sourceTree = "<group>"; };
 		4B7C65B72C3820E600429124 /* WolfsslModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WolfsslModule.h; path = iosApp/cipherFuncs/WolfsslModule.h; sourceTree = "<group>"; };
 		4B810CCA2C8B2139007795B2 /* callee.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = callee.mp3; sourceTree = "<group>"; };
@@ -110,6 +112,7 @@
 				4BAEB3872CF877710046252D /* IosNetworkHelper.swift */,
 				4BE5E41C2D425E8E00D04A36 /* CallManager.swift */,
 				4BE5E4202D477DD700D04A36 /* PushKitHandler.swift */,
+				4B4CF34C2D5A0E2700198918 /* ViewController.swift */,
 			);
 			path = iosSpecificFiles;
 			sourceTree = "<group>";
@@ -286,6 +289,7 @@
 				4BA72F922C36AB9000CCBE12 /* SharedSecret.m in Sources */,
 				4BAEB3882CF877710046252D /* IosNetworkHelper.swift in Sources */,
 				4BA72FAB2C3726D800CCBE12 /* SwiftEncryptionWrapper.swift in Sources */,
+				4B4CF34D2D5A0E2700198918 /* ViewController.swift in Sources */,
 				4BE5E41D2D425E8E00D04A36 /* CallManager.swift in Sources */,
 				4B7C65B62C3820BC00429124 /* WolfsslModule.m in Sources */,
 				4BE5E4212D477DD700D04A36 /* PushKitHandler.swift in Sources */,

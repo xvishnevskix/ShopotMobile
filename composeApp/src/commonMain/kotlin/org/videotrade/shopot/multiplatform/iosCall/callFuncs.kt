@@ -43,14 +43,14 @@ object CallHandler : KoinComponent {
                 
                 callViewModel.initWebrtc()
                 
-                commonViewModel.mainNavigator.value?.push(
-                    CallIosScreen(
-                        calleeId = callViewModel.iosCallData.value?.userId ?: "",
-                        userFirstName = "",
-                        userLastName = "",
-                        userPhone = ""
-                    )
-                )
+//                commonViewModel.mainNavigator.value?.push(
+//                    CallIosScreen(
+//                        calleeId = callViewModel.iosCallData.value?.userId ?: "",
+//                        userFirstName = "",
+//                        userLastName = "",
+//                        userPhone = ""
+//                    )
+//                )
             } catch (e: Exception) {
                 println("❌ Ошибка получения CommonViewModel: $e")
             }
