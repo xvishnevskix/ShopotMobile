@@ -10,8 +10,8 @@
 		4B240E922CCA33440029233D /* message.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B240E902CCA33440029233D /* message.mp3 */; };
 		4B240E932CCA33440029233D /* newmess.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B240E912CCA33440029233D /* newmess.mp3 */; };
 		4B25B1ED2BEE1AF800AAB866 /* WebRTC in Frameworks */ = {isa = PBXBuildFile; productRef = 4B25B1EC2BEE1AF800AAB866 /* WebRTC */; };
-		4B4CF3522D5A19BB00198918 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4B4CF3512D5A19BB00198918 /* Main.storyboard */; };
 		4B4CF3542D5A1A2A00198918 /* VoIPViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B4CF3532D5A1A2A00198918 /* VoIPViewController.swift */; };
+		4B4CF3572D5A287E00198918 /* ES_CellRingtone23.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B4CF3562D5A287E00198918 /* ES_CellRingtone23.mp3 */; };
 		4B7C65B62C3820BC00429124 /* WolfsslModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 4B7C65B52C3820BC00429124 /* WolfsslModule.m */; };
 		4B810CCB2C8B2139007795B2 /* callee.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B810CCA2C8B2139007795B2 /* callee.mp3 */; };
 		4B810CCD2C8B2142007795B2 /* caller.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 4B810CCC2C8B2142007795B2 /* caller.mp3 */; };
@@ -36,8 +36,8 @@
 		4B240E912CCA33440029233D /* newmess.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = newmess.mp3; sourceTree = "<group>"; };
 		4B25B1E52BEDA00A00AAB866 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		4B25B1E72BEDA1A600AAB866 /* Specs */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Specs; path = "../../../Library/Developer/Xcode/DerivedData/iosApp-aqpjntnwydssvpbfaxdymfedbggc/SourcePackages/checkouts/Specs"; sourceTree = "<group>"; };
-		4B4CF3512D5A19BB00198918 /* Main.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		4B4CF3532D5A1A2A00198918 /* VoIPViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoIPViewController.swift; sourceTree = "<group>"; };
+		4B4CF3562D5A287E00198918 /* ES_CellRingtone23.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = ES_CellRingtone23.mp3; sourceTree = "<group>"; };
 		4B7C65B52C3820BC00429124 /* WolfsslModule.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = WolfsslModule.m; path = iosApp/cipherFuncs/WolfsslModule.m; sourceTree = "<group>"; };
 		4B7C65B72C3820E600429124 /* WolfsslModule.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = WolfsslModule.h; path = iosApp/cipherFuncs/WolfsslModule.h; sourceTree = "<group>"; };
 		4B810CCA2C8B2139007795B2 /* callee.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = callee.mp3; sourceTree = "<group>"; };
@@ -95,7 +95,7 @@
 		4B4CF3502D5A199200198918 /* CallFiles */ = {
 			isa = PBXGroup;
 			children = (
-				4B4CF3512D5A19BB00198918 /* Main.storyboard */,
+				4B4CF3562D5A287E00198918 /* ES_CellRingtone23.mp3 */,
 				4B4CF3532D5A1A2A00198918 /* VoIPViewController.swift */,
 			);
 			path = CallFiles;
@@ -240,8 +240,8 @@
 				A93A954229CC810D00F8E227 /* Preview Assets.xcassets in Resources */,
 				A93A953F29CC810D00F8E227 /* Assets.xcassets in Resources */,
 				4B240E932CCA33440029233D /* newmess.mp3 in Resources */,
-				4B4CF3522D5A19BB00198918 /* Main.storyboard in Resources */,
 				4B240E922CCA33440029233D /* message.mp3 in Resources */,
+				4B4CF3572D5A287E00198918 /* ES_CellRingtone23.mp3 in Resources */,
 				4B810CCB2C8B2139007795B2 /* callee.mp3 in Resources */,
 				4BBB6F182C14A1F100C72863 /* GoogleService-Info.plist in Resources */,
 				4B810CCD2C8B2142007795B2 /* caller.mp3 in Resources */,

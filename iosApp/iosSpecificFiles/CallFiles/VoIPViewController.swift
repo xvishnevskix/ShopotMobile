@@ -1,76 +1,47 @@
 import UIKit
 import CallKit
 import PushKit
-import AVFoundation
 
 class VoIPViewController: UIViewController, CXProviderDelegate, PKPushRegistryDelegate {
-    var pushRegistry: PKPushRegistry!
-    var callProvider: CXProvider!
-    var callController: CXCallController!
-    
     override func viewDidLoad() {
-        super.viewDidLoad()
+        let callRegistry = PKPushRegistry(queue: nil)
+        callRegistry.delegate = self
+        // Register to receive push notifications
+        callRegistry.desiredPushTypes = [PKPushType.voIP]
+    }
+
+    // Call this function when the app receives push notifications
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
         
-        setupVoIP()
+        // Create an object to handle call configurations and settings
+        let callConfigObject = CXProviderConfiguration()
+        // Enable video calls
+        callConfigObject.supportsVideo = true;
+        // Show missed, received and sent calls in the phone app's Recents category
+        callConfigObject.includesCallsInRecents = true;
+        // Set a custom ring tone for incoming calls
+        callConfigObject.ringtoneSound = "ES_CellRingtone23.mp3"
+        
+        // Create an object to give update about call-related events
+        let callReport = CXCallUpdate()
+        // Display the name of the caller
+        callReport.remoteHandle = CXHandle(type: .generic, value: "Amos Gyamfi")
+        // Enable video call
+        callReport.hasVideo = true
+        
+        // Create an object to give update about incoming calls
+        let callProvider = CXProvider(configuration: callConfigObject)
+        callProvider.reportNewIncomingCall(with: UUID(), update: callReport, completion: { error in })
+        callProvider.setDelegate(self, queue: nil)
     }
     
-    private func setupVoIP() {
-        pushRegistry = PKPushRegistry(queue: DispatchQueue.main)
-        pushRegistry.delegate = self
-        pushRegistry.desiredPushTypes = [.voIP]
-
-        let config = CXProviderConfiguration(localizedName: "MyApp")
-        config.supportsVideo = true
-        config.includesCallsInRecents = true
-        config.ringtoneSound = "ES_CellRingtone23.mp3"
-
-        callProvider = CXProvider(configuration: config)
-        callProvider.setDelegate(self, queue: nil)
-        callController = CXCallController()
-    }
-
-    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
-        guard type == .voIP else { return }
-        
-        let uuid = UUID()
-        let update = CXCallUpdate()
-        update.remoteHandle = CXHandle(type: .generic, value: "Caller Name")
-        update.hasVideo = true
-
-        callProvider.reportNewIncomingCall(with: uuid, update: update) { error in
-            if let error = error {
-                print("Ошибка обработки входящего вызова: \(error.localizedDescription)")
-                return
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                let transaction = CXTransaction(action: CXAnswerCallAction(call: uuid))
-                self.callController.request(transaction) { error in
-                    if let error = error {
-                        print("Ошибка обработки вызова: \(error.localizedDescription)")
-                    }
-                }
-            }
-        }
-    }
-
+    // Call this function when the app receives push credentials
     func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
-        if type == .voIP {
-            let token = pushCredentials.token.map { String(format: "%02.2hhx", $0) }.joined()
-            print("VoIP токен: \(token)")
-        }
+        // Display the iOS device token in the Xcode console
+        print(pushCredentials.token.map { String(format: "%02.2hhx", $0) }.joined())
     }
-
-    func provider(_ provider: CXProvider, didActivate audioSession: AVAudioSession) {
-        do {
-            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .allowBluetoothA2DP])
-            try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
-        } catch {
-            print("Ошибка активации аудиосессии: \(error.localizedDescription)")
-        }
-    }
-
-    func providerDidReset(_ provider: CXProvider) {
-        print("CallKit сброшен")
+    
+    func providerDidReset(_ callProvider: CXProvider) {
+        //
     }
 }

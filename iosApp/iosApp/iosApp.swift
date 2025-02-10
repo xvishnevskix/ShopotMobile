@@ -40,14 +40,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     ) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
-        Messaging.messaging().delegate = nil // <-- Отключаем обработку FCM
+        Messaging.messaging().delegate = nil
 
         window = UIWindow(frame: UIScreen.main.bounds)
-        let voipViewController = VoIPViewController()
-        window?.rootViewController = voipViewController
+        let mainVC = MainKt.MainViewController() // Ваш основной контроллер
+        window?.rootViewController = mainVC
         window?.makeKeyAndVisible()
 
+        // Запускаем VoIP-пуш (регистрацию)
+        let voipVC = VoIPViewController()
+//        
+//        window = UIWindow(frame: UIScreen.main.bounds)
+//         let voipViewController = VoIPViewController()
+//         window?.rootViewController = voipViewController
+//         window?.makeKeyAndVisible()
+//        
+        
         Logger.readLogs()
+
         requestNotificationAuthorization(application)
 
         appLifecycleObserver = ComposeApp.AppLifecycleObserver_iosKt.getAppLifecycleObserver()
@@ -58,7 +68,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
         return true
     }
-
 
     func requestNotificationAuthorization(_ application: UIApplication) {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { granted, error in
