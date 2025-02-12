@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.koin.compose.koinInject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
@@ -42,7 +43,7 @@ object CallHandler : KoinComponent {
                 println("commonViewModel.mainNavigator.value ${commonViewModel.mainNavigator.value}")
                 
                 callViewModel.initWebrtc()
-                
+
 //                commonViewModel.mainNavigator.value?.push(
 //                    CallIosScreen(
 //                        calleeId = callViewModel.iosCallData.value?.userId ?: "",
@@ -99,7 +100,7 @@ object CallHandler : KoinComponent {
 //                .getPermission("microphone")
 
 //            if (cameraPer) {
-            
+
 //            callViewModel.setIsIncomingCall(true)
 //            callViewModel.setIsCallBackground(true)
             
@@ -124,9 +125,9 @@ object CallHandler : KoinComponent {
         
     }
     
-     fun rejectCallIos() {
+    fun rejectCallIos() {
         try {
-            callViewModel.iosCallData.value?.userId?.let { callViewModel.rejectCall(it, "00:00:00") }
+//            callViewModel.iosCallData.value?.userId?.let { callViewModel.rejectCall(it, "00:00:00") }
         } catch (e: Exception) {
         
         }
@@ -134,24 +135,22 @@ object CallHandler : KoinComponent {
         
     }
     
-    suspend fun waitForCommonViewModel(): CommonViewModel {
-        var attempt = 0
-        while (attempt < 5) {
-            try {
-                val viewModel: CommonViewModel = getKoin().get()
-                if (viewModel.mainNavigator.value != null) return viewModel
-            } catch (e: Exception) {
-                println("🔄 Ожидание CommonViewModel... Попытка: $attempt")
-            }
-            delay(500) // Подождем 500 мс и попробуем снова
-            attempt++
-        }
-        throw IllegalStateException("❌ CommonViewModel не стал доступен после 5 попыток!")
+    
+    fun setIsCallBackground(isCallBackground: Boolean) {
+        val callUseCase: CallUseCase by inject()
+        val commonViewModel: CommonViewModel by inject()
+        callUseCase.setIsCallBackground(isCallBackground)
+        
+    }
+    
+    fun setAppIsActive(appIsActive: Boolean) {
+        val commonViewModel: CommonViewModel by inject()
+        
+        commonViewModel.setAppIsActive(appIsActive)
+        
     }
     
 }
-
-
 
 
 @Serializable

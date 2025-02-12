@@ -58,7 +58,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
     val isRestartApp = MutableStateFlow(false)
 
-    val appIsActive = MutableStateFlow(false)
+    val appIsActive = MutableStateFlow(true)
 
     private val _isReconnectionWs = MutableStateFlow(false)
 

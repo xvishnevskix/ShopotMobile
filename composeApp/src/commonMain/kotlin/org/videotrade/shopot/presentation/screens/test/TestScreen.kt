@@ -6,9 +6,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.Color
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -24,15 +28,26 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.compose.koinInject
+import org.videotrade.shopot.isActiveCallIos
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.presentation.screens.call.CallViewModel
 
 class TestScreen : Screen {
     @Composable
     override fun Content() {
         val scope = rememberCoroutineScope()
+        val callViewModel: CallViewModel = koinInject()
+        val isCallBackground by callViewModel.isCallBackground.collectAsState()
+        val navigator = LocalNavigator.currentOrThrow
+        
+        
+        if (isCallBackground) {
+            isActiveCallIos(callViewModel, navigator)
+        }
+        
         
         
         LaunchedEffect(Unit){

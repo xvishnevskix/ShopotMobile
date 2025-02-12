@@ -1,0 +1,127 @@
+import PushKit
+import os.log
+import AVFoundation // ✅ Добавляем импорт
+import UIKit
+import CallKit
+import PushKit
+import ComposeApp
+
+class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
+
+    private var pushRegistry: PKPushRegistry!
+    private var callProvider: CXProvider!
+
+    override init() {
+        super.init()
+        registerForPushKit()
+        setupCallKit()
+    }
+
+    func registerForPushKit() {
+        self.pushRegistry = PKPushRegistry(queue: DispatchQueue.main)
+        self.pushRegistry.delegate = self
+        self.pushRegistry.desiredPushTypes = [.voIP]
+        print("✅ PushKit зарегистрирован и подписан на VoIP уведомления!")
+    }
+
+    // ✅ Настройка CallKit
+    private func setupCallKit() {
+        let configuration = CXProviderConfiguration()
+        configuration.supportsVideo = true
+        configuration.includesCallsInRecents = true
+        configuration.ringtoneSound = "ES_CellRingtone23.mp3"
+
+        callProvider = CXProvider(configuration: configuration)
+        callProvider.setDelegate(self, queue: nil)
+    }
+
+    // 📲 Получаем VoIP Token
+    func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
+        let voipToken = pushCredentials.token.map { String(format: "%02x", $0) }.joined()
+        Logger.log("📲 Новый VoIP Token: \(voipToken)")
+    }
+
+    // ✅ Обрабатываем входящий VoIP-звонок
+    func pushRegistry(_ registry: PKPushRegistry, didReceiveIncomingPushWith payload: PKPushPayload, for type: PKPushType, completion: @escaping () -> Void) {
+        Logger.log("🔔 VoIP push получен!")
+        Logger.log("📦 Payload: \(payload.dictionaryPayload)")
+        
+        
+        let appState = UIApplication.shared.applicationState
+
+        switch appState {
+        case .active:
+            Logger.log("📲 Приложение активно (foreground)")
+        case .background:
+            Logger.log("🌙 Приложение в фоне (background)")
+            
+            let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+            
+            callHandler.setAppIsActive(appIsActive: false)
+            
+            callHandler.setIsCallBackground(isCallBackground: true)
+        @unknown default:
+            Logger.log("⚠️ Неизвестное состояние приложения")
+        }
+        
+
+        activateAudioSession()
+
+        let uuid = UUID()
+        let callerName = payload.dictionaryPayload["callerName"] as? String ?? "Unknown Caller"
+
+        let update = CXCallUpdate()
+        update.remoteHandle = CXHandle(type: .generic, value: callerName)
+        update.hasVideo = true
+
+        callProvider.reportNewIncomingCall(with: uuid, update: update) { error in
+            if let error = error {
+                Logger.log("❌ Ошибка обработки вызова: \(error.localizedDescription)")
+            } else {
+                Logger.log("✅ Вызов успешно зарегистрирован в CallKit")
+            }
+        }
+
+        completion()
+    }
+
+    // ✅ Активация аудиосессии
+    func activateAudioSession() {
+        DispatchQueue.main.async {
+            let audioSession = AVAudioSession.sharedInstance()
+            do {
+                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .defaultToSpeaker])
+                try audioSession.setActive(true)
+                Logger.log("🔊 Аудиосессия успешно активирована")
+            } catch {
+                Logger.log("❌ Ошибка активации аудиосессии: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    // ✅ Реализация CXProviderDelegate
+
+    // CallKit требует обработки сброса состояния
+    func providerDidReset(_ provider: CXProvider) {
+        Logger.log("🔄 CallKit был сброшен")
+    }
+
+    // CallKit требует обработки принятия звонка
+    func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
+        Logger.log("📞 Входящий звонок принят")
+        activateAudioSession()
+        
+        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+        
+        callHandler.setAppIsActive(appIsActive: true)
+        
+        
+        action.fulfill()
+    }
+
+    // CallKit требует обработки завершения звонка
+    func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
+        Logger.log("📞 Звонок завершен")
+        action.fulfill()
+    }
+}

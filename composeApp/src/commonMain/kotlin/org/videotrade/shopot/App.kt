@@ -12,6 +12,8 @@ import org.koin.compose.KoinContext
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
@@ -23,28 +25,44 @@ import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
 import org.videotrade.shopot.presentation.screens.test.TestScreen
 
 @Composable
-internal fun App()  {
+internal fun App() {
     val viewModel: MainViewModel = koinInject()
     val commonViewModel: CommonViewModel = koinInject()
     val callViewModel: CallViewModel = koinInject()
     val settingsViewModel: SettingsViewModel = koinInject()
     val isDarkTheme by settingsViewModel.isDarkTheme
-
+    
+    
     AppTheme(darkTheme = isDarkTheme) {
         KoinContext {
-            if (callViewModel.isCallBackground.value) {
-                isActiveCall(callViewModel)
+            if (getPlatform() === Platform.Ios) {
+                    Navigator(
+                        IntroScreen()
+//                        TestScreen()
+                    ) { navigator ->
+                        val appIsActive by commonViewModel.appIsActive.collectAsState()
+                        
+                        if (appIsActive) {
+                            SlideTransition(navigator)
+                        }
+                    }
+                
+                
             } else {
-                setScreenLockFlags(false)
-
-                Navigator(
+                if (callViewModel.isCallBackground.value) {
+                    isActiveCall(callViewModel)
+                } else {
+                    setScreenLockFlags(false)
+                    
+                    Navigator(
 //                    IntroScreen()
-                TestScreen()
-                ) { navigator ->
-                    SlideTransition(navigator)
+                        TestScreen()
+                    ) { navigator ->
+                        SlideTransition(navigator)
+                    }
                 }
+                
             }
-
         }
     }
 }
@@ -88,6 +106,29 @@ fun isActiveCall(callViewModel: CallViewModel) {
     ) { navigator ->
         SlideTransition(navigator)
     }
+    
+}
+
+
+@Composable
+fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
+    val profileId = getValueInStorage("profileId")
+    
+    val user = ProfileDTO()
+    
+    LaunchedEffect(Unit) {
+        if (profileId != null) {
+            callViewModel.callScreenInfo.value =
+                CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
+            
+            callViewModel.initWebrtc()
+        }
+    }
+    
+    
+    navigator.push(
+        CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
+    )
     
 }
 

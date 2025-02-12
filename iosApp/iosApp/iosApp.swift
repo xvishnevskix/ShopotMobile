@@ -12,7 +12,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     var window: UIWindow?
     private var appLifecycleObserver: AppLifecycleObserver?
     private var pushRegistry: PKPushRegistry!
-    
+    private var pushKitHandler: PushKitHandler!
+
     override init() {
         super.init()
 
@@ -29,7 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             appDeclaration: { _ in }
         )
 
-
+        self.pushKitHandler = PushKitHandler()  // Запускаем VoIP push
 
 
     }
@@ -38,24 +39,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
+
+
         UNUserNotificationCenter.current().delegate = self
         FirebaseApp.configure()
-        Messaging.messaging().delegate = nil
+        Messaging.messaging().delegate = nil // <-- Отключаем обработку FCM
 
         window = UIWindow(frame: UIScreen.main.bounds)
-        let mainVC = MainKt.MainViewController() // Ваш основной контроллер
-        window?.rootViewController = mainVC
-        window?.makeKeyAndVisible()
+        if let window = window {
+            window.rootViewController = MainKt.MainViewController()
+            window.makeKeyAndVisible()
+        }
 
-        // Запускаем VoIP-пуш (регистрацию)
-        let voipVC = VoIPViewController()
-//        
-//        window = UIWindow(frame: UIScreen.main.bounds)
-//         let voipViewController = VoIPViewController()
-//         window?.rootViewController = voipViewController
-//         window?.makeKeyAndVisible()
-//        
-        
         Logger.readLogs()
 
         requestNotificationAuthorization(application)
