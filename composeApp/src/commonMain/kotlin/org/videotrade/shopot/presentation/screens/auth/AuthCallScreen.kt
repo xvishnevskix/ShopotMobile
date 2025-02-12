@@ -66,9 +66,12 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
@@ -471,12 +474,15 @@ suspend fun sendRequestToBackend(
     val client = HttpClient(getHttpClientEngine()) { // или другой движок в зависимости от платформы
 
     }
+    
+    val voipToken = getValueInStorage("voipToken")
 
     try {
         val jsonContent = Json.encodeToString(
             buildJsonObject {
                 put("phoneNumber", phone.drop(1))
                 notificationToken?.let { put("notificationToken", it) }
+                if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
             }
         )
 

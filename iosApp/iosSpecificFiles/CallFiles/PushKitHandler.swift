@@ -10,6 +10,7 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
 
     private var pushRegistry: PKPushRegistry!
     private var callProvider: CXProvider!
+    let callController = CXCallController()
 
     override init() {
         super.init()
@@ -39,6 +40,12 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
     func pushRegistry(_ registry: PKPushRegistry, didUpdate pushCredentials: PKPushCredentials, for type: PKPushType) {
         let voipToken = pushCredentials.token.map { String(format: "%02x", $0) }.joined()
         Logger.log("📲 Новый VoIP Token: \(voipToken)")
+        
+        
+        LocalStorageKt.addValueInStorage(
+            key: "voipToken",
+            value: voipToken
+        )
     }
 
     // ✅ Обрабатываем входящий VoIP-звонок
@@ -69,6 +76,7 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
 
         let uuid = UUID()
         let callerName = payload.dictionaryPayload["callerName"] as? String ?? "Unknown Caller"
+        let callId = payload.dictionaryPayload["callId"] as? String ?? "0"
 
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: callerName)
@@ -81,6 +89,23 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
                 Logger.log("✅ Вызов успешно зарегистрирован в CallKit")
             }
         }
+        
+        DispatchQueue.main.async {
+                  Task {
+                      do {
+                          let callHandler = KoinHelperKt.getCallHandler() // ✅ Берем CallHandler из Koin внутри метода
+                          let callInfo = try await callHandler.getCallInfo(callId: callId)
+                          if let callInfo = callInfo {
+                              print("Call info retrieved successfully: \(callInfo)")
+                          } else {
+                              print("Call info is nil")
+                          }
+                      } catch {
+                          print("Failed to retrieve call info: \(error)")
+                      }
+                  }
+              }
+
 
         completion()
     }
@@ -113,7 +138,22 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         
         let callHandler: CallHandler = KoinHelperKt.getCallHandler()
         
-        callHandler.setAppIsActive(appIsActive: true)
+
+        
+        let appState = UIApplication.shared.applicationState
+
+        switch appState {
+        case .active:
+            Logger.log("📲 Приложение активно (foreground)")
+        case .background:
+            Logger.log("🌙 Приложение в фоне (background)")
+            
+            let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+            
+            callHandler.setAppIsActive(appIsActive: true)
+        @unknown default:
+            Logger.log("⚠️ Неизвестное состояние приложения")
+        }
         
         
         action.fulfill()
@@ -123,5 +163,28 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         Logger.log("📞 Звонок завершен")
         action.fulfill()
+    }
+    
+    @objc func endAllCalls() {
+        print("🔴 Завершаем все звонки")
+
+        let transactions = callController.callObserver.calls
+
+        for call in transactions {
+            let endCallAction = CXEndCallAction(call: call.uuid)
+            let transaction = CXTransaction(action: endCallAction)
+
+            callController.request(transaction) { error in
+                if let error = error {
+                    print("❌ Ошибка завершения звонка: \(error.localizedDescription)")
+                } else {
+                    print("✅ Все звонки завершены!")
+                }
+            }
+        }
+
+        if transactions.isEmpty {
+            print("⚠️ Нет активных звонков для завершения")
+        }
     }
 }
