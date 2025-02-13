@@ -124,7 +124,8 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             val contactsGet = origin().post("contacts/addContactsList", jsonContent) ?: return null
             
-            
+            println("contactsGet ${contactsGet}")
+
             val jsonElement = Json.parseToJsonElement(contactsGet)
             
             

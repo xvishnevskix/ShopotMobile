@@ -67,11 +67,13 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
 import org.videotrade.shopot.presentation.components.Main.News.StoryViewer
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
@@ -105,6 +107,10 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     var showNewsOnceViewer by remember { mutableStateOf(false) }
     var selectedNews: NewsItem? by remember { mutableStateOf(null) }
     var selectedOnceNews: NewsItem? by remember { mutableStateOf(null) }
+
+    val viewModel: ChatViewModel = koinInject()
+
+
 
 
 
@@ -219,7 +225,15 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                             ) {
                                 items(filteredChats) { item ->
                                     Column {
-                                        UserComponentItem(item, commonViewModel, mainViewModel)
+
+                                        var groupUsers by remember { mutableStateOf<List<GroupUserDTO>>(emptyList()) }
+
+                                        LaunchedEffect(item.chatId) {
+                                            groupUsers = viewModel.getGroupUsers(item.chatId)
+                                        }
+
+
+                                        UserComponentItem(item, commonViewModel, mainViewModel, groupUsers)
                                         Spacer(modifier = Modifier.background(Color(0xFFF3F4F6)).height(16.dp))
                                     }
                                 }

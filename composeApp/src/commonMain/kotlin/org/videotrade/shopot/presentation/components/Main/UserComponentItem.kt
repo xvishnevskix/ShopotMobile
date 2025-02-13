@@ -16,10 +16,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -41,6 +44,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.presentation.components.Chat.getCallStatusString
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
@@ -58,14 +62,13 @@ import shopot.composeapp.generated.resources.message_single_check
 fun UserComponentItem(
     chat: ChatItem,
     commonViewModel: CommonViewModel,
-    mainViewModel: MainViewModel
+    mainViewModel: MainViewModel,
+    groupUsers: List<GroupUserDTO>
 ) {
     val viewModel: ChatViewModel = koinInject()
     val profile = mainViewModel.profile.collectAsState().value
     val colors = MaterialTheme.colorScheme
 
-
-    
     Row(
         modifier = Modifier
             .clip(RoundedCornerShape(2.dp))
@@ -79,13 +82,17 @@ fun UserComponentItem(
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.Top
         ) {
             
-            Avatar(
-                icon = chat.icon,
-                size = 56.dp
-            )
+            if (chat.personal) {
+                Avatar(
+                    icon = chat.icon,
+                    size = 56.dp
+                )
+            } else {
+                GroupAvatar(users = groupUsers)
+            }
             
             Spacer(modifier = Modifier.width(12.dp))
             
@@ -284,6 +291,73 @@ fun MessageContent(message: MessageItem): String {
                 "image" -> stringResource(MokoRes.strings.photo)
                 "sticker" -> stringResource(MokoRes.strings.sticker)
                 else -> stringResource(MokoRes.strings.file)
+            }
+        }
+    }
+}
+
+@Composable
+fun GroupAvatar(users: List<GroupUserDTO>) {
+    val avatars = users.take(4) // Берем первых 4 пользователей
+    val avatarSize = 24.dp
+    val spacing = 4.dp
+    val cornerShape = 6.dp // Вынесенный roundedCornerShape
+
+    Box(
+        modifier = Modifier
+            .size(56.dp)
+    ) {
+        when (avatars.size) {
+            1 -> {
+                Avatar(icon = avatars[0].icon, size = 56.dp, roundedCornerShape = cornerShape)
+            }
+            2 -> {
+                Row(
+                    modifier = Modifier.align(Alignment.Center),
+                    horizontalArrangement = Arrangement.spacedBy(spacing)
+                ) {
+                    avatars.forEach { user ->
+                        Avatar(icon = user.icon, size = avatarSize, roundedCornerShape = cornerShape)
+                    }
+                }
+            }
+            3 -> {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    verticalArrangement = Arrangement.spacedBy(spacing)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Avatar(icon = avatars[0].icon, size = avatarSize, roundedCornerShape = cornerShape)
+                        Avatar(icon = avatars[1].icon, size = avatarSize, roundedCornerShape = cornerShape)
+                    }
+                    Box(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                        Avatar(icon = avatars[2].icon, size = avatarSize, roundedCornerShape = cornerShape)
+                    }
+                }
+            }
+            4 -> {
+                Column(
+                    modifier = Modifier.align(Alignment.Center),
+                    verticalArrangement = Arrangement.spacedBy(spacing)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Avatar(icon = avatars[0].icon, size = avatarSize, roundedCornerShape = cornerShape)
+                        Avatar(icon = avatars[1].icon, size = avatarSize, roundedCornerShape = cornerShape)
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        Avatar(icon = avatars[2].icon, size = avatarSize, roundedCornerShape = cornerShape)
+                        Avatar(icon = avatars[3].icon, size = avatarSize, roundedCornerShape = cornerShape)
+                    }
+                }
             }
         }
     }

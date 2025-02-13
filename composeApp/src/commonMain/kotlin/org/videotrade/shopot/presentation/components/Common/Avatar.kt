@@ -39,6 +39,7 @@ fun Avatar(
         onClick?.invoke()
     },
     contentScale: ContentScale = ContentScale.Crop,
+    roundedCornerShape: Dp = 16.dp,
 ) {
     val placeholderPainter = painterResource(Res.drawable.Avatar)
     
@@ -50,7 +51,7 @@ fun Avatar(
     
     
     Surface(
-        modifier = modifier.clip(RoundedCornerShape(16.dp)),
+        modifier = modifier.clip(RoundedCornerShape(roundedCornerShape)),
 //        shape = CircleShape,
     ) {
         Image(

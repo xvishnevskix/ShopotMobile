@@ -79,9 +79,9 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
         val colors = MaterialTheme.colorScheme
 
 
-//        LaunchedEffect(Unit) {
-//            viewModel.loadGroupUsers(chat.chatId)
-//        }
+        LaunchedEffect(Unit) {
+            viewModel.loadGroupUsers(chat.chatId)
+        }
 
            Box(
                modifier = Modifier.fillMaxSize(1f).background(colors.background),
@@ -129,7 +129,10 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                        horizontalAlignment = Alignment.CenterHorizontally,
                        modifier = Modifier.padding(horizontal = 16.dp).weight(1f)
                    ) {
+
+                       println("groupUsers: ${groupUsers}")
                        itemsIndexed(groupUsers) { _, groupUser ->
+
                            GroupUserCard(groupUser = groupUser, viewModel)
                            Spacer(modifier = Modifier.height(16.dp))
                        }
