@@ -36,7 +36,7 @@ object CallHandler : KoinComponent {
     val callViewModel: CallViewModel = getKoin().get()
     
     
-    fun startWebRTCSession(callId: String) {
+    fun startWebRTCSession() {
         CoroutineScope(Dispatchers.Main).launch {
             try {
                 println("✅ CommonViewModel найден: ${callViewModel}")
@@ -44,14 +44,14 @@ object CallHandler : KoinComponent {
                 
                 callViewModel.initWebrtc()
 
-//                commonViewModel.mainNavigator.value?.push(
-//                    CallIosScreen(
-//                        calleeId = callViewModel.iosCallData.value?.userId ?: "",
-//                        userFirstName = "",
-//                        userLastName = "",
-//                        userPhone = ""
-//                    )
-//                )
+                commonViewModel.mainNavigator.value?.push(
+                    CallIosScreen(
+                        calleeId = callViewModel.iosCallData.value?.userId ?: "",
+                        userFirstName = "",
+                        userLastName = "",
+                        userPhone = ""
+                    )
+                )
             } catch (e: Exception) {
                 println("❌ Ошибка получения CommonViewModel: $e")
             }
@@ -77,6 +77,7 @@ object CallHandler : KoinComponent {
                     newCallIos(responseData)
                     responseData
                 } else {
+                    
                     println("Failed to retrieve data: ${response.status.description} ${response.request}")
                     null
                 }
@@ -127,7 +128,7 @@ object CallHandler : KoinComponent {
     
     fun rejectCallIos() {
         try {
-//            callViewModel.iosCallData.value?.userId?.let { callViewModel.rejectCall(it, "00:00:00") }
+            callViewModel.iosCallData.value?.userId?.let { callViewModel.rejectCall(it, "00:00:00") }
         } catch (e: Exception) {
         
         }

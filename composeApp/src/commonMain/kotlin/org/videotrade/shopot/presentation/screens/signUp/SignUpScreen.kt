@@ -306,6 +306,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         put("status", "active")
                                                         put("icon", icon)
                                                         if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
+                                                        put("deviceType", getPlatform().name)
                                                         
                                                     }
                                                 )

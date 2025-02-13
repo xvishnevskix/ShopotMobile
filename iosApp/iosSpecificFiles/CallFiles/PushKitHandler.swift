@@ -75,11 +75,11 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         activateAudioSession()
 
         let uuid = UUID()
-        let callerName = payload.dictionaryPayload["callerName"] as? String ?? "Unknown Caller"
+        let phone = payload.dictionaryPayload["phone"] as? String ?? "Unknown Caller"
         let callId = payload.dictionaryPayload["callId"] as? String ?? "0"
 
         let update = CXCallUpdate()
-        update.remoteHandle = CXHandle(type: .generic, value: callerName)
+        update.remoteHandle = CXHandle(type: .generic, value: phone)
         update.hasVideo = true
 
         callProvider.reportNewIncomingCall(with: uuid, update: update) { error in
@@ -145,6 +145,11 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         switch appState {
         case .active:
             Logger.log("📲 Приложение активно (foreground)")
+            let callHandler = KoinHelperKt.getCallHandler()
+
+            DispatchQueue.main.async {
+              callHandler.startWebRTCSession()
+            }
         case .background:
             Logger.log("🌙 Приложение в фоне (background)")
             
@@ -162,6 +167,10 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
     // CallKit требует обработки завершения звонка
     func provider(_ provider: CXProvider, perform action: CXEndCallAction) {
         Logger.log("📞 Звонок завершен")
+        let callHandler = KoinHelperKt.getCallHandler() // ✅ Вызываем Koin внутри метода
+        
+            callHandler.rejectCallIos()
+        
         action.fulfill()
     }
     

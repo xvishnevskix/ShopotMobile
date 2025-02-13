@@ -29,6 +29,7 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.multiplatform.iosCall.GetCallInfoDto
 import org.videotrade.shopot.presentation.screens.common.NetworkErrorScreen
 
 class origin {
@@ -212,11 +213,12 @@ class origin {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("refreshToken", refreshToken)
+                    put("deviceType", getPlatform().name)
                     if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
                 }
             )
             
-            println("response11 ")
+            println("response11 $jsonContent")
             
             val response: HttpResponse =
                 client.post("${EnvironmentConfig.SERVER_URL}auth/refresh-token") {

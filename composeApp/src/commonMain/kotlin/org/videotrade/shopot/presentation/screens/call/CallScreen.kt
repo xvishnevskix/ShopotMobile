@@ -768,7 +768,6 @@ class CallIosScreen(
                     
                     
                     Row {
-                        val swiftFuncsClass: SwiftFuncsClass = koinInject()
                         
                         if (isIncomingCall) {
                             Row(
@@ -786,6 +785,9 @@ class CallIosScreen(
                                 })
                             }
                         } else {
+                            
+                            val swiftFuncsClass: SwiftFuncsClass = koinInject()
+                            
                             Row(
                                 verticalAlignment = Alignment.Bottom,
                                 horizontalArrangement = Arrangement.Center,
@@ -815,7 +817,7 @@ class CallIosScreen(
                                     viewModel.rejectCall(calleeId, timerValue.value)
                                     
                                     
-                                    swiftFuncsClass.sendAA()
+                                    swiftFuncsClass.endCall()
                                     
                                     
                                 }, size = 56.dp)

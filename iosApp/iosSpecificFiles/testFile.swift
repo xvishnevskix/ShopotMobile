@@ -2,11 +2,11 @@ import Foundation
 import ComposeApp
 
 class IosSwiftFuncsHelper : SwiftFuncsHelper {
-//    private let callManager: CallManager
-//
-//    init(callManager: CallManager) {
-//        self.callManager = callManager
-//    }
+    private let pushKitHandler: PushKitHandler
+
+    init(pushKitHandler: PushKitHandler) {
+        self.pushKitHandler = pushKitHandler
+    }
 
     func testFunc() {
         print("ADDADAD")
@@ -15,7 +15,7 @@ class IosSwiftFuncsHelper : SwiftFuncsHelper {
     @objc func endCall() {
         print("🔴 Завершаем звонок из IosSwiftFuncsHelper")
 
-//        callManager.endAllCalls() // ✅ Вызываем метод у переданного объекта CallManager
+        pushKitHandler.endAllCalls() // ✅ Вызываем метод у переданного объекта CallManager
     }
 }
 

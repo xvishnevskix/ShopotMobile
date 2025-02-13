@@ -8,7 +8,7 @@ interface SwiftFuncsHelper {
 }
 
 class SwiftFuncsClass(private val helper: SwiftFuncsHelper) {
-    fun sendAA() {
+    fun endCall() {
         helper.endCall()
     }
 }

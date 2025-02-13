@@ -483,6 +483,8 @@ suspend fun sendRequestToBackend(
                 put("phoneNumber", phone.drop(1))
                 notificationToken?.let { put("notificationToken", it) }
                 if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
+                put("deviceType", getPlatform().name)
+                
             }
         )
 

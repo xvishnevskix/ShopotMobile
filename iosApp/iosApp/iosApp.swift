@@ -16,6 +16,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
 
     override init() {
         super.init()
+        
+        self.pushKitHandler = PushKitHandler()  // Запускаем VoIP push
 
         // Инициализация Koin
         KoinHelperKt.doInitKoin(
@@ -24,13 +26,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
                 networkHelper: IosNetworkHelper() as NetworkHelper
             ),
             swiftFuncs: SwiftFuncsIos(
-                  swiftFuncsHelper: IosSwiftFuncsHelper() as SwiftFuncsHelper // ✅ Передаём callManager
+                swiftFuncsHelper: IosSwiftFuncsHelper(pushKitHandler: pushKitHandler) as SwiftFuncsHelper // ✅ Передаём callManager
               ),
             additionalModules: SharedModulesKt.getSharedModules(),
             appDeclaration: { _ in }
         )
 
-        self.pushKitHandler = PushKitHandler()  // Запускаем VoIP push
 
 
     }

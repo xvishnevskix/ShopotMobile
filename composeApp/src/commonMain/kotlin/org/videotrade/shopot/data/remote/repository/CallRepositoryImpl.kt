@@ -287,6 +287,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                             user.phone,
                                                             contactsUseCase.contacts.value
                                                         )
+                                                        
                                                         if (
                                                             contact !== null && contact.firstName !== null && contact.lastName !== null
                                                         ) {
