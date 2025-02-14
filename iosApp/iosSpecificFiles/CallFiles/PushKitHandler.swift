@@ -30,7 +30,7 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         let configuration = CXProviderConfiguration()
         configuration.supportsVideo = true
         configuration.includesCallsInRecents = true
-        configuration.ringtoneSound = "ES_CellRingtone23.mp3"
+//        configuration.ringtoneSound = "ES_CellRingtone23.mp3"
 
         callProvider = CXProvider(configuration: configuration)
         callProvider.setDelegate(self, queue: nil)
@@ -72,15 +72,16 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         }
         
 
-        activateAudioSession()
 
         let uuid = UUID()
         let phone = payload.dictionaryPayload["phone"] as? String ?? "Unknown Caller"
         let callId = payload.dictionaryPayload["callId"] as? String ?? "0"
 
         let update = CXCallUpdate()
-        update.remoteHandle = CXHandle(type: .generic, value: phone)
+        update.remoteHandle = CXHandle(type: .generic, value: "+\(phone)")
         update.hasVideo = true
+        
+        activateAudioSession()
 
         callProvider.reportNewIncomingCall(with: uuid, update: update) { error in
             if let error = error {
@@ -89,6 +90,8 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
                 Logger.log("✅ Вызов успешно зарегистрирован в CallKit")
             }
         }
+        
+
         
         DispatchQueue.main.async {
                   Task {
