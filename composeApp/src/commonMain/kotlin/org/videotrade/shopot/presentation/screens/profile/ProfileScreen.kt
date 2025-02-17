@@ -204,7 +204,7 @@ class ProfileScreen(
                             modifier = Modifier,
                         ) {
                             Text(
-                                profile.phone,
+                                if (profile.phone != "") "+" + profile.phone else profile.phone,
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,

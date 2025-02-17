@@ -105,11 +105,8 @@ init {
 
     suspend fun updateAuthProfile(profileUpdate: HttpResponse, navigator: Navigator,) {
         val responseData: ProfileDTO = Json.decodeFromString(profileUpdate.bodyAsText())
-
-        println("responseData $responseData")
-
         profileUseCase.setProfile(responseData)
-        navigator.push(MainScreen())
+//        navigator.push(MainScreen())
     }
     
     

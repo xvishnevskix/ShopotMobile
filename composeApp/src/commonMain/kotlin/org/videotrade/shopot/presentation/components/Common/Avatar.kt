@@ -1,6 +1,7 @@
 import androidx.collection.LruCache
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,7 +36,10 @@ fun Avatar(
     icon: String? = null,
     size: Dp = 40.dp,
     onClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier.size(size).clickable {
+    modifier: Modifier = Modifier.size(size).clickable(
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null
+    ) {
         onClick?.invoke()
     },
     contentScale: ContentScale = ContentScale.Crop,

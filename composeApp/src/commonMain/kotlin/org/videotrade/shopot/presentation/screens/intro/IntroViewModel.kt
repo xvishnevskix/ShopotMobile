@@ -115,7 +115,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
     }
 
 
-    fun fetchContacts(navigator: Navigator) {
+    fun fetchContacts(navigator: Navigator?) {
 
 
 
@@ -128,13 +128,17 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
             if (contacts != null) {
 
-                chatsInit(navigator)
+                if (navigator != null) {
+                    chatsInit(navigator)
+                }
 
             } else {
                 if (isAuth.value) {
 
                 } else {
-                    navigator.push(IntroScreen())
+                    if (navigator != null) {
+                        navigator.push(IntroScreen())
+                    }
                 }
 
 

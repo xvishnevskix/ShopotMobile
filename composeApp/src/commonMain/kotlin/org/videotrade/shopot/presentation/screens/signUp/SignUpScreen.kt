@@ -80,10 +80,7 @@ import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Common.validateLastName
 import org.videotrade.shopot.presentation.components.Common.validateNickname
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
-import org.videotrade.shopot.presentation.screens.login.CountryName
-import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.human
@@ -290,7 +287,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                             isLoading.value = true
 
                                             try {
-
+                                                introViewModel.isAuth.value = true
 
                                                 val voipToken = getValueInStorage("voipToken")
                                                 val jsonContent = Json.encodeToString(
@@ -358,7 +355,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         )
                                                     }
 
-                                                    introViewModel.isAuth.value = true
+
 
 
                                                     viewModel.updateNotificationToken()
@@ -367,10 +364,10 @@ class SignUpScreen(private val phone: String) : Screen {
 
                                                     сommonViewModel.cipherShared(
                                                         responseData.userId,
-                                                        navigator
+                                                        navigator = null
                                                     )
 
-                                                    delay(3000)
+                                                    delay(4000)
 
                                                     val icon = image?.let {
                                                         withContext(Dispatchers.IO) { // Запускаем в другом потоке
@@ -415,6 +412,10 @@ class SignUpScreen(private val phone: String) : Screen {
                                                                 introViewModel.isAuth.value = false
                                                                 viewModel.startObserving()
                                                                 profileViewModel.updateAuthProfile(profileUpdate, navigator)
+                                                                сommonViewModel.cipherShared(
+                                                                    responseData.userId,
+                                                                    navigator
+                                                                )
                                                             } else {
                                                                 println("Ошибка обновления профиля с аватаркой: ${profileUpdate.bodyAsText()}")
                                                             }
