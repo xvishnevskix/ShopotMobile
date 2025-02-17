@@ -241,19 +241,22 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                     }
 
                 }
-                
+
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(20.dp)
+                        .clip(CircleShape)
+                        .size(30.dp)
                         .clickable {
                             sharedViewModel.removeContact(item)
                         }
+                        .padding(8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
-                        tint = colors.primary
+                        tint = Color.Gray
+
                     )
                 }
 

@@ -62,11 +62,14 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
@@ -282,7 +285,17 @@ class SignUpScreen(private val phone: String) : Screen {
 
                                             try {
 
+                                                val icon = image?.let {
+                                                    withContext(Dispatchers.IO) { // Запускаем в другом потоке
+                                                        val uploadedImageUrl = origin().sendImageFile(
+                                                            it.fileAbsolutePath, "image", it.fileName, true
+                                                        )
+                                                        println("Аватарка загружена: $uploadedImageUrl")
+                                                        uploadedImageUrl
+                                                    }
 
+                                                }
+                                                val voipToken = getValueInStorage("voipToken")
                                                 val jsonContent = Json.encodeToString(
                                                     buildJsonObject {
                                                         put("phoneNumber", phone.drop(1))
@@ -295,6 +308,9 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         )
                                                         put("login", textState.value.nickname)
                                                         put("status", "active")
+                                                        put("icon", icon)
+                                                        if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
+                                                        put("deviceType", getPlatform().name)
 
                                                     }
                                                 )
@@ -355,16 +371,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     )
 
                                                     println("Начало загрузки аватарки...")
-                                                    val icon = image?.let {
-                                                        withContext(Dispatchers.IO) { // Запускаем в другом потоке
-                                                            val uploadedImageUrl = origin().sendImageFile(
-                                                                it.fileAbsolutePath, "image", it.fileName, true
-                                                            )
-                                                            println("Аватарка загружена: $uploadedImageUrl")
-                                                            uploadedImageUrl
-                                                        }
 
-                                                    }
 
                                                     if (icon != null) {
                                                         println("Обновляем профиль с новой аватаркой...")

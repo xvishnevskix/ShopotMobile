@@ -69,9 +69,12 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.videotrade.shopot.presentation.components.Auth.Otp
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
@@ -489,11 +492,16 @@ suspend fun sendRequestToBackend(
 
     }
 
+    val voipToken = getValueInStorage("voipToken")
+
     try {
         val jsonContent = Json.encodeToString(
             buildJsonObject {
                 put("phoneNumber", phone.drop(1))
                 notificationToken?.let { put("notificationToken", it) }
+                if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
+                put("deviceType", getPlatform().name)
+
             }
         )
 
@@ -531,13 +539,6 @@ suspend fun sendRequestToBackend(
                 if (animationTrigger != null) {
                     animationTrigger.value = !animationTrigger.value
                 }
-            } else if (response.status.description == "Service Unavailable") {
-                toasterViewModel.toaster.show(
-
-                    serverUnavailable,
-                    type = ToastType.Error,
-                    duration = ToasterDefaults.DurationDefault
-                )
             }
 
         }
@@ -549,7 +550,6 @@ suspend fun sendRequestToBackend(
 
     return null
 }
-
 
 suspend fun sendLogin(
     phone: String,

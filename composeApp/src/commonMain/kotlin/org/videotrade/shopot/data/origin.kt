@@ -26,7 +26,9 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.common.NetworkErrorScreen
 
 class origin {
@@ -204,10 +206,12 @@ class origin {
 
             val refreshToken = getValueInStorage("refreshToken")
 
-
+            val voipToken = getValueInStorage("voipToken")
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("refreshToken", refreshToken)
+                    put("deviceType", getPlatform().name)
+                    if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
                 }
             )
 

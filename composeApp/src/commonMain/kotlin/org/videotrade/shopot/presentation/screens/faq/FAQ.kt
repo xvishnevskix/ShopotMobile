@@ -126,12 +126,12 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", "$message \\n App Version: ${BuildConfig.VERSION_NAME}")
+            put("message", "$message  App Version: ${BuildConfig.VERSION_NAME}")
         }.toString()
 
         println("Отправка email с данными: $jsonContent")
 
-        val response: HttpResponse = client.post("https://oiweida.ru/api/user/mailSend") {
+        val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}user/mailSend") {
             contentType(ContentType.Application.Json)
             setBody(jsonContent)
         }

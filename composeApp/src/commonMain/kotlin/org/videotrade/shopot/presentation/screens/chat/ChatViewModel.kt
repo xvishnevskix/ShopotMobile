@@ -550,10 +550,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     suspend fun getGroupUsers(chatId: String): List<GroupUserDTO> {
         return try {
             val groupUsersGet = origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId")
-            groupUsersGet ?: emptyList() // Если результат null, возвращаем пустой список
+            groupUsersGet ?: emptyList()
         } catch (e: Exception) {
-            // Обработка ошибки
-            emptyList() // или можно вернуть пустой список или обработать ошибку по-другому
+
+            emptyList()
         }
     }
     
