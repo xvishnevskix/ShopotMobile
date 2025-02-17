@@ -51,6 +51,7 @@ import io.ktor.http.isSuccess
 import io.ktor.util.InternalAPI
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
@@ -79,8 +80,11 @@ import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Common.validateLastName
 import org.videotrade.shopot.presentation.components.Common.validateNickname
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.login.CountryName
+import org.videotrade.shopot.presentation.screens.main.MainScreen
+import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.human
 import shopot.composeapp.generated.resources.pencil_in_circle
@@ -104,6 +108,8 @@ class SignUpScreen(private val phone: String) : Screen {
         val byteArray = remember { mutableStateOf<ByteArray?>(null) }
         var images by remember { mutableStateOf<ImageBitmap?>(null) }
         val сommonViewModel: CommonViewModel = koinInject()
+        val introViewModel: IntroViewModel = koinInject()
+        val profileViewModel: ProfileViewModel = koinInject()
         var image by remember { mutableStateOf<PlatformFilePick?>(null) }
         val toasterViewModel: CommonViewModel = koinInject()
         val isLoading = remember { mutableStateOf(false) }
@@ -285,16 +291,7 @@ class SignUpScreen(private val phone: String) : Screen {
 
                                             try {
 
-                                                val icon = image?.let {
-                                                    withContext(Dispatchers.IO) { // Запускаем в другом потоке
-                                                        val uploadedImageUrl = origin().sendImageFile(
-                                                            it.fileAbsolutePath, "image", it.fileName, true
-                                                        )
-                                                        println("Аватарка загружена: $uploadedImageUrl")
-                                                        uploadedImageUrl
-                                                    }
 
-                                                }
                                                 val voipToken = getValueInStorage("voipToken")
                                                 val jsonContent = Json.encodeToString(
                                                     buildJsonObject {
@@ -308,7 +305,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         )
                                                         put("login", textState.value.nickname)
                                                         put("status", "active")
-                                                        put("icon", icon)
+
                                                         if (getPlatform() == Platform.Ios) put("voipToken", voipToken)
                                                         put("deviceType", getPlatform().name)
 
@@ -361,14 +358,32 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         )
                                                     }
 
+                                                    introViewModel.isAuth.value = true
+
+
                                                     viewModel.updateNotificationToken()
 
-                                                    viewModel.startObserving()
+
 
                                                     сommonViewModel.cipherShared(
                                                         responseData.userId,
                                                         navigator
                                                     )
+
+                                                    delay(3000)
+
+                                                    val icon = image?.let {
+                                                        withContext(Dispatchers.IO) { // Запускаем в другом потоке
+                                                            val uploadedImageUrl = origin().sendImageFile(
+                                                                it.fileAbsolutePath, "image", it.fileName, true
+                                                            )
+                                                            println("Аватарка загружена: $uploadedImageUrl")
+                                                            uploadedImageUrl
+                                                        }
+
+                                                    }
+
+
 
                                                     println("Начало загрузки аватарки...")
 
@@ -376,22 +391,33 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     if (icon != null) {
                                                         println("Обновляем профиль с новой аватаркой...")
 
-                                                        val updateProfileJson = Json.encodeToString(
+//
+                                                        val jsonContent = Json.encodeToString(
                                                             buildJsonObject {
-                                                                put("userId", userId)
+                                                                put("firstName", textState.value.firstName)
+                                                                put("lastName", textState.value.lastName)
                                                                 put("icon", icon)
+                                                                put("description", textState.value.nickname)
                                                             }
                                                         )
 
-                                                        val updateResponse: HttpResponse = client.post("${SERVER_URL}user/update-profile") {
-                                                            contentType(ContentType.Application.Json)
-                                                            setBody(updateProfileJson)
-                                                        }
 
-                                                        if (updateResponse.status.isSuccess()) {
-                                                            println("Аватарка успешно привязана к пользователю!")
-                                                        } else {
-                                                            println("Ошибка обновления профиля с аватаркой: ${updateResponse.bodyAsText()}")
+                                                        println("jsonContent321323 $jsonContent")
+
+
+                                                        val profileUpdate = origin().put("user/profile/edit", jsonContent)
+
+
+
+                                                        if (profileUpdate != null) {
+                                                            if (profileUpdate.status.isSuccess()) {
+                                                                println("Аватарка успешно привязана к пользователю!")
+                                                                introViewModel.isAuth.value = false
+                                                                viewModel.startObserving()
+                                                                profileViewModel.updateAuthProfile(profileUpdate, navigator)
+                                                            } else {
+                                                                println("Ошибка обновления профиля с аватаркой: ${profileUpdate.bodyAsText()}")
+                                                            }
                                                         }
                                                     } else {
                                                         println("Аватарка не загружена, пропускаем обновление профиля.")
@@ -399,6 +425,8 @@ class SignUpScreen(private val phone: String) : Screen {
 
                                                     println("Аватарка загружена: $icon")
                                                     println("phone ${phone}")
+
+//                                                    viewModel.startObserving()
 
                                                 }
                                             } catch (e: Exception) {

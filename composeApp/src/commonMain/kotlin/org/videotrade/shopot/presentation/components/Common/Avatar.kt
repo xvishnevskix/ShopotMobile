@@ -55,7 +55,7 @@ fun Avatar(
 //        shape = CircleShape,
     ) {
         Image(
-            painter = imagePainter.value ?: painterResource(Res.drawable.person),
+            painter = imagePainter.value ?: painterResource(Res.drawable.Avatar),
             contentDescription = "Avatar",
             contentScale = contentScale,
             modifier = Modifier.size(size)
