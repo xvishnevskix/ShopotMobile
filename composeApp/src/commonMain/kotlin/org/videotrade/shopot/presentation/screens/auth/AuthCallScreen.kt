@@ -325,15 +325,15 @@ class AuthCallScreen(
                     responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
 
                     // Проверка, что все 4 цифры введены перед проверкой
-//                    val otpText = otpFields.joinToString("")
-//                    if (otpText.length == 4) {
-//                        if (responseState.value == otpText) {
-//                            handleAuthCase()
-//                        } else {
-//                            handleError(invalidCode)
-//                        }
-//                    }
-                    handleAuthCase()
+                    val otpText = otpFields.joinToString("")
+                    if (otpText.length == 4) {
+                        if (responseState.value == otpText) {
+                            handleAuthCase()
+                        } else {
+                            handleError(invalidCode)
+                        }
+                    }
+//                    handleAuthCase()
                 } else {
                     if (authCase == "SignIn") {
                         handleError(invalidCode)
