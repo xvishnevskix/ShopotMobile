@@ -525,20 +525,58 @@ suspend fun sendRequestToBackend(
         } else {
             println("Failed to retrieve data: ${response.status.description}")
 
-            if (response.bodyAsText() == "User not found") {
-                if (hasError != null) {
-                    hasError.value = true
-                }
-                toasterViewModel.toaster.show(
+            when (response.status.value) {
 
-                    phoneNotRegistered,
-                    type = ToastType.Error,
-                    duration = ToasterDefaults.DurationDefault
-                )
-
-                if (animationTrigger != null) {
-                    animationTrigger.value = !animationTrigger.value
+                404 -> {
+                    if (response.bodyAsText() == "User not found") {
+                        hasError?.value = true
+                        toasterViewModel.toaster.show(
+                            phoneNotRegistered,
+                            type = ToastType.Error,
+                            duration = ToasterDefaults.DurationDefault
+                        )
+                    }
                 }
+                500 -> {
+                    toasterViewModel.toaster.show(
+                        serverUnavailable,
+                        type = ToastType.Error,
+                        duration = ToasterDefaults.DurationDefault
+                    )
+                }
+                502 -> {
+                    toasterViewModel.toaster.show(
+                        serverUnavailable,
+                        type = ToastType.Error,
+                        duration = ToasterDefaults.DurationDefault
+                    )
+                }
+                503 -> {
+                    toasterViewModel.toaster.show(
+                        serverUnavailable,
+                        type = ToastType.Error,
+                        duration = ToasterDefaults.DurationDefault
+                    )
+                }
+                504 -> {
+                    toasterViewModel.toaster.show(
+                        serverUnavailable,
+                        type = ToastType.Error,
+                        duration = ToasterDefaults.DurationDefault
+                    )
+                }
+                else -> {
+                    toasterViewModel.toaster.show(
+                        "Неизвестная ошибка (${response.status.value}). Попробуйте позже.",
+                        type = ToastType.Error,
+                        duration = ToasterDefaults.DurationDefault
+                    )
+                }
+            }
+
+// Триггер анимации, если нужно
+            animationTrigger?.let {
+                it.value = !it.value
             }
 
         }
