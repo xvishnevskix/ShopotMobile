@@ -861,8 +861,12 @@ actual class FileProvider(private val applicationContext: Context) {
         )
         try {
             val token = getValueInStorage("accessToken")
+
+            println("accessToken: ${token}")
             
             val sharedSecret = getValueInStorage("sharedSecret")
+
+            println("sharedSecret: ${sharedSecret}")
             
             val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
             

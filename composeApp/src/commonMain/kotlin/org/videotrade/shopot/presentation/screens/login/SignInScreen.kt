@@ -1,19 +1,28 @@
 package org.videotrade.shopot.presentation.screens.login
 
+import FAQ
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
@@ -90,6 +99,8 @@ class SignInScreen : Screen {
         val defaultCountry = stringResource(MokoRes.strings.ru)
         var selectedCountryName by remember { mutableStateOf(defaultCountry) }
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
+        val serverUnavailable = stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
+
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -124,12 +135,12 @@ class SignInScreen : Screen {
 
         LaunchedEffect(showPhoneMenu) {
 //            if (showPhoneMenu.value) {
-            keyboardController?.hide()
+                keyboardController?.hide()
 //            }
         }
         DisposableEffect(showPhoneMenu.value) {
 //            if (showPhoneMenu.value) {
-            keyboardController?.hide()
+                keyboardController?.hide()
 //            }
             onDispose { }
         }
@@ -148,6 +159,7 @@ class SignInScreen : Screen {
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
                 sheetContent = {
+
                     CountryPickerBottomSheet(
                         countries = countries,
                         showPhoneMenu = showPhoneMenu,
@@ -211,7 +223,7 @@ class SignInScreen : Screen {
                                 painter = painterResource(Res.drawable.auth_logo),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                colorFilter = ColorFilter.tint(colors.primary)
+                                colorFilter =  ColorFilter.tint(colors.primary)
                             )
 
                             Spacer(modifier = Modifier.height(50.dp))
@@ -265,40 +277,36 @@ class SignInScreen : Screen {
                                 Spacer(modifier = Modifier.height(16.dp))
                                 val requiredPhoneLength =
                                     stringResource(MokoRes.strings.required_phone_number_length)
-                                Box(modifier = Modifier.padding(bottom = 20.dp)) {
-                                    CustomButton(
-                                        stringResource(MokoRes.strings.login), {
-                                            isLoading.value = true
-                                            coroutineScope.launch {
-                                                try {
-                                                    val fullPhoneNumber =
-                                                        countryCode + textState.value.text
-                                                    val phoneNumberLength =
-                                                        getPhoneNumberLength(countryCode)
-                                                    hasError.value = false
+                                Box( modifier = Modifier.padding(bottom = 20.dp)) {
+                                    CustomButton(stringResource(MokoRes.strings.login), {
+                                        isLoading.value = true
+                                        coroutineScope.launch {
+                                            try {
+                                                val fullPhoneNumber = countryCode + textState.value.text
+                                                val phoneNumberLength = getPhoneNumberLength(countryCode)
+                                                hasError.value = false
 
-                                                    if (fullPhoneNumber.length < phoneNumberLength) {
-                                                        hasError.value = true
-                                                        toasterViewModel.toaster.show(
-                                                            "$requiredPhoneLength $phoneNumberLength",
-                                                            type = ToastType.Error,
-                                                            duration = ToasterDefaults.DurationDefault
+                                                if (fullPhoneNumber.length < phoneNumberLength) {
+                                                    hasError.value = true
+                                                    toasterViewModel.toaster.show(
+                                                        "$requiredPhoneLength $phoneNumberLength",
+                                                        type = ToastType.Error,
+                                                        duration = ToasterDefaults.DurationDefault
+                                                    )
+                                                    animationTrigger.value = !animationTrigger.value
+
+                                                } else {
+                                                    val response =
+                                                        sendRequestToBackend(
+                                                            fullPhoneNumber,
+                                                            NotifierManager.getPushNotifier().getToken(),
+                                                            "auth/login",
+                                                            toasterViewModel,
+                                                            phoneNotRegistered,
+                                                            hasError = hasError,
+                                                            animationTrigger = animationTrigger,
+                                                            serverUnavailable = serverUnavailable
                                                         )
-                                                        animationTrigger.value =
-                                                            !animationTrigger.value
-
-                                                    } else {
-                                                        val response =
-                                                            sendRequestToBackend(
-                                                                fullPhoneNumber,
-                                                                NotifierManager.getPushNotifier()
-                                                                    .getToken(),
-                                                                "auth/login",
-                                                                toasterViewModel,
-                                                                phoneNotRegistered,
-                                                                hasError = hasError,
-                                                                animationTrigger = animationTrigger
-                                                            )
 
                                                         if (response != null) {
                                                             navigator.push(

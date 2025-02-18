@@ -57,7 +57,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chat_call
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val interactionSource =
@@ -70,6 +70,9 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
 
+    if (!chat.personal) {
+        viewModel.loadGroupUsers(chat.chatId)
+    }
 
     Column {
         Row(
@@ -111,7 +114,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                             navigator.push(ProfileChatScreen(chat))
                         } else {
                             
-                            viewModel.loadGroupUsers(chat.chatId)
+//                            viewModel.loadGroupUsers(chat.chatId)
                             navigator.push(GroupProfileScreen(profile, chat))
                             
                         }
@@ -215,7 +218,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 //                                    }
                                         
                                         if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
-                                            println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
                                             commonViewModel.mainNavigator.value?.push(
                                                 CallScreen(
                                                     chat.userId,
@@ -235,7 +237,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                         
                                     }
                                 }
-                                println("userID : ${chat.userId}")
+
                                 
                                 
                             },
@@ -251,13 +253,15 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 
 @Composable
 private fun ParticipantCountText(count: Int) {
+    val colors = MaterialTheme.colorScheme
+
     Text(
         text = getParticipantCountText(count),
         fontSize = 16.sp,
         lineHeight = 16.sp,
         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
         fontWeight = FontWeight(400),
-        color = Color(0x80373533),
+        color = colors.secondary,
         letterSpacing = TextUnit(0F, TextUnitType.Sp),
     )
 }

@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -67,11 +68,13 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
 import org.videotrade.shopot.presentation.components.Main.News.StoryViewer
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
@@ -102,10 +105,11 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     val newsState = newsViewModel.news.collectAsState().value
     val onceNewsState = newsViewModel.onceNews.collectAsState().value
     var showNewsViewer by remember { mutableStateOf(false) }
-    var showNewsOnceViewer by remember { mutableStateOf(false) }// Состояние для StoryViewer для actual
+    var showNewsOnceViewer by remember { mutableStateOf(false) }
     var selectedNews: NewsItem? by remember { mutableStateOf(null) }
     var selectedOnceNews: NewsItem? by remember { mutableStateOf(null) }
 
+    val viewModel: ChatViewModel = koinInject()
 
 
     val filteredChats = if (searchQuery.value.isEmpty()) {
@@ -115,6 +119,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
             (it.firstName?.contains(searchQuery.value, ignoreCase = true) == true)
                     || (it.lastName?.contains(searchQuery.value, ignoreCase = true) == true)
                     || (it.phone?.contains(searchQuery.value) == true)
+                    || (it.groupName?.contains(searchQuery.value, ignoreCase = true) == true)
         }
     }
     
@@ -141,16 +146,16 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
 // Обработка новостей из `once`
     LaunchedEffect(onceNewsState) {
-//        if (!showNewsOnceViewer) {
-//            val newsToShow = onceNewsState.find {
-//                it.appearance == "once" && !it.viewed &&
-//                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
-//            }
-//            if (newsToShow != null) {
-//                selectedOnceNews = newsToShow
-//                showNewsOnceViewer = true
-//            }
-//        }
+        if (!showNewsOnceViewer) {
+            val newsToShow = onceNewsState.find {
+                it.appearance == "once" && !it.viewed &&
+                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
+            }
+            if (newsToShow != null) {
+                selectedOnceNews = newsToShow
+                showNewsOnceViewer = true
+            }
+        }
     }
 
 
@@ -199,17 +204,11 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                             .pullRefresh(refreshState)
                     ) {
                         if (isLoading) {
-                            LazyColumn(
-                                modifier = Modifier.fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                items(12) {
-                                    ChatSkeleton()
-                                }
-                            }
+                            ChatSkeleton()
                         } else {
                             LazyColumn(
                                 modifier = Modifier
+
                                     .offset {
                                         IntOffset(
                                             x = 0,
@@ -218,116 +217,39 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                     },
                                 verticalArrangement = Arrangement.Center,
                             ) {
+                                //чаты
+
                                 items(filteredChats) { item ->
-                                    Column {
-                                        UserComponentItem(item, commonViewModel, mainViewModel)
-                                        Spacer(modifier = Modifier.background(Color(0xFFF3F4F6)).height(16.dp))
+                                    Crossfade(targetState = item) { item ->
+                                        Column {
+                                            val groupUsers by remember {
+                                                derivedStateOf { viewModel.cachedGroupUsers[item.chatId] ?: emptyList() }
+                                            }
+
+                                            LaunchedEffect(item.chatId) {
+                                                if (!item.personal && groupUsers.isEmpty()) {
+                                                    viewModel.getGroupUsers(item.chatId)
+                                                }
+                                            }
+                                            UserComponentItem(item, commonViewModel, mainViewModel, groupUsers)
+                                            Spacer(modifier = Modifier.background(Color(0xFFF3F4F6)).height(16.dp))
+                                        }
                                     }
+
                                 }
 
                                 if (chatState.isNotEmpty()) {
                                     item {
-                                        Column(
-                                            modifier = Modifier.padding(top = 40.dp, bottom = 10.dp)
-                                                .fillMaxWidth(),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            Row(
-                                                horizontalArrangement = Arrangement.Center,
-                                                verticalAlignment = Alignment.CenterVertically,
-                                            ) {
-                                                Image(
-                                                    modifier = Modifier.size(27.dp),
-                                                    painter = painterResource(Res.drawable.smart_lock),
-                                                    contentDescription = null,
-                                                    colorFilter =  ColorFilter.tint(colors.primary)
-                                                )
-                                            }
-
-                                            Spacer(modifier = Modifier.height(10.dp))
-
-                                            Row (
-                                                horizontalArrangement = Arrangement.Center,
-                                                modifier = Modifier.padding(bottom = 50.dp).fillMaxWidth().padding(bottom = 50.dp)
-                                            ) {
-                                                Text(
-                                                    stringResource(MokoRes.strings.encryption_info_1),
-                                                    fontSize = 9.5.sp,
-                                                    lineHeight = 10.sp,
-                                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                                                    color = colors.primary,
-                                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                                )
-                                                Text(
-                                                    " " + stringResource(MokoRes.strings.encryption_info_2),
-                                                    textAlign = TextAlign.Start,
-                                                    fontSize = 9.5.sp,
-                                                    lineHeight = 10.sp,
-                                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                                                    color = Color(0xFFCAB7A3),
-                                                    textDecoration = TextDecoration.Underline,
-                                                    letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                                                )
+                                        Crossfade(targetState = isSearching.value) { searching ->
+                                            if (!searching) {
+                                                EncryptionInfoCard()
                                             }
                                         }
                                     }
 
                                 } else {
                                     item {
-                                        Column(
-                                            modifier = Modifier.background(colors.surface).padding(bottom = 20.dp)
-                                                .fillMaxSize()
-                                                .size(600.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            verticalArrangement = Arrangement.Center
-                                        ) {
-                                            Column(
-                                                modifier = Modifier.background(colors.surface).width(324.dp)
-                                                    .height(324.dp)
-                                                    .background(color = colors.surface, shape = RoundedCornerShape(size = 16.dp))
-                                                ,
-                                                verticalArrangement = Arrangement.Center,
-                                                horizontalAlignment = Alignment.CenterHorizontally
-                                            ) {
-                                                Image(
-                                                    modifier = Modifier
-                                                        .size(width = 195.dp, height = 132.dp),
-                                                    painter = painterResource(Res.drawable.auth_logo),
-                                                    contentDescription = null,
-                                                    contentScale = ContentScale.Crop,
-                                                    colorFilter =  ColorFilter.tint(colors.primary)
-                                                )
-                                                Spacer(modifier = Modifier.height(56.dp))
-                                                Text(
-                                                    stringResource(
-                                                        MokoRes.strings.greeting
-                                                    ),
-                                                    fontSize = 24.sp,
-                                                    lineHeight = 24.sp,
-                                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                                                    fontWeight = FontWeight(500),
-                                                    textAlign = TextAlign.Center,
-                                                    color = colors.primary,
-                                                    letterSpacing = TextUnit(0F, TextUnitType.Sp)
-                                                )
-                                                Spacer(modifier = Modifier.height(8.dp))
-                                                Text(
-                                                    stringResource(
-                                                        MokoRes.strings.create_your_first_chat
-                                                    ),
-                                                    fontSize = 15.sp,
-                                                    lineHeight = 15.sp,
-                                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                                    fontWeight = FontWeight(400),
-                                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                                    textAlign = TextAlign.Center,
-                                                    color = colors.secondary,
-                                                    maxLines = 3,
-                                                )
-
-                                            }
-                                        }
+                                        CreateFirstChatCard()
                                     }
                                 }
                             }
@@ -361,110 +283,10 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
             newsViewModel,
         )
     }
-//    if (isLoadingNews) {
-//        Box(
-//            modifier = Modifier.fillMaxSize(),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            CircularProgressIndicator()
-//        }
-//    }
 }
 
 
-@Composable
-fun ChatSkeleton() {
-    val colors = MaterialTheme.colorScheme
-    // Бесконечная анимация перелива
-    val transition = rememberInfiniteTransition()
-    val shimmerTranslateAnim by transition.animateFloat(
-        initialValue = 0f,
-        targetValue = 2000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(
-                durationMillis = 1800, // Скорость перелива
-                easing = LinearEasing
-            ),
-            repeatMode = RepeatMode.Restart
-        )
-    )
 
-    // Градиент для эффекта перелива
-    val shimmerBrush = Brush.linearGradient(
-        colors = listOf(
-            colors.onBackground,
-            colors.onPrimary,
-            colors.onBackground,
-        ),
-        start = Offset.Zero,
-        end = Offset(x = shimmerTranslateAnim, y = shimmerTranslateAnim) // Плавное перемещение по X и Y
-    )
-
-    Row(
-        modifier = Modifier
-            .background(Color.Transparent)
-            .fillMaxWidth()
-            .clickable {},
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Row(
-            verticalAlignment = Alignment.Top
-        ) {
-            // Круглый элемент скелетона
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50.dp))
-                    .background(colors.onBackground)
-                    .size(56.dp)
-            )
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            Column(
-                modifier = Modifier,
-                verticalArrangement = Arrangement.Top
-            ) {
-                // Прямоугольный элемент для текста
-                Box(
-                    modifier = Modifier
-                        .width(50.dp)
-                        .height(8.dp)
-                        .background(shimmerBrush, shape = RoundedCornerShape(size = 30.dp))
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Row {
-                    // Длинный прямоугольник
-                    Box(
-                        modifier = Modifier
-                            .width(163.dp)
-                            .height(8.dp)
-                            .background(shimmerBrush, shape = RoundedCornerShape(size = 100.dp))
-                    )
-
-                    Spacer(modifier = Modifier.width(12.dp))
-
-                    // Короткий прямоугольник
-                    Box(
-                        modifier = Modifier
-                            .width(50.dp)
-                            .height(8.dp)
-                            .background(shimmerBrush, shape = RoundedCornerShape(size = 30.dp))
-                    )
-                }
-            }
-        }
-
-        // Короткий прямоугольник справа
-        Box(
-            modifier = Modifier
-                .width(30.dp)
-                .height(8.dp)
-                .background(shimmerBrush, shape = RoundedCornerShape(size = 30.dp))
-        )
-    }
-}
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -483,4 +305,111 @@ fun PullRefreshIndicator(state: PullRefreshState, modifier: Modifier = Modifier)
             color = Color(0xFFCAB7A3)
         )
     }
+}
+
+@Composable
+fun CreateFirstChatCard() {
+    val colors = MaterialTheme.colorScheme
+
+    Column(
+        modifier = Modifier
+            .background(colors.surface)
+            .padding(bottom = 20.dp)
+            .fillMaxSize()
+            .size(600.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Column(
+            modifier = Modifier
+                .background(colors.surface)
+                .width(324.dp)
+                .height(324.dp)
+                .background(color = colors.surface, shape = RoundedCornerShape(size = 16.dp)),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                modifier = Modifier.size(width = 195.dp, height = 132.dp),
+                painter = painterResource(Res.drawable.auth_logo),
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                colorFilter = ColorFilter.tint(colors.primary)
+            )
+            Spacer(modifier = Modifier.height(56.dp))
+            Text(
+                stringResource(MokoRes.strings.greeting),
+                fontSize = 24.sp,
+                lineHeight = 24.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                fontWeight = FontWeight(500),
+                textAlign = TextAlign.Center,
+                color = colors.primary,
+                letterSpacing = TextUnit(0F, TextUnitType.Sp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                stringResource(MokoRes.strings.create_your_first_chat),
+                fontSize = 15.sp,
+                lineHeight = 15.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                fontWeight = FontWeight(400),
+                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                textAlign = TextAlign.Center,
+                color = colors.secondary,
+                maxLines = 3,
+            )
+        }
+    }
+}
+
+
+@Composable
+fun EncryptionInfoCard() {
+    val colors = MaterialTheme.colorScheme
+
+Column(
+modifier = Modifier.padding(top = 40.dp, bottom = 10.dp)
+.fillMaxWidth(),
+horizontalAlignment = Alignment.CenterHorizontally,
+verticalArrangement = Arrangement.Center
+) {
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            modifier = Modifier.size(27.dp),
+            painter = painterResource(Res.drawable.smart_lock),
+            contentDescription = null,
+            colorFilter =  ColorFilter.tint(colors.primary)
+        )
+    }
+
+    Spacer(modifier = Modifier.height(10.dp))
+
+    Row (
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(bottom = 50.dp).fillMaxWidth().padding(bottom = 50.dp)
+    ) {
+        Text(
+            stringResource(MokoRes.strings.encryption_info_1),
+            fontSize = 9.5.sp,
+            lineHeight = 10.sp,
+            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+            color = colors.primary,
+            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+        )
+        Text(
+            " " + stringResource(MokoRes.strings.encryption_info_2),
+            textAlign = TextAlign.Start,
+            fontSize = 9.5.sp,
+            lineHeight = 10.sp,
+            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+            color = Color(0xFFCAB7A3),
+            textDecoration = TextDecoration.Underline,
+            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
+        )
+    }
+}
 }

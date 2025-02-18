@@ -52,14 +52,18 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
+import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -70,6 +74,7 @@ import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
+import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -93,7 +98,8 @@ class CreateGroupSecondScreen() : Screen {
         val fillInput = stringResource(MokoRes.strings.please_fill_in_the_group_name_input_field)
         val groupNameError = remember { mutableStateOf<String?>("") }
         val colors = MaterialTheme.colorScheme
-
+        val tabNavigator = LocalTabNavigator.current
+        val mainViewModel: MainViewModel = koinInject()
         val filteredContacts = if (searchQuery.value.isEmpty()) {
             selectedContacts
         } else {
@@ -120,7 +126,7 @@ class CreateGroupSecondScreen() : Screen {
                     .fillMaxWidth()
                     .background(colors.background)
             ) {
-                SafeArea(padding = 15.dp) {
+                SafeArea(padding = if (getPlatform() == Platform.Android) 0.dp else 16.dp) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
@@ -128,16 +134,18 @@ class CreateGroupSecondScreen() : Screen {
                         stringResource(MokoRes.strings.create_group),
                         order = "2",
                         onClick = {
-//                            if (groupNameError.value != null) {
-//                                toasterViewModel.toaster.show(
-//                                    fillInput,
-//                                    type = ToastType.Error,
-//                                    duration = ToasterDefaults.DurationDefault
-//                                )
-//                            } else {
+                            if (groupNameError.value != null) {
+                                toasterViewModel.toaster.show(
+                                    fillInput,
+                                    type = ToastType.Error,
+                                    duration = ToasterDefaults.DurationDefault
+                                )
+                            } else {
                             viewModel.createGroupChat(groupName.value)
-                            commonViewModel.restartApp()
-//                            }
+                                tabNavigator.current = ChatsTab
+                                commonViewModel.restartApp()
+                                mainViewModel.getChatsInBack()
+                            }
                         }
                     )
                     LazyColumn(
@@ -233,19 +241,22 @@ private fun ContactItem(item: ContactDTO, sharedViewModel: ContactsViewModel) {
                     }
 
                 }
-                
+
                 Box(
                     contentAlignment = Alignment.Center,
                     modifier = Modifier
-                        .size(20.dp)
+                        .clip(CircleShape)
+                        .size(30.dp)
                         .clickable {
                             sharedViewModel.removeContact(item)
                         }
+                        .padding(8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Close,
                         contentDescription = "Close",
-                        tint = colors.primary
+                        tint = Color.Gray
+
                     )
                 }
 
@@ -373,7 +384,7 @@ private fun validateGroupName(
     nameValidate4: String
 ): String? {
     return when {
-        name.isEmpty() -> nameValidate1
+        name.isBlank() -> nameValidate1
         name.length > 40 -> nameValidate2
         !name.matches(Regex("^[\\p{L}\\p{N}\\p{S}\\s]+$")) -> nameValidate4 // Добавлено поддержка эмодзи
         else -> null

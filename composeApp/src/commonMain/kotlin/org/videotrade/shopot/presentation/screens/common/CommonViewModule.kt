@@ -37,7 +37,6 @@ import org.videotrade.shopot.domain.usecase.CommonUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
-import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.multiplatform.getPlatform
@@ -132,7 +131,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
     }
 
 
-    fun cipherShared(userId: String?, navigator: Navigator) {
+    fun cipherShared(userId: String?, navigator: Navigator?) {
         viewModelScope.launch {
             println("cipherShared")
             try {

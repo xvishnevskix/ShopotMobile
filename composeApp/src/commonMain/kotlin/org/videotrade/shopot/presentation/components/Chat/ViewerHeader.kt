@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -16,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -40,16 +43,17 @@ fun ViewerHeader(name: String, time: String = "") {
             .fillMaxWidth()
             .statusBarsPadding()
 //            .padding(top = 30.dp, start = 15.dp, end = 15.dp, bottom = 10.dp),
-            .padding(top = 15.dp, start = 24.dp, end = 124.dp, bottom = 10.dp),
+            .padding(top = 16.dp, start = 24.dp, end = 124.dp, bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
 
         Box(modifier = Modifier
-            .padding(end = 8.dp)
+            .clip(CircleShape)
             .clickable {
                 navigator.pop()
             }
-            .width(30.dp)) {
+            .padding(16.dp)
+            ) {
             BackIcon()
         }
 

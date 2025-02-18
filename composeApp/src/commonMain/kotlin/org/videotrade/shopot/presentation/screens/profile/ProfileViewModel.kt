@@ -2,6 +2,7 @@ package org.videotrade.shopot.presentation.screens.profile
 
 import cafe.adriel.voyager.navigator.Navigator
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -18,6 +19,7 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.multiplatform.PlatformFilePick
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
 class ProfileViewModel : ViewModel(), KoinComponent {
@@ -99,6 +101,12 @@ init {
         }
         
         
+    }
+
+    suspend fun updateAuthProfile(profileUpdate: HttpResponse, navigator: Navigator,) {
+        val responseData: ProfileDTO = Json.decodeFromString(profileUpdate.bodyAsText())
+        profileUseCase.setProfile(responseData)
+//        navigator.push(MainScreen())
     }
     
     

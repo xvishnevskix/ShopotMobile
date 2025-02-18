@@ -114,18 +114,25 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     override suspend fun fetchContacts(): List<ContactDTO>? {
         try {
             val contactsNative = ContactsProviderFactory.create().getContacts()
+
+            println("contacts contactsNative ${contactsNative}")
             
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("listContacts", Json.encodeToJsonElement(contactsNative))
                 }
             )
+
+            println("contacts jsonContent contactsGet ${jsonContent}")
             
             
             val contactsGet = origin().post("contacts/addContactsList", jsonContent) ?: return null
             
-            
+            println("contactsGet ${contactsGet}")
+
             val jsonElement = Json.parseToJsonElement(contactsGet)
+
+            println("contacts jsonElement ${jsonElement}")
             
             
             val registeredUsers =

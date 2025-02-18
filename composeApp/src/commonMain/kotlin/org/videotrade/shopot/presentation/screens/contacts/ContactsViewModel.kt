@@ -71,9 +71,14 @@ class ContactsViewModel() : ViewModel(),
     
     fun createGroupChat(groupName: String) {
         viewModelScope.launch {
-            val idUsers = selectedContacts.map { it.id }.toMutableList()
-            idUsers.add(ProfileUseCase.getProfile().id)
-            contactsUseCase.createGroupChat(idUsers, groupName)
+            try {
+                val idUsers = selectedContacts.map { it.id }.toMutableList()
+                idUsers.add(ProfileUseCase.getProfile().id)
+                contactsUseCase.createGroupChat(idUsers, groupName)
+            }
+            finally {
+                clearSelectedContacts()
+            }
         }
     }
 
@@ -89,5 +94,9 @@ class ContactsViewModel() : ViewModel(),
     
     fun removeContact(contact: ContactDTO) {
         selectedContacts.remove(contact)
+    }
+
+    fun clearSelectedContacts() {
+        selectedContacts.clear()
     }
 }

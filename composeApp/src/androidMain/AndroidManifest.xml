@@ -46,7 +46,7 @@
             android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
             android:launchMode="singleInstance"
             android:windowSoftInputMode="adjustResize"
-            android:screenOrientation="fullSensor"
+            android:screenOrientation="portrait"
             android:exported="true"
             tools:ignore="DiscouragedApi">
             <intent-filter>

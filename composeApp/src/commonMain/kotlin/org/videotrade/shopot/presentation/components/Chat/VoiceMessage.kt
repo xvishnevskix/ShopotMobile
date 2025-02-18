@@ -84,6 +84,17 @@ fun VoiceMessage(
     var progress by remember(message.id) { mutableStateOf(0f) }
     var downloadJob by remember(message.id) { mutableStateOf<Job?>(null) }
     var isUpload by remember(message.id) { mutableStateOf(false) }
+
+    // Получаем текущее воспроизводимое сообщение
+    val currentPlayingMessage by viewModel.currentPlayingMessage.collectAsState()
+
+    // Проверяем, активное ли это сообщение
+    LaunchedEffect(currentPlayingMessage) {
+        isPlaying.value = currentPlayingMessage == message.id
+        if (!isPlaying.value) {
+            stopVoice(audioPlayer)  // Останавливаем воспроизведение, если это не активное сообщение
+        }
+    }
     
     // Эффект для обновления времени воспроизведения
     LaunchedEffect(isPlaying.value) {
@@ -218,10 +229,20 @@ fun VoiceMessage(
                 isPlaying = isPlaying.value,
                 onClick = {
                     isPlaying.value = !isPlaying.value
+//                    if (isPlaying.value) {
+//                        playVoice(audioPlayer, audioFilePath, isPlaying)
+//                    } else {
+//                        stopVoice(audioPlayer)
+//                    }
+
                     if (isPlaying.value) {
-                        playVoice(audioPlayer, audioFilePath, isPlaying)
+                        viewModel.setPlayingMessage(message.id)  // Устанавливаем новое активное сообщение
+                        playVoice(audioPlayer, audioFilePath, isPlaying) // Передаём isPlaying
+
                     } else {
                         stopVoice(audioPlayer)
+                        viewModel.setPlayingMessage(null)  // Останавливаем текущее воспроизведение
+                        isPlaying.value = false
                     }
                 },
                 isFromUser = message.fromUser == profile.id
@@ -338,7 +359,14 @@ fun PlayPauseButton(
 
 
 fun playVoice(audioPlayer: AudioPlayer, audioFilePath: String, isPlaying: MutableState<Boolean>) {
-    audioPlayer.startPlaying(audioFilePath, isPlaying)
+//    audioPlayer.startPlaying(audioFilePath, isPlaying)
+    isPlaying.value = true // Устанавливаем состояние "играет"
+
+    val isStarted = audioPlayer.startPlaying(audioFilePath, isPlaying) // Передаём isPlaying
+
+    if (!isStarted) {
+        isPlaying.value = false // Если аудио не запустилось, сбрасываем состояние
+    }
 }
 
 fun stopVoice(audioPlayer: AudioPlayer) {

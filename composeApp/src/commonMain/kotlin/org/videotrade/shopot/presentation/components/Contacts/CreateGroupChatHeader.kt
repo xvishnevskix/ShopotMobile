@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -29,6 +30,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -45,12 +47,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Medium
 import shopot.composeapp.generated.resources.Montserrat_SemiBold
@@ -68,6 +73,7 @@ fun CreateGroupChatHeader(
     val navigator = LocalNavigator.currentOrThrow
     val colors = MaterialTheme.colorScheme
 
+
     Column(
         modifier = Modifier.background(colors.background).padding(horizontal = 16.dp)
     ) {
@@ -84,9 +90,11 @@ fun CreateGroupChatHeader(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Box(modifier = Modifier.clickable {
+                Box(modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
                     navigator.pop()
-                }.padding(start = 8.dp, end = 8.dp)) {
+                }.padding(12.dp)) {
                     BackIcon()
                 }
                 Text(
@@ -101,17 +109,20 @@ fun CreateGroupChatHeader(
 
                     )
                 if (order == "1") {
-                    Box(modifier = Modifier.clickable {
+                    Box(modifier = Modifier
+                        .clip(CircleShape)
+                        .clickable {
                         onClick()
-                    }.padding(start = 8.dp, end = 8.dp).rotate(180f)) {
+                    }.padding(12.dp).rotate(180f)) {
 
                             BackIcon()
                         }
                     }
                 else {
-                    Box(modifier = Modifier.clickable {
+                    Box(modifier = Modifier.clip(CircleShape).clickable {
                         onClick()
-                    }.padding(start = 8.dp, end = 8.dp)) {
+
+                    }.padding(8.dp)) {
                             Image(
                                 modifier = Modifier
                                     .size(width = 15.56.dp, height = 10.61.dp),

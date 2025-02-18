@@ -50,6 +50,8 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
     private var isObserving = MutableStateFlow(true)
 
+    val isAuth = MutableStateFlow(false)
+
     val navigator = MutableStateFlow<Navigator?>(null)
 
 
@@ -113,7 +115,10 @@ class IntroViewModel : ViewModel(), KoinComponent {
     }
 
 
-    fun fetchContacts(navigator: Navigator) {
+    fun fetchContacts(navigator: Navigator?) {
+
+
+
         viewModelScope.launch {
 
 
@@ -123,10 +128,18 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
             if (contacts != null) {
 
-                chatsInit(navigator)
+                if (navigator != null) {
+                    chatsInit(navigator)
+                }
 
             } else {
-                navigator.push(WelcomeScreen())
+                if (isAuth.value) {
+
+                } else {
+                    if (navigator != null) {
+                        navigator.push(IntroScreen())
+                    }
+                }
 
 
             }

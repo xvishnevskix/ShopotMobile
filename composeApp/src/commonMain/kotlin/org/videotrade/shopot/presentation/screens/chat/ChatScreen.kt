@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -45,6 +44,7 @@ import org.videotrade.shopot.presentation.components.Chat.Chat
 import org.videotrade.shopot.presentation.components.Chat.ChatFooter
 import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Chat.StickerMenuContent
+import org.videotrade.shopot.presentation.components.Common.BottomSheetModal
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
@@ -134,18 +134,8 @@ class ChatScreen(
             val density = LocalDensity.current
             val screenHeightInPx = maxHeight.value * density.density // Пример, если maxHeight в Dp
             
-            
-            SafeArea(
-                isBlurred = selectedMessage.value != null,
-                padding = 0.dp,
-                isNotSafeContentPadding = true
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(colors.background)
-                        .imePadding() // Например, если нужны отступы для содержимого
-                ) {
+            SafeArea(isBlurred = selectedMessage.value != null, padding = 0.dp) {
+                Column(modifier = Modifier.fillMaxSize().background(colors.background)) {
                     Scaffold(
                         topBar = {
                             ChatHeader(chat, viewModel, profile)
@@ -245,7 +235,7 @@ class ChatScreen(
                 
                 
                 //пересылка сообщений
-//                BottomSheetModal(scaffoldForwardState)
+                BottomSheetModal(scaffoldForwardState)
                 //стикеры
                 BottomSheetScaffold(
                     modifier = Modifier.background(colors.surface),
@@ -290,12 +280,12 @@ class ChatScreen(
                     sheetPeekHeight = 0.dp,
                 ) {}
             }
-            
+
             if (isMessageUpdated.value && selectedMessage.value != null) {
                 val overlayPosition = selectedMessageY.value
                 val isWithinBounds = overlayPosition >= 0 &&
                         overlayPosition + boxSelectedMessageHeight.value <= screenHeightInPx
-                
+
                 if (isWithinBounds) {
                     BlurredMessageOverlay(
                         chat = chat,
@@ -309,14 +299,14 @@ class ChatScreen(
                         }
                     )
                 } else {
-                    
+
                     scope.launch {
                         selectedMessageY.value = when {
                             overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
                             overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
                                 (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
                             }
-                            
+
                             else -> overlayPosition
                         }
                         isMessageUpdated.value = true // Перезапуск
@@ -328,7 +318,7 @@ class ChatScreen(
                     val overlayPosition = selectedMessageY.value
                     val isWithinBounds = overlayPosition >= 0 &&
                             overlayPosition + boxSelectedMessageHeight.value + 180 <= screenHeightInPx
-                    
+
                     if (isWithinBounds) {
                         BlurredMessageOverlay(
                             chat = chat,
@@ -348,7 +338,7 @@ class ChatScreen(
                                 overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
                                     (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
                                 }
-                                
+
                                 else -> overlayPosition
                             }
                             isMessageUpdated.value = true // Перезапуск
