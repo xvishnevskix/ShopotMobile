@@ -114,7 +114,7 @@ fun HeaderMain(
                 )
                 Spacer(modifier = Modifier.width(11.dp))
 
-                // Отображаем StoryCircle для каждой новости
+                // Отображаем кружочек для каждой новости
                 Box(
                     modifier = Modifier.fillMaxWidth()
                 ) {

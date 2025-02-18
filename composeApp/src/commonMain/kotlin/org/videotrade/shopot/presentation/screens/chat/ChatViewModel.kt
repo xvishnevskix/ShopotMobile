@@ -1,6 +1,7 @@
 package org.videotrade.shopot.presentation.screens.chat
 
 
+import androidx.compose.runtime.mutableStateMapOf
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
@@ -547,14 +548,24 @@ class ChatViewModel : ViewModel(), KoinComponent {
         
     }
 
-    suspend fun getGroupUsers(chatId: String): List<GroupUserDTO> {
-        return try {
-            val groupUsersGet = origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId")
-            groupUsersGet ?: emptyList()
-        } catch (e: Exception) {
+    private val _cachedGroupUsers = mutableStateMapOf<String, List<GroupUserDTO>>() // Кэш пользователей чатов
+    val cachedGroupUsers: Map<String, List<GroupUserDTO>> get() = _cachedGroupUsers
 
+    suspend fun getGroupUsers(chatId: String): List<GroupUserDTO> {
+        // Если данные уже загружены – возвращаем их
+        _cachedGroupUsers[chatId]?.let { return it }
+
+        return try {
+            val groupUsersGet = origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId") ?: emptyList()
+            _cachedGroupUsers[chatId] = groupUsersGet // Сохраняем в кэше
+            groupUsersGet
+        } catch (e: Exception) {
             emptyList()
         }
+    }
+
+    fun clearCache() {
+        _cachedGroupUsers.clear() // Очищаем кэш (например, если юзер вышел)
     }
     
     fun selectMessage(chatId: String, message: MessageItem, senderName: String) {
