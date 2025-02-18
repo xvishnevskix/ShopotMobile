@@ -74,10 +74,13 @@ import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
+import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.closeApp
 import org.videotrade.shopot.multiplatform.configureAudioSession
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
@@ -204,6 +207,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
      suspend fun setRemoteDisc() {
         offer.value?.let { _peerConnection.value?.setRemoteDescription(it) }
+        
     }
     override suspend fun connectionWs(userId: String) {
         
@@ -393,21 +397,23 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         setIsCallActive(false)
                                         
+
+                                        
                                         if (isScreenOn()) {
-                                            
                                             if (_isIncomingCall.value) {
                                                 println("rejectCallAnswer() ${_isIncomingCall.value}")
                                                 if (currentScreen is CallScreen) {
+                                                    println("Мы на экране CallScreen 1")
+
                                                     // Вы на экране CallScreen
                                                     navigator?.push(MainScreen())
-                                                    
-                                                    println("Мы на экране CallScreen 1")
+
                                                 } else if (currentScreen is MainScreen) {
                                                     // Вы на экране MainScreen
                                                     println("Мы на экране MainScreen 1")
                                                 }
                                             }
-                                            
+
                                             if (isCall.value) {
                                                 rejectCallAnswer(
                                                     userId = userID,
@@ -421,8 +427,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             
                                             
                                             
-                                            if (isConnectedWebrtc.value) {
-                                                println("rejectCallAnswer() ${isConnectedWebrtc.value}")
+//                                            if (isConnectedWebrtc.value) {
+                                                println("rejectCallAnswer() ${currentScreen}")
                                                 if (currentScreen is CallScreen) {
                                                     // Вы на экране CallScreen
                                                     navigator?.push(MainScreen())
@@ -433,7 +439,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                     println("Мы на экране MainScreen 2")
                                                 }
                                                 
-                                            }
+//                                            }
                                         } else {
                                             rejectCallAnswer()
                                             println("rejectCallAnswer() 2")
@@ -569,7 +575,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .onEach { state ->
                     Logger.d { "peerState111 onConnectionStateChange: $state" }
                     
-                    AudioFactory.createAudioPlayer().stopAllAudioStreams()
+//                    AudioFactory.createAudioPlayer().stopAllAudioStreams()
                     
                     _callState.value = state
                     
@@ -580,7 +586,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             // Обработка треков, получаемых от удалённого пира
             peerConnection.value!!.onTrack
                 .onEach { event ->
-                    Logger.d { "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" }
+                    println( "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" )
                     if (event.track?.kind == MediaStreamTrackKind.Video) {
                         remoteVideoTrack.value = event.track as VideoStreamTrack
                     }
@@ -625,8 +631,53 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     
     @OptIn(DelicateCoroutinesApi::class)
+    override suspend fun makeCall(userId: String, calleeId: String) {
+        println("makeCall31313131 ${wsSession.value}")
+
+        coroutineScope {
+            if (wsSession.value != null) {
+                try {
+                    println("makeCall")
+
+                    val offer = peerConnection.value?.createOffer(
+                        OfferAnswerOptions(
+                            offerToReceiveAudio = true
+                        )
+                    )
+                    if (offer != null) {
+                        peerConnection.value?.setLocalDescription(offer)
+                    }
+
+
+                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
+                        return@coroutineScope
+                    }
+
+                    val newCallMessage = WebRTCMessage(
+                        type = "call",
+                        calleeId = calleeId,
+                        userId = userId,
+                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
+                    )
+
+
+                    val jsonMessage =
+                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
+
+                    wsSession.value?.send(Frame.Text(jsonMessage))
+                    println("Message sent successfully Call")
+
+
+                } catch (e: Exception) {
+                    println("Failed to send message: ${e.message}")
+                }
+            }
+        }
+
+    }
+//
 //    override suspend fun makeCall(userId: String, calleeId: String) {
-//        println("makeCall31313131 ${wsSession.value}")
+//        println("callIOS ${wsSession.value}")
 //
 //        coroutineScope {
 //            if (wsSession.value != null) {
@@ -648,17 +699,17 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //                    }
 //
 //                    val newCallMessage = WebRTCMessage(
-//                        type = "call",
+//                        type = "callIOS",
 //                        calleeId = calleeId,
 //                        userId = userId,
 //                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
 //                    )
 //
-//
 //                    val jsonMessage =
 //                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
 //
 //                    wsSession.value?.send(Frame.Text(jsonMessage))
+//
 //                    println("Message sent successfully Call")
 //
 //
@@ -669,50 +720,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 //        }
 //
 //    }
-    override suspend fun makeCall(userId: String, calleeId: String) {
-        println("makeCall31313131 ${wsSession.value}")
-        
-        coroutineScope {
-            if (wsSession.value != null) {
-                try {
-                    println("makeCall")
-                    
-                    val offer = peerConnection.value?.createOffer(
-                        OfferAnswerOptions(
-                            offerToReceiveAudio = true
-                        )
-                    )
-                    if (offer != null) {
-                        peerConnection.value?.setLocalDescription(offer)
-                    }
-                    
-                    
-                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
-                        return@coroutineScope
-                    }
-                    
-                    val newCallMessage = WebRTCMessage(
-                        type = "callIOS",
-                        calleeId = calleeId,
-                        userId = userId,
-                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
-                    )
-                    
-                    val jsonMessage =
-                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-                    
-                    wsSession.value?.send(Frame.Text(jsonMessage))
-                    
-                    println("Message sent successfully Call")
-                    
-                    
-                } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
-                }
-            }
-        }
-        
-    }
     
     
     suspend fun sendCall() {
@@ -812,21 +819,32 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             if (wsSession.value != null) {
                 
                 try {
-                    println("answerCall")
+//                    configureAudioSession() // Настраиваем аудиосессию
+                    
+                    println("answerCall1")
                     setRemoteDisc()
+                    println("answerCall12")
                     
                     val otherUserId = otherUserId.value
                     
+                    println("answerCall123")
                     
                     val answer = peerConnection.value?.createAnswer(
                         options = OfferAnswerOptions(
                             offerToReceiveAudio = true
                         )
                     )
+                    println("answerCall1234")
                     
                     if (answer != null) {
-                        peerConnection.value?.setLocalDescription(answer)
+                        
+                        if (peerConnection.value?.remoteDescription == null) {
+                            println("❌ RemoteDescription не установлен перед setLocalDescription")
+                        } else {
+                            peerConnection.value?.setLocalDescription(answer)
+                        }
                     }
+                    println("answerCall12345")
                     
                     if (wsSession.value?.outgoing?.isClosedForSend == true) {
                         println("wsSession.value?.outgoing?.isClosedForSend aaaa!!!!!!!")
@@ -840,16 +858,18 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         rtcMessage = answer?.let { SessionDescriptionDTO(it.type, answer.sdp) }
                     )
                     
-                    Logger.d {
+                    println(
                         "answerCallMessage $answerCallMessage"
-                    }
+                    )
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
                     
-                    setIsIncomingCall(false)
                     
                     
                     wsSession.value?.send(Frame.Text(jsonMessage))
+                    
+                    setIsIncomingCall(false)
+                    
                     println("Message sent successfully")
                 } catch (e: Exception) {
                     println("Failed to send message: ${e.message}")

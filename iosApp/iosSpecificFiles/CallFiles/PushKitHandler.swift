@@ -55,18 +55,22 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         
         
         let appState = UIApplication.shared.applicationState
+        let callHandler: CallHandler = KoinHelperKt.getCallHandler()
+
 
         switch appState {
         case .active:
+            callHandler.setIsIncomingCall(isIncomingCall: true)
+
             Logger.log("📲 Приложение активно (foreground)")
         case .background:
             Logger.log("🌙 Приложение в фоне (background)")
             
-            let callHandler: CallHandler = KoinHelperKt.getCallHandler()
-            
             callHandler.setAppIsActive(appIsActive: false)
             
             callHandler.setIsCallBackground(isCallBackground: true)
+            
+
         @unknown default:
             Logger.log("⚠️ Неизвестное состояние приложения")
         }
@@ -81,7 +85,7 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         update.remoteHandle = CXHandle(type: .generic, value: "+\(phone)")
         update.hasVideo = true
         
-        activateAudioSession()
+//        activateAudioSession()
 
         callProvider.reportNewIncomingCall(with: uuid, update: update) { error in
             if let error = error {
@@ -99,7 +103,6 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
                           let callHandler = KoinHelperKt.getCallHandler() // ✅ Берем CallHandler из Koin внутри метода
                           let callInfo = try await callHandler.getCallInfo(callId: callId)
                           if let callInfo = callInfo {
-                              print("Call info retrieved successfully: \(callInfo)")
                           } else {
                               print("Call info is nil")
                           }
@@ -113,19 +116,23 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
         completion()
     }
 
-    // ✅ Активация аудиосессии
     func activateAudioSession() {
         DispatchQueue.main.async {
             let audioSession = AVAudioSession.sharedInstance()
             do {
+                // Деактивируем перед изменениями
+                try audioSession.setActive(false)
+
                 try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .defaultToSpeaker])
                 try audioSession.setActive(true)
+                
                 Logger.log("🔊 Аудиосессия успешно активирована")
             } catch {
                 Logger.log("❌ Ошибка активации аудиосессии: \(error.localizedDescription)")
             }
         }
     }
+
 
     // ✅ Реализация CXProviderDelegate
 
@@ -137,7 +144,7 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
     // CallKit требует обработки принятия звонка
     func provider(_ provider: CXProvider, perform action: CXAnswerCallAction) {
         Logger.log("📞 Входящий звонок принят")
-        activateAudioSession()
+//        activateAudioSession()
         
         let callHandler: CallHandler = KoinHelperKt.getCallHandler()
         
@@ -180,9 +187,13 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
     @objc func endAllCalls() {
         print("🔴 Завершаем все звонки")
 
-        let transactions = callController.callObserver.calls
+        let activeCalls = callController.callObserver.calls
+        if activeCalls.isEmpty {
+            print("⚠️ Нет активных звонков для завершения")
+            return
+        }
 
-        for call in transactions {
+        for call in activeCalls {
             let endCallAction = CXEndCallAction(call: call.uuid)
             let transaction = CXTransaction(action: endCallAction)
 
@@ -190,13 +201,10 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
                 if let error = error {
                     print("❌ Ошибка завершения звонка: \(error.localizedDescription)")
                 } else {
-                    print("✅ Все звонки завершены!")
+                    print("✅ Звонок \(call.uuid) завершен!")
                 }
             }
         }
-
-        if transactions.isEmpty {
-            print("⚠️ Нет активных звонков для завершения")
-        }
     }
+
 }

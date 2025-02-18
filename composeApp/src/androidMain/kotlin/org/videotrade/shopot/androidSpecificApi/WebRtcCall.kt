@@ -174,6 +174,9 @@ class CallForegroundService : Service() {
         if (!isScreenOn) {
             notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
         } else {
+            
+            println("isScreenOn3123 $isScreenOn")
+            
             // Добавляем действия для принятия и отклонения вызова
             val acceptIntent = Intent(this, CallActionReceiver::class.java).apply {
                 action = "ACTION_ACCEPT_CALL"
@@ -182,7 +185,7 @@ class CallForegroundService : Service() {
                 this,
                 0,
                 acceptIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
             
             val declineIntent = Intent(this, CallActionReceiver::class.java).apply {
@@ -192,7 +195,7 @@ class CallForegroundService : Service() {
                 this,
                 0,
                 declineIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
             )
             
             notificationBuilder.addAction(
@@ -221,10 +224,7 @@ class CallForegroundService : Service() {
     
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        println("wakeDevice and startActivity")
-        
         // Пробуждаем устройство
-        
         wakeDevice()
         
         // Если экран выключен, запускаем FullscreenNotificationActivity

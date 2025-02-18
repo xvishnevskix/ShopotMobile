@@ -35,7 +35,9 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.isActiveCallIos
 import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
+import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.checkNetwork
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.common.NetworkErrorScreen
@@ -59,9 +61,13 @@ class IntroScreen : Screen {
         val callViewModel: CallViewModel = koinInject()
         val isCallBackground by callViewModel.isCallBackground.collectAsState()
         
-        
+        if (getPlatform() == Platform.Ios) {
+            if (isCallBackground) {
+                isActiveCallIos(callViewModel, navigator)
+            }
+        }
         if (isCallBackground) {
-            isActiveCallIos(callViewModel, navigator)
+            return
         }
         
         LaunchedEffect(key1 = Unit) {

@@ -11,12 +11,10 @@ import io.ktor.http.isSuccess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.koin.compose.koinInject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
@@ -25,8 +23,8 @@ import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
-import org.videotrade.shopot.presentation.screens.call.CallIosScreen
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -43,9 +41,9 @@ object CallHandler : KoinComponent {
                 println("commonViewModel.mainNavigator.value ${commonViewModel.mainNavigator.value}")
                 
                 callViewModel.initWebrtc()
-
+                
                 commonViewModel.mainNavigator.value?.push(
-                    CallIosScreen(
+                    CallScreen(
                         calleeId = callViewModel.iosCallData.value?.userId ?: "",
                         userFirstName = "",
                         userLastName = "",
@@ -128,7 +126,18 @@ object CallHandler : KoinComponent {
     
     fun rejectCallIos() {
         try {
-            callViewModel.iosCallData.value?.userId?.let { callViewModel.rejectCall(it, "00:00:00") }
+            val callUseCase: CallUseCase = getKoin().get()
+
+            
+            if (callUseCase.isCallBackground.value) {
+                callViewModel.iosCallData.value?.userId?.let {
+                    callViewModel.rejectCall(
+                        it,
+                        "00:00:00"
+                    )
+                }
+            }
+
         } catch (e: Exception) {
         
         }
@@ -139,9 +148,15 @@ object CallHandler : KoinComponent {
     
     fun setIsCallBackground(isCallBackground: Boolean) {
         val callUseCase: CallUseCase by inject()
-        val commonViewModel: CommonViewModel by inject()
+        
         callUseCase.setIsCallBackground(isCallBackground)
         
+    }
+    
+    fun setIsIncomingCall(isIncomingCall: Boolean) {
+        val callUseCase: CallUseCase by inject()
+        
+        callUseCase.setIsIncomingCall(isIncomingCall)
     }
     
     fun setAppIsActive(appIsActive: Boolean) {

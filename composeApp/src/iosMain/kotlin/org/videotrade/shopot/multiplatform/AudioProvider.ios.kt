@@ -14,31 +14,31 @@ import platform.AVFAudio.AVAudioPlayerDelegateProtocol
 import platform.AVFAudio.AVAudioQualityHigh
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
-import platform.AVFAudio.AVAudioSessionCategoryAmbient
 import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetooth
 import platform.AVFAudio.AVAudioSessionCategoryOptionDefaultToSpeaker
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
-import platform.AVFAudio.AVAudioSessionCategorySoloAmbient
 import platform.AVFAudio.AVAudioSessionModeDefault
-import platform.AVFAudio.AVAudioSessionModeVideoChat
 import platform.AVFAudio.AVAudioSessionModeVoiceChat
+import platform.AVFAudio.AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
 import platform.AVFAudio.AVEncoderAudioQualityKey
 import platform.AVFAudio.AVFormatIDKey
 import platform.AVFAudio.AVNumberOfChannelsKey
 import platform.AVFAudio.AVSampleRateKey
+import platform.AVFAudio.availableInputs
 import platform.AVFAudio.currentRoute
 import platform.AVFAudio.setActive
 import platform.AVFoundation.AVAsset
 import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
 import platform.CoreMedia.CMTimeGetSeconds
-import platform.Foundation.NSBundle
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSThread
 import platform.Foundation.NSURL
 import platform.darwin.DISPATCH_TIME_FOREVER
 import platform.darwin.NSObject
+import platform.darwin.dispatch_async
+import platform.darwin.dispatch_get_main_queue
 import platform.darwin.dispatch_semaphore_create
 import platform.darwin.dispatch_semaphore_signal
 import platform.darwin.dispatch_semaphore_wait
@@ -205,12 +205,18 @@ actual class AudioPlayer {
                 }
                 
                 player.delegate = object : NSObject(), AVAudioPlayerDelegateProtocol {
-                    override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
+                    override fun audioPlayerDidFinishPlaying(
+                        player: AVAudioPlayer,
+                        successfully: Boolean
+                    ) {
                         println("Playback finished. Successfully: $successfully")
                         isPlaying.value = false
                     }
                     
-                    override fun audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+                    override fun audioPlayerDecodeErrorDidOccur(
+                        player: AVAudioPlayer,
+                        error: NSError?
+                    ) {
                         println("Playback error occurred: ${error?.localizedDescription}")
                         isPlaying.value = false
                     }
@@ -240,7 +246,7 @@ actual class AudioPlayer {
         
         return true
     }
-
+    
     
     actual fun stopPlaying() {
         println("Stop playing")
@@ -332,44 +338,47 @@ actual class MusicPlayer {
     
     @OptIn(ExperimentalForeignApi::class)
     actual fun play(musicName: String, isRepeat: Boolean, isCategoryMusic: MusicType) {
-        // Получаем путь к файлу в бандле приложения
-        val filePath = NSBundle.mainBundle.pathForResource(name = musicName, ofType = "mp3")
-        
-        if (filePath == null) {
-            println("Ошибка: Файл $musicName.mp3 не найден в бандле.")
-            return
-        }
-        
-        val fileUrl = NSURL.fileURLWithPath(filePath)
-        
-        try {
-            // Настройка аудиосессии
-            val audioSession = AVAudioSession.sharedInstance()
-            
-            when (isCategoryMusic) {
-                MusicType.Notification -> {
-                    audioSession.setCategory(AVAudioSessionCategoryAmbient, error = null)
-                }
-                MusicType.Ringtone -> {
-                    audioSession.setCategory(AVAudioSessionCategorySoloAmbient, error = null)
-                }
-            }
-            audioSession.setActive(true, error = null)
-            
-            // Инициализация AVAudioPlayer
-            audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
-                numberOfLoops = if (isRepeat) -1 else 0 // Устанавливаем количество повторений в зависимости от isRepeat
-                prepareToPlay()                         // Подготовка к воспроизведению
-                play()                                  // Начало воспроизведения
-            }
-            
-            if (audioPlayer == null) {
-                println("Ошибка: Не удалось инициализировать AVAudioPlayer для файла $musicName.mp3.")
-            }
-        } catch (e: Exception) {
-            println("Ошибка при попытке воспроизведения: ${e.message}")
-        }
     }
+    
+    //    {
+//        // Получаем путь к файлу в бандле приложения
+//        val filePath = NSBundle.mainBundle.pathForResource(name = musicName, ofType = "mp3")
+//
+//        if (filePath == null) {
+//            println("Ошибка: Файл $musicName.mp3 не найден в бандле.")
+//            return
+//        }
+//
+//        val fileUrl = NSURL.fileURLWithPath(filePath)
+//
+//        try {
+//            // Настройка аудиосессии
+//            val audioSession = AVAudioSession.sharedInstance()
+//
+//            when (isCategoryMusic) {
+//                MusicType.Notification -> {
+//                    audioSession.setCategory(AVAudioSessionCategoryAmbient, error = null)
+//                }
+//                MusicType.Ringtone -> {
+//                    audioSession.setCategory(AVAudioSessionCategorySoloAmbient, error = null)
+//                }
+//            }
+//            audioSession.setActive(true, error = null)
+//
+//            // Инициализация AVAudioPlayer
+//            audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
+//                numberOfLoops = if (isRepeat) -1 else 0 // Устанавливаем количество повторений в зависимости от isRepeat
+//                prepareToPlay()                         // Подготовка к воспроизведению
+//                play()                                  // Начало воспроизведения
+//            }
+//
+//            if (audioPlayer == null) {
+//                println("Ошибка: Не удалось инициализировать AVAudioPlayer для файла $musicName.mp3.")
+//            }
+//        } catch (e: Exception) {
+//            println("Ошибка при попытке воспроизведения: ${e.message}")
+//        }
+//    }
     actual fun stop() {
         audioPlayer?.stop()
         audioPlayer = null
@@ -379,38 +388,59 @@ actual class MusicPlayer {
         return audioPlayer?.playing ?: false
     }
     
-
+    
 }
 
 @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
 actual fun configureAudioSession() {
     val audioSession = AVAudioSession.sharedInstance()
+    
     memScoped {
         val error = alloc<ObjCObjectVar<NSError?>>()
         
-        // Настраиваем категорию аудиосессии
+        // ❌ Принудительное отключение всех аудиосессий перед настройкой
+        val wasDeactivated = audioSession.setActive(
+            false, // Отключаем текущую сессию
+            AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation, // Уведомляем другие приложения
+            error.ptr
+        )
+        
+        if (!wasDeactivated) {
+            println("⚠️ Ошибка деактивации предыдущей аудиосессии: ${error.value?.localizedDescription}")
+        } else {
+            println("✅ Все аудиосессии отключены перед настройкой")
+        }
+        
+        // ✅ Устанавливаем категорию
         val success = audioSession.setCategory(
             AVAudioSessionCategoryPlayAndRecord,
-            mode = AVAudioSessionModeVoiceChat,
-            options = AVAudioSessionCategoryOptionDefaultToSpeaker or AVAudioSessionCategoryOptionAllowBluetooth,
+            mode = AVAudioSessionModeVoiceChat, // Режим звонка
+            options = AVAudioSessionCategoryOptionAllowBluetooth
+                    or AVAudioSessionCategoryOptionDefaultToSpeaker, // Динамик по умолчанию
             error.ptr
         )
         
         if (!success) {
-            println("Error configuring audio session category: ${error.value?.localizedDescription}")
+            println("❌ Ошибка установки категории аудиосессии: ${error.value?.localizedDescription}")
             return@memScoped
         }
         
-        // Проверяем текущий маршрут аудио
-        val currentRoute = audioSession.currentRoute
-        println("Audio session current route: $currentRoute")
+        // 🔍 Лог текущего состояния аудиосессии перед активацией
+        println("🔍 Audio session category: ${audioSession.category}")
+        println("🔍 Audio session mode: ${audioSession.mode}")
+        println("🔍 Audio session availableInputs: ${audioSession.availableInputs}")
+        println("🔍 Audio session currentRoute: ${audioSession.currentRoute}")
         
-        // Принудительно активируем аудиосессию
-        val isActive = audioSession.setActive(true, error.ptr)
-        if (!isActive) {
-            println("Error activating audio session: ${error.value?.localizedDescription}")
-        } else {
-            println("Audio session activated successfully")
+        // ✅ Активация аудиосессии после установки параметров
+        dispatch_async(dispatch_get_main_queue()) {
+            val isActive = audioSession.setActive(true, error.ptr)
+            if (!isActive) {
+                println("❌ Ошибка активации аудиосессии: ${error.value?.localizedDescription}")
+            } else {
+                println("✅ Аудиосессия успешно активирована")
+            }
         }
     }
 }
+
+
