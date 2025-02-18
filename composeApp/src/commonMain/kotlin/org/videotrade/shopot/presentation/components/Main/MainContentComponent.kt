@@ -145,18 +145,18 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     var isProcessingUpdate by remember { mutableStateOf(false) }
 
 // Обработка новостей из `once`
-    LaunchedEffect(onceNewsState) {
-        if (!showNewsOnceViewer) {
-            val newsToShow = onceNewsState.find {
-                it.appearance == "once" && !it.viewed &&
-                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
-            }
-            if (newsToShow != null) {
-                selectedOnceNews = newsToShow
-                showNewsOnceViewer = true
-            }
-        }
-    }
+//    LaunchedEffect(onceNewsState) {
+//        if (!showNewsOnceViewer) {
+//            val newsToShow = onceNewsState.find {
+//                it.appearance == "once" && !it.viewed &&
+//                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
+//            }
+//            if (newsToShow != null) {
+//                selectedOnceNews = newsToShow
+//                showNewsOnceViewer = true
+//            }
+//        }
+//    }
 
 
     
