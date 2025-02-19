@@ -80,7 +80,9 @@ import org.videotrade.shopot.presentation.components.Common.validateFirstName
 import org.videotrade.shopot.presentation.components.Common.validateLastName
 import org.videotrade.shopot.presentation.components.Common.validateNickname
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.human
@@ -367,7 +369,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         navigator = null
                                                     )
 
-                                                    delay(4000)
+                                                    delay(2000)
 
                                                     val icon = image?.let {
                                                         withContext(Dispatchers.IO) { // Запускаем в другом потоке
@@ -416,6 +418,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                                     responseData.userId,
                                                                     navigator
                                                                 )
+                                                                navigator.push(IntroScreen())
                                                             } else {
                                                                 println("Ошибка обновления профиля с аватаркой: ${profileUpdate.bodyAsText()}")
                                                             }
