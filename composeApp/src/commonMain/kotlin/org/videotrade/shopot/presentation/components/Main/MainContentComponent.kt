@@ -235,7 +235,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                         if (isLoading) {
                             ChatSkeleton()
                         } else {
-                            val maxHeight = if (isSearching.value) ((72.dp) * 3) else Dp.Unspecified
+                            val maxHeight = if (isSearching.value) ((72.dp) * 6) else Dp.Unspecified
                             //чаты  пользователя
                             Column(
                                 modifier = Modifier
@@ -250,7 +250,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                 LazyColumn(
                                     modifier = Modifier.padding(horizontal = 16.dp)
                                         .animateContentSize()
-//                                        .heightIn(max = maxHeight)
+                                        .heightIn(max = maxHeight)
 
                                        ,
                                     verticalArrangement = Arrangement.Center,
@@ -272,6 +272,27 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                 UserComponentItem(item, commonViewModel, mainViewModel, groupUsers)
                                                 Spacer(modifier = Modifier.background(Color(0xFFF3F4F6)).height(16.dp))
                                             }
+                                        }
+
+                                    }
+
+                                    item {
+                                        if (chatState.isNotEmpty()) {
+
+                                            Crossfade(targetState = isSearching.value) { searching ->
+                                                if (!searching) {
+                                                    EncryptionInfoCard()
+                                                }
+                                            }
+
+
+                                        } else {
+                                            Crossfade(targetState = isSearching.value) { searching ->
+                                                if (!searching) {
+                                                    CreateFirstChatCard()
+                                                }
+                                            }
+
                                         }
 
                                     }
@@ -327,9 +348,6 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                        }
                                                     }
                                                 }
-                                                item {
-
-                                                }
                                             }
 
                                         }
@@ -337,24 +355,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                 }
 
 
-                                if (chatState.isNotEmpty()) {
 
-                                        Crossfade(targetState = isSearching.value) { searching ->
-                                            if (!searching) {
-                                                EncryptionInfoCard()
-                                            }
-                                        }
-
-
-                                } else {
-                                    Crossfade(targetState = isSearching.value) { searching ->
-                                        if (!searching) {
-                                            CreateFirstChatCard()
-                                        }
-                                    }
-
-                                }
-                                Spacer(modifier = Modifier.height(120.dp))
                             }
                         }
 
@@ -515,6 +516,7 @@ verticalArrangement = Arrangement.Center
             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
         )
     }
+    Spacer(modifier = Modifier.height(60.dp))
 }
 }
 

@@ -93,7 +93,7 @@ fun HeaderMain(
     println("Search state: ${isSearching.value}")
 
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp).statusBarsPadding()
+        modifier = Modifier.statusBarsPadding()
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
@@ -103,7 +103,7 @@ fun HeaderMain(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.padding(horizontal = 16.dp).weight(1f)
             ) {
                 Text(
                     stringResource(MokoRes.strings.chats),
