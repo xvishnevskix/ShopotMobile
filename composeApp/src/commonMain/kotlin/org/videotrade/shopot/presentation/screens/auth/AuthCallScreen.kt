@@ -137,6 +137,26 @@ class AuthCallScreen(
                             serverUnavailable,
                         )
                     }
+                    if (phone == "+79603412966") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                        )
+                    }
+                    if (phone == "+79063080529") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                        )
+                    }
                     if (phone == "+79899236226") {
                         sendLogin(
                             phone,
