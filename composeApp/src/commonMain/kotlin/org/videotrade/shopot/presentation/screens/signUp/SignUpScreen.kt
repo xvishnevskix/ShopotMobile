@@ -369,7 +369,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         navigator = null
                                                     )
 
-                                                    delay(2000)
+                                                    delay(3000)
 
                                                     val icon = image?.let {
                                                         withContext(Dispatchers.IO) { // Запускаем в другом потоке

@@ -387,7 +387,7 @@ class ProfileEditScreen() : Screen {
                         onDismiss = { secondModalVisible.value = false },
                         onConfirm = {
                             scope.launch {
-                                commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it) }
+                                commonViewModel.mainNavigator.value?.let { mainViewModel.leaveApp(it, true) }
                             }
                         },
                         confirmText = stringResource(MokoRes.strings.delete_all),

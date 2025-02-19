@@ -18,7 +18,9 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
@@ -26,6 +28,7 @@ import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.model.SearchDto
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
@@ -54,7 +57,8 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     val profile = MutableStateFlow(ProfileDTO())
 
-
+    private val _globalSearchResults = MutableStateFlow<List<SearchDto>>(emptyList())
+    val globalSearchResults: StateFlow<List<SearchDto>> = _globalSearchResults
     
     
     val isLoadingChats = chatsUseCase.isLoadingChats
@@ -270,15 +274,20 @@ class MainViewModel : ViewModel(), KoinComponent {
 
     
     
-    fun leaveApp(navigator: Navigator) {
+    fun leaveApp(navigator: Navigator, isArchive: Boolean) {
         viewModelScope.launch {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
                 }
             )
-            
-            
-            origin().post("user/removeNotificationToken", jsonContent)
+
+            if (isArchive) {
+                origin().post("user/removeNotificationToken", jsonContent)
+              val response = origin().post("archive", jsonContent)
+                println("sdgehefsdf ${response}")
+            } else {
+                origin().post("user/removeNotificationToken", jsonContent)
+            }
             
             _chats.value = emptyList()
             _wsSession.value = null
@@ -297,6 +306,35 @@ class MainViewModel : ViewModel(), KoinComponent {
             
         }
     }
-    
+
+
+
+
+    fun searchUsers(query: String) {
+        viewModelScope.launch {
+            try {
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                    }
+                )
+
+                val response: String? = origin().post("user/search?login=${query}", jsonContent)
+
+
+                val searchResults: List<SearchDto> = response?.let {
+                    Json.decodeFromString(it)
+                } ?: emptyList()
+
+                _globalSearchResults.value = searchResults
+            } catch (e: Exception) {
+                e.printStackTrace()
+                _globalSearchResults.value = emptyList()
+            }
+        }
+    }
+
+    fun clearGlobalResults() {
+        _globalSearchResults.value = emptyList()
+    }
 
 }
