@@ -290,7 +290,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                                     .background(colors.onBackground)
                                             ) {
                                                 Text(
-                                                    text = "Глобальный поиск",
+                                                    text = stringResource(MokoRes.strings.global_search),
                                                     textAlign = TextAlign.Start,
                                                     fontSize = 16.sp,
                                                     lineHeight = 16.sp,
