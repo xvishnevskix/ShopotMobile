@@ -311,7 +311,7 @@ class origin {
         
         return if (fileDir != null) {
             FileProviderFactory.create().uploadFileNotInput(
-                if (isAuth) "file/upload/no-auth" else "file/upload",
+                "file/upload",
                 fileDir,
                 contentType,
                 filename

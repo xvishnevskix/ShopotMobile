@@ -270,6 +270,8 @@
     <string name="second_few">seconds</string>
     <string name="second_plural">seconds</string>
 
+    <string name="global_search">Global search</string>
+
 
 
 </resources>

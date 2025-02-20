@@ -77,15 +77,13 @@ fun ReconnectionBar() {
         Row(
             modifier = Modifier
                 .shadow(16.dp)
-                .padding(top = 1.dp)
-                .clip(RoundedCornerShape(8.dp))
+                .padding(top = 4.dp)
+//                .clip(RoundedCornerShape(8.dp))
                 .fillMaxWidth()
                 .height(40.dp)
                 .background(colors.background)
                 .padding(horizontal = 24.dp, vertical = 2.dp)
-                .clickable {
 
-                }
             ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween

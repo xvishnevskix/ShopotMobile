@@ -32,6 +32,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Common.CustomTextField
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
 
@@ -39,7 +40,8 @@ import shopot.composeapp.generated.resources.Res
 fun ContactsSearch(
     searchQuery: MutableState<String>,
     isSearching: MutableState<Boolean>,
-    padding: Dp = 16.dp
+    padding: Dp = 16.dp,
+    mainViewModel: MainViewModel? = null
     ) {
     val colors = MaterialTheme.colorScheme
     Column(
@@ -65,6 +67,10 @@ fun ContactsSearch(
                     .pointerInput(searchQuery.value) {
                         isSearching.value = false
                         searchQuery.value = ""
+                        if (mainViewModel != null) {
+                            mainViewModel.clearGlobalResults()
+                        }
+
                     },
                 contentAlignment = Alignment.Center
             ) {

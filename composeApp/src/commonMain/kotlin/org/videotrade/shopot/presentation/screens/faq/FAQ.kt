@@ -44,6 +44,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
@@ -126,7 +127,7 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-//            put("message", "$message  \nApp Version: ${BuildConfig.VERSION_NAME}")
+            put("message", "$message  \nApp Version: ${BuildConfig.VERSION_NAME}")
         }.toString()
 
         println("Отправка email с данными: $jsonContent")
@@ -237,8 +238,8 @@ class FAQ() : Screen {
                     ) {
 
                         Text(
-                            text = "${MokoRes.strings.app_version}: alpha~1.0.8",
-//                            text = "App Version: alpha~${BuildConfig.VERSION_NAME}",
+//                            text = "${MokoRes.strings.app_version}: alpha~1.0.8",
+                            text = "App Version: alpha~${BuildConfig.VERSION_NAME}",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
@@ -342,125 +343,128 @@ class FAQ() : Screen {
                     shape = RoundedCornerShape(20.dp),
                     modifier = Modifier.padding(16.dp)
                 ) {
-                    Column(
+                    LazyColumn(
                         modifier = Modifier
                             .background(colors.background)
                             .padding(5.dp)
                             .fillMaxWidth()
                     ) {
-                        if (!isMessageSent.value) {
-                            Row(
-                                modifier = Modifier.clickable { onDismiss() }.fillMaxWidth().padding(5.dp),
-                                horizontalArrangement = Arrangement.End,
-                            ) {
-                                Icon(
-
-                                    imageVector = Icons.Default.Close,
-                                    contentDescription = "Close",
-                                    tint = colors.primary,
-                                    modifier = Modifier
-                                        .size(15.dp)
-
-
-                                )
-                            }
-                            Column(
-                                modifier = Modifier
-                                    .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
-                            ) {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                EmailInput(email, isEmailValid)
-                                Spacer(modifier = Modifier.height(10.dp))
-                                DescriptionInput(description, isDescValid)
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                CustomButton(stringResource(MokoRes.strings.send),
-                                    {
-                                        isEmailValid = validateEmail(email.value)
-                                        isDescValid = validateDescription(description.value)
-                                        if (isEmailValid && isDescValid) {
-                                            onSubmit()
-                                        }
-                                    }
-                                    , style = ButtonStyle.Gradient
-                                )
-                            }
-                        } else if (loading.value) {
-                            Box(
-                                contentAlignment = Alignment.Center,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(top = 20.dp, bottom = 20.dp)
-                            ) {
-                                CircularProgressIndicator(color = colors.surface)
-                            }
-                        } else {
-
-                            if (isSuccessfulSend.value) {
-
-                                email.value = ""
-                                description.value = ""
-                                Column(
-                                    modifier = Modifier.width(324.dp)
-                                        .height(324.dp)
-                                        .background(color = colors.background, shape = RoundedCornerShape(size = 16.dp))
-                                    ,
-                                    verticalArrangement = Arrangement.Center,
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                        item {
+                            if (!isMessageSent.value) {
+                                Row(
+                                    modifier = Modifier.clickable { onDismiss() }.fillMaxWidth().padding(5.dp),
+                                    horizontalArrangement = Arrangement.End,
                                 ) {
-                                    Image(
+                                    Icon(
+
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Close",
+                                        tint = colors.primary,
                                         modifier = Modifier
-                                            .size(width = 128.dp, height = 86.dp),
-                                        painter = painterResource(Res.drawable.auth_logo),
-                                        contentDescription = null,
-                                        contentScale = ContentScale.Crop,
-                                        colorFilter =  ColorFilter.tint(colors.primary)
+                                            .size(15.dp)
+
+
                                     )
-                                    Spacer(modifier = Modifier.height(32.dp))
-                                    Text(
-                                        stringResource(
-                                            MokoRes.strings.request_accepted
-                                        ),
-                                        fontSize = 20.sp,
-                                        lineHeight = 20.sp,
-                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                                        fontWeight = FontWeight(500),
-                                        textAlign = TextAlign.Center,
-                                        color = colors.primary,
-                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    )
+                                }
+                                Column(
+                                    modifier = Modifier
+                                        .padding(start = 20.dp, end = 20.dp, bottom = 20.dp)
+                                ) {
                                     Spacer(modifier = Modifier.height(8.dp))
+                                    EmailInput(email, isEmailValid)
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    DescriptionInput(description, isDescValid)
+                                    Spacer(modifier = Modifier.height(20.dp))
+
+                                    CustomButton(stringResource(MokoRes.strings.send),
+                                        {
+                                            isEmailValid = validateEmail(email.value)
+                                            isDescValid = validateDescription(description.value)
+                                            if (isEmailValid && isDescValid) {
+                                                onSubmit()
+                                            }
+                                        }
+                                        , style = ButtonStyle.Gradient
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                }
+                            } else if (loading.value) {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(top = 20.dp, bottom = 20.dp)
+                                ) {
+                                    CircularProgressIndicator(color = colors.surface)
+                                }
+                            } else {
+
+                                if (isSuccessfulSend.value) {
+
+                                    email.value = ""
+                                    description.value = ""
+                                    Column(
+                                        modifier = Modifier.width(324.dp)
+                                            .height(324.dp)
+                                            .background(color = colors.background, shape = RoundedCornerShape(size = 16.dp))
+                                        ,
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Image(
+                                            modifier = Modifier
+                                                .size(width = 128.dp, height = 86.dp),
+                                            painter = painterResource(Res.drawable.auth_logo),
+                                            contentDescription = null,
+                                            contentScale = ContentScale.Crop,
+                                            colorFilter =  ColorFilter.tint(colors.primary)
+                                        )
+                                        Spacer(modifier = Modifier.height(32.dp))
+                                        Text(
+                                            stringResource(
+                                                MokoRes.strings.request_accepted
+                                            ),
+                                            fontSize = 20.sp,
+                                            lineHeight = 20.sp,
+                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                            fontWeight = FontWeight(500),
+                                            textAlign = TextAlign.Center,
+                                            color = colors.primary,
+                                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            stringResource(
+                                                MokoRes.strings.we_will_contact_you_shortly_and_try_to_solve_the_problem
+                                            ),
+                                            fontSize = 15.sp,
+                                            lineHeight = 15.sp,
+                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                            fontWeight = FontWeight(400),
+                                            textAlign = TextAlign.Center,
+                                            color = colors.secondary,
+                                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                            maxLines = 3,
+                                        )
+
+                                    }
+                                }
+                                else {
                                     Text(
-                                        stringResource(
-                                            MokoRes.strings.we_will_contact_you_shortly_and_try_to_solve_the_problem
+                                        text = stringResource(
+                                            MokoRes.strings.an_error_occurred_please_try_again
                                         ),
-                                        fontSize = 15.sp,
-                                        lineHeight = 15.sp,
+                                        fontSize = 16.sp,
+                                        lineHeight = 16.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
-                                        textAlign = TextAlign.Center,
-                                        color = colors.secondary,
+                                        color = colors.primary,
                                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                        maxLines = 3,
+                                        modifier = Modifier.padding(vertical = 15.dp, horizontal = 16.dp)
                                     )
-
                                 }
-                            }
-                            else {
-                                Text(
-                                    text = stringResource(
-                                        MokoRes.strings.an_error_occurred_please_try_again
-                                    ),
-                                    fontSize = 16.sp,
-                                    lineHeight = 16.sp,
-                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                    fontWeight = FontWeight(400),
-                                    color = colors.primary,
-                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    modifier = Modifier.padding(vertical = 15.dp, horizontal = 16.dp)
-                                )
-                            }
 
+                            }
                         }
                     }
                 }
