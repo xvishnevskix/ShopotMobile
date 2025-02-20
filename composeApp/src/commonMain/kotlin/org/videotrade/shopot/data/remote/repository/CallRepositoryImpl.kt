@@ -72,7 +72,6 @@ import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
-import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
@@ -205,10 +204,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-     suspend fun setRemoteDisc() {
+    suspend fun setRemoteDisc() {
         offer.value?.let { _peerConnection.value?.setRemoteDescription(it) }
         
     }
+    
     override suspend fun connectionWs(userId: String) {
         
         println("aaaaaaa11111")
@@ -397,23 +397,23 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         setIsCallActive(false)
                                         
-
+                                        
                                         
                                         if (isScreenOn()) {
                                             if (_isIncomingCall.value) {
                                                 println("rejectCallAnswer() ${_isIncomingCall.value}")
                                                 if (currentScreen is CallScreen) {
                                                     println("Мы на экране CallScreen 1")
-
+                                                    
                                                     // Вы на экране CallScreen
                                                     navigator?.push(MainScreen())
-
+                                                    
                                                 } else if (currentScreen is MainScreen) {
                                                     // Вы на экране MainScreen
                                                     println("Мы на экране MainScreen 1")
                                                 }
                                             }
-
+                                            
                                             if (isCall.value) {
                                                 rejectCallAnswer(
                                                     userId = userID,
@@ -423,22 +423,20 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 )
                                                 println("rejectCallAnswer() 1")
                                             }
-                                            
-                                            
-                                            
-                                            
+
+
 //                                            if (isConnectedWebrtc.value) {
-                                                println("rejectCallAnswer() ${currentScreen}")
-                                                if (currentScreen is CallScreen) {
-                                                    // Вы на экране CallScreen
-                                                    navigator?.push(MainScreen())
-                                                    
-                                                    println("Мы на экране CallScreen 2")
-                                                } else if (currentScreen is MainScreen) {
-                                                    // Вы на экране MainScreen
-                                                    println("Мы на экране MainScreen 2")
-                                                }
+                                            println("rejectCallAnswer() ${currentScreen}")
+                                            if (currentScreen is CallScreen) {
+                                                // Вы на экране CallScreen
+                                                navigator?.push(MainScreen())
                                                 
+                                                println("Мы на экране CallScreen 2")
+                                            } else if (currentScreen is MainScreen) {
+                                                // Вы на экране MainScreen
+                                                println("Мы на экране MainScreen 2")
+                                            }
+
 //                                            }
                                         } else {
                                             rejectCallAnswer()
@@ -574,7 +572,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             peerConnection.value!!.onConnectionStateChange
                 .onEach { state ->
                     Logger.d { "peerState111 onConnectionStateChange: $state" }
-                    
+
 //                    AudioFactory.createAudioPlayer().stopAllAudioStreams()
                     
                     _callState.value = state
@@ -586,7 +584,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             // Обработка треков, получаемых от удалённого пира
             peerConnection.value!!.onTrack
                 .onEach { event ->
-                    println( "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" )
+                    println("onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}")
                     if (event.track?.kind == MediaStreamTrackKind.Video) {
                         remoteVideoTrack.value = event.track as VideoStreamTrack
                     }
@@ -633,12 +631,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun makeCall(userId: String, calleeId: String) {
         println("makeCall31313131 ${wsSession.value}")
-
+        
         coroutineScope {
             if (wsSession.value != null) {
                 try {
                     println("makeCall")
-
+                    
                     val offer = peerConnection.value?.createOffer(
                         OfferAnswerOptions(
                             offerToReceiveAudio = true
@@ -647,33 +645,33 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     if (offer != null) {
                         peerConnection.value?.setLocalDescription(offer)
                     }
-
-
+                    
+                    
                     if (wsSession.value?.outgoing?.isClosedForSend == true) {
                         return@coroutineScope
                     }
-
+                    
                     val newCallMessage = WebRTCMessage(
                         type = "call",
                         calleeId = calleeId,
                         userId = userId,
                         rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
                     )
-
-
+                    
+                    
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-
+                    
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     println("Message sent successfully Call")
-
-
+                    
+                    
                 } catch (e: Exception) {
                     println("Failed to send message: ${e.message}")
                 }
             }
         }
-
+        
     }
 //
 //    override suspend fun makeCall(userId: String, calleeId: String) {
@@ -1051,6 +1049,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         duration: String? = null
     ) {
         try {
+            
             if (!_isIncomingCall.value) {
                 // Убедиться, что сообщение отправляется только один раз
                 if (isCallRejected) {
@@ -1128,29 +1127,35 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _peerConnection.value = PeerConnection(rtcConfiguration)
             
             
-            
-            if (isScreenOn()) {
+            if (getPlatform() == Platform.Ios) {
+                val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
                 
-                val navigator = commonViewModel.mainNavigator.value
-                val currentScreen = navigator?.lastItem
-                
-                if (currentScreen is CallScreen) {
-                    // Вы на экране CallScreen
-                    
-                    println("MainScreen $navigator")
-                    navigator.push(MainScreen())
-                    
-                    println("Мы на экране CallScreen")
-                } else if (currentScreen is MainScreen) {
-                    // Вы на экране MainScreen
-                    println("Мы на экране MainScreen")
-                }
-            } else {
-                CoroutineScope(Dispatchers.IO).launch {
-                    wsSession.value?.close()
-                }
-                closeApp()
+                swiftFuncsClass.stopAVAudioSession()
             }
+                
+                
+                if (isScreenOn()) {
+                    
+                    val navigator = commonViewModel.mainNavigator.value
+                    val currentScreen = navigator?.lastItem
+                    
+                    if (currentScreen is CallScreen) {
+                        // Вы на экране CallScreen
+                        
+                        println("MainScreen $navigator")
+                        navigator.push(MainScreen())
+                        
+                        println("Мы на экране CallScreen")
+                    } else if (currentScreen is MainScreen) {
+                        // Вы на экране MainScreen
+                        println("Мы на экране MainScreen")
+                    }
+                } else {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        wsSession.value?.close()
+                    }
+                    closeApp()
+                }
             
             
             Logger.d { "Call answer rejected and resources cleaned up successfully." }

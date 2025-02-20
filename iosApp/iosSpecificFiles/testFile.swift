@@ -1,5 +1,6 @@
 import Foundation
 import ComposeApp
+import AVFoundation // ✅ Добавляем импорт
 
 class IosSwiftFuncsHelper : SwiftFuncsHelper {
     private let pushKitHandler: PushKitHandler
@@ -17,6 +18,19 @@ class IosSwiftFuncsHelper : SwiftFuncsHelper {
 
         pushKitHandler.endAllCalls() // ✅ Вызываем метод у переданного объекта CallManager
     }
+    
+    
+    @objc func stopAVAudioSession() {
+        print("🔴 stopAVAudioSession")
+        
+        do {
+            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+        } catch {
+            print("Failed to deactivate AVAudioSession: \(error.localizedDescription)")
+        }
+
+    }
+    
 }
 
 

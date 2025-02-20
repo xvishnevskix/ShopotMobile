@@ -188,7 +188,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                             it
                                         )
                                     }
-
+                                    
 
                                     if (result !== null) {
                                         val answerPublicKeyJsonContent = Json.encodeToString(
@@ -204,6 +204,8 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                         println(
                                             "answerPublicKeyJsonContent111 $answerPublicKeyJsonContent"
                                         )
+                                        
+                                        
 
 
                                         addValueInStorage(
@@ -231,6 +233,9 @@ class CommonViewModel : ViewModel(), KoinComponent {
                                 }
 
                                 "encryptedSharedSecret" -> {
+                                    println(
+                                        "encryptedSharedSecret $jsonElement"
+                                    )
                                     val secret =
                                         jsonElement.jsonObject["secret"]?.jsonObject
 

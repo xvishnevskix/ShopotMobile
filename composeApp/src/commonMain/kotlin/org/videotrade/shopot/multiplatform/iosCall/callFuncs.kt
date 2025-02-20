@@ -64,7 +64,7 @@ object CallHandler : KoinComponent {
                 val profileId = getValueInStorage("profileId")
                 
                 val response: HttpResponse =
-                    client.get("${SERVER_URL}/calls/callMessage/$callId")
+                    client.get("${SERVER_URL}calls/callMessage/$callId")
                 
                 println("response.bodyAsText() ${response.bodyAsText()}")
                 

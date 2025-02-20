@@ -36,6 +36,7 @@ import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.decupsMessage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.domain.usecase.CallUseCase
@@ -52,6 +53,7 @@ import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.iosCall.GetCallInfoDto
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
@@ -293,7 +295,8 @@ class CallViewModel() : ViewModel(), KoinComponent {
 
             if (isRejectCall) {
                 val navigator = commonViewModel.mainNavigator.value
-                navigator?.popAll()
+//                navigator?.popAll()
+                navigator?.push(MainScreen())
             }
         }
         
@@ -439,17 +442,17 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                             buildJsonObject {
                                                 put("action", "sendCipherText")
                                                 put("cipherText", result.ciphertext.encodeBase64())
+                                                put(
+                                                    "deviceId", getValueInStorage("deviceId")
+                                                )
                                             }
                                         )
                                         
                                         println(
-                                            "successSharedSecret111 ${
-                                                EncapsulationFileResult(
-                                                    result.sharedSecret,
-                                                    result.sharedSecret
-                                                )
-                                            }"
+                                            "answerPublicKeyJsonContent111 $answerPublicKeyJsonContent"
                                         )
+                                        
+                                        
                                         
                                         
                                         addValueInStorage(
@@ -464,12 +467,55 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                 }
                                 
                                 "successSharedSecret" -> {
-                                    addValueInStorage("profileId", userId)
+                                    
+                                    val introViewModel: IntroViewModel =
+                                        KoinPlatform.getKoin().get()
+                                    
+                                    addValueInStorage("profileId", userId!!)
                                     
                                     commonViewModel.updateNotificationToken()
-                                    fetchContacts(navigator)
+                                    
+                                    introViewModel.fetchContacts(navigator)
                                     
                                 }
+                                
+                                "encryptedSharedSecret" -> {
+                                    println(
+                                        "encryptedSharedSecret $jsonElement"
+                                    )
+                                    val secret =
+                                        jsonElement.jsonObject["secret"]?.jsonObject
+                                    
+                                    println(
+                                        "encryptedSharedSecret $secret"
+                                    )
+                                    
+                                    val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                                    
+                                    if (secret != null) {
+                                        val sharedSecretDecups =
+                                            decupsMessage(secret.toString(), cipherWrapper)
+                                        
+                                        
+                                        if (sharedSecretDecups != null) {
+                                            addValueInStorage(
+                                                "sharedSecret",
+                                                sharedSecretDecups
+                                            )
+                                            
+                                            val introViewModel: IntroViewModel =
+                                                KoinPlatform.getKoin().get()
+                                            
+                                            addValueInStorage("profileId", userId!!)
+                                            
+                                           commonViewModel.updateNotificationToken()
+                                            
+                                            introViewModel.fetchContacts(navigator)
+                                        }
+                                    }
+                                    
+                                }
+                                
                             }
                         }
                     }
