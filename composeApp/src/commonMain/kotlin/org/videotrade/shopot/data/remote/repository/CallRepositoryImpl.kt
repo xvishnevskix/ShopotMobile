@@ -1080,7 +1080,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         try {
             // Проверяем, инициализирован ли peerConnection
-            val currentPeerConnection = _peerConnection.value
+            val currentPeerConnection = peerConnection.value
             println("rejectCallAnswer1")
             
             if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
@@ -1130,7 +1130,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             if (getPlatform() == Platform.Ios) {
                 val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
                 
-                swiftFuncsClass.stopAVAudioSession()
+//                swiftFuncsClass.stopAVAudioSession()
             }
                 
                 
