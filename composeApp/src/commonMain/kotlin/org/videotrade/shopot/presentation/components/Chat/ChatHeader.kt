@@ -191,6 +191,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 //                                chat.notificationToken
 //                            )
 //
+                                        callViewModel.resetWebRTC()
                                         callViewModel.initWebrtc()
                                         callViewModel.setChatId(chat.chatId)
                                         callViewModel.setCalleeId(chat.userId)

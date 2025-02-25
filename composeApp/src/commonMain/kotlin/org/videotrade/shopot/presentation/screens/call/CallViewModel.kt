@@ -73,11 +73,12 @@ class CallViewModel() : ViewModel(), KoinComponent {
 //    private val _isConnectedWebrtc = MutableStateFlow(false)
     val isConnectedWebrtc =  callUseCase.isConnectedWebrtc
     
-    private val _localStream = MutableStateFlow<MediaStream?>(null)
-    val localStream: StateFlow<MediaStream?> get() = _localStream
+    val localStream =  callUseCase.localStream
     
-    private val _remoteVideoTrack = MutableStateFlow<VideoStreamTrack?>(null)
-    val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = _remoteVideoTrack
+    val remoteVideoTrack = callUseCase.remoteVideoTrack
+    
+    val remoteAudioTrack = callUseCase.remoteAudioTrack
+    
     
     private val _callState = MutableStateFlow(PeerConnectionState.New)
     val callState: StateFlow<PeerConnectionState> get() = _callState
@@ -193,23 +194,23 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     private fun observeStreams() {
-        callUseCase.localStream
-            .onEach { localStreamNew ->
-                if (isObserving.value) {
-                    _localStream.value = localStreamNew
-                    println("_localStream $_localStream")
-                }
-            }
-            .launchIn(viewModelScope)
-        
-        callUseCase.remoteVideoTrack
-            .onEach { remoteVideoTrackNew ->
-                if (isObserving.value) {
-                    _remoteVideoTrack.value = remoteVideoTrackNew
-                    println("remoteVideoTrackNew $remoteVideoTrackNew")
-                }
-            }
-            .launchIn(viewModelScope)
+//        callUseCase.localStream
+//            .onEach { localStreamNew ->
+//                if (isObserving.value) {
+//                    _localStream.value = localStreamNew
+//                    println("_localStream ${_localStream.value}")
+//                }
+//            }
+//            .launchIn(viewModelScope)
+//
+//        callUseCase.remoteVideoTrack
+//            .onEach { remoteVideoTrackNew ->
+//                if (isObserving.value) {
+//                    _remoteVideoTrack.value = remoteVideoTrackNew
+//                    println("remoteVideoTrackNew $remoteVideoTrackNew")
+//                }
+//            }
+//            .launchIn(viewModelScope)
     }
     
     private fun observeIsConnectedWebrtc() {
@@ -275,6 +276,10 @@ class CallViewModel() : ViewModel(), KoinComponent {
     @OptIn(DelicateCoroutinesApi::class)
     suspend fun answerCall() {
         callUseCase.answerCall()
+    }
+    
+     fun resetWebRTC() {
+        callUseCase.resetWebRTC()
     }
     
     fun answerCallBackground() {

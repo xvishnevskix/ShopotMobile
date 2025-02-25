@@ -1,5 +1,6 @@
 package org.videotrade.shopot.multiplatform
 
+import WebRTC.RTCMTLVideoView
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -23,6 +24,8 @@ import platform.UIKit.UIImageJPEGRepresentation
 import kotlin.random.Random
 import androidx.compose.runtime.remember
 import androidx.compose.ui.interop.UIKitView
+import com.shepeliev.webrtckmp.AudioStreamTrack
+import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.engine.darwin.*
 import kotlinx.cinterop.CValue
 import org.koin.dsl.module
@@ -34,6 +37,7 @@ import platform.CoreGraphics.CGRect
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
 import platform.UIKit.UIView
+import platform.UIKit.UIViewContentMode
 
 
 @OptIn(ExperimentalForeignApi::class)
@@ -140,5 +144,20 @@ actual fun VideoPlayer(modifier: Modifier, filePath: String) {
             avPlayerViewController.player!!.play()
         },
         modifier = modifier
+    )
+}
+
+@OptIn(ExperimentalForeignApi::class)
+@Composable
+actual fun Video(videoTrack: VideoStreamTrack, modifier: Modifier, audioTrack: AudioStreamTrack?) {
+    UIKitView(
+        factory = {
+            RTCMTLVideoView().apply {
+                videoContentMode = UIViewContentMode.UIViewContentModeScaleAspectFit
+                videoTrack.addRenderer(this)
+            }
+        },
+        modifier = modifier,
+        onRelease = { videoTrack.removeRenderer(it) }
     )
 }

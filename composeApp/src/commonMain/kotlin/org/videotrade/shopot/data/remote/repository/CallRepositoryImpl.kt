@@ -2,6 +2,7 @@ package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
 import co.touchlab.kermit.Logger
+import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.IceServer
@@ -27,15 +28,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
-import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
@@ -47,7 +40,9 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -78,7 +73,6 @@ import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.closeApp
 import org.videotrade.shopot.multiplatform.configureAudioSession
-import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.presentation.screens.call.CallScreen
@@ -173,6 +167,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override val remoteVideoTrack = MutableStateFlow<VideoStreamTrack?>(null)
     
+    override val remoteAudioTrack = MutableStateFlow<AudioStreamTrack?>(null)
     
     private val _isConnectedWebrtc = MutableStateFlow(false)
     
@@ -247,6 +242,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 when (type) {
                                     "newCall" -> {
                                         try {
+                                            println("newCall")
+                                            resetWebRTC()
+                                            
+                                            
                                             val contactsUseCase: ContactsUseCase by inject()
                                             val callViewModel: CallViewModel by inject()
                                             val navigator = commonViewModel.mainNavigator.value
@@ -255,6 +254,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 .getPermission("microphone")
                                             
                                             if (cameraPer) {
+                                                println("rtcMessage $rtcMessage")
+                                                
                                                 rtcMessage?.let {
                                                     val userJson =
                                                         jsonElement.jsonObject["user"]?.jsonObject
@@ -380,6 +381,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         println("fafafasfa515151151 ${isScreenOn()}")
                                         
+                                        if(getPlatform() == Platform.Ios) {
+                                            val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
+                                            
+                                            swiftFuncsClass.stopAVAudioSession()
+                                            
+                                        }
                                         
                                         val callViewModel: CallViewModel =
                                             KoinPlatform.getKoin().get()
@@ -472,16 +479,21 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         isCall.value = true
         println("signalingStateClose")
-
-//            val peerConnection.value = PeerConnection(rtcConfiguration)
-
-
-//            _peerConnection.value = PeerConnection(rtcConfiguration)
+        
+        
+        _peerConnection.value = PeerConnection(rtcConfiguration)
         
         
         println("peerConnection.value ${peerConnection.value}")
         
-        val stream = MediaDevices.getUserMedia(audio = true)
+        if(getPlatform() == Platform.Ios) {
+            val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
+            
+//            swiftFuncsClass.setAVAudioSession()
+            
+        }
+        
+        val stream = MediaDevices.getUserMedia(audio = true, video = true)
         
         
         if (peerConnection.value !== null) {
@@ -583,10 +595,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             // Обработка треков, получаемых от удалённого пира
             peerConnection.value!!.onTrack
-                .onEach { event ->
-                    println("onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}")
-                    if (event.track?.kind == MediaStreamTrackKind.Video) {
-                        remoteVideoTrack.value = event.track as VideoStreamTrack
+                .onEach { println( "PC2 onTrack: ${it.track?.kind}" ) }
+                .map { it.track }
+                .filterNotNull()
+                .onEach {
+                    if (it.kind == MediaStreamTrackKind.Audio) {
+                        remoteAudioTrack.value = it as AudioStreamTrack
+                    } else if (it.kind == MediaStreamTrackKind.Video) {
+                        remoteVideoTrack.value = it as VideoStreamTrack
                     }
                 }
                 .launchIn(this)
@@ -633,14 +649,21 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         println("makeCall31313131 ${wsSession.value}")
         
         coroutineScope {
+//            resetWebRTC()
+            
             if (wsSession.value != null) {
                 try {
                     println("makeCall")
                     
+                    if(getPlatform() == Platform.Ios) {
+                        val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
+                        
+//                        swiftFuncsClass.setAVAudioSession()
+                        
+                    }
+
                     val offer = peerConnection.value?.createOffer(
-                        OfferAnswerOptions(
-                            offerToReceiveAudio = true
-                        )
+                        OfferAnswerOptions(offerToReceiveVideo = true, offerToReceiveAudio = true)
                     )
                     if (offer != null) {
                         peerConnection.value?.setLocalDescription(offer)
@@ -650,6 +673,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     if (wsSession.value?.outgoing?.isClosedForSend == true) {
                         return@coroutineScope
                     }
+                    
+                    println("offer $offer")
                     
                     val newCallMessage = WebRTCMessage(
                         type = "call",
@@ -663,7 +688,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
                     
                     wsSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully Call")
+                    println("Message sent successfully Call $jsonMessage")
                     
                     
                 } catch (e: Exception) {
@@ -673,90 +698,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         }
         
     }
-//
-//    override suspend fun makeCall(userId: String, calleeId: String) {
-//        println("callIOS ${wsSession.value}")
-//
-//        coroutineScope {
-//            if (wsSession.value != null) {
-//                try {
-//                    println("makeCall")
-//
-//                    val offer = peerConnection.value?.createOffer(
-//                        OfferAnswerOptions(
-//                            offerToReceiveAudio = true
-//                        )
-//                    )
-//                    if (offer != null) {
-//                        peerConnection.value?.setLocalDescription(offer)
-//                    }
-//
-//
-//                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
-//                        return@coroutineScope
-//                    }
-//
-//                    val newCallMessage = WebRTCMessage(
-//                        type = "callIOS",
-//                        calleeId = calleeId,
-//                        userId = userId,
-//                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
-//                    )
-//
-//                    val jsonMessage =
-//                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-//
-//                    wsSession.value?.send(Frame.Text(jsonMessage))
-//
-//                    println("Message sent successfully Call")
-//
-//
-//                } catch (e: Exception) {
-//                    println("Failed to send message: ${e.message}")
-//                }
-//            }
-//        }
-//
-//    }
-    
-    
-    suspend fun sendCall() {
-        try {
-            
-            val client = HttpClient(getHttpClientEngine())
-            
-            val jsonContent = Json.encodeToString(buildJsonObject {
-                put(
-                    "deviceToken",
-                    "808f2ae7ade15325d8b35347c18f461393ce6725e3f677f9fa3070aa4a1f758f51a2ff6e3c721e8e32ce4cb5559466a94934b82d2da475efe4bdb0a8c04d7cdd570bbfc430711e620dc5ac75677b09d9"
-                )
-                put("callerName", "Test Call")
-                put("callerId", "1234")
-            })
-            
-            
-            val response: HttpResponse =
-                client.post("http://192.168.1.118:3000/send-voip-notification") {
-                    contentType(ContentType.Application.Json)
-                    setBody(jsonContent)
-                }
-            
-            println("response.bodyAsText() ${response.bodyAsText()}")
-            
-            if (response.status.isSuccess()) {
-                
-                println("response.bodyAsText() ${response.bodyAsText()}")
-                
-            } else {
-                println("Failed to retrieve data: ${response.status.description} ${response.request}")
-            }
-        } catch (e: Exception) {
-            
-            println("Error1111: $e")
-            
-        }
-    }
-    
     
     override suspend fun makeCallBackground(notificToken: String, calleeId: String) {
         coroutineScope {
@@ -810,15 +751,17 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-    
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun answerCall() {
-        coroutineScope {
+        CoroutineScope(Dispatchers.IO).launch { // Запускаем в фоновом потоке
             if (wsSession.value != null) {
-                
                 try {
-//                    configureAudioSession() // Настраиваем аудиосессию
-                    
+                    if(getPlatform() == Platform.Ios) {
+                        val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
+                        
+                        swiftFuncsClass.setAVAudioSession()
+                        
+                    }
                     println("answerCall1")
                     setRemoteDisc()
                     println("answerCall12")
@@ -828,14 +771,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     println("answerCall123")
                     
                     val answer = peerConnection.value?.createAnswer(
-                        options = OfferAnswerOptions(
-                            offerToReceiveAudio = true
-                        )
+                        options = OfferAnswerOptions()
                     )
                     println("answerCall1234")
                     
                     if (answer != null) {
-                        
                         if (peerConnection.value?.remoteDescription == null) {
                             println("❌ RemoteDescription не установлен перед setLocalDescription")
                         } else {
@@ -846,8 +786,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     if (wsSession.value?.outgoing?.isClosedForSend == true) {
                         println("wsSession.value?.outgoing?.isClosedForSend aaaa!!!!!!!")
-                        
-                        return@coroutineScope
+                        return@launch
                     }
                     
                     val answerCallMessage = WebRTCMessage(
@@ -856,13 +795,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         rtcMessage = answer?.let { SessionDescriptionDTO(it.type, answer.sdp) }
                     )
                     
-                    println(
-                        "answerCallMessage $answerCallMessage"
-                    )
-                    val jsonMessage =
-                        Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
-                    
-                    
+                    println("answerCallMessage $answerCallMessage")
+                    val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
                     
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     
@@ -870,12 +804,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     println("Message sent successfully")
                 } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
+                    println("❌ Failed to send message: ${e.message}")
                 }
             }
         }
-        
     }
+
     
     override fun answerCallBackground() {
         
@@ -1050,6 +984,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     ) {
         try {
             
+            if (getPlatform() == Platform.Ios) {
+                val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                
+                swiftFuncsClass.stopAVAudioSession()
+            }
+            
+            
             if (!_isIncomingCall.value) {
                 // Убедиться, что сообщение отправляется только один раз
                 if (isCallRejected) {
@@ -1080,19 +1021,18 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         try {
             // Проверяем, инициализирован ли peerConnection
-            val currentPeerConnection = peerConnection.value
+            val currentPeerConnection = _peerConnection.value
             println("rejectCallAnswer1")
             
             if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
-                println("rejectCallAnswer2")
+                println("rejectCallAnswer2signalingState")
                 
-                localStream.value?.let { stream ->
-                    stream.tracks.forEach { track ->
-                        track.stop()
-                    }
-                }
-                
+//                localStream.value?.let { stream ->
+//                    stream.tracks.forEach { track ->
+//                        track.stop()
+//                    }
+//                }
                 println("rejectCallAnswer3")
                 
                 // Удаляем все треки
@@ -1100,8 +1040,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     currentPeerConnection.removeTrack(it.sender)
                 }
                 
+                localStream.value?.release()
+                
                 // Закрываем PeerConnection
                 currentPeerConnection.close()
+                
+                
             } else {
                 Logger.w { "PeerConnection already closed" }
             }
@@ -1124,38 +1068,32 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             println("rejectCallAnswer5")
             _chatId.value = ""
             _calleeId.value = ""
-            _peerConnection.value = PeerConnection(rtcConfiguration)
+            _peerConnection.value = null
             
+
             
-            if (getPlatform() == Platform.Ios) {
-                val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+            if (isScreenOn()) {
                 
-//                swiftFuncsClass.stopAVAudioSession()
-            }
+                val navigator = commonViewModel.mainNavigator.value
+                val currentScreen = navigator?.lastItem
                 
-                
-                if (isScreenOn()) {
+                if (currentScreen is CallScreen) {
+                    // Вы на экране CallScreen
                     
-                    val navigator = commonViewModel.mainNavigator.value
-                    val currentScreen = navigator?.lastItem
+                    println("MainScreen $navigator")
+                    navigator.push(MainScreen())
                     
-                    if (currentScreen is CallScreen) {
-                        // Вы на экране CallScreen
-                        
-                        println("MainScreen $navigator")
-                        navigator.push(MainScreen())
-                        
-                        println("Мы на экране CallScreen")
-                    } else if (currentScreen is MainScreen) {
-                        // Вы на экране MainScreen
-                        println("Мы на экране MainScreen")
-                    }
-                } else {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        wsSession.value?.close()
-                    }
-                    closeApp()
+                    println("Мы на экране CallScreen")
+                } else if (currentScreen is MainScreen) {
+                    // Вы на экране MainScreen
+                    println("Мы на экране MainScreen")
                 }
+            } else {
+                CoroutineScope(Dispatchers.IO).launch {
+                    wsSession.value?.close()
+                }
+                closeApp()
+            }
             
             
             Logger.d { "Call answer rejected and resources cleaned up successfully." }
@@ -1212,6 +1150,43 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _calleeId.value = calleeId
     }
     
+    override  fun resetWebRTC() {
+        println("🛑 Resetting WebRTC session...")
+//
+//        // 1. Остановка всех треков локального потока
+//        localStream.value?.tracks?.forEach { it.stop() }
+//        localStream.value = null
+//
+//        remoteVideoTrack.value = null
+//
+//        // 2. Закрываем текущий PeerConnection
+//        _peerConnection.value?.close()
+//        _peerConnection.value = null
+
+//        // 3. Закрываем WebSocket
+//        wsSession.value?.close()
+//        _wsSession.value = null
+        
+        // 4. Деактивируем AVAudioSession (iOS)
+//        if (getPlatform() == Platform.Ios) {
+//            val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+//            swiftFuncsClass.stopAVAudioSession() // Добавь этот метод в Swift
+//        }
+//
+        // 5. Сбрасываем состояние
+//        _isConnectedWebrtc.value = false
+//        _isConnectedWs.value = false
+//        _isCallActive.value = false
+//        _isIncomingCall.value = false
+//        _isCallBackground.value = false
+//        offer.value = null
+//        otherUserId.value = ""
+//        callerId.value = generateRandomNumber()
+//        _chatId.value = ""
+//        _calleeId.value = ""
+        
+        println("✅ WebRTC session reset complete.")
+    }
     
 }
 
@@ -1234,3 +1209,5 @@ suspend fun initializeAudioSessionAndStream(): MediaStream? {
         }
     }
 }
+
+

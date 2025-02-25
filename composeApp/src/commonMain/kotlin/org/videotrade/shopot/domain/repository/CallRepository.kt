@@ -1,5 +1,6 @@
 package org.videotrade.shopot.domain.repository
 
+import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
@@ -29,6 +30,8 @@ interface CallRepository {
     val localStream: StateFlow<MediaStream?>
     
     val remoteVideoTrack: StateFlow<VideoStreamTrack?>
+    
+    val remoteAudioTrack: StateFlow<AudioStreamTrack?>
     
     val callState: StateFlow<PeerConnectionState>
     
@@ -81,4 +84,8 @@ interface CallRepository {
     fun setCalleeId(calleeId: String)
     
     fun setOffer(sessionDescription: SessionDescription)
+    
+    fun resetWebRTC()
+    
+    
 }

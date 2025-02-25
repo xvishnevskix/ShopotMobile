@@ -6,6 +6,8 @@ interface SwiftFuncsHelper {
     fun endCall()
     fun stopAVAudioSession()
     
+    fun setAVAudioSession()
+    
 }
 
 class SwiftFuncsClass(private val helper: SwiftFuncsHelper) {
@@ -15,5 +17,11 @@ class SwiftFuncsClass(private val helper: SwiftFuncsHelper) {
     fun stopAVAudioSession() {
         helper.stopAVAudioSession()
     }
+    
+    fun setAVAudioSession() {
+        helper.setAVAudioSession()
+    }
+    
+    
     
 }
