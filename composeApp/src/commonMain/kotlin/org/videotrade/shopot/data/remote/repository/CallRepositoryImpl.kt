@@ -638,6 +638,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
+    
+     suspend fun setMedia() {
+        val stream = MediaDevices.getUserMedia(audio = true, video = true)
+
+         localStream.value = stream
+    }
+    
+    
     override fun updateOtherUserId(userId: String) {
         
         otherUserId.value = userId
@@ -1056,7 +1064,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _isCallActive.value = false
             _isIncomingCall.value = false
             _isCallBackground.value = false
-            localStream.value = null
+//            localStream.value = null
             remoteVideoTrack.value = null
             _isConnectedWebrtc.value = false
             offer.value = null
