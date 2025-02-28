@@ -671,7 +671,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     }
 
                     val offer = peerConnection.value?.createOffer(
-                        OfferAnswerOptions(offerToReceiveVideo = true, offerToReceiveAudio = true)
+                        OfferAnswerOptions(offerToReceiveAudio = true)
                     )
                     if (offer != null) {
                         peerConnection.value?.setLocalDescription(offer)
@@ -861,9 +861,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 println("111111")
                                 
                                 val answer = peerConnection.value?.createAnswer(
-                                    options = OfferAnswerOptions(
-                                        offerToReceiveAudio = true
-                                    )
+                                    options = OfferAnswerOptions()
                                 )
                                 println("22222")
                                 

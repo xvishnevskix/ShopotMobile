@@ -411,34 +411,34 @@ class CallScreen(
                         }
                     }
                     val localVideoTrack = localStream?.videoTracks?.firstOrNull()
-                    
-                    Column {
-                        localVideoTrack?.let {
-                            Video(
-                                videoTrack = it,
-                                modifier = Modifier.weight(0.3f).fillMaxWidth()
-                            )
-                        } ?: Box(
-                            modifier = Modifier.weight(0.3f).fillMaxWidth(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            androidx.compose.material.Text("Local video")
-                        }
-                        
-                        remoteVideoTrack?.let {
-                            Video(
-                                videoTrack = it,
-                                audioTrack = remoteAudioTrack,
-                                modifier = Modifier.weight(0.3f).fillMaxWidth(),
-                            )
-                        } ?: Box(
-                            modifier = Modifier.weight(0.3f).fillMaxWidth(),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            androidx.compose.material.Text("Remote video")
-                        }
-                        
-                    }
+//
+//                    Column {
+//                        localVideoTrack?.let {
+//                            Video(
+//                                videoTrack = it,
+//                                modifier = Modifier.weight(0.3f).fillMaxWidth()
+//                            )
+//                        } ?: Box(
+//                            modifier = Modifier.weight(0.3f).fillMaxWidth(),
+//                            contentAlignment = Alignment.Center,
+//                        ) {
+//                            androidx.compose.material.Text("Local video")
+//                        }
+//
+//                        remoteVideoTrack?.let {
+//                            Video(
+//                                videoTrack = it,
+//                                audioTrack = remoteAudioTrack,
+//                                modifier = Modifier.weight(0.3f).fillMaxWidth(),
+//                            )
+//                        } ?: Box(
+//                            modifier = Modifier.weight(0.3f).fillMaxWidth(),
+//                            contentAlignment = Alignment.Center,
+//                        ) {
+//                            androidx.compose.material.Text("Remote video")
+//                        }
+//
+//                    }
                     
                     Row {
                         
