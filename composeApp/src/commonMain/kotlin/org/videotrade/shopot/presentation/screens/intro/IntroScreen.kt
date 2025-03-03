@@ -86,10 +86,12 @@ class IntroScreen : Screen {
         if (isCallBackground) {
             return
         }
-        
+
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {
-                navigator.push(MainScreen())
+                if (navigator.lastItem !is MainScreen) {
+                    navigator.push(MainScreen())
+                }
             }
         }
 
@@ -97,58 +99,46 @@ class IntroScreen : Screen {
 
         LaunchedEffect(key1 = Unit) {
             try {
-
-
                 if (checkNetwork()) {
                     val isCheckVersion = false
-//                        updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
-
                     if (isCheckVersion) {
-                        navigator.push(UpdateScreen())
+                        if (navigator.lastItem !is UpdateScreen) {
+                            navigator.push(UpdateScreen())
+                        }
                     } else {
-
                         viewModel.navigator.value = navigator
 
-
-                        val contactsNative =
-                            PermissionsProviderFactory.create().checkPermission("contacts")
+                        val contactsNative = PermissionsProviderFactory.create().checkPermission("contacts")
                         PermissionsProviderFactory.create().getPermission("notifications")
 
-
-
-
                         if (!contactsNative) {
-                            navigator.replace(PermissionsScreen())
+                            if (navigator.lastItem !is PermissionsScreen) {
+                                navigator.replace(PermissionsScreen())
+                            }
                             return@LaunchedEffect
                         }
-
 
                         val response = origin().reloadTokens(navigator)
-
                         if (response != null) {
-
                             сommonViewModel.setMainNavigator(navigator)
-
                             сommonViewModel.cipherShared(response, navigator)
-
-
                             return@LaunchedEffect
-
-
                         }
-                        println("dasdadasadsad")
-                        navigator.replace(WelcomeScreen())
 
-
+                        if (navigator.lastItem !is WelcomeScreen) {
+                            navigator.replace(WelcomeScreen())
+                        }
                     }
                 } else {
+                    if (navigator.lastItem !is NetworkErrorScreen) {
+                        navigator.replace(NetworkErrorScreen())
+                    }
+                }
+            } catch (e: Exception) {
+                if (navigator.lastItem !is NetworkErrorScreen) {
                     navigator.replace(NetworkErrorScreen())
                 }
-
-            } catch (e: Exception) {
-                navigator.replace(NetworkErrorScreen())
             }
-
         }
 
 
