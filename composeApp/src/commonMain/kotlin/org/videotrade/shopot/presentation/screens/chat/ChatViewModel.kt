@@ -552,7 +552,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val cachedGroupUsers: Map<String, List<GroupUserDTO>> get() = _cachedGroupUsers
 
     suspend fun getGroupUsers(chatId: String): List<GroupUserDTO> {
-        // Если данные уже загружены – возвращаем их
+
         _cachedGroupUsers[chatId]?.let { return it }
 
         return try {

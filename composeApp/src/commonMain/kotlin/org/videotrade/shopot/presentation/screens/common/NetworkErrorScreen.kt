@@ -133,7 +133,7 @@ class NetworkErrorScreen : Screen {
                                     navigator.replace(IntroScreen())
                                 } else {
                                     commonViewModel.toaster.show(
-                                        "Не удалось подключиьтся к сети",
+                                        "Не удалось подключиться к сети",
                                         type = ToastType.Error,
                                         duration = ToasterDefaults.DurationDefault
                                     )

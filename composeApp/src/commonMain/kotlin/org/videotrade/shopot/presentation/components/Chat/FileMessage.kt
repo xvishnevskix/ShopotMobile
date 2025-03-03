@@ -217,10 +217,15 @@ fun FileMessage(
                 if (isStartCipherLoading) {
                     Box(
                         contentAlignment = Alignment.Center,
-                        modifier = Modifier
+                        modifier = Modifier.padding(4.dp)
                     ) {
                         CircularProgressIndicator(
-                            color = if (message.fromUser == profile.id) Color.White else Color(0xFF373533),
+                            color =
+
+                            if (message.fromUser != profile.id) Color(0xFF373533) else Color(
+                                0xFFCAB7A3
+                            )
+                            ,
                             strokeWidth = 2.dp,
                             modifier = Modifier
                         )
@@ -228,33 +233,46 @@ fun FileMessage(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close",
                             modifier = Modifier
-                                .padding()
+                                .padding(4.dp)
                                 .pointerInput(Unit) {
                                     isStartCipherLoading = false
                                     viewModel.deleteMessage(message)
                                 },
-                            tint = if (message.fromUser == profile.id) Color.White else Color(0xFF373533)
+                            tint =
+                            if (message.fromUser != profile.id) Color(0xFF373533) else Color(
+                                0xFFCAB7A3
+                            )
                         )
                     }
                 } else {
                     if (isLoading) {
-                        CircularProgressIndicator(
-                            progress = progress,  // Use animated progress
-                            color = if (message.fromUser == profile.id) Color.White else Color(0xFF373533),
-                            strokeWidth = 2.dp,
-                            modifier = Modifier
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            modifier = Modifier
-                                .padding()
-                                .pointerInput(Unit) {
-                                    isLoading = false
-                                    
-                                },
-                            tint = if (message.fromUser == profile.id) Color.White else Color(0xFF373533)
-                        )
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier.padding(4.dp)
+                        ) {
+                            CircularProgressIndicator(
+                                progress = progress,  // Use animated progress
+                                color =
+                                if (message.fromUser != profile.id) Color(0xFF373533) else Color(
+                                    0xFFCAB7A3
+                                ),
+                                strokeWidth = 2.dp,
+                                modifier = Modifier
+                            )
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Close",
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .pointerInput(Unit) {
+                                        isLoading = false
+
+                                    },
+                                if (message.fromUser != profile.id) Color(0xFF373533) else Color(
+                                    0xFFCAB7A3
+                                )
+                            )
+                        }
                     } else {
                         Box(
                             modifier = Modifier.background(
