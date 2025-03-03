@@ -165,7 +165,7 @@ kotlin {
 
 
 tasks.register("generateBuildConfig") {
-    val versionName = project.findProperty("VERSION_NAME") ?: "1.1.0"
+    val versionName = project.findProperty("VERSION_NAME") ?: "1.1.1"
 
     val outputDir = File(buildDir, "generated/kotlin")
     outputDir.mkdirs()
