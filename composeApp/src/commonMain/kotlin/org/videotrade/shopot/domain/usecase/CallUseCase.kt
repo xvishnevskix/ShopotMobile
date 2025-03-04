@@ -1,5 +1,6 @@
 package org.videotrade.shopot.domain.usecase
 
+import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
@@ -25,6 +26,7 @@ class CallUseCase : KoinComponent {
     val isCallActive: StateFlow<Boolean> get() = repository.isCallActive
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
+    val remoteAudioTrack: StateFlow<AudioStreamTrack?> get() = repository.remoteAudioTrack
     val callState: StateFlow<PeerConnectionState> get() = repository.callState
     val iseState: StateFlow<IceConnectionState> get() = repository.iseState
     
@@ -42,8 +44,9 @@ class CallUseCase : KoinComponent {
      fun setOffer(sessionDescription: SessionDescription) {
         return repository.setOffer(sessionDescription)
     }
-    
-
+    fun resetWebRTC() {
+        return repository.resetWebRTC()
+    }
     
     suspend fun getWsSession(): DefaultClientWebSocketSession? {
         return repository.getWsSession()

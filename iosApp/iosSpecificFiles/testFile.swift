@@ -24,12 +24,28 @@ class IosSwiftFuncsHelper : SwiftFuncsHelper {
         print("🔴 stopAVAudioSession")
         
         do {
-            try AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+            print("🛑 AVAudioSession деактивирован после завершения вызова")
         } catch {
-            print("Failed to deactivate AVAudioSession: \(error.localizedDescription)")
+            print("❌ Ошибка при деактивации AVAudioSession: \(error.localizedDescription)")
         }
 
     }
+    
+    @objc func setAVAudioSession() {
+        print("🔴 setAVAudioSession")
+//        do {
+//            let audioSession = AVAudioSession.sharedInstance()
+//            try audioSession.setCategory(.playAndRecord, mode: .videoChat, options: [.allowBluetooth, .allowBluetoothA2DP, .defaultToSpeaker])
+//            try audioSession.setActive(true)
+//            print("✅ AVAudioSession успешно активирован")
+//        } catch {
+//            print("❌ Ошибка при активации AVAudioSession: \(error.localizedDescription)")
+//        }
+
+    }
+    
     
 }
 
