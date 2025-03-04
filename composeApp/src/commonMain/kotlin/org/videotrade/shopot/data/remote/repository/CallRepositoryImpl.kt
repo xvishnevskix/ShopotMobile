@@ -38,6 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
@@ -60,6 +61,7 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.handleConnectWebSocket
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
@@ -67,6 +69,7 @@ import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
+import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
@@ -463,6 +466,29 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             } catch (e: Exception) {
                 _isConnectedWs.value = false
                 println("Ошибка соединения: $e")
+            }
+        }
+    }
+    
+    
+    
+    suspend fun reconnectCallWebSocket(
+        userId: String
+    ) {
+        
+        while (wsSession.value == null || wsSession.value?.isActive == false) {
+            try {
+                println("Attempting to reconnect WebSocket...")
+                connectionWs(
+                    userId = userId,
+                )
+                if (wsSession.value != null) {
+                    println("WebSocket reconnected successfully!")
+                    break
+                }
+            } catch (e: Exception) {
+                println("Reconnect failed: ${e.message}. Retrying in 3 seconds...")
+                delay(3000) // Задержка перед следующей попыткой
             }
         }
     }
@@ -1213,5 +1239,7 @@ suspend fun initializeAudioSessionAndStream(): MediaStream? {
         }
     }
 }
+
+
 
 

@@ -1,108 +1,130 @@
 package org.videotrade.shopot.presentation.screens.test
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import io.ktor.client.HttpClient
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.util.InternalAPI
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.serialization.encodeToString
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import org.koin.compose.koinInject
-import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
-import org.videotrade.shopot.multiplatform.SwiftFuncsClass
-import org.videotrade.shopot.multiplatform.getHttpClientEngine
-import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.screens.call.CallViewModel
+
+@Serializable
+data class VerificationResponse(
+    val clientNumber: String,
+    val confirmationNumber: String,
+    val qrCodeUri: String,
+    val callId: String
+)
+
+@Serializable
+data class CheckResponse(
+    val flag: Boolean,
+    val timeout: Int
+)
 
 class TestScreen : Screen {
+    @OptIn(InternalAPI::class)
     @Composable
     override fun Content() {
-        val scope = rememberCoroutineScope()
-        val callViewModel: CallViewModel = koinInject()
-        val isCallBackground by callViewModel.isCallBackground.collectAsState()
-        val navigator = LocalNavigator.currentOrThrow
+        val backendUrl = "" // Укажите URL вашего бэкенда
+        val client = HttpClient()
+        val coroutineScope = rememberCoroutineScope()
         
+        var phoneNumber by remember { mutableStateOf("") }
+        var clientNumber by remember { mutableStateOf("") }
+        var confirmationNumber by remember { mutableStateOf("") }
+        var qrCodeUri by remember { mutableStateOf("") }
+        var timer by remember { mutableStateOf(0) }
+        var view by remember { mutableStateOf("start") }
         
-        LaunchedEffect(Unit){
-            val cameraPer =
-                PermissionsProviderFactory.create()
-                    .getPermission("microphone")
+        fun checkConfirmation(callId: String) {
+            coroutineScope.launch {
+                while (true) {
+                    delay(1000)
+                    try {
+                        val response: HttpResponse = client.post("$backendUrl?action=check") {
+                            body = listOf("callId" to callId)
+                        }
+                        val data = Json.decodeFromString<CheckResponse>(response.body())
+                        if (data.timeout > 0) {
+                            timer = data.timeout
+                            if (data.flag) {
+                                view = "confirm"
+                                break
+                            }
+                        } else {
+                            view = "expire"
+                            break
+                        }
+                    } catch (e: Exception) {
+                        view = "error"
+                        break
+                    }
+                }
+            }
         }
         
-        MaterialTheme {
-            SafeArea {
-                Column {
+        Column(modifier = Modifier.padding(16.dp)) {
+            when (view) {
+                "start" -> {
+                    Text("Введите номер телефона", fontSize = 20.sp)
+                    OutlinedTextField(
+                        value = phoneNumber,
+                        onValueChange = { phoneNumber = it },
+                        label = { Text("Номер телефона") },
+                        singleLine = true
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = {
-
-                        scope.launch {
-                            val client = sendCall()
+                        coroutineScope.launch {
+                            try {
+                                val response: HttpResponse = client.post("$backendUrl?action=start") {
+                                    body = listOf("phoneNumber" to phoneNumber)
+                                }
+                                val data = Json.decodeFromString<VerificationResponse>(response.body())
+                                clientNumber = data.clientNumber
+                                confirmationNumber = data.confirmationNumber
+                                qrCodeUri = data.qrCodeUri
+                                view = "wait"
+                                checkConfirmation(data.callId)
+                            } catch (e: Exception) {
+                                view = "error"
+                            }
                         }
-                        
                     }) {
-                        Text(
-                            "Start Recording", color = Color.Black
-                        )
+                        Text("Далее")
                     }
-                    
+                }
+                "wait" -> {
+                    Text("Позвоните с номера $clientNumber на $confirmationNumber")
+      
+                    Text("Ожидаем ваш звонок: $timer сек.")
+                }
+                "confirm" -> {
+                    Text("Номер $clientNumber успешно верифицирован.", color = Color.Green)
+                }
+                "expire" -> {
+                    Text("Время ожидания истекло. Номер $clientNumber не верифицирован.", color = Color.Red)
+                }
+                "error" -> {
+                    Text("Ошибка при обработке запроса.", color = Color.Red)
                 }
             }
         }
     }
+    
+
 }
 
 
-suspend fun sendCall() {
-    try {
-        
-        val client = HttpClient(getHttpClientEngine())
-        
-        val jsonContent = Json.encodeToString(buildJsonObject {
-            put(
-                "deviceToken",
-                "808f2ae7ade15325d8b35347c18f461393ce6725e3f677f9fa3070aa4a1f758f51a2ff6e3c721e8e32ce4cb5559466a94934b82d2da475efe4bdb0a8c04d7cdd570bbfc430711e620dc5ac75677b09d9"
-            )
-            put("callerName", "Test Call")
-            put("callerId", "1234")
-        })
-        
-        
-        val response: HttpResponse = client.post("http://192.168.1.118:3000/send-voip-notification") {
-            contentType(ContentType.Application.Json)
-            setBody(jsonContent)
-        }
-        
-        println("response.bodyAsText() ${response.bodyAsText()}")
-        
-        if (response.status.isSuccess()) {
-            
-            println("response.bodyAsText() ${response.bodyAsText()}")
-            
-        } else {
-            println("Failed to retrieve data: ${response.status.description} ${response.request}")
-        }
-    } catch (e: Exception) {
-        
-        println("Error1111: $e")
-        
-    }
-}
