@@ -125,34 +125,13 @@ class CallScreen(
         
         var isPlaying by remember { mutableStateOf(false) }
 
-
-//        val imagePainter = if (userIcon.isNullOrBlank()) {
-//            painterResource(Res.drawable.person)
-//        } else {
-//            rememberImagePainter("${SERVER_URL}file/plain/${userIcon}")
-//        }
-        
         LaunchedEffect(Unit) {
             onResumeCallActivity(navigator)
         }
-
-//        LaunchedEffect(Unit) {
-//            if (isIncomingCall) {
-////                musicPlayer.play("callee", true, MusicType.Ringtone)
-//                isPlaying = true
-//            } else {
-////                musicPlayer.play("caller", true,  MusicType.Ringtone)
-//                isPlaying = true
-//            }
-//
-//        }
-
-//        LaunchedEffect(isCallActive) {
-//            if (isCallActive) {
-//                musicPlayer.stop()
-//                isPlaying = false
-//            }
-//        }
+        
+        LaunchedEffect(Unit) {
+        
+        }
         
         DisposableEffect(Unit) {
             onDispose {
@@ -198,7 +177,6 @@ class CallScreen(
                 if (profileId != null) {
                     commonViewModel.mainNavigator.value = navigator
                     viewModel.checkUserShared(profileId, navigator)
-                    
                 }
             }
             
@@ -207,14 +185,10 @@ class CallScreen(
                 println("isConnectedWs $isConnectedWs")
                 if (isConnectedWs) {
 //                    viewModel.setIsCallBackground(false)
-                    
-                    
                     if (getPlatform() == Platform.Ios) {
-                        
                         viewModel.answerCall()
                     } else {
                         viewModel.answerCallBackground()
-                        
                     }
                     
                 }

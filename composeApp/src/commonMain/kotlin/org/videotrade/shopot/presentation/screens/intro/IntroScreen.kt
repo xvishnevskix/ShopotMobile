@@ -46,7 +46,6 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.data.origin
-import org.videotrade.shopot.isActiveCallIos
 import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.NetworkHelper
 import org.videotrade.shopot.multiplatform.NetworkStatus
@@ -54,6 +53,7 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.checkNetwork
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.multiplatform.iosCall.isActiveCallIos
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.components.Common.LogoLoading
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel

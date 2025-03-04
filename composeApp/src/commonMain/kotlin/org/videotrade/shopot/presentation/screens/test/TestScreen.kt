@@ -28,7 +28,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.compose.koinInject
-import org.videotrade.shopot.isActiveCallIos
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
@@ -42,12 +41,6 @@ class TestScreen : Screen {
         val callViewModel: CallViewModel = koinInject()
         val isCallBackground by callViewModel.isCallBackground.collectAsState()
         val navigator = LocalNavigator.currentOrThrow
-        
-        
-        if (isCallBackground) {
-            isActiveCallIos(callViewModel, navigator)
-        }
-        
         
         
         LaunchedEffect(Unit){

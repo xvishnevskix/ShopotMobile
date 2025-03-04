@@ -243,8 +243,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     "newCall" -> {
                                         try {
                                             println("newCall")
-                                            resetWebRTC()
-                                            
                                             
                                             val contactsUseCase: ContactsUseCase by inject()
                                             val callViewModel: CallViewModel by inject()
@@ -493,7 +491,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
         }
         
-        val stream = MediaDevices.getUserMedia(audio = true, video = true)
+        val stream = MediaDevices.getUserMedia(audio = true)
         
         
         if (peerConnection.value !== null) {

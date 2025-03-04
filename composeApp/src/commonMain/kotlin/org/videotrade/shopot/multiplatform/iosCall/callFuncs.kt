@@ -1,5 +1,8 @@
 package org.videotrade.shopot.multiplatform.iosCall
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.SessionDescriptionType
 import io.ktor.client.HttpClient
@@ -20,6 +23,7 @@ import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
@@ -167,6 +171,32 @@ object CallHandler : KoinComponent {
     }
     
 }
+
+
+
+@Composable
+fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
+    val profileId = getValueInStorage("profileId")
+    
+    val user = ProfileDTO()
+    
+    LaunchedEffect(Unit) {
+        if (profileId != null) {
+            callViewModel.callScreenInfo.value =
+                CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
+            
+            
+//            callViewModel.initWebrtc()
+        }
+    }
+    
+    
+    navigator.push(
+        CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
+    )
+    
+}
+
 
 
 @Serializable
