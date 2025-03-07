@@ -207,5 +207,26 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
             }
         }
     }
+    
+    
+    func initializeCall(phone: String, callId: String) {
+        let uuid = UUID()
+        let handle = CXHandle(type: .generic, value: "+\(phone)")
+        
+        let startCallAction = CXStartCallAction(call: uuid, handle: handle)
+//        startCallAction.isVideo = true // Включи, если хочешь видеозвонок
+        
+        let transaction = CXTransaction(action: startCallAction)
+        
+        callController.request(transaction) { error in
+            if let error = error {
+                Logger.log("❌ Ошибка запуска вызова: \(error.localizedDescription)")
+            } else {
+                Logger.log("✅ Вызов успешно начался через CallKit")
+            }
+        }
+    }
+
+        
 
 }

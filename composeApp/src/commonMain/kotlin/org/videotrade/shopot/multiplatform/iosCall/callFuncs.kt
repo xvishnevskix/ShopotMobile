@@ -27,7 +27,6 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
-import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
@@ -131,17 +130,11 @@ object CallHandler : KoinComponent {
     fun rejectCallIos() {
         try {
             val callUseCase: CallUseCase = getKoin().get()
-
+            callViewModel.rejectCall(
+                callUseCase.getOtherUserId(),
+                "00:00:00"
+            )
             
-            if (callUseCase.isCallBackground.value) {
-                callViewModel.iosCallData.value?.userId?.let {
-                    callViewModel.rejectCall(
-                        it,
-                        "00:00:00"
-                    )
-                }
-            }
-
         } catch (e: Exception) {
         
         }
@@ -173,7 +166,6 @@ object CallHandler : KoinComponent {
 }
 
 
-
 @Composable
 fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
     val profileId = getValueInStorage("profileId")
@@ -184,8 +176,8 @@ fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
         if (profileId != null) {
             callViewModel.callScreenInfo.value =
                 CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
-            
-            
+
+
 //            callViewModel.initWebrtc()
         }
     }
@@ -196,7 +188,6 @@ fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
     )
     
 }
-
 
 
 @Serializable

@@ -39,6 +39,7 @@ import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.decupsMessage
 import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
@@ -588,5 +589,9 @@ class CallViewModel() : ViewModel(), KoinComponent {
 
     fun setCalleeId(calleeId: String) {
         callUseCase.setCalleeId(calleeId)
+    }
+    
+    fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
+        callUseCase.setCalleeUserInfo(calleeUserInfo)
     }
 }

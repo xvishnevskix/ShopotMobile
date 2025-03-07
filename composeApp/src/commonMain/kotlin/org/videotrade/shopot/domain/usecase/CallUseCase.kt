@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 
 class CallUseCase : KoinComponent {
@@ -134,7 +135,11 @@ class CallUseCase : KoinComponent {
     fun setCalleeId(calleeId: String) {
         return repository.setCalleeId(calleeId)
     }
-
+    
+    fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
+        return repository.setCalleeUserInfo(calleeUserInfo)
+    }
+    
 
     
 }

@@ -15,17 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
@@ -69,11 +66,11 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val timer = callViewModel.timer.collectAsState()
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
-
+    
     if (!chat.personal) {
         viewModel.loadGroupUsers(chat.chatId)
     }
-
+    
     Column {
         Row(
             modifier = Modifier
@@ -113,7 +110,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         if (chat.personal) {
                             navigator.push(ProfileChatScreen(chat))
                         } else {
-                            
+
 //                            viewModel.loadGroupUsers(chat.chatId)
                             navigator.push(GroupProfileScreen(profile, chat))
                             
@@ -178,45 +175,31 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                                 .getPermission("microphone")
                                         
                                         if (!cameraPer) return@launch
-//
-//                                callViewModel.makeCallBackground(
-//                                    chat.notificationToken!!,
-//                                    chat.userId
-//                                )
-
-
-//                            commonViewModel.sendNotify(
-//                                "Звонок",
-//                                "от ${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
-//                                chat.notificationToken
-//                            )
-//
-                                        callViewModel.resetWebRTC()
+                                        
                                         callViewModel.initWebrtc()
+                                        
                                         callViewModel.setChatId(chat.chatId)
+                                        
                                         callViewModel.setCalleeId(chat.userId)
+                                        
+                                        callViewModel.setOtherUserId(chat.userId)
+                                        
+                                        chat.phone?.let {
+                                            callViewModel.setCalleeUserInfo(
+                                                ProfileDTO(
+                                                    phone = it
+                                                )
+                                            )
+                                        }
+                                        
                                         callViewModel.callScreenInfo.value = CallScreen(
                                             chat.userId,
                                             chat.icon,
                                             chat.firstName!!,
                                             chat.lastName!!,
                                             chat.phone!!,
-
-                                        )
-//
-//                                    if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
-//                                        println("aasdasdadadda ${chat.userId}  ${chat.firstName} ${chat.lastName} ${chat.userId} ${chat.phone} ${chat.icon}")
-//                                        navigator.push(
-//                                            CallScreen(
-//                                                chat.userId,
-//                                                "Call",
-//                                                chat.icon,
-//                                                chat.firstName!!,
-//                                                chat.lastName!!,
-//                                                chat.phone!!,
-//                                            )
-//                                        )
-//                                    }
+                                            
+                                            )
                                         
                                         if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
                                             commonViewModel.mainNavigator.value?.push(
@@ -227,8 +210,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                                     chat.lastName!!,
                                                     chat.phone!!,
                                                     sendCall = true,
-
-                                                )
+                                                    
+                                                    )
                                             )
                                         }
 //
@@ -238,7 +221,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                         
                                     }
                                 }
-
                                 
                                 
                             },
@@ -255,7 +237,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
 @Composable
 private fun ParticipantCountText(count: Int) {
     val colors = MaterialTheme.colorScheme
-
+    
     Text(
         text = getParticipantCountText(count),
         fontSize = 16.sp,

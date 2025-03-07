@@ -158,7 +158,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
     
     private val _calleeId = MutableStateFlow("")
+    
     private val calleeId: StateFlow<String> get() = _calleeId
+    
+    
+    private val calleeUser = MutableStateFlow(ProfileDTO())
+    
     
     private val _chatId = MutableStateFlow("")
     val chatId: StateFlow<String> get() = _chatId
@@ -349,6 +354,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 sdp
                                             )
                                             _peerConnection.value?.setRemoteDescription(answer)
+                                            
+                                            if (getPlatform() == Platform.Ios) {
+                                                val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                                                
+                                                swiftFuncsClass.initCallKit(phone = calleeUser.value.phone, callId = "1")
+                                            }
                                         }
                                     }
                                     
@@ -1180,6 +1191,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _calleeId.value = calleeId
     }
     
+    override fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
+        calleeUser.value = calleeUserInfo
+    }
     override  fun resetWebRTC() {
         println("🛑 Resetting WebRTC session...")
 //
