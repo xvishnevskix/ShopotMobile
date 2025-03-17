@@ -16,6 +16,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.presentation.screens.auth.CallPasswordScreen
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -57,6 +58,7 @@ internal fun App() {
                     
                     Navigator(
                     IntroScreen()
+//                            CallPasswordScreen("79899236226", "SignIn")
 //                        TestScreen()
                     ) { navigator ->
                         SlideTransition(navigator)

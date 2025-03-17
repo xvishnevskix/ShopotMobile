@@ -13,11 +13,20 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.contentType
 import io.ktor.util.InternalAPI
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.multiplatform.getPlatform
 
 @Serializable
 data class VerificationResponse(
@@ -37,8 +46,10 @@ class TestScreen : Screen {
     @OptIn(InternalAPI::class)
     @Composable
     override fun Content() {
-        val backendUrl = "" // Укажите URL вашего бэкенда
-        val client = HttpClient()
+        val backendUrl = "https://videotradedev.ru/api/2fa" // Укажите URL вашего бэкенда
+        val client =
+            HttpClient(getHttpClientEngine()) // Инициализация HTTP клиента, возможно вам стоит инициализировать его вне этой функции, чтобы использовать пул соединений
+        
         val coroutineScope = rememberCoroutineScope()
         
         var phoneNumber by remember { mutableStateOf("") }
@@ -53,7 +64,7 @@ class TestScreen : Screen {
                 while (true) {
                     delay(1000)
                     try {
-                        val response: HttpResponse = client.post("$backendUrl?action=check") {
+                        val response: HttpResponse = client.post("$backendUrl") {
                             body = listOf("callId" to callId)
                         }
                         val data = Json.decodeFromString<CheckResponse>(response.body())
@@ -89,10 +100,25 @@ class TestScreen : Screen {
                     Button(onClick = {
                         coroutineScope.launch {
                             try {
-                                val response: HttpResponse = client.post("$backendUrl?action=start") {
-                                    body = listOf("phoneNumber" to phoneNumber)
-                                }
+                                println("data31")
+                                
+                                val jsonContent = Json.encodeToString(
+                                    buildJsonObject {
+                                        put("phone", phoneNumber)
+                                    }
+                                )
+                                
+                                val response: HttpResponse =
+                                    client.post("$backendUrl/start") {
+                                        contentType(ContentType.Application.Json)
+                                        setBody(jsonContent)
+                                    }
+                                
+                                println("data31321131 ${response.bodyAsText()}")
+                                
                                 val data = Json.decodeFromString<VerificationResponse>(response.body())
+                                
+                                println("data31321 $data")
                                 clientNumber = data.clientNumber
                                 confirmationNumber = data.confirmationNumber
                                 qrCodeUri = data.qrCodeUri

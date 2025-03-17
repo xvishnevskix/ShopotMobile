@@ -215,6 +215,8 @@ class IntroViewModel : ViewModel(), KoinComponent {
     fun startObserving() {
         isObserving.value = true
     }
+    
+
 
 }
 

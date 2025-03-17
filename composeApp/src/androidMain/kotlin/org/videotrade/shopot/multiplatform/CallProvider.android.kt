@@ -608,3 +608,6 @@ class RTCAudioManager(context: Context) {
         Log.d(TAG, "defaultAudioDevice: $defaultAudioDevice")
     }
 }
+
+actual fun settingCAudioSession() {
+}

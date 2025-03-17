@@ -1,13 +1,21 @@
 package org.videotrade.shopot.multiplatform
 
 
+import WebRTC.RTCAudioSession
+import WebRTC.RTCAudioSessionConfiguration
+import WebRTC.setConfiguration
 import cafe.adriel.voyager.navigator.Navigator
 import kotlinx.cinterop.ExperimentalForeignApi
+import kotlinx.cinterop.ObjCObjectVar
+import kotlinx.cinterop.memScoped
 import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetooth
+import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetoothA2DP
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionPortOverrideNone
 import platform.AVFAudio.AVAudioSessionPortOverrideSpeaker
 import platform.AVFAudio.setActive
+import platform.Foundation.NSError
 import platform.Foundation.NSLog
 
 actual class CallProvider {
@@ -52,5 +60,9 @@ actual fun clearNotificationsForChannel(channelId: String) {
 }
 
 actual fun closeAppAndCloseCall() {
+
+}
+
+actual fun settingCAudioSession() {
 
 }
