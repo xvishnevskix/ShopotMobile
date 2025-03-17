@@ -36,6 +36,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -47,6 +49,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -61,7 +64,6 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.api.getValueInStorage
-import org.videotrade.shopot.api.handleConnectWebSocket
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
@@ -69,7 +71,6 @@ import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
-import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
@@ -140,6 +141,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     private val isCall = mutableStateOf(false)
     
+    private val isCallMaker = mutableStateOf(false)
+    
     private var isCallRejected = false
     
     private val _isCallActive = MutableStateFlow(false)
@@ -195,6 +198,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override val iseState: StateFlow<IceConnectionState> get() = _iceState
     
     private val isMuted = MutableStateFlow(false)
+    
+    val iceCandidates = MutableStateFlow<MutableList<IceCandidate>?>(null)
     
     
     override suspend fun reconnectPeerConnection() {
@@ -343,11 +348,61 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     
                                     "callAnswered" -> {
                                         rtcMessage?.let {
+                                            val iceCandidatesList =
+                                                iceCandidates.value ?: emptyList()
+                                            
+                                            // Запускаем асинхронные операции отправки ICE-кандидатов
+//                                            val sendJobs = iceCandidatesList.map { candidate ->
+//                                                coroutineScope {
+//                                                    async {
+//                                                        val iceCandidateMessage = WebRTCMessage(
+//                                                            type = "ICEcandidate",
+//                                                            calleeId = otherUserId.value,
+//                                                            iceMessage = rtcMessageDTO(
+//                                                                label = candidate.sdpMLineIndex,
+//                                                                id = candidate.sdpMid,
+//                                                                candidate = candidate.candidate,
+//                                                            ),
+//                                                        )
+//
+//                                                        val jsonMessage = Json.encodeToString(
+//                                                            WebRTCMessage.serializer(),
+//                                                            iceCandidateMessage
+//                                                        )
+//
+//                                                        try {
+//                                                            Logger.d { "PC2213131: $jsonMessage" }
+//                                                            Logger.d { "wsSession: ${wsSession.value}" }
+//
+//                                                            if (wsSession.value?.isActive == true) {
+//                                                                wsSession.value?.send(
+//                                                                    Frame.Text(
+//                                                                        jsonMessage
+//                                                                    )
+//                                                                )
+//                                                                println("Message sent successfully")
+//                                                            } else {
+//                                                                println("WebSocket session is not active")
+//                                                            }
+//                                                        } catch (e: Exception) {
+//                                                            e.printStackTrace()
+//                                                            println("Failed to send message: onIceCandidate ${e.message}")
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//
+//                                            // Дожидаемся завершения всех отправок
+//                                            runBlocking {
+//                                                sendJobs.awaitAll()
+//                                            }
+                                            
+                                            println("All ICE candidates sent. Proceeding with SDP setting.")
                                             
                                             println("return@launch callAnswered ${it["sdp"]?.jsonPrimitive?.content}")
                                             
                                             val sdp =
-                                                it["sdp"]?.jsonPrimitive?.content ?: return@launch
+                                                it["sdp"]?.jsonPrimitive?.content ?: return@let
                                             
                                             val answer = SessionDescription(
                                                 SessionDescriptionType.Answer,
@@ -356,9 +411,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             _peerConnection.value?.setRemoteDescription(answer)
                                             
                                             if (getPlatform() == Platform.Ios) {
-                                                val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                                                val swiftFuncsClass: SwiftFuncsClass =
+                                                    getKoin().get()
                                                 
-                                                swiftFuncsClass.initCallKit(phone = calleeUser.value.phone, callId = "1")
+                                                swiftFuncsClass.initCallKit(
+                                                    phone = calleeUser.value.phone,
+                                                    callId = "1"
+                                                )
                                             }
                                         }
                                     }
@@ -393,8 +452,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         println("fafafasfa515151151 ${isScreenOn()}")
                                         
-                                        if(getPlatform() == Platform.Ios) {
-                                            val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
+                                        if (getPlatform() == Platform.Ios) {
+                                            val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
                                             
                                             swiftFuncsClass.stopAVAudioSession()
                                             
@@ -482,7 +541,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    
     suspend fun reconnectCallWebSocket(
         userId: String
     ) {
@@ -521,9 +579,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         println("peerConnection.value ${peerConnection.value}")
         
-        if(getPlatform() == Platform.Ios) {
-            val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
-            
+        if (getPlatform() == Platform.Ios) {
+            val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+
 //            swiftFuncsClass.setAVAudioSession()
             
         }
@@ -561,6 +619,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .onEach { candidate ->
                     println("candidate ${candidate}")
                     
+                    iceCandidates.value?.add(candidate)
+                    
                     val iceCandidateMessage = WebRTCMessage(
                         type = "ICEcandidate",
                         calleeId = otherUserId.value,
@@ -574,21 +634,26 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
                     
-                    try {
-                        Logger.d { "PC2213131: $jsonMessage" }
-                        Logger.d { "wsSession: ${wsSession.value}" }
-                        
-                        // Проверяем, активна ли корутина и открыт ли WebSocket
-                        if (wsSession.value?.isActive == true) {
-                            wsSession.value?.send(Frame.Text(jsonMessage))
-                            println("Message sent successfully")
-                        } else {
-                            println("WebSocket session is not active")
+//                    if (!isCallMaker.value) {
+                        try {
+                            Logger.d { "PC2213131: $jsonMessage" }
+                            Logger.d { "wsSession: ${wsSession.value}" }
+                            
+                            // Проверяем, активна ли корутина и открыт ли WebSocket
+                            if (wsSession.value?.isActive == true) {
+
+//                            delay(5000)
+                                wsSession.value?.send(Frame.Text(jsonMessage))
+                                println("Message sent successfully")
+                            } else {
+                                println("WebSocket session is not active")
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            println("Failed to send message: onIceCandidate ${e.message}")
                         }
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        println("Failed to send message: onIceCandidate ${e.message}")
-                    }
+//                    }
+                    
                     
                     peerConnection.value?.addIceCandidate(candidate)
                 }
@@ -630,7 +695,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             // Обработка треков, получаемых от удалённого пира
             peerConnection.value!!.onTrack
-                .onEach { println( "PC2 onTrack: ${it.track?.kind}" ) }
+                .onEach { println("PC2 onTrack: ${it.track?.kind}") }
                 .map { it.track }
                 .filterNotNull()
                 .onEach {
@@ -673,11 +738,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    
-     suspend fun setMedia() {
+    suspend fun setMedia() {
         val stream = MediaDevices.getUserMedia(audio = true, video = true)
-
-         localStream.value = stream
+        
+        localStream.value = stream
     }
     
     
@@ -691,6 +755,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override suspend fun makeCall(userId: String, calleeId: String) {
         println("makeCall31313131 ${wsSession.value}")
         
+        isCallMaker.value = true
+        
         coroutineScope {
 //            resetWebRTC()
             
@@ -698,13 +764,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 try {
                     println("makeCall")
                     
-                    if(getPlatform() == Platform.Ios) {
-                        val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
-                        
+                    if (getPlatform() == Platform.Ios) {
+                        val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+
 //                        swiftFuncsClass.setAVAudioSession()
                         
                     }
-
+                    
                     val offer = peerConnection.value?.createOffer(
                         OfferAnswerOptions(offerToReceiveAudio = true)
                     )
@@ -799,8 +865,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         CoroutineScope(Dispatchers.IO).launch { // Запускаем в фоновом потоке
             if (wsSession.value != null) {
                 try {
-                    if(getPlatform() == Platform.Ios) {
-                        val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
+                    if (getPlatform() == Platform.Ios) {
+                        val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
                         
                         swiftFuncsClass.setAVAudioSession()
                         
@@ -839,7 +905,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     )
                     
                     println("answerCallMessage $answerCallMessage")
-                    val jsonMessage = Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
+                    val jsonMessage =
+                        Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
                     
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     
@@ -852,7 +919,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             }
         }
     }
-
+    
     
     override fun answerCallBackground() {
         
@@ -1068,7 +1135,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
                 println("rejectCallAnswer2signalingState")
-                
+
 //                localStream.value?.let { stream ->
 //                    stream.tracks.forEach { track ->
 //                        track.stop()
@@ -1111,7 +1178,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _calleeId.value = ""
             _peerConnection.value = null
             
-
+            
             
             if (isScreenOn()) {
                 
@@ -1194,7 +1261,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
         calleeUser.value = calleeUserInfo
     }
-    override  fun resetWebRTC() {
+    
+    override fun resetWebRTC() {
         println("🛑 Resetting WebRTC session...")
 //
 //        // 1. Остановка всех треков локального потока

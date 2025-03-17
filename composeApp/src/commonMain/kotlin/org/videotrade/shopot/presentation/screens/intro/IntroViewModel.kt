@@ -115,7 +115,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
     }
 
 
-    fun fetchContacts(navigator: Navigator?) {
+    fun  fetchContacts(navigator: Navigator?) {
 
 
 

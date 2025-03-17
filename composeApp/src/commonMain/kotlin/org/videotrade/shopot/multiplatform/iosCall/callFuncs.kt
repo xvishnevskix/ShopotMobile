@@ -112,6 +112,7 @@ object CallHandler : KoinComponent {
             
             callViewModel.connectionCallWs(profileId)
             
+            
             callUseCase.setOffer(
                 SessionDescription(
                     sdp = callInfo.rtcMessage.sdp,
@@ -158,6 +159,8 @@ object CallHandler : KoinComponent {
     
     fun setAppIsActive(appIsActive: Boolean) {
         val commonViewModel: CommonViewModel by inject()
+        
+        callViewModel.initWebrtc()
         
         commonViewModel.setAppIsActive(appIsActive)
         

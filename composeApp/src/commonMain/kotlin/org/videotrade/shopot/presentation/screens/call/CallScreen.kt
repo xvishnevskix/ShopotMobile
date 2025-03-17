@@ -53,6 +53,7 @@ import org.videotrade.shopot.multiplatform.iosCall.CallHandler.getKoin
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.multiplatform.settingCAudioSession
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -130,7 +131,7 @@ class CallScreen(
         }
         
         LaunchedEffect(Unit) {
-        
+            settingCAudioSession()
         }
         
         DisposableEffect(Unit) {
@@ -155,26 +156,6 @@ class CallScreen(
                 
             }
         }
-        
-        
-        LaunchedEffect(Unit) {
-            memScoped {
-                val error = alloc<ObjCObjectVar<NSError?>>()
-                with(RTCAudioSession.sharedInstance()) {
-                    val config = RTCAudioSessionConfiguration.webRTCConfiguration()
-                    config.category = AVAudioSessionCategoryPlayAndRecord.toString()
-                    config.categoryOptions = AVAudioSessionCategoryOptionAllowBluetooth or AVAudioSessionCategoryOptionAllowBluetoothA2DP
-                    lockForConfiguration()
-                    setConfiguration(config, error.ptr)
-                    error.value?.let {
-                        Logger.e { "Error setting WebRTC audio session configuration: ${it.localizedDescription}" }
-                    }
-                    unlockForConfiguration()
-                }
-            }
-        }
-        
-        println("isIncomingCallCase $isIncomingCall")
         
         if (isIncomingCall) {
             println("isIncomingCallCase")
