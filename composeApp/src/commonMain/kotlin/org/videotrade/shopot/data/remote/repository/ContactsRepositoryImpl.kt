@@ -216,7 +216,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             wsUseCase.wsSession.value?.send(Frame.Text(jsonString))
         } catch (e: Exception) {
-            println("error createChat: ${e.message}")
+            println("error createGroupChat: ${e.message}")
         }
     }
     
