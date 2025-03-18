@@ -10,6 +10,7 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onUpload
+import io.ktor.client.request.forms.ChannelProvider
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.header
@@ -681,7 +682,9 @@ actual class FileProvider {
                 body = MultiPartFormDataContent(
                     formData {
                         append("file",
-                            fileData.toByteArray(),
+                            value = ChannelProvider(file.length()) {
+                                file.readChannel()
+                            },
                             Headers.build {
                                 append(HttpHeaders.ContentType, fileType)
                                 append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")

@@ -524,8 +524,11 @@ actual class FileProvider(private val applicationContext: Context) {
                 "cipher"
             )
         
-        if (cipherFilePath == null) return null
-        
+        if (cipherFilePath == null) {
+            onProgress(1F)
+            return null
+        }
+
         
         val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
             fileDirectory,
