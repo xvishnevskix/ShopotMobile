@@ -288,9 +288,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             
             
             if (content !== null && isCipher) {
-                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                
-                val resEncups = encupsMessage(content, cipherWrapper)
+                val resEncups = encupsMessage(content)
                 
                 contentSort = Json.encodeToString(resEncups)
             } else {

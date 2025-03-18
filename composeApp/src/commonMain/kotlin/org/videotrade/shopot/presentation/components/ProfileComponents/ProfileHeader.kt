@@ -36,6 +36,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
@@ -81,7 +82,7 @@ fun ProfileHeader(text: String, commonViewModel: CommonViewModel = koinInject(),
             ) {
                 Box(
                     modifier = Modifier.padding(start = 16.dp, end = 6.dp).clickable {
-                        navigator.push(
+                        navigateToScreen(navigator,
                             ProfileEditScreen()
                         )
                     }

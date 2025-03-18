@@ -23,6 +23,7 @@ import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.CallVerificationResponse
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -116,7 +117,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
             
             println("jsonElement41414 $responseData")
             
-            navigator.push(
+            navigateToScreen(navigator,
                 CallPasswordScreen(
                     phone,
                     authCase,

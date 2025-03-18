@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
@@ -108,11 +109,11 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     modifier = Modifier.padding(end = 5.dp).pointerInput(Unit) {
                         
                         if (chat.personal) {
-                            navigator.push(ProfileChatScreen(chat))
+                            navigateToScreen(navigator,ProfileChatScreen(chat))
                         } else {
 
 //                            viewModel.loadGroupUsers(chat.chatId)
-                            navigator.push(GroupProfileScreen(profile, chat))
+                            navigateToScreen(navigator,GroupProfileScreen(profile, chat))
                             
                         }
                     }
@@ -215,7 +216,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                             )
                                         }
 //
-                                    
+                                        
                                     } catch (e: Exception) {
                                         println("ERROR : $e")
                                         

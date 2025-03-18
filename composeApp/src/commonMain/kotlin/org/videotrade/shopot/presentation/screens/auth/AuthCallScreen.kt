@@ -67,6 +67,7 @@ import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getFbToken
@@ -652,7 +653,7 @@ suspend fun sendLogin(
 
 
         viewModel.updateNotificationToken()
-//        navigator.push(MainScreen())
+//        navigateToScreen(navigator,MainScreen())
 
         viewModel.startObserving()
 
@@ -664,7 +665,7 @@ suspend fun sendLogin(
 
 
 fun sendSignUp(phone: String, navigator: Navigator) {
-    navigator.push(SignUpScreen(phone))
+    navigateToScreen(navigator,SignUpScreen(phone))
 
 }
 

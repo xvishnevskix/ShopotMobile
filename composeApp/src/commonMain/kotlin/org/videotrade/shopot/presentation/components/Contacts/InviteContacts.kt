@@ -37,6 +37,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.screens.contacts.CreateGroupFirstScreen
 import org.videotrade.shopot.presentation.screens.contacts.InviteContactsScreen
@@ -66,7 +67,7 @@ fun InviteContacts(contacts: List<ContactDTO>) {
                 )
                 .clickable {
                     if (contacts.isNotEmpty())
-                        navigator.push(InviteContactsScreen())
+                        navigateToScreen(navigator,InviteContactsScreen())
                 },
 
             ) {

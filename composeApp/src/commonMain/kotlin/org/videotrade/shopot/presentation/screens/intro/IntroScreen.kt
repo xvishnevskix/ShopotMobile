@@ -45,6 +45,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.NetworkHelper
@@ -89,7 +90,7 @@ class IntroScreen : Screen {
         
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {
-                navigator.push(MainScreen())
+                navigateToScreen(navigator,MainScreen())
             }
         }
 
@@ -104,7 +105,7 @@ class IntroScreen : Screen {
 //                        updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
 
                     if (isCheckVersion) {
-                        navigator.push(UpdateScreen())
+                        navigateToScreen(navigator,UpdateScreen())
                     } else {
 
                         viewModel.navigator.value = navigator

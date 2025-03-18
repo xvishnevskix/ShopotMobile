@@ -1,156 +1,127 @@
 package org.videotrade.shopot.presentation.screens.test
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.MaterialTheme.colors
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.contentType
-import io.ktor.util.InternalAPI
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.serialization.Serializable
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import org.videotrade.shopot.api.EnvironmentConfig
-import org.videotrade.shopot.multiplatform.getHttpClientEngine
-import org.videotrade.shopot.multiplatform.getPlatform
+import org.jetbrains.compose.resources.Font
+import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.decupsMessage
+import org.videotrade.shopot.api.encupsMessage
+import org.videotrade.shopot.presentation.components.Common.SafeArea
+import shopot.composeapp.generated.resources.ArsonPro_Regular
+import shopot.composeapp.generated.resources.Res
 
-@Serializable
-data class VerificationResponse(
-    val clientNumber: String,
-    val confirmationNumber: String,
-    val qrCodeUri: String,
-    val callId: String
-)
-
-@Serializable
-data class CheckResponse(
-    val flag: Boolean,
-    val timeout: Int
-)
 
 class TestScreen : Screen {
-    @OptIn(InternalAPI::class)
+    
+    
     @Composable
     override fun Content() {
-        val backendUrl = "https://videotradedev.ru/api/2fa" // Укажите URL вашего бэкенда
-        val client =
-            HttpClient(getHttpClientEngine()) // Инициализация HTTP клиента, возможно вам стоит инициализировать его вне этой функции, чтобы использовать пул соединений
+        val navigator = LocalNavigator.currentOrThrow
+        var footerText by remember { mutableStateOf("") }
+        var textRes by remember { mutableStateOf("") }
         
-        val coroutineScope = rememberCoroutineScope()
-        
-        var phoneNumber by remember { mutableStateOf("") }
-        var clientNumber by remember { mutableStateOf("") }
-        var confirmationNumber by remember { mutableStateOf("") }
-        var qrCodeUri by remember { mutableStateOf("") }
-        var timer by remember { mutableStateOf(0) }
-        var view by remember { mutableStateOf("start") }
-        
-        fun checkConfirmation(callId: String) {
-            coroutineScope.launch {
-                while (true) {
-                    delay(1000)
-                    try {
-                        val response: HttpResponse = client.post("$backendUrl") {
-                            body = listOf("callId" to callId)
-                        }
-                        val data = Json.decodeFromString<CheckResponse>(response.body())
-                        if (data.timeout > 0) {
-                            timer = data.timeout
-                            if (data.flag) {
-                                view = "confirm"
-                                break
-                            }
-                        } else {
-                            view = "expire"
-                            break
-                        }
-                    } catch (e: Exception) {
-                        view = "error"
-                        break
+        SafeArea {
+            
+            Column {
+                
+                Button(onClick = {
+                    val encupsRes = encupsMessage(footerText)
+                    
+                    println("encupsRes $encupsRes")
+                    
+                    val decupsRes = decupsMessage(Json.encodeToString(encupsRes))
+                    
+                    println("decupsRes $decupsRes")
+                    if (decupsRes != null) {
+                        textRes = decupsRes
                     }
-                }
-            }
-        }
-        
-        Column(modifier = Modifier.padding(16.dp)) {
-            when (view) {
-                "start" -> {
-                    Text("Введите номер телефона", fontSize = 20.sp)
-                    OutlinedTextField(
-                        value = phoneNumber,
-                        onValueChange = { phoneNumber = it },
-                        label = { Text("Номер телефона") },
-                        singleLine = true
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Button(onClick = {
-                        coroutineScope.launch {
-                            try {
-                                println("data31")
-                                
-                                val jsonContent = Json.encodeToString(
-                                    buildJsonObject {
-                                        put("phone", phoneNumber)
-                                    }
+                    
+                }, content = { Text("AAAA") })
+                
+                
+                BasicTextField(
+                    value = footerText,
+                    onValueChange = { newText ->
+                        footerText =
+                            newText
+                    },
+                    modifier = Modifier
+                        .heightIn(max = 130.dp, min = 56.dp)
+                        .padding(16.dp)
+                        .fillMaxWidth(), // Для обеспечения выравнивания по ширине
+                    textStyle = TextStyle(
+                        fontSize = 16.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                        fontWeight = FontWeight(400),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        textAlign = TextAlign.Start
+                    ),
+                    cursorBrush = SolidColor(colors.primary),
+                    visualTransformation = VisualTransformation.None,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        capitalization = KeyboardCapitalization.Sentences // Заставляет начинать с заглавной буквы
+                    ),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(), // Обеспечивает выравнивание текста по центру
+                            contentAlignment = Alignment.CenterStart // Центрируем внутреннее поле
+                        ) {
+                            if (footerText.isEmpty()) {
+                                Text(
+                                    stringResource(MokoRes.strings.write_message),
+                                    fontSize = 16.sp,
+                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                    fontWeight = FontWeight(400),
+                                    color = colors.secondary,
+                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                    textAlign = TextAlign.Start
                                 )
-                                
-                                val response: HttpResponse =
-                                    client.post("$backendUrl/start") {
-                                        contentType(ContentType.Application.Json)
-                                        setBody(jsonContent)
-                                    }
-                                
-                                println("data31321131 ${response.bodyAsText()}")
-                                
-                                val data = Json.decodeFromString<VerificationResponse>(response.body())
-                                
-                                println("data31321 $data")
-                                clientNumber = data.clientNumber
-                                confirmationNumber = data.confirmationNumber
-                                qrCodeUri = data.qrCodeUri
-                                view = "wait"
-                                checkConfirmation(data.callId)
-                            } catch (e: Exception) {
-                                view = "error"
                             }
+                            innerTextField() // Вставка текстового поля в Box
                         }
-                    }) {
-                        Text("Далее")
-                    }
-                }
-                "wait" -> {
-                    Text("Позвоните с номера $clientNumber на $confirmationNumber")
-      
-                    Text("Ожидаем ваш звонок: $timer сек.")
-                }
-                "confirm" -> {
-                    Text("Номер $clientNumber успешно верифицирован.", color = Color.Green)
-                }
-                "expire" -> {
-                    Text("Время ожидания истекло. Номер $clientNumber не верифицирован.", color = Color.Red)
-                }
-                "error" -> {
-                    Text("Ошибка при обработке запроса.", color = Color.Red)
-                }
+                    },
+                )
+                
+                
+                Text(textRes)
             }
+            
+            
         }
+        
     }
-    
-
 }
 
 

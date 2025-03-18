@@ -51,6 +51,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.callInPhone
@@ -349,7 +350,7 @@ class CallPasswordScreen(
                                         text = "Другие способы входа",
                                         { scope ->
                                             scope.launch {
-                                                navigator.push(AuthCallScreen(phone, authCase, countryName))
+                                                navigateToScreen(navigator,AuthCallScreen(phone, authCase, countryName))
                                             }
                                         },
                                         style = ButtonStyle.Primary,

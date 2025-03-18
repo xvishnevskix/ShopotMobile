@@ -60,6 +60,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
@@ -127,7 +128,7 @@ fun AuthHeader(text: String) {
                     { scope ->
                         scope.launch {
                             showDialog.value = false
-                            navigator.push(
+                            navigateToScreen(navigator,
                                 WelcomeScreen()
                             )
                         }

@@ -46,7 +46,6 @@ suspend fun handleConnectWebSocket(
         install(WebSockets)
     }
     
-    if (!wsUseCase.isConnected.value) {
         try {
             httpClient.webSocket(
                 method = HttpMethod.Get,
@@ -118,7 +117,6 @@ suspend fun handleConnectWebSocket(
                                                 if (chat.lastMessage?.content?.isNotBlank() == true) {
                                                     val lastMessageContent = decupsMessage(
                                                         chat.lastMessage?.content!!,
-                                                        cipherWrapper
                                                     )
                                                     
                                                     println("lastMessageContent")
@@ -193,7 +191,6 @@ suspend fun handleConnectWebSocket(
                                                 if (!message.content.isNullOrBlank()) {
                                                     val decups = decupsMessage(
                                                         message.content,
-                                                        cipherWrapper
                                                     )
                                                     messageNew = messageNew.copy(content = decups)
                                                 }
@@ -203,7 +200,6 @@ suspend fun handleConnectWebSocket(
                                                     if (!answerMessage.content.isNullOrBlank()) {
                                                         val decupsAnswerMessage = decupsMessage(
                                                             answerMessage.content,
-                                                            cipherWrapper
                                                         )
                                                         if (decupsAnswerMessage != null) {
                                                             val updatedAnswerMessage =
@@ -246,7 +242,7 @@ suspend fun handleConnectWebSocket(
                                             // Декодируем content, если оно не пустое
                                             if (!message.content.isNullOrBlank()) {
                                                 val decups =
-                                                    decupsMessage(message.content, cipherWrapper)
+                                                    decupsMessage(message.content, )
                                                 messageNew = messageNew.copy(content = decups)
                                             }
                                             
@@ -255,7 +251,7 @@ suspend fun handleConnectWebSocket(
                                                 if (!answerMessage.content.isNullOrBlank()) {
                                                     val decupsAnswerMessage = decupsMessage(
                                                         answerMessage.content,
-                                                        cipherWrapper
+                                                        
                                                     )
                                                     if (decupsAnswerMessage != null) {
                                                         val updatedAnswerMessage =
@@ -319,7 +315,7 @@ suspend fun handleConnectWebSocket(
                                             if (message.answerMessage?.content?.isNotBlank() == true) {
                                                 val decupsAnswerMessage = decupsMessage(
                                                     message.answerMessage?.content!!,
-                                                    cipherWrapper
+                                                    
                                                 )
                                                 
                                                 if (decupsAnswerMessage != null) {
@@ -416,7 +412,7 @@ suspend fun handleConnectWebSocket(
                                         // Декодируем content, если оно не пустое
                                         if (!message.content.isNullOrBlank()) {
                                             val decups =
-                                                decupsMessage(message.content, cipherWrapper)
+                                                decupsMessage(message.content, )
                                             messageNew = messageNew.copy(content = decups)
                                         }
                                         
@@ -459,7 +455,7 @@ suspend fun handleConnectWebSocket(
                                                     messageNew = message.copy(
                                                         content = decupsMessage(
                                                             message.content,
-                                                            cipherWrapper
+                                                            
                                                         )
                                                     )
                                                 }
@@ -527,7 +523,7 @@ suspend fun handleConnectWebSocket(
                                                 chatsUseCase.addChat(chat)
                                             }
 
-//                                            navigator.push(MainScreen())
+//                                            navigateToScreen(navigator,MainScreen())
                                         }
                                         
                                     } catch (e: Exception) {
@@ -586,7 +582,7 @@ suspend fun handleConnectWebSocket(
                                                 messageNew = message.copy(
                                                     content = decupsMessage(
                                                         message.content,
-                                                        cipherWrapper
+                                                        
                                                     )
                                                 )
                                             }
@@ -647,7 +643,6 @@ suspend fun handleConnectWebSocket(
             // Запускам повторное подключение
             reconnectWebSocket(userId)
         }
-    }
 }
 
 

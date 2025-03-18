@@ -57,9 +57,8 @@ internal fun App() {
                     setScreenLockFlags(false)
                     
                     Navigator(
-                    IntroScreen()
-//                            CallPasswordScreen("79899236226", "SignIn")
-//                        TestScreen()
+//                    IntroScreen()
+                        TestScreen()
                     ) { navigator ->
                         SlideTransition(navigator)
                     }

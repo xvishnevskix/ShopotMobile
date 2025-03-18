@@ -247,7 +247,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
                                     if (secret != null) {
                                         val sharedSecretDecups =
-                                            decupsMessage(secret.toString(), cipherWrapper)
+                                            decupsMessage(secret.toString(), )
 
 
                                         if (sharedSecretDecups != null) {

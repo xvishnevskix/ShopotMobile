@@ -26,6 +26,7 @@ import org.videotrade.shopot.R
 import org.videotrade.shopot.androidSpecificApi.CallActionReceiver
 import org.videotrade.shopot.androidSpecificApi.CallForegroundService
 import org.videotrade.shopot.androidSpecificApi.getContextObj
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.webrtc.ThreadUtils
 import java.util.Collections
@@ -98,7 +99,7 @@ class MyLifecycleObserver(private val navigator: Navigator) : DefaultLifecycleOb
         if (callViewModel.replaceInCall.value) {
             println("Pushh!!!!!")
             
-            callViewModel.callScreenInfo.value?.let { navigator.push(it) }        // Ваш код, который нужно выполнить при onResume
+            callViewModel.callScreenInfo.value?.let { navigateToScreen(navigator,it) }        // Ваш код, который нужно выполнить при onResume
         }
         
         

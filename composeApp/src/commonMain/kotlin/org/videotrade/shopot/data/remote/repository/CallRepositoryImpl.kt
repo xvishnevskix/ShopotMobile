@@ -36,8 +36,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -49,7 +47,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -64,6 +61,7 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
@@ -323,15 +321,19 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                             )
                                                         
                                                         setIsCallBackground(false)
-                                                        navigator?.push(
-                                                            CallScreen(
-                                                                userId,
-                                                                null,
-                                                                user.firstName,
-                                                                user.lastName,
-                                                                user.phone,
+                                                        
+                                                        if (navigator != null) {
+                                                            navigateToScreen(
+                                                                navigator,
+                                                                CallScreen(
+                                                                    userId,
+                                                                    null,
+                                                                    user.firstName,
+                                                                    user.lastName,
+                                                                    user.phone,
+                                                                )
                                                             )
-                                                        )
+                                                        }
                                                         
                                                     }
                                                     
@@ -480,16 +482,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         if (isScreenOn()) {
                                             if (_isIncomingCall.value) {
                                                 println("rejectCallAnswer() ${_isIncomingCall.value}")
-                                                if (currentScreen is CallScreen) {
-                                                    println("Мы на экране CallScreen 1")
-                                                    
-                                                    // Вы на экране CallScreen
-                                                    navigator?.push(MainScreen())
-                                                    
-                                                } else if (currentScreen is MainScreen) {
-                                                    // Вы на экране MainScreen
-                                                    println("Мы на экране MainScreen 1")
+                                                println("Мы на экране CallScreen 1")
+                                                
+                                                // Вы на экране CallScreen
+                                                if (navigator != null) {
+                                                    navigateToScreen(navigator, MainScreen())
                                                 }
+                                                
                                             }
                                             
                                             if (isCall.value) {
@@ -507,7 +506,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                             println("rejectCallAnswer() ${currentScreen}")
                                             if (currentScreen is CallScreen) {
                                                 // Вы на экране CallScreen
-                                                navigator?.push(MainScreen())
+                                                navigateToScreen(navigator, MainScreen())
                                                 
                                                 println("Мы на экране CallScreen 2")
                                             } else if (currentScreen is MainScreen) {
@@ -633,25 +632,25 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
-                    
+
 //                    if (!isCallMaker.value) {
-                        try {
-                            Logger.d { "PC2213131: $jsonMessage" }
-                            Logger.d { "wsSession: ${wsSession.value}" }
-                            
-                            // Проверяем, активна ли корутина и открыт ли WebSocket
-                            if (wsSession.value?.isActive == true) {
+                    try {
+                        Logger.d { "PC2213131: $jsonMessage" }
+                        Logger.d { "wsSession: ${wsSession.value}" }
+                        
+                        // Проверяем, активна ли корутина и открыт ли WebSocket
+                        if (wsSession.value?.isActive == true) {
 
 //                            delay(5000)
-                                wsSession.value?.send(Frame.Text(jsonMessage))
-                                println("Message sent successfully")
-                            } else {
-                                println("WebSocket session is not active")
-                            }
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            println("Failed to send message: onIceCandidate ${e.message}")
+                            wsSession.value?.send(Frame.Text(jsonMessage))
+                            println("Message sent successfully")
+                        } else {
+                            println("WebSocket session is not active")
                         }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        println("Failed to send message: onIceCandidate ${e.message}")
+                    }
 //                    }
                     
                     
@@ -764,12 +763,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 try {
                     println("makeCall")
                     
-                    if (getPlatform() == Platform.Ios) {
-                        val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
-
-//                        swiftFuncsClass.setAVAudioSession()
-                        
-                    }
                     
                     val offer = peerConnection.value?.createOffer(
                         OfferAnswerOptions(offerToReceiveAudio = true)
@@ -1075,7 +1068,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             println("errorRejectCall: $e")
             val navigator = commonViewModel.mainNavigator.value
             
-            navigator?.push(MainScreen())
+            if (navigator != null) {
+                navigateToScreen(navigator, MainScreen())
+            }
             return false
             
         } finally {
@@ -1185,17 +1180,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 val navigator = commonViewModel.mainNavigator.value
                 val currentScreen = navigator?.lastItem
                 
-                if (currentScreen is CallScreen) {
-                    // Вы на экране CallScreen
-                    
-                    println("MainScreen $navigator")
-                    navigator.push(MainScreen())
-                    
-                    println("Мы на экране CallScreen")
-                } else if (currentScreen is MainScreen) {
-                    // Вы на экране MainScreen
-                    println("Мы на экране MainScreen")
+                // Вы на экране CallScreen
+                
+                println("MainScreen $navigator")
+                if (navigator != null) {
+                    navigateToScreen(navigator, MainScreen())
                 }
+                
             } else {
                 CoroutineScope(Dispatchers.IO).launch {
                     wsSession.value?.close()

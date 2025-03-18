@@ -1,12 +1,9 @@
 package org.videotrade.shopot.presentation.screens.call
 
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
-import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnectionState
-import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
@@ -37,8 +34,8 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.decupsMessage
-import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
@@ -47,7 +44,6 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
-import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
@@ -68,13 +64,13 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val isConnectedWs = callUseCase.isConnectedWs
     val isCallBackground = callUseCase.isCallBackground
-
+    
     val isIncomingCall = callUseCase.isIncomingCall
     
-//    private val _isConnectedWebrtc = MutableStateFlow(false)
-    val isConnectedWebrtc =  callUseCase.isConnectedWebrtc
+    //    private val _isConnectedWebrtc = MutableStateFlow(false)
+    val isConnectedWebrtc = callUseCase.isConnectedWebrtc
     
-    val localStream =  callUseCase.localStream
+    val localStream = callUseCase.localStream
     
     val remoteVideoTrack = callUseCase.remoteVideoTrack
     
@@ -279,7 +275,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.answerCall()
     }
     
-     fun resetWebRTC() {
+    fun resetWebRTC() {
         callUseCase.resetWebRTC()
     }
     
@@ -289,20 +285,22 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     fun rejectCall(calleeId: String, duration: String) {
         viewModelScope.launch {
-
-            if(getPlatform() == Platform.Android) {
+            
+            if (getPlatform() == Platform.Android) {
                 clearNotificationsForChannel("OngoingCallChannel")
             }
             
             stopTimer()
             setIsCallActive(false)
-
+            
             val isRejectCall = callUseCase.rejectCall(calleeId, duration)
-
+            
             if (isRejectCall) {
                 val navigator = commonViewModel.mainNavigator.value
 //                navigator?.popAll()
-                navigator?.push(MainScreen())
+                if (navigator != null) {
+                    navigateToScreen(navigator, MainScreen())
+                }
             }
         }
         
@@ -500,7 +498,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                     
                                     if (secret != null) {
                                         val sharedSecretDecups =
-                                            decupsMessage(secret.toString(), cipherWrapper)
+                                            decupsMessage(secret.toString(), )
                                         
                                         
                                         if (sharedSecretDecups != null) {
@@ -514,7 +512,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                             
                                             addValueInStorage("profileId", userId!!)
                                             
-                                           commonViewModel.updateNotificationToken()
+                                            commonViewModel.updateNotificationToken()
                                             
                                             introViewModel.fetchContacts(navigator)
                                         }
@@ -544,7 +542,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                 
                 if (profileCase == null) {
                     
-                    navigator.push(WelcomeScreen())
+                    navigateToScreen(navigator, WelcomeScreen())
                     return@launch
                     
                 } else {
@@ -564,7 +562,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-     fun disconnectWs() {
+    fun disconnectWs() {
         viewModelScope.launch {
             wsUseCase.disconnectWs()
         }
@@ -574,7 +572,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         val navPop = navigator.pop()
         println("navPop $navPop")
         if (!navPop) {
-            navigator.push(MainScreen())
+            navigateToScreen(navigator, MainScreen())
         }
     }
     
@@ -582,11 +580,11 @@ class CallViewModel() : ViewModel(), KoinComponent {
     fun setOtherUserId(newOtherUserId: String) {
         callUseCase.setOtherUserId(newOtherUserId)
     }
-
+    
     fun setChatId(chatId: String) {
         callUseCase.setChatId(chatId)
     }
-
+    
     fun setCalleeId(calleeId: String) {
         callUseCase.setCalleeId(calleeId)
     }

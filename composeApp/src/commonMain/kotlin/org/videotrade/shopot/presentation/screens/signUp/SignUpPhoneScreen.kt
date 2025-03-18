@@ -399,7 +399,7 @@ class SignUpPhoneScreen : Screen {
 //                                            }
 //                                        }
 //                                        else if (response == null) {
-//                                            navigator.push(
+//                                            navigateToScreen(navigator,
 //                                                AuthCallScreen(
 //                                                    phone.value.text,
 //                                                    "SignUp"

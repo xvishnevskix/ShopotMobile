@@ -23,6 +23,7 @@ import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
@@ -122,7 +123,7 @@ object CallHandler : KoinComponent {
             
             
         } catch (e: Exception) {
-        
+            
         }
         
         
@@ -137,7 +138,7 @@ object CallHandler : KoinComponent {
             )
             
         } catch (e: Exception) {
-        
+            
         }
         
         
@@ -186,7 +187,7 @@ fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
     }
     
     
-    navigator.push(
+    navigateToScreen(navigator,
         CallScreen(user.id, null, user.firstName, user.lastName, user.phone)
     )
     

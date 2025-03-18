@@ -49,6 +49,7 @@ import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
 import org.videotrade.shopot.presentation.components.Common.SafeArea
@@ -104,7 +105,7 @@ class ProfileScreen(
                 20.dp,
                 stringResource(MokoRes.strings.design)
             ) {
-                navigator.push(
+                navigateToScreen(navigator,
                     ThemeScreen()
                 )
             },
@@ -114,7 +115,7 @@ class ProfileScreen(
                 18.dp,
                 stringResource(MokoRes.strings.language)
             ) {
-                navigator.push(
+                navigateToScreen(navigator,
                     LanguageScreen()
                 )
             },
@@ -125,7 +126,7 @@ class ProfileScreen(
                 18.dp,
                 stringResource(MokoRes.strings.support)
             ) {
-                navigator.push(
+                navigateToScreen(navigator,
                     FAQ()
                 )
             },
