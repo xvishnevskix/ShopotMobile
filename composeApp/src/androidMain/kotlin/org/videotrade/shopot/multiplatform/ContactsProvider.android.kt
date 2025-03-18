@@ -56,7 +56,14 @@ actual class ContactsProvider(private val context: Context) {
         val shareIntent = Intent().apply {
             action = Intent.ACTION_SEND
             type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, "Приглашаю общаться в Shopot. Скачай в RuStore: https://www.rustore.ru/catalog/app/org.videotrade.shopot.androidApp") // Текст сообщения
+            putExtra(Intent.EXTRA_TEXT,
+                "Привет!  \n" +
+                    "\n" +
+                    "Приглашаю тебя в Шёпот — безопасный мессенджер для общения и обмена идеями. Присоединяйся, чтобы быть на связи и делиться мыслями в защищённой среде.  \n" +
+                    "\n" +
+                    "\uD83D\uDC49 [shopot.videotrade.ru]\n" +
+                    "\n" +
+                    "Жду тебя там! \uD83D\uDD12") // Текст сообщения
         }
         
         // Показываем выбор приложений для отправки

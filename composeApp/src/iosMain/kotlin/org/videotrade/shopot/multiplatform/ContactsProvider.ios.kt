@@ -48,7 +48,14 @@ actual class ContactsProvider {
     }
     
     actual fun sendMessageInvite() {
-        val message = "Приглашаем в шепот, господа" // Текст сообщения
+        val message =
+            "Привет!  \n" +
+                    "\n" +
+                    "Приглашаю тебя в Шёпот — безопасный мессенджер для общения и обмена идеями. Присоединяйся, чтобы быть на связи и делиться мыслями в защищённой среде.  \n" +
+                    "\n" +
+                    "\uD83D\uDC49 [shopot.videotrade.ru]\n" +
+                    "\n" +
+                    "Жду тебя там! \uD83D\uDD12"
         
         // Создаем массив для данных, которые будем шарить
         val itemsToShare = listOf(message)
