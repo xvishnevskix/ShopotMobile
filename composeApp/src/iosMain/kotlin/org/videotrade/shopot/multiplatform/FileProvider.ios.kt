@@ -102,6 +102,21 @@ import kotlin.toULong
 
 actual class FileProvider {
     private val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+
+    actual fun openFileOrDirectory(filePath: String): Boolean {
+        val url = NSURL.fileURLWithPath(filePath)
+        val controller = UIDocumentInteractionController.interactionControllerWithURL(url)
+        val window = UIApplication.sharedApplication.keyWindow
+        val rootController = window?.rootViewController
+
+        return if (rootController != null) {
+            controller.presentPreviewAnimated(true)
+            true
+        } else {
+            println("Failed to find rootViewController")
+            false
+        }
+    }
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
     actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {

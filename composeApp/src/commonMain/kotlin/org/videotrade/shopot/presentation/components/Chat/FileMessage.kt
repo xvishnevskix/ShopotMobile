@@ -2,6 +2,7 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -72,7 +73,7 @@ fun FileMessage(
     val viewModel: ChatViewModel = koinInject()
     val profile = viewModel.profile.collectAsState(initial = ProfileDTO()).value
     val downloadProgress = viewModel.downloadProgress.collectAsState().value
-    
+    val fileProvider = FileProviderFactory.create()
     var isLoading by remember { mutableStateOf(false) }
     var isLoadingSuccess by remember { mutableStateOf(false) }
     var isStartCipherLoading by remember { mutableStateOf(false) }
@@ -150,10 +151,11 @@ fun FileMessage(
         
         val existingFile = audioFile.existingFileInDir(fileName, attachments[0].type)
         
-        if (!existingFile.isNullOrBlank()) {
-            isLoadingSuccess = true
+        if (!existingFile.isNullOrBlank() ) {
             downloadJob?.cancel()
+            isLoadingSuccess = true
             isLoading = false
+            isStartCipherLoading = false
             progress = 1f
             filePath = existingFile
         }
@@ -168,6 +170,15 @@ fun FileMessage(
                 top = 16.dp
             )
             .widthIn(max = 260.dp)
+            .clickable {
+                val fileName = attachments[0].name
+                val existingFile = fileProvider.existingFileInDir(fileName, attachments[0].type)
+                if (existingFile != null) {
+                    fileProvider.openFileOrDirectory(existingFile)
+                } else {
+                    println("File not found in the system: $fileName")
+                }
+            }
             ,
         verticalAlignment = Alignment.CenterVertically
     ) {
