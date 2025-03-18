@@ -28,8 +28,13 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.SearchDto
+import org.videotrade.shopot.presentation.screens.chat.ChatScreen
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
@@ -38,8 +43,11 @@ import shopot.composeapp.generated.resources.Res
 fun SearchUserItem(
     user: SearchDto,
     onClick: () -> Unit,
+
+
     ) {
 
+    val viewModel: ChatViewModel = koinInject()
     val colors = MaterialTheme.colorScheme
     Row(
         modifier = Modifier
@@ -53,6 +61,8 @@ fun SearchUserItem(
 //                searchQuery.value = ""
 //                mainViewModel.clearGlobalResults()
                 onClick()
+
+
             },
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {

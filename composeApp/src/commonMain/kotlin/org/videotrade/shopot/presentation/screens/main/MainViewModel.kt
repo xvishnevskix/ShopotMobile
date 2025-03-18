@@ -112,6 +112,9 @@ class MainViewModel : ViewModel(), KoinComponent {
             } catch (_: Exception) {
             
             }
+            finally {
+                chatsUseCase.setIsLoadingValue(false)
+            }
         }
         
     }

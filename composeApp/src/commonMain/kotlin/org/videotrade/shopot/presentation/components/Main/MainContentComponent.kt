@@ -338,11 +338,18 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 //
                                                        Column {
                                                            SearchUserItem(user) {
-                                                               val contact = user.toContactDTO()
-                                                               contactsViewModel.createChat(contact)
-                                                               isSearching.value = false
-                                                               searchQuery.value = ""
-                                                               mainViewModel.clearGlobalResults()
+
+                                                               scope.launch {
+                                                                   val contact = user.toContactDTO()
+                                                                   contactsViewModel.createChat(contact)
+                                                                   isSearching.value = false
+                                                                   searchQuery.value = ""
+                                                                   mainViewModel.clearGlobalResults()
+
+                                                                   delay(500)
+                                                                   mainViewModel.getChatsInBack()
+                                                               }
+
                                                            }
                                                            Spacer(modifier = Modifier.height(16.dp))
                                                        }
