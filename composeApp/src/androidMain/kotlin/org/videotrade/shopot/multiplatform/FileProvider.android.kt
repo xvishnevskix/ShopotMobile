@@ -68,6 +68,8 @@ import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import id.zelory.compressor.Compressor
+import io.ktor.client.request.forms.ChannelProvider
+import io.ktor.util.cio.readChannel
 import net.jpountz.lz4.LZ4Factory
 import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
@@ -444,7 +446,9 @@ actual class FileProvider(private val applicationContext: Context) {
                     formData {
                         append(
                             "file",
-                            InputProvider(file.length()) { file.inputStream().asInput() },
+                            value = ChannelProvider(file.length()) {
+                                file.readChannel()
+                            },
                             Headers.build {
                                 append(HttpHeaders.ContentType, fileType)
                                 append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
@@ -698,37 +702,44 @@ actual class FileProvider(private val applicationContext: Context) {
             null
         }
     }
-    
-    
+
+
     actual fun existingFileInDir(fileName: String, fileType: String): String? {
-        // Определяем каталог для поиска файла в зависимости от типа файла
         val directory = when (fileType) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document" -> File(
-                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                "Documents"
-            )
-            
+            "document" -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Documents")
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
             else -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
         }
-        
-        // Проверяем, существует ли файл в указанной директории
+
         val file = File(directory, fileName)
-        return if (file.exists()) {
-            println("Файл найден: ${file.absolutePath + fileName}")
-            file.absolutePath
-        } else {
-            println("Файл не найден: $fileName в каталоге $directory")
-            null
+
+        if (file.exists()) {
+            println("Файл найден: ${file.absolutePath}")
+            return file.absolutePath
         }
+
+        // Если тип документа и файл не найден в Documents, ищем в Others
+        if (fileType == "document") {
+            val fallbackDir = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
+            val fallbackFile = File(fallbackDir, fileName)
+
+            if (fallbackFile.exists()) {
+                println("Файл найден в Others: ${fallbackFile.absolutePath}")
+                return fallbackFile.absolutePath
+            }
+        }
+
+        println("Файл не найден: $fileName в каталогах $directory и Others")
+        return null
     }
-    
-    
+
+
+
     actual suspend fun uploadFileNotInput(
         url: String,
         fileDirectory: String,
