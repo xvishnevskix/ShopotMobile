@@ -1165,9 +1165,3 @@ fun ChatFooter(
         }
     }
 }
-
-
-fun sendVoiceMessage() {
-
-
-}

@@ -143,7 +143,7 @@ class ProfileScreen(
 
                     modalVisible.value = false
                     commonViewModel.mainNavigator.value?.let {
-                        mainViewModel.leaveApp(it)
+                        mainViewModel.leaveApp(it, false)
                     }
 
                 },

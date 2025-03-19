@@ -3,6 +3,7 @@ package org.videotrade.shopot.multiplatform
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -67,6 +68,8 @@ import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import id.zelory.compressor.Compressor
+import io.ktor.client.request.forms.ChannelProvider
+import io.ktor.util.cio.readChannel
 import net.jpountz.lz4.LZ4Factory
 import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
@@ -80,155 +83,38 @@ actual class FileProvider(private val applicationContext: Context) {
     private val context = getContextObj.getContext()
 
 
-    actual suspend fun compressFile(filePath: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val file = if (filePath.startsWith("content://")) {
-                    val uri = Uri.parse(filePath)
-
-
-
-                    val tempFile = File(applicationContext.cacheDir, "temp_${System.currentTimeMillis()}")
-                    applicationContext.contentResolver.openInputStream(uri)?.use { inputStream ->
-                        tempFile.outputStream().use { outputStream ->
-                            inputStream.copyTo(outputStream)
-                        }
-                    }
-                    tempFile
-                } else {
-                    File(filePath)
-                }
-
-                if (!file.exists() || file.extension.isEmpty()) {
-                    println("File does not exist or has no extension.")
-                    return@withContext null
-                }
-
-                val compressedFile = when (file.extension.lowercase()) {
-                    "pdf" -> compressPdf(file) // Метод сжатия PDF
-                    "zip" -> compressZip(file) // Метод сжатия ZIP
-                    else -> {
-                        println("Unsupported file format: ${file.extension}")
-                        null
-                    }
-                }
-
-                if (compressedFile == null) {
-                    println("Compression failed for file: ${file.name}")
-                }
-
-                compressedFile?.absolutePath
-            } catch (e: Exception) {
-                println("Error during file compression: ${e.message}")
-                null
-            }
-        }
-    }
-
-    private fun compressPdf(file: File): File {
-        val compressedFile = File(applicationContext.cacheDir, "compressed_${file.name}")
-        try {
-            val reader = PdfReader(file)
-            val writer = PdfWriter(
-                FileOutputStream(compressedFile),
-                WriterProperties().setCompressionLevel(CompressionConstants.BEST_COMPRESSION)
-            )
-            val pdfDocument = PdfDocument(reader, writer)
-
-            // Удаление ненужных объектов, оптимизация структуры
-            for (page in 1..pdfDocument.numberOfPages) {
-                pdfDocument.getPage(page).flush()
-            }
-
-            pdfDocument.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return compressedFile
-    }
-
-    private fun compressZip(file: File): File {
-        val compressedFile = File(applicationContext.cacheDir, "compressed_${file.name}")
-        val buffer = ByteArray(1024)
-        try {
-            ZipInputStream(FileInputStream(file)).use { zis ->
-                ZipOutputStream(FileOutputStream(compressedFile)).use { zos ->
-                    zos.setLevel(9) // Максимальный уровень сжатия
-                    var entry: ZipEntry?
-                    while (zis.nextEntry.also { entry = it } != null) {
-                        val newEntry = ZipEntry(entry!!.name)
-                        zos.putNextEntry(newEntry)
-                        var length: Int
-                        while (zis.read(buffer).also { length = it } > 0) {
-                            zos.write(buffer, 0, length)
-                        }
-                        zos.closeEntry()
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return compressedFile
-    }
-
-
-    actual suspend fun compressImage(filePath: String): String? {
+    actual fun openFileOrDirectory(filePath: String): Boolean {
         return try {
-            withContext(Dispatchers.IO) {
-                val originalFile = File(filePath)
-                val bitmap = BitmapFactory.decodeFile(originalFile.absolutePath)
-
-                val compressedFile = File(applicationContext.cacheDir, "compressed_${originalFile.name}")
-                val outputStream = FileOutputStream(compressedFile)
-
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 75, outputStream)
-                outputStream.flush()
-                outputStream.close()
-
-                compressedFile.absolutePath
+            val file = File(filePath)
+            if (!file.exists()) {
+                println("File not found: $filePath")
+                return false
             }
+
+            val uri = androidx.core.content.FileProvider.getUriForFile(
+                applicationContext,
+                "${applicationContext.packageName}.provider",
+                file
+            )
+
+            val intent = Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, getMimeType(file))
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+
+            applicationContext.startActivity(intent)
+            true
         } catch (e: Exception) {
             e.printStackTrace()
-            null
+            println("Error opening file: ${e.message}")
+            false
         }
     }
 
-    actual suspend fun compressFileWithLength(filePath: String): String? {
-        return withContext(Dispatchers.IO) {
-            try {
-                val inputFile = File(filePath)
-                if (!inputFile.exists()) {
-                    println("File not found: $filePath")
-                    return@withContext null
-                }
-
-                val factory = LZ4Factory.fastestInstance()
-                val compressor = factory.fastCompressor()
-
-                val inputBytes = inputFile.readBytes()
-                val originalLength = inputBytes.size
-                val maxCompressedLength = compressor.maxCompressedLength(originalLength)
-                val compressedBytes = ByteArray(maxCompressedLength)
-
-                val compressedSize = compressor.compress(inputBytes, 0, originalLength, compressedBytes, 0, maxCompressedLength)
-
-                // Сохраняем длину оригинальных данных + сжатые данные в файл
-                val compressedFile = File(inputFile.parent, "compressed_${inputFile.name}.lz4")
-                compressedFile.outputStream().use { outputStream ->
-                    // Сохраняем длину оригинальных данных
-                    outputStream.write(originalLength.toByteArray())
-                    // Сохраняем сжатые данные
-                    outputStream.write(compressedBytes, 0, compressedSize)
-                }
-                println("File compressed name: ${compressedFile.name}")
-                println("File compressed successfully: ${compressedFile.absolutePath}")
-                compressedFile.absolutePath
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
-        }
+    private fun getMimeType(file: File): String {
+        return MimeTypeMap.getSingleton()
+            .getMimeTypeFromExtension(file.extension.lowercase())
+            ?: "*/*"
     }
 
     // Утилита для конвертации Int в байты
@@ -524,8 +410,11 @@ actual class FileProvider(private val applicationContext: Context) {
                 "cipher"
             )
         
-        if (cipherFilePath == null) return null
-        
+        if (cipherFilePath == null) {
+            onProgress(1F)
+            return null
+        }
+
         
         val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
             fileDirectory,
@@ -557,7 +446,9 @@ actual class FileProvider(private val applicationContext: Context) {
                     formData {
                         append(
                             "file",
-                            InputProvider(file.length()) { file.inputStream().asInput() },
+                            value = ChannelProvider(file.length()) {
+                                file.readChannel()
+                            },
                             Headers.build {
                                 append(HttpHeaders.ContentType, fileType)
                                 append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
@@ -811,37 +702,44 @@ actual class FileProvider(private val applicationContext: Context) {
             null
         }
     }
-    
-    
+
+
     actual fun existingFileInDir(fileName: String, fileType: String): String? {
-        // Определяем каталог для поиска файла в зависимости от типа файла
         val directory = when (fileType) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document" -> File(
-                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                "Documents"
-            )
-            
+            "document" -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Documents")
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
             else -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
         }
-        
-        // Проверяем, существует ли файл в указанной директории
+
         val file = File(directory, fileName)
-        return if (file.exists()) {
-            println("Файл найден: ${file.absolutePath + fileName}")
-            file.absolutePath
-        } else {
-            println("Файл не найден: $fileName в каталоге $directory")
-            null
+
+        if (file.exists()) {
+            println("Файл найден: ${file.absolutePath}")
+            return file.absolutePath
         }
+
+        // Если тип документа и файл не найден в Documents, ищем в Others
+        if (fileType == "document") {
+            val fallbackDir = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
+            val fallbackFile = File(fallbackDir, fileName)
+
+            if (fallbackFile.exists()) {
+                println("Файл найден в Others: ${fallbackFile.absolutePath}")
+                return fallbackFile.absolutePath
+            }
+        }
+
+        println("Файл не найден: $fileName в каталогах $directory и Others")
+        return null
     }
-    
-    
+
+
+
     actual suspend fun uploadFileNotInput(
         url: String,
         fileDirectory: String,
@@ -1155,6 +1053,8 @@ actual class FileProvider(private val applicationContext: Context) {
         }
         return null
     }
+
+
 
 
 }

@@ -224,3 +224,12 @@ extension KotlinByteArray {
         return byteArray
     }
 }
+
+import UIKit
+import SwiftUI
+
+extension UIDocumentInteractionControllerDelegate where Self: UIViewController {
+    public func documentInteractionControllerViewControllerForPreview(_ controller: UIDocumentInteractionController) -> UIViewController {
+        return self
+    }
+}

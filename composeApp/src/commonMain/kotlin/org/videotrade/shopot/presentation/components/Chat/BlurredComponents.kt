@@ -384,18 +384,19 @@ fun MessageBlurBox(
                                         shape = RoundedCornerShape(size = 16.dp)
                                     )
                                     .width(197.dp)
-                                    .padding(
-                                        start = 16.dp,
-                                        end = 16.dp,
-                                        top = 16.dp,
-                                        bottom = 16.dp
-                                    )
+
                                     .clickable(
                                         interactionSource = remember { MutableInteractionSource() },
                                         indication = null // Убирает эффект нажатия
                                     ) {
                                         editOption.onClick(viewModel, message, clipboardManager)
                                     }
+                                    .padding(
+                                        start = 16.dp,
+                                        end = 16.dp,
+                                        top = 16.dp,
+                                        bottom = 16.dp
+                                    )
 
                             ) {
                                 Text(

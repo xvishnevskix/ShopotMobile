@@ -1,5 +1,6 @@
 package org.videotrade.shopot.presentation.components.Main
 
+import Avatar
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearEasing
@@ -16,13 +17,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,6 +58,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -68,20 +74,28 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.formatTimestamp
+import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.NewsItem
+import org.videotrade.shopot.domain.model.SearchDto
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
 import org.videotrade.shopot.presentation.components.Main.News.StoryViewer
+import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.auth_logo
 import shopot.composeapp.generated.resources.govno_peredelyvay
+import shopot.composeapp.generated.resources.group
+import shopot.composeapp.generated.resources.message_double_check
+import shopot.composeapp.generated.resources.message_single_check
 import shopot.composeapp.generated.resources.pepe
 import shopot.composeapp.generated.resources.smart_lock
 import shopot.composeapp.generated.resources.sticker1
@@ -97,6 +111,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     var fakeLoading by remember { mutableStateOf(false) }
     var refreshing by remember { mutableStateOf(false) }
     val newsViewModel: NewsViewModel = koinInject()
+    val contactsViewModel: ContactsViewModel = koinInject()
 
 
     val isSearching = remember { mutableStateOf(false) }
@@ -111,6 +126,17 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
     val viewModel: ChatViewModel = koinInject()
 
+    val globalResults by mainViewModel.globalSearchResults.collectAsState()
+
+    LaunchedEffect(searchQuery.value) {
+        if (searchQuery.value.trim().length >= 3) {
+            isSearching.value = true
+            delay(500)
+            mainViewModel.searchUsers(searchQuery.value)
+        } else {
+            mainViewModel.clearGlobalResults()
+        }
+    }
 
     val filteredChats = if (searchQuery.value.isEmpty()) {
         chatState
@@ -145,22 +171,25 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     var isProcessingUpdate by remember { mutableStateOf(false) }
 
 // Обработка новостей из `once`
-//    LaunchedEffect(onceNewsState) {
-//        if (!showNewsOnceViewer) {
-//            val newsToShow = onceNewsState.find {
-//                it.appearance == "once" && !it.viewed &&
-//                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
-//            }
-//            if (newsToShow != null) {
-//                selectedOnceNews = newsToShow
-//                showNewsOnceViewer = true
-//            }
-//        }
-//    }
+    LaunchedEffect(onceNewsState) {
+        if (!showNewsOnceViewer) {
+            val newsToShow = onceNewsState.find {
+                it.appearance == "once" && !it.viewed &&
+                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
+            }
+            if (newsToShow != null) {
+                selectedOnceNews = newsToShow
+                showNewsOnceViewer = true
+            }
+        }
+    }
 
 
     
-        SafeArea(backgroundColor = if (isLoading) colors.background else colors.surface) {
+        SafeArea(
+            backgroundColor = if (isLoading) colors.background else colors.surface,
+            padding = 0.dp
+        ) {
             Box(modifier = Modifier.background(color = if (isLoading) colors.background else colors.surface).fillMaxSize()) {
             
             Column(modifier = Modifier.fillMaxSize(),
@@ -177,7 +206,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
 
                 Column(
-                    modifier = Modifier.animateContentSize()
+                    modifier = Modifier.animateContentSize().padding(horizontal = 16.dp)
                 ) {
                     Crossfade(targetState = isSearching.value) { searching ->
                         if (searching) {
@@ -186,7 +215,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                 modifier = Modifier.animateContentSize()
                             ) {
                                 Spacer(modifier = Modifier.height(16.dp))
-                                ContactsSearch(searchQuery, isSearching, padding = 0.dp)
+                                ContactsSearch(searchQuery, isSearching, padding = 0.dp, mainViewModel)
                             }
                         }
                     }
@@ -206,54 +235,137 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                         if (isLoading) {
                             ChatSkeleton()
                         } else {
-                            LazyColumn(
+                            val maxHeight = if (isSearching.value) ((72.dp) * 6) else Dp.Unspecified
+                            //чаты  пользователя
+                            Column(
                                 modifier = Modifier
-
+                                    .animateContentSize()
                                     .offset {
                                         IntOffset(
                                             x = 0,
                                             y = (refreshState.progress * 200).toInt()
                                         )
-                                    },
-                                verticalArrangement = Arrangement.Center,
+                                    }
                             ) {
-                                //чаты
+                                LazyColumn(
+                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                        .animateContentSize()
+                                        .heightIn(max = maxHeight)
 
-                                items(filteredChats) { item ->
-                                    Crossfade(targetState = item) { item ->
-                                        Column {
-                                            val groupUsers by remember {
-                                                derivedStateOf { viewModel.cachedGroupUsers[item.chatId] ?: emptyList() }
+                                       ,
+                                    verticalArrangement = Arrangement.Center,
+                                ) {
+
+
+                                    items(filteredChats) { item ->
+                                        Crossfade(targetState = item) { item ->
+                                            Column {
+                                                val groupUsers by remember {
+                                                    derivedStateOf { viewModel.cachedGroupUsers[item.chatId] ?: emptyList() }
+                                                }
+
+                                                LaunchedEffect(item.chatId) {
+                                                    if (!item.personal && groupUsers.isEmpty()) {
+                                                        viewModel.getGroupUsers(item.chatId)
+                                                    }
+                                                }
+                                                UserComponentItem(item, commonViewModel, mainViewModel, groupUsers)
+                                                Spacer(modifier = Modifier.background(Color(0xFFF3F4F6)).height(16.dp))
                                             }
+                                        }
 
-                                            LaunchedEffect(item.chatId) {
-                                                if (!item.personal && groupUsers.isEmpty()) {
-                                                    viewModel.getGroupUsers(item.chatId)
+                                    }
+
+                                    item {
+                                        if (chatState.isNotEmpty()) {
+
+                                            Crossfade(targetState = isSearching.value) { searching ->
+                                                if (!searching) {
+                                                    EncryptionInfoCard()
                                                 }
                                             }
-                                            UserComponentItem(item, commonViewModel, mainViewModel, groupUsers)
-                                            Spacer(modifier = Modifier.background(Color(0xFFF3F4F6)).height(16.dp))
-                                        }
-                                    }
 
-                                }
 
-                                if (chatState.isNotEmpty()) {
-                                    item {
-                                        Crossfade(targetState = isSearching.value) { searching ->
-                                            if (!searching) {
-                                                EncryptionInfoCard()
+                                        } else {
+                                            Crossfade(targetState = isSearching.value) { searching ->
+                                                if (!searching) {
+                                                    CreateFirstChatCard()
+                                                }
                                             }
+
                                         }
+
                                     }
 
-                                } else {
-                                    item {
-                                        CreateFirstChatCard()
+
+                                }
+                                //глобальный
+                                Crossfade(targetState = isSearching.value) { searching ->
+                                    if (searching) {
+                                        Column(
+                                            modifier = Modifier.animateContentSize()
+                                        ) {
+                                            Box(
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .background(colors.onBackground)
+                                            ) {
+                                                Text(
+                                                    text = stringResource(MokoRes.strings.global_search),
+                                                    textAlign = TextAlign.Start,
+                                                    fontSize = 16.sp,
+                                                    lineHeight = 16.sp,
+                                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                                    fontWeight = FontWeight(400),
+                                                    color = colors.secondary,
+                                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                                                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+                                                )
+
+
+                                            }
+                                            LazyColumn(
+                                                modifier = Modifier.animateContentSize(),
+                                                verticalArrangement = Arrangement.Center,
+                                            ) {
+
+                                                item {
+                                                    Spacer(modifier = Modifier.height(16.dp))
+                                                }
+
+                                                items(globalResults) { user ->
+                                                    Crossfade(targetState = user) {user ->
+//
+                                                       Column {
+                                                           SearchUserItem(user) {
+
+                                                               scope.launch {
+                                                                   val contact = user.toContactDTO()
+                                                                   contactsViewModel.createChat(contact)
+                                                                   isSearching.value = false
+                                                                   searchQuery.value = ""
+                                                                   mainViewModel.clearGlobalResults()
+
+                                                                   delay(500)
+                                                                   mainViewModel.getChatsInBack()
+                                                               }
+
+                                                           }
+                                                           Spacer(modifier = Modifier.height(16.dp))
+                                                       }
+                                                    }
+                                                }
+                                            }
+
+                                        }
                                     }
                                 }
+
+
+
                             }
                         }
+
                         PullRefreshIndicator(refreshState, Modifier.align(Alignment.TopCenter))
                         
                     }
@@ -411,5 +523,18 @@ verticalArrangement = Arrangement.Center
             letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
         )
     }
+    Spacer(modifier = Modifier.height(60.dp))
 }
+}
+
+fun SearchDto.toContactDTO(): ContactDTO {
+    return ContactDTO(
+        id = this.userId,
+        login = this.login,
+        firstName = this.firstName,
+        lastName = this.lastName,
+        phone = this.phone ?: "", // Устанавливаем пустую строку, если phone == null
+        icon = this.icon,
+        notificationToken = this.notificationToken
+    )
 }

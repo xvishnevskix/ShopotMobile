@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -91,7 +92,9 @@ fun HeaderMain(
 
     println("Search state: ${isSearching.value}")
 
-    Column {
+    Column(
+        modifier = Modifier.padding(start = 16.dp, end = 8.dp).statusBarsPadding()
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 15.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -147,7 +150,10 @@ fun HeaderMain(
                         Box(
                             modifier = Modifier
                                 .padding(horizontal = 5.dp)
-                                .clickable { isSearching.value = true }
+                                .clickable(
+                                    interactionSource = remember { MutableInteractionSource() },
+                                    indication = null
+                                ) { isSearching.value = true }
                         ) {
                             Image(
                                 painter = painterResource(Res.drawable.search_icon),

@@ -54,27 +54,28 @@ fun CallBar() {
     if (isTimerRunning.value) {
         Row(
             modifier = Modifier
-                .shadow(16.dp)
-                .padding(top = 1.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .fillMaxWidth()
-                .height(40.dp)
-                .background(colors.background)
-                .padding(horizontal = 24.dp, vertical = 2.dp).clickable {
-                    
+                .clickable {
+
                     if (commonViewModel.mainNavigator.value?.lastItem !is CallScreen) {
                         // Выполняем навигацию только если мы не находимся на этом экране
                         callScreenInfo.value?.let { commonViewModel.mainNavigator.value?.push(it) }
                     }
-               
+
                 }
+                .shadow(16.dp)
+                .padding(top = 4.dp)
+//                .clip(RoundedCornerShape(16.dp))
+                .fillMaxWidth()
+                .height(40.dp)
+                .background(colors.background)
+                .padding(horizontal = 24.dp, vertical = 2.dp)
             ,
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
 
             Box(modifier = Modifier) {
-                Avatar(userIcon.value, 30.dp)
+                Avatar(userIcon.value, 30.dp, roundedCornerShape = 6.dp)
             }
 
             Text(

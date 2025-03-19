@@ -33,6 +33,17 @@ data class ChatItem(
     
 )
 
+@Serializable
+data class SearchDto(
+    val userId: String,
+    val icon: String?,
+    val notificationToken: String?,
+    val firstName: String?,
+    val lastName: String?,
+    val phone: String?,
+    val login: String?
+)
+
 
 
 //@Serializable
