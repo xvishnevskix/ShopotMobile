@@ -130,70 +130,70 @@ class CallPasswordScreen(
         
         LaunchedEffect(key1 = Unit) {
             viewModel.navigator.value = navigator
-
-//            when (authCase) {
-//                "SignIn" -> {
-//                    if (phone == "+79990000000") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+79899236226") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+79388899885") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+375336483673") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                }
-//
-//                "SignUp" -> {
-//                    if (phone == "+79990000000") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                    if (phone == "+79899236226") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                    if (phone == "+79388899885") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                    if (phone == "+375336483673") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                }
-//            }
+            
+            when (authCase) {
+                "SignIn" -> {
+                    if (phone == "+79990000000") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+79899236226") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+79388899885") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+375336483673") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                }
+                
+                "SignUp" -> {
+                    if (phone == "+79990000000") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+79899236226") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+79388899885") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+375336483673") {
+                        sendSignUp(phone, navigator)
+                    }
+                }
+            }
             
         
         }
@@ -383,22 +383,7 @@ class CallPasswordScreen(
                     
                     Spacer(modifier = Modifier.height(20.dp))
 
-//                    Text(
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .padding(bottom = 50.dp),
-//                        text = "Продолжая вход, вы соглашаетесь с пользовательским соглашением и соглашением о конфиденциальности",
-//
-//
-//
-//                        style = TextStyle(
-//                            fontSize = 12.sp,
-//                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                            fontWeight = FontWeight(400),
-//                            textAlign = TextAlign.Center,
-//                            color = colors.secondary
-//                        )
-//                    )
+
                     
                     AgreementText(
                         onUserAgreementClick = { navigateToScreen(navigator, UserAgreement()) },

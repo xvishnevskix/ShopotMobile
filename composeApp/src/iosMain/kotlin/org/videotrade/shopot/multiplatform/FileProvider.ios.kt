@@ -10,7 +10,6 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.darwin.Darwin
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onUpload
-import io.ktor.client.request.forms.ChannelProvider
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.header
@@ -22,11 +21,13 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.request
 import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
+import io.ktor.http.content.PartData
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import io.ktor.util.InternalAPI
 import io.ktor.util.decodeBase64Bytes
 import io.ktor.utils.io.ByteReadChannel
+import io.ktor.utils.io.core.ByteReadPacket
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.cinterop.ObjCObjectVar
@@ -78,37 +79,22 @@ import platform.Foundation.outputStreamWithURL
 import platform.Foundation.pathExtension
 import platform.Foundation.stringByAppendingPathComponent
 import platform.UIKit.UIApplication
+import platform.UIKit.UIDocumentInteractionController
 import platform.UIKit.UIDocumentPickerDelegateProtocol
 import platform.UIKit.UIDocumentPickerViewController
 import platform.darwin.NSObject
-import kotlin.Boolean
-import kotlin.ByteArray
-import kotlin.Exception
-import kotlin.Float
-import kotlin.IllegalArgumentException
-import kotlin.IllegalStateException
-import kotlin.Int
-import kotlin.Long
-import kotlin.NullPointerException
-import kotlin.OptIn
-import kotlin.String
-import kotlin.TODO
-import kotlin.Unit
-import kotlin.let
 import kotlin.math.roundToInt
 import kotlin.random.Random
-import kotlin.run
-import kotlin.toULong
 
 actual class FileProvider {
     private val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-
+    
     actual fun openFileOrDirectory(filePath: String): Boolean {
         val url = NSURL.fileURLWithPath(filePath)
         val controller = UIDocumentInteractionController.interactionControllerWithURL(url)
         val window = UIApplication.sharedApplication.keyWindow
         val rootController = window?.rootViewController
-
+        
         return if (rootController != null) {
             controller.presentPreviewAnimated(true)
             true
@@ -632,7 +618,6 @@ actual class FileProvider {
             println("HTTP client closed")
         }
     }
-
     
     
     @OptIn(InternalAPI::class)
@@ -651,94 +636,65 @@ actual class FileProvider {
             }
         }
         
-        val sharedSecret = getValueInStorage("sharedSecret")
-        
+        val sharedSecret = getValueInStorage("sharedSecret") ?: return null
         val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
         
-        
-        println("22222 $filename $fileType")
-        
         val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
-        
-        
-        val cipherFilePath = FileProviderFactory.create()
-            .createNewFileWithApp(
-                fileNameCipher,
-                "cipher"
-            )
-        
-        if (cipherFilePath == null) return null
-        
+        val cipherFilePath =
+            FileProviderFactory.create().createNewFileWithApp(fileNameCipher, "cipher")
+                ?: return null
         
         val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
             fileDirectory,
             cipherFilePath,
-            sharedSecret?.decodeBase64Bytes()!!
-        )
-        println("444444")
+            sharedSecret.decodeBase64Bytes()
+        ) ?: return null
         
-        if (encupsChachaFileResult == null) {
-            
-            return null
-        }
-        println("result2 $encupsChachaFileResult")
-        
-        // Get the file from the provided directory
         val file = NSURL.fileURLWithPath(cipherFilePath)
-        val fileData = NSData.dataWithContentsOfURL(file) ?: return null
-        
-        println("66666 $file")
+        val fileData = NSData.dataWithContentsOfURL(file) ?: return null // Читаем данные файла
+        val fileByteArray = fileData.toByteArray() // Конвертируем в ByteArray
         
         try {
-            val token = getValueInStorage("accessToken")
-            println("77777")
+            val token = getValueInStorage("accessToken") ?: return null
             
             val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
-                body = MultiPartFormDataContent(
-                    formData {
-                        append("file",
-                            value = ChannelProvider(file.length()) {
-                                file.readChannel()
-                            },
-                            Headers.build {
+                header(HttpHeaders.Authorization, "Bearer $token")
+                setBody(MultiPartFormDataContent(
+                    parts = listOf(
+                        PartData.BinaryItem(
+                            provider = { ByteReadPacket(fileByteArray) }, // ✅ Исправленный способ передачи файла
+                            dispose = {},
+                            partHeaders = Headers.build {
                                 append(HttpHeaders.ContentType, fileType)
-                                append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "form-data; name=\"file\"; filename=\"$filename\""
+                                )
                             }
-                        )
-                        
-                        append(
-                            "encupsFile",
-                            Json.encodeToString(
+                        ),
+                        PartData.FormItem(
+                            value = Json.encodeToString(
                                 EncapsulationFileResult.serializer(),
                                 encupsChachaFileResult
-                            )
+                            ),
+                            dispose = {}, // ✅ Добавлено `dispose`
+                            partHeaders = Headers.build {
+                                append(
+                                    HttpHeaders.ContentDisposition,
+                                    "form-data; name=\"encupsFile\""
+                                )
+                            }
                         )
-                    }
-                )
-                header(HttpHeaders.Authorization, "Bearer $token")
-                
-                
-                
-                onUpload { bytesSentTotal, contentLength ->
-                    if (contentLength != -1L) { // -1 means that the content length is unknown
-                        val progress = (bytesSentTotal.toDouble() / contentLength * 100).toFloat()
-                        onProgress(progress)
-                    }
-                }
+                    
+                    )
+                ))
             }
-            println("8888888 ${response}")
             
             if (response.status.isSuccess()) {
                 val jsonElement = Json.parseToJsonElement(response.bodyAsText())
-                
-                println("jsonElementFile ${jsonElement}")
-                
-                val id = jsonElement.jsonObject["id"]?.jsonPrimitive?.content
-                
-                return id
-                
+                return jsonElement.jsonObject["id"]?.jsonPrimitive?.content
             } else {
-                println("Failed to retrieve data: ${response.status} ${response.request}")
+                println("Failed to upload file: ${response.status}")
                 return null
             }
         } catch (e: Exception) {
@@ -1444,18 +1400,6 @@ actual class FileProvider {
             println("Файл не найден: $fileName в каталоге $directoryPath")
             null
         }
-    }
-    
-    actual suspend fun compressImage(filePath: String): String? {
-        TODO("Not yet implemented")
-    }
-    
-    actual suspend fun compressFile(filePath: String): String? {
-        TODO("Not yet implemented")
-    }
-    
-    actual suspend fun compressFileWithLength(filePath: String): String? {
-        TODO("Not yet implemented")
     }
     
 }

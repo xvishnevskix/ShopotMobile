@@ -58,8 +58,8 @@ internal fun App() {
                     setScreenLockFlags(false)
                     
                     Navigator(
-//                        IntroScreen()
-                                CallPasswordScreen("", "SignIn", CountryName.RU)
+                        IntroScreen()
+//                                CallPasswordScreen("", "SignIn", CountryName.RU)
 //                        TestScreen()
                     ) { navigator ->
                         SlideTransition(navigator)
