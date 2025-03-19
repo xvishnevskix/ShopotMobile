@@ -167,7 +167,7 @@ fun Chat(
                 message.created.subList(0, 3)
             }
 
-            println("groupedMessages: ${groupedMessages.values.size}")
+
 
             numberOfDays = groupedMessages.values.size
 
@@ -192,13 +192,9 @@ fun Chat(
                     .distinctUntilChanged()
                     .collect { visibleItems ->
                         if (viewModel.messages.value.size > largestNumberMessages) {
-                            println("viewModel.messages.value.size: ${viewModel.messages.value.size}")
-                            println("visibleItems.last().index: ${visibleItems.last().index}")
-
 
                             val totalItems = viewModel.messages.value.size + numberOfDays
-                            println("numberOfDays ${numberOfDays}")
-                            println("totalItems ${totalItems}")
+
                             if (visibleItems.isNotEmpty() && visibleItems.last().index == totalItems - 1) {
 
                                 coroutineScope.launch {
@@ -222,7 +218,7 @@ fun Chat(
                 modifier = modifier.background(colors.background).padding(horizontal = 8.dp)
             ) {
                 groupedMessages.forEach { (date, messages) ->
-                    println("Group: $date, Messages: ${messages.size}")
+
                     stickyHeader {
                         val alpha by animateFloatAsState(
                             targetValue = if (isScrolling) 1f else 0f,
@@ -235,11 +231,10 @@ fun Chat(
                         )
                     }
 
-                    items(messages, key = { message -> message.id }) { message ->
+                    itemsIndexed(messages, key = { index, message -> "${message.id}-$index" }) { index, message ->
 //                itemsIndexed(messages, key = { index, message -> "${message.id}-$index" }) { index, message ->
 
 
-                        println("Message ID: ${message.id}")
 
 
                         var messageY by remember { mutableStateOf(0) }
@@ -259,7 +254,7 @@ fun Chat(
                             } ?: ""
                         }
 
-                        println("message.created: ${message.created}")
+
 
                         MessageBox(
                             viewModel = viewModel,
