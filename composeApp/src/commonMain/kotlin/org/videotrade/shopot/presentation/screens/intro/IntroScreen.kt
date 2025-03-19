@@ -119,7 +119,7 @@ class IntroScreen : Screen {
 
 
                         if (!contactsNative) {
-                            navigator.replace(PermissionsScreen())
+                            navigateToScreen(navigator,PermissionsScreen())
                             return@LaunchedEffect
                         }
 
@@ -138,15 +138,15 @@ class IntroScreen : Screen {
 
                         }
                         println("dasdadasadsad")
-                        navigator.replace(WelcomeScreen())
+                        navigateToScreen(navigator,WelcomeScreen())
 
 
                     }
                 } else {
-                    navigator.replace(NetworkErrorScreen())
+                    navigateToScreen(navigator,NetworkErrorScreen())
                 }
             } catch (e: Exception) {
-                navigator.replace(NetworkErrorScreen())
+                navigateToScreen(navigator,NetworkErrorScreen())
             }
 
         }
