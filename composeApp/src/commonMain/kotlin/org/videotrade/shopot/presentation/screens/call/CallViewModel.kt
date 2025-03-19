@@ -1,12 +1,9 @@
 package org.videotrade.shopot.presentation.screens.call
 
-import androidx.compose.runtime.remember
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.Navigator
 import com.shepeliev.webrtckmp.IceConnectionState
-import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnectionState
-import com.shepeliev.webrtckmp.VideoStreamTrack
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
@@ -36,8 +33,10 @@ import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.addValueInStorage
-import org.videotrade.shopot.api.delValueInStorage
+import org.videotrade.shopot.api.decupsMessage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
@@ -45,13 +44,13 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
-import org.videotrade.shopot.multiplatform.EncapsulationFileResult
 import org.videotrade.shopot.multiplatform.MusicPlayer
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.iosCall.GetCallInfoDto
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
@@ -65,17 +64,18 @@ class CallViewModel() : ViewModel(), KoinComponent {
     
     val isConnectedWs = callUseCase.isConnectedWs
     val isCallBackground = callUseCase.isCallBackground
-
+    
     val isIncomingCall = callUseCase.isIncomingCall
     
-//    private val _isConnectedWebrtc = MutableStateFlow(false)
-    val isConnectedWebrtc =  callUseCase.isConnectedWebrtc
+    //    private val _isConnectedWebrtc = MutableStateFlow(false)
+    val isConnectedWebrtc = callUseCase.isConnectedWebrtc
     
-    private val _localStream = MutableStateFlow<MediaStream?>(null)
-    val localStream: StateFlow<MediaStream?> get() = _localStream
+    val localStream = callUseCase.localStream
     
-    private val _remoteVideoTrack = MutableStateFlow<VideoStreamTrack?>(null)
-    val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = _remoteVideoTrack
+    val remoteVideoTrack = callUseCase.remoteVideoTrack
+    
+    val remoteAudioTrack = callUseCase.remoteAudioTrack
+    
     
     private val _callState = MutableStateFlow(PeerConnectionState.New)
     val callState: StateFlow<PeerConnectionState> get() = _callState
@@ -191,23 +191,23 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     private fun observeStreams() {
-        callUseCase.localStream
-            .onEach { localStreamNew ->
-                if (isObserving.value) {
-                    _localStream.value = localStreamNew
-                    println("_localStream $_localStream")
-                }
-            }
-            .launchIn(viewModelScope)
-        
-        callUseCase.remoteVideoTrack
-            .onEach { remoteVideoTrackNew ->
-                if (isObserving.value) {
-                    _remoteVideoTrack.value = remoteVideoTrackNew
-                    println("remoteVideoTrackNew $remoteVideoTrackNew")
-                }
-            }
-            .launchIn(viewModelScope)
+//        callUseCase.localStream
+//            .onEach { localStreamNew ->
+//                if (isObserving.value) {
+//                    _localStream.value = localStreamNew
+//                    println("_localStream ${_localStream.value}")
+//                }
+//            }
+//            .launchIn(viewModelScope)
+//
+//        callUseCase.remoteVideoTrack
+//            .onEach { remoteVideoTrackNew ->
+//                if (isObserving.value) {
+//                    _remoteVideoTrack.value = remoteVideoTrackNew
+//                    println("remoteVideoTrackNew $remoteVideoTrackNew")
+//                }
+//            }
+//            .launchIn(viewModelScope)
     }
     
     private fun observeIsConnectedWebrtc() {
@@ -275,25 +275,32 @@ class CallViewModel() : ViewModel(), KoinComponent {
         callUseCase.answerCall()
     }
     
+    fun resetWebRTC() {
+        callUseCase.resetWebRTC()
+    }
+    
     fun answerCallBackground() {
         callUseCase.answerCallBackground()
     }
     
     fun rejectCall(calleeId: String, duration: String) {
         viewModelScope.launch {
-
-            if(getPlatform() == Platform.Android) {
+            
+            if (getPlatform() == Platform.Android) {
                 clearNotificationsForChannel("OngoingCallChannel")
             }
             
             stopTimer()
             setIsCallActive(false)
-
+            
             val isRejectCall = callUseCase.rejectCall(calleeId, duration)
-
+            
             if (isRejectCall) {
                 val navigator = commonViewModel.mainNavigator.value
-                navigator?.popAll()
+//                navigator?.popAll()
+                if (navigator != null) {
+                    navigateToScreen(navigator, MainScreen())
+                }
             }
         }
         
@@ -439,17 +446,17 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                             buildJsonObject {
                                                 put("action", "sendCipherText")
                                                 put("cipherText", result.ciphertext.encodeBase64())
+                                                put(
+                                                    "deviceId", getValueInStorage("deviceId")
+                                                )
                                             }
                                         )
                                         
                                         println(
-                                            "successSharedSecret111 ${
-                                                EncapsulationFileResult(
-                                                    result.sharedSecret,
-                                                    result.sharedSecret
-                                                )
-                                            }"
+                                            "answerPublicKeyJsonContent111 $answerPublicKeyJsonContent"
                                         )
+                                        
+                                        
                                         
                                         
                                         addValueInStorage(
@@ -464,12 +471,55 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                 }
                                 
                                 "successSharedSecret" -> {
-                                    addValueInStorage("profileId", userId)
+                                    
+                                    val introViewModel: IntroViewModel =
+                                        KoinPlatform.getKoin().get()
+                                    
+                                    addValueInStorage("profileId", userId!!)
                                     
                                     commonViewModel.updateNotificationToken()
-                                    fetchContacts(navigator)
+                                    
+                                    introViewModel.fetchContacts(navigator)
                                     
                                 }
+                                
+                                "encryptedSharedSecret" -> {
+                                    println(
+                                        "encryptedSharedSecret $jsonElement"
+                                    )
+                                    val secret =
+                                        jsonElement.jsonObject["secret"]?.jsonObject
+                                    
+                                    println(
+                                        "encryptedSharedSecret $secret"
+                                    )
+                                    
+                                    val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+                                    
+                                    if (secret != null) {
+                                        val sharedSecretDecups =
+                                            decupsMessage(secret.toString(), )
+                                        
+                                        
+                                        if (sharedSecretDecups != null) {
+                                            addValueInStorage(
+                                                "sharedSecret",
+                                                sharedSecretDecups
+                                            )
+                                            
+                                            val introViewModel: IntroViewModel =
+                                                KoinPlatform.getKoin().get()
+                                            
+                                            addValueInStorage("profileId", userId!!)
+                                            
+                                            commonViewModel.updateNotificationToken()
+                                            
+                                            introViewModel.fetchContacts(navigator)
+                                        }
+                                    }
+                                    
+                                }
+                                
                             }
                         }
                     }
@@ -492,7 +542,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                 
                 if (profileCase == null) {
                     
-                    navigator.push(WelcomeScreen())
+                    navigateToScreen(navigator, WelcomeScreen())
                     return@launch
                     
                 } else {
@@ -512,7 +562,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
     }
     
     
-     fun disconnectWs() {
+    fun disconnectWs() {
         viewModelScope.launch {
             wsUseCase.disconnectWs()
         }
@@ -522,7 +572,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
         val navPop = navigator.pop()
         println("navPop $navPop")
         if (!navPop) {
-            navigator.push(MainScreen())
+            navigateToScreen(navigator, MainScreen())
         }
     }
     
@@ -530,12 +580,16 @@ class CallViewModel() : ViewModel(), KoinComponent {
     fun setOtherUserId(newOtherUserId: String) {
         callUseCase.setOtherUserId(newOtherUserId)
     }
-
+    
     fun setChatId(chatId: String) {
         callUseCase.setChatId(chatId)
     }
-
+    
     fun setCalleeId(calleeId: String) {
         callUseCase.setCalleeId(calleeId)
+    }
+    
+    fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
+        callUseCase.setCalleeUserInfo(calleeUserInfo)
     }
 }

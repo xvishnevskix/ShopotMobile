@@ -103,7 +103,7 @@ fun CreateChatHeader(
 //                                modifier = Modifier
 //                                    .size(20.dp)
 //                                    .pointerInput(Unit) {
-//                                        navigator.push(InviteContactsScreen())
+//                                        navigateToScreen(navigator,InviteContactsScreen())
 //                                    },
 //                                colorFilter = ColorFilter.tint(colors.primary)
 //                            )

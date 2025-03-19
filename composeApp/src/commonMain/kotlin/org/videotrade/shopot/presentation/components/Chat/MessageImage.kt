@@ -8,10 +8,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -24,7 +22,7 @@ import coil3.compose.rememberAsyncImagePainter
 import getImageStorage
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
-import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -52,7 +50,7 @@ fun MessageImage(
         var imageFilePath = remember { mutableStateOf("") }
         
         imagePainter.value = getImageStorage(fileId, fileId, false).value
-
+        
         
         if (imagePainter.value != null) {
             println("imagePainter.value asdada")
@@ -72,7 +70,7 @@ fun MessageImage(
                         indication = null // Убирает эффект нажатия
                     ) {
                         if (imagePainter.value !== null)
-                            navigator.push(
+                            navigateToScreen(navigator,
                                 PhotoViewerScreen(
                                     imagePainter,
                                     messageSenderName,
@@ -100,7 +98,7 @@ fun MessageImage(
                         indication = null // Убирает эффект нажатия
                     ) {
                         if (imagePainter.value !== null)
-                            navigator.push(
+                            navigateToScreen(navigator,
                                 PhotoViewerScreen(
                                     imagePainter,
                                     messageSenderName,
@@ -154,7 +152,7 @@ fun MessageImage(
             modifier = Modifier
                 .size(250.dp, 350.dp)
                 .padding(
-                   4.dp
+                    4.dp
                 )
                 .clip(
                     RoundedCornerShape(
@@ -165,12 +163,15 @@ fun MessageImage(
                     indication = null // Убирает эффект нажатия
                 ) {
                     if (imageFilePath.value.isNotBlank())
-                        navigator?.push(
-                            PhotoViewerScreen(
-                                imageState,
-                                messageSenderName,
+                        navigator?.let {
+                            navigateToScreen(
+                                it,
+                                PhotoViewerScreen(
+                                    imageState,
+                                    messageSenderName,
+                                )
                             )
-                        )
+                        }
                 }
         )
     }

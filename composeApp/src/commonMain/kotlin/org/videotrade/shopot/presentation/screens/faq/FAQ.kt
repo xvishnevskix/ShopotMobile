@@ -103,6 +103,7 @@ import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.BaseHeader
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
@@ -202,13 +203,13 @@ class FAQ() : Screen {
                             .fillMaxWidth()
                     ) {
                         PolicyItem(stringResource(MokoRes.strings.privacy_policy)) {
-                            navigator.push(PrivacyPolicy())
+                            navigateToScreen(navigator,PrivacyPolicy())
                         }
                         PolicyItem(stringResource(MokoRes.strings.user_agreement)) {
-                            navigator.push(UserAgreement())
+                            navigateToScreen(navigator,UserAgreement())
                         }
                         PolicyItem(stringResource(MokoRes.strings.data_processing_agreement)) {
-                            navigator.push(DataProcessingAgreement())
+                            navigateToScreen(navigator,DataProcessingAgreement())
                         }
                     }
                 }

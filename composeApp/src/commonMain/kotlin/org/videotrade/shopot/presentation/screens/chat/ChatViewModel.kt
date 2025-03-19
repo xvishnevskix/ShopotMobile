@@ -16,7 +16,6 @@ import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
-import org.videotrade.shopot.api.decupsMessage
 import org.videotrade.shopot.api.encupsMessage
 import org.videotrade.shopot.api.getCurrentTimeList
 import org.videotrade.shopot.data.origin
@@ -289,13 +288,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             
             
             if (content !== null && isCipher) {
-                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                
-                val resEncups = encupsMessage(content, cipherWrapper)
-                val decupsMes = decupsMessage(Json.encodeToString(resEncups), cipherWrapper)
-
-                println("ЗАШИФРОВАННОЕ СООБЩЕНИЕ ${resEncups}")
-                println("РАСШИФРОВАННОЕ СООБЩЕНИЕ ${decupsMes}")
+                val resEncups = encupsMessage(content)
                 
                 contentSort = Json.encodeToString(resEncups)
             } else {
@@ -686,16 +679,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     ///////////////////////////////////////////////////////
 
 
-    ///////////////////////Статусы///////////////////////
-
-    val userStatuses: StateFlow<Map<String, String>> = chatUseCase.userStatuses
-
-    init {
-        viewModelScope.launch {
-            chatUseCase.startListeningForStatusUpdates()
-        }
-    }
-
 
 
     fun onTypingStart() = viewModelScope.launch { chatUseCase.sendTypingStart() }
@@ -708,7 +691,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun onVoiceRecordingEnd() = viewModelScope.launch { chatUseCase.sendVoiceRecordingEnd() }
 
     ///////////////////////////////////////////////////////
-    
-    
+
+
+
+
 }
 

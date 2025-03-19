@@ -18,6 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.delValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.AppVersion
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -57,25 +58,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
     init {
         viewModelScope.launch {
-//            profile.onEach { _ ->
-//
-//                println("navigator.value1111111")
-//
-//                profile.value?.id?.let {
-//                    println("navigator.value222222 $it")
-//
-//                    if (navigator.value !== null) {
-//
-//                        println("navigator.value333333 $it")
-//
-//
-//                    }
-//
-//
-//                }
-//
-//
-//            }.launchIn(viewModelScope)
+
 
             observeWsConnection()
 
@@ -115,7 +98,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
     }
 
 
-    fun fetchContacts(navigator: Navigator?) {
+    fun  fetchContacts(navigator: Navigator?) {
 
 
 
@@ -137,7 +120,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
 
                 } else {
                     if (navigator != null) {
-                        navigator.push(IntroScreen())
+                        navigateToScreen(navigator,IntroScreen())
                     }
                 }
 
@@ -161,7 +144,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
             println("profileCase $profileCase")
 
             if (profileCase == null) {
-                navigator.push(WelcomeScreen())
+                navigateToScreen(navigator,WelcomeScreen())
 
 
                 return@launch
@@ -215,6 +198,8 @@ class IntroViewModel : ViewModel(), KoinComponent {
     fun startObserving() {
         isObserving.value = true
     }
+    
+
 
 }
 

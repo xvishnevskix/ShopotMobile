@@ -85,6 +85,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.addValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.ReloadRes
@@ -188,7 +189,7 @@ class ProfileEditScreen() : Screen {
                                 )
 
                                 if (profileUpdate) {
-                                    navigator.push(ProfileScreen(anotherUser = false))
+                                    navigateToScreen(navigator,ProfileScreen(anotherUser = false))
                                 }
                             }
 

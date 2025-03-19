@@ -305,7 +305,7 @@ class MainViewModel : ViewModel(), KoinComponent {
 
 
             commonViewModel.delSharedSecret()
-            navigator.replace(WelcomeScreen())
+            navigateToScreen(navigator,WelcomeScreen())
             
         }
     }

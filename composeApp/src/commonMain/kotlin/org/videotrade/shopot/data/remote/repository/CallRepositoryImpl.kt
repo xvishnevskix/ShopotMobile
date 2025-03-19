@@ -2,6 +2,7 @@ package org.videotrade.shopot.data.remote.repository
 
 import androidx.compose.runtime.mutableStateOf
 import co.touchlab.kermit.Logger
+import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.IceCandidate
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.IceServer
@@ -27,15 +28,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.client.statement.bodyAsText
-import io.ktor.client.statement.request
-import io.ktor.http.ContentType
 import io.ktor.http.HttpMethod
-import io.ktor.http.contentType
-import io.ktor.http.isSuccess
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
@@ -45,9 +38,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -65,6 +61,7 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.findContactByPhone
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
@@ -72,14 +69,12 @@ import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
-import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
 import org.videotrade.shopot.multiplatform.clearNotificationsForChannel
 import org.videotrade.shopot.multiplatform.closeApp
 import org.videotrade.shopot.multiplatform.configureAudioSession
-import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.isScreenOn
 import org.videotrade.shopot.presentation.screens.call.CallScreen
@@ -144,6 +139,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     private val isCall = mutableStateOf(false)
     
+    private val isCallMaker = mutableStateOf(false)
+    
     private var isCallRejected = false
     
     private val _isCallActive = MutableStateFlow(false)
@@ -162,7 +159,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
     
     private val _calleeId = MutableStateFlow("")
+    
     private val calleeId: StateFlow<String> get() = _calleeId
+    
+    
+    private val calleeUser = MutableStateFlow(ProfileDTO())
+    
     
     private val _chatId = MutableStateFlow("")
     val chatId: StateFlow<String> get() = _chatId
@@ -174,6 +176,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     override val remoteVideoTrack = MutableStateFlow<VideoStreamTrack?>(null)
     
+    override val remoteAudioTrack = MutableStateFlow<AudioStreamTrack?>(null)
     
     private val _isConnectedWebrtc = MutableStateFlow(false)
     
@@ -194,6 +197,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     
     private val isMuted = MutableStateFlow(false)
     
+    val iceCandidates = MutableStateFlow<MutableList<IceCandidate>?>(null)
+    
     
     override suspend fun reconnectPeerConnection() {
         // Переподключение PeerConnection
@@ -205,10 +210,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-     suspend fun setRemoteDisc() {
+    suspend fun setRemoteDisc() {
         offer.value?.let { _peerConnection.value?.setRemoteDescription(it) }
         
     }
+    
     override suspend fun connectionWs(userId: String) {
         
         println("aaaaaaa11111")
@@ -247,6 +253,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 when (type) {
                                     "newCall" -> {
                                         try {
+                                            println("newCall")
+                                            
                                             val contactsUseCase: ContactsUseCase by inject()
                                             val callViewModel: CallViewModel by inject()
                                             val navigator = commonViewModel.mainNavigator.value
@@ -255,6 +263,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 .getPermission("microphone")
                                             
                                             if (cameraPer) {
+                                                println("rtcMessage $rtcMessage")
+                                                
                                                 rtcMessage?.let {
                                                     val userJson =
                                                         jsonElement.jsonObject["user"]?.jsonObject
@@ -311,15 +321,19 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                             )
                                                         
                                                         setIsCallBackground(false)
-                                                        navigator?.push(
-                                                            CallScreen(
-                                                                userId,
-                                                                null,
-                                                                user.firstName,
-                                                                user.lastName,
-                                                                user.phone,
+                                                        
+                                                        if (navigator != null) {
+                                                            navigateToScreen(
+                                                                navigator,
+                                                                CallScreen(
+                                                                    userId,
+                                                                    null,
+                                                                    user.firstName,
+                                                                    user.lastName,
+                                                                    user.phone,
+                                                                )
                                                             )
-                                                        )
+                                                        }
                                                         
                                                     }
                                                     
@@ -336,17 +350,77 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                     
                                     "callAnswered" -> {
                                         rtcMessage?.let {
+                                            val iceCandidatesList =
+                                                iceCandidates.value ?: emptyList()
+                                            
+                                            // Запускаем асинхронные операции отправки ICE-кандидатов
+//                                            val sendJobs = iceCandidatesList.map { candidate ->
+//                                                coroutineScope {
+//                                                    async {
+//                                                        val iceCandidateMessage = WebRTCMessage(
+//                                                            type = "ICEcandidate",
+//                                                            calleeId = otherUserId.value,
+//                                                            iceMessage = rtcMessageDTO(
+//                                                                label = candidate.sdpMLineIndex,
+//                                                                id = candidate.sdpMid,
+//                                                                candidate = candidate.candidate,
+//                                                            ),
+//                                                        )
+//
+//                                                        val jsonMessage = Json.encodeToString(
+//                                                            WebRTCMessage.serializer(),
+//                                                            iceCandidateMessage
+//                                                        )
+//
+//                                                        try {
+//                                                            Logger.d { "PC2213131: $jsonMessage" }
+//                                                            Logger.d { "wsSession: ${wsSession.value}" }
+//
+//                                                            if (wsSession.value?.isActive == true) {
+//                                                                wsSession.value?.send(
+//                                                                    Frame.Text(
+//                                                                        jsonMessage
+//                                                                    )
+//                                                                )
+//                                                                println("Message sent successfully")
+//                                                            } else {
+//                                                                println("WebSocket session is not active")
+//                                                            }
+//                                                        } catch (e: Exception) {
+//                                                            e.printStackTrace()
+//                                                            println("Failed to send message: onIceCandidate ${e.message}")
+//                                                        }
+//                                                    }
+//                                                }
+//                                            }
+//
+//                                            // Дожидаемся завершения всех отправок
+//                                            runBlocking {
+//                                                sendJobs.awaitAll()
+//                                            }
+                                            
+                                            println("All ICE candidates sent. Proceeding with SDP setting.")
                                             
                                             println("return@launch callAnswered ${it["sdp"]?.jsonPrimitive?.content}")
                                             
                                             val sdp =
-                                                it["sdp"]?.jsonPrimitive?.content ?: return@launch
+                                                it["sdp"]?.jsonPrimitive?.content ?: return@let
                                             
                                             val answer = SessionDescription(
                                                 SessionDescriptionType.Answer,
                                                 sdp
                                             )
                                             _peerConnection.value?.setRemoteDescription(answer)
+                                            
+                                            if (getPlatform() == Platform.Ios) {
+                                                val swiftFuncsClass: SwiftFuncsClass =
+                                                    getKoin().get()
+                                                
+                                                swiftFuncsClass.initCallKit(
+                                                    phone = calleeUser.value.phone,
+                                                    callId = "1"
+                                                )
+                                            }
                                         }
                                     }
                                     
@@ -380,6 +454,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         println("fafafasfa515151151 ${isScreenOn()}")
                                         
+                                        if (getPlatform() == Platform.Ios) {
+                                            val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                                            
+                                            swiftFuncsClass.stopAVAudioSession()
+                                            
+                                        }
                                         
                                         val callViewModel: CallViewModel =
                                             KoinPlatform.getKoin().get()
@@ -397,23 +477,20 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                         
                                         setIsCallActive(false)
                                         
-
+                                        
                                         
                                         if (isScreenOn()) {
                                             if (_isIncomingCall.value) {
                                                 println("rejectCallAnswer() ${_isIncomingCall.value}")
-                                                if (currentScreen is CallScreen) {
-                                                    println("Мы на экране CallScreen 1")
-
-                                                    // Вы на экране CallScreen
-                                                    navigator?.push(MainScreen())
-
-                                                } else if (currentScreen is MainScreen) {
-                                                    // Вы на экране MainScreen
-                                                    println("Мы на экране MainScreen 1")
+                                                println("Мы на экране CallScreen 1")
+                                                
+                                                // Вы на экране CallScreen
+                                                if (navigator != null) {
+                                                    navigateToScreen(navigator, MainScreen())
                                                 }
+                                                
                                             }
-
+                                            
                                             if (isCall.value) {
                                                 rejectCallAnswer(
                                                     userId = userID,
@@ -423,22 +500,20 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                                 )
                                                 println("rejectCallAnswer() 1")
                                             }
-                                            
-                                            
-                                            
-                                            
+
+
 //                                            if (isConnectedWebrtc.value) {
-                                                println("rejectCallAnswer() ${currentScreen}")
-                                                if (currentScreen is CallScreen) {
-                                                    // Вы на экране CallScreen
-                                                    navigator?.push(MainScreen())
-                                                    
-                                                    println("Мы на экране CallScreen 2")
-                                                } else if (currentScreen is MainScreen) {
-                                                    // Вы на экране MainScreen
-                                                    println("Мы на экране MainScreen 2")
-                                                }
+                                            println("rejectCallAnswer() ${currentScreen}")
+                                            if (currentScreen is CallScreen) {
+                                                // Вы на экране CallScreen
+                                                navigateToScreen(navigator, MainScreen())
                                                 
+                                                println("Мы на экране CallScreen 2")
+                                            } else if (currentScreen is MainScreen) {
+                                                // Вы на экране MainScreen
+                                                println("Мы на экране MainScreen 2")
+                                            }
+
 //                                            }
                                         } else {
                                             rejectCallAnswer()
@@ -465,6 +540,28 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
+    suspend fun reconnectCallWebSocket(
+        userId: String
+    ) {
+        
+        while (wsSession.value == null || wsSession.value?.isActive == false) {
+            try {
+                println("Attempting to reconnect WebSocket...")
+                connectionWs(
+                    userId = userId,
+                )
+                if (wsSession.value != null) {
+                    println("WebSocket reconnected successfully!")
+                    break
+                }
+            } catch (e: Exception) {
+                println("Reconnect failed: ${e.message}. Retrying in 3 seconds...")
+                delay(3000) // Задержка перед следующей попыткой
+            }
+        }
+    }
+    
+    
     override suspend fun disconnectWs() {
         wsSession.value?.close()
     }
@@ -474,14 +571,19 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
         isCall.value = true
         println("signalingStateClose")
-
-//            val peerConnection.value = PeerConnection(rtcConfiguration)
-
-
-//            _peerConnection.value = PeerConnection(rtcConfiguration)
+        
+        
+        _peerConnection.value = PeerConnection(rtcConfiguration)
         
         
         println("peerConnection.value ${peerConnection.value}")
+        
+        if (getPlatform() == Platform.Ios) {
+            val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+
+//            swiftFuncsClass.setAVAudioSession()
+            
+        }
         
         val stream = MediaDevices.getUserMedia(audio = true)
         
@@ -516,6 +618,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 .onEach { candidate ->
                     println("candidate ${candidate}")
                     
+                    iceCandidates.value?.add(candidate)
+                    
                     val iceCandidateMessage = WebRTCMessage(
                         type = "ICEcandidate",
                         calleeId = otherUserId.value,
@@ -528,13 +632,16 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), iceCandidateMessage)
-                    
+
+//                    if (!isCallMaker.value) {
                     try {
                         Logger.d { "PC2213131: $jsonMessage" }
                         Logger.d { "wsSession: ${wsSession.value}" }
                         
                         // Проверяем, активна ли корутина и открыт ли WebSocket
                         if (wsSession.value?.isActive == true) {
+
+//                            delay(5000)
                             wsSession.value?.send(Frame.Text(jsonMessage))
                             println("Message sent successfully")
                         } else {
@@ -544,6 +651,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         e.printStackTrace()
                         println("Failed to send message: onIceCandidate ${e.message}")
                     }
+//                    }
+                    
                     
                     peerConnection.value?.addIceCandidate(candidate)
                 }
@@ -574,7 +683,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             peerConnection.value!!.onConnectionStateChange
                 .onEach { state ->
                     Logger.d { "peerState111 onConnectionStateChange: $state" }
-                    
+
 //                    AudioFactory.createAudioPlayer().stopAllAudioStreams()
                     
                     _callState.value = state
@@ -585,10 +694,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             // Обработка треков, получаемых от удалённого пира
             peerConnection.value!!.onTrack
-                .onEach { event ->
-                    println( "onTrack: $  ${event.track} ${event.streams} ${event.receiver} ${event.transceiver}" )
-                    if (event.track?.kind == MediaStreamTrackKind.Video) {
-                        remoteVideoTrack.value = event.track as VideoStreamTrack
+                .onEach { println("PC2 onTrack: ${it.track?.kind}") }
+                .map { it.track }
+                .filterNotNull()
+                .onEach {
+                    if (it.kind == MediaStreamTrackKind.Audio) {
+                        remoteAudioTrack.value = it as AudioStreamTrack
+                    } else if (it.kind == MediaStreamTrackKind.Video) {
+                        remoteVideoTrack.value = it as VideoStreamTrack
                     }
                 }
                 .launchIn(this)
@@ -624,6 +737,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
+    suspend fun setMedia() {
+        val stream = MediaDevices.getUserMedia(audio = true, video = true)
+        
+        localStream.value = stream
+    }
+    
+    
     override fun updateOtherUserId(userId: String) {
         
         otherUserId.value = userId
@@ -633,132 +753,53 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun makeCall(userId: String, calleeId: String) {
         println("makeCall31313131 ${wsSession.value}")
-
+        
+        isCallMaker.value = true
+        
         coroutineScope {
+//            resetWebRTC()
+            
             if (wsSession.value != null) {
                 try {
                     println("makeCall")
-
+                    
+                    
                     val offer = peerConnection.value?.createOffer(
-                        OfferAnswerOptions(
-                            offerToReceiveAudio = true
-                        )
+                        OfferAnswerOptions(offerToReceiveAudio = true)
                     )
                     if (offer != null) {
                         peerConnection.value?.setLocalDescription(offer)
                     }
-
-
+                    
+                    
                     if (wsSession.value?.outgoing?.isClosedForSend == true) {
                         return@coroutineScope
                     }
-
+                    
+                    println("offer $offer")
+                    
                     val newCallMessage = WebRTCMessage(
                         type = "call",
                         calleeId = calleeId,
                         userId = userId,
                         rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
                     )
-
-
+                    
+                    
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-
+                    
                     wsSession.value?.send(Frame.Text(jsonMessage))
-                    println("Message sent successfully Call")
-
-
+                    println("Message sent successfully Call $jsonMessage")
+                    
+                    
                 } catch (e: Exception) {
                     println("Failed to send message: ${e.message}")
                 }
             }
         }
-
+        
     }
-//
-//    override suspend fun makeCall(userId: String, calleeId: String) {
-//        println("callIOS ${wsSession.value}")
-//
-//        coroutineScope {
-//            if (wsSession.value != null) {
-//                try {
-//                    println("makeCall")
-//
-//                    val offer = peerConnection.value?.createOffer(
-//                        OfferAnswerOptions(
-//                            offerToReceiveAudio = true
-//                        )
-//                    )
-//                    if (offer != null) {
-//                        peerConnection.value?.setLocalDescription(offer)
-//                    }
-//
-//
-//                    if (wsSession.value?.outgoing?.isClosedForSend == true) {
-//                        return@coroutineScope
-//                    }
-//
-//                    val newCallMessage = WebRTCMessage(
-//                        type = "callIOS",
-//                        calleeId = calleeId,
-//                        userId = userId,
-//                        rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
-//                    )
-//
-//                    val jsonMessage =
-//                        Json.encodeToString(WebRTCMessage.serializer(), newCallMessage)
-//
-//                    wsSession.value?.send(Frame.Text(jsonMessage))
-//
-//                    println("Message sent successfully Call")
-//
-//
-//                } catch (e: Exception) {
-//                    println("Failed to send message: ${e.message}")
-//                }
-//            }
-//        }
-//
-//    }
-    
-    
-    suspend fun sendCall() {
-        try {
-            
-            val client = HttpClient(getHttpClientEngine())
-            
-            val jsonContent = Json.encodeToString(buildJsonObject {
-                put(
-                    "deviceToken",
-                    "808f2ae7ade15325d8b35347c18f461393ce6725e3f677f9fa3070aa4a1f758f51a2ff6e3c721e8e32ce4cb5559466a94934b82d2da475efe4bdb0a8c04d7cdd570bbfc430711e620dc5ac75677b09d9"
-                )
-                put("callerName", "Test Call")
-                put("callerId", "1234")
-            })
-            
-            
-            val response: HttpResponse =
-                client.post("http://192.168.1.118:3000/send-voip-notification") {
-                    contentType(ContentType.Application.Json)
-                    setBody(jsonContent)
-                }
-            
-            println("response.bodyAsText() ${response.bodyAsText()}")
-            
-            if (response.status.isSuccess()) {
-                
-                println("response.bodyAsText() ${response.bodyAsText()}")
-                
-            } else {
-                println("Failed to retrieve data: ${response.status.description} ${response.request}")
-            }
-        } catch (e: Exception) {
-            
-            println("Error1111: $e")
-            
-        }
-    }
-    
     
     override suspend fun makeCallBackground(notificToken: String, calleeId: String) {
         coroutineScope {
@@ -812,15 +853,17 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-    
     @OptIn(DelicateCoroutinesApi::class)
     override suspend fun answerCall() {
-        coroutineScope {
+        CoroutineScope(Dispatchers.IO).launch { // Запускаем в фоновом потоке
             if (wsSession.value != null) {
-                
                 try {
-//                    configureAudioSession() // Настраиваем аудиосессию
-                    
+                    if (getPlatform() == Platform.Ios) {
+                        val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                        
+                        swiftFuncsClass.setAVAudioSession()
+                        
+                    }
                     println("answerCall1")
                     setRemoteDisc()
                     println("answerCall12")
@@ -830,14 +873,11 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     println("answerCall123")
                     
                     val answer = peerConnection.value?.createAnswer(
-                        options = OfferAnswerOptions(
-                            offerToReceiveAudio = true
-                        )
+                        options = OfferAnswerOptions()
                     )
                     println("answerCall1234")
                     
                     if (answer != null) {
-                        
                         if (peerConnection.value?.remoteDescription == null) {
                             println("❌ RemoteDescription не установлен перед setLocalDescription")
                         } else {
@@ -848,8 +888,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     if (wsSession.value?.outgoing?.isClosedForSend == true) {
                         println("wsSession.value?.outgoing?.isClosedForSend aaaa!!!!!!!")
-                        
-                        return@coroutineScope
+                        return@launch
                     }
                     
                     val answerCallMessage = WebRTCMessage(
@@ -858,13 +897,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                         rtcMessage = answer?.let { SessionDescriptionDTO(it.type, answer.sdp) }
                     )
                     
-                    println(
-                        "answerCallMessage $answerCallMessage"
-                    )
+                    println("answerCallMessage $answerCallMessage")
                     val jsonMessage =
                         Json.encodeToString(WebRTCMessage.serializer(), answerCallMessage)
-                    
-                    
                     
                     wsSession.value?.send(Frame.Text(jsonMessage))
                     
@@ -872,12 +907,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     
                     println("Message sent successfully")
                 } catch (e: Exception) {
-                    println("Failed to send message: ${e.message}")
+                    println("❌ Failed to send message: ${e.message}")
                 }
             }
         }
-        
     }
+    
     
     override fun answerCallBackground() {
         
@@ -921,9 +956,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                                 println("111111")
                                 
                                 val answer = peerConnection.value?.createAnswer(
-                                    options = OfferAnswerOptions(
-                                        offerToReceiveAudio = true
-                                    )
+                                    options = OfferAnswerOptions()
                                 )
                                 println("22222")
                                 
@@ -1035,7 +1068,9 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             println("errorRejectCall: $e")
             val navigator = commonViewModel.mainNavigator.value
             
-            navigator?.push(MainScreen())
+            if (navigator != null) {
+                navigateToScreen(navigator, MainScreen())
+            }
             return false
             
         } finally {
@@ -1051,6 +1086,14 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         duration: String? = null
     ) {
         try {
+            
+            if (getPlatform() == Platform.Ios) {
+                val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                
+                swiftFuncsClass.stopAVAudioSession()
+            }
+            
+            
             if (!_isIncomingCall.value) {
                 // Убедиться, что сообщение отправляется только один раз
                 if (isCallRejected) {
@@ -1086,14 +1129,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             
             if (currentPeerConnection !== null && currentPeerConnection.signalingState != SignalingState.Closed) {
                 // Останавливаем все треки локального потока
-                println("rejectCallAnswer2")
-                
-                localStream.value?.let { stream ->
-                    stream.tracks.forEach { track ->
-                        track.stop()
-                    }
-                }
-                
+                println("rejectCallAnswer2signalingState")
+
+//                localStream.value?.let { stream ->
+//                    stream.tracks.forEach { track ->
+//                        track.stop()
+//                    }
+//                }
                 println("rejectCallAnswer3")
                 
                 // Удаляем все треки
@@ -1101,8 +1143,12 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     currentPeerConnection.removeTrack(it.sender)
                 }
                 
+                localStream.value?.release()
+                
                 // Закрываем PeerConnection
                 currentPeerConnection.close()
+                
+                
             } else {
                 Logger.w { "PeerConnection already closed" }
             }
@@ -1113,7 +1159,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             _isCallActive.value = false
             _isIncomingCall.value = false
             _isCallBackground.value = false
-            localStream.value = null
+//            localStream.value = null
             remoteVideoTrack.value = null
             _isConnectedWebrtc.value = false
             offer.value = null
@@ -1125,7 +1171,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
             println("rejectCallAnswer5")
             _chatId.value = ""
             _calleeId.value = ""
-            _peerConnection.value = PeerConnection(rtcConfiguration)
+            _peerConnection.value = null
             
             
             
@@ -1134,17 +1180,13 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 val navigator = commonViewModel.mainNavigator.value
                 val currentScreen = navigator?.lastItem
                 
-                if (currentScreen is CallScreen) {
-                    // Вы на экране CallScreen
-                    
-                    println("MainScreen $navigator")
-                    navigator.push(MainScreen())
-                    
-                    println("Мы на экране CallScreen")
-                } else if (currentScreen is MainScreen) {
-                    // Вы на экране MainScreen
-                    println("Мы на экране MainScreen")
+                // Вы на экране CallScreen
+                
+                println("MainScreen $navigator")
+                if (navigator != null) {
+                    navigateToScreen(navigator, MainScreen())
                 }
+                
             } else {
                 CoroutineScope(Dispatchers.IO).launch {
                     wsSession.value?.close()
@@ -1207,6 +1249,47 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         _calleeId.value = calleeId
     }
     
+    override fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
+        calleeUser.value = calleeUserInfo
+    }
+    
+    override fun resetWebRTC() {
+        println("🛑 Resetting WebRTC session...")
+//
+//        // 1. Остановка всех треков локального потока
+//        localStream.value?.tracks?.forEach { it.stop() }
+//        localStream.value = null
+//
+//        remoteVideoTrack.value = null
+//
+//        // 2. Закрываем текущий PeerConnection
+//        _peerConnection.value?.close()
+//        _peerConnection.value = null
+
+//        // 3. Закрываем WebSocket
+//        wsSession.value?.close()
+//        _wsSession.value = null
+        
+        // 4. Деактивируем AVAudioSession (iOS)
+//        if (getPlatform() == Platform.Ios) {
+//            val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+//            swiftFuncsClass.stopAVAudioSession() // Добавь этот метод в Swift
+//        }
+//
+        // 5. Сбрасываем состояние
+//        _isConnectedWebrtc.value = false
+//        _isConnectedWs.value = false
+//        _isCallActive.value = false
+//        _isIncomingCall.value = false
+//        _isCallBackground.value = false
+//        offer.value = null
+//        otherUserId.value = ""
+//        callerId.value = generateRandomNumber()
+//        _chatId.value = ""
+//        _calleeId.value = ""
+        
+        println("✅ WebRTC session reset complete.")
+    }
     
 }
 
@@ -1229,3 +1312,7 @@ suspend fun initializeAudioSessionAndStream(): MediaStream? {
         }
     }
 }
+
+
+
+

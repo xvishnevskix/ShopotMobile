@@ -1,5 +1,6 @@
 package org.videotrade.shopot.domain.usecase
 
+import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.IceConnectionState
 import com.shepeliev.webrtckmp.MediaStream
 import com.shepeliev.webrtckmp.PeerConnection
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.repository.CallRepository
 
 class CallUseCase : KoinComponent {
@@ -25,6 +27,7 @@ class CallUseCase : KoinComponent {
     val isCallActive: StateFlow<Boolean> get() = repository.isCallActive
     val localStream: StateFlow<MediaStream?> get() = repository.localStream
     val remoteVideoTrack: StateFlow<VideoStreamTrack?> get() = repository.remoteVideoTrack
+    val remoteAudioTrack: StateFlow<AudioStreamTrack?> get() = repository.remoteAudioTrack
     val callState: StateFlow<PeerConnectionState> get() = repository.callState
     val iseState: StateFlow<IceConnectionState> get() = repository.iseState
     
@@ -42,8 +45,9 @@ class CallUseCase : KoinComponent {
      fun setOffer(sessionDescription: SessionDescription) {
         return repository.setOffer(sessionDescription)
     }
-    
-
+    fun resetWebRTC() {
+        return repository.resetWebRTC()
+    }
     
     suspend fun getWsSession(): DefaultClientWebSocketSession? {
         return repository.getWsSession()
@@ -131,7 +135,11 @@ class CallUseCase : KoinComponent {
     fun setCalleeId(calleeId: String) {
         return repository.setCalleeId(calleeId)
     }
-
+    
+    fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
+        return repository.setCalleeUserInfo(calleeUserInfo)
+    }
+    
 
     
 }

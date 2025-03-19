@@ -1,23 +1,47 @@
 import Foundation
 import ComposeApp
+import AVFoundation // ✅ Добавляем импорт
 
-class IosSwiftFuncsHelper : SwiftFuncsHelper {
+class IosSwiftFuncsHelper: SwiftFuncsHelper {
+    func doInitCallKit(phone: String, callId: String) {
+        print("📞 Инициализируем CallKit с номером: \(phone) и callId: \(callId)")
+        pushKitHandler.initializeCall(phone: phone, callId: callId)    }
+    
     private let pushKitHandler: PushKitHandler
 
     init(pushKitHandler: PushKitHandler) {
         self.pushKitHandler = pushKitHandler
     }
 
-    func testFunc() {
-        print("ADDADAD")
+    func endCall() {
+        print("🔴 Завершаем звонок из IosSwiftFuncsHelper")
+        pushKitHandler.endAllCalls()
     }
 
-    @objc func endCall() {
-        print("🔴 Завершаем звонок из IosSwiftFuncsHelper")
+    func stopAVAudioSession() {
+        print("🔇 Останавливаем AVAudioSession")
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setActive(false, options: .notifyOthersOnDeactivation)
+            print("🛑 AVAudioSession деактивирован")
+        } catch {
+            print("❌ Ошибка при деактивации AVAudioSession: \(error.localizedDescription)")
+        }
+    }
 
-        pushKitHandler.endAllCalls() // ✅ Вызываем метод у переданного объекта CallManager
+    func setAVAudioSession() {
+        print("🎤 Активируем AVAudioSession")
+//        do {
+//            let audioSession = AVAudioSession.sharedInstance()
+//            try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .defaultToSpeaker])
+//            try audioSession.setActive(true)
+//            print("✅ AVAudioSession успешно активирован")
+//        } catch {
+//            print("❌ Ошибка при активации AVAudioSession: \(error.localizedDescription)")
+//        }
     }
 }
+
 
 
 class Logger {

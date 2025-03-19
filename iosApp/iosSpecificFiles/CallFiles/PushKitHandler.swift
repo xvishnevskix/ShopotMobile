@@ -83,7 +83,7 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
 
         let update = CXCallUpdate()
         update.remoteHandle = CXHandle(type: .generic, value: "+\(phone)")
-        update.hasVideo = true
+//        update.hasVideo = true
         
 //        activateAudioSession()
 
@@ -98,16 +98,17 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
 
         
         DispatchQueue.main.async {
+            Logger.log("getCallInfo12313131")
                   Task {
                       do {
                           let callHandler = KoinHelperKt.getCallHandler() // ✅ Берем CallHandler из Koin внутри метода
                           let callInfo = try await callHandler.getCallInfo(callId: callId)
                           if let callInfo = callInfo {
                           } else {
-                              print("Call info is nil")
+                              Logger.log("Call info is nil")
                           }
                       } catch {
-                          print("Failed to retrieve call info: \(error)")
+                          Logger.log("Failed to retrieve call info: \(error)")
                       }
                   }
               }
@@ -117,20 +118,20 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
     }
 
     func activateAudioSession() {
-        DispatchQueue.main.async {
-            let audioSession = AVAudioSession.sharedInstance()
-            do {
-                // Деактивируем перед изменениями
-                try audioSession.setActive(false)
-
-                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .defaultToSpeaker])
-                try audioSession.setActive(true)
-                
-                Logger.log("🔊 Аудиосессия успешно активирована")
-            } catch {
-                Logger.log("❌ Ошибка активации аудиосессии: \(error.localizedDescription)")
-            }
-        }
+//        DispatchQueue.main.async {
+//            let audioSession = AVAudioSession.sharedInstance()
+//            do {
+//                // Деактивируем перед изменениями
+//                try audioSession.setActive(false)
+//
+//                try audioSession.setCategory(.playAndRecord, mode: .voiceChat, options: [.allowBluetooth, .defaultToSpeaker])
+//                try audioSession.setActive(true)
+//                
+//                Logger.log("🔊 Аудиосессия успешно активирована")
+//            } catch {
+//                Logger.log("❌ Ошибка активации аудиосессии: \(error.localizedDescription)")
+//            }
+//        }
     }
 
 
@@ -206,5 +207,26 @@ class PushKitHandler: NSObject, PKPushRegistryDelegate, CXProviderDelegate {
             }
         }
     }
+    
+    
+    func initializeCall(phone: String, callId: String) {
+        let uuid = UUID()
+        let handle = CXHandle(type: .generic, value: "+\(phone)")
+        
+        let startCallAction = CXStartCallAction(call: uuid, handle: handle)
+//        startCallAction.isVideo = true // Включи, если хочешь видеозвонок
+        
+        let transaction = CXTransaction(action: startCallAction)
+        
+        callController.request(transaction) { error in
+            if let error = error {
+                Logger.log("❌ Ошибка запуска вызова: \(error.localizedDescription)")
+            } else {
+                Logger.log("✅ Вызов успешно начался через CallKit")
+            }
+        }
+    }
+
+        
 
 }

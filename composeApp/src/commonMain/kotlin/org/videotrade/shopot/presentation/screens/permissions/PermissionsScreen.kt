@@ -137,7 +137,7 @@ class PermissionsScreen : Screen {
 
                         }
 
-                        navigator.replace(IntroScreen())
+                        navigateToScreen(navigator,IntroScreen())
                     }
                 }, style = ButtonStyle.Gradient)
                 

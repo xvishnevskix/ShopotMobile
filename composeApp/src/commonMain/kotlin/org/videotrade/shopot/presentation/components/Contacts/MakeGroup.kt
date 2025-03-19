@@ -36,6 +36,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.presentation.screens.contacts.CreateGroupFirstScreen
 import shopot.composeapp.generated.resources.ArsonPro_Regular
@@ -63,7 +64,7 @@ import shopot.composeapp.generated.resources.group
                 )
                 .clickable {
                     if (contacts.isNotEmpty())
-                        navigator.push(CreateGroupFirstScreen())
+                        navigateToScreen(navigator,CreateGroupFirstScreen())
                 },
 
             ) {

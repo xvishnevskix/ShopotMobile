@@ -36,24 +36,24 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.seiko.imageloader.rememberImagePainter
 import com.shepeliev.webrtckmp.PeerConnectionState
+import com.shepeliev.webrtckmp.videoTracks
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
 import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.multiplatform.CallProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.SwiftFuncsClass
+import org.videotrade.shopot.multiplatform.Video
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.iosCall.CallHandler.getKoin
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.multiplatform.settingCAudioSession
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -64,7 +64,6 @@ import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.person
 
 class CallScreen(
     private val calleeId: String,
@@ -87,12 +86,17 @@ class CallScreen(
         val callStateView by viewModel.callState.collectAsState()
         val isCallActive by viewModel.isCallActive.collectAsState()
         val isConnectedWs by viewModel.isConnectedWs.collectAsState()
-        val localStream by viewModel.localStreamm.collectAsState()
         val isCallBackground by viewModel.isCallBackground.collectAsState()
         val isIncomingCall by viewModel.isIncomingCall.collectAsState()
         val timerValue = viewModel.timer.collectAsState()
         val isConnectedWebrtc by viewModel.isConnectedWebrtc.collectAsState()
-        val musicPlayer by viewModel.musicPlayer.collectAsState()
+//        val musicPlayer by viewModel.musicPlayer.collectAsState()
+        
+        val localStream by viewModel.localStream.collectAsState()
+        val remoteVideoTrack by viewModel.remoteVideoTrack.collectAsState()
+        val remoteAudioTrack by viewModel.remoteAudioTrack.collectAsState()
+        
+        
         
         val hasExecuted = remember { mutableStateOf(false) }
         
@@ -104,12 +108,12 @@ class CallScreen(
             
             setScreenLockFlags(true)
         }
-
+        
         LaunchedEffect(Unit) {
             settingsViewModel.setProximitySensorEnabled(true)
             println("ProximitySensor Включаем датчик приближения")
         }
-
+        
         DisposableEffect(Unit) {
             println("ProximitySensor Отключаем датчик приближения")
             onDispose {
@@ -121,34 +125,13 @@ class CallScreen(
         val isSwitchToMicrophone = remember { mutableStateOf(true) }
         
         var isPlaying by remember { mutableStateOf(false) }
-        
-        
-        val imagePainter = if (userIcon.isNullOrBlank()) {
-            painterResource(Res.drawable.person)
-        } else {
-            rememberImagePainter("${SERVER_URL}file/plain/${userIcon}")
-        }
-        
+
         LaunchedEffect(Unit) {
             onResumeCallActivity(navigator)
         }
         
         LaunchedEffect(Unit) {
-            if (isIncomingCall) {
-//                musicPlayer.play("callee", true, MusicType.Ringtone)
-                isPlaying = true
-            } else {
-//                musicPlayer.play("caller", true,  MusicType.Ringtone)
-                isPlaying = true
-            }
-            
-        }
-        
-        LaunchedEffect(isCallActive) {
-            if (isCallActive) {
-                musicPlayer.stop()
-                isPlaying = false
-            }
+            settingCAudioSession()
         }
         
         DisposableEffect(Unit) {
@@ -160,21 +143,19 @@ class CallScreen(
                 if (
                     isPlaying
                 ) {
-                    musicPlayer.stop()
+//                    musicPlayer.stop()
                     isPlaying = false
                 }
                 
                 if (getPlatform() == Platform.Ios) {
                     val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
-
+                    
                     swiftFuncsClass.endCall()
                 }
                 
                 
             }
         }
-        
-        println("isIncomingCallCase $isIncomingCall")
         
         if (isIncomingCall) {
             println("isIncomingCallCase")
@@ -195,7 +176,6 @@ class CallScreen(
                 if (profileId != null) {
                     commonViewModel.mainNavigator.value = navigator
                     viewModel.checkUserShared(profileId, navigator)
-                    
                 }
             }
             
@@ -204,14 +184,10 @@ class CallScreen(
                 println("isConnectedWs $isConnectedWs")
                 if (isConnectedWs) {
 //                    viewModel.setIsCallBackground(false)
-                    
-                    
                     if (getPlatform() == Platform.Ios) {
-                        
                         viewModel.answerCall()
                     } else {
                         viewModel.answerCallBackground()
-                        
                     }
                     
                 }
@@ -219,13 +195,14 @@ class CallScreen(
         } else {
             LaunchedEffect(isConnectedWs) {
                 
-                println("Call")
+                println("Call $sendCall")
                 
                 if (sendCall == true) {
-                    if (!isCallActive)
-                        if (isConnectedWs) {
-                            viewModel.initCall(calleeId)
-                        }
+                    println("Call ${!isCallActive} $isConnectedWs")
+                    
+                    if (!isCallActive && isConnectedWs) {
+                        viewModel.initCall(calleeId)
+                    }
                 }
                 
             }
@@ -349,8 +326,6 @@ class CallScreen(
                     )
 
 
-
-
 //                    Text(
 //                        modifier = Modifier
 //                            .padding(top = 12.5.dp)
@@ -363,7 +338,6 @@ class CallScreen(
 //                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
 //                        lineHeight = 20.sp,
 //                    )
-
 
 
 //            Row(
@@ -382,11 +356,11 @@ class CallScreen(
 //                microfonBtn {}
 //            }
                 }
-
-
+                
+                
                 //футер с кнопками
                 Column {
-
+                    
                     Crossfade(targetState = isSwitchToMicrophone.value) { isSwitched ->
                         if (!isSwitched) {
                             Column(
@@ -409,10 +383,38 @@ class CallScreen(
                             Spacer(modifier = Modifier.height(42.dp))
                         }
                     }
-
-
+                    val localVideoTrack = localStream?.videoTracks?.firstOrNull()
+//
+//                    Column {
+//                        localVideoTrack?.let {
+//                            Video(
+//                                videoTrack = it,
+//                                modifier = Modifier.weight(0.3f).fillMaxWidth()
+//                            )
+//                        } ?: Box(
+//                            modifier = Modifier.weight(0.3f).fillMaxWidth(),
+//                            contentAlignment = Alignment.Center,
+//                        ) {
+//                            androidx.compose.material.Text("Local video")
+//                        }
+//
+//                        remoteVideoTrack?.let {
+//                            Video(
+//                                videoTrack = it,
+//                                audioTrack = remoteAudioTrack,
+//                                modifier = Modifier.weight(0.3f).fillMaxWidth(),
+//                            )
+//                        } ?: Box(
+//                            modifier = Modifier.weight(0.3f).fillMaxWidth(),
+//                            contentAlignment = Alignment.Center,
+//                        ) {
+//                            androidx.compose.material.Text("Remote video")
+//                        }
+//
+//                    }
+                    
                     Row {
-
+                        
                         if (isIncomingCall) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -434,49 +436,57 @@ class CallScreen(
                                 horizontalArrangement = Arrangement.Center,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-
+                                
                                 speakerBtn(isSwitchToSpeaker.value) {
-                                    CallProviderFactory.create().switchToSpeaker(isSwitchToSpeaker.value)
-
-
+                                    CallProviderFactory.create()
+                                        .switchToSpeaker(isSwitchToSpeaker.value)
+                                    
+                                    
                                     isSwitchToSpeaker.value = !isSwitchToSpeaker.value
                                 }
                                 Spacer(modifier = Modifier.width(15.dp))
-
+                                
                                 microfonBtn(isSwitchToMicrophone.value) {
                                     viewModel.setMicro()
                                     isSwitchToMicrophone.value = !isSwitchToMicrophone.value
 //                            viewModel.setIsCallActive(true)
-                                        viewModel.startTimer(userIcon)
-                                    }
-                                    
-                                    Spacer(modifier = Modifier.width(15.dp))
-                                    
-                                    rejectBtn({
-                                        
-                                        
-                                        viewModel.rejectCall(calleeId, timerValue.value)
-                                        
-                                        if (getPlatform() == Platform.Ios) {
-                                            val swiftFuncsClass: SwiftFuncsClass= getKoin().get()
-                                            
-                                            swiftFuncsClass.endCall()
-                                        }
-                                        
-                                    }, size = 56.dp)
-//
+                                    viewModel.startTimer(userIcon)
                                 }
                                 
+                                Spacer(modifier = Modifier.width(15.dp))
+                                
+                                rejectBtn({
+                                    
+                                    
+                                    viewModel.rejectCall(calleeId, timerValue.value)
+                                    
+                                    if (getPlatform() == Platform.Ios) {
+                                        val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                                        
+                                        swiftFuncsClass.endCall()
+                                    }
+                                    
+                                    if (getPlatform() == Platform.Ios) {
+                                        val swiftFuncsClass: SwiftFuncsClass = getKoin().get()
+                                        
+                                        swiftFuncsClass.stopAVAudioSession()
+                                        
+                                    }
+                                    
+                                }, size = 56.dp)
+//
                             }
-                            
                             
                         }
                         
-                        Spacer(modifier = Modifier.height(40.dp))
+                        
                     }
                     
+                    Spacer(modifier = Modifier.height(40.dp))
                 }
+                
             }
         }
     }
+}
 

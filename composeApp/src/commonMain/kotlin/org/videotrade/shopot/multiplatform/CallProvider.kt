@@ -22,3 +22,6 @@ expect fun isCallActiveNatific()
 expect fun clearNotificationsForChannel(channelId: String)
 
 expect fun closeAppAndCloseCall()
+
+
+expect fun settingCAudioSession()

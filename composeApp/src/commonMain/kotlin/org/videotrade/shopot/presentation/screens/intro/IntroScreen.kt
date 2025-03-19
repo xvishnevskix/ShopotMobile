@@ -45,8 +45,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
-import org.videotrade.shopot.isActiveCallIos
 import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.NetworkHelper
 import org.videotrade.shopot.multiplatform.NetworkStatus
@@ -54,6 +54,7 @@ import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.checkNetwork
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.multiplatform.iosCall.isActiveCallIos
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.components.Common.LogoLoading
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -86,12 +87,10 @@ class IntroScreen : Screen {
         if (isCallBackground) {
             return
         }
-
+        
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {
-                if (navigator.lastItem !is MainScreen) {
-                    navigator.push(MainScreen())
-                }
+                navigateToScreen(navigator,MainScreen())
             }
         }
 
@@ -99,46 +98,57 @@ class IntroScreen : Screen {
 
         LaunchedEffect(key1 = Unit) {
             try {
+
+
                 if (checkNetwork()) {
                     val isCheckVersion = false
+//                        updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
+
                     if (isCheckVersion) {
-                        if (navigator.lastItem !is UpdateScreen) {
-                            navigator.push(UpdateScreen())
-                        }
+                        navigateToScreen(navigator,UpdateScreen())
                     } else {
+
                         viewModel.navigator.value = navigator
 
-                        val contactsNative = PermissionsProviderFactory.create().checkPermission("contacts")
+
+                        val contactsNative =
+                            PermissionsProviderFactory.create().checkPermission("contacts")
                         PermissionsProviderFactory.create().getPermission("notifications")
 
+
+
+
                         if (!contactsNative) {
-                            if (navigator.lastItem !is PermissionsScreen) {
-                                navigator.replace(PermissionsScreen())
-                            }
+                            navigateToScreen(navigator,PermissionsScreen())
                             return@LaunchedEffect
                         }
+
 
                         val response = origin().reloadTokens(navigator)
-                        if (response != null) {
-                            сommonViewModel.setMainNavigator(navigator)
-                            сommonViewModel.cipherShared(response, navigator)
-                            return@LaunchedEffect
-                        }
 
-                        if (navigator.lastItem !is WelcomeScreen) {
-                            navigator.replace(WelcomeScreen())
+                        if (response != null) {
+
+                            сommonViewModel.setMainNavigator(navigator)
+
+                            сommonViewModel.cipherShared(response, navigator)
+
+
+                            return@LaunchedEffect
+
+
                         }
+                        println("dasdadasadsad")
+                        navigateToScreen(navigator,WelcomeScreen())
+
+
                     }
                 } else {
-                    if (navigator.lastItem !is NetworkErrorScreen) {
-                        navigator.replace(NetworkErrorScreen())
-                    }
+                    navigateToScreen(navigator,NetworkErrorScreen())
                 }
             } catch (e: Exception) {
-                if (navigator.lastItem !is NetworkErrorScreen) {
-                    navigator.replace(NetworkErrorScreen())
-                }
+                navigateToScreen(navigator,NetworkErrorScreen())
             }
+
         }
 
 
