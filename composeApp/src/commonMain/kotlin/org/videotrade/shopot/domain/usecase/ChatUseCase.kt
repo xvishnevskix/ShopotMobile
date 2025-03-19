@@ -12,6 +12,8 @@ class ChatUseCase : KoinComponent {
 
     val currentChat: StateFlow<ChatItem?> get() = repository.currentChat
 
+    val userStatuses: StateFlow<Map<String, String>> = repository.userStatuses
+
     fun setMessagePage(page: Int) {
         return repository.setMessagePage(page)
 
@@ -100,4 +102,24 @@ class ChatUseCase : KoinComponent {
     fun setCurrentChat(chat: ChatItem) {
         return repository.setCurrentChat(chat)
     }
+
+
+
+
+    suspend fun startListeningForStatusUpdates() {
+        repository.listenForUserStatusUpdates()
+    }
+
+    suspend fun sendUserStatus(action: String) {
+        repository.sendUserStatus(action)
+    }
+
+    suspend fun sendTypingStart() = sendUserStatus("startTyping")
+    suspend fun sendTypingEnd() = sendUserStatus("stopTyping")
+    suspend fun sendFileUploadStart() = sendUserStatus("startSendingFile")
+    suspend fun sendFileUploadEnd() = sendUserStatus("stopSendingFile")
+    suspend fun sendStickerChoosingStart() = sendUserStatus("startChoosingSticker")
+    suspend fun sendStickerChoosingEnd() = sendUserStatus("stopChoosingSticker")
+    suspend fun sendVoiceRecordingStart() = sendUserStatus("startRecordingVoice")
+    suspend fun sendVoiceRecordingEnd() = sendUserStatus("stopRecordingVoice")
 }

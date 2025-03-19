@@ -1,6 +1,8 @@
 package org.videotrade.shopot.data.remote.repository
 
 import io.ktor.websocket.Frame
+import io.ktor.websocket.readText
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -9,6 +11,8 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -21,6 +25,8 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
     private val _currentChat = MutableStateFlow<ChatItem?>(null)
     override val currentChat: StateFlow<ChatItem?> get() = _currentChat.asStateFlow()
 
+    private val _userStatuses = MutableStateFlow<Map<String, String>>(emptyMap())
+    override val userStatuses: StateFlow<Map<String, String>> = _userStatuses.asStateFlow()
 
     private val _messages = MutableStateFlow<List<MessageItem>>(
         emptyList()
@@ -241,6 +247,48 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         if (chatId == currentChat.value?.id)
             _messages.value = _messages.value.filter { it.id != messageId }
 
+    }
+
+
+
+    override suspend fun sendUserStatus(action: String) {
+        try {
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", action)
+                }
+            )
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+        } catch (e: Exception) {
+            println("Failed to send status: ${e.message}")
+        }
+    }
+
+    override suspend fun listenForUserStatusUpdates() {
+        wsUseCase.wsSession.value?.incoming?.consumeEach { frame ->
+            if (frame is Frame.Text) {
+                handleWebSocketMessage(frame.readText())
+            }
+        }
+    }
+
+    private fun handleWebSocketMessage(message: String) {
+        try {
+            val jsonObject = Json.parseToJsonElement(message).jsonObject
+            val action = jsonObject["action"]?.jsonPrimitive?.content
+            val userId = jsonObject["userId"]?.jsonPrimitive?.content
+            val status = jsonObject["status"]?.jsonPrimitive?.content // ✅ Достаем статус
+
+            if (userId != null && status != null) {
+                println("Received status update: $userId -> $status") // ✅ Лог для отладки
+
+                _userStatuses.update { currentStatuses ->
+                    currentStatuses + (userId to status)
+                }
+            }
+        } catch (e: Exception) {
+            println("Error parsing WebSocket message: ${e.message}")
+        }
     }
 
 

@@ -89,7 +89,9 @@ class ChatScreen(
         
         LaunchedEffect(isScaffoldStickerState) {
             if (isScaffoldStickerState) {
+
                 scaffoldStickerState.bottomSheetState.expand()
+
             }
         }
         
@@ -271,8 +273,13 @@ class ChatScreen(
                             StickerMenuContent(chat) {
                                 // Функция, которая закроет BottomSheet при выборе стикера
                                 scope.launch {
+                                    viewModel.onStickerChoosingEnd()
                                     scaffoldStickerState.bottomSheetState.partialExpand()
+                                    println("Прекращаем выбирать стикер")
+
+                                    viewModel.onStickerChoosingEnd()
                                     showStickerMenu.value = false
+
                                 }
                             }
                         }
