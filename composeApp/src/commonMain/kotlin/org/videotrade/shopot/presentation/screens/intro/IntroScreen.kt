@@ -145,7 +145,6 @@ class IntroScreen : Screen {
                 } else {
                     navigator.replace(NetworkErrorScreen())
                 }
-
             } catch (e: Exception) {
                 navigator.replace(NetworkErrorScreen())
             }
@@ -195,7 +194,7 @@ class IntroScreen : Screen {
 
                     Text(
 //                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
-                        text = "App Version: alpha~1.1.0",
+                        text = "App Version: alpha~1.1.1",
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
