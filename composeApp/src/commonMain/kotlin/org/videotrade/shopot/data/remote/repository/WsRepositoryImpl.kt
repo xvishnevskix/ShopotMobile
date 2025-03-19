@@ -3,47 +3,38 @@ package org.videotrade.shopot.data.remote.repository
 import cafe.adriel.voyager.navigator.Navigator
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.close
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.isActive
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.handleConnectWebSocket
 import org.videotrade.shopot.domain.repository.WsRepository
-import org.videotrade.shopot.domain.usecase.ChatUseCase
-import org.videotrade.shopot.domain.usecase.ChatsUseCase
-import org.videotrade.shopot.domain.usecase.ContactsUseCase
-import org.videotrade.shopot.multiplatform.CipherWrapper
+import org.videotrade.shopot.domain.usecase.WsUseCase
 
 class WsRepositoryImpl : WsRepository, KoinComponent {
     
-    private val isConnected = MutableStateFlow(false)
+    override  val isConnected: MutableStateFlow<Boolean> = MutableStateFlow(false)
     
     private val _wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     override val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = _wsSession
     
     
     override suspend fun connectionWs(userId: String, navigator: Navigator) {
-        val chatUseCase: ChatUseCase by inject()
-        val chatsUseCase: ChatsUseCase by inject()
-        val contactsUseCase: ContactsUseCase by inject()
-        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+
         
         println("aaaaaaaa1111111 $userId")
         
         handleConnectWebSocket(
-            navigator,
-            _wsSession,
-            isConnected,
             userId,
-            chatUseCase,
-            chatsUseCase,
-            contactsUseCase,
-            cipherWrapper
         )
         
         
     }
+    
+
+    
     
     
     override suspend fun disconnectWs() {
@@ -63,7 +54,7 @@ class WsRepositoryImpl : WsRepository, KoinComponent {
     }
     
     
-    override fun setWsSession(wsSession: DefaultClientWebSocketSession) {
+    override fun setWsSession(wsSession: DefaultClientWebSocketSession?) {
         
         _wsSession.value = wsSession
     }

@@ -72,10 +72,8 @@ expect class FileProvider {
     
     suspend fun loadBitmapFromFile(filePath: String): ImageBitmap?
 
-    suspend fun compressImage(filePath: String): String?
-    suspend fun compressFile(filePath: String): String?
-    suspend fun compressFileWithLength(filePath: String): String?
 
+    fun openFileOrDirectory(filePath: String): Boolean
 }
 
 expect object FileProviderFactory {

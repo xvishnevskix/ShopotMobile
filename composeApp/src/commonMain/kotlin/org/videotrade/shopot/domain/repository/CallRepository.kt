@@ -9,6 +9,7 @@ import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
+import org.videotrade.shopot.domain.model.ProfileDTO
 
 interface CallRepository {
     
@@ -82,6 +83,8 @@ interface CallRepository {
     fun setChatId(chatId: String)
     
     fun setCalleeId(calleeId: String)
+    
+    fun setCalleeUserInfo(calleeUserInfo: ProfileDTO)
     
     fun setOffer(sessionDescription: SessionDescription)
     

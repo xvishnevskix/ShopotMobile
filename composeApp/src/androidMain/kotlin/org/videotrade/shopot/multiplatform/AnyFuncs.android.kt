@@ -104,3 +104,10 @@ actual fun openUrl(url: String) {
     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Убедитесь, что intent запускает новую задачу
     context.startActivity(intent)
 }
+
+actual suspend fun callInPhone(phoneNumber: String) {
+    val intent = Intent(Intent.ACTION_DIAL).apply {
+        data = Uri.parse("tel:$phoneNumber")
+    }
+    getContextObj.getActivity()?.startActivity(intent)
+}

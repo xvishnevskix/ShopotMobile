@@ -130,10 +130,10 @@ class NetworkErrorScreen : Screen {
                             
                             CustomButton(stringResource(MokoRes.strings.network_button_title), {
                                 if (checkNetwork()) {
-                                    navigator.replace(IntroScreen())
+                                    navigateToScreen(navigator,IntroScreen())
                                 } else {
                                     commonViewModel.toaster.show(
-                                        "Не удалось подключиьтся к сети",
+                                        "Не удалось подключиться к сети",
                                         type = ToastType.Error,
                                         duration = ToasterDefaults.DurationDefault
                                     )

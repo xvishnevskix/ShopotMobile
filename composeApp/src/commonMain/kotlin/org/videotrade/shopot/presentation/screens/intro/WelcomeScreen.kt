@@ -61,6 +61,7 @@ import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.multiplatform.LanguageSelector
 import org.videotrade.shopot.multiplatform.openUrl
 import org.videotrade.shopot.presentation.components.Auth.PhoneInput
@@ -195,11 +196,11 @@ class WelcomeScreen : Screen {
                                 )
                                 Spacer(modifier = Modifier.height(50.dp))
                                 CustomButton(stringResource(MokoRes.strings.entrance), {
-                                    navigator.push(SignInScreen())
+                                    navigateToScreen(navigator,SignInScreen())
                                 }, style = ButtonStyle.Primary)
                                 Spacer(modifier = Modifier.height(16.dp))
                                 CustomButton(stringResource(MokoRes.strings.registration), {
-                                    navigator.push(SignUpPhoneScreen())
+                                    navigateToScreen(navigator,SignUpPhoneScreen())
                                 }, style = ButtonStyle.Outline)
                             }
 
@@ -211,7 +212,7 @@ class WelcomeScreen : Screen {
                             modifier = Modifier.padding(bottom = 20.dp).graphicsLayer {
                                 alpha = contentAlpha.value
                             }.pointerInput(Unit) {
-                                navigator.push(FAQ())
+                                navigateToScreen(navigator,FAQ())
                             }
                         ) {
                             Image(

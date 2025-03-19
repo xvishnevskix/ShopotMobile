@@ -41,6 +41,7 @@ import getImageStorage
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileChatHeader
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
@@ -98,7 +99,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                             
                             scope.launch {
                                 imagePainter.value?.let {
-                                    navigator.push(
+                                    navigateToScreen(navigator,
                                         PhotoViewerScreen(
                                             imagePainter,
                                             messageSenderName = "${chat.firstName} ${chat.lastName}",

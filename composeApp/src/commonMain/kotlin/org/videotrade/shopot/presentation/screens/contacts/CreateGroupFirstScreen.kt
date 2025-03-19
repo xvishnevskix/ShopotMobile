@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.InternalResourceApi
 import org.jetbrains.compose.resources.StringResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
@@ -116,7 +117,7 @@ class CreateGroupFirstScreen() : Screen {
                                     duration = ToasterDefaults.DurationDefault
                                 )
                             } else {
-                                navigator.push(CreateGroupSecondScreen())
+                                navigateToScreen(navigator,CreateGroupSecondScreen())
                             }
                         }
                     )
@@ -170,7 +171,7 @@ class CreateGroupFirstScreen() : Screen {
 //                                if (selectedContacts.isEmpty()) {
 ////                                    Toast.makeText(context, "Выберите участников", Toast.LENGTH_SHORT).show()
 //                                } else {
-//                                    navigator.push(CreateGroupSecondScreen())
+//                                    navigateToScreen(navigator,CreateGroupSecondScreen())
 //                                }
 //                            }
 //                        )

@@ -124,7 +124,7 @@ fun Chat(
     var shouldShowHeader by remember { mutableStateOf(false) }
     val answerMessageId = remember { mutableStateOf<String?>(null) }
 
-    var isLoading by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(true) }
     var isVisible by remember { mutableStateOf(false) }
     var numberOfDays by remember { mutableStateOf(0) }
     val largestNumberMessages = if (chat.unread > 23 ) chat.unread else 23
@@ -200,11 +200,16 @@ fun Chat(
                             println("numberOfDays ${numberOfDays}")
                             println("totalItems ${totalItems}")
                             if (visibleItems.isNotEmpty() && visibleItems.last().index == totalItems - 1) {
-                                isLoading = true
+
                                 coroutineScope.launch {
+                                    isLoading = true
+                                    delay(800)
                                     viewModel.getMessagesBack(chat.chatId)
-                                    isLoading = false
+
                                 }
+                            } else {
+                                delay(300)
+                                isLoading = false
                             }
                         }
                     }
@@ -277,20 +282,20 @@ fun Chat(
                     }
 
                 }
-//            if (isLoading) {
-//                item {
-//                    Box(
-//                        modifier = Modifier.fillMaxWidth()
-//                            .padding(16.dp),
-//                        contentAlignment = Alignment.Center
-//                    ) {
-//                        CircularProgressIndicator(
-//                            color = Color(0xFFCAB7A3),
-//                            modifier = Modifier.size(32.dp)
-//                        )
-//                    }
-//                }
-//            }
+            if (isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = Color(0xFFCAB7A3),
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                }
+            }
             }
 
 

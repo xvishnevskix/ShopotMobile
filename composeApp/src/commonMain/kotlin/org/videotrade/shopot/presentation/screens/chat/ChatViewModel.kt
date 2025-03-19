@@ -288,9 +288,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             
             
             if (content !== null && isCipher) {
-                val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
-                
-                val resEncups = encupsMessage(content, cipherWrapper)
+                val resEncups = encupsMessage(content)
                 
                 contentSort = Json.encodeToString(resEncups)
             } else {
@@ -552,7 +550,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val cachedGroupUsers: Map<String, List<GroupUserDTO>> get() = _cachedGroupUsers
 
     suspend fun getGroupUsers(chatId: String): List<GroupUserDTO> {
-        // Если данные уже загружены – возвращаем их
+
         _cachedGroupUsers[chatId]?.let { return it }
 
         return try {

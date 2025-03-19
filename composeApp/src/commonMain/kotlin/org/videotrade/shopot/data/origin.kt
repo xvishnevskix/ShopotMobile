@@ -261,7 +261,7 @@ class origin {
         } catch (e: Exception) {
             
             println("Error2: $e")
-            navigator.replace(NetworkErrorScreen())
+            navigateToScreen(navigator,NetworkErrorScreen())
         } finally {
             client.close()
         }

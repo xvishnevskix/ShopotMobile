@@ -55,4 +55,9 @@ actual fun openUrl(url: String) {
 }
 
 
-
+actual suspend fun callInPhone(phoneNumber: String) {
+    val url = NSURL.URLWithString("telprompt:$phoneNumber") // Используем telprompt вместо tel
+    if (url != null && UIApplication.sharedApplication.canOpenURL(url)) {
+        UIApplication.sharedApplication.openURL(url)
+    }
+}

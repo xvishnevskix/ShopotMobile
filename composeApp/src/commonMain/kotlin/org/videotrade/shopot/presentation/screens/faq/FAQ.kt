@@ -103,6 +103,7 @@ import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.presentation.components.Auth.BaseHeader
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
@@ -127,7 +128,7 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", "$message  \nApp Version: ${BuildConfig.VERSION_NAME}")
+            put("message", "$message  \nApp Version: 1.1.1")
         }.toString()
 
         println("Отправка email с данными: $jsonContent")
@@ -202,13 +203,13 @@ class FAQ() : Screen {
                             .fillMaxWidth()
                     ) {
                         PolicyItem(stringResource(MokoRes.strings.privacy_policy)) {
-                            navigator.push(PrivacyPolicy())
+                            navigateToScreen(navigator,PrivacyPolicy())
                         }
                         PolicyItem(stringResource(MokoRes.strings.user_agreement)) {
-                            navigator.push(UserAgreement())
+                            navigateToScreen(navigator,UserAgreement())
                         }
                         PolicyItem(stringResource(MokoRes.strings.data_processing_agreement)) {
-                            navigator.push(DataProcessingAgreement())
+                            navigateToScreen(navigator,DataProcessingAgreement())
                         }
                     }
                 }
@@ -239,7 +240,7 @@ class FAQ() : Screen {
 
                         Text(
 //                            text = "${MokoRes.strings.app_version}: alpha~1.0.8",
-                            text = "App Version: alpha~${BuildConfig.VERSION_NAME}",
+                            text = "App Version: alpha~1.1.1",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,

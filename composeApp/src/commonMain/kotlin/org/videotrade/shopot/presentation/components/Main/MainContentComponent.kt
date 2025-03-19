@@ -171,18 +171,18 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     var isProcessingUpdate by remember { mutableStateOf(false) }
 
 // Обработка новостей из `once`
-    LaunchedEffect(onceNewsState) {
-        if (!showNewsOnceViewer) {
-            val newsToShow = onceNewsState.find {
-                it.appearance == "once" && !it.viewed &&
-                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
-            }
-            if (newsToShow != null) {
-                selectedOnceNews = newsToShow
-                showNewsOnceViewer = true
-            }
-        }
-    }
+//    LaunchedEffect(onceNewsState) {
+//        if (!showNewsOnceViewer) {
+//            val newsToShow = onceNewsState.find {
+//                it.appearance == "once" && !it.viewed &&
+//                        (it.version.isEmpty() || it.version == BuildConfig.VERSION_NAME)
+//            }
+//            if (newsToShow != null) {
+//                selectedOnceNews = newsToShow
+//                showNewsOnceViewer = true
+//            }
+//        }
+//    }
 
 
     
@@ -338,11 +338,18 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 //
                                                        Column {
                                                            SearchUserItem(user) {
-                                                               val contact = user.toContactDTO()
-                                                               contactsViewModel.createChat(contact)
-                                                               isSearching.value = false
-                                                               searchQuery.value = ""
-                                                               mainViewModel.clearGlobalResults()
+
+                                                               scope.launch {
+                                                                   val contact = user.toContactDTO()
+                                                                   contactsViewModel.createChat(contact)
+                                                                   isSearching.value = false
+                                                                   searchQuery.value = ""
+                                                                   mainViewModel.clearGlobalResults()
+
+                                                                   delay(500)
+                                                                   mainViewModel.getChatsInBack()
+                                                               }
+
                                                            }
                                                            Spacer(modifier = Modifier.height(16.dp))
                                                        }

@@ -45,6 +45,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.NetworkHelper
@@ -89,7 +90,7 @@ class IntroScreen : Screen {
         
         LaunchedEffect(key1 = Unit) {
             if (сommonViewModel.isRestartApp.value) {
-                navigator.push(MainScreen())
+                navigateToScreen(navigator,MainScreen())
             }
         }
 
@@ -104,7 +105,7 @@ class IntroScreen : Screen {
 //                        updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
 
                     if (isCheckVersion) {
-                        navigator.push(UpdateScreen())
+                        navigateToScreen(navigator,UpdateScreen())
                     } else {
 
                         viewModel.navigator.value = navigator
@@ -118,7 +119,7 @@ class IntroScreen : Screen {
 
 
                         if (!contactsNative) {
-                            navigator.replace(PermissionsScreen())
+                            navigateToScreen(navigator,PermissionsScreen())
                             return@LaunchedEffect
                         }
 
@@ -137,16 +138,15 @@ class IntroScreen : Screen {
 
                         }
                         println("dasdadasadsad")
-                        navigator.replace(WelcomeScreen())
+                        navigateToScreen(navigator,WelcomeScreen())
 
 
                     }
                 } else {
-                    navigator.replace(NetworkErrorScreen())
+                    navigateToScreen(navigator,NetworkErrorScreen())
                 }
-
             } catch (e: Exception) {
-                navigator.replace(NetworkErrorScreen())
+                navigateToScreen(navigator,NetworkErrorScreen())
             }
 
         }
@@ -194,7 +194,7 @@ class IntroScreen : Screen {
 
                     Text(
 //                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
-                        text = "App Version: alpha~1.1.0",
+                        text = "App Version: alpha~1.1.1",
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 16.sp,

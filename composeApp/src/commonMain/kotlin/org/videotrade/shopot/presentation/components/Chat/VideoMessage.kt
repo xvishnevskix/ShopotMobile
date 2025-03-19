@@ -34,6 +34,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -203,13 +204,15 @@ fun VideoMessage(
             ) {
                 if (isLoadingSuccess.value) {
                     viewModel.clearMessages()
-                    navigator?.push(
-                        VideoViewerScreen(
-                            messageSenderName = messageSenderName,
-                            message = message,
-                            filePath = filePath.value
+                    if (navigator != null) {
+                        navigateToScreen(navigator,
+                            VideoViewerScreen(
+                                messageSenderName = messageSenderName,
+                                message = message,
+                                filePath = filePath.value
+                            )
                         )
-                    )
+                    }
                     return@clickable
                 }
 
@@ -298,13 +301,15 @@ fun VideoMessage(
                 contentDescription = "Play",
                 tint = Color.White,
                 modifier = Modifier.align(Alignment.Center).size(30.dp).clickable {
-                    navigator?.push(
-                        VideoViewerScreen(
-                            messageSenderName = messageSenderName,
-                            message = message,
-                            filePath = filePath.value
+                    if (navigator != null) {
+                        navigateToScreen(navigator,
+                            VideoViewerScreen(
+                                messageSenderName = messageSenderName,
+                                message = message,
+                                filePath = filePath.value
+                            )
                         )
-                    )
+                    }
                 }
             )
         } else {

@@ -1,18 +1,18 @@
 package org.videotrade.shopot.api
 
 import io.ktor.util.decodeBase64Bytes
-import io.ktor.util.encodeBase64
-import io.ktor.utils.io.core.toByteArray
 import kotlinx.serialization.json.Json
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.EncapsulationMessageResult
 
 fun decupsMessage(
-    contentCipher: String,
-    cipherWrapper: CipherWrapper
+    contentCipher: String
 ): String? {
     try {
         val sharedSecret = getValueInStorage("sharedSecret")
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+        
         
         val contentDecode: EncapsulationMessageResult =
             Json.decodeFromString(contentCipher)
@@ -40,11 +40,11 @@ fun decupsMessage(
 }
 
 
-fun encupsMessage(text: String, cipherWrapper: CipherWrapper): EncapsulationMessageResult? {
+fun encupsMessage(text: String): EncapsulationMessageResult? {
     try {
+        val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
+        
         val sharedSecret = getValueInStorage("sharedSecret")
-        
-        
         
         if (sharedSecret !== null) {
             val cipherValue = cipherWrapper.encupsChachaMessageCommon(

@@ -29,3 +29,15 @@ data class SessionDescriptionDTO(
     val type: SessionDescriptionType,
     val sdp: String
 )
+
+
+@Serializable
+data class CallVerificationResponse(
+    val status: String,
+    val callId: String,
+    val clientNumber: String,
+    val confirmationNumber: String,
+    val qrCodeUri: String,
+    val operatorName: String,
+    val regionName: String
+)

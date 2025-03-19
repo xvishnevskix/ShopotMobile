@@ -1,28 +1,19 @@
 package org.videotrade.shopot.presentation.screens.login
 
-import FAQ
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ExperimentalMaterialApi
@@ -74,7 +65,7 @@ import org.videotrade.shopot.presentation.components.Auth.getPhoneNumberLength
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.screens.auth.AuthCallScreen
+import org.videotrade.shopot.presentation.screens.auth.AuthViewModel
 import org.videotrade.shopot.presentation.screens.auth.sendRequestToBackend
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
@@ -84,13 +75,14 @@ import shopot.composeapp.generated.resources.auth_logo
 
 
 class SignInScreen : Screen {
-
-
+    
+    
     @OptIn(ExperimentalMaterialApi::class)
     @Composable
     override fun Content() {
         val colors = MaterialTheme.colorScheme
         val navigator = LocalNavigator.currentOrThrow
+        val authViewModel: AuthViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
         val coroutineScope = rememberCoroutineScope()
         val bottomSheetState =
@@ -99,8 +91,9 @@ class SignInScreen : Screen {
         val defaultCountry = stringResource(MokoRes.strings.ru)
         var selectedCountryName by remember { mutableStateOf(defaultCountry) }
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
-        val serverUnavailable = stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
-
+        val serverUnavailable =
+            stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
+        
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
         val keyboardController = LocalSoftwareKeyboardController.current
@@ -109,8 +102,8 @@ class SignInScreen : Screen {
         val scrollState = rememberScrollState()
         val focusRequester = remember { FocusRequester() }
         var selectCountryName by remember { mutableStateOf(CountryName.RU) }
-
-
+        
+        
         val textState =
             remember {
                 mutableStateOf(
@@ -119,7 +112,7 @@ class SignInScreen : Screen {
                     )
                 )
             }
-
+        
         val countries = listOf(
             "+7" to "\uD83C\uDDF7\uD83C\uDDFA   ${stringResource(MokoRes.strings.ru)}",
             "+375" to "\uD83C\uDDE7\uD83C\uDDFE   ${stringResource(MokoRes.strings.by)}",
@@ -132,34 +125,34 @@ class SignInScreen : Screen {
             "+371" to "\uD83C\uDDF1\uD83C\uDDFB   ${stringResource(MokoRes.strings.lv)}",
             "+63" to "\uD83C\uDDF5\uD83C\uDDED   ${stringResource(MokoRes.strings.ph)}"
         )
-
+        
         LaunchedEffect(showPhoneMenu) {
 //            if (showPhoneMenu.value) {
-                keyboardController?.hide()
+            keyboardController?.hide()
 //            }
         }
         DisposableEffect(showPhoneMenu.value) {
 //            if (showPhoneMenu.value) {
-                keyboardController?.hide()
+            keyboardController?.hide()
 //            }
             onDispose { }
         }
-
+        
         LaunchedEffect(focusRequester) {
             focusRequester.requestFocus()
             scrollState.scrollTo(scrollState.maxValue)
         }
-
-
-
+        
+        
+        
         SafeArea(padding = 4.dp, backgroundColor = colors.background)
         {
             val kzString = stringResource(MokoRes.strings.kz)
-
+            
             ModalBottomSheetLayout(
                 sheetState = bottomSheetState,
                 sheetContent = {
-
+                    
                     CountryPickerBottomSheet(
                         countries = countries,
                         showPhoneMenu = showPhoneMenu,
@@ -170,7 +163,7 @@ class SignInScreen : Screen {
                             when (selectedName) {
                                 kzString -> selectCountryName = CountryName.KZ
                             }
-
+                            
                             countryCode = selectedCode
                             selectedCountryName = selectedName
                             val currentNumber = textState.value.text
@@ -197,14 +190,14 @@ class SignInScreen : Screen {
                         ),
                     contentAlignment = Alignment.TopCenter
                 ) {
-
-
+                    
+                    
                     Column(
                         verticalArrangement = Arrangement.SpaceBetween,
                         horizontalAlignment = Alignment.CenterHorizontally,
                         modifier = Modifier
                             .imePadding()
-
+                    
                     ) {
                         AuthHeader(stringResource(MokoRes.strings.login))
                         Column(
@@ -216,18 +209,18 @@ class SignInScreen : Screen {
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-
+                            
                             Image(
                                 modifier = Modifier
                                     .size(width = 195.dp, height = 132.dp),
                                 painter = painterResource(Res.drawable.auth_logo),
                                 contentDescription = null,
                                 contentScale = ContentScale.Crop,
-                                colorFilter =  ColorFilter.tint(colors.primary)
+                                colorFilter = ColorFilter.tint(colors.primary)
                             )
-
+                            
                             Spacer(modifier = Modifier.height(50.dp))
-
+                            
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally,
                                 modifier = Modifier
@@ -258,7 +251,7 @@ class SignInScreen : Screen {
                                     )
                                 )
                                 Spacer(modifier = Modifier.height(50.dp))
-
+                                
                                 PhoneInput(
                                     textState = textState,
                                     countryCode = countryCode,
@@ -273,48 +266,52 @@ class SignInScreen : Screen {
                                     scrollState = scrollState, // Передаем ScrollState
                                     focusRequester = focusRequester
                                 )
-
+                                
                                 Spacer(modifier = Modifier.height(16.dp))
                                 val requiredPhoneLength =
                                     stringResource(MokoRes.strings.required_phone_number_length)
-                                Box( modifier = Modifier.padding(bottom = 20.dp)) {
-                                    CustomButton(stringResource(MokoRes.strings.login), {
-                                        isLoading.value = true
-                                        coroutineScope.launch {
-                                            try {
-                                                val fullPhoneNumber = countryCode + textState.value.text
-                                                val phoneNumberLength = getPhoneNumberLength(countryCode)
-                                                hasError.value = false
-
-                                                if (fullPhoneNumber.length < phoneNumberLength) {
-                                                    hasError.value = true
-                                                    toasterViewModel.toaster.show(
-                                                        "$requiredPhoneLength $phoneNumberLength",
-                                                        type = ToastType.Error,
-                                                        duration = ToasterDefaults.DurationDefault
-                                                    )
-                                                    animationTrigger.value = !animationTrigger.value
-
-                                                } else {
-                                                    val response =
-                                                        sendRequestToBackend(
-                                                            fullPhoneNumber,
-                                                            NotifierManager.getPushNotifier().getToken(),
-                                                            "auth/login",
-                                                            toasterViewModel,
-                                                            phoneNotRegistered,
-                                                            hasError = hasError,
-                                                            animationTrigger = animationTrigger,
-                                                            serverUnavailable = serverUnavailable
+                                Box(modifier = Modifier.padding(bottom = 20.dp)) {
+                                    CustomButton(
+                                        stringResource(MokoRes.strings.login), {
+                                            isLoading.value = true
+                                            coroutineScope.launch {
+                                                try {
+                                                    val fullPhoneNumber =
+                                                        countryCode + textState.value.text
+                                                    val phoneNumberLength =
+                                                        getPhoneNumberLength(countryCode)
+                                                    hasError.value = false
+                                                    
+                                                    if (fullPhoneNumber.length < phoneNumberLength) {
+                                                        hasError.value = true
+                                                        toasterViewModel.toaster.show(
+                                                            "$requiredPhoneLength $phoneNumberLength",
+                                                            type = ToastType.Error,
+                                                            duration = ToasterDefaults.DurationDefault
                                                         )
-
+                                                        animationTrigger.value =
+                                                            !animationTrigger.value
+                                                        
+                                                    } else {
+                                                        val response =
+                                                            sendRequestToBackend(
+                                                                fullPhoneNumber,
+                                                                NotifierManager.getPushNotifier()
+                                                                    .getToken(),
+                                                                "auth/login",
+                                                                toasterViewModel,
+                                                                phoneNotRegistered,
+                                                                hasError = hasError,
+                                                                animationTrigger = animationTrigger,
+                                                                serverUnavailable = serverUnavailable
+                                                            )
+                                                        
                                                         if (response != null) {
-                                                            navigator.push(
-                                                                AuthCallScreen(
-                                                                    fullPhoneNumber,
-                                                                    "SignIn",
-                                                                    selectCountryName
-                                                                )
+                                                            authViewModel.handleAuth(
+                                                                "SignIn",
+                                                                navigator,
+                                                                fullPhoneNumber,
+                                                                selectCountryName
                                                             )
                                                         }
                                                     }
@@ -325,11 +322,11 @@ class SignInScreen : Screen {
                                         }, style = ButtonStyle.Gradient,
                                         isLoading = isLoading.value
                                     )
-
+                                    
                                 }
                             }
-
-
+                            
+                            
                         }
                     }
                 }

@@ -15,6 +15,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
@@ -93,7 +94,7 @@ init {
             
             profileUseCase.setProfile(responseData)
             
-            navigator.push(ProfileScreen(anotherUser = false))
+            navigateToScreen(navigator,ProfileScreen(anotherUser = false))
             
             true
         } else {
@@ -106,7 +107,7 @@ init {
     suspend fun updateAuthProfile(profileUpdate: HttpResponse, navigator: Navigator,) {
         val responseData: ProfileDTO = Json.decodeFromString(profileUpdate.bodyAsText())
         profileUseCase.setProfile(responseData)
-//        navigator.push(MainScreen())
+//        navigateToScreen(navigator,MainScreen())
     }
     
     

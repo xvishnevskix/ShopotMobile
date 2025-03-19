@@ -269,6 +269,8 @@
     <string name="second_plural">секунд</string>
 
     <string name="global_search">Глобальный поиск</string>
+    <string name="no_messages_yet">Сообщений пока нет...</string>
+    <string name="send_a_message">Отправьте сообщение</string>
 
 
 

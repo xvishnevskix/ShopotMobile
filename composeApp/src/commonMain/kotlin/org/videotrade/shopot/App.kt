@@ -16,10 +16,12 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.presentation.screens.auth.CallPasswordScreen
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
+import org.videotrade.shopot.presentation.screens.login.CountryName
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.settings.AppTheme
 import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
@@ -56,7 +58,8 @@ internal fun App() {
                     setScreenLockFlags(false)
                     
                     Navigator(
-                    IntroScreen()
+                        IntroScreen()
+//                                CallPasswordScreen("", "SignIn", CountryName.RU)
 //                        TestScreen()
                     ) { navigator ->
                         SlideTransition(navigator)
@@ -98,9 +101,6 @@ fun isActiveCall(callViewModel: CallViewModel) {
     }
     
     
-    
-    if (!isScreenOn) {
-    }
     
     Navigator(
         CallScreen(user.id, null, user.firstName, user.lastName, user.phone)

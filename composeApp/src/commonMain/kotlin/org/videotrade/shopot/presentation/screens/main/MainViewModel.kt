@@ -112,6 +112,9 @@ class MainViewModel : ViewModel(), KoinComponent {
             } catch (_: Exception) {
             
             }
+            finally {
+                chatsUseCase.setIsLoadingValue(false)
+            }
         }
         
     }
@@ -302,7 +305,7 @@ class MainViewModel : ViewModel(), KoinComponent {
 
 
             commonViewModel.delSharedSecret()
-            navigator.replace(WelcomeScreen())
+            navigateToScreen(navigator,WelcomeScreen())
             
         }
     }

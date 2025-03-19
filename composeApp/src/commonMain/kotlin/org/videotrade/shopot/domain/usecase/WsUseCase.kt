@@ -9,7 +9,11 @@ import org.videotrade.shopot.domain.repository.WsRepository
 
 class WsUseCase : KoinComponent {
     private val repository: WsRepository by inject()
+    
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = repository.wsSession
+    
+    val isConnected: StateFlow<Boolean> get() = repository.isConnected
+    
     suspend fun connectionWs(userId: String, navigator: Navigator) {
         return repository.connectionWs(userId, navigator)
     }
@@ -27,7 +31,7 @@ class WsUseCase : KoinComponent {
     }
     
     
-    fun setWsSession(wsSession: DefaultClientWebSocketSession) {
+    fun setWsSession(wsSession: DefaultClientWebSocketSession?) {
         repository.setWsSession(wsSession)
     }
     

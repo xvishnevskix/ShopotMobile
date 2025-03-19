@@ -53,6 +53,7 @@ import org.videotrade.shopot.multiplatform.iosCall.CallHandler.getKoin
 import org.videotrade.shopot.multiplatform.isCallActiveNatific
 import org.videotrade.shopot.multiplatform.onResumeCallActivity
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.multiplatform.settingCAudioSession
 import org.videotrade.shopot.presentation.components.Call.aceptBtn
 import org.videotrade.shopot.presentation.components.Call.microfonBtn
 import org.videotrade.shopot.presentation.components.Call.rejectBtn
@@ -130,7 +131,7 @@ class CallScreen(
         }
         
         LaunchedEffect(Unit) {
-        
+            settingCAudioSession()
         }
         
         DisposableEffect(Unit) {
@@ -155,8 +156,6 @@ class CallScreen(
                 
             }
         }
-        
-        println("isIncomingCallCase $isIncomingCall")
         
         if (isIncomingCall) {
             println("isIncomingCallCase")

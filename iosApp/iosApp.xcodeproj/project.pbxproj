@@ -447,7 +447,6 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Мы используем ваш микрофон для записи аудио.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Мы хотим получить доступ к вашей фотогалерее";
-				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to provide relevant notifications.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
@@ -504,7 +503,6 @@
 				INFOPLIST_KEY_NSContactsUsageDescription = "Ваше приложение использует контакты для управления контактами пользователей и предоставления персонализированного опыта.";
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Мы используем ваш микрофон для записи аудио.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Мы хотим получить доступ к вашей фотогалерее";
-				INFOPLIST_KEY_NSUserTrackingUsageDescription = "This identifier will be used to provide relevant notifications.";
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
