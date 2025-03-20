@@ -100,30 +100,35 @@ class AuthViewModel : ViewModel(), KoinComponent {
     ) {
         
         viewModelScope.launch {
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                    put("phone", phone)
-                }
-            )
-            connectWsAuth()
-            
-            val response = origin().post("2fa/start", jsonContent) ?: return@launch
-            
-            val responseData: CallVerificationResponse = Json.decodeFromString(response)
-            
-            confirmNumber.value = responseData.confirmationNumber
-            
-            callId.value = responseData.callId
-            
-            println("jsonElement41414 $responseData")
-            
-            navigateToScreen(navigator,
-                CallPasswordScreen(
-                    phone,
-                    authCase,
-                    selectCountryName
+            try {
+                val jsonContent = Json.encodeToString(
+                    buildJsonObject {
+                        put("phone", phone)
+                    }
                 )
-            )
+                connectWsAuth()
+                
+                val response = origin().post("2fa/start", jsonContent) ?: return@launch
+                
+                val responseData: CallVerificationResponse = Json.decodeFromString(response)
+                
+                confirmNumber.value = responseData.confirmationNumber
+                
+                callId.value = responseData.callId
+                
+                println("jsonElement41414 $responseData")
+                
+                navigateToScreen(
+                    navigator,
+                    CallPasswordScreen(
+                        phone,
+                        authCase,
+                        selectCountryName
+                    )
+                )
+            } catch (e: Exception) {
+                println("2fa/start $e")
+            }
         }
     }
     

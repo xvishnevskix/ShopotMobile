@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -635,8 +636,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 
 //                    if (!isCallMaker.value) {
                     try {
-                        Logger.d { "PC2213131: $jsonMessage" }
-                        Logger.d { "wsSession: ${wsSession.value}" }
+                        println( "PC2213131: $jsonMessage" )
+                        println( "wsSession: ${wsSession.value}" )
                         
                         // Проверяем, активна ли корутина и открыт ли WebSocket
                         if (wsSession.value?.isActive == true) {
@@ -781,7 +782,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     val newCallMessage = WebRTCMessage(
                         type = "call",
                         calleeId = calleeId,
-                        userId = userId,
+                        callerId = userId,
                         rtcMessage = offer?.let { SessionDescriptionDTO(it.type, offer.sdp) }
                     )
                     
@@ -1291,6 +1292,34 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         println("✅ WebRTC session reset complete.")
     }
     
+    
+    override fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
+        
+        iceCandidates.forEach {
+            
+            val jsonElement =
+                Json.parseToJsonElement(it.toString())
+            
+            val iceMessage = jsonElement.jsonObject["iceMessage"]?.jsonObject
+            
+            val id = iceMessage?.get("id")?.jsonPrimitive?.content
+            val label = iceMessage?.get("label")?.jsonPrimitive?.int
+            val candidate = iceMessage?.get("candidate")?.jsonPrimitive?.content
+            
+            if (candidate != null && id != null && label != null) {
+                val iceCandidate = IceCandidate(
+                    candidate = candidate,
+                    sdpMid = id,
+                    sdpMLineIndex = label
+                )
+                
+                _peerConnection.value?.addIceCandidate(iceCandidate)
+            }
+
+        }
+    }
+    
+    
 }
 
 
@@ -1313,6 +1342,15 @@ suspend fun initializeAudioSessionAndStream(): MediaStream? {
     }
 }
 
+
+
+
+@Serializable
+data class rtcMessageDTO(
+    val label: Int,
+    val id: String,
+    val candidate: String,
+)
 
 
 

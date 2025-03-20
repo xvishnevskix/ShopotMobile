@@ -52,7 +52,7 @@ kotlin {
             }
         }
     }
-    
+
 //    listOf(
 //        iosX64 { configureWebRtcCinterops() },
 //        iosArm64 { configureWebRtcCinterops() },
@@ -129,7 +129,7 @@ kotlin {
             api(libs.resources.compose) // for compose multiplatfor
             implementation(libs.compressor)
         }
-
+        
         //Для версии приложения
         commonMain {
             val versionName = project.findProperty("VERSION_NAME") as String
@@ -166,10 +166,10 @@ kotlin {
 
 tasks.register("generateBuildConfig") {
     val versionName = project.findProperty("VERSION_NAME") ?: "1.1.0"
-
+    
     val outputDir = File(buildDir, "generated/kotlin")
     outputDir.mkdirs()
-
+    
     val buildConfigFile = File(outputDir, "BuildConfig.kt")
     buildConfigFile.writeText("""
         object BuildConfig {
@@ -187,9 +187,9 @@ android {
         targetSdk = 34
         
         applicationId = "org.videotrade.shopot.androidApp"
-        versionCode = 1
-        versionName = "1.0.0"
-
+        versionCode = 22
+        versionName = "1.1.0"
+        
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
         externalNativeBuild {
@@ -298,3 +298,4 @@ private fun KonanTarget.matches(dir: String): Boolean {
         else -> error("Unsupported target $name")
     }
 }
+

@@ -10,6 +10,7 @@ import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.model.WebRTCMessage
 
 interface CallRepository {
     
@@ -90,5 +91,5 @@ interface CallRepository {
     
     fun resetWebRTC()
     
-    
+    fun addIceCandidates(iceCandidates: List<WebRTCMessage>)
 }
