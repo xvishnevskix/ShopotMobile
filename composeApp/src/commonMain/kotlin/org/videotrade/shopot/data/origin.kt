@@ -24,6 +24,7 @@ import kotlinx.serialization.json.put
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ReloadRes
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.Platform

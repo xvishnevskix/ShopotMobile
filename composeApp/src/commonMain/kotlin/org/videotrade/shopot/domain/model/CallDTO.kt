@@ -38,6 +38,6 @@ data class CallVerificationResponse(
     val clientNumber: String,
     val confirmationNumber: String,
     val qrCodeUri: String,
-    val operatorName: String,
+    val operatorName: String?,
     val regionName: String
 )

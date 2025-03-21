@@ -13,6 +13,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.repository.CallRepository
 
 class CallUseCase : KoinComponent {
@@ -138,6 +139,11 @@ class CallUseCase : KoinComponent {
     
     fun setCalleeUserInfo(calleeUserInfo: ProfileDTO) {
         return repository.setCalleeUserInfo(calleeUserInfo)
+    }
+    
+    
+    fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
+        return repository.addIceCandidates(iceCandidates)
     }
     
 

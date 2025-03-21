@@ -26,6 +26,7 @@ import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.SessionDescriptionDTO
+import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
@@ -48,7 +49,7 @@ object CallHandler : KoinComponent {
                 
                 commonViewModel.mainNavigator.value?.push(
                     CallScreen(
-                        calleeId = callViewModel.iosCallData.value?.userId ?: "",
+                        calleeId = callViewModel.iosCallData.value?.webRTCMessage?.callerId ?: "",
                         userFirstName = "",
                         userLastName = "",
                         userPhone = ""
@@ -74,7 +75,9 @@ object CallHandler : KoinComponent {
                 
                 if (response.status.isSuccess()) {
                     val responseData: GetCallInfoDto = Json.decodeFromString(response.bodyAsText())
-                    callViewModel.setOtherUserId(responseData.userId)
+                    
+                    callViewModel.addIceCandidates(responseData.iceCandidates)
+                    callViewModel.setOtherUserId(responseData.webRTCMessage.callerId)
                     callViewModel.setIosCallData(responseData)
                     newCallIos(responseData)
                     responseData
@@ -109,14 +112,12 @@ object CallHandler : KoinComponent {
             
             val profileId = getValueInStorage("profileId") ?: return
             
-            callViewModel.setOtherUserId(callInfo.userId)
-            
             callViewModel.connectionCallWs(profileId)
             
             
             callUseCase.setOffer(
                 SessionDescription(
-                    sdp = callInfo.rtcMessage.sdp,
+                    sdp = callInfo.webRTCMessage.rtcMessage.sdp,
                     type = SessionDescriptionType.Offer,
                 )
             )
@@ -161,7 +162,6 @@ object CallHandler : KoinComponent {
     fun setAppIsActive(appIsActive: Boolean) {
         val commonViewModel: CommonViewModel by inject()
         
-        callViewModel.initWebrtc()
         
         commonViewModel.setAppIsActive(appIsActive)
         
@@ -175,6 +175,12 @@ fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
     val profileId = getValueInStorage("profileId")
     
     val user = ProfileDTO()
+    
+    if(callViewModel.isCallBackground.value) {
+        callViewModel.initWebrtc()
+    }
+    
+    
     
     LaunchedEffect(Unit) {
         if (profileId != null) {
@@ -196,8 +202,14 @@ fun isActiveCallIos(callViewModel: CallViewModel, navigator: Navigator) {
 
 @Serializable
 data class GetCallInfoDto(
+    val webRTCMessage: CallInfoWebRTCMessage,
+    val iceCandidates: List<WebRTCMessage>,
+)
+
+@Serializable
+data class CallInfoWebRTCMessage(
     val type: String,
-    val userId: String,
+    val callerId: String,
     val calleeId: String,
     val rtcMessage: SessionDescriptionDTO,
 )
