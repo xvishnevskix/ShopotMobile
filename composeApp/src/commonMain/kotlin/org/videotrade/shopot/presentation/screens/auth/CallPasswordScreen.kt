@@ -72,7 +72,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.auth_logo
-import shopot.composeapp.generated.resources.call_password_success
+//import shopot.composeapp.generated.resources.call_password_success
 
 class CallPasswordScreen(
     private val phone: String,
@@ -351,12 +351,12 @@ class CallPasswordScreen(
                         }
                     } else {
                         Spacer(modifier = Modifier.height(40.dp))
-                        Image(
-                            modifier = Modifier.size(width = 195.dp, height = 146.dp),
-                            painter = painterResource(Res.drawable.call_password_success),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop
-                        )
+//                        Image(
+//                            modifier = Modifier.size(width = 195.dp, height = 146.dp),
+//                            painter = painterResource(Res.drawable.call_password_success),
+//                            contentDescription = null,
+//                            contentScale = ContentScale.Crop
+//                        )
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
                             "Номер успешно подтверждён!",

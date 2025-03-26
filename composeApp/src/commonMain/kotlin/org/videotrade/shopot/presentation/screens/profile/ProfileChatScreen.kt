@@ -112,8 +112,15 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         }
                     )
                     Spacer(modifier = Modifier.height(24.dp))
+
+                    val isDeletedUser = chat.firstName.equals("Unknown", ignoreCase = true) && chat.lastName.isNullOrBlank()
+                    val displayName = when {
+                        isDeletedUser -> stringResource(MokoRes.strings.deleted_user)
+                        else -> "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
+                    }
+
                     Text(
-                        "${chat.firstName} ${chat.lastName}",
+                        text = displayName,
                         textAlign = TextAlign.Center,
                         fontSize = 16.sp,
                         lineHeight = 16.sp,

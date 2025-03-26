@@ -239,7 +239,6 @@ class FAQ() : Screen {
                     ) {
 
                         Text(
-//                            text = "${MokoRes.strings.app_version}: alpha~1.0.8",
                             text = "App Version: alpha~1.1.1",
                             style = TextStyle(
                                 fontSize = 16.sp,

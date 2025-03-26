@@ -106,10 +106,25 @@ fun UserComponentItem(
                 } else {
                     chat.groupName.orEmpty()
                 }
-                
+
+                val displayName = if (chat.personal) {
+                    val firstName = chat.firstName.orEmpty()
+                    val lastName = chat.lastName.orEmpty()
+                    val name = "$firstName $lastName".trim()
+
+                    when {
+                        firstName.equals("Unknown", ignoreCase = true) && lastName.isBlank() -> stringResource(MokoRes.strings.deleted_user)
+                        name.isNotBlank() -> name
+                        !chat.phone.isNullOrBlank() -> "+${chat.phone}"
+                        else -> stringResource(MokoRes.strings.deleted_user)
+                    }
+                } else {
+                    chat.groupName?.takeIf { it.isNotBlank() } ?: "Deleted group"
+                }
+
                 Row() {
                     if (chat.personal) {
-                        val displayName = fullName.ifBlank { chat.phone!! }
+
                         
                         Text(
                             text = displayName,
@@ -127,7 +142,7 @@ fun UserComponentItem(
                         )
                     } else {
                         Text(
-                            text = fullName,
+                            text = displayName,
                             textAlign = TextAlign.Start,
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
