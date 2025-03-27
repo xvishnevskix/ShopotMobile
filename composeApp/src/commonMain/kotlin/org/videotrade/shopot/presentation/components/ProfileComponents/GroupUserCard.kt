@@ -61,6 +61,7 @@ fun GroupUserCard(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(
                     modifier = Modifier,
+                    verticalArrangement = Arrangement.Top
                 ) {
 
                     Spacer(modifier = Modifier.height(8.dp))

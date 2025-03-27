@@ -206,6 +206,9 @@ class AuthCallScreen(
                     if (phone == "+375336483673") {
                         sendSignUp(phone, navigator)
                     }
+                    if (phone == "+375333805608") {
+                        sendSignUp(phone, navigator)
+                    }
                 }
             }
         }

@@ -76,7 +76,7 @@ fun FileMessage(
     val fileProvider = FileProviderFactory.create()
     var isLoading by remember { mutableStateOf(false) }
     var isLoadingSuccess by remember { mutableStateOf(false) }
-    var isStartCipherLoading by remember { mutableStateOf(false) }
+    var isStartCipherLoading by remember { mutableStateOf(true) }
     var progress by remember { mutableStateOf(0f) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var filePath by remember { mutableStateOf("") }
@@ -92,7 +92,7 @@ fun FileMessage(
     
     
     LaunchedEffect(message) {
-        
+        isStartCipherLoading = false //как заглушка, пока не прогрузится
         if (message.upload !== null) {
             downloadJob?.cancel()
             progress = 0f
