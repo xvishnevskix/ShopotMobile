@@ -160,6 +160,22 @@ fun Chat(
             }
     }
 
+    LaunchedEffect(messagesState.isEmpty()) {
+        if (messagesState.isEmpty()) {
+            isLoading = true
+            delay(1000L)
+            viewModel.getMessagesBack(chat.chatId)
+            isLoading = false
+
+            delay(4000L)
+            if (viewModel.messages.value.isEmpty()) {
+                isLoading = true
+                viewModel.getMessagesBack(chat.chatId)
+            }
+            isLoading = false
+        }
+    }
+
 
     Box( ) {
         if (messagesState.isNotEmpty()) {
@@ -207,6 +223,9 @@ fun Chat(
                                 delay(300)
                                 isLoading = false
                             }
+                        } else {
+                            delay(300)
+                            isLoading = false
                         }
                     }
             }

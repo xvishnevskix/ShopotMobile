@@ -6,8 +6,11 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -678,6 +681,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     ///////////////////////////////////////////////////////
 
+    val userStatuses: StateFlow<Map<String, String>> =
+        chatUseCase.userStatuses
+            .map { map -> map.mapValues { it.value.first } }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
 
 
 
@@ -689,6 +696,13 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun onStickerChoosingEnd() = viewModelScope.launch { chatUseCase.sendStickerChoosingEnd() }
     fun onVoiceRecordingStart() = viewModelScope.launch { chatUseCase.sendVoiceRecordingStart() }
     fun onVoiceRecordingEnd() = viewModelScope.launch { chatUseCase.sendVoiceRecordingEnd() }
+
+    fun startListeningStatuses() = viewModelScope.launch {
+        chatUseCase.startListeningForStatusUpdates()
+    }
+
+
+
 
     ///////////////////////////////////////////////////////
 

@@ -71,6 +71,7 @@ import id.zelory.compressor.Compressor
 import io.ktor.client.request.forms.ChannelProvider
 import io.ktor.util.cio.readChannel
 import net.jpountz.lz4.LZ4Factory
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import java.nio.ByteBuffer
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -385,6 +386,7 @@ actual class FileProvider(private val applicationContext: Context) {
     ): String? {
         println("111111111313123123131")
         val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+        val chatViewModel: ChatViewModel = KoinPlatform.getKoin().get()
         
         val client = HttpClient() {
             install(HttpTimeout) {
@@ -439,6 +441,7 @@ actual class FileProvider(private val applicationContext: Context) {
         println("Local file path: ${file.absolutePath}")
         
         try {
+            chatViewModel.onFileUploadStart()
             val token = getValueInStorage("accessToken")
             
             val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}$url") {
@@ -480,6 +483,7 @@ actual class FileProvider(private val applicationContext: Context) {
             println("11111111 ${response.status} ${response.toString()}")
             
             if (response.status.isSuccess()) {
+                chatViewModel.onFileUploadEnd()
                 println("11111111")
                 
                 val jsonElement = Json.parseToJsonElement(response.bodyAsText())
@@ -511,7 +515,7 @@ actual class FileProvider(private val applicationContext: Context) {
             return null
             
         } finally {
-            
+            chatViewModel.onFileUploadEnd()
             client.close()
             
             

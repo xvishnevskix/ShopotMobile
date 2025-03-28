@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -94,10 +95,10 @@ class ChatScreen(
 
             }
         }
-        
-        
+
         
         LaunchedEffect(key1 = viewModel) {
+            viewModel.startListeningStatuses()
             viewModel.getProfile()
             viewModel.getMessagesBack(chat.id)
         }
@@ -105,7 +106,8 @@ class ChatScreen(
         DisposableEffect(Unit) {
             onDispose {
                 viewModel.clearSelection(chatId = chat.chatId)
-                
+                viewModel.onStickerChoosingEnd()
+                viewModel.onVoiceRecordingEnd()
                 if (
                     viewModel.isRecording.value
                 ) {
@@ -114,6 +116,19 @@ class ChatScreen(
                 
                 mainViewModel.setCurrentChat("")
             }
+        }
+
+        LaunchedEffect(scaffoldStickerState.bottomSheetState) {
+            snapshotFlow { scaffoldStickerState.bottomSheetState.currentValue }
+                .collect { state ->
+                    if (state == androidx.compose.material3.SheetValue.PartiallyExpanded || state == androidx.compose.material3.SheetValue.Hidden) {
+                        if (showStickerMenu.value) {
+                            println("BottomSheet свернут → завершаем выбор стикера")
+                            viewModel.onStickerChoosingEnd()
+                            showStickerMenu.value = false
+                        }
+                    }
+                }
         }
         
         
@@ -126,6 +141,7 @@ class ChatScreen(
                         scope.launch {
                             if (scaffoldStickerState.bottomSheetState.isVisible) {
                                 scaffoldStickerState.bottomSheetState.partialExpand()
+                                viewModel.onStickerChoosingEnd()
                                 showStickerMenu.value = false
                             }
                         }
@@ -273,10 +289,8 @@ class ChatScreen(
                             StickerMenuContent(chat) {
                                 // Функция, которая закроет BottomSheet при выборе стикера
                                 scope.launch {
-                                    viewModel.onStickerChoosingEnd()
                                     scaffoldStickerState.bottomSheetState.partialExpand()
                                     println("Прекращаем выбирать стикер")
-
                                     viewModel.onStickerChoosingEnd()
                                     showStickerMenu.value = false
 

@@ -71,6 +71,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -101,6 +102,7 @@ import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.DrawableResource
@@ -186,6 +188,7 @@ fun ChatFooter(
 
     LaunchedEffect(isRecording) {
         if (isRecording) {
+            viewModel.onVoiceRecordingStart()
             while (isRecording) {
                 delay(1000L)
 
@@ -231,8 +234,10 @@ fun ChatFooter(
 
                 }
             }
+            viewModel.onVoiceRecordingEnd()
         } else {
             recordingTime = 0
+            viewModel.onVoiceRecordingEnd()
         }
     }
 
@@ -349,6 +354,7 @@ fun ChatFooter(
 
                 scope.launch {
                     try {
+                        viewModel.onFileUploadStart()
                         val filePick = FileProviderFactory.create()
                             .pickFile(PickerType.File(listOf("pdf", "zip")))
 
@@ -361,9 +367,11 @@ fun ChatFooter(
                             }
                         }
 
-
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
+                    }
+                    finally {
+                        viewModel.onFileUploadEnd()
                     }
                 }
             }
@@ -759,25 +767,30 @@ fun ChatFooter(
                                     )
                                     .animateContentSize()
                             ) {
-
+                                val onTyping = rememberTypingStatusHandler(
+                                    onTypingStart = { viewModel.onTypingStart() },
+                                    onTypingEnd = { viewModel.onTypingEnd() }
+                                )
 
                                 BasicTextField(
                                     value = footerText,
                                     onValueChange = { newText ->
                                         if (!isRecording) {
+                                            
                                             viewModel.footerText.value = if (footerText.isEmpty()) {
                                                 // Преобразуем первый символ в заглавный, если поле было пустым
                                                 newText.replaceFirstChar { it.uppercase() }
                                             } else {
                                                 newText
                                             }
+                                            onTyping(newText)
                                         }
                                     },
                                     modifier = Modifier
                                         .weight(1f)
                                         .heightIn(max = 130.dp, min = 56.dp)
                                         .padding(16.dp)
-                                        .fillMaxWidth(), // Для обеспечения выравнивания по ширине
+                                        .fillMaxWidth(),
                                     textStyle = TextStyle(
                                         fontSize = 16.sp,
                                         lineHeight = lineHeight.value.sp,
@@ -887,6 +900,7 @@ fun ChatFooter(
                                                     login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
                                                     true
                                                 )
+                                                viewModel.onTypingEnd()
                                                 viewModel.footerText.value = ""
                                             }
                                         })
@@ -1165,3 +1179,51 @@ fun ChatFooter(
         }
     }
 }
+
+
+@Composable
+fun rememberTypingStatusHandler(
+    onTypingStart: () -> Unit,
+    onTypingEnd: () -> Unit
+): (String) -> Unit {
+    val coroutineScope = rememberCoroutineScope()
+    val latestOnStart = rememberUpdatedState(onTypingStart)
+    val latestOnEnd = rememberUpdatedState(onTypingEnd)
+
+    val isTyping = remember { mutableStateOf(false) }
+    val typingJob = remember { mutableStateOf<Job?>(null) }
+    val lastText = remember { mutableStateOf("") }
+
+    return { text: String ->
+        lastText.value = text
+
+        if (text.isBlank()) {
+            typingJob.value?.cancel()
+            if (isTyping.value) {
+                isTyping.value = false
+                latestOnEnd.value()
+            }
+        } else {
+            if (!isTyping.value) {
+                isTyping.value = true
+                latestOnStart.value()
+            }
+
+            typingJob.value?.cancel()
+            val currentText = text
+
+            typingJob.value = coroutineScope.launch {
+                delay(2000L)
+                if (lastText.value == currentText) {
+                    isTyping.value = false
+                    latestOnEnd.value()
+                }
+            }
+        }
+    }
+}
+
+
+
+
+

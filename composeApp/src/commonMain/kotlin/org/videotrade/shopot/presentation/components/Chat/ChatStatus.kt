@@ -47,10 +47,12 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
@@ -71,17 +73,17 @@ fun ChatStatus(
     println("asdasasfasdasdafgasdasd ${status}")
 
     val statusText = when (status) {
-        "ONLINE" -> "В сети"
-        "OFFLINE" -> "Не в сети"
-        "TYPING" -> "Печатает"
-        "SENDING_FILE" -> "Отправляет файл"
-        "CHOOSING_STICKER" -> "Выбирает стикер"
-        "RECORDING_VOICE" -> "Записывает голосовое"
-        else -> ""
+        "ONLINE" -> stringResource(MokoRes.strings.status_online)
+        "OFFLINE" -> stringResource(MokoRes.strings.status_offline)
+        "TYPING" -> stringResource(MokoRes.strings.status_typing)
+        "SENDING_FILE" -> stringResource(MokoRes.strings.status_sending_file)
+        "CHOOSING_STICKER" -> stringResource(MokoRes.strings.status_choosing_sticker)
+        "RECORDING_VOICE" -> stringResource(MokoRes.strings.status_recording_voice)
+        else -> stringResource(MokoRes.strings.status_offline)
     }
 
     LaunchedEffect(status) {
-        println("Composable ChatStatus recomposed: $userId -> $status")
+        println("Composable Chat Status recomposed: $userId -> $status")
     }
 
 
@@ -107,7 +109,7 @@ fun ChatStatus(
                         lineHeight = 16.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
-                        color = Color(0xFFCAB7A3),
+                        color =  if (animatedText == stringResource(MokoRes.strings.status_offline)) colors.secondary else Color(0xFFCAB7A3),
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                 }
@@ -124,7 +126,7 @@ fun ChatStatus(
             }
         } else {
             Text(
-                text = "Не в сети",
+                text = stringResource(MokoRes.strings.status_offline),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
                 lineHeight = 16.sp,
