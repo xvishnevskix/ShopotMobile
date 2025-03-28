@@ -177,77 +177,77 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             
             
             
-            Box(
-                modifier = Modifier
-            ) {
-                if (chat.personal)
-                    
-                    Image(
-                        painter = painterResource(Res.drawable.chat_call),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .pointerInput(Unit) {
-                                
-                                scope.launch {
-                                    try {
-                                        val cameraPer =
-                                            PermissionsProviderFactory.create()
-                                                .getPermission("microphone")
-                                        
-                                        if (!cameraPer) return@launch
-                                        
-                                        callViewModel.initWebrtc()
-                                        
-                                        callViewModel.setChatId(chat.chatId)
-                                        
-                                        callViewModel.setCalleeId(chat.userId)
-                                        
-                                        callViewModel.setOtherUserId(chat.userId)
-                                        
-                                        chat.phone?.let {
-                                            callViewModel.setCalleeUserInfo(
-                                                ProfileDTO(
-                                                    phone = it
-                                                )
-                                            )
-                                        }
-                                        
-                                        callViewModel.callScreenInfo.value = CallScreen(
-                                            chat.userId,
-                                            chat.icon,
-                                            chat.firstName!!,
-                                            chat.lastName!!,
-                                            chat.phone!!,
-                                            
-                                            )
-                                        
-                                        if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
-                                            commonViewModel.mainNavigator.value?.push(
-                                                CallScreen(
-                                                    chat.userId,
-                                                    chat.icon,
-                                                    chat.firstName!!,
-                                                    chat.lastName!!,
-                                                    chat.phone!!,
-                                                    sendCall = true,
-                                                    
-                                                    )
-                                            )
-                                        }
+//            Box(
+//                modifier = Modifier
+//            ) {
+//                if (chat.personal)
 //
-                                        
-                                    } catch (e: Exception) {
-                                        println("ERROR : $e")
-                                        
-                                    }
-                                }
-                                
-                                
-                            },
-                        colorFilter = ColorFilter.tint(colors.primary)
-                    )
-            }
+//                    Image(
+//                        painter = painterResource(Res.drawable.chat_call),
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .size(18.dp)
+//                            .pointerInput(Unit) {
+//
+//                                scope.launch {
+//                                    try {
+//                                        val cameraPer =
+//                                            PermissionsProviderFactory.create()
+//                                                .getPermission("microphone")
+//
+//                                        if (!cameraPer) return@launch
+//
+//                                        callViewModel.initWebrtc()
+//
+//                                        callViewModel.setChatId(chat.chatId)
+//
+//                                        callViewModel.setCalleeId(chat.userId)
+//
+//                                        callViewModel.setOtherUserId(chat.userId)
+//
+//                                        chat.phone?.let {
+//                                            callViewModel.setCalleeUserInfo(
+//                                                ProfileDTO(
+//                                                    phone = it
+//                                                )
+//                                            )
+//                                        }
+//
+//                                        callViewModel.callScreenInfo.value = CallScreen(
+//                                            chat.userId,
+//                                            chat.icon,
+//                                            chat.firstName!!,
+//                                            chat.lastName!!,
+//                                            chat.phone!!,
+//
+//                                            )
+//
+//                                        if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
+//                                            commonViewModel.mainNavigator.value?.push(
+//                                                CallScreen(
+//                                                    chat.userId,
+//                                                    chat.icon,
+//                                                    chat.firstName!!,
+//                                                    chat.lastName!!,
+//                                                    chat.phone!!,
+//                                                    sendCall = true,
+//
+//                                                    )
+//                                            )
+//                                        }
+////
+//
+//                                    } catch (e: Exception) {
+//                                        println("ERROR : $e")
+//
+//                                    }
+//                                }
+//
+//
+//                            },
+//                        colorFilter = ColorFilter.tint(colors.primary)
+//                    )
+//            }
             
         }
         ReconnectionBar()
