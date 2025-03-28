@@ -275,5 +275,23 @@
     <string name="send_a_message">Send a message</string>
     <string name="deleted_user">Deleted user</string>
 
+    <string name="auth_confirm_title">Confirm your number</string>
+    <string name="auth_confirm_description">To confirm your number, please call:</string>
+    <string name="auth_confirm_note">The call is free. It will be dropped and the system will confirm your login</string>
+    <string name="auth_confirm_call">Call</string>
+    <string name="auth_confirm_alt">Other login options</string>
+    <string name="auth_confirm_success_title">Number successfully confirmed!</string>
+    <string name="auth_confirm_success_note">You will be logged in within 5 seconds</string>
+    <string name="auth_agreement_text">By continuing, you agree to the </string>
+    <string name="auth_user_agreement">User Agreement</string>
+    <string name="auth_privacy_policy">Privacy Policy</string>
+    <string name="and"> and </string>
 
+
+    <string name="status_online">Online</string>
+    <string name="status_offline">Offline</string>
+    <string name="status_typing">Typing...</string>
+    <string name="status_sending_file">Sending a file</string>
+    <string name="status_choosing_sticker">Choosing a sticker</string>
+    <string name="status_recording_voice">Recording voice</string>
 </resources>

@@ -275,7 +275,7 @@ class CallPasswordScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Text(
-                                "Подтвердите номер",
+                                stringResource(MokoRes.strings.auth_confirm_title),
                                 style = TextStyle(
                                     fontSize = 24.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
@@ -286,7 +286,7 @@ class CallPasswordScreen(
                             )
                             Spacer(modifier = Modifier.height(24.dp))
                             Text(
-                                "Для подтверждения номера позвоните по номеру:",
+                                stringResource(MokoRes.strings.auth_confirm_description),
                                 style = TextStyle(
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
@@ -295,7 +295,7 @@ class CallPasswordScreen(
                                     color = colors.secondary
                                 )
                             )
-                            Spacer(modifier = Modifier.height(10.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
                             Text(
                                 confirmNumber,
                                 style = TextStyle(
@@ -308,8 +308,7 @@ class CallPasswordScreen(
                             )
                             Spacer(modifier = Modifier.height(24.dp))
                             Text(
-                                "Звонок бесплатный. Он будет сброшен, а система подтвердит вход",
-                                style = TextStyle(
+                                stringResource(MokoRes.strings.auth_confirm_note),                                style = TextStyle(
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
@@ -321,7 +320,7 @@ class CallPasswordScreen(
                             
                             Box(modifier = Modifier.padding(bottom = 20.dp)) {
                                 CustomButton(
-                                    text = "Позвонить",
+                                    text = stringResource(MokoRes.strings.auth_confirm_call),
                                     { scope ->
                                         scope.launch {
                                             callInPhone(confirmNumber)
@@ -335,7 +334,7 @@ class CallPasswordScreen(
                             Spacer(modifier = Modifier.height(70.dp))
                             
                             CustomButton(
-                                text = "Другие способы входа",
+                                text = stringResource(MokoRes.strings.auth_confirm_alt),
                                 { scope ->
                                     scope.launch {
                                         navigateToScreen(
@@ -359,7 +358,7 @@ class CallPasswordScreen(
 //                        )
                         Spacer(modifier = Modifier.height(20.dp))
                         Text(
-                            "Номер успешно подтверждён!",
+                            stringResource(MokoRes.strings.auth_confirm_success_title),
                             style = TextStyle(
                                 fontSize = 24.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
@@ -370,7 +369,7 @@ class CallPasswordScreen(
                         )
                         Spacer(modifier = Modifier.height(24.dp))
                         Text(
-                            "Через 5 сек. вы войдёте в аккаунт",
+                            stringResource(MokoRes.strings.auth_confirm_success_note),
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
@@ -404,14 +403,19 @@ fun AgreementText(
     onPrivacyPolicyClick: () -> Unit
 ) {
     val textColor = Color(0x37353380) // Обычный цвет текста
-    val linkColor = Color(0x80353380) // Цвет для ссылок
-    
+    val linkColor = Color(0xFFCAB7A3) // Цвет для ссылок
+    val colors = MaterialTheme.colorScheme
+    val faqText1 =  stringResource(MokoRes.strings.auth_agreement_text) + " "
+    val faqText2 =  stringResource(MokoRes.strings.user_agreement) + "  "
+    val faqText3 =  stringResource(MokoRes.strings.and) + " "
+    val faqText4 =  stringResource(MokoRes.strings.privacy_policy)
+
     val annotatedString = remember {
         buildAnnotatedString {
-            append("Продолжая вход, вы соглашаетесь с ")
+            append(faqText1)
             
             val startUserAgreement = length
-            append("пользовательским соглашением")
+            append(faqText2)
             addStyle(
                 SpanStyle(
                     color = linkColor,
@@ -422,10 +426,10 @@ fun AgreementText(
             )
             addStringAnnotation("USER_AGREEMENT", "user_agreement", startUserAgreement, length)
             
-            append(" и ")
+            append(faqText3)
             
             val startPrivacyPolicy = length
-            append("соглашением о конфиденциальности")
+            append(faqText4)
             addStyle(
                 SpanStyle(
                     color = linkColor,
@@ -468,7 +472,7 @@ fun AgreementText(
             fontWeight = FontWeight.W600, // Более плотный текст
             textAlign = TextAlign.Center, // Центрирование текста внутри строки
             letterSpacing = (-0.5).sp, // Более плотный текст
-            color = Color(0x37353380)
+            color = colors.secondary
         )
     )
     

@@ -273,6 +273,24 @@
     <string name="send_a_message">Отправьте сообщение</string>
     <string name="deleted_user">Удалённый пользователь</string>
 
+    <string name="auth_confirm_title">Подтвердите номер</string>
+    <string name="auth_confirm_description">Для подтверждения номера позвоните по номеру:</string>
+    <string name="auth_confirm_note">Звонок бесплатный. Он будет сброшен, а система подтвердит вход</string>
+    <string name="auth_confirm_call">Позвонить</string>
+    <string name="auth_confirm_alt">Другие способы входа</string>
+    <string name="auth_confirm_success_title">Номер успешно подтверждён!</string>
+    <string name="auth_confirm_success_note">Через 5 сек. вы войдёте в аккаунт</string>
+    <string name="auth_agreement_text">Продолжая вход, вы соглашаетесь с </string>
+    <string name="auth_user_agreement">пользовательским соглашением</string>
+    <string name="auth_privacy_policy">соглашением о конфиденциальности</string>
+    <string name="and"> и </string>
 
+
+    <string name="status_online">В сети</string>
+    <string name="status_offline">Не в сети</string>
+    <string name="status_typing">Печатает</string>
+    <string name="status_sending_file">Отправляет файл</string>
+    <string name="status_choosing_sticker">Выбирает стикер</string>
+    <string name="status_recording_voice">Записывает голосовое</string>
 
 </resources>
