@@ -165,7 +165,7 @@ kotlin {
 
 
 tasks.register("generateBuildConfig") {
-    val versionName = project.findProperty("VERSION_NAME") ?: "1.1.0"
+    val versionName = project.findProperty("VERSION_NAME") ?: "1.1.1"
     
     val outputDir = File(buildDir, "generated/kotlin")
     outputDir.mkdirs()
@@ -187,8 +187,8 @@ android {
         targetSdk = 34
         
         applicationId = "org.videotrade.shopot.androidApp"
-        versionCode = 22
-        versionName = "1.1.0"
+        versionCode = 23
+        versionName = "1.1.1"
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
