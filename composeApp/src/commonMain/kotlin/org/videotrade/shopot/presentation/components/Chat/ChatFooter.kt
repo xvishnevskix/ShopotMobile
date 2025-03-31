@@ -1200,11 +1200,14 @@ fun rememberTypingStatusHandler(
         if (text.isBlank()) {
             typingJob.value?.cancel()
             if (isTyping.value) {
+
+                println("Stop typing")
                 isTyping.value = false
                 latestOnEnd.value()
             }
         } else {
             if (!isTyping.value) {
+                println("Start typing")
                 isTyping.value = true
                 latestOnStart.value()
             }
@@ -1215,6 +1218,7 @@ fun rememberTypingStatusHandler(
             typingJob.value = coroutineScope.launch {
                 delay(2000L)
                 if (lastText.value == currentText) {
+                    println("Stop typing")
                     isTyping.value = false
                     latestOnEnd.value()
                 }

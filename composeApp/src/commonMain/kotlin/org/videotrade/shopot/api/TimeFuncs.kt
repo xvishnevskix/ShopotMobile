@@ -168,7 +168,6 @@ fun formatTimeOnly(timestamp: List<Int>): String {
         // Создание LocalDateTime на основе входящих данных
         val localDateTime = LocalDateTime(year, month, day, hour, minute, second, nanosecond)
 
-        println("localDateTime ${localDateTime}")
 
         // Преобразование LocalDateTime в Instant с предположением, что время в UTC
         val instant = localDateTime.toInstant(TimeZone.UTC)
@@ -176,12 +175,10 @@ fun formatTimeOnly(timestamp: List<Int>): String {
         // Получение текущего часового пояса устройства
         val currentTimeZone = TimeZone.currentSystemDefault()
 
-        println("currentTimeZone ${currentTimeZone}")
 
         // Преобразование Instant в LocalDateTime с учётом текущего часового пояса устройства
         val dateTimeInCurrentZone = instant.toLocalDateTime(currentTimeZone)
 
-        println("dateTimeInCurrentZone ${dateTimeInCurrentZone}")
 
         // Форматирование времени с учётом локального времени устройства
         "${dateTimeInCurrentZone.hour.toString().padStart(2, '0')}:${dateTimeInCurrentZone.minute.toString().padStart(2, '0')}"

@@ -290,7 +290,7 @@
 
     <string name="status_online">Online</string>
     <string name="status_offline">Offline</string>
-    <string name="status_typing">Typing...</string>
+    <string name="status_typing">Typing</string>
     <string name="status_sending_file">Sending a file</string>
     <string name="status_choosing_sticker">Choosing a sticker</string>
     <string name="status_recording_voice">Recording voice</string>
