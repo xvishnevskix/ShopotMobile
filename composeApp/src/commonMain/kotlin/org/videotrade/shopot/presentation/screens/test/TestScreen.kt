@@ -49,74 +49,14 @@ class TestScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        var footerText by remember { mutableStateOf("") }
-        var textRes by remember { mutableStateOf("") }
+        var voicePath by remember { mutableStateOf("") }
+
         
         SafeArea {
-            
             Column {
-                
-                Button(onClick = {
-                    val encupsRes = encupsMessage(footerText)
-                    
-                    println("encupsRes $encupsRes")
-                    
-                    val decupsRes = decupsMessage(Json.encodeToString(encupsRes))
-                    
-                    println("decupsRes $decupsRes")
-                    if (decupsRes != null) {
-                        textRes = decupsRes
-                    }
-                    
-                }, content = { Text("AAAA") })
-                
-                
-                BasicTextField(
-                    value = footerText,
-                    onValueChange = { newText ->
-                        footerText =
-                            newText
-                    },
-                    modifier = Modifier
-                        .heightIn(max = 130.dp, min = 56.dp)
-                        .padding(16.dp)
-                        .fillMaxWidth(), // Для обеспечения выравнивания по ширине
-                    textStyle = TextStyle(
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                        fontWeight = FontWeight(400),
-                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                        textAlign = TextAlign.Start
-                    ),
-                    cursorBrush = SolidColor(colors.primary),
-                    visualTransformation = VisualTransformation.None,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        capitalization = KeyboardCapitalization.Sentences // Заставляет начинать с заглавной буквы
-                    ),
-                    decorationBox = { innerTextField ->
-                        Box(
-                            modifier = Modifier.fillMaxWidth(), // Обеспечивает выравнивание текста по центру
-                            contentAlignment = Alignment.CenterStart // Центрируем внутреннее поле
-                        ) {
-                            if (footerText.isEmpty()) {
-                                Text(
-                                    stringResource(MokoRes.strings.write_message),
-                                    fontSize = 16.sp,
-                                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                    fontWeight = FontWeight(400),
-                                    color = colors.secondary,
-                                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    textAlign = TextAlign.Start
-                                )
-                            }
-                            innerTextField() // Вставка текстового поля в Box
-                        }
-                    },
-                )
-                
-                
-                Text(textRes)
+            
             }
+           
             
             
         }
