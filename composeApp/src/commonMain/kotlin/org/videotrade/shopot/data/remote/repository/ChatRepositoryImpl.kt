@@ -1,8 +1,6 @@
 package org.videotrade.shopot.data.remote.repository
 
 import io.ktor.websocket.Frame
-import io.ktor.websocket.readText
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,8 +10,6 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -266,48 +262,17 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         }
     }
 
-    override suspend fun listenForUserStatusUpdates() {
-//        val session = wsUseCase.wsSession.value
-//        if (session == null) {
-//            println("WebSocket session is null!")
-//        } else {
-//            println("WebSocket session is ready!")
-//        }
-//
-//        session?.incoming?.consumeEach { frame ->
-//            if (frame is Frame.Text) {
-////                handleWebSocketMessage(frame.readText())
-//            }
-//        }
-    }
+    override fun updateUserStatus(userId: String, status: String) {
+        _userStatuses.update { current ->
+            val previous = current[userId]
+            val shouldUpdate = previous == null || previous.first != status
 
-    private fun handleWebSocketMessage(message: String) {
-//        try {
-//            val jsonObject = Json.parseToJsonElement(message).jsonObject
-//            val action = jsonObject["action"]?.jsonPrimitive?.content
-//            val userId = jsonObject["userId"]?.jsonPrimitive?.content
-//            val status = jsonObject["status"]?.jsonPrimitive?.content
-//
-//            if (userId != null && status != null) {
-//                println("Received status update: $userId -> $status")
-//
-//                val now = Clock.System.now().toEpochMilliseconds()
-//                _userStatuses.update { currentStatuses ->
-//                    val previous = currentStatuses[userId]
-//                    val shouldUpdate = previous == null ||
-//                            previous.first != status ||
-//                            now - previous.second > 1000 // Обновим, если прошло больше 1 секунды
-//
-//                    if (shouldUpdate) {
-//                        currentStatuses + (userId to (status to now))
-//                    } else {
-//                        currentStatuses
-//                    }
-//                }
-//            }
-//        } catch (e: Exception) {
-//            println("Error parsing WebSocket message: ${e.message}")
-//        }
+            if (shouldUpdate) {
+                current + (userId to (status to Clock.System.now().toEpochMilliseconds()))
+            } else {
+                current
+            }
+        }
     }
 
 

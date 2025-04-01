@@ -1,27 +1,24 @@
 package org.videotrade.shopot.api
 
-import cafe.adriel.voyager.navigator.Navigator
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
-import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.repository.ChatRepository
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
@@ -57,7 +54,7 @@ suspend fun handleConnectWebSocket(
                 wsUseCase.setConnection(true)
                 
                 launch { monitorWebSocketConnection(userId) }
-                
+
                 
                 println("WebSocket connected successfully")
                 
@@ -624,6 +621,23 @@ suspend fun handleConnectWebSocket(
                                     chatsUseCase.updateLastMessageChat(message)
                                     
                                     println("newLastMessage$jsonElement")
+                                }
+
+                                "statusChange" -> {
+                                    println("userStatus block triggered")
+                                    try {
+                                        val userId = jsonElement.jsonObject["userId"]?.jsonPrimitive?.content
+                                        val status = jsonElement.jsonObject["status"]?.jsonPrimitive?.content
+
+                                        if (userId != null && status != null) {
+                                            println("Got userId=$userId, status=$status")
+
+                                            val chatRepository: ChatRepository = KoinPlatform.getKoin().get()
+                                            chatRepository.updateUserStatus(userId, status)
+                                        }
+                                    } catch (e: Exception) {
+                                        println("Error handling userStatus: ${e.message}")
+                                    }
                                 }
                             }
                         }

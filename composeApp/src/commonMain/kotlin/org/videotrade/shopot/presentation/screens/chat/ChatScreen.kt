@@ -98,7 +98,6 @@ class ChatScreen(
 
         
         LaunchedEffect(key1 = viewModel) {
-            viewModel.startListeningStatuses()
             viewModel.getProfile()
             viewModel.getMessagesBack(chat.id)
         }

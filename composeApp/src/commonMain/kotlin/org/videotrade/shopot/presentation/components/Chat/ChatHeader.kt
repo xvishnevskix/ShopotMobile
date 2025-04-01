@@ -167,7 +167,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         if (!chat.personal) {
                             ParticipantCountText(groupUsers.size)
                         } else {
-//                            ChatStatus(chat.chatUser!![0].id , viewModel)
+                            ChatStatus(chat.chatUser!![0].id , viewModel)
                         }
                     }
                     

@@ -25,7 +25,6 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ContactDTO
-import org.videotrade.shopot.domain.model.FavoritePack
 import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -36,10 +35,9 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
-import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
-import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.multiplatform.MusicType
+import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import kotlin.random.Random
 
@@ -679,7 +677,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
 
     
     
-    ///////////////////////////////////////////////////////
+    /////////////////////////СТАТУСЫ//////////////////////////////
 
     val userStatuses: StateFlow<Map<String, String>> =
         chatUseCase.userStatuses
@@ -696,10 +694,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun onStickerChoosingEnd() = viewModelScope.launch { chatUseCase.sendStickerChoosingEnd() }
     fun onVoiceRecordingStart() = viewModelScope.launch { chatUseCase.sendVoiceRecordingStart() }
     fun onVoiceRecordingEnd() = viewModelScope.launch { chatUseCase.sendVoiceRecordingEnd() }
-
-    fun startListeningStatuses() = viewModelScope.launch {
-        chatUseCase.startListeningForStatusUpdates()
-    }
 
 
 

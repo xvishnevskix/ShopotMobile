@@ -105,17 +105,9 @@ class ChatUseCase : KoinComponent {
     }
 
 
-
-
-    suspend fun startListeningForStatusUpdates() {
-        repository.listenForUserStatusUpdates()
-    }
-
     suspend fun sendUserStatus(action: String) {
         repository.sendUserStatus(action)
     }
-
-
 
     suspend fun sendTypingStart() = sendUserStatus("startTyping")
     suspend fun sendTypingEnd() = sendUserStatus("stopTyping")
