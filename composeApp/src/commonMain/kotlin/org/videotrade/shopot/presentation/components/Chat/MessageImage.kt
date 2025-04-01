@@ -3,6 +3,7 @@ package org.videotrade.shopot.presentation.components.Chat
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -10,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -29,6 +31,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.presentation.components.Common.LogoLoading
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.person
@@ -80,33 +83,37 @@ fun MessageImage(
                     }
             )
         } else {
-            Image(
-                painter = painterResource(Res.drawable.person), // Замените на ваш источник изображения
-                contentDescription = "Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(250.dp, 350.dp)
-                    .padding(4.dp)
-                    .clip(
-                        RoundedCornerShape(
-                            16.dp
-                        )
-                    )
-                    .blur(1000.dp) // Применяет блюр к изображению (значение можно настроить)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null // Убирает эффект нажатия
-                    ) {
-                        if (imagePainter.value !== null)
-                            navigateToScreen(navigator,
-                                PhotoViewerScreen(
-                                    imagePainter,
-                                    messageSenderName,
-                                    message.created
-                                )
-                            )
-                    }
-            )
+//            Image(
+//                painter = painterResource(Res.drawable.person), // Замените на ваш источник изображения
+//                contentDescription = "Image",
+//                contentScale = ContentScale.Crop,
+//                modifier = Modifier
+//                    .size(250.dp, 350.dp)
+//                    .padding(4.dp)
+//                    .clip(
+//                        RoundedCornerShape(
+//                            16.dp
+//                        )
+//                    )
+//                    .blur(1000.dp) // Применяет блюр к изображению (значение можно настроить)
+//                    .clickable(
+//                        interactionSource = remember { MutableInteractionSource() },
+//                        indication = null // Убирает эффект нажатия
+//                    ) {
+//                        if (imagePainter.value !== null)
+//                            navigateToScreen(navigator,
+//                                PhotoViewerScreen(
+//                                    imagePainter,
+//                                    messageSenderName,
+//                                    message.created
+//                                )
+//                            )
+//                    }
+//            )
+            Box(modifier = Modifier.size(250.dp, 350.dp).padding(bottom = 40.dp, end = 20.dp),
+                contentAlignment = Alignment.Center) {
+                LogoLoading()
+            }
         }
     } else {
         val imageFilePath = remember(attachments[0].fileId) { mutableStateOf("") }
