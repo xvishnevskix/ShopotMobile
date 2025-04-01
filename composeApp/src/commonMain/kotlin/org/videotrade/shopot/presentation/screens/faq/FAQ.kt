@@ -128,7 +128,7 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", "$message  \nApp Version: 1.1.1(beta)")
+            put("message", "$message  \nApp Version: 1.1.2(beta)")
         }.toString()
 
         println("Отправка email с данными: $jsonContent")
@@ -239,7 +239,7 @@ class FAQ() : Screen {
                     ) {
 
                         Text(
-                            text = "App Version: 1.1.1(beta)",
+                            text = "App Version: 1.1.2(beta)",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
