@@ -363,6 +363,8 @@ fun ChatFooter(
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
 
                             if (fileData !== null) {
+                                
+                                
                                 viewModel.addFileMessage(chat, fileData.fileType, filePick)
                             }
                         }

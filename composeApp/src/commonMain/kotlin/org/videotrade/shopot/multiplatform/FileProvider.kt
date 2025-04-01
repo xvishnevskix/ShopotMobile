@@ -2,18 +2,17 @@ package org.videotrade.shopot.multiplatform
 
 import androidx.compose.ui.graphics.ImageBitmap
 import io.github.vinceglb.filekit.core.PickerType
-import org.videotrade.shopot.domain.model.FileDTO
 
 expect class FileProvider {
-
+    
     suspend fun pickFile(pickerType: PickerType): PlatformFilePick?
-
+    
     suspend fun pickGallery(): PlatformFilePick?
     
     fun getFilePath(fileName: String, fileType: String): String?
     
     
-    fun createNewFileWithApp(fileName: String, fileType: String): String?
+    fun createNewFileWithApp(fileName: String, fileType: String, cipher: Boolean = false): String?
     
     fun saveFileInDir(fileName: String, fileDirectory: String, fileType: String): String?
     
@@ -22,6 +21,7 @@ expect class FileProvider {
         fileDirectory: String,
         onProgress: (Float) -> Unit
     )
+    
     suspend fun downloadCipherFile(
         url: String,
         contentType: String,
@@ -71,8 +71,8 @@ expect class FileProvider {
     suspend fun delFile(fileDirectory: String): Boolean
     
     suspend fun loadBitmapFromFile(filePath: String): ImageBitmap?
-
-
+    
+    
     fun openFileOrDirectory(filePath: String): Boolean
 }
 

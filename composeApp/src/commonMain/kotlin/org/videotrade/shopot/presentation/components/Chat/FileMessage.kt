@@ -121,6 +121,7 @@ fun FileMessage(
                     
                     if (fileId !== null) {
                         println("fileId ${fileId}")
+                        
                         viewModel.sendLargeFileAttachments(
                             message.content,
                             message.fromUser,
@@ -174,6 +175,8 @@ fun FileMessage(
                 val fileName = attachments[0].name
                 val existingFile = fileProvider.existingFileInDir(fileName, attachments[0].type)
                 if (existingFile != null) {
+                    println("existingFile: $existingFile")
+                    
                     fileProvider.openFileOrDirectory(existingFile)
                 } else {
                     println("File not found in the system: $fileName")
@@ -193,6 +196,8 @@ fun FileMessage(
                     if (isLoadingSuccess) return@IconButton
 
                     message.attachments?.get(0)?.let { attachment ->
+                        
+                        println(" attachment.type ${ attachment.type}")
 
                         val existingFile = fileProvider.existingFileInDir(attachment.name, attachment.type)
                         if (existingFile != null) {
@@ -218,7 +223,7 @@ fun FileMessage(
                                     url,
                                     attachment.type,
                                     attachment.name,
-                                    "file"
+                                    "document"
                                 ) { newProgress ->
                                     isStartCipherLoading = false
                                     progress = newProgress

@@ -627,7 +627,7 @@ actual class FileProvider(private val applicationContext: Context) {
     }
     
     
-    actual fun createNewFileWithApp(fileName: String, fileType: String): String? {
+    actual fun createNewFileWithApp(fileName: String, fileType: String, cipher: Boolean): String? {
         
         // Определяем каталог для хранения файла в зависимости от типа файла
         val directory = when (fileType) {

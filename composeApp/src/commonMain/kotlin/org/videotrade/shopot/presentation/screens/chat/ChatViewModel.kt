@@ -240,6 +240,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 uploadId = Random.nextInt(1, 1501).toString()
             )
         )
+        
+        
     }
     
     
@@ -312,7 +314,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             println("сообщениесообщениесообщениесообщение")
             
             musicPlayer.play("message", false, MusicType.Notification)
-            commonViewModel.sendNotify("$login", content, notificationToken)
+            commonViewModel.sendNotify("$login", content, fromUser)
             
             clearSelection(chatId)
         }
@@ -327,6 +329,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
         fileIds: List<String>,
         fileType: String
     ) {
+        val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+        
         viewModelScope.launch {
             chatUseCase.sendUploadMessage(
                 MessageItem(
@@ -343,6 +347,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 fileType
             
             )
+            
             musicPlayer.play("message", false, MusicType.Notification)
             
         }

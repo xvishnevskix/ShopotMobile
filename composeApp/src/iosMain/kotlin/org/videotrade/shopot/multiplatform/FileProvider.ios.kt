@@ -80,8 +80,10 @@ import platform.Foundation.pathExtension
 import platform.Foundation.stringByAppendingPathComponent
 import platform.UIKit.UIApplication
 import platform.UIKit.UIDocumentInteractionController
+import platform.UIKit.UIDocumentInteractionControllerDelegateProtocol
 import platform.UIKit.UIDocumentPickerDelegateProtocol
 import platform.UIKit.UIDocumentPickerViewController
+import platform.UIKit.UIViewController
 import platform.darwin.NSObject
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -92,16 +94,22 @@ actual class FileProvider {
     actual fun openFileOrDirectory(filePath: String): Boolean {
         val url = NSURL.fileURLWithPath(filePath)
         val controller = UIDocumentInteractionController.interactionControllerWithURL(url)
-        val window = UIApplication.sharedApplication.keyWindow
-        val rootController = window?.rootViewController
         
-        return if (rootController != null) {
-            controller.presentPreviewAnimated(true)
-            true
-        } else {
-            println("Failed to find rootViewController")
-            false
+        val window = UIApplication.sharedApplication.keyWindow
+        val rootVC = window?.rootViewController
+        
+        if (rootVC == null) {
+            println("No root view controller found")
+            return false
         }
+        
+        controller.delegate = object : NSObject(), UIDocumentInteractionControllerDelegateProtocol {
+            override fun documentInteractionControllerViewControllerForPreview(controller: UIDocumentInteractionController): UIViewController {
+                return rootVC
+            }
+        }
+        
+        return controller.presentPreviewAnimated(true)
     }
     
     @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
@@ -520,7 +528,8 @@ actual class FileProvider {
             
             val fileDirectory = createNewFileWithApp(
                 filename.substringBeforeLast(".", filename),
-                "cipher"
+                "cipher",
+                true
             ) ?: throw IllegalStateException("Failed to create cipher file")
             
             val decryptFilePath = createNewFileWithApp(filename, dirType)
@@ -588,6 +597,9 @@ actual class FileProvider {
                         }
                         
                         filePath = resultPath
+                        
+                        deleteFile(fileDirectory)
+                        
                         println("File successfully saved at $filePath")
                         onProgress(1f) // Устанавливаем прогресс на 100%
                     } catch (e: Exception) {
@@ -1008,7 +1020,7 @@ actual class FileProvider {
     }
     
     @OptIn(ExperimentalForeignApi::class)
-    actual fun createNewFileWithApp(fileName: String, fileType: String): String? {
+    actual fun createNewFileWithApp(fileName: String, fileType: String, cipher: Boolean): String? {
         // Получаем путь к каталогу для хранения файла в зависимости от типа файла
         val directoryPath = when (fileType) {
             "audio" -> NSSearchPathForDirectoriesInDomains(
@@ -1092,6 +1104,12 @@ actual class FileProvider {
         val filePath = "$directoryPath/$fileName"
         if (fileManager.fileExistsAtPath(filePath)) {
             println("Файл уже существует: $filePath")
+            
+//            if (cipher) {
+//                deleteFile(filePath)
+//
+//                return filePath
+//            }
             return null
         }
         
