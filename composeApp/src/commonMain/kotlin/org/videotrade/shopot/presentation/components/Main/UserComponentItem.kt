@@ -138,12 +138,6 @@ fun UserComponentItem(
                 modifier = Modifier,
                 verticalArrangement = Arrangement.Top
             ) {
-                val fullName = if (chat.personal) {
-                    if (chat.isSavedContact == false) "+${chat.phone}" else "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
-                        .ifBlank { "+${chat.phone}" }
-                } else {
-                    chat.groupName.orEmpty()
-                }
 
                 val displayName = if (chat.personal) {
                     val firstName = chat.firstName.orEmpty()

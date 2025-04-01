@@ -191,16 +191,27 @@ fun FileMessage(
                 onClick = {
                     
                     if (isLoadingSuccess) return@IconButton
-                    
+
                     message.attachments?.get(0)?.let { attachment ->
+
+                        val existingFile = fileProvider.existingFileInDir(attachment.name, attachment.type)
+                        if (existingFile != null) {
+                            isStartCipherLoading = false
+                            isLoading = false
+                            isLoadingSuccess = true
+                            progress = 1f
+                            filePath = existingFile
+                            return@IconButton
+                        }
+
                         if (!isLoading) {
                             downloadJob?.cancel()
                             progress = 0f
                             isLoading = true
-                            
+
                             val url =
                                 "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
-                            
+
                             downloadJob = scope.launch {
                                 isLoading = true
                                 audioFile.downloadCipherFile(
@@ -217,6 +228,7 @@ fun FileMessage(
                             }
                         } else {
                             downloadJob?.cancel()
+                            isStartCipherLoading = false
                             isLoading = false
                             progress = 0f
                         }
@@ -247,7 +259,9 @@ fun FileMessage(
                                 .padding(4.dp)
                                 .pointerInput(Unit) {
                                     isStartCipherLoading = false
-                                    viewModel.deleteMessage(message)
+                                    if (message.upload !== null) {
+                                        viewModel.deleteMessage(message)
+                                    }
                                 },
                             tint =
                             if (message.fromUser != profile.id) Color(0xFF373533) else Color(

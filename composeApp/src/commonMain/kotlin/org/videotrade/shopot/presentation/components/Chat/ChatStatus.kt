@@ -127,34 +127,27 @@ fun ChatStatus(
 fun TypingIndicator() {
     val transition = rememberInfiniteTransition()
 
-    val delays = listOf(0, 100, 200) // волна
-    val animatedOffsets = delays.map { delay ->
-        transition.animateFloat(
-            initialValue = 0f,
-            targetValue = -1.5f, // поднимается вверх
-            animationSpec = infiniteRepeatable(
-                animation = tween(
-                    durationMillis = 500,
-                    delayMillis = delay,
-                    easing = EaseInOutSine
-                ),
-                repeatMode = RepeatMode.Reverse
-            )
+    val alphaAnim = transition.animateFloat(
+        initialValue = 0.3f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1000, easing = EaseInOutSine),
+            repeatMode = RepeatMode.Reverse
         )
-    }
+    )
 
     Row(
         verticalAlignment = Alignment.Bottom,
         modifier = Modifier.padding(start = 2.dp, top = 4.dp)
     ) {
-        animatedOffsets.forEachIndexed { index, offsetY ->
+        repeat(3) { index ->
             Box(
                 modifier = Modifier
-                    .offset(y = offsetY.value.dp)
                     .size(4.dp)
+                    .alpha(alphaAnim.value)
                     .background(Color(0xFFCAB7A3), CircleShape)
             )
-            if (index != animatedOffsets.lastIndex) {
+            if (index < 2) {
                 Spacer(modifier = Modifier.width(4.dp))
             }
         }
