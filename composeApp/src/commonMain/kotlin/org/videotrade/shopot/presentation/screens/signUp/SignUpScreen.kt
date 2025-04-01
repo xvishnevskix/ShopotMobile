@@ -369,7 +369,7 @@ class SignUpScreen(private val phone: String) : Screen {
                                                         navigator = null
                                                     )
 
-                                                    delay(3000)
+                                                    delay(3500)
 
                                                     val icon = image?.let {
                                                         withContext(Dispatchers.IO) { // Запускаем в другом потоке
@@ -430,12 +430,14 @@ class SignUpScreen(private val phone: String) : Screen {
                                                     println("Аватарка загружена: $icon")
                                                     println("phone ${phone}")
 
-//                                                    viewModel.startObserving()
+
 
                                                 }
                                             } catch (e: Exception) {
                                                 e.printStackTrace() // It is a good practice to print the stack trace of the exception for debugging purposes
                                             } finally {
+                                                viewModel.startObserving()
+                                                navigator.push(IntroScreen())
                                                 isLoading.value = false
                                                 client.close()
                                             }

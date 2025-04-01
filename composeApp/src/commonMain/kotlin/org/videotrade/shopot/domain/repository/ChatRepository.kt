@@ -7,11 +7,11 @@ import org.videotrade.shopot.domain.model.MessageItem
 interface ChatRepository {
 
     val currentChat: StateFlow<ChatItem?>
+    val userStatuses: StateFlow<Map<String, Pair<String, Long>>>
 
     fun setMessagePage(page: Int)
 
     fun implementCount()
-
 
     fun initMessages(messages: List<MessageItem>)
     fun getMessages(): StateFlow<List<MessageItem>>
@@ -44,8 +44,11 @@ interface ChatRepository {
         fileType: String
     )
 
-    fun clearData()
-
-
     fun setCurrentChat(chat: ChatItem)
+
+    fun updateUserStatus(userId: String, status: String)
+
+    suspend fun sendUserStatus(action: String)
+
+    fun clearData()
 }

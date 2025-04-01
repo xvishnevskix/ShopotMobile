@@ -128,7 +128,7 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", "$message  \nApp Version: 1.1.1")
+            put("message", "$message  \nApp Version: 1.1.2(beta)")
         }.toString()
 
         println("Отправка email с данными: $jsonContent")
@@ -239,8 +239,7 @@ class FAQ() : Screen {
                     ) {
 
                         Text(
-//                            text = "${MokoRes.strings.app_version}: alpha~1.0.8",
-                            text = "App Version: alpha~1.1.1",
+                            text = "App Version: 1.1.2(beta)",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
@@ -292,18 +291,20 @@ class FAQ() : Screen {
         Box(
             modifier = Modifier
                 .padding(top = 4.dp, bottom = 4.dp)
+                .clip(RoundedCornerShape(16.dp))
                 .fillMaxWidth()
                 .border(
                     width = 1.dp,
                     color = colors.secondaryContainer,
                     shape = RoundedCornerShape(size = 16.dp)
-                ),
+                )
+                .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = text,
                 modifier = Modifier
-                    .clickable(onClick = onClick)
+
                     .padding(start = 16.dp, top = 20.dp, end = 16.dp, bottom = 20.dp),
                 style = TextStyle(
                     fontSize = 14.sp,

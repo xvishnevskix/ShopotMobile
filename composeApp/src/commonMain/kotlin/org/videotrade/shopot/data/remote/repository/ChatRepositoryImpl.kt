@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -20,6 +21,9 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 class ChatRepositoryImpl : ChatRepository, KoinComponent {
     private val _currentChat = MutableStateFlow<ChatItem?>(null)
     override val currentChat: StateFlow<ChatItem?> get() = _currentChat.asStateFlow()
+
+    private val _userStatuses = MutableStateFlow<Map<String, Pair<String, Long>>>(emptyMap())
+    override val userStatuses: StateFlow<Map<String, Pair<String, Long>>> get() = _userStatuses.asStateFlow()
 
 
     private val _messages = MutableStateFlow<List<MessageItem>>(
@@ -241,6 +245,34 @@ class ChatRepositoryImpl : ChatRepository, KoinComponent {
         if (chatId == currentChat.value?.id)
             _messages.value = _messages.value.filter { it.id != messageId }
 
+    }
+
+
+
+    override suspend fun sendUserStatus(action: String) {
+        try {
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", action)
+                }
+            )
+            wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+        } catch (e: Exception) {
+            println("Failed to send status: ${e.message}")
+        }
+    }
+
+    override fun updateUserStatus(userId: String, status: String) {
+        _userStatuses.update { current ->
+            val previous = current[userId]
+            val shouldUpdate = previous == null || previous.first != status
+
+            if (shouldUpdate) {
+                current + (userId to (status to Clock.System.now().toEpochMilliseconds()))
+            } else {
+                current
+            }
+        }
     }
 
 

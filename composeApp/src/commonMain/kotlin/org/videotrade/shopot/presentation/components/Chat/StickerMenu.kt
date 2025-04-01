@@ -39,6 +39,7 @@ import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -111,7 +112,17 @@ fun StickerMenuContent(chat: ChatItem, onStickerClick: (String) -> Unit) {
     val viewModel: ChatViewModel = koinInject()
     val colors = MaterialTheme.colorScheme
 
+    LaunchedEffect(key1 = viewModel) {
+        println("Выбираем стикер")
+        viewModel.onStickerChoosingStart()
+    }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            println("Прекращаем выбирать стикер")
+            viewModel.onStickerChoosingEnd()
+        }
+    }
 
     Column(modifier = Modifier
         .fillMaxHeight(0.5f)

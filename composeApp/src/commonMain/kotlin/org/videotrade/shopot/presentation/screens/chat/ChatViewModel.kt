@@ -6,8 +6,11 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -22,7 +25,6 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ContactDTO
-import org.videotrade.shopot.domain.model.FavoritePack
 import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -33,10 +35,9 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.StickerUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.AudioFactory
-import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
-import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.multiplatform.MusicType
+import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import kotlin.random.Random
 
@@ -676,16 +677,31 @@ class ChatViewModel : ViewModel(), KoinComponent {
 
     
     
+    /////////////////////////СТАТУСЫ//////////////////////////////
+
+    val userStatuses: StateFlow<Map<String, String>> =
+        chatUseCase.userStatuses
+            .map { map -> map.mapValues { it.value.first } }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
+
+
+
+    fun onTypingStart() = viewModelScope.launch { chatUseCase.sendTypingStart() }
+    fun onTypingEnd() = viewModelScope.launch { chatUseCase.sendTypingEnd() }
+    fun onFileUploadStart() = viewModelScope.launch { chatUseCase.sendFileUploadStart() }
+    fun onFileUploadEnd() = viewModelScope.launch { chatUseCase.sendFileUploadEnd() }
+    fun onStickerChoosingStart() = viewModelScope.launch { chatUseCase.sendStickerChoosingStart() }
+    fun onStickerChoosingEnd() = viewModelScope.launch { chatUseCase.sendStickerChoosingEnd() }
+    fun onVoiceRecordingStart() = viewModelScope.launch { chatUseCase.sendVoiceRecordingStart() }
+    fun onVoiceRecordingEnd() = viewModelScope.launch { chatUseCase.sendVoiceRecordingEnd() }
+
+
+
+
     ///////////////////////////////////////////////////////
-    
-    
-    fun sendSticker(
-        fileId: String,
-    ) {
-    
-        
-    }
-    
-    
+
+
+
+
 }
 

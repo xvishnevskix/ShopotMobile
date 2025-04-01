@@ -27,16 +27,19 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -51,6 +54,7 @@ import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.group.GroupProfileScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileChatScreen
+import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.chat_call
@@ -67,11 +71,13 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
     val timer = callViewModel.timer.collectAsState()
     val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
-    
+
     if (!chat.personal) {
         viewModel.loadGroupUsers(chat.chatId)
     }
-    
+
+
+
     Column {
         Row(
             modifier = Modifier
@@ -123,10 +129,22 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         icon = chat.icon,
                         size = 56.dp
                     )
-                    
+
+                    println("sdfdsf sdfsdfsdffsdf ${chat.firstName}")
+
                     val fullName = if (chat.personal) {
-                        if (chat.isSavedContact == false) "+${chat.phone}" else "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
-                            .ifBlank { "+${chat.phone}" }
+                        val firstName = chat.firstName.orEmpty()
+                        val lastName = chat.lastName.orEmpty()
+                        val name = "$firstName $lastName".trim()
+                        val isDeletedUser = firstName == "Unknown"
+
+                        when {
+                            isDeletedUser -> stringResource(MokoRes.strings.deleted_user)
+                            chat.isSavedContact == false -> "+${chat.phone}"
+                            name.isNotBlank() -> name
+                            !chat.phone.isNullOrBlank() -> "+${chat.phone}"
+                            else -> stringResource(MokoRes.strings.deleted_user)
+                        }
                     } else {
                         chat.groupName.orEmpty()
                     }.takeIf { it.isNotBlank() }
@@ -148,6 +166,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         Spacer(modifier = Modifier.height(8.dp))
                         if (!chat.personal) {
                             ParticipantCountText(groupUsers.size)
+                        } else {
+                            ChatStatus(chat.chatUser!![0].id , viewModel)
                         }
                     }
                     
@@ -157,77 +177,77 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             
             
             
-            Box(
-                modifier = Modifier
-            ) {
-                if (chat.personal)
-                    
-                    Image(
-                        painter = painterResource(Res.drawable.chat_call),
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .pointerInput(Unit) {
-                                
-                                scope.launch {
-                                    try {
-                                        val cameraPer =
-                                            PermissionsProviderFactory.create()
-                                                .getPermission("microphone")
-                                        
-                                        if (!cameraPer) return@launch
-                                        
-                                        callViewModel.initWebrtc()
-                                        
-                                        callViewModel.setChatId(chat.chatId)
-                                        
-                                        callViewModel.setCalleeId(chat.userId)
-                                        
-                                        callViewModel.setOtherUserId(chat.userId)
-                                        
-                                        chat.phone?.let {
-                                            callViewModel.setCalleeUserInfo(
-                                                ProfileDTO(
-                                                    phone = it
-                                                )
-                                            )
-                                        }
-                                        
-                                        callViewModel.callScreenInfo.value = CallScreen(
-                                            chat.userId,
-                                            chat.icon,
-                                            chat.firstName!!,
-                                            chat.lastName!!,
-                                            chat.phone!!,
-                                            
-                                            )
-                                        
-                                        if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
-                                            commonViewModel.mainNavigator.value?.push(
-                                                CallScreen(
-                                                    chat.userId,
-                                                    chat.icon,
-                                                    chat.firstName!!,
-                                                    chat.lastName!!,
-                                                    chat.phone!!,
-                                                    sendCall = true,
-                                                    
-                                                    )
-                                            )
-                                        }
+//            Box(
+//                modifier = Modifier
+//            ) {
+//                if (chat.personal)
 //
-                                        
-                                    } catch (e: Exception) {
-                                        println("ERROR : $e")
-                                        
-                                    }
-                                }
-                                
-                                
-                            },
-                        colorFilter = ColorFilter.tint(colors.primary)
-                    )
-            }
+//                    Image(
+//                        painter = painterResource(Res.drawable.chat_call),
+//                        contentDescription = null,
+//                        modifier = Modifier
+//                            .size(18.dp)
+//                            .pointerInput(Unit) {
+//
+//                                scope.launch {
+//                                    try {
+//                                        val cameraPer =
+//                                            PermissionsProviderFactory.create()
+//                                                .getPermission("microphone")
+//
+//                                        if (!cameraPer) return@launch
+//
+//                                        callViewModel.initWebrtc()
+//
+//                                        callViewModel.setChatId(chat.chatId)
+//
+//                                        callViewModel.setCalleeId(chat.userId)
+//
+//                                        callViewModel.setOtherUserId(chat.userId)
+//
+//                                        chat.phone?.let {
+//                                            callViewModel.setCalleeUserInfo(
+//                                                ProfileDTO(
+//                                                    phone = it
+//                                                )
+//                                            )
+//                                        }
+//
+//                                        callViewModel.callScreenInfo.value = CallScreen(
+//                                            chat.userId,
+//                                            chat.icon,
+//                                            chat.firstName!!,
+//                                            chat.lastName!!,
+//                                            chat.phone!!,
+//
+//                                            )
+//
+//                                        if (chat.firstName !== null && chat.lastName !== null && chat.phone !== null) {
+//                                            commonViewModel.mainNavigator.value?.push(
+//                                                CallScreen(
+//                                                    chat.userId,
+//                                                    chat.icon,
+//                                                    chat.firstName!!,
+//                                                    chat.lastName!!,
+//                                                    chat.phone!!,
+//                                                    sendCall = true,
+//
+//                                                    )
+//                                            )
+//                                        }
+////
+//
+//                                    } catch (e: Exception) {
+//                                        println("ERROR : $e")
+//
+//                                    }
+//                                }
+//
+//
+//                            },
+//                        colorFilter = ColorFilter.tint(colors.primary)
+//                    )
+//            }
             
         }
         ReconnectionBar()

@@ -42,7 +42,7 @@ fun EmptyChat() {
     val colors = MaterialTheme.colorScheme
     // Запускаем эффект, который через 1 секунду переключит состояние
     LaunchedEffect(Unit) {
-        delay(700)
+        delay(1000)
         isLoading.value = false
     }
 
