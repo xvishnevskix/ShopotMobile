@@ -26,6 +26,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.Attachment
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -41,7 +42,8 @@ import shopot.composeapp.generated.resources.person
 fun MessageImage(
     message: MessageItem, profile: ProfileDTO,
     attachments: List<Attachment>,
-    messageSenderName: String? = null
+    messageSenderName: String? = null,
+    chat: ChatItem
 ) {
     if (getPlatform() == Platform.Android) {
         val navigator = LocalNavigator.currentOrThrow

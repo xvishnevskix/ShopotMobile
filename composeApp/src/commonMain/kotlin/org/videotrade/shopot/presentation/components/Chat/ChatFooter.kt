@@ -19,29 +19,22 @@ import androidx.compose.animation.expandIn
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -83,7 +76,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -151,7 +143,7 @@ fun ChatFooter(
 ) {
     val scope = rememberCoroutineScope()
     val colors = MaterialTheme.colorScheme
-
+    
     var recordingTime by remember { mutableStateOf(0) }
     val swipeOffset = remember { Animatable(0f) }
     var isDragging by remember { mutableStateOf(false) }
@@ -166,37 +158,37 @@ fun ChatFooter(
     val isStopAndSendVoice = remember { mutableStateOf(false) }
     val isRecordingLock = remember { mutableStateOf(false) }
     var activeAxis by remember { mutableStateOf<String?>(null) }
-
-
+    
+    
     val audioRecorder = viewModel.audioRecorder.collectAsState().value
     val isRecording = viewModel.isRecording.collectAsState().value
-
+    
     val selectedMessagePair = viewModel.selectedMessagesByChat.collectAsState().value[chat.chatId]
     val profile = viewModel.profile.collectAsState().value
     val selectedMessage = selectedMessagePair?.first
     val selectedMessageSenderName = selectedMessagePair?.second
-
+    
     LaunchedEffect(isStopAndSendVoice.value) {
         if (isStopAndSendVoice.value) {
             println("isStopAndSendVoice")
             viewModel.sendVoice(chat, voiceName)
-
+            
             isStopAndSendVoice.value = false
         }
     }
-
-
+    
+    
     LaunchedEffect(isRecording) {
         if (isRecording) {
             viewModel.onVoiceRecordingStart()
             while (isRecording) {
                 delay(1000L)
-
+                
                 recordingTime++
-
+                
                 var seconds = recordingTime
                 seconds++
-
+                
                 if (seconds > 1) {
                     if (!isStartRecording) {
                         scope.launch {
@@ -211,27 +203,27 @@ fun ChatFooter(
                                         voiceName,
                                         "audio/mp4"
                                     ) // Генерация пути к файлу
-
+                                
                                 println("audioFilePathNew $audioFilePathNew")
-
+                                
                                 if (audioFilePathNew != null) {
                                     voicePath = audioFilePathNew
-
+                                    
                                     audioRecorder.startRecording(audioFilePathNew)
                                 }
                                 isStartRecording = true
                             } else {
-
+                                
                                 println("perStop")
-
+                                
                                 viewModel.setIsRecording(false)
-
+                                
                                 audioRecorder.stopRecording(false)
                                 offset = Offset.Zero
                             }
                         }
                     }
-
+                    
                 }
             }
             viewModel.onVoiceRecordingEnd()
@@ -240,21 +232,21 @@ fun ChatFooter(
             viewModel.onVoiceRecordingEnd()
         }
     }
-
+    
     LaunchedEffect(showStickerMenu) {
         if (showStickerMenu.value) {
             keyboardController?.hide()
         }
     }
-
+    
     DisposableEffect(showStickerMenu.value) {
         if (showStickerMenu.value) {
             keyboardController?.hide()
         }
         onDispose { }
     }
-
-
+    
+    
     val infiniteTransition = rememberInfiniteTransition()
     val recordingCircleAlpha by infiniteTransition.animateFloat(
         initialValue = 1f,
@@ -264,7 +256,7 @@ fun ChatFooter(
             repeatMode = RepeatMode.Reverse
         )
     )
-
+    
     val textOffset by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = -15f,
@@ -293,7 +285,7 @@ fun ChatFooter(
 //            }
 //        }
 //    )
-
+    
     val menuItems = listOf(
         MenuItem(
             text = stringResource(MokoRes.strings.gallery),
@@ -306,24 +298,23 @@ fun ChatFooter(
 //                    "image",
 //                    "jpg",
 //                )
-
+                
                 scope.launch {
                     try {
                         val filePick = FileProviderFactory.create()
                             .pickGallery()
-
+                        
                         if (filePick !== null) {
                             val fileData =
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
-
+                            
                             if (fileData?.fileType?.substringBefore("/") == "image") {
                                 viewModel.sendImage(
                                     viewModel.footerText.value,
-                                    viewModel.profile.value.id,
-                                    chat.id,
                                     filePick.fileName,
                                     filePick.fileAbsolutePath,
-                                    fileData.fileType
+                                    fileData.fileType,
+                                    chat
                                 )
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
@@ -336,14 +327,14 @@ fun ChatFooter(
                                     )
                                 }
                             }
-
+                            
                         }
-
-
+                        
+                        
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
                     }
-
+                    
                 }
             }
         ),
@@ -351,28 +342,27 @@ fun ChatFooter(
             text = stringResource(MokoRes.strings.file),
             imagePath = Res.drawable.menu_file,
             onClick = {
-
+                
                 scope.launch {
                     try {
                         viewModel.onFileUploadStart()
                         val filePick = FileProviderFactory.create()
                             .pickFile(PickerType.File(listOf("pdf", "zip")))
-
+                        
                         if (filePick !== null) {
                             val fileData =
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
-
+                            
                             if (fileData !== null) {
                                 
                                 
                                 viewModel.addFileMessage(chat, fileData.fileType, filePick)
                             }
                         }
-
+                        
                     } catch (e: Exception) {
                         println("Error: ${e.message}")
-                    }
-                    finally {
+                    } finally {
                         viewModel.onFileUploadEnd()
                     }
                 }
@@ -407,16 +397,16 @@ fun ChatFooter(
 //            }
 //        ),
     )
-
-
+    
+    
     val collapsedHeight = if (selectedMessage != null) 375.dp else 56.dp
     val collapsedselectedHeight = if (selectedMessage != null) 41.dp else 0.dp
-
+    
     // Анимация высоты Row
     val height by animateDpAsState(targetValue = collapsedHeight)
     val selectedHeight by animateDpAsState(targetValue = collapsedselectedHeight)
-
-
+    
+    
     val maxHeight =
         if (selectedMessage != null) 240.dp else 200.dp // Увеличиваем максимальную высоту компонента
     val minHeight = when {
@@ -427,10 +417,10 @@ fun ChatFooter(
         showMenu -> 120.dp
         else -> 56.dp
     }
-
+    
     val lineHeight = 16.dp // Высота одной строки текста в dp
     val maxLines = 8       // Максимальное количество строк текста
-
+    
     // Рассчитываем количество строк на основе текста
     val calculatedLines = remember(footerText) {
         val totalLines = footerText.split("\n").size
@@ -438,13 +428,13 @@ fun ChatFooter(
             (footerText.length / 20).coerceAtLeast(1) // Примерно 20 символов на строку
         totalLines.coerceAtLeast(approximateLines)
     }.coerceAtMost(maxLines)
-
+    
     // Высота на основе количества строк
     val targetHeight = minHeight + calculatedLines * lineHeight
-
+    
     // Ограничиваем высоту максимумом
     val finalHeight = targetHeight.coerceAtMost(maxHeight)
-
+    
     // Анимируем высоту
     val animatedHeight by animateDpAsState(targetValue = finalHeight)
 
@@ -458,24 +448,27 @@ fun ChatFooter(
             repeatMode = RepeatMode.Reverse
         )
     )
-
+    
     val lockOffsetY = remember { mutableStateOf(-50f) }
 
 
 // Общее смещение с учетом свайпа и анимации
     val totalLockOffsetY = lockOffsetY.value.dp + animationOffset.dp
-
-
+    
+    
     Box(
         modifier = Modifier
     ) {
-
+        
         if (isRecording && !isRecordingLock.value) {
             Box(
                 modifier = Modifier
                     .zIndex(1f)
                     .align(Alignment.TopEnd)
-                    .offset(x = (-16).dp, y = totalLockOffsetY) // Смещение контролируется состоянием
+                    .offset(
+                        x = (-16).dp,
+                        y = totalLockOffsetY
+                    ) // Смещение контролируется состоянием
             ) {
                 Box(
                     modifier = Modifier
@@ -493,7 +486,7 @@ fun ChatFooter(
                 }
             }
         }
-
+        
         Box(
             modifier = Modifier
                 .zIndex(0f)
@@ -510,8 +503,8 @@ fun ChatFooter(
                             .windowInsetsPadding(WindowInsets.navigationBars) // This line adds padding for the navigation bar
                     }
                 )
-
-
+        
+        
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -522,12 +515,12 @@ fun ChatFooter(
                     .fillMaxWidth()
                     .heightIn(max = 375.dp, min = 56.dp)
                     .height(animatedHeight)
-
+            
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-
+                    
                     if (selectedMessage != null && selectedMessageSenderName != null) {
                         Column {
                             Row(
@@ -538,9 +531,9 @@ fun ChatFooter(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             )
-
+                            
                             {
-
+                                
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -559,14 +552,14 @@ fun ChatFooter(
                                             .fillMaxHeight()
                                             .background(Color(0xFFCAB7A3))
                                     ) {
-
+                                    
                                     }
                                 }
-
+                                
                                 Spacer(modifier = Modifier.width(16.dp))
-
+                                
                                 Box(modifier = Modifier.weight(1f)) {
-
+                                    
                                     SelectedMessageFormat(
                                         selectedMessage,
                                         profile,
@@ -574,7 +567,7 @@ fun ChatFooter(
                                         isFromFooter = true
                                     )
                                 }
-
+                                
                                 Box(
                                     modifier = Modifier.fillMaxHeight().width(60.dp)
                                         .pointerInput(Unit) {
@@ -592,14 +585,14 @@ fun ChatFooter(
                             Spacer(modifier = Modifier.height(6.dp))
                         }
                     }
-
-
+                    
+                    
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                         modifier = Modifier
                             .heightIn(max = 375.dp, min = 60.dp)
-
+                    
                     ) {
                         if (isRecording) {
                             Row(
@@ -633,12 +626,18 @@ fun ChatFooter(
                                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                 )
                             }
-
+                            
                             AnimatedContent(
                                 targetState = isRecordingLock.value,
                                 transitionSpec = {
-                                    (slideInVertically(initialOffsetY = { fullHeight -> fullHeight }) + fadeIn(animationSpec = tween(300)))
-                                        .togetherWith(slideOutVertically(targetOffsetY = { fullHeight -> -fullHeight }) + fadeOut(animationSpec = tween(150)))
+                                    (slideInVertically(initialOffsetY = { fullHeight -> fullHeight }) + fadeIn(
+                                        animationSpec = tween(300)
+                                    ))
+                                        .togetherWith(
+                                            slideOutVertically(targetOffsetY = { fullHeight -> -fullHeight }) + fadeOut(
+                                                animationSpec = tween(150)
+                                            )
+                                        )
                                 },
                                 modifier = Modifier
                                     .padding(start = 10.dp, end = 10.dp)
@@ -683,8 +682,8 @@ fun ChatFooter(
                                     Row(
                                         modifier = Modifier
                                             .pointerInput(Unit) {
-
-
+                                                
+                                                
                                                 viewModel.setIsRecording(false)
                                                 audioRecorder.stopRecording(false)
                                                 isStartRecording = false
@@ -693,10 +692,9 @@ fun ChatFooter(
                                                     swipeOffset.snapTo(0f)
                                                 }
                                                 isRecordingLock.value = false
-
-
-
-                                        },
+                                                
+                                                
+                                            },
                                         verticalAlignment = Alignment.CenterVertically,
                                         horizontalArrangement = Arrangement.Center
                                     ) {
@@ -712,10 +710,10 @@ fun ChatFooter(
                                     }
                                 }
                             }
-
+                            
                         }
-
-
+                        
+                        
                         Row(
                             modifier = Modifier
                                 .alpha(if (isRecording) 0f else 1f)
@@ -758,7 +756,7 @@ fun ChatFooter(
                                     }
                                 }
                             }
-
+                            
                             Row(
                                 modifier = Modifier
                                     .weight(1f)
@@ -773,7 +771,7 @@ fun ChatFooter(
                                     onTypingStart = { viewModel.onTypingStart() },
                                     onTypingEnd = { viewModel.onTypingEnd() }
                                 )
-
+                                
                                 BasicTextField(
                                     value = footerText,
                                     onValueChange = { newText ->
@@ -828,7 +826,7 @@ fun ChatFooter(
                                         }
                                     },
                                 )
-
+                                
                                 if (!isRecording) {
                                     Box(
                                         contentAlignment = Alignment.CenterEnd,
@@ -849,14 +847,14 @@ fun ChatFooter(
                                         )
                                     }
                                 }
-
+                                
                             }
                             Spacer(modifier = Modifier.width(12.dp))
-
-
+                            
+                            
                         }
-
-
+                        
+                        
                         val boxSize by animateDpAsState(
                             targetValue = 56.dp
 //                            if (footerText.isNotEmpty()) 56.dp else 50.dp
@@ -866,10 +864,10 @@ fun ChatFooter(
                                 easing = FastOutSlowInEasing // Плавное увеличение
                             )
                         )
-
+                        
                         val isFooterTextNotEmpty = footerText.isNotBlank()
-
-
+                        
+                        
                         AnimatedVisibility(
                             visible = isFooterTextNotEmpty,
                             enter = fadeIn(animationSpec = tween(100)) + expandIn(expandFrom = Alignment.Center),
@@ -895,12 +893,9 @@ fun ChatFooter(
                                                 val trimmedText = footerText.trim()
                                                 viewModel.sendMessage(
                                                     content = trimmedText,
-                                                    fromUser = viewModel.profile.value.id,
-                                                    chatId = chat.id,
-                                                    notificationToken = chat.notificationToken,
                                                     attachments = emptyList(),
-                                                    login = "${viewModel.profile.value.firstName} ${viewModel.profile.value.lastName}",
-                                                    true
+                                                    isCipher = true,
+                                                    chat = chat
                                                 )
                                                 viewModel.onTypingEnd()
                                                 viewModel.footerText.value = ""
@@ -910,9 +905,9 @@ fun ChatFooter(
                                 )
                             }
                         }
-
-
-
+                        
+                        
+                        
                         AnimatedVisibility(
                             visible = !isFooterTextNotEmpty,
                             enter = fadeIn(animationSpec = tween(300)) + expandIn(expandFrom = Alignment.Center),
@@ -930,7 +925,8 @@ fun ChatFooter(
                                             detectDragGestures(
                                                 onDragStart = {
                                                     isDragging = true
-                                                    activeAxis = null // Сбрасываем ось при начале нового жеста
+                                                    activeAxis =
+                                                        null // Сбрасываем ось при начале нового жеста
                                                 },
                                                 onDragEnd = {
                                                     println("Drag ended")
@@ -946,21 +942,26 @@ fun ChatFooter(
                                                                 swipeOffset.snapTo(0f) // Сбрасываем смещение
                                                             }
                                                         }
+                                                        
                                                         offset.y <= -25f -> {
                                                             // Завершение свайпа вверх
                                                             println("Swipe up complete, locking recording")
                                                             isRecordingLock.value = true
                                                             isStartRecording = false
                                                             offset = Offset.Zero
-                                                            lockOffsetY.value = -50f // Смещаем кнопку lock вверх
+                                                            lockOffsetY.value =
+                                                                -50f // Смещаем кнопку lock вверх
                                                         }
+                                                        
                                                         else -> {
                                                             println("Swipe not complete, resetting position")
                                                             scope.launch {
-                                                                offset = Offset.Zero // Возвращаем кнопку на место
+                                                                offset =
+                                                                    Offset.Zero // Возвращаем кнопку на место
                                                                 swipeOffset.animateTo(0f)
-                                                                lockOffsetY.value = -50f // Сбрасываем положение lock
-
+                                                                lockOffsetY.value =
+                                                                    -50f // Сбрасываем положение lock
+                                                                
                                                             }
                                                             val seconds = recordingTime % 60
                                                             if (seconds > 1) {
@@ -976,7 +977,8 @@ fun ChatFooter(
                                                         activeAxis = null
                                                     }
                                                     isDragging = false
-                                                    activeAxis = null // Сбрасываем ось после завершения свайпа
+                                                    activeAxis =
+                                                        null // Сбрасываем ось после завершения свайпа
                                                 },
                                                 onDrag = { change, dragAmount ->
                                                     change.consume()
@@ -987,24 +989,31 @@ fun ChatFooter(
                                                             else -> "y" // Вертикальный свайп
                                                         }
                                                     }
-
+                                                    
                                                     // Обрабатываем только движение по активной оси
                                                     if (activeAxis == "x") {
                                                         // Обновляем смещение для кнопки записи
                                                         offset = Offset(
-                                                            x = (offset.x + dragAmount.x).coerceAtLeast(-200f).coerceAtMost(0f),
+                                                            x = (offset.x + dragAmount.x).coerceAtLeast(
+                                                                -200f
+                                                            ).coerceAtMost(0f),
                                                             y = offset.y
                                                         )
                                                         scope.launch {
                                                             swipeOffset.snapTo(
-                                                                (swipeOffset.value + dragAmount.x / 4).coerceIn(-50f, 0f) // Ограничиваем диапазон
+                                                                (swipeOffset.value + dragAmount.x / 4).coerceIn(
+                                                                    -50f,
+                                                                    0f
+                                                                ) // Ограничиваем диапазон
                                                             )
                                                         }
                                                     } else if (activeAxis == "y") {
                                                         // Обновляем положение кнопки lock на основе свайпа вверх
                                                         offset = Offset(
                                                             x = offset.x,
-                                                            y = (offset.y + dragAmount.y).coerceAtLeast(-25f).coerceAtMost(0f)
+                                                            y = (offset.y + dragAmount.y).coerceAtLeast(
+                                                                -25f
+                                                            ).coerceAtMost(0f)
                                                         )
                                                         if (offset.y < 25f) {
                                                             lockOffsetY.value =
@@ -1042,32 +1051,43 @@ fun ChatFooter(
                                     }
                             ) {
                                 val infiniteTransition = rememberInfiniteTransition()
-
+                                
                                 // Анимация прозрачности волны
                                 val waveAlpha by infiniteTransition.animateFloat(
                                     initialValue = 0.1f,
                                     targetValue = 0.5f,
                                     animationSpec = infiniteRepeatable(
-                                        animation = tween(durationMillis = 1200, easing = LinearOutSlowInEasing),
+                                        animation = tween(
+                                            durationMillis = 1200,
+                                            easing = LinearOutSlowInEasing
+                                        ),
                                         repeatMode = RepeatMode.Reverse
                                     )
                                 )
-
+                                
                                 // Анимация масштаба волны
                                 val waveScale by infiniteTransition.animateFloat(
                                     initialValue = 1.07f,
                                     targetValue = 1.15f,
                                     animationSpec = infiniteRepeatable(
-                                        animation = tween(durationMillis = 1200, easing = LinearOutSlowInEasing),
+                                        animation = tween(
+                                            durationMillis = 1200,
+                                            easing = LinearOutSlowInEasing
+                                        ),
                                         repeatMode = RepeatMode.Reverse
                                     )
                                 )
-
+                                
                                 Box(
                                     contentAlignment = Alignment.Center,
                                     modifier = Modifier
                                         .size(56.dp)
-                                        .offset { IntOffset(offset.x.roundToInt(), offset.y.roundToInt()) } // Используем ваш offset
+                                        .offset {
+                                            IntOffset(
+                                                offset.x.roundToInt(),
+                                                offset.y.roundToInt()
+                                            )
+                                        } // Используем ваш offset
                                 ) {
                                     if (isRecording) {
                                         // Волна вокруг кнопки
@@ -1081,18 +1101,18 @@ fun ChatFooter(
                                                 )
                                         )
                                     }
-
+                                    
                                     // Фиксированная кнопка записи
-
-                                        Box(
-                                            modifier = Modifier
-                                                .size(56.dp)
-                                                .background(
-                                                    color = if (isRecording) Color(0xFFCAB7A3) else Color.Transparent,
-                                                    shape = RoundedCornerShape(16.dp)
-                                                ),
-                                            contentAlignment = Alignment.Center
-                                        ) {
+                                    
+                                    Box(
+                                        modifier = Modifier
+                                            .size(56.dp)
+                                            .background(
+                                                color = if (isRecording) Color(0xFFCAB7A3) else Color.Transparent,
+                                                shape = RoundedCornerShape(16.dp)
+                                            ),
+                                        contentAlignment = Alignment.Center
+                                    ) {
 //                                            AnimatedContent(
 //                                                targetState = isRecordingLock.value,
 //                                                transitionSpec = {
@@ -1102,26 +1122,30 @@ fun ChatFooter(
 //                                                modifier = Modifier.size(30.dp)
 //                                            ) { isLocked ->
 //                                            Box() {
-                                                if (!isRecordingLock.value) {
-                                                    Image(
-                                                        painter = painterResource(Res.drawable.chat_micro),
-                                                        contentDescription = null,
-                                                        contentScale = ContentScale.Crop,
-                                                        colorFilter = if (!isRecording) ColorFilter.tint(colors.primary) else ColorFilter.tint(
-                                                            Color.White
-                                                        ),
-                                                        modifier = Modifier.background(Color.Transparent)
-                                                    )
-                                                } else {
-                                                    Image(
-                                                        painter = painterResource(Res.drawable.chat_send_arrow),
-                                                        contentDescription = null,
-                                                        contentScale = ContentScale.Crop,
-                                                        colorFilter = if (!isRecording) ColorFilter.tint(colors.primary) else ColorFilter.tint(
-                                                            Color.White
-                                                        ),
-                                                        modifier = Modifier.background(Color.Transparent)
-                                                    )
+                                        if (!isRecordingLock.value) {
+                                            Image(
+                                                painter = painterResource(Res.drawable.chat_micro),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = if (!isRecording) ColorFilter.tint(
+                                                    colors.primary
+                                                ) else ColorFilter.tint(
+                                                    Color.White
+                                                ),
+                                                modifier = Modifier.background(Color.Transparent)
+                                            )
+                                        } else {
+                                            Image(
+                                                painter = painterResource(Res.drawable.chat_send_arrow),
+                                                contentDescription = null,
+                                                contentScale = ContentScale.Crop,
+                                                colorFilter = if (!isRecording) ColorFilter.tint(
+                                                    colors.primary
+                                                ) else ColorFilter.tint(
+                                                    Color.White
+                                                ),
+                                                modifier = Modifier.background(Color.Transparent)
+                                            )
 //                                                }
 //                                            }
                                         }
@@ -1129,11 +1153,11 @@ fun ChatFooter(
                                 }
                             }
                         }
-
-
+                        
+                        
                     }
-
-
+                    
+                    
                     Crossfade(targetState = showMenu) { isMenuVisible ->
                         if (isMenuVisible) {
                             Row(
@@ -1176,7 +1200,7 @@ fun ChatFooter(
                         }
                     }
                 }
-
+                
             }
         }
     }
@@ -1191,18 +1215,18 @@ fun rememberTypingStatusHandler(
     val coroutineScope = rememberCoroutineScope()
     val latestOnStart = rememberUpdatedState(onTypingStart)
     val latestOnEnd = rememberUpdatedState(onTypingEnd)
-
+    
     val isTyping = remember { mutableStateOf(false) }
     val typingJob = remember { mutableStateOf<Job?>(null) }
     val lastText = remember { mutableStateOf("") }
-
+    
     return { text: String ->
         lastText.value = text
-
+        
         if (text.isBlank()) {
             typingJob.value?.cancel()
             if (isTyping.value) {
-
+                
                 println("Stop typing")
                 isTyping.value = false
                 latestOnEnd.value()
@@ -1213,10 +1237,10 @@ fun rememberTypingStatusHandler(
                 isTyping.value = true
                 latestOnStart.value()
             }
-
+            
             typingJob.value?.cancel()
             val currentText = text
-
+            
             typingJob.value = coroutineScope.launch {
                 delay(2000L)
                 if (lastText.value == currentText) {

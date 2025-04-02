@@ -39,7 +39,6 @@ import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.getFbToken
-import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 
@@ -333,7 +332,9 @@ class CommonViewModel : ViewModel(), KoinComponent {
     fun sendNotify(
         title: String,
         content: String? = "Уведомление",
-        fromUser: String?
+        fromUser: String?,
+        chatId: String,
+        personal: Boolean
     ) {
         viewModelScope.launch {
             println("Уведомление ${fromUser}")
@@ -344,7 +345,8 @@ class CommonViewModel : ViewModel(), KoinComponent {
                         put("title", title)
                         put("body", content)
                         put("fromUser", fromUser)
-                        put("platform", getPlatform().name)
+                        put("chatId", chatId)
+                        put("personal", personal)
                     }
                 )
 

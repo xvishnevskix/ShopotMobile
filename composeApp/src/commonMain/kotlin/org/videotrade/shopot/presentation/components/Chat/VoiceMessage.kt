@@ -50,6 +50,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.domain.model.Attachment
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.AudioFactory
@@ -65,7 +66,8 @@ import kotlin.random.Random
 @Composable
 fun VoiceMessage(
     message: MessageItem,
-    attachments: List<Attachment>
+    attachments: List<Attachment>,
+    chat: ChatItem
 ) {
     val scope = rememberCoroutineScope()
     val colors = MaterialTheme.colorScheme
@@ -140,7 +142,9 @@ fun VoiceMessage(
                             message.chatId,
                             message.uploadId!!,
                             listOf(it),
-                            fileType = message.attachments!![0].type
+                            fileType = message.attachments!![0].type,
+                            message.phone!!,
+                            chat
                         )
                         audioFilePath = attachment.originalFileDir!!
                     }

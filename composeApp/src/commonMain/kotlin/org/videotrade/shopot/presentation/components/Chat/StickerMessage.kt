@@ -13,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.rememberAsyncImagePainter
 import getImageStorage
 import org.videotrade.shopot.api.EnvironmentConfig.SERVER_URL
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 
 
@@ -20,6 +21,7 @@ import org.videotrade.shopot.domain.model.MessageItem
 fun StickerMessage(
     message: MessageItem,
     imageId: String,
+    chat: ChatItem
 ) {
 //    val imagePainter = getImageStorage(imageId, imageId, false)
     

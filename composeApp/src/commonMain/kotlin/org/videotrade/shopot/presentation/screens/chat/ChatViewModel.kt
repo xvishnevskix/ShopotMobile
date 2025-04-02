@@ -47,9 +47,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
     private val musicPlayer = AudioFactory.createMusicPlayer()
-
+    
     val currentChat = chatUseCase.currentChat
-   
+    
     val footerText = MutableStateFlow("")
     
     val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
@@ -59,8 +59,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val messages: StateFlow<List<MessageItem>> = _messages.asStateFlow()
     
     val profile = MutableStateFlow(ProfileDTO())
-
-
+    
     
     val ws = MutableStateFlow<DefaultClientWebSocketSession?>(null)
     
@@ -83,23 +82,23 @@ class ChatViewModel : ViewModel(), KoinComponent {
         MutableStateFlow<Map<String, Pair<MessageItem?, String?>>>(emptyMap())
     val selectedMessagesByChat: StateFlow<Map<String, Pair<MessageItem?, String?>>> =
         _selectedMessagesByChat.asStateFlow()
-
+    
     private val _boxHeight = MutableStateFlow(0)
     val boxHeight: StateFlow<Int> = _boxHeight
-
+    
     private val _isDeleteConfirmationVisible = MutableStateFlow(false)
     val isDeleteConfirmationVisible: StateFlow<Boolean> = _isDeleteConfirmationVisible
-
-
+    
+    
     private val _messageToDelete = MutableStateFlow<MessageItem?>(null)
     val messageToDelete: StateFlow<MessageItem?> = _messageToDelete
-
+    
     private val _currentPlayingMessage = MutableStateFlow<String?>(null)
     val currentPlayingMessage: StateFlow<String?> = _currentPlayingMessage
-
+    
     private val _voiceMessages = MutableStateFlow<List<MessageItem>>(emptyList())
     val voiceMessages: StateFlow<List<MessageItem>> = _voiceMessages
-
+    
     
     init {
         
@@ -161,44 +160,40 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.implementCount()
         }
     }
-
+    
     //обновить высоту заблюренного сообщения
     fun updateBoxHeight(height: Int) {
         _boxHeight.value = height
     }
-
     
-
+    
     // Установить сообщение для удаления
     fun showDeleteConfirmation(message: MessageItem) {
         _messageToDelete.value = message
         _isDeleteConfirmationVisible.value = true
-
+        
     }
-
+    
     // Скрыть окно подтверждения
     fun dismissDeleteConfirmation() {
         _messageToDelete.value = null
         _isDeleteConfirmationVisible.value = false
     }
-
+    
     // Удалить сообщение и закрыть окно
-    fun deleteMessageAndDismiss(onDismiss: () -> Unit,) {
+    fun deleteMessageAndDismiss(onDismiss: () -> Unit) {
         _messageToDelete.value?.let {
             deleteMessage(it) // Вызов существующей функции удаления
         }
         dismissDeleteConfirmation()
         onDismiss()
     }
-
-
-
+    
+    
     fun setPlayingMessage(messageId: String?) {
         _currentPlayingMessage.value = messageId
     }
-
-
-
+    
     
     fun addFileMessage(
         chat: ChatItem,
@@ -245,11 +240,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-
-    
-    
-
-    
     fun addMessage(message: MessageItem) {
         
         chatUseCase.addMessage(message)
@@ -276,13 +266,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     fun sendMessage(
         content: String? = null,
-        fromUser: String,
-        chatId: String,
-        notificationToken: String?,
         attachments: List<String>? = null,
-        login: String? = null,
         isCipher: Boolean,
-        forwardMessage: Boolean = false
+        forwardMessage: Boolean = false,
+        chat: ChatItem,
     ) {
         viewModelScope.launch {
             var contentSort = ""
@@ -301,22 +288,30 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.sendMessage(
                 MessageItem(
                     content = contentSort,
-                    fromUser = fromUser,
-                    chatId = chatId,
+                    fromUser = profile.value.id,
+                    chatId = chat.chatId,
                     anotherRead = false,
                     iread = false,
                     attachments = null,
                     forwardMessage = forwardMessage,
                 ),
                 attachments,
-                selectedMessagesByChat.value[chatId]?.first?.id
+                selectedMessagesByChat.value[chat.chatId]?.first?.id
             )
             println("сообщениесообщениесообщениесообщение")
             
             musicPlayer.play("message", false, MusicType.Notification)
-            commonViewModel.sendNotify("$login", content, fromUser)
+            commonViewModel.sendNotify(
+                "+${profile.value.phone}",
+                content,
+                profile.value.id,
+                chat.chatId,
+                chat.personal
+            )
             
-            clearSelection(chatId)
+            clearSelection(
+                chat.chatId,
+            )
         }
     }
     
@@ -327,7 +322,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
         chatId: String,
         uploadId: String,
         fileIds: List<String>,
-        fileType: String
+        fileType: String,
+        phone: String,
+        chat: ChatItem,
     ) {
         val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
         
@@ -346,6 +343,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 selectedMessagesByChat.value[chatId]?.first?.id,
                 fileType
             
+            )
+            
+            commonViewModel.sendNotify(
+                "+$phone",
+                "Отправлен файл",
+                fromUser,
+                chat.chatId,
+                chat.personal
             )
             
             musicPlayer.play("message", false, MusicType.Notification)
@@ -399,11 +404,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     fun sendImage(
         content: String? = null,
-        fromUser: String,
-        chatId: String,
         fileName: String,
         fileAbsolutePath: String,
         contentType: String,
+        chat: ChatItem
     ) {
         viewModelScope.launch {
 //            val filePick = FileProviderFactory.create()
@@ -412,11 +416,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
             
             sendAttachments(
                 content,
-                fromUser,
-                chatId,
                 contentType,
                 fileName,
                 fileAbsolutePath,
+                chat
             )
             
         }
@@ -425,11 +428,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     private fun sendAttachments(
         content: String?,
-        fromUser: String,
-        chatId: String,
         contentType: String,
         fileName: String,
-        fileDir: String
+        fileDir: String,
+        chat: ChatItem,
     ) {
         viewModelScope.launch {
             
@@ -443,11 +445,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
             if (fileId !== null)
                 sendMessage(
                     content = content,
-                    fromUser = fromUser,
-                    chatId = chatId,
-                    notificationToken = null,
                     attachments = listOf(fileId),
-                    isCipher = false
+                    isCipher = false,
+                    chat = chat
                 )
         }
     }
@@ -461,14 +461,12 @@ class ChatViewModel : ViewModel(), KoinComponent {
         if (currentChat.value !== null) {
             sendMessage(
                 content = footerText.value,
-                fromUser = profile.value.id,
-                chatId = currentChat.value!!.chatId,
-                notificationToken = null,
                 attachments = listOf(stickerId),
-                isCipher = false
+                isCipher = false,
+                chat = chat,
             )
         }
-
+        
     }
     
     fun sendForwardMessage(
@@ -551,23 +549,26 @@ class ChatViewModel : ViewModel(), KoinComponent {
         }
         
     }
-
-    private val _cachedGroupUsers = mutableStateMapOf<String, List<GroupUserDTO>>() // Кэш пользователей чатов
+    
+    private val _cachedGroupUsers =
+        mutableStateMapOf<String, List<GroupUserDTO>>() // Кэш пользователей чатов
     val cachedGroupUsers: Map<String, List<GroupUserDTO>> get() = _cachedGroupUsers
-
+    
     suspend fun getGroupUsers(chatId: String): List<GroupUserDTO> {
-
+        
         _cachedGroupUsers[chatId]?.let { return it }
-
+        
         return try {
-            val groupUsersGet = origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId") ?: emptyList()
+            val groupUsersGet =
+                origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId")
+                    ?: emptyList()
             _cachedGroupUsers[chatId] = groupUsersGet // Сохраняем в кэше
             groupUsersGet
         } catch (e: Exception) {
             emptyList()
         }
     }
-
+    
     fun clearCache() {
         _cachedGroupUsers.clear() // Очищаем кэш (например, если юзер вышел)
     }
@@ -591,7 +592,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     private val _stickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val stickerPacks: StateFlow<List<StickerPack>> get() = _stickerPacks
-
+    
     private val _favoriteStickerPacks = MutableStateFlow<List<StickerPack>>(emptyList())
     val favoriteStickerPacks: StateFlow<List<StickerPack>> = _favoriteStickerPacks
     
@@ -626,21 +627,21 @@ class ChatViewModel : ViewModel(), KoinComponent {
             _isLoading.value = false
         }
     }
-
+    
     fun getFavoritePacks() {
         viewModelScope.launch {
             // Получаем список избранных пакетов (из базы данных или API)
             val favoritePackList = stickerUseCase.getFavoritePacks()
-
+            
             // Загружаем информацию о каждом пакете по ID
             val packs = favoritePackList?.mapNotNull { favoritePack ->
                 getPack(favoritePack.packId) // Метод для загрузки пакета по его ID
             }
-
+            
             _favoriteStickerPacks.value = packs ?: emptyList() // Обновляем состояние
         }
     }
-
+    
     // Функция для получения пакета по его ID
     private suspend fun getPack(packId: String): StickerPack? {
         return stickerUseCase.getPack(packId)
@@ -650,13 +651,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             val success = stickerUseCase.removePackFromFavorites(packId)
             if (success) {
-
+                
                 _stickerPacks.value = _stickerPacks.value.map { pack ->
                     if (pack.packId == packId) pack.copy(favorite = false) else pack
                 }
-
-                _favoriteStickerPacks.value = _favoriteStickerPacks.value.filter { it.packId != packId }
-
+                
+                _favoriteStickerPacks.value =
+                    _favoriteStickerPacks.value.filter { it.packId != packId }
+                
                 println("Pack successfully removed from favorites")
             } else {
                 println("Failed to remove pack from favorites")
@@ -679,18 +681,14 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
-
-    
-    
     /////////////////////////СТАТУСЫ//////////////////////////////
-
+    
     val userStatuses: StateFlow<Map<String, String>> =
         chatUseCase.userStatuses
             .map { map -> map.mapValues { it.value.first } }
             .stateIn(viewModelScope, SharingStarted.Eagerly, emptyMap())
-
-
-
+    
+    
     fun onTypingStart() = viewModelScope.launch { chatUseCase.sendTypingStart() }
     fun onTypingEnd() = viewModelScope.launch { chatUseCase.sendTypingEnd() }
     fun onFileUploadStart() = viewModelScope.launch { chatUseCase.sendFileUploadStart() }
@@ -699,14 +697,10 @@ class ChatViewModel : ViewModel(), KoinComponent {
     fun onStickerChoosingEnd() = viewModelScope.launch { chatUseCase.sendStickerChoosingEnd() }
     fun onVoiceRecordingStart() = viewModelScope.launch { chatUseCase.sendVoiceRecordingStart() }
     fun onVoiceRecordingEnd() = viewModelScope.launch { chatUseCase.sendVoiceRecordingEnd() }
-
-
-
-
+    
+    
     ///////////////////////////////////////////////////////
-
-
-
-
+    
+    
 }
 

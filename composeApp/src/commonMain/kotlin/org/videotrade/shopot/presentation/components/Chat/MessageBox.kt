@@ -113,7 +113,6 @@ fun MessageBox(
     val theme = getThemeMode()
 
 
-
 //    LaunchedEffect(Unit) {
 //        message.phone?.let {
 //            val findContact = viewModel.findContactByPhone(it)
@@ -123,8 +122,8 @@ fun MessageBox(
 //            }
 //        }
 //    }
-
-
+    
+    
     LaunchedEffect(viewModel.messages.value) {
         if (message.fromUser == profile.id) {
             if (message.anotherRead) {
@@ -136,7 +135,7 @@ fun MessageBox(
             }
         }
     }
-
+    
     //покраска сообщенния при переходе на него
     LaunchedEffect(answerMessageId.value) {
         if (isHighlighted) {
@@ -144,11 +143,11 @@ fun MessageBox(
             answerMessageId.value = null
         }
     }
-
+    
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(color = backgroundColor.value )
+            .background(color = backgroundColor.value)
             .onGloballyPositioned(onPositioned)
             .alpha(if (isVisible) 1f else 0f).pointerInput(message) {
                 detectTapGestures(
@@ -173,8 +172,8 @@ fun MessageBox(
                 )
             }
     ) {
-
-
+        
+        
         BoxWithConstraints(
             contentAlignment = Alignment.CenterStart
         ) {
@@ -205,8 +204,8 @@ fun MessageBox(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-
-
+                
+                
                 Box(
                     contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
                     modifier = Modifier
@@ -218,12 +217,12 @@ fun MessageBox(
                                 onTap = {
                                     // Action for normal tap
                                     println("onTap")
-
+                                    
                                     focusManager.clearFocus() // Your action on tap
                                 },
                                 onLongPress = {
                                     println("onLongPress")
-
+                                    
                                     onClick()
                                 }
                             )
@@ -249,33 +248,31 @@ fun MessageBox(
 
 
 //                        shadowElevation = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") 0.dp else 4.dp,
-
-
+                        
+                        
                         color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
                             Color.Transparent  // Прозрачный цвет для стикеров
                         } else {
                             if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
                             else colors.onBackground  // Цвет для сообщений от других пользователей
                         }
-
-
-
+                    
+                    
                     ) {
                         var messageFormatWidth by remember { mutableStateOf(0) }
 //                        var selectedMessageWidth by remember { mutableStateOf(0) }
-
+                        
                         Column(
                             horizontalAlignment =
-
+                            
                             //изменение для самого бокса сообщений
                             if (message.fromUser == profile.id) Alignment.Start else Alignment.Start,
                         ) {
-
-
-
+                            
+                            
                             // Ответ на сообщение
                             message.answerMessage?.let {
-
+                                
                                 Row(
                                     modifier = Modifier
 //                                        .onGloballyPositioned { coordinates ->
@@ -283,17 +280,20 @@ fun MessageBox(
 //                                        }
                                         .widthIn(
                                             min = (messageFormatWidth * 0.38f).dp,
-
-                                        )
+                                            
+                                            )
                                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                                         .height(56.dp)
                                         .background(
-                                            color = if (message.fromUser == profile.id) Color(0x4DFFFFFF) else colors.background,
-                                            shape = RoundedCornerShape(size = 8.dp))
+                                            color = if (message.fromUser == profile.id) Color(
+                                                0x4DFFFFFF
+                                            ) else colors.background,
+                                            shape = RoundedCornerShape(size = 8.dp)
+                                        )
                                         .wrapContentHeight()
                                         .clickable {
 //                                            answerMessageId.value = it.id // Устанавливаем ID выделенного сообщения
-
+                                            
                                             coroutineScope.launch {
 
 
@@ -323,24 +323,35 @@ fun MessageBox(
 //                                                }
                                             }
                                         },
-
+                                    
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement =
                                     if (message.fromUser == profile.id) Arrangement.Start else Arrangement.Start
                                 ) {
-                                    Box(modifier = Modifier
-
-                                        .width(6.dp)
-                                        .height(56.dp)
-                                        .clip(RoundedCornerShape(topStart = 8.dp, bottomStart = 8.dp))
-                                        .background(color =
-                                        if (message.fromUser == profile.id)
-                                            if (theme == ThemeMode.LIGHT) Color.White else Color(0xFF373533)
-                                        else
-                                            Color(0xFFCAB7A3)))
-
+                                    Box(
+                                        modifier = Modifier
+                                            
+                                            .width(6.dp)
+                                            .height(56.dp)
+                                            .clip(
+                                                RoundedCornerShape(
+                                                    topStart = 8.dp,
+                                                    bottomStart = 8.dp
+                                                )
+                                            )
+                                            .background(
+                                                color =
+                                                if (message.fromUser == profile.id)
+                                                    if (theme == ThemeMode.LIGHT) Color.White else Color(
+                                                        0xFF373533
+                                                    )
+                                                else
+                                                    Color(0xFFCAB7A3)
+                                            )
+                                    )
+                                    
                                     {
-
+                                    
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column(
@@ -378,24 +389,25 @@ fun MessageBox(
 //                            }
                             // Пересланное сообщение
                             if (message.forwardMessage == true) {
-                            Row(
-                                modifier = Modifier.padding(
-                                    start = 16.dp,
-                                    end = 16.dp,
-                                    top = 16.dp,
-                                ),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-
-
-
+                                Row(
+                                    modifier = Modifier.padding(
+                                        start = 16.dp,
+                                        end = 16.dp,
+                                        top = 16.dp,
+                                    ),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    
+                                    
                                     Image(
                                         modifier = Modifier.size(width = 16.5.dp, height = 11.5.dp),
                                         painter = painterResource(Res.drawable.chat_forward),
                                         contentDescription = null,
-                                        colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(Color(0xFFF7F7F7)) else ColorFilter.tint(colors.tertiary)
+                                        colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(
+                                            Color(0xFFF7F7F7)
+                                        ) else ColorFilter.tint(colors.tertiary)
                                     )
-
+                                    
                                     Spacer(modifier = Modifier.width(7.dp))
                                     Text(
                                         stringResource(MokoRes.strings.forwarded_message),
@@ -404,15 +416,20 @@ fun MessageBox(
                                             lineHeight = 16.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                             fontWeight = FontWeight(400),
-                                            color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else colors.tertiary,
+                                            color = if (message.fromUser == profile.id) Color(
+                                                0xFFF7F7F7
+                                            ) else colors.tertiary,
                                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         ),
                                     )
                                 }
                             }
-
+                            
                             // Проверка на персональный чат и наличие имени отправителя
-                            if (!chat.personal && messageSenderName.isNotBlank() && messageSenderName != stringResource(MokoRes.strings.you)) {
+                            if (!chat.personal && messageSenderName.isNotBlank() && messageSenderName != stringResource(
+                                    MokoRes.strings.you
+                                )
+                            ) {
                                 Box(
                                     modifier = Modifier.padding(
                                         start = 16.dp,
@@ -427,17 +444,19 @@ fun MessageBox(
                                             lineHeight = 16.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                             fontWeight = FontWeight(500),
-                                            color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else Color(0xFFCAB7A3),
+                                            color = if (message.fromUser == profile.id) Color(
+                                                0xFFF7F7F7
+                                            ) else Color(0xFFCAB7A3),
                                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         ),
                                         modifier = Modifier.padding(
-
+                                        
                                         ),
                                     )
                                 }
                             }
-
-
+                            
+                            
                             Box(
                                 modifier = Modifier
                                     .onGloballyPositioned { coordinates ->
@@ -450,8 +469,8 @@ fun MessageBox(
                         }
                     }
                 }
-
-
+                
+                
             }
         }
         Spacer(modifier = Modifier.height(4.dp))
@@ -459,7 +478,7 @@ fun MessageBox(
             horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-
+                
                 .fillMaxWidth().clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убирает эффект нажатия
@@ -467,7 +486,7 @@ fun MessageBox(
                     focusManager.clearFocus() // Ваше действие при нажатии
                 }
         ) {
-
+            
             if (message.created.isNotEmpty())
                 Text(
                     text = formatTimeOnly(message.created),
@@ -481,8 +500,8 @@ fun MessageBox(
                     ),
                     modifier = Modifier.padding(),
                 )
-
-
+            
+            
             if (message.fromUser == profile.id)
                 if (message.anotherRead) {
                     Image(
@@ -499,12 +518,11 @@ fun MessageBox(
                             .size(width = 12.7.dp, height = 8.5.dp),
                         painter = painterResource(Res.drawable.message_single_check),
                         contentDescription = null,
-                        colorFilter =  ColorFilter.tint(colors.secondary)
+                        colorFilter = ColorFilter.tint(colors.secondary)
                     )
                 }
-
-
-
+            
+            
         }
         Spacer(modifier = Modifier.height(8.dp))
     }
@@ -520,52 +538,66 @@ fun MessageFormat(
     chat: ChatItem? = null
 ) {
     val isFromUser = message.fromUser == profile.id
-
+    
     when {
-        message.callInfo != null  -> {
+        message.callInfo != null -> {
             CallMessage(message.callInfo!!, isFromUser)
         }
+        
         message.attachments == null || message.attachments?.isEmpty() == true -> {
-            MessageText(message, profile)
+            MessageText(
+                message, profile,
+                chat
+            )
         }
+        
         else -> {
             when (message.attachments!![0].type) {
                 "audio/mp4" -> {
                     VoiceMessage(
                         message,
-                        message.attachments!!
+                        message.attachments!!,
+                        chat!!
                     )
                 }
+                
                 "image" -> {
                     MessageImage(
                         message, profile,
                         message.attachments!!,
-                        messageSenderName
+                        messageSenderName,
+                        chat!!
                     )
                 }
+                
                 "video" -> {
                     VideoMessage(
                         message,
                         message.attachments!!,
-                        messageSenderName
+                        messageSenderName,
+                        chat!!
                     )
                 }
+                
                 "sticker" -> {
                     StickerMessage(
                         message,
-                        message.attachments!![0].fileId
+                        message.attachments!![0].fileId,
+                        chat!!
                     )
                 }
+                
                 else -> {
                     FileMessage(
                         message,
-                        message.attachments!!
+                        message.attachments!!,
+                        chat!!
                     )
                 }
             }
         }
     }
-
+    
 }
 
 
@@ -591,19 +623,19 @@ fun SelectedMessageFormat(
                 }
             }
         } ?: ""
-
+    
     val isFromUser = message?.fromUser == profile?.id
-
+    
     val colorTitle = if (isFromFooter) Color(0xFFCAB7A3) else {
         if (isFromUser)
             colors.inversePrimary
         else
             colors.primary
     }
-
+    
     when {
-
-        selectedMessage.callInfo != null  -> {
+        
+        selectedMessage.callInfo != null -> {
             SelectedCallMessage(
                 selectedMessage,
                 messageAnswerName,
@@ -617,20 +649,40 @@ fun SelectedMessageFormat(
                 SelectedMessageText(selectedMessage, messageAnswerName, colorTitle, isFromUser)
             }
         }
+        
         else -> {
             when (selectedMessage.attachments!![0].type) {
                 "audio/mp4" -> {
                     SelectedVoiceMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
                 }
+                
                 "image" -> {
-                    SelectedMessageImage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
+                    SelectedMessageImage(
+                        selectedMessage.attachments!!,
+                        messageAnswerName,
+                        colorTitle,
+                        isFromUser
+                    )
                 }
+                
                 "video" -> {
-                    SelectedVideoMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
+                    SelectedVideoMessage(
+                        selectedMessage.attachments!!,
+                        messageAnswerName,
+                        colorTitle,
+                        isFromUser
+                    )
                 }
+                
                 "sticker" -> {
-                    SelectedStickerMessage(selectedMessage.attachments!!, messageAnswerName, colorTitle, isFromUser)
+                    SelectedStickerMessage(
+                        selectedMessage.attachments!!,
+                        messageAnswerName,
+                        colorTitle,
+                        isFromUser
+                    )
                 }
+                
                 else -> {
                     SelectedFileMessage(selectedMessage, messageAnswerName, colorTitle, isFromUser)
                 }

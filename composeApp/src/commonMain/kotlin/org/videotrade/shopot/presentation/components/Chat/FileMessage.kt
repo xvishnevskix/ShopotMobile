@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -37,7 +36,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -51,6 +49,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.formatSize
 import org.videotrade.shopot.domain.model.Attachment
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -58,7 +57,6 @@ import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.chat_file_message
 import shopot.composeapp.generated.resources.download
 
@@ -67,6 +65,7 @@ import shopot.composeapp.generated.resources.download
 fun FileMessage(
     message: MessageItem,
     attachments: List<Attachment>,
+    chat: ChatItem
 ) {
     val scope = rememberCoroutineScope()
     val colors = MaterialTheme.colorScheme
@@ -128,7 +127,9 @@ fun FileMessage(
                             message.chatId,
                             message.uploadId!!,
                             listOf(fileId),
-                            fileType = message.attachments!![0].type
+                            fileType = message.attachments!![0].type,
+                            message.phone!!,
+                            chat,
                         )
                     }
                     

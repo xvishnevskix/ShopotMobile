@@ -36,6 +36,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.Attachment
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
@@ -50,7 +51,8 @@ import shopot.composeapp.generated.resources.chat_play
 fun VideoMessage(
     message: MessageItem,
     attachments: List<Attachment>,
-    messageSenderName: String? = null
+    messageSenderName: String? = null,
+    chat: ChatItem
 ) {
     val scope = rememberCoroutineScope()
     val navigator = LocalNavigator.current
@@ -149,7 +151,10 @@ fun VideoMessage(
                             message.chatId,
                             message.uploadId!!,
                             fileIds,
-                            fileType = message.attachments!![0].type
+                            fileType = message.attachments!![0].type,
+                            message.phone!!,
+                            chat,
+                            
                         )
                     }
 
