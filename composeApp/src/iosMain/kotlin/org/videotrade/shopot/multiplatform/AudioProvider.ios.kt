@@ -14,10 +14,14 @@ import platform.AVFAudio.AVAudioPlayerDelegateProtocol
 import platform.AVFAudio.AVAudioQualityHigh
 import platform.AVFAudio.AVAudioRecorder
 import platform.AVFAudio.AVAudioSession
+import platform.AVFAudio.AVAudioSessionCategoryAmbient
 import platform.AVFAudio.AVAudioSessionCategoryOptionAllowBluetooth
 import platform.AVFAudio.AVAudioSessionCategoryOptionDefaultToSpeaker
+import platform.AVFAudio.AVAudioSessionCategoryOptionDuckOthers
+import platform.AVFAudio.AVAudioSessionCategoryOptions
 import platform.AVFAudio.AVAudioSessionCategoryPlayAndRecord
 import platform.AVFAudio.AVAudioSessionCategoryPlayback
+import platform.AVFAudio.AVAudioSessionCategorySoloAmbient
 import platform.AVFAudio.AVAudioSessionModeDefault
 import platform.AVFAudio.AVAudioSessionModeVoiceChat
 import platform.AVFAudio.AVAudioSessionSetActiveOptionNotifyOthersOnDeactivation
@@ -31,6 +35,7 @@ import platform.AVFAudio.setActive
 import platform.AVFoundation.AVAsset
 import platform.CoreAudioTypes.kAudioFormatMPEG4AAC
 import platform.CoreMedia.CMTimeGetSeconds
+import platform.Foundation.NSBundle
 import platform.Foundation.NSError
 import platform.Foundation.NSFileManager
 import platform.Foundation.NSThread
@@ -202,12 +207,18 @@ actual class AudioPlayer {
                 }
                 
                 audioPlayer?.delegate = object : NSObject(), AVAudioPlayerDelegateProtocol {
-                    override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
+                    override fun audioPlayerDidFinishPlaying(
+                        player: AVAudioPlayer,
+                        successfully: Boolean
+                    ) {
                         println("Playback finished. Successfully: $successfully")
                         isPlaying.value = false
                     }
                     
-                    override fun audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
+                    override fun audioPlayerDecodeErrorDidOccur(
+                        player: AVAudioPlayer,
+                        error: NSError?
+                    ) {
                         println("Playback error occurred: ${error?.localizedDescription}")
                         isPlaying.value = false
                     }
@@ -324,49 +335,68 @@ actual class MusicPlayer {
     
     private var audioPlayer: AVAudioPlayer? = null
     
+
+    
     @OptIn(ExperimentalForeignApi::class)
     actual fun play(musicName: String, isRepeat: Boolean, isCategoryMusic: MusicType) {
+        // Получаем путь к файлу в бандле приложения
+        val filePath = NSBundle.mainBundle.pathForResource(name = musicName, ofType = "mp3")
+        
+        if (filePath == null) {
+            println("Ошибка: Файл $musicName.mp3 не найден в бандле.")
+            return
+        }
+        
+        val fileUrl = NSURL.fileURLWithPath(filePath)
+        
+        try {
+            // Настройка аудиосессии
+            val audioSession = AVAudioSession.sharedInstance()
+            
+            val category = AVAudioSessionCategoryPlayback
+            val options: AVAudioSessionCategoryOptions = AVAudioSessionCategoryOptionDuckOthers
+            
+            val categoryResult = audioSession.setCategory(
+                category = category,
+                withOptions = options,
+                error = null
+            )
+            
+            if (!categoryResult) {
+                println("Ошибка: Не удалось установить категорию аудиосессии")
+                return
+            }
+            
+            val activeResult = audioSession.setActive(true, error = null)
+            if (!activeResult) {
+                println("Ошибка: Не удалось активировать аудиосессию")
+                return
+            }
+            
+            // Инициализация AVAudioPlayer
+            audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
+                numberOfLoops = if (isRepeat) -1 else 0
+                
+                // Восстановим аудиосессию после окончания воспроизведения
+                setDelegate(object : NSObject(), AVAudioPlayerDelegateProtocol {
+                    override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
+                        println("Завершено воспроизведение — отключаем аудиосессию")
+                        audioSession.setActive(false, error = null)
+                    }
+                })
+                
+                prepareToPlay()
+                play()
+            }
+            
+            if (audioPlayer == null) {
+                println("Ошибка: Не удалось инициализировать AVAudioPlayer для файла $musicName.mp3.")
+            }
+            
+        } catch (e: Exception) {
+            println("Ошибка при попытке воспроизведения: ${e.message}")
+        }
     }
-    
-    //    {
-//        // Получаем путь к файлу в бандле приложения
-//        val filePath = NSBundle.mainBundle.pathForResource(name = musicName, ofType = "mp3")
-//
-//        if (filePath == null) {
-//            println("Ошибка: Файл $musicName.mp3 не найден в бандле.")
-//            return
-//        }
-//
-//        val fileUrl = NSURL.fileURLWithPath(filePath)
-//
-//        try {
-//            // Настройка аудиосессии
-//            val audioSession = AVAudioSession.sharedInstance()
-//
-//            when (isCategoryMusic) {
-//                MusicType.Notification -> {
-//                    audioSession.setCategory(AVAudioSessionCategoryAmbient, error = null)
-//                }
-//                MusicType.Ringtone -> {
-//                    audioSession.setCategory(AVAudioSessionCategorySoloAmbient, error = null)
-//                }
-//            }
-//            audioSession.setActive(true, error = null)
-//
-//            // Инициализация AVAudioPlayer
-//            audioPlayer = AVAudioPlayer(contentsOfURL = fileUrl, error = null).apply {
-//                numberOfLoops = if (isRepeat) -1 else 0 // Устанавливаем количество повторений в зависимости от isRepeat
-//                prepareToPlay()                         // Подготовка к воспроизведению
-//                play()                                  // Начало воспроизведения
-//            }
-//
-//            if (audioPlayer == null) {
-//                println("Ошибка: Не удалось инициализировать AVAudioPlayer для файла $musicName.mp3.")
-//            }
-//        } catch (e: Exception) {
-//            println("Ошибка при попытке воспроизведения: ${e.message}")
-//        }
-//    }
     actual fun stop() {
         audioPlayer?.stop()
         audioPlayer = null

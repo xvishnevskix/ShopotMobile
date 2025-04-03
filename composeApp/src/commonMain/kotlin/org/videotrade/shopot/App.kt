@@ -40,8 +40,8 @@ internal fun App() {
         KoinContext {
             if (getPlatform() === Platform.Ios) {
                     Navigator(
-                        IntroScreen()
-//                        TestScreen()
+//                        IntroScreen()
+                        TestScreen()
                     ) { navigator ->
                         val appIsActive by commonViewModel.appIsActive.collectAsState()
                         

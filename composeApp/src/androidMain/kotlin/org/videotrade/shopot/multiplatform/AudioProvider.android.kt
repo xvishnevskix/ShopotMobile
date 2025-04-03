@@ -250,85 +250,83 @@ actual class MusicPlayer {
             val context = getContextObj.getContext()
             val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
             
-            // Запрашиваем аудио фокус для системного звука
-            val focusRequest = audioManager.requestAudioFocus(
-                { focusChange ->
-                    if (isRepeat) {
-                        when (focusChange) {
-                            AudioManager.AUDIOFOCUS_LOSS -> {
-                                mediaPlayer?.pause()
-                            }
-                            
-                            AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
-                                mediaPlayer?.pause()
-                            }
-                            
-                            AudioManager.AUDIOFOCUS_GAIN -> {
-                                mediaPlayer?.start()
-                            }
-                        }
-                    } else {
-                        mediaPlayer?.start()
+            val focusChangeListener = AudioManager.OnAudioFocusChangeListener { focusChange ->
+                when (focusChange) {
+                    AudioManager.AUDIOFOCUS_LOSS,
+                    AudioManager.AUDIOFOCUS_LOSS_TRANSIENT -> {
+                        mediaPlayer?.pause()
                     }
                     
-                    
-                },
-                AudioManager.STREAM_ALARM, // Используем системный поток для уведомлений/сигналов
-                AudioManager.AUDIOFOCUS_GAIN
+                    AudioManager.AUDIOFOCUS_GAIN,
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK -> {
+                        if (isRepeat) {
+                            mediaPlayer?.start()
+                        }
+                    }
+                }
+            }
+            
+            val focusRequest = audioManager.requestAudioFocus(
+                focusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK
             )
             
             if (focusRequest == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 if (mediaPlayer == null) {
                     val assetManager = context.assets
-                    val inputStream = assetManager.open("${musicName}.mp3")
-                    
+                    val inputStream = assetManager.open("$musicName.mp3")
                     val tempFile = File.createTempFile("system_sound", ".mp3", context.cacheDir)
-                    val outputStream = FileOutputStream(tempFile)
-                    inputStream.copyTo(outputStream)
-                    inputStream.close()
-                    outputStream.close()
+                    
+                    inputStream.use { input ->
+                        FileOutputStream(tempFile).use { output ->
+                            input.copyTo(output)
+                        }
+                    }
+                    
+                    val audioAttributes = when (isCategoryMusic) {
+                        MusicType.Notification -> AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                        
+                        MusicType.Ringtone -> AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                        
+                        else -> AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_ASSISTANCE_SONIFICATION)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .build()
+                    }
                     
                     mediaPlayer = MediaPlayer().apply {
                         setDataSource(tempFile.absolutePath)
-                        
-                        
-                        val audioAttributes = when (isCategoryMusic) {
-                            MusicType.Notification -> {
-                                AudioAttributes.Builder()
-                                    .setUsage(AudioAttributes.USAGE_NOTIFICATION) // Устанавливаем использование для уведомлений
-                                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для системных звуков
-                                    .build()
-                            }
-                            
-                            MusicType.Ringtone -> AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE) // Устанавливаем использование для мелодии звонка
-                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для звуков оповещений и звонков
-                                .build()
-                            
-                            else -> AudioAttributes.Builder()
-                                .setUsage(AudioAttributes.USAGE_NOTIFICATION) // Устанавливаем использование для уведомлений
-                                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION) // Тип контента для системных звуков
-                                .build()
-                        }
-                        
-                        
-                        setAudioAttributes(audioAttributes) // Устанавливаем аудио атрибуты
-                        isLooping =
-                            isRepeat // Устанавливаем цикличное воспроизведение в зависимости от параметра isRepeat
+                        setAudioAttributes(audioAttributes)
+                        isLooping = isRepeat
                         prepare()
                         start()
+                        
+                        setOnCompletionListener {
+                            audioManager.abandonAudioFocus(focusChangeListener)
+                        }
                     }
-                    
                 } else {
                     mediaPlayer?.start()
+                    
+                    // В случае повторного использования — тоже слушаем завершение
+                    mediaPlayer?.setOnCompletionListener {
+                        audioManager.abandonAudioFocus(focusChangeListener)
+                    }
                 }
             } else {
                 println("Не удалось получить аудио фокус.")
             }
+            
         } catch (e: Exception) {
             println("e: $e")
         }
-        
     }
     
     // Метод для остановки воспроизведения музыки
