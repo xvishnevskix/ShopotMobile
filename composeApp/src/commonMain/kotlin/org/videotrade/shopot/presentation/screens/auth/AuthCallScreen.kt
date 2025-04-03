@@ -1,5 +1,8 @@
 package org.videotrade.shopot.presentation.screens.auth
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -105,10 +108,10 @@ class AuthCallScreen(
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
-        var time by remember { mutableStateOf(30) }
+        var time by remember { mutableStateOf(0) }
         var isRunning by remember { mutableStateOf(false) }
         var reloadSend by remember { mutableStateOf(false) }
-        var isSmsMode by remember { mutableStateOf(false) }
+//        var isSmsMode by remember { mutableStateOf(false) }
         var isSms by remember { mutableStateOf(false) }
 
         val isLoading = remember { mutableStateOf(false) }
@@ -126,72 +129,72 @@ class AuthCallScreen(
             viewModel.navigator.value = navigator
 
             when (authCase) {
-                "SignIn" -> {
-                    if (phone == "+79990000000") {
-                        sendLogin(
-                            phone,
-                            navigator,
-                            viewModel,
-                            сommonViewModel,
-                            toasterViewModel = toasterViewModel,
-                            phoneNotRegistered,
-                            serverUnavailable,
-                        )
-                    }
-                    if (phone == "+79603412966") {
-                        sendLogin(
-                            phone,
-                            navigator,
-                            viewModel,
-                            сommonViewModel,
-                            toasterViewModel = toasterViewModel,
-                            phoneNotRegistered,
-                        )
-                    }
-                    if (phone == "+79063080529") {
-                        sendLogin(
-                            phone,
-                            navigator,
-                            viewModel,
-                            сommonViewModel,
-                            toasterViewModel = toasterViewModel,
-                            phoneNotRegistered,
-                        )
-                    }
-                    if (phone == "+79899236226") {
-                        sendLogin(
-                            phone,
-                            navigator,
-                            viewModel,
-                            сommonViewModel,
-                            toasterViewModel = toasterViewModel,
-                            phoneNotRegistered,
-                            serverUnavailable,
-                        )
-                    }
-                    if (phone == "+79388899885") {
-                        sendLogin(
-                            phone,
-                            navigator,
-                            viewModel,
-                            сommonViewModel,
-                            toasterViewModel = toasterViewModel,
-                            phoneNotRegistered,
-                            serverUnavailable,
-                        )
-                    }
-                    if (phone == "+375336483673") {
-                        sendLogin(
-                            phone,
-                            navigator,
-                            viewModel,
-                            сommonViewModel,
-                            toasterViewModel = toasterViewModel,
-                            phoneNotRegistered,
-                            serverUnavailable,
-                        )
-                    }
-                }
+//                "SignIn" -> {
+//                    if (phone == "+79990000000") {
+//                        sendLogin(
+//                            phone,
+//                            navigator,
+//                            viewModel,
+//                            сommonViewModel,
+//                            toasterViewModel = toasterViewModel,
+//                            phoneNotRegistered,
+//                            serverUnavailable,
+//                        )
+//                    }
+//                    if (phone == "+79603412966") {
+//                        sendLogin(
+//                            phone,
+//                            navigator,
+//                            viewModel,
+//                            сommonViewModel,
+//                            toasterViewModel = toasterViewModel,
+//                            phoneNotRegistered,
+//                        )
+//                    }
+//                    if (phone == "+79063080529") {
+//                        sendLogin(
+//                            phone,
+//                            navigator,
+//                            viewModel,
+//                            сommonViewModel,
+//                            toasterViewModel = toasterViewModel,
+//                            phoneNotRegistered,
+//                        )
+//                    }
+//                    if (phone == "+79899236226") {
+//                        sendLogin(
+//                            phone,
+//                            navigator,
+//                            viewModel,
+//                            сommonViewModel,
+//                            toasterViewModel = toasterViewModel,
+//                            phoneNotRegistered,
+//                            serverUnavailable,
+//                        )
+//                    }
+//                    if (phone == "+79388899885") {
+//                        sendLogin(
+//                            phone,
+//                            navigator,
+//                            viewModel,
+//                            сommonViewModel,
+//                            toasterViewModel = toasterViewModel,
+//                            phoneNotRegistered,
+//                            serverUnavailable,
+//                        )
+//                    }
+//                    if (phone == "+375336483673") {
+//                        sendLogin(
+//                            phone,
+//                            navigator,
+//                            viewModel,
+//                            сommonViewModel,
+//                            toasterViewModel = toasterViewModel,
+//                            phoneNotRegistered,
+//                            serverUnavailable,
+//                        )
+//                    }
+//                }
 
                 "SignUp" -> {
                     if (phone == "+79990000000") {
@@ -217,17 +220,20 @@ class AuthCallScreen(
 
         fun startTimer() {
             coroutineScope.launch {
+                time = 30
                 while (isRunning && time > 0) {
                     delay(1000) // Задержка в 1 секунду
                     time -= 1 // Уменьшаем время на 1 секунду
                 }
                 if (time == 0) {
                     isRunning = false // Останавливаем таймер, когда достигнет 0
-                    isSmsMode = true // Переходим в режим SMS после завершения таймера
-                    time = 30 // Сбрасываем таймер обратно
+//                    isSmsMode = true // Переходим в режим SMS после завершения таймера
+                    time = 0 // Сбрасываем таймер обратно
                 }
             }
         }
+
+
 
         fun handleError(errorMessage: String) {
             hasError.value = true
@@ -261,7 +267,7 @@ class AuthCallScreen(
             isSms = true
             coroutineScope.launch {
                 try {
-                    if (!isRunning && time == 30) {
+                    if (!isRunning && time == 0) {
                         if (!isRunning) {
                             isRunning = true
                             startTimer()
@@ -309,7 +315,7 @@ class AuthCallScreen(
 
         fun sendCall()
         {
-
+            isSms = false
             println("sendCall")
 
             when (phone) {
@@ -320,7 +326,7 @@ class AuthCallScreen(
             }
 
             coroutineScope.launch {
-                if (!isRunning) {
+                if (!isRunning && time == 0) {
                     isRunning = true
                     startTimer()
                 }
@@ -364,13 +370,10 @@ class AuthCallScreen(
             }
         }
 
-        LaunchedEffect(Unit) {
+        LaunchedEffect(time, isRunning) {
+            println("sadfasdfsdfsd${time}")
+            println("sadfasdfsdfsd${isRunning}")
 
-            if (!isRunning) {
-                isRunning = true
-                startTimer()
-            }
-            sendCall()
         }
 
 
@@ -458,7 +461,7 @@ class AuthCallScreen(
                                     coroutineScope.launch {
                                         isLoading.value = true
                                         if (responseState.value == otpText) {
-                                            handleAuthCase()
+//                                            handleAuthCase()
                                         } else {
                                             handleError(invalidCode)
                                             isLoading.value = false
@@ -468,29 +471,57 @@ class AuthCallScreen(
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
-                            Box(modifier = Modifier.padding(bottom = 20.dp)) {
+                            Box(modifier = Modifier) {
                                 CustomButton(
-                                    text = if (isRunning && time > 0) {
-                                        if (isSmsMode) "${stringResource(MokoRes.strings.get_a_new_code)} ${time}" else "${
-                                            stringResource(
-                                                MokoRes.strings.receive_code_via_sms
-                                            )
-                                        } ${time}"
-                                    } else {
-                                        if (isSmsMode) stringResource(MokoRes.strings.get_a_new_code) else stringResource(
-                                            MokoRes.strings.receive_code_via_sms
-                                        )
-                                    },
+                                    text =
+                                         "${stringResource(MokoRes.strings.get_code)}",
                                     {
-                                        if (isSmsMode) {
-                                            sendSms(sentSMSCode)
-                                        } else {
-//                                            sendCall()
+                                        if (!isRunning && time == 0) {
+                                            sendCall()
                                         }
                                     },
                                     style = ButtonStyle.Gradient,
                                     disabled = isRunning
                                 )
+                            }
+                            Spacer(modifier = Modifier.height(26.dp))
+
+                            Box(modifier = Modifier) {
+                                CustomButton(
+                                    text =
+                                        stringResource(MokoRes.strings.get_code_via_sms)
+                                    ,
+                                    {
+                                        if (!isRunning && time == 0) {
+                                            sendSms(sentSMSCode)
+                                        }
+
+                                    },
+                                    style = ButtonStyle.Primary,
+                                    disabled = isRunning
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Column(modifier = Modifier.height(30.dp)) {
+                                AnimatedVisibility(
+                                    visible = isRunning,
+                                    enter = fadeIn(animationSpec = tween(durationMillis = 600)),
+
+                                ) {
+                                    Text(
+                                        "${stringResource(MokoRes.strings.you_can_resend_the_code_after)} $time",
+                                        style = TextStyle(
+                                            fontSize = 16.sp,
+                                            lineHeight = 16.sp,
+                                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                            fontWeight = FontWeight(400),
+                                            textAlign = TextAlign.Center,
+                                            color = colors.secondary,
+                                            letterSpacing = TextUnit(0f, TextUnitType.Sp),
+
+                                            )
+                                    )
+                                }
                             }
                         }
                     }
