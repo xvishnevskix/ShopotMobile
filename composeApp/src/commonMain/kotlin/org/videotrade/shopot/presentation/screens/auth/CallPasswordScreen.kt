@@ -297,7 +297,7 @@ class CallPasswordScreen(
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             Text(
-                                confirmNumber,
+                                formatPhoneNumber(confirmNumber),
                                 style = TextStyle(
                                     fontSize = 18.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
@@ -479,3 +479,11 @@ fun AgreementText(
 }
 
 
+fun formatPhoneNumber(number: String): String {
+    return if (number.length == 11 && number.startsWith("7")) {
+        "+7 ${number.substring(1, 4)} ${number.substring(4, 7)}-" +
+                "${number.substring(7, 9)}-${number.substring(9, 11)}"
+    } else {
+        number // если номер не соответствует формату, возвращаем как есть
+    }
+}

@@ -59,19 +59,19 @@ fun CustomButton(
     when (style) {
         ButtonStyle.Primary -> {
             backgroundColor = Color(0xFF373533)
-            textColor = Color.White
+            textColor = if (disabled) Color.Gray else Color.White
         }
         ButtonStyle.Outline -> {
             backgroundColor = Color.Transparent
-            textColor = Color(0xFF373533)
+            textColor = if (disabled) Color(0x80373533) else Color(0xFF373533)
         }
         ButtonStyle.Gradient -> {
             backgroundColor = Color.Transparent // Gradient will be applied in Modifier
-            textColor = Color(0xFF373533)
+            textColor = if (disabled) Color(0x80373533) else Color(0xFF373533)
         }
         ButtonStyle.Red -> {
             backgroundColor = Color.Transparent // Gradient will be applied in Modifier
-            textColor = Color(0xFFFF3B30)
+            textColor = if (disabled) Color(0x80373533) else Color(0xFFFF3B30)
         }
     }
 
@@ -129,7 +129,7 @@ fun CustomButton(
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp,
                 lineHeight = 16.sp,
-                color = if (disabled) Color(0x80373533) else textColor,
+                color = textColor,
             )
         }
     }
