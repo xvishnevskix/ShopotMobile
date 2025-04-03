@@ -129,72 +129,72 @@ class AuthCallScreen(
             viewModel.navigator.value = navigator
 
             when (authCase) {
-//                "SignIn" -> {
-//                    if (phone == "+79990000000") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+79603412966") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                        )
-//                    }
-//                    if (phone == "+79063080529") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                        )
-//                    }
-//                    if (phone == "+79899236226") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+79388899885") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+375336483673") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                }
+                "SignIn" -> {
+                    if (phone == "+79990000000") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+79603412966") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                        )
+                    }
+                    if (phone == "+79063080529") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                        )
+                    }
+                    if (phone == "+79899236226") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+79388899885") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+375336483673") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                }
 
                 "SignUp" -> {
                     if (phone == "+79990000000") {
@@ -461,7 +461,7 @@ class AuthCallScreen(
                                     coroutineScope.launch {
                                         isLoading.value = true
                                         if (responseState.value == otpText) {
-//                                            handleAuthCase()
+                                            handleAuthCase()
                                         } else {
                                             handleError(invalidCode)
                                             isLoading.value = false
