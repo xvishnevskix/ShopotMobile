@@ -318,12 +318,9 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     fun sendLargeFileAttachments(
         content: String? = null,
-        fromUser: String,
-        chatId: String,
         uploadId: String,
         fileIds: List<String>,
         fileType: String,
-        phone: String,
         chat: ChatItem,
     ) {
         val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
@@ -332,23 +329,23 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.sendUploadMessage(
                 MessageItem(
                     content = content,
-                    fromUser = fromUser,
-                    chatId = chatId,
+                    fromUser =  profile.value.id,
+                    chatId = chat.chatId,
                     uploadId = uploadId,
                     anotherRead = false,
                     iread = false,
                     attachments = null
                 ),
                 fileIds,
-                selectedMessagesByChat.value[chatId]?.first?.id,
+                selectedMessagesByChat.value[chat.chatId]?.first?.id,
                 fileType
             
             )
             
             commonViewModel.sendNotify(
-                "+$phone",
+                "+${profile.value.phone}",
                 "Отправлен файл",
-                fromUser,
+                profile.value.id,
                 chat.chatId,
                 chat.personal
             )

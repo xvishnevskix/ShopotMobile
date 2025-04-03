@@ -162,12 +162,11 @@ actual class AudioRecorder {
 actual class AudioPlayer {
     private var audioPlayer: AVAudioPlayer? = null
     
-    @OptIn(ExperimentalForeignApi::class, BetaInteropApi::class)
+    @OptIn(ExperimentalForeignApi::class)
     actual fun startPlaying(filePath: String, isPlaying: MutableState<Boolean>): Boolean {
         println("Start playing with filePath: $filePath")
         val audioURL = NSURL.fileURLWithPath(filePath)
         
-        // Проверяем существование файла
         if (!NSFileManager.defaultManager.fileExistsAtPath(filePath)) {
             println("File does not exist at path: $filePath")
             isPlaying.value = false
@@ -178,10 +177,8 @@ actual class AudioPlayer {
             val errorPtr = alloc<ObjCObjectVar<NSError?>>()
             
             try {
-                println("Initializing AVAudioSession")
                 val audioSession = AVAudioSession.sharedInstance()
                 audioSession.setCategory(AVAudioSessionCategoryPlayback, error = errorPtr.ptr)
-                
                 if (errorPtr.value != null) {
                     println("Error setting audio session category: ${errorPtr.value?.localizedDescription}")
                     isPlaying.value = false
@@ -196,36 +193,28 @@ actual class AudioPlayer {
                 }
                 
                 println("Initializing AVAudioPlayer")
-                val player = AVAudioPlayer(audioURL, errorPtr.ptr)
+                audioPlayer = AVAudioPlayer(audioURL, errorPtr.ptr)
                 
-                if (errorPtr.value != null) {
+                if (errorPtr.value != null || audioPlayer == null) {
                     println("Error initializing AVAudioPlayer: ${errorPtr.value?.localizedDescription}")
                     isPlaying.value = false
                     return false
                 }
                 
-                player.delegate = object : NSObject(), AVAudioPlayerDelegateProtocol {
-                    override fun audioPlayerDidFinishPlaying(
-                        player: AVAudioPlayer,
-                        successfully: Boolean
-                    ) {
+                audioPlayer?.delegate = object : NSObject(), AVAudioPlayerDelegateProtocol {
+                    override fun audioPlayerDidFinishPlaying(player: AVAudioPlayer, successfully: Boolean) {
                         println("Playback finished. Successfully: $successfully")
                         isPlaying.value = false
                     }
                     
-                    override fun audioPlayerDecodeErrorDidOccur(
-                        player: AVAudioPlayer,
-                        error: NSError?
-                    ) {
+                    override fun audioPlayerDecodeErrorDidOccur(player: AVAudioPlayer, error: NSError?) {
                         println("Playback error occurred: ${error?.localizedDescription}")
                         isPlaying.value = false
                     }
                 }
                 
-                println("Preparing to play")
-                if (player.prepareToPlay()) {
-                    println("Prepared successfully")
-                    if (player.play()) {
+                if (audioPlayer?.prepareToPlay() == true) {
+                    if (audioPlayer?.play() == true) {
                         println("Playback started")
                         isPlaying.value = true
                     } else {
@@ -238,7 +227,6 @@ actual class AudioPlayer {
                 }
             } catch (e: Exception) {
                 println("Exception while initializing AVAudioPlayer: ${e.message}")
-                e.printStackTrace()
                 isPlaying.value = false
                 return false
             }

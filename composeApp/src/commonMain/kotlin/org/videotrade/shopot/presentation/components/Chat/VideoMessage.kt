@@ -147,12 +147,9 @@ fun VideoMessage(
                         println("fileId ${fileIds}")
                         viewModel.sendLargeFileAttachments(
                             message.content,
-                            message.fromUser,
-                            message.chatId,
                             message.uploadId!!,
                             fileIds,
                             fileType = message.attachments!![0].type,
-                            message.phone!!,
                             chat,
                             
                         )

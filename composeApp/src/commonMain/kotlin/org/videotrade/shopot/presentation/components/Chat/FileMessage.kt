@@ -123,12 +123,9 @@ fun FileMessage(
                         
                         viewModel.sendLargeFileAttachments(
                             message.content,
-                            message.fromUser,
-                            message.chatId,
                             message.uploadId!!,
                             listOf(fileId),
                             fileType = message.attachments!![0].type,
-                            message.phone!!,
                             chat,
                         )
                     }

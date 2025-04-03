@@ -125,29 +125,30 @@ fun VoiceMessage(
 
 
 //                    delay(4000)
-                    val fileId = FileProviderFactory.create().uploadCipherFile(
-                        "file/upload",
-                        attachment.originalFileDir!!,
-                        attachment.type,
-                        attachment.name
-                    ) {
-                        isStartCipherLoading = false
-                        progress = it / 100f
+                    val originalFilePath = attachment.originalFileDir
+                    if (originalFilePath != null) {
+                        val fileId = FileProviderFactory.create().uploadCipherFile(
+                            "file/upload",
+                            originalFilePath,
+                            attachment.type,
+                            attachment.name
+                        ) {
+                            isStartCipherLoading = false
+                            progress = it / 100f
+                        }
+
+                        fileId?.let {
+                            viewModel.sendLargeFileAttachments(
+                                message.content,
+                                message.uploadId!!,
+                                listOf(it),
+                                fileType = message.attachments!![0].type,
+                                chat,
+                            )
+                            audioFilePath = originalFilePath
+                        }
                     }
-                    
-                    fileId?.let {
-                        viewModel.sendLargeFileAttachments(
-                            message.content,
-                            message.fromUser,
-                            message.chatId,
-                            message.uploadId!!,
-                            listOf(it),
-                            fileType = message.attachments!![0].type,
-                            message.phone!!,
-                            chat
-                        )
-                        audioFilePath = attachment.originalFileDir!!
-                    }
+
                 }
                 isUpload = true
                 isLoading = false
@@ -171,7 +172,7 @@ fun VoiceMessage(
                 val url = "${EnvironmentConfig.SERVER_URL}file/id/${attachments.first().fileId}"
                 val fileName = attachments.first().name
                 val fileType = attachments.first().type
-                
+
                 scope.launch {
                     isLoading = true
                     isStartCipherLoading = true
@@ -181,9 +182,9 @@ fun VoiceMessage(
                             isStartCipherLoading = false
                             progress = it / 100f
                         }
-                    
+
                     println(" end AAAAA")
-                    
+
                     pathResult?.let {
                         audioFilePath = it
                         audioPlayer.getAudioDuration(it, fileName)?.let { durationString ->
