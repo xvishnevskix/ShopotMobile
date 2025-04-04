@@ -370,13 +370,6 @@ class AuthCallScreen(
             }
         }
 
-        LaunchedEffect(time, isRunning) {
-            println("sadfasdfsdfsd${time}")
-            println("sadfasdfsdfsd${isRunning}")
-
-        }
-
-
 
 
 

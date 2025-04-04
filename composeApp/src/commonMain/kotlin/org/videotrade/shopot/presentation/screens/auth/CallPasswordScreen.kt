@@ -86,35 +86,23 @@ class CallPasswordScreen(
         val navigator = LocalNavigator.currentOrThrow
         val colors = MaterialTheme.colorScheme
         val authViewModel: AuthViewModel = koinInject()
-        
-        val responseState = remember { mutableStateOf<String?>("1111") }
-        val otpFields = remember { mutableStateListOf("", "", "", "") }
-        val isSuccessOtp = remember { mutableStateOf(false) }
-        val coroutineScope = rememberCoroutineScope()
+
         val viewModel: IntroViewModel = koinInject()
         val сommonViewModel: CommonViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
-        var time by remember { mutableStateOf(30) }
         var isRunning by remember { mutableStateOf(false) }
-        var reloadSend by remember { mutableStateOf(false) }
-        var isSmsMode by remember { mutableStateOf(false) }
-        var isSms by remember { mutableStateOf(false) }
+
         
         
         val isLoading = remember { mutableStateOf(false) }
-        
         val phoneNotRegistered = stringResource(MokoRes.strings.phone_number_is_not_registered)
-        val invalidCode = stringResource(MokoRes.strings.invalid_code)
-        val sentSMSCode = stringResource(MokoRes.strings.sms_with_code_sent)
         val serverUnavailable =
             stringResource(MokoRes.strings.the_server_is_temporarily_unavailable)
         var hasError = remember { mutableStateOf(false) }
         val animationTrigger = remember { mutableStateOf(false) }
-        
         val isCallPasswordSuccess by authViewModel.isCallPasswordSuccess.collectAsState()
         val confirmNumber by authViewModel.confirmNumber.collectAsState()
-        val callId by authViewModel.callId.collectAsState()
-        
+
         val scrollState = rememberScrollState()
         
         
