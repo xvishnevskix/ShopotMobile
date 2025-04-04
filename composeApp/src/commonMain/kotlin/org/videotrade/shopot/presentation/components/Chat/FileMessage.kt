@@ -79,7 +79,7 @@ fun FileMessage(
     var progress by remember { mutableStateOf(0f) }
     var downloadJob by remember { mutableStateOf<Job?>(null) }
     var filePath by remember { mutableStateOf("") }
-    val audioFile by remember { mutableStateOf(FileProviderFactory.create()) }
+    val file by remember { mutableStateOf(FileProviderFactory.create()) }
 //    var isUploading by remember { mutableStateOf(false) }
     
     val animatedProgress by animateFloatAsState(
@@ -148,7 +148,7 @@ fun FileMessage(
         val fileName = attachments[0].name
         println("fileName $fileName")
         
-        val existingFile = audioFile.existingFileInDir(fileName, attachments[0].type)
+        val existingFile = file.existingFileInDir(fileName, attachments[0].type)
         
         if (!existingFile.isNullOrBlank() ) {
             downloadJob?.cancel()
@@ -217,7 +217,7 @@ fun FileMessage(
 
                             downloadJob = scope.launch {
                                 isLoading = true
-                                audioFile.downloadCipherFile(
+                                file.downloadCipherFile(
                                     url,
                                     attachment.type,
                                     attachment.name,

@@ -301,7 +301,7 @@ fun MessageBlurBox(
                     }
                 ) {
                     message.content?.let {
-                        MessageFormat(message, profile, onClick)
+                        MessageFormat(message, profile, onClick, chat = chat)
                     }
                 }
             }

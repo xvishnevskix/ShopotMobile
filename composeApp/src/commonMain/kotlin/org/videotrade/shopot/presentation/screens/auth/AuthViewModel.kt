@@ -101,8 +101,19 @@ class AuthViewModel : ViewModel(), KoinComponent {
         
         viewModelScope.launch {
             try {
-                when(phone) {
-                    "+79899236226" ->  {
+                when (phone) {
+                    "+79990000000" -> {
+                        navigateToScreen(
+                            navigator,
+                            CallPasswordScreen(
+                                phone,
+                                authCase,
+                                selectCountryName
+                            )
+                        )
+                    }
+                    
+                    "+79899236226" -> {
                         navigateToScreen(
                             navigator,
                             CallPasswordScreen(
@@ -114,7 +125,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
                         return@launch
                     }
                     
-                    "+79388899885" ->  {
+                    "+79388899885" -> {
                         navigateToScreen(
                             navigator,
                             CallPasswordScreen(

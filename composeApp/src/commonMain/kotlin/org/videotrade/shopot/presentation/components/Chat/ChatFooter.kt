@@ -309,13 +309,16 @@ fun ChatFooter(
                                 FileProviderFactory.create().getFileData(filePick.fileContentPath)
                             
                             if (fileData?.fileType?.substringBefore("/") == "image") {
-                                viewModel.sendImage(
-                                    viewModel.footerText.value,
-                                    filePick.fileName,
-                                    filePick.fileAbsolutePath,
-                                    fileData.fileType,
-                                    chat
-                                )
+//                                viewModel.sendImage(
+//                                    viewModel.footerText.value,
+//                                    filePick.fileName,
+//                                    filePick.fileAbsolutePath,
+//                                    fileData.fileType,
+//                                    chat
+//                                )
+//
+                                viewModel.addFileMessage(chat, "image", filePick)
+                                
                             } else {
                                 getAndSaveFirstFrame(filePick.fileAbsolutePath) { photoName, photoPath, photoByteArray ->
                                     viewModel.addFileMessage(

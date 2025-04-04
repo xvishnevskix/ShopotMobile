@@ -562,12 +562,14 @@ fun MessageFormat(
                 }
                 
                 "image" -> {
-                    MessageImage(
-                        message, profile,
-                        message.attachments!!,
-                        messageSenderName,
-                        chat!!
-                    )
+                    if (chat != null) {
+                        MessageImage(
+                            message, profile,
+                            message.attachments!!,
+                            messageSenderName,
+                            chat
+                        )
+                    }
                 }
                 
                 "video" -> {

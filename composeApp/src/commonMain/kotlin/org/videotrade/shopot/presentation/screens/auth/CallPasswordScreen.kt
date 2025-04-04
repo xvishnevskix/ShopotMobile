@@ -116,75 +116,75 @@ class CallPasswordScreen(
         
         
         
-//        LaunchedEffect(key1 = Unit) {
-//            viewModel.navigator.value = navigator
-//
-//            when (authCase) {
-//                "SignIn" -> {
-//                    if (phone == "+79990000000") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+79899236226") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+79388899885") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                    if (phone == "+375336483673") {
-//                        sendLogin(
-//                            phone,
-//                            navigator,
-//                            viewModel,
-//                            сommonViewModel,
-//                            toasterViewModel = toasterViewModel,
-//                            phoneNotRegistered,
-//                            serverUnavailable,
-//                        )
-//                    }
-//                }
-//
-//                "SignUp" -> {
-//                    if (phone == "+79990000000") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                    if (phone == "+79899236226") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                    if (phone == "+79388899885") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                    if (phone == "+375336483673") {
-//                        sendSignUp(phone, navigator)
-//                    }
-//                }
-//            }
-//
-//
-//        }
+        LaunchedEffect(key1 = Unit) {
+            viewModel.navigator.value = navigator
+            
+            when (authCase) {
+                "SignIn" -> {
+                    if (phone == "+79990000000") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+79899236226") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+79388899885") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                    if (phone == "+375336483673") {
+                        sendLogin(
+                            phone,
+                            navigator,
+                            viewModel,
+                            сommonViewModel,
+                            toasterViewModel = toasterViewModel,
+                            phoneNotRegistered,
+                            serverUnavailable,
+                        )
+                    }
+                }
+                
+                "SignUp" -> {
+                    if (phone == "+79990000000") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+79899236226") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+79388899885") {
+                        sendSignUp(phone, navigator)
+                    }
+                    if (phone == "+375336483673") {
+                        sendSignUp(phone, navigator)
+                    }
+                }
+            }
+            
+        
+        }
         
         
         
