@@ -107,7 +107,7 @@ actual fun openUrl(url: String) {
 
 actual suspend fun callInPhone(phoneNumber: String) {
     val intent = Intent(Intent.ACTION_DIAL).apply {
-        data = Uri.parse("tel:$phoneNumber")
+        data = Uri.parse("tel:+$phoneNumber")
     }
     getContextObj.getActivity()?.startActivity(intent)
 }

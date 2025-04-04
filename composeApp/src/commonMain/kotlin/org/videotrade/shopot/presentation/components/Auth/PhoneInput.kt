@@ -430,7 +430,7 @@ fun CountryPickerBottomSheet(
                         val borderColor =
                             if (isSelected) colors.primary else colors.onSecondary // rgba(55, 53, 51, 0.2)
 
-                        println("${countryName} ountryNameountryNameountryName")
+
 
                         Column(
                             modifier = Modifier
