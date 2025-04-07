@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,7 @@ fun MessageText(message: MessageItem, profile: ProfileDTO, chat: ChatItem? = nul
     message.content?.let {
       Text(
         text = it,
+          overflow = TextOverflow.Ellipsis,
         style = TextStyle(
             color = if (message.fromUser == profile.id) Color.White else colors.primary,
             fontSize = 16.sp,
@@ -35,6 +37,7 @@ fun MessageText(message: MessageItem, profile: ProfileDTO, chat: ChatItem? = nul
             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
             fontWeight = FontWeight(400),
             letterSpacing = TextUnit(0F, TextUnitType.Sp),
+
         ),
           modifier = Modifier.padding(
               start = 16.dp,

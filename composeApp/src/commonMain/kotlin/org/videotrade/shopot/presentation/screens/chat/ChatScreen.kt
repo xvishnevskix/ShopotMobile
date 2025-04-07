@@ -313,6 +313,7 @@ class ChatScreen(
                         viewModel = viewModel,
                         selectedMessage = selectedMessage.value,
                         selectedMessageY = selectedMessageY.value,
+                        screenHeightInPx = screenHeightInPx,
                         onDismiss = {
                             selectedMessage.value = null
                             hiddenMessageId.value = null
@@ -346,6 +347,7 @@ class ChatScreen(
                             viewModel = viewModel,
                             selectedMessage = message,
                             selectedMessageY = selectedMessageY.value,
+                            screenHeightInPx = screenHeightInPx,
                             onDismiss = {
                                 selectedMessage.value = null
                                 hiddenMessageId.value = null
