@@ -5,6 +5,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
+import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.delay
@@ -31,7 +32,8 @@ import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 
 suspend fun handleConnectWebSocket(
-    userId: String
+    userId: String,
+    onConnectionResult: suspend (Boolean, DefaultWebSocketSession) -> Unit = { _, _ -> }
 ) {
     val chatUseCase: ChatUseCase = KoinPlatform.getKoin().get()
     val chatsUseCase: ChatsUseCase = KoinPlatform.getKoin().get()
@@ -43,203 +45,156 @@ suspend fun handleConnectWebSocket(
         install(WebSockets)
     }
     
-        try {
-            httpClient.webSocket(
-                method = HttpMethod.Get,
-                host = WEB_SOCKETS_URL,
-                port = 5050,
-                path = "/chat?userId=$userId"
-            ) {
-                wsUseCase.setWsSession(this)
-                wsUseCase.setConnection(true)
-                
-                launch { monitorWebSocketConnection(userId) }
+    try {
+        httpClient.webSocket(
+            method = HttpMethod.Get,
+            host = WEB_SOCKETS_URL,
+            port = 5050,
+            path = "/chat?userId=$userId"
+        ) {
+            wsUseCase.setWsSession(this)
+            wsUseCase.setConnection(true)
 
+//            launch { monitorWebSocketConnection(userId) }
+            
+            
+            println("WebSocket connected successfully")
+            
+            
+            onConnectionResult(true, this)
+            
+            
+            val callOutputRoutine = launch {
                 
-                println("WebSocket connected successfully")
-                
-                val callOutputRoutine = launch {
-                    
-                    for (frame in incoming) {
-                        if (frame is Frame.Text) {
-                            
-                            val text = frame.readText()
-                            
-                            println("NewFrame $text")
-                            
-                            val jsonElement = Json.parseToJsonElement(text)
-                            val action = jsonElement.jsonObject["action"]?.jsonPrimitive?.content
-                            
-                            
-                            when (action) {
-                                "getUserChats" -> {
-                                    try {
-                                        
-                                        chatsUseCase.setIsLoadingValue(false)
-                                        
-                                        println("getUserChatsgetUserChats $jsonElement")
-                                        
-                                        val dataJson = jsonElement.jsonObject["data"]?.jsonArray
-                                        
-                                        val chats = mutableListOf<ChatItem>()
-                                        
-                                        println("chatSize ${dataJson?.size}")
-                                        
-                                        val mainViewModel: MainViewModel =
-                                            KoinPlatform.getKoin().get()
+                for (frame in incoming) {
+                    if (frame is Frame.Text) {
+                        
+                        val text = frame.readText()
+                        
+                        println("NewFrame $text")
+                        
+                        val jsonElement = Json.parseToJsonElement(text)
+                        val action = jsonElement.jsonObject["action"]?.jsonPrimitive?.content
+                        
+                        
+                        when (action) {
+                            "getUserChats" -> {
+                                try {
+                                    
+                                    chatsUseCase.setIsLoadingValue(false)
+                                    
+                                    println("getUserChatsgetUserChats $jsonElement")
+                                    
+                                    val dataJson = jsonElement.jsonObject["data"]?.jsonArray
+                                    
+                                    val chats = mutableListOf<ChatItem>()
+                                    
+                                    println("chatSize ${dataJson?.size}")
+                                    
+                                    val mainViewModel: MainViewModel =
+                                        KoinPlatform.getKoin().get()
 
 
 //                                        commonViewModel.toaster.show("chats size ${dataJson?.size}")
+                                    
+                                    if (dataJson != null) {
                                         
-                                        if (dataJson != null) {
+                                        val contactsMap =
+                                            contactsUseCase.contacts.value.associateBy {
+                                                normalizePhoneNumber(it.phone)
+                                            }
+                                        
+                                        
+                                        println("sortChat $dataJson")
+                                        
+                                        for (chatItem in dataJson) {
+                                            println("chat $chatItem")
                                             
-                                            val contactsMap =
-                                                contactsUseCase.contacts.value.associateBy {
-                                                    normalizePhoneNumber(it.phone)
-                                                }
+                                            val chat: ChatItem =
+                                                Json.decodeFromString(chatItem.toString())
+                                            println("chat $chat")
                                             
                                             
-                                            println("sortChat $dataJson")
+                                            var newChat = chat
                                             
-                                            for (chatItem in dataJson) {
-                                                println("chat $chatItem")
+                                            if (chat.lastMessage?.content?.isNotBlank() == true) {
+                                                val lastMessageContent = decupsMessage(
+                                                    chat.lastMessage?.content!!,
+                                                )
                                                 
-                                                val chat: ChatItem =
-                                                    Json.decodeFromString(chatItem.toString())
-                                                println("chat $chat")
+                                                println("lastMessageContent")
                                                 
-                                                
-                                                var newChat = chat
-                                                
-                                                if (chat.lastMessage?.content?.isNotBlank() == true) {
-                                                    val lastMessageContent = decupsMessage(
-                                                        chat.lastMessage?.content!!,
+                                                newChat = chat.copy(
+                                                    lastMessage = chat.lastMessage!!.copy(
+                                                        content = lastMessageContent
                                                     )
-                                                    
-                                                    println("lastMessageContent")
-                                                    
-                                                    newChat = chat.copy(
-                                                        lastMessage = chat.lastMessage!!.copy(
-                                                            content = lastMessageContent
-                                                        )
+                                                )
+                                                
+                                            }
+                                            
+                                            
+                                            if (chat.personal) {
+                                                val normalizedChatPhone =
+                                                    newChat.phone?.let { normalizePhoneNumber(it) }
+                                                
+                                                val contact = contactsMap[normalizedChatPhone]
+                                                
+                                                if (contact != null) {
+                                                    val sortChat = newChat.copy(
+                                                        firstName = "${contact.firstName}",
+                                                        lastName = "${contact.lastName}"
                                                     )
-                                                    
-                                                }
-                                                
-                                                
-                                                if (chat.personal) {
-                                                    val normalizedChatPhone =
-                                                        newChat.phone?.let { normalizePhoneNumber(it) }
-                                                    
-                                                    val contact = contactsMap[normalizedChatPhone]
-                                                    
-                                                    if (contact != null) {
-                                                        val sortChat = newChat.copy(
-                                                            firstName = "${contact.firstName}",
-                                                            lastName = "${contact.lastName}"
-                                                        )
-                                                        println("sortChat $sortChat")
-                                                        chats.add(sortChat)
-                                                    } else {
-                                                        chats.add(newChat.copy(isSavedContact = false))
-                                                        
-                                                    }
+                                                    println("sortChat $sortChat")
+                                                    chats.add(sortChat)
                                                 } else {
-                                                    chats.add(newChat)
+                                                    chats.add(newChat.copy(isSavedContact = false))
+                                                    
                                                 }
-                                                
+                                            } else {
+                                                chats.add(newChat)
                                             }
-                                            
-                                            println("chats $chats")
-                                            
-                                            
-                                            chatsUseCase.addChats(
-                                                mainViewModel.sortChatsByLastMessageCreated(
-                                                    chats
-                                                ).toMutableList()
-                                            ) // Инициализация сообщений
                                             
                                         }
                                         
-                                    } catch (e: Exception) {
-                                        Logger.d("Error228: $e")
+                                        println("chats $chats")
+                                        
+                                        
+                                        chatsUseCase.addChats(
+                                            mainViewModel.sortChatsByLastMessageCreated(
+                                                chats
+                                            ).toMutableList()
+                                        ) // Инициализация сообщений
+                                        
                                     }
                                     
+                                } catch (e: Exception) {
+                                    Logger.d("Error228: $e")
                                 }
                                 
-                                "getMessages" -> {
-                                    try {
-                                        val dataJson =
-                                            jsonElement.jsonObject["data"]?.jsonArray
-                                        
-                                        println("getMessages111111 ${dataJson?.size}")
-                                        
-                                        val messages = mutableListOf<MessageItem>()
-                                        
-                                        if (dataJson != null) {
-                                            
-                                            for (messageItem in dataJson) {
-                                                val message: MessageItem =
-                                                    Json.decodeFromString(messageItem.toString())
-                                                
-                                                var messageNew = message
-                                                
-                                                // Декодируем content, если оно не пустое
-                                                if (!message.content.isNullOrBlank()) {
-                                                    val decups = decupsMessage(
-                                                        message.content,
-                                                    )
-                                                    messageNew = messageNew.copy(content = decups)
-                                                }
-                                                
-                                                // Декодируем answerMessage.content, если оно не пустое
-                                                message.answerMessage?.let { answerMessage ->
-                                                    if (!answerMessage.content.isNullOrBlank()) {
-                                                        val decupsAnswerMessage = decupsMessage(
-                                                            answerMessage.content,
-                                                        )
-                                                        if (decupsAnswerMessage != null) {
-                                                            val updatedAnswerMessage =
-                                                                answerMessage.copy(content = decupsAnswerMessage)
-                                                            messageNew =
-                                                                messageNew.copy(answerMessage = updatedAnswerMessage)
-                                                        }
-                                                    }
-                                                }
-                                                8
-                                                messages.add(messageNew)
-                                                
-                                            }
-                                            
-                                            
-                                            chatUseCase.implementCount()
-                                            chatUseCase.initMessages(messages)// Инициализация сообщений
-                                        }
-                                        
-                                    } catch (e: Exception) {
-                                        
-                                        Logger.d("Error228: $e")
-                                    }
+                            }
+                            
+                            "getMessages" -> {
+                                try {
+                                    val dataJson =
+                                        jsonElement.jsonObject["data"]?.jsonArray
                                     
-                                }
-                                
-                                "messageSent" -> {
-                                    try {
-                                        val messageJson =
-                                            jsonElement.jsonObject["message"]?.jsonObject
+                                    println("getMessages111111 ${dataJson?.size}")
+                                    
+                                    val messages = mutableListOf<MessageItem>()
+                                    
+                                    if (dataJson != null) {
                                         
-                                        if (messageJson != null) {
-                                            println("ttttaaaaa $messageJson")
-                                            println("currentChat ${chatsUseCase.currentChat.value}")
-                                            
+                                        for (messageItem in dataJson) {
                                             val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
+                                                Json.decodeFromString(messageItem.toString())
+                                            
                                             var messageNew = message
                                             
                                             // Декодируем content, если оно не пустое
                                             if (!message.content.isNullOrBlank()) {
-                                                val decups =
-                                                    decupsMessage(message.content, )
+                                                val decups = decupsMessage(
+                                                    message.content,
+                                                )
                                                 messageNew = messageNew.copy(content = decups)
                                             }
                                             
@@ -248,7 +203,6 @@ suspend fun handleConnectWebSocket(
                                                 if (!answerMessage.content.isNullOrBlank()) {
                                                     val decupsAnswerMessage = decupsMessage(
                                                         answerMessage.content,
-                                                        
                                                     )
                                                     if (decupsAnswerMessage != null) {
                                                         val updatedAnswerMessage =
@@ -258,321 +212,246 @@ suspend fun handleConnectWebSocket(
                                                     }
                                                 }
                                             }
-                                            
-                                            // Проверяем, совпадает ли currentChat с message.chatId
-                                            if (chatsUseCase.currentChat.value == message.chatId) {
-                                                chatUseCase.addMessage(messageNew)
-                                            }
-                                            
-                                            // Обновляем последнее сообщение в чате
-                                            chatsUseCase.updateLastMessageChat(messageNew)
-                                            val musicPlayer = AudioFactory.createMusicPlayer()
-                                            
-                                            
-                                            if (message.fromUser != userId) {
-                                                musicPlayer.play(
-                                                    "newmess",
-                                                    false,
-                                                    MusicType.Notification
-                                                )
-                                            }
+                                            8
+                                            messages.add(messageNew)
                                             
                                         }
                                         
-                                    } catch (e: Exception) {
-                                        Logger.d("Error228: $e")
-                                    }
-                                }
-                                
-                                
-                                "sendUploadMessage" -> {
-                                    try {
-                                        val messageJson =
-                                            jsonElement.jsonObject["message"]?.jsonObject
                                         
-                                        
-                                        
-                                        if (messageJson != null) {
-                                            
-                                            
-                                            println("tttt ${messageJson}")
-                                            
-                                            
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
-                                            
-                                            println("message ${userId} ${message.fromUser}")
-                                            
-                                            
-                                            var messageNew = message
-                                            
-                                            
-                                            var answerMessage = ""
-                                            
-                                            if (message.answerMessage?.content?.isNotBlank() == true) {
-                                                val decupsAnswerMessage = decupsMessage(
-                                                    message.answerMessage?.content!!,
-                                                    
-                                                )
-                                                
-                                                if (decupsAnswerMessage != null) {
-                                                    answerMessage = decupsAnswerMessage
-                                                }
-                                                
-                                            }
-                                            
-                                            messageNew = message.copy(
-                                                answerMessage = if (message.answerMessage !== null)
-                                                    message.answerMessage!!.copy(
-                                                        content = answerMessage
-                                                    ) else null
-                                            )
-                                            
-                                            
-                                            if (userId == messageNew.fromUser) {
-                                                
-                                                val uploadId =
-                                                    jsonElement.jsonObject["uploadId"]?.jsonPrimitive?.content
-                                                
-                                                println("uploadId ${uploadId}")
-                                                
-                                                
-                                                chatUseCase.updateUploadMessage(
-                                                    messageNew.copy(
-                                                        uploadId = uploadId
-                                                    )
-                                                )// Инициализация сообщений
-                                                
-                                            } else {
-                                                println("message2 ${message}")
-                                                
-                                                
-                                                if (chatsUseCase.currentChat.value == messageNew.chatId) {
-                                                    
-                                                    chatUseCase.addMessage(messageNew)// Инициализация сообщений
-                                                }
-                                            }
-                                            
-                                            chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
-                                            
-                                            
-                                            val musicPlayer = AudioFactory.createMusicPlayer()
-                                            
-                                            println("(message.fromUser ${message.fromUser} ${userId}")
-                                            
-                                            
-                                            if (message.fromUser != userId) {
-                                                musicPlayer.play(
-                                                    "newmess",
-                                                    false,
-                                                    MusicType.Notification
-                                                )
-                                            }
-                                        }
-                                        
-                                    } catch (e: Exception) {
-                                        
-                                        Logger.d("Error228: $e")
+                                        chatUseCase.implementCount()
+                                        chatUseCase.initMessages(messages)// Инициализация сообщений
                                     }
                                     
+                                } catch (e: Exception) {
+                                    
+                                    Logger.d("Error228: $e")
                                 }
                                 
-                                "messageDeleted" -> {
-                                    try {
-                                        println("messagePoka $jsonElement")
-                                        
-                                        val messageIdJson =
-                                            jsonElement.jsonObject["messageId"]?.jsonPrimitive?.content
-                                        
-                                        
-                                        val chatIdJson =
-                                            jsonElement.jsonObject["chatId"]?.jsonPrimitive?.content
-                                        
-                                        val lastMessageJson =
-                                            jsonElement.jsonObject["lastMessage"]?.jsonObject
-
-
-//                                        chatsUseCase.updateLastMessageChat(messageNew)
-                                        
-                                        if (messageIdJson != null && chatIdJson != null) {
-                                            chatUseCase.delMessageById(
-                                                messageIdJson,
-                                                chatIdJson
-                                            )
-                                        }// Инициализация сообщений
-                                        
+                            }
+                            
+                            "messageSent" -> {
+                                try {
+                                    val messageJson =
+                                        jsonElement.jsonObject["message"]?.jsonObject
+                                    
+                                    if (messageJson != null) {
+                                        println("ttttaaaaa $messageJson")
+                                        println("currentChat ${chatsUseCase.currentChat.value}")
                                         
                                         val message: MessageItem =
-                                            Json.decodeFromString(lastMessageJson.toString())
+                                            Json.decodeFromString(messageJson.toString())
                                         var messageNew = message
                                         
                                         // Декодируем content, если оно не пустое
                                         if (!message.content.isNullOrBlank()) {
                                             val decups =
-                                                decupsMessage(message.content, )
+                                                decupsMessage(message.content)
                                             messageNew = messageNew.copy(content = decups)
                                         }
                                         
-                                        
-                                        println("messageNew $messageNew")
-                                        
-                                        chatsUseCase.updateLastMessageChat(messageNew)
-                                        
-                                    } catch (e: Exception) {
-                                        Logger.d("ErrorDellMess: $e")
-                                    }
-                                }
-                                
-                                "messageReadNotification" -> {
-                                    try {
-                                        val messageJson =
-                                            jsonElement.jsonObject["message"]?.jsonObject
-                                        
-                                        println("messageReadNotification1 $messageJson")
-                                        
-                                        
-                                        if (messageJson != null) {
-                                            
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
-                                            
-                                            
-                                            val messageId =
-                                                messageJson["id"]?.jsonPrimitive?.content
-                                            
-                                            
-                                            if (messageId != null) {
-                                                chatUseCase.readMessage(messageId)
-                                            }
-                                            
-                                            if (message.fromUser == userId) {
-                                                var messageNew = message
-                                                
-                                                if (message.content?.isNotBlank() == true) {
-                                                    messageNew = message.copy(
-                                                        content = decupsMessage(
-                                                            message.content,
-                                                            
-                                                        )
+                                        // Декодируем answerMessage.content, если оно не пустое
+                                        message.answerMessage?.let { answerMessage ->
+                                            if (!answerMessage.content.isNullOrBlank()) {
+                                                val decupsAnswerMessage = decupsMessage(
+                                                    answerMessage.content,
+                                                    
                                                     )
+                                                if (decupsAnswerMessage != null) {
+                                                    val updatedAnswerMessage =
+                                                        answerMessage.copy(content = decupsAnswerMessage)
+                                                    messageNew =
+                                                        messageNew.copy(answerMessage = updatedAnswerMessage)
                                                 }
-//
-                                                chatsUseCase.updateReadLastMessageChat(messageNew)
-                                            } else {
-//                                                chatsUseCase.updateReadLastMessageChat(message)
-                                            
                                             }
-                                            
-                                            
                                         }
                                         
-                                    } catch (e: Exception) {
+                                        // Проверяем, совпадает ли currentChat с message.chatId
+                                        if (chatsUseCase.currentChat.value == message.chatId) {
+                                            chatUseCase.addMessage(messageNew)
+                                        }
                                         
-                                        Logger.d("Error228: $e")
+                                        // Обновляем последнее сообщение в чате
+                                        chatsUseCase.updateLastMessageChat(messageNew)
+                                        val musicPlayer = AudioFactory.createMusicPlayer()
+                                        
+                                        
+                                        if (message.fromUser != userId) {
+                                            musicPlayer.play(
+                                                "newmess",
+                                                false,
+                                                MusicType.Notification
+                                            )
+                                        }
+                                        
                                     }
                                     
-                                    
+                                } catch (e: Exception) {
+                                    Logger.d("Error228: $e")
                                 }
-                                
-                                "createChat" -> {
-                                    try {
-                                        println("createChat")
+                            }
+                            
+                            
+                            "sendUploadMessage" -> {
+                                try {
+                                    val messageJson =
+                                        jsonElement.jsonObject["message"]?.jsonObject
+                                    
+                                    
+                                    
+                                    if (messageJson != null) {
                                         
-                                        val dataJson =
-                                            jsonElement.jsonObject["data"]?.jsonObject
+                                        
+                                        println("tttt ${messageJson}")
                                         
                                         
-                                        if (dataJson != null) {
-                                            
-                                            println("createChatdataJson $dataJson")
-                                            
-                                            
-                                            val chat =
-                                                Json.decodeFromString<ChatItem>(dataJson.toString())
-                                            
-                                            println("createChat1 $chat")
-                                            
-                                            
-                                            
-                                            fun normalizePhoneNumber(phone: String): String {
-                                                return phone.replace(Regex("[^0-9]"), "")
-                                            }
-                                            
-                                            val contactsMap =
-                                                contactsUseCase.contacts.value.associateBy {
-                                                    normalizePhoneNumber(it.phone)
-                                                }
-                                            
-                                            
-                                            val normalizedChatPhone =
-                                                chat.phone?.let { normalizePhoneNumber(it) }
-                                            
-                                            val contact = contactsMap[normalizedChatPhone]
-                                            
-                                            if (contact != null) {
-                                                val sortChat = chat.copy(
-                                                    firstName = "${contact.firstName}",
-                                                    lastName = "${contact.lastName}"
+                                        val message: MessageItem =
+                                            Json.decodeFromString(messageJson.toString())
+                                        
+                                        println("message ${userId} ${message.fromUser}")
+                                        
+                                        
+                                        var messageNew = message
+                                        
+                                        
+                                        var answerMessage = ""
+                                        
+                                        if (message.answerMessage?.content?.isNotBlank() == true) {
+                                            val decupsAnswerMessage = decupsMessage(
+                                                message.answerMessage?.content!!,
+                                                
                                                 )
-                                                println("sortChat $sortChat")
-                                                chatsUseCase.addChat(sortChat)
-                                            } else {
-                                                chatsUseCase.addChat(chat)
+                                            
+                                            if (decupsAnswerMessage != null) {
+                                                answerMessage = decupsAnswerMessage
                                             }
+                                            
+                                        }
+                                        
+                                        messageNew = message.copy(
+                                            answerMessage = if (message.answerMessage !== null)
+                                                message.answerMessage!!.copy(
+                                                    content = answerMessage
+                                                ) else null
+                                        )
+                                        
+                                        
+                                        if (userId == messageNew.fromUser) {
+                                            
+                                            val uploadId =
+                                                jsonElement.jsonObject["uploadId"]?.jsonPrimitive?.content
+                                            
+                                            println("uploadId ${uploadId}")
+                                            
+                                            
+                                            chatUseCase.updateUploadMessage(
+                                                messageNew.copy(
+                                                    uploadId = uploadId
+                                                )
+                                            )// Инициализация сообщений
+                                            
+                                        } else {
+                                            println("message2 ${message}")
+                                            
+                                            
+                                            if (chatsUseCase.currentChat.value == messageNew.chatId) {
+                                                
+                                                chatUseCase.addMessage(messageNew)// Инициализация сообщений
+                                            }
+                                        }
+                                        
+                                        chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
+                                        
+                                        
+                                        val musicPlayer = AudioFactory.createMusicPlayer()
+                                        
+                                        println("(message.fromUser ${message.fromUser} ${userId}")
+                                        
+                                        
+                                        if (message.fromUser != userId) {
+                                            musicPlayer.play(
+                                                "newmess",
+                                                false,
+                                                MusicType.Notification
+                                            )
+                                        }
+                                    }
+                                    
+                                } catch (e: Exception) {
+                                    
+                                    Logger.d("Error228: $e")
+                                }
+                                
+                            }
+                            
+                            "messageDeleted" -> {
+                                try {
+                                    println("messagePoka $jsonElement")
+                                    
+                                    val messageIdJson =
+                                        jsonElement.jsonObject["messageId"]?.jsonPrimitive?.content
+                                    
+                                    
+                                    val chatIdJson =
+                                        jsonElement.jsonObject["chatId"]?.jsonPrimitive?.content
+                                    
+                                    val lastMessageJson =
+                                        jsonElement.jsonObject["lastMessage"]?.jsonObject
 
-//                                            navigateToScreen(navigator,MainScreen())
-                                        }
-                                        
-                                    } catch (e: Exception) {
-                                        
-                                        Logger.d("Error228: $e")
+
+//                                        chatsUseCase.updateLastMessageChat(messageNew)
+                                    
+                                    if (messageIdJson != null && chatIdJson != null) {
+                                        chatUseCase.delMessageById(
+                                            messageIdJson,
+                                            chatIdJson
+                                        )
+                                    }// Инициализация сообщений
+                                    
+                                    
+                                    val message: MessageItem =
+                                        Json.decodeFromString(lastMessageJson.toString())
+                                    var messageNew = message
+                                    
+                                    // Декодируем content, если оно не пустое
+                                    if (!message.content.isNullOrBlank()) {
+                                        val decups =
+                                            decupsMessage(message.content)
+                                        messageNew = messageNew.copy(content = decups)
                                     }
                                     
+                                    
+                                    println("messageNew $messageNew")
+                                    
+                                    chatsUseCase.updateLastMessageChat(messageNew)
+                                    
+                                } catch (e: Exception) {
+                                    Logger.d("ErrorDellMess: $e")
                                 }
-                                
-                                "createGroupChat" -> {
-                                    try {
-                                        val commonViewModel: CommonViewModel =
-                                            KoinPlatform.getKoin().get()
+                            }
+                            
+                            "messageReadNotification" -> {
+                                try {
+                                    val messageJson =
+                                        jsonElement.jsonObject["message"]?.jsonObject
+                                    
+                                    println("messageReadNotification1 $messageJson")
+                                    
+                                    
+                                    if (messageJson != null) {
                                         
-                                        println("createGroupChat ${jsonElement}")
-                                        
-                                        val dataJson =
-                                            jsonElement.jsonObject["data"]?.jsonObject
+                                        val message: MessageItem =
+                                            Json.decodeFromString(messageJson.toString())
                                         
                                         
-                                        if (dataJson != null) {
-                                            val chat =
-                                                Json.decodeFromString<ChatItem>(dataJson.toString())
-                                            
-                                            chatsUseCase.addChat(chat)
-                                            
-                                            commonViewModel.tabNavigator.value?.current = ChatsTab
+                                        val messageId =
+                                            messageJson["id"]?.jsonPrimitive?.content
+                                        
+                                        
+                                        if (messageId != null) {
+                                            chatUseCase.readMessage(messageId)
                                         }
                                         
-                                    } catch (e: Exception) {
-                                        
-                                        Logger.d("Error228: $e")
-                                    }
-                                    
-                                }
-                                
-                                "messageForwarded" -> {
-                                    try {
-                                        val messageJson =
-                                            jsonElement.jsonObject["message"]?.jsonObject
-                                        
-                                        if (messageJson != null) {
-                                            
-                                            println("ttttaaaaa ${messageJson}")
-                                            
-                                            println("currentChat ${chatsUseCase.currentChat.value}")
-                                            
-                                            
-                                            val message: MessageItem =
-                                                Json.decodeFromString(messageJson.toString())
-                                            
-                                            
+                                        if (message.fromUser == userId) {
                                             var messageNew = message
                                             
                                             if (message.content?.isNotBlank() == true) {
@@ -580,88 +459,219 @@ suspend fun handleConnectWebSocket(
                                                     content = decupsMessage(
                                                         message.content,
                                                         
-                                                    )
+                                                        )
                                                 )
                                             }
+//
+                                            chatsUseCase.updateReadLastMessageChat(messageNew)
+                                        } else {
+//                                                chatsUseCase.updateReadLastMessageChat(message)
                                             
-                                            if (chatsUseCase.currentChat.value == message.chatId) {
-                                                chatUseCase.addMessage(messageNew)
-                                            }
-                                            
-                                            chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
-                                            
-                                            val musicPlayer = AudioFactory.createMusicPlayer()
-                                            
-                                            println("(message.fromUser ${message.fromUser} ${userId}")
-                                            
-                                            if (message.fromUser != userId) {
-                                                musicPlayer.play(
-                                                    "newmess",
-                                                    false,
-                                                    MusicType.Notification
-                                                )
-                                            }
                                         }
                                         
-                                    } catch (e: Exception) {
                                         
-                                        Logger.d("Error228: $e")
                                     }
                                     
+                                } catch (e: Exception) {
+                                    
+                                    Logger.d("Error228: $e")
                                 }
                                 
                                 
-                                "updateLastMessage" -> {
+                            }
+                            
+                            "createChat" -> {
+                                try {
+                                    println("createChat")
+                                    
+                                    val dataJson =
+                                        jsonElement.jsonObject["data"]?.jsonObject
+                                    
+                                    
+                                    if (dataJson != null) {
+                                        
+                                        println("createChatdataJson $dataJson")
+                                        
+                                        
+                                        val chat =
+                                            Json.decodeFromString<ChatItem>(dataJson.toString())
+                                        
+                                        println("createChat1 $chat")
+                                        
+                                        
+                                        
+                                        fun normalizePhoneNumber(phone: String): String {
+                                            return phone.replace(Regex("[^0-9]"), "")
+                                        }
+                                        
+                                        val contactsMap =
+                                            contactsUseCase.contacts.value.associateBy {
+                                                normalizePhoneNumber(it.phone)
+                                            }
+                                        
+                                        
+                                        val normalizedChatPhone =
+                                            chat.phone?.let { normalizePhoneNumber(it) }
+                                        
+                                        val contact = contactsMap[normalizedChatPhone]
+                                        
+                                        if (contact != null) {
+                                            val sortChat = chat.copy(
+                                                firstName = "${contact.firstName}",
+                                                lastName = "${contact.lastName}"
+                                            )
+                                            println("sortChat $sortChat")
+                                            chatsUseCase.addChat(sortChat)
+                                        } else {
+                                            chatsUseCase.addChat(chat)
+                                        }
+
+//                                            navigateToScreen(navigator,MainScreen())
+                                    }
+                                    
+                                } catch (e: Exception) {
+                                    
+                                    Logger.d("Error228: $e")
+                                }
+                                
+                            }
+                            
+                            "createGroupChat" -> {
+                                try {
+                                    val commonViewModel: CommonViewModel =
+                                        KoinPlatform.getKoin().get()
+                                    
+                                    println("createGroupChat ${jsonElement}")
+                                    
+                                    val dataJson =
+                                        jsonElement.jsonObject["data"]?.jsonObject
+                                    
+                                    
+                                    if (dataJson != null) {
+                                        val chat =
+                                            Json.decodeFromString<ChatItem>(dataJson.toString())
+                                        
+                                        chatsUseCase.addChat(chat)
+                                        
+                                        commonViewModel.tabNavigator.value?.current = ChatsTab
+                                    }
+                                    
+                                } catch (e: Exception) {
+                                    
+                                    Logger.d("Error228: $e")
+                                }
+                                
+                            }
+                            
+                            "messageForwarded" -> {
+                                try {
                                     val messageJson =
-                                        jsonElement.jsonObject["lastMessage"]?.jsonObject
+                                        jsonElement.jsonObject["message"]?.jsonObject
                                     
-                                    val message: MessageItem =
-                                        Json.decodeFromString(messageJson.toString())
-                                    
-                                    chatsUseCase.updateLastMessageChat(message)
-                                    
-                                    println("newLastMessage$jsonElement")
-                                }
-
-                                "statusChange" -> {
-                                    println("userStatus block triggered")
-                                    try {
-                                        val userId = jsonElement.jsonObject["userId"]?.jsonPrimitive?.content
-                                        val status = jsonElement.jsonObject["status"]?.jsonPrimitive?.content
-
-                                        if (userId != null && status != null) {
-                                            println("Got userId=$userId, status=$status")
-
-                                            val chatRepository: ChatRepository = KoinPlatform.getKoin().get()
-                                            chatRepository.updateUserStatus(userId, status)
+                                    if (messageJson != null) {
+                                        
+                                        println("ttttaaaaa ${messageJson}")
+                                        
+                                        println("currentChat ${chatsUseCase.currentChat.value}")
+                                        
+                                        
+                                        val message: MessageItem =
+                                            Json.decodeFromString(messageJson.toString())
+                                        
+                                        
+                                        var messageNew = message
+                                        
+                                        if (message.content?.isNotBlank() == true) {
+                                            messageNew = message.copy(
+                                                content = decupsMessage(
+                                                    message.content,
+                                                    
+                                                    )
+                                            )
                                         }
-                                    } catch (e: Exception) {
-                                        println("Error handling userStatus: ${e.message}")
+                                        
+                                        if (chatsUseCase.currentChat.value == message.chatId) {
+                                            chatUseCase.addMessage(messageNew)
+                                        }
+                                        
+                                        chatsUseCase.updateLastMessageChat(messageNew)// Инициализация сообщений
+                                        
+                                        val musicPlayer = AudioFactory.createMusicPlayer()
+                                        
+                                        println("(message.fromUser ${message.fromUser} ${userId}")
+                                        
+                                        if (message.fromUser != userId) {
+                                            musicPlayer.play(
+                                                "newmess",
+                                                false,
+                                                MusicType.Notification
+                                            )
+                                        }
                                     }
+                                    
+                                } catch (e: Exception) {
+                                    
+                                    Logger.d("Error228: $e")
+                                }
+                                
+                            }
+                            
+                            
+                            "updateLastMessage" -> {
+                                val messageJson =
+                                    jsonElement.jsonObject["lastMessage"]?.jsonObject
+                                
+                                val message: MessageItem =
+                                    Json.decodeFromString(messageJson.toString())
+                                
+                                chatsUseCase.updateLastMessageChat(message)
+                                
+                                println("newLastMessage$jsonElement")
+                            }
+                            
+                            "statusChange" -> {
+                                println("userStatus block triggered")
+                                try {
+                                    val userId =
+                                        jsonElement.jsonObject["userId"]?.jsonPrimitive?.content
+                                    val status =
+                                        jsonElement.jsonObject["status"]?.jsonPrimitive?.content
+                                    
+                                    if (userId != null && status != null) {
+                                        println("Got userId=$userId, status=$status")
+                                        
+                                        val chatRepository: ChatRepository =
+                                            KoinPlatform.getKoin().get()
+                                        chatRepository.updateUserStatus(userId, status)
+                                    }
+                                } catch (e: Exception) {
+                                    println("Error handling userStatus: ${e.message}")
                                 }
                             }
                         }
                     }
-                    
-                    
                 }
                 
-                callOutputRoutine.join()
+                
             }
-        } catch (e: Exception) {
-            println("Ошибка соединения: $e")
             
-            wsUseCase.setConnection(false)
-            wsUseCase.setWsSession(null)
-            
-            // Запускам повторное подключение
-            reconnectWebSocket(userId)
+            callOutputRoutine.join()
         }
+    } catch (e: Exception) {
+        println("Ошибка соединения: $e")
+        
+        wsUseCase.setConnection(false)
+        wsUseCase.setWsSession(null)
+        
+        // Запускам повторное подключение
+        reconnectWebSocket(userId)
+    }
 }
 
 
 suspend fun reconnectWebSocket(
-    userId: String
+    userId: String,
+    onConnectionResult: suspend (Boolean, DefaultWebSocketSession) -> Unit = { _, _ -> }
 ) {
     val wsUseCase: WsUseCase = KoinPlatform.getKoin().get()
     
@@ -670,6 +680,7 @@ suspend fun reconnectWebSocket(
             println("Attempting to reconnect WebSocket...")
             handleConnectWebSocket(
                 userId = userId,
+                onConnectionResult
             )
             if (wsUseCase.wsSession.value != null) {
                 println("WebSocket reconnected successfully!")

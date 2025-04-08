@@ -10,6 +10,7 @@ import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.util.encodeBase64
+import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -229,9 +230,12 @@ class CallViewModel() : ViewModel(), KoinComponent {
         }
     }
     
-    fun connectionCallWs(userId: String) {
+    fun connectionCallWs(
+        userId: String,
+        onConnectionResult: suspend (Boolean, DefaultWebSocketSession) -> Unit = { _, _ -> }
+    ) {
         viewModelScope.launch {
-            callUseCase.connectionWs(userId)
+            callUseCase.connectionCallWs(userId, onConnectionResult)
         }
     }
     
@@ -499,7 +503,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                     
                                     if (secret != null) {
                                         val sharedSecretDecups =
-                                            decupsMessage(secret.toString(), )
+                                            decupsMessage(secret.toString())
                                         
                                         
                                         if (sharedSecretDecups != null) {

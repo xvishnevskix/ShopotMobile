@@ -34,6 +34,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -68,17 +69,24 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
+import io.ktor.websocket.Frame
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
+import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.formatTimestamp
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.domain.model.SearchDto
+import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
@@ -203,8 +211,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                         showNewsViewer = true
                     }
                 )
-
-
+                
                 Column(
                     modifier = Modifier.animateContentSize().padding(horizontal = 16.dp)
                 ) {

@@ -8,6 +8,7 @@ import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.websocket.DefaultWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
@@ -40,7 +41,10 @@ interface CallRepository {
     val iseState: StateFlow<IceConnectionState>
     
     
-    suspend fun connectionWs(userId: String)
+    suspend fun connectionCallWs(
+        userId: String,
+        onConnectionResult: suspend (Boolean, DefaultWebSocketSession) -> Unit = { _, _ -> }
+    )
     
     suspend fun disconnectWs()
     

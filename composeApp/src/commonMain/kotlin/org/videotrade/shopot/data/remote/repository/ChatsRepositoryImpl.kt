@@ -1,10 +1,8 @@
 package org.videotrade.shopot.data.remote.repository
 
-import io.ktor.websocket.Frame
-import io.ktor.websocket.WebSocketSession
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -13,8 +11,10 @@ import kotlinx.serialization.json.put
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.repository.ChatsRepository
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
+import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
 
 class ChatsRepositoryImpl : ChatsRepository {
     
@@ -44,7 +44,7 @@ class ChatsRepositoryImpl : ChatsRepository {
     }
     
     
-    override suspend fun getChatsInBack(wsSession: WebSocketSession, userId: String) {
+    override suspend fun getChatsInBack(wsSession: DefaultClientWebSocketSession, userId: String) {
         try {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
@@ -54,7 +54,11 @@ class ChatsRepositoryImpl : ChatsRepository {
             )
             println("jsonContent $jsonContent")
             
-            wsSession.send(Frame.Text(jsonContent))
+            sendMessageOrReconnect(
+                wsSession,
+                jsonContent,
+                WsReconnectionCase.ChatWs
+            )
             
             println("Message sent successfully")
         } catch (e: Exception) {
