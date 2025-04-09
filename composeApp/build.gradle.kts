@@ -128,6 +128,8 @@ kotlin {
             api(libs.resources)
             api(libs.resources.compose) // for compose multiplatfor
             implementation(libs.compressor)
+            implementation(libs.kotlinx.datetime.v061)
+
         }
         
         //Для версии приложения
@@ -165,7 +167,7 @@ kotlin {
 
 
 tasks.register("generateBuildConfig") {
-    val versionName = project.findProperty("VERSION_NAME") ?: "1.1.2"
+    val versionName = project.findProperty("VERSION_NAME") ?: "1.1.3"
     
     val outputDir = File(buildDir, "generated/kotlin")
     outputDir.mkdirs()
@@ -187,7 +189,7 @@ android {
         targetSdk = 34
         
         applicationId = "org.videotrade.shopot.androidApp"
-        versionCode = 26
+        versionCode = 27
         versionName = "1.1.3"
         
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

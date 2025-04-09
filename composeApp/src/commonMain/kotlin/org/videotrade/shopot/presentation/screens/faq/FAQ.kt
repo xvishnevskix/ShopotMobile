@@ -5,37 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import dev.icerock.moko.resources.compose.stringResource
-import org.jetbrains.compose.resources.Font
-import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.presentation.components.Auth.AuthHeader
-import org.videotrade.shopot.presentation.components.Auth.Otp
-import org.videotrade.shopot.presentation.components.Common.CustomButton
-import org.videotrade.shopot.presentation.components.Common.SafeArea
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,37 +20,35 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
-
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
-
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-
+import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
@@ -88,32 +57,25 @@ import io.ktor.client.request.post
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
-import io.ktor.client.utils.EmptyContent.contentType
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.coroutines.launch
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import org.videotrade.shopot.presentation.components.Auth.Otp
-import org.videotrade.shopot.presentation.components.Common.CustomButton
-import org.videotrade.shopot.presentation.components.Common.SafeArea
-import org.videotrade.shopot.presentation.components.Auth.AuthHeader
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Auth.BaseHeader
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
+import org.videotrade.shopot.presentation.components.Common.CustomButton
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
-
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
-import shopot.composeapp.generated.resources.SFProText_Semibold
 import shopot.composeapp.generated.resources.auth_logo
 
 
@@ -128,25 +90,25 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", "$message  \nApp Version: 1.1.2(beta)")
+            put("message", "$message  \nApp Version: 1.1.3(beta) \n${getPlatform().name}")
         }.toString()
 
-        println("Отправка email с данными: $jsonContent")
+        println("Sending email with data: $jsonContent")
 
         val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}user/mailSend") {
             contentType(ContentType.Application.Json)
             setBody(jsonContent)
         }
 
-        println("Ответ от сервера: ${response.bodyAsText()}")
+        println("Response from the server user/mailSend: ${response.bodyAsText()}")
 
         if (response.status.isSuccess()) {
             return response
         } else {
-            println("Ошибка при отправке письма: ${response.status.description}")
+            println("Error sending email: ${response.status.description}")
         }
     } catch (e: Exception) {
-        println("Ошибка при выполнении запроса: $e")
+        println("Error executing request: $e")
     } finally {
         client.close()
     }
@@ -239,7 +201,7 @@ class FAQ() : Screen {
                     ) {
 
                         Text(
-                            text = "App Version: 1.1.2(beta)",
+                            text = "App Version: 1.1.3(beta)",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
@@ -537,66 +499,68 @@ class FAQ() : Screen {
         }
     }
 
-    @Composable
-    fun DescriptionInput(description: MutableState<String>, isDescValid: Boolean) {
-        val colors = MaterialTheme.colorScheme
-        Column {
-            Text(
-                stringResource(MokoRes.strings.appeal),
+
+}
+
+@Composable
+fun DescriptionInput(description: MutableState<String>, isDescValid: Boolean) {
+    val colors = MaterialTheme.colorScheme
+    Column {
+        Text(
+            stringResource(MokoRes.strings.description),
+            fontSize = 16.sp,
+            lineHeight = 16.sp,
+            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+            fontWeight = FontWeight(500),
+            textAlign = TextAlign.Center,
+            color = colors.primary,
+            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        BasicTextField(
+            cursorBrush = SolidColor(colors.primary),
+            value = description.value,
+            onValueChange = { description.value = it },
+            decorationBox = { innerTextField ->
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    if (description.value.isEmpty()) {
+                        Text(
+                            stringResource(MokoRes.strings.detailed_description_will_help_improve_our_application),
+                            fontSize = 16.sp,
+                            lineHeight = 16.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            textAlign = TextAlign.Start,
+                            color = colors.secondary,
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        )
+                    }
+                    innerTextField()
+                }
+            },
+            textStyle = TextStyle(
                 fontSize = 16.sp,
                 lineHeight = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                fontWeight = FontWeight(500),
-                textAlign = TextAlign.Center,
-                color = colors.primary,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                fontWeight = FontWeight(400),
+                textAlign = TextAlign.Start,
+                color = colors.primary
+            ),
+            modifier = Modifier
+                .border(width = 1.dp, color = colors.secondaryContainer, shape = RoundedCornerShape(size = 16.dp))
+                .fillMaxWidth(1f).height(232.dp).background(colors.background)
+                .padding(start = 16.dp, top = 16.dp, bottom = 20.dp, end = 16.dp)
+        )
+        if (!isDescValid) {
+            Text(
+                text = stringResource(MokoRes.strings.don_not_forget_to_describe_the_problem),
+                color = colors.error,
+                fontSize = 12.sp,
+                lineHeight = 16.sp,
+                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier.padding(top = 5.dp)
             )
-            BasicTextField(
-                cursorBrush = SolidColor(colors.primary),
-                value = description.value,
-                onValueChange = { description.value = it },
-                decorationBox = { innerTextField ->
-                    Box(modifier = Modifier.fillMaxWidth()) {
-                        if (description.value.isEmpty()) {
-                            Text(
-                                stringResource(MokoRes.strings.detailed_description_will_help_us_answer_you_as_soon_as_possible),
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
-                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                fontWeight = FontWeight(400),
-                                textAlign = TextAlign.Start,
-                                color = colors.secondary,
-                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                            )
-                        }
-                        innerTextField()
-                    }
-                },
-                textStyle = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                    fontWeight = FontWeight(400),
-                    textAlign = TextAlign.Start,
-                    color = colors.primary
-                ),
-                modifier = Modifier
-                    .border(width = 1.dp, color = colors.secondaryContainer, shape = RoundedCornerShape(size = 16.dp))
-                    .fillMaxWidth(1f).height(232.dp).background(colors.background)
-                    .padding(start = 16.dp, top = 16.dp, bottom = 20.dp, end = 16.dp)
-            )
-            if (!isDescValid) {
-                Text(
-                    text = stringResource(MokoRes.strings.don_not_forget_to_describe_the_problem),
-                    color = colors.error,
-                    fontSize = 12.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    modifier = Modifier.padding(top = 5.dp)
-                )
-            }
         }
     }
 }

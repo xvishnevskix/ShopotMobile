@@ -45,7 +45,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.incrementAppLaunchCounter
 import org.videotrade.shopot.api.navigateToScreen
+import org.videotrade.shopot.api.setFirstLaunchDateIfNotSet
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.multiplatform.AppInitializer
 import org.videotrade.shopot.multiplatform.NetworkHelper
@@ -57,6 +59,7 @@ import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.iosCall.isActiveCallIos
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.components.Common.LogoLoading
+import org.videotrade.shopot.presentation.components.Common.markSessionToday
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.common.NetworkErrorScreen
 import org.videotrade.shopot.presentation.screens.common.UpdateAppViewModel
@@ -147,6 +150,10 @@ class IntroScreen : Screen {
                 }
             } catch (e: Exception) {
                 navigateToScreen(navigator,NetworkErrorScreen())
+            } finally {
+                incrementAppLaunchCounter()
+                setFirstLaunchDateIfNotSet()
+                markSessionToday()
             }
 
         }
@@ -194,7 +201,7 @@ class IntroScreen : Screen {
 
                     Text(
 //                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
-                        text = "App Version: 1.1.2(beta)",
+                        text = "App Version: 1.1.3(beta)",
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 16.sp,

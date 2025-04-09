@@ -124,7 +124,6 @@
 
     <string name="your_email">Ваша электронная почта</string>
     <string name="appeal">Обращение</string>
-    <string name="detailed_description_will_help_us_answer_you_as_soon_as_possible">Подробное описание поможет ответить быстрее</string>
     <string name="send">Отправить</string>
     <string name="please_enter_a_valid_email">Введите корректный email</string>
     <string name="don_not_forget_to_describe_the_problem">Не забудьте описать проблему</string>
@@ -294,5 +293,18 @@
     <string name="status_sending_file">Отправляет файл</string>
     <string name="status_choosing_sticker">Выбирает стикер</string>
     <string name="status_recording_voice">Записывает голосовое</string>
+
+    <string name="detailed_description_will_help_improve_our_application">Подробное описание поможет улучшить наше приложение</string>
+    <string name="how_do_you_like_app">Как вам Shopot?</string>
+    <string name="short_survey_invite">Предлагаем пройти небольшой опрос. Это займёт меньше минуты.</string>
+    <string name="rate_our_app">Оцените наше приложение</string>
+    <string name="send">Отправить</string>
+    <string name="thank_you_for_feedback">Спасибо за ваш отзыв!</string>
+    <string name="close">Закрыть</string>
+    <string name="not_now">Не сейчас</string>
+    <string name="do_not_show_again">Не показывать</string>
+    <string name="your_feedback">Нам очень важно ваше мнение!</string>
+    <string name="start_survey">Пройти</string>
+    <string name="enter_comment_optional">Комментарий (необязательно)</string>
 
 </resources>
