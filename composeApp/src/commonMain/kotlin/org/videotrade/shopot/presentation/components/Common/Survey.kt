@@ -684,45 +684,45 @@ fun RateAppDialog(
 }
 
 
-@Composable
-fun CheckAndShowSurvey() {
-    val coroutineScope = rememberCoroutineScope()
-    val showSurveyDialog = remember { mutableStateOf<AppSurveyDto?>(null) }
-
-    LaunchedEffect(Unit) {
-
-        val count = getAppLaunchCount()
-        val survey = getSurvey()
-
-        println("count: ${count}")
-        if (count % 1 == 0 && survey != null && !isSurveyHidden(survey.id)) {
-            showSurveyDialog.value = survey
-        }
-    }
-
-    showSurveyDialog.value?.let { survey ->
-        SurveyDialog(survey = survey, onDismiss = {
-            showSurveyDialog.value = null
-        })
-    }
-}
-
-@Composable
-fun CheckAndShowRateApp() {
-    val showDialog = remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        val count = getAppLaunchCount()
-        val key = "rate_app"
-        if (count % 10 == 0 && !isSurveyHidden(key)) {
-            showDialog.value = true
-        }
-    }
-
-    if (showDialog.value) {
-        RateAppDialog(onDismiss = { showDialog.value = false })
-    }
-}
+//@Composable
+//fun CheckAndShowSurvey() {
+//    val coroutineScope = rememberCoroutineScope()
+//    val showSurveyDialog = remember { mutableStateOf<AppSurveyDto?>(null) }
+//
+//    LaunchedEffect(Unit) {
+//
+//        val count = getAppLaunchCount()
+//        val survey = getSurvey()
+//
+//        println("count: ${count}")
+//        if (count % 1 == 0 && survey != null && !isSurveyHidden(survey.id)) {
+//            showSurveyDialog.value = survey
+//        }
+//    }
+//
+//    showSurveyDialog.value?.let { survey ->
+//        SurveyDialog(survey = survey, onDismiss = {
+//            showSurveyDialog.value = null
+//        })
+//    }
+//}
+//
+//@Composable
+//fun CheckAndShowRateApp() {
+//    val showDialog = remember { mutableStateOf(false) }
+//
+//    LaunchedEffect(Unit) {
+//        val count = getAppLaunchCount()
+//        val key = "rate_app"
+//        if (count % 10 == 0 && !isSurveyHidden(key)) {
+//            showDialog.value = true
+//        }
+//    }
+//
+//    if (showDialog.value) {
+//        RateAppDialog(onDismiss = { showDialog.value = false })
+//    }
+//}
 
 fun markSessionToday() {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).date.toString()
@@ -750,32 +750,55 @@ fun shouldShowRateDialog(): Boolean {
     val installDate = getFirstLaunchDate() ?: return false
     val daysSinceInstall = (now - installDate) / (1000 * 60 * 60 * 24)
 
-    val lastShown = getLastRateShown() ?: 0
-    val lastPostpone = getRatePostpone() ?: 0
-    val daysSinceLast = (now - lastShown) / (1000 * 60 * 60 * 24)
-    val daysSincePostpone = (now - lastPostpone) / (1000 * 60 * 60 * 24)
+    val lastShown = getLastRateShown()
+    val lastPostpone = getRatePostpone()
+
+    val daysSinceLast = lastShown?.let { (now - it) / (1000 * 60 * 60 * 24) }
+    val daysSincePostpone = lastPostpone?.let { (now - it) / (1000 * 60 * 60 * 24) }
+
+    println("now $now")
+    println("installDate $installDate")
+    println("daysSinceInstall $daysSinceInstall")
+    println("lastShown $lastShown")
+    println("lastPostpone $lastPostpone")
+    println("daysSinceLast $daysSinceLast")
+    println(" >= 90 ${isAppRated() && (daysSinceLast ?: -1) >= 90}")
+
+
+    println("daysSincePostpone $daysSincePostpone")
+    val notRated = !isAppRated()
 
     return when {
-        !isAppRated() && daysSinceInstall in 5..7 -> true
-        !isAppRated() && daysSincePostpone >= 14 -> true
-        !isAppRated() && daysSinceInstall >= 30 && daysSinceLast > 20 && daysSincePostpone >= 14 -> true
-        isAppRated() && daysSinceLast >= 90 -> true
+        notRated && daysSinceInstall in 5..7 -> true
+        notRated && (daysSincePostpone ?: -1) >= 14 -> true
+        notRated && daysSinceInstall >= 30 &&
+                (daysSinceLast ?: -1) > 20 &&
+                (daysSincePostpone ?: -1) >= 14 -> true
+        isAppRated() && (daysSinceLast ?: -1) >= 90 -> true
         else -> false
     }
 }
 
 fun shouldShowSurvey(): Boolean {
     val now = Clock.System.now().toEpochMilliseconds()
-    val lastSurvey = getLastSurveyShown() ?: 0
-    val lastPostpone = getSurveyPostpone() ?: 0
-    val daysSince = (now - lastSurvey) / (1000 * 60 * 60 * 24)
-    val daysSincePostpone = (now - lastPostpone) / (1000 * 60 * 60 * 24)
+    val lastSurvey = getLastSurveyShown()
+    val lastPostpone = getSurveyPostpone()
+
+    val daysSince = lastSurvey?.let { (now - it) / (1000 * 60 * 60 * 24) } ?: Long.MAX_VALUE
+    val daysSincePostpone = lastPostpone?.let { (now - it) / (1000 * 60 * 60 * 24) } ?: Long.MAX_VALUE
+
     val active = getSessionCountLast7Days() >= 3
 
+    println("daysSince Survey $daysSince")
+    println("daysSincePostpone Survey $daysSincePostpone")
+    println("lastPostpone Survey $lastPostpone")
+    println("active Survey $active")
+    println("daysSince >= 30 Survey ${daysSince >= 30}")
+    println("daysSincePostpone >= 14 Survey ${daysSincePostpone >= 14}")
+
     return active && daysSince >= 30 && daysSincePostpone >= 14
-//    return active
-//    return daysSince >= 0
 }
+
 
 @Composable
 fun CheckAndShowDialogs() {

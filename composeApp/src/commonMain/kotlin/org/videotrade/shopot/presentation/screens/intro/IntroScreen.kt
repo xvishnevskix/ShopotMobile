@@ -152,8 +152,6 @@ class IntroScreen : Screen {
                 navigateToScreen(navigator,NetworkErrorScreen())
             } finally {
                 incrementAppLaunchCounter()
-                setFirstLaunchDateIfNotSet()
-                markSessionToday()
             }
 
         }
@@ -201,7 +199,7 @@ class IntroScreen : Screen {
 
                     Text(
 //                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
-                        text = "App Version: 1.1.3(beta)",
+                        text = "App Version: 1.1.4(beta)",
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
