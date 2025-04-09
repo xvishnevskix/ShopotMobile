@@ -90,12 +90,12 @@ class ChatScreen(
         
         LaunchedEffect(isScaffoldStickerState) {
             if (isScaffoldStickerState) {
-
+                
                 scaffoldStickerState.bottomSheetState.expand()
-
+                
             }
         }
-
+        
         
         LaunchedEffect(key1 = viewModel) {
             viewModel.getProfile()
@@ -116,7 +116,7 @@ class ChatScreen(
                 mainViewModel.setCurrentChat("")
             }
         }
-
+        
         LaunchedEffect(scaffoldStickerState.bottomSheetState) {
             snapshotFlow { scaffoldStickerState.bottomSheetState.currentValue }
                 .collect { state ->
@@ -292,7 +292,7 @@ class ChatScreen(
                                     println("Прекращаем выбирать стикер")
                                     viewModel.onStickerChoosingEnd()
                                     showStickerMenu.value = false
-
+                                    
                                 }
                             }
                         }
@@ -300,12 +300,12 @@ class ChatScreen(
                     sheetPeekHeight = 0.dp,
                 ) {}
             }
-
+            
             if (isMessageUpdated.value && selectedMessage.value != null) {
                 val overlayPosition = selectedMessageY.value
                 val isWithinBounds = overlayPosition >= 0 &&
                         overlayPosition + boxSelectedMessageHeight.value <= screenHeightInPx
-
+                
                 if (isWithinBounds) {
                     BlurredMessageOverlay(
                         chat = chat,
@@ -320,14 +320,14 @@ class ChatScreen(
                         }
                     )
                 } else {
-
+                    
                     scope.launch {
                         selectedMessageY.value = when {
                             overlayPosition < 0 -> 0 // Если выходит за верхнюю границу
                             overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
                                 (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
                             }
-
+                            
                             else -> overlayPosition
                         }
                         isMessageUpdated.value = true // Перезапуск
@@ -339,7 +339,7 @@ class ChatScreen(
                     val overlayPosition = selectedMessageY.value
                     val isWithinBounds = overlayPosition >= 0 &&
                             overlayPosition + boxSelectedMessageHeight.value + 180 <= screenHeightInPx
-
+                    
                     if (isWithinBounds) {
                         BlurredMessageOverlay(
                             chat = chat,
@@ -360,7 +360,7 @@ class ChatScreen(
                                 overlayPosition + boxSelectedMessageHeight.value > screenHeightInPx -> {
                                     (screenHeightInPx - boxSelectedMessageHeight.value).toInt() - 180 // нижняя граница
                                 }
-
+                                
                                 else -> overlayPosition
                             }
                             isMessageUpdated.value = true // Перезапуск

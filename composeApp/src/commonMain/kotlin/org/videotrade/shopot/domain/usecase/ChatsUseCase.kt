@@ -1,7 +1,6 @@
 package org.videotrade.shopot.domain.usecase
 
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.websocket.WebSocketSession
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

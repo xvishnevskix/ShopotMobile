@@ -1,7 +1,5 @@
 package org.videotrade.shopot.data.remote.repository
 
-import co.touchlab.kermit.Logger
-import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.serialization.encodeToString
@@ -18,9 +16,11 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.repository.ContactsRepository
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
+import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
 
 class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     private val _contacts = MutableStateFlow<List<ContactDTO>>(
@@ -114,7 +114,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     override suspend fun fetchContacts(): List<ContactDTO>? {
         try {
             val contactsNative = ContactsProviderFactory.create().getContacts()
-
+            
             println("contacts contactsNative ${contactsNative}")
             
             val jsonContent = Json.encodeToString(
@@ -122,16 +122,16 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
                     put("listContacts", Json.encodeToJsonElement(contactsNative))
                 }
             )
-
+            
             println("contacts jsonContent contactsGet ${jsonContent}")
             
             
             val contactsGet = origin().post("contacts/addContactsList", jsonContent) ?: return null
             
             println("contactsGet ${contactsGet}")
-
+            
             val jsonElement = Json.parseToJsonElement(contactsGet)
-
+            
             println("contacts jsonElement ${jsonElement}")
             
             
@@ -173,17 +173,21 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         
         
         try {
-            val jsonContentSocket = Json.encodeToString(
+            val jsonContent = Json.encodeToString(
                 buildJsonObject {
                     put("action", "createChat")
                     put("firstUserId", profileId)
                     put("secondUserId", contact.id)
                 }
             )
-            println("error createChat $jsonContentSocket")
+            println("error createChat $jsonContent")
             
             
-            wsUseCase.wsSession.value?.send(Frame.Text(jsonContentSocket))
+            sendMessageOrReconnect(
+                wsUseCase.wsSession.value,
+                jsonContent,
+                WsReconnectionCase.ChatWs
+            )
         } catch (e: Exception) {
             
             println("error createChat")
@@ -214,7 +218,12 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             
             println("error createChat $jsonString")
             
-            wsUseCase.wsSession.value?.send(Frame.Text(jsonString))
+            sendMessageOrReconnect(
+                wsUseCase.wsSession.value,
+                jsonString,
+                WsReconnectionCase.ChatWs
+            )
+            
         } catch (e: Exception) {
             println("error createGroupChat: ${e.message}")
         }

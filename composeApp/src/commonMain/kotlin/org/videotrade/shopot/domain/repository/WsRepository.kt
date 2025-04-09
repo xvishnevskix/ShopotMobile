@@ -12,6 +12,8 @@ interface WsRepository {
     
     val isConnected: MutableStateFlow<Boolean>
     
+    val processingReconnect: MutableStateFlow<Boolean>
+    
     
     suspend fun connectionWs(userId: String, navigator: Navigator)
     

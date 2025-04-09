@@ -8,10 +8,10 @@ import com.shepeliev.webrtckmp.PeerConnectionState
 import com.shepeliev.webrtckmp.SessionDescription
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.websocket.DefaultWebSocketSession
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.repository.CallRepository
@@ -37,9 +37,11 @@ class CallUseCase : KoinComponent {
         return repository.reconnectPeerConnection()
     }
     
-    suspend fun connectionWs(userId: String) {
-        
-        return repository.connectionWs(userId)
+    suspend fun connectionCallWs(
+        userId: String,
+        onConnectionResult: suspend (Boolean, DefaultWebSocketSession) -> Unit = { _, _ -> }
+    ) {
+        return repository.connectionCallWs(userId, onConnectionResult)
     }
     
     

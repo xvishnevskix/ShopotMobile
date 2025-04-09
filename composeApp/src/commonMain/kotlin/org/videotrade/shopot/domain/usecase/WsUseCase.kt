@@ -2,6 +2,7 @@ package org.videotrade.shopot.domain.usecase
 
 import cafe.adriel.voyager.navigator.Navigator
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -13,6 +14,11 @@ class WsUseCase : KoinComponent {
     val wsSession: StateFlow<DefaultClientWebSocketSession?> get() = repository.wsSession
     
     val isConnected: StateFlow<Boolean> get() = repository.isConnected
+    
+    
+    val processingReconnect: MutableStateFlow<Boolean> get() = repository.processingReconnect
+    
+    
     
     suspend fun connectionWs(userId: String, navigator: Navigator) {
         return repository.connectionWs(userId, navigator)

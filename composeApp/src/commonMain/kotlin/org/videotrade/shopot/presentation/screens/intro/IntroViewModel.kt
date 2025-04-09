@@ -2,7 +2,6 @@ package org.videotrade.shopot.presentation.screens.intro
 
 
 import cafe.adriel.voyager.navigator.Navigator
-import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -11,28 +10,20 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.jsonObject
-import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.videotrade.shopot.api.addValueInStorage
-import org.videotrade.shopot.api.delValueInStorage
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.data.origin
-import org.videotrade.shopot.domain.model.AppVersion
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
-import org.videotrade.shopot.multiplatform.getBuildVersion
 import org.videotrade.shopot.multiplatform.getFbToken
-import org.videotrade.shopot.presentation.screens.common.UpdateScreen
-import org.videotrade.shopot.presentation.screens.login.SignInScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
-import org.videotrade.shopot.presentation.screens.test.TestScreen
 
 class IntroViewModel : ViewModel(), KoinComponent {
 
@@ -157,7 +148,7 @@ class IntroViewModel : ViewModel(), KoinComponent {
                 profile.value = profileCase
 
                 connectionWs(profileCase.id, navigator)
-                callUseCase.connectionWs(profileCase.id)
+                callUseCase.connectionCallWs(profileCase.id)
             }
 
         }

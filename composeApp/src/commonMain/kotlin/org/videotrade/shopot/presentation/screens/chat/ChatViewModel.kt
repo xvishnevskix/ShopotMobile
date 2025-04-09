@@ -29,6 +29,7 @@ import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.StickerPack
+import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
@@ -39,6 +40,7 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
@@ -482,7 +484,12 @@ class ChatViewModel : ViewModel(), KoinComponent {
                     }
                 )
                 println("jsonContent $jsonContent")
-                wsUseCase.wsSession.value?.send(Frame.Text(jsonContent))
+                
+                sendMessageOrReconnect(
+                    wsUseCase.wsSession.value,
+                    jsonContent,
+                    WsReconnectionCase.ChatWs
+                )
                 
                 musicPlayer.play("message", false, MusicType.Notification)
                 

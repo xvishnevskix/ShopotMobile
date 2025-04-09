@@ -29,6 +29,7 @@ import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
+import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close
 import io.ktor.websocket.readText
@@ -69,6 +70,7 @@ import org.videotrade.shopot.domain.model.SessionDescriptionDTO
 import org.videotrade.shopot.domain.model.WebRTCMessage
 import org.videotrade.shopot.domain.model.rtcMessageDTO
 import org.videotrade.shopot.domain.repository.CallRepository
+import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
@@ -216,7 +218,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
         
     }
     
-    override suspend fun connectionWs(userId: String) {
+    override suspend fun connectionCallWs(
+        userId: String,
+        onConnectionResult: suspend (Boolean, DefaultWebSocketSession) -> Unit
+    ) {
         
         println("aaaaaaa11111")
         val httpClient = HttpClient {
@@ -234,6 +239,10 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                     _wsSession.value = this
                     _isConnectedWs.value = true
                     println("Connection Call")
+                    
+                    
+                    onConnectionResult(true, this)
+                    
                     
                     val callOutputRoutine = launch {
                         for (frame in incoming) {
@@ -541,28 +550,6 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    suspend fun reconnectCallWebSocket(
-        userId: String
-    ) {
-        
-        while (wsSession.value == null || wsSession.value?.isActive == false) {
-            try {
-                println("Attempting to reconnect WebSocket...")
-                connectionWs(
-                    userId = userId,
-                )
-                if (wsSession.value != null) {
-                    println("WebSocket reconnected successfully!")
-                    break
-                }
-            } catch (e: Exception) {
-                println("Reconnect failed: ${e.message}. Retrying in 3 seconds...")
-                delay(3000) // Задержка перед следующей попыткой
-            }
-        }
-    }
-    
-    
     override suspend fun disconnectWs() {
         wsSession.value?.close()
     }
@@ -636,8 +623,8 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
 
 //                    if (!isCallMaker.value) {
                     try {
-                        println( "PC2213131: $jsonMessage" )
-                        println( "wsSession: ${wsSession.value}" )
+                        println("PC2213131: $jsonMessage")
+                        println("wsSession: ${wsSession.value}")
                         
                         // Проверяем, активна ли корутина и открыт ли WebSocket
                         if (wsSession.value?.isActive == true) {
@@ -1315,7 +1302,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
                 
                 _peerConnection.value?.addIceCandidate(iceCandidate)
             }
-
+            
         }
     }
     
@@ -1342,7 +1329,31 @@ suspend fun initializeAudioSessionAndStream(): MediaStream? {
     }
 }
 
-
+suspend fun reconnectCallWebSocket(
+    userId: String,
+    onConnectionResult: suspend (Boolean, DefaultWebSocketSession) -> Unit = { _, _ -> }
+) {
+    
+    
+    val callUseCase: CallUseCase = KoinPlatform.getKoin().get()
+    
+    while (callUseCase.wsSession.value == null || callUseCase.wsSession.value?.isActive == false) {
+        try {
+            println("Attempting to reconnect WebSocket...")
+            callUseCase.connectionCallWs(
+                userId,
+                onConnectionResult
+            )
+            if (callUseCase.wsSession.value != null) {
+                println("WebSocket reconnected successfully!")
+                break
+            }
+        } catch (e: Exception) {
+            println("Reconnect failed: ${e.message}. Retrying in 3 seconds...")
+            delay(3000) // Задержка перед следующей попыткой
+        }
+    }
+}
 
 
 @Serializable
