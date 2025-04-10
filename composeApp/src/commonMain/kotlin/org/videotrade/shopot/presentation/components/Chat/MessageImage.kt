@@ -184,8 +184,8 @@ fun MessageImage(
                 }
             }
         }
-        
-        
+
+        val imageState = remember { mutableStateOf(imagePainter) }
         Box(
             modifier = Modifier
                 .size(250.dp, 350.dp)
@@ -198,6 +198,22 @@ fun MessageImage(
                         bottomStart = if (message.fromUser == profile.id) 20.dp else 0.dp,
                     )
                 )
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null // Убирает эффект нажатия
+                ) {
+
+
+                    navigator.let {
+                        navigateToScreen(
+                            it,
+                            PhotoViewerScreen(
+                                imageState,
+                                messageSenderName,
+                            )
+                        )
+                    }
+                }
         ) {
             
             Image(
