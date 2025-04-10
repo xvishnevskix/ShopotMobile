@@ -26,8 +26,7 @@
 		<string>fetch</string>
 		<string>processing</string>
 		<string>remote-notification</string>
-		<string>voip</string>
-		<string>audio</string>
+	<!-- <string>voip</string> -->
 	</array>
 	<key>aps-environment</key>
 	<string>development</string>
