@@ -26,6 +26,7 @@ fun AppTheme(
             onBackground = Color(0x1AFFFFFF),
             error = Color(0xFFFF3B30),
             onPrimary = Color(0xFFBBA796),
+            surfaceDim = Color.DarkGray
         )
     } else {
         lightColorScheme(
@@ -41,6 +42,7 @@ fun AppTheme(
             onBackground = Color(0xFFF7F7F7),
             error = Color(0xFFFF3B30),
             onPrimary = Color(0xFFEDDCCC),
+            surfaceDim = Color(0xFFd5d5d5)
         )
     }
 

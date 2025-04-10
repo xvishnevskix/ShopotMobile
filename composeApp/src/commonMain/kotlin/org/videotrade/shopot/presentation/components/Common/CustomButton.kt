@@ -76,7 +76,9 @@ fun CustomButton(
     }
 
     Button(
-        onClick = { onClick(scope) },
+        onClick = {
+            if (disabled) {} else onClick(scope)
+                  },
         colors = ButtonDefaults.buttonColors(backgroundColor),
         shape = buttonShape,
         modifier = Modifier
