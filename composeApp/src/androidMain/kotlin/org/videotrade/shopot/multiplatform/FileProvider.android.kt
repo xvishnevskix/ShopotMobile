@@ -634,11 +634,7 @@ actual class FileProvider(private val applicationContext: Context) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document" -> File(
-                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                "Documents"
-            )
-            
+            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
@@ -646,19 +642,21 @@ actual class FileProvider(private val applicationContext: Context) {
         }
         
         // Создаем папку, если она не существует
-        if (!directory.exists()) {
-            directory.mkdirs()
+        if (directory != null) {
+            if (!directory.exists()) {
+                directory.mkdirs()
+            }
         }
         
         // Проверка, существует ли файл с таким именем
         val existingFile = File(directory, fileName)
         if (existingFile.exists()) {
-            println("Файл уже существует: ${existingFile.absolutePath}")
+            println("file existing: ${existingFile.absolutePath}")
             return null
         }
         
         val file = File(directory, fileName)
-        println("Путь к файлу: ${file.absolutePath}")
+        println("file path created: ${file.absolutePath}")
         
         return file.absolutePath
     }
@@ -668,7 +666,7 @@ actual class FileProvider(private val applicationContext: Context) {
         
         // Проверяем, существует ли исходный файл
         if (!sourceFile.exists()) {
-            println("Исходный файл не найден: $fileDirectory")
+            println("Source file not found: $fileDirectory")
             return null
         }
         
@@ -677,11 +675,7 @@ actual class FileProvider(private val applicationContext: Context) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document" -> File(
-                context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS),
-                "Documents"
-            )
-            
+            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
@@ -689,8 +683,10 @@ actual class FileProvider(private val applicationContext: Context) {
         }
         
         // Создаем каталог, если он не существует
-        if (!directory.exists()) {
-            directory.mkdirs()
+        if (directory != null) {
+            if (!directory.exists()) {
+                directory.mkdirs()
+            }
         }
         
         // Определяем путь для нового файла
@@ -699,7 +695,7 @@ actual class FileProvider(private val applicationContext: Context) {
         return try {
             // Копируем файл в нужный каталог
             sourceFile.copyTo(destinationFile, overwrite = true)
-            println("Файл успешно сохранен: ${destinationFile.absolutePath}")
+            println("file saved: ${destinationFile.absolutePath}")
             destinationFile.absolutePath
         } catch (e: IOException) {
             e.printStackTrace()
@@ -713,7 +709,7 @@ actual class FileProvider(private val applicationContext: Context) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document" -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), "Documents")
+            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
@@ -723,7 +719,7 @@ actual class FileProvider(private val applicationContext: Context) {
         val file = File(directory, fileName)
 
         if (file.exists()) {
-            println("Файл найден: ${file.absolutePath}")
+            println("File found: ${file.absolutePath}")
             return file.absolutePath
         }
 
@@ -733,12 +729,12 @@ actual class FileProvider(private val applicationContext: Context) {
             val fallbackFile = File(fallbackDir, fileName)
 
             if (fallbackFile.exists()) {
-                println("Файл найден в Others: ${fallbackFile.absolutePath}")
+                println("File not found in Others: ${fallbackFile.absolutePath}")
                 return fallbackFile.absolutePath
             }
         }
 
-        println("Файл не найден: $fileName в каталогах $directory и Others")
+        println("File not found: $fileName in catalogs $directory and Others")
         return null
     }
 
