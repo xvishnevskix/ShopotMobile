@@ -196,7 +196,11 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
         
     }
     
-    override suspend fun createGroupChat(users: List<String?>, groupName: String) {
+    override suspend fun createGroupChat(
+        users: List<String?>,
+        groupName: String,
+//        ownerId: String,
+    ) {
         val wsUseCase: WsUseCase by inject()
         try {
             // Преобразуйте список пользователей в JSON-массив строк
@@ -211,6 +215,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
             val jsonContentSocket = buildJsonObject {
                 put("action", "createGroupChat")
                 put("groupName", groupName)
+//                put("ownerId", ownerId)
                 put("users", usersJsonArray)
             }
             

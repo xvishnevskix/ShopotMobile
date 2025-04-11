@@ -14,7 +14,11 @@ interface ContactsRepository {
     
     
     suspend fun createChat(profileId: String, contact: ContactDTO)
-    suspend fun createGroupChat(users: List<String?>, groupName: String)
+    suspend fun createGroupChat(
+        users: List<String?>,
+        groupName: String,
+//        ownerId: String
+    )
     
     fun clearData()
 }
