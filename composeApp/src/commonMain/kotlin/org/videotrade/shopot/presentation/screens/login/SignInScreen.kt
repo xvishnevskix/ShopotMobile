@@ -311,7 +311,9 @@ class SignInScreen : Screen {
                                                                 "SignIn",
                                                                 navigator,
                                                                 fullPhoneNumber,
-                                                                selectCountryName
+                                                                selectCountryName,
+                                                                serverUnavailable,
+                                                                toasterViewModel
                                                             )
                                                         }
                                                     }

@@ -309,4 +309,10 @@
     <string name="start_survey">Start</string>
     <string name="enter_comment_optional">Comment (optional)</string>
 
+    <string name="will_be_displayed_to_other_users">will be displayed to other users</string>
+    <string name="to_find_you_in_the_app">to find you in the app</string>
+
+
+
+
 </resources>

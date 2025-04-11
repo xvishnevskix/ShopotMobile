@@ -307,4 +307,9 @@
     <string name="start_survey">Пройти</string>
     <string name="enter_comment_optional">Комментарий (необязательно)</string>
 
+    <string name="will_be_displayed_to_other_users">будет отображаться у других пользователей</string>
+    <string name="to_find_you_in_the_app">для поиска вас в приложении</string>
+
+
+
 </resources>

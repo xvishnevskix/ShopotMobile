@@ -262,6 +262,10 @@ class AuthCallScreen(
             }
         }
 
+//        //для тестов
+//        LaunchedEffect(key1 = Unit) {
+//            handleAuthCase()
+//        }
 
         fun sendSms(sentSMSCode: String) {
             isSms = true
@@ -529,8 +533,8 @@ suspend fun sendRequestToBackend(
     notificationToken: String?,
     url: String,
     toasterViewModel: CommonViewModel,
-    phoneNotRegistered: String = "Номер телефона не зарегистрирован",
-    serverUnavailable: String = "Сервер временно недоступен",
+    phoneNotRegistered: String = "",
+    serverUnavailable: String = "Server unavailable",
     hasError: MutableState<Boolean>? = null,
     animationTrigger: MutableState<Boolean>? = null,
 ): HttpResponse? {
@@ -582,7 +586,13 @@ suspend fun sendRequestToBackend(
 
             when (response.status.value) {
 
-
+                404 -> {
+                    toasterViewModel.toaster.show(
+                        serverUnavailable,
+                        type = ToastType.Error,
+                        duration = ToasterDefaults.DurationDefault
+                    )
+                }
                 500 -> {
                     toasterViewModel.toaster.show(
                         serverUnavailable,
@@ -641,7 +651,7 @@ suspend fun sendLogin(
     viewModel: IntroViewModel,
     сommonViewModel: CommonViewModel,
     toasterViewModel: CommonViewModel,
-    phoneNotRegistered: String = "Номер телефона не зарегистрирован",
+    phoneNotRegistered: String = "",
     serverUnavailable: String = "Сервер временно недоступен",
 ) {
     println("sendLogin")
