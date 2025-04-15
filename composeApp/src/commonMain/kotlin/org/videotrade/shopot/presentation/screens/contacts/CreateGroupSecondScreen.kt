@@ -54,6 +54,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.multiplatform.Platform
@@ -75,9 +76,6 @@ class CreateGroupSecondScreen() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
-        val commonViewModel: CommonViewModel = koinInject()
-        val chatViewModel: ChatViewModel = koinInject()
-        val profile = chatViewModel.profile.collectAsState().value
         val toasterViewModel: CommonViewModel = koinInject()
         val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
@@ -129,9 +127,14 @@ class CreateGroupSecondScreen() : Screen {
                                     duration = ToasterDefaults.DurationDefault
                                 )
                             } else {
-                                viewModel.createGroupChat(groupName.value,
-                                    profile.id
-                                )
+                                val profileId = getValueInStorage("profileId")
+                                println("profileId profileId ${profileId}")
+                                if (profileId != null) {
+                                    viewModel.createGroupChat(groupName.value,
+                                        profileId
+                                    )
+                                }
+
                                 navigateToScreen(navigator, CreateChatScreen())
                                 tabNavigator.current = ChatsTab
 //                                commonViewModel.restartApp()

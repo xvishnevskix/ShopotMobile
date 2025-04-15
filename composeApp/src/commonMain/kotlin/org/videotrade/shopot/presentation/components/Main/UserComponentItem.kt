@@ -105,6 +105,8 @@ fun UserComponentItem(
 //            ) {
                 Row(
                     modifier = Modifier
+                        //потом убрать для удаления
+                        .padding(horizontal = 16.dp)
                         .clip(RoundedCornerShape(2.dp))
                         .background(colors.surface).fillMaxWidth().clickable {
                             mainViewModel.setCurrentChat(chat.id)
