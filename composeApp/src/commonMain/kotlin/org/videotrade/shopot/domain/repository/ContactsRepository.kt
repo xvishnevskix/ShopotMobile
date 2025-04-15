@@ -17,7 +17,7 @@ interface ContactsRepository {
     suspend fun createGroupChat(
         users: List<String?>,
         groupName: String,
-//        ownerId: String
+        ownerId: String
     )
     
     fun clearData()

@@ -28,10 +28,10 @@ class ContactsUseCase : KoinComponent {
     }
     
     suspend fun createGroupChat(users: List<String?>, groupName: String,
-//    ownerId: String,
+    ownerId: String,
     ) {
         return repository.createGroupChat(users, groupName,
-//            ownerId
+            ownerId
 
         )
     }

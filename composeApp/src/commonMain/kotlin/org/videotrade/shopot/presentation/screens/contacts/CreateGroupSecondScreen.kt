@@ -130,7 +130,7 @@ class CreateGroupSecondScreen() : Screen {
                                 )
                             } else {
                                 viewModel.createGroupChat(groupName.value,
-//                                    profile.id
+                                    profile.id
                                 )
                                 navigateToScreen(navigator, CreateChatScreen())
                                 tabNavigator.current = ChatsTab

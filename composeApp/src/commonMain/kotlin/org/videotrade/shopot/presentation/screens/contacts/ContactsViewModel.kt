@@ -70,14 +70,14 @@ class ContactsViewModel() : ViewModel(),
     }
     
     fun createGroupChat(groupName: String,
-//                        ownerId: String
+                        ownerId: String
     ) {
         viewModelScope.launch {
             try {
                 val idUsers = selectedContacts.map { it.id }.toMutableList()
                 idUsers.add(ProfileUseCase.getProfile().id)
                 contactsUseCase.createGroupChat(idUsers, groupName,
-//                    ownerId
+                    ownerId
                 )
             }
             finally {
