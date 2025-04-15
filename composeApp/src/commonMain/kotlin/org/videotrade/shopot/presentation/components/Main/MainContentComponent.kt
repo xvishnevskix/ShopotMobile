@@ -227,7 +227,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                     }
                             ) {
                                 LazyColumn(
-                                    modifier = Modifier.padding(horizontal = 16.dp)
+                                    modifier = Modifier
                                         .animateContentSize()
                                         .heightIn(max = maxHeight)
 
