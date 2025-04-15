@@ -769,10 +769,10 @@ fun shouldShowRateDialog(): Boolean {
     val notRated = !isAppRated()
 
     return when {
-        notRated && daysSinceInstall in 5..7 -> true
+        notRated && (daysSinceInstall in 5..7) && (daysSincePostpone ?: -1) >= 14 -> true
         notRated && (daysSincePostpone ?: -1) >= 14 -> true
         notRated && daysSinceInstall >= 30 &&
-                (daysSinceLast ?: -1) > 20 &&
+                (daysSinceLast ?: -1) > 90 &&
                 (daysSincePostpone ?: -1) >= 14 -> true
         isAppRated() && (daysSinceLast ?: -1) >= 90 -> true
         else -> false
