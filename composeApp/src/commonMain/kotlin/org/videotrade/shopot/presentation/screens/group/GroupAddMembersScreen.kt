@@ -99,6 +99,7 @@ class GroupAddMembersScreen() : Screen {
                     CreateGroupChatHeader(
                         stringResource(MokoRes.strings.add),
                         order = "2",
+                        viewModel = viewModel,
                         onClick = {
                             if (selectedContacts.isEmpty()) {
                                 toasterViewModel.toaster.show(
@@ -108,6 +109,7 @@ class GroupAddMembersScreen() : Screen {
                                 )
                             } else {
 //                               TODO()
+                                viewModel.clearSelectedContacts()
                                 navigator.pop()
                             }
                         }

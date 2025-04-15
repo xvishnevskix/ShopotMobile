@@ -109,6 +109,7 @@ class CreateGroupFirstScreen() : Screen {
                     CreateGroupChatHeader(
                         stringResource(MokoRes.strings.create_group),
                         order = "1",
+                        viewModel = viewModel,
                         onClick = {
                             if (selectedContacts.isEmpty()) {
                                 toasterViewModel.toaster.show(
