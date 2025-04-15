@@ -313,7 +313,8 @@
     <string name="to_find_you_in_the_app">to find you in the app</string>
     <string name="delete_chat_with">Delete chat with</string>
     <string name="this_action_will_permanently_delete_all_messages_in_this_chat">This action will permanently delete all messages in this chat</string>
-
+    <string name="add_members">Add members</string>
+    <string name="remove_member">Remove member</string>
 
 
 </resources>

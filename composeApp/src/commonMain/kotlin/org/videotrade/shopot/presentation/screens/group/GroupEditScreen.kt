@@ -1,23 +1,33 @@
 package org.videotrade.shopot.presentation.screens.group
 
-import Avatar
 import GroupUserCard
+import ProfileSettingsButton
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -26,155 +36,129 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.jetbrains.compose.resources.Font
-import shopot.composeapp.generated.resources.Res
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.Divider
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
 import dev.icerock.moko.resources.compose.stringResource
-import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditHeader
-import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
-import shopot.composeapp.generated.resources.Montserrat_Medium
-import shopot.composeapp.generated.resources.SFCompactDisplay_Medium
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
+import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
+import org.videotrade.shopot.presentation.components.ProfileComponents.GroupProfileHeader
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import shopot.composeapp.generated.resources.ArsonPro_Medium
+import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.add_photo
+import shopot.composeapp.generated.resources.add_users
+import shopot.composeapp.generated.resources.profile_design
 
 
-class GroupEditScreen : Screen {
+class GroupEditScreen(private val profile: ProfileDTO, private val chat: ChatItem) : Screen {
 
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val textState = remember { mutableStateOf("") }
-        val textStyle = TextStyle(
-            color = Color.Black,
-            fontSize = 14.sp,
-            fontFamily = FontFamily(Font(Res.font.Montserrat_Medium)),
-            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-            lineHeight = 20.sp,
-        )
-
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.TopStart
-        ) {
-
-            Column {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(bottomEnd = 46.dp, bottomStart = 46.dp))
-                        .background(Color(0xFFF3F4F6))
-                        .padding(16.dp)
-                ) {
-                    GroupEditHeader(stringResource(MokoRes.strings.edit))
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Avatar(icon = null, size = 70.dp)
-                        BasicTextField(
-                            value = textState.value,
-                            onValueChange = { newText -> textState.value = newText },
-                            singleLine = true,
-                            textStyle = textStyle,
-                            cursorBrush = SolidColor(Color.Black),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(Color.Transparent)
-                                .padding(16.dp),
-                            decorationBox = { innerTextField ->
-
-                                Column {
-                                    Box(
-                                        modifier = Modifier
-                                            .background(Color.Transparent)
-                                            .padding(8.dp)
-                                    ) {
-
-                                        if (textState.value.isEmpty()) {
-                                            Text(stringResource(MokoRes.strings.enter_group_name), style = textStyle.copy(color = Color.Gray))
-                                        }
-                                        innerTextField()
-                                    }
-                                    Divider(color = Color(0xFF8E8E93), thickness = 1.dp)
-                                }
-                            }
-
-                        )
-                    }
-
-                    Row(
-                        modifier = Modifier.padding(top = 25.dp, bottom = 10.dp).fillMaxWidth(0.95F),
-                        horizontalArrangement = Arrangement.Start,
-
-                    ) {
-                        Image(
-                            painter = painterResource(Res.drawable.add_photo),
-                            contentDescription = "Avatar",
-                            modifier = Modifier.size(width = 27.75.dp, height = 20.dp),
-                            contentScale = ContentScale.FillBounds
-                        )
-                        Text(
-                            stringResource(MokoRes.strings.upload_photo),
-                            textAlign = TextAlign.Center,
-                            fontSize = 14.sp,
-                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-                            letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                            lineHeight = 15.sp,
-                            color = Color(0xFF2A293C),
-                                    modifier = Modifier.padding(start = 10.dp)
-                        )
-                    }
+        val scope = rememberCoroutineScope()
+        val viewModel: ChatViewModel = koinInject()
+        val groupUsers = viewModel.groupUsers.collectAsState().value
+        val colors = MaterialTheme.colorScheme
 
 
-                }
-
-                Box(
-                    modifier = Modifier.fillMaxWidth().padding(start = 20.dp, top = 40.dp, bottom = 13.dp),
-                    contentAlignment = Alignment.TopStart
-                ) {
-                    Text(
-                        stringResource(MokoRes.strings.edit_members),
-                        textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Medium)),
-                        letterSpacing = TextUnit(-0.5F, TextUnitType.Sp),
-                        lineHeight = 15.sp,
-                        color = Color(0xFF000000)
-                    )
-                }
-
-
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.TopCenter,
-                    ) {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.Top,
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            item {
-//                                GroupUserCard(isEdit = true)
-//                                GroupUserCard(isEdit = true)
-//                                GroupUserCard(isEdit = true)
-//                                GroupUserCard(isEdit = true)
-                            }
-                        }
-                }
-            }
+        LaunchedEffect(Unit) {
+            viewModel.loadGroupUsers(chat.chatId)
         }
+
+           Box(
+               modifier = Modifier.fillMaxSize(1f).background(colors.background),
+               contentAlignment = Alignment.TopStart
+           ) {
+
+               Column {
+                   Column(
+                       horizontalAlignment = Alignment.CenterHorizontally,
+                       modifier = Modifier
+                           .padding(horizontal = 16.dp)
+                           .fillMaxWidth()
+                           .background(colors.background)
+                   ) {
+                       GroupProfileHeader(stringResource(MokoRes.strings.edit), profile, chat, isEdit = true)
+                       ProfileSettingsButton(drawableRes = Res.drawable.add_users,
+                           width = 19.dp,
+                           height = 15.dp,
+                           stringResource(MokoRes.strings.add_members),
+                           {
+                               navigator.push(GroupAddMembersScreen())
+                           })
+
+                       Spacer(modifier = Modifier.height(16.dp))
+
+                       ProfileSettingsButton(drawableRes = Res.drawable.add_photo,
+                           width = 22.dp,
+                           height = 16.dp,
+                           stringResource(MokoRes.strings.upload_photo),
+                           {})
+
+                   }
+
+                   Spacer(modifier = Modifier.height(32.dp))
+
+                   LazyColumn(
+                       verticalArrangement = Arrangement.Top,
+                       horizontalAlignment = Alignment.CenterHorizontally,
+                       modifier = Modifier.weight(1f)
+                   ) {
+
+                       println("groupUsers: ${groupUsers}")
+                       itemsIndexed(groupUsers) { _, groupUser ->
+
+                           GroupUserCard(groupUser = groupUser, viewModel, isEdit = true)
+                           Spacer(modifier = Modifier.height(16.dp))
+                       }
+                   }
+
+
+                   Row(
+                       modifier = Modifier
+                           .padding(top = 5.dp)
+                           .height(100.dp)
+                           .fillMaxWidth()
+                           .shadow(
+                           elevation = 6.dp,
+                           shape = RoundedCornerShape(8.dp),
+                           clip = false,
+                           ambientColor = Color.Gray,
+                           spotColor = Color.Gray
+                       ).background(colors.background).padding(top = 28.dp),
+                       horizontalArrangement = Arrangement.Center
+                   ) {
+                       ParticipantCountText(groupUsers.size)
+                   }
+               }
+           }
+       }
     }
+
+
+@Composable
+private fun ParticipantCountText(count: Int) {
+    val colors = MaterialTheme.colorScheme
+    Text(
+        text = getParticipantCountText(count),
+        textAlign = TextAlign.Center,
+        fontSize = 16.sp,
+        lineHeight = 16.sp,
+        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+        fontWeight = FontWeight(500),
+        color = colors.primary,
+        letterSpacing = TextUnit(0F, TextUnitType.Sp)
+        ,
+        modifier = Modifier.padding(start = 12.dp)
+    )
 }
 
 
+data class TabInfo(
+    val title: String,
+    val text: String
+)

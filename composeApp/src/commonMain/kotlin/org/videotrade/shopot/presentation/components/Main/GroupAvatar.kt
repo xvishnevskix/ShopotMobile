@@ -10,23 +10,24 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.videotrade.shopot.domain.model.GroupUserDTO
 
 @Composable
-fun GroupAvatar(users: List<GroupUserDTO>) {
+fun GroupAvatar(users: List<GroupUserDTO>, size: Dp = 24.dp, shape: Dp = 6.dp) {
     val avatars = users.take(4) // Берем первых 4 пользователей
-    val avatarSize = 24.dp
+    val avatarSize = size
     val spacing = 4.dp
-    val cornerShape = 6.dp // Вынесенный roundedCornerShape
+    val cornerShape = shape // Вынесенный roundedCornerShape
 
     Box(
         modifier = Modifier
-            .size(56.dp)
+            .size(size*2+8.dp)
     ) {
         when (avatars.size) {
             1 -> {
-                Avatar(icon = avatars[0].icon, size = 56.dp, roundedCornerShape = cornerShape)
+                Avatar(icon = avatars[0].icon, size = size*2+8.dp, roundedCornerShape = cornerShape)
             }
             2 -> {
                 Row(

@@ -311,6 +311,7 @@
     <string name="to_find_you_in_the_app">для поиска вас в приложении</string>
     <string name="delete_chat_with">Удалить чат с</string>
     <string name="this_action_will_permanently_delete_all_messages_in_this_chat">Это действие удалит все сообщения в данном чате без возможности восстановления</string>
-
+    <string name="add_members">Добавить участников</string>
+    <string name="remove_member">Удалить участника</string>
 
 </resources>

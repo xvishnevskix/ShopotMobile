@@ -65,6 +65,7 @@ import org.videotrade.shopot.presentation.components.Chat.ChatStatus
 import org.videotrade.shopot.presentation.components.Chat.getCallStatusString
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithText
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
+import org.videotrade.shopot.presentation.components.Common.SwipeToDeleteContainer
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -94,15 +95,16 @@ fun UserComponentItem(
 
 
 
-//            SwipeToDeleteContainer(
-//                modifier = Modifier
-//                    .padding(horizontal = 16.dp)
-//                    .fillMaxWidth()
-//                    .height(IntrinsicSize.Min),
-//                onSwipeDelete = {
-//                    firstModalVisible.value = true
-//                }
-//            ) {
+            SwipeToDeleteContainer(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
+                isVisible = false,
+                onSwipeDelete = {
+                    firstModalVisible.value = true
+                }
+            ) {
                 Row(
                     modifier = Modifier
                         //потом убрать для удаления
@@ -369,7 +371,7 @@ fun UserComponentItem(
 
 
                 }
-//            }
+            }
     if (firstModalVisible.value) {
         ModalDialogWithoutText(
             onDismiss = { firstModalVisible.value = false },
@@ -420,80 +422,4 @@ fun MessageContent(message: MessageItem): String {
     }
 }
 
-@Composable
-fun SwipeToDeleteContainer(
-    modifier: Modifier = Modifier,
-    threshold: Float = 200f,
-    onSwipeDelete: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    val offsetX = remember { Animatable(0f) }
-    val scope = rememberCoroutineScope()
-    val deleteVisible = remember { mutableStateOf(false) }
 
-    Box(
-        modifier = modifier
-            .pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragEnd = {
-                        scope.launch {
-                            if (offsetX.value <= -threshold + 5f) {
-                                onSwipeDelete()
-                                offsetX.animateTo(0f)
-                            } else if (offsetX.value < -threshold / 2) {
-                                offsetX.animateTo(-threshold)
-                            } else {
-                                offsetX.animateTo(0f)
-                            }
-                        }
-                    },
-                    onHorizontalDrag = { _, delta ->
-                        scope.launch {
-                            val newOffset = (offsetX.value + delta).coerceIn(-threshold, 0f)
-                            offsetX.snapTo(newOffset)
-                        }
-                    }
-                )
-            }
-    ) {
-        // Delete background
-        Row(
-            modifier = Modifier
-                .width(75.dp)
-                .matchParentSize()
-                .background(Color.Transparent),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val alpha = (-offsetX.value / threshold).coerceIn(0f, 1f)
-            Box(
-                modifier = Modifier
-                    .width(1.dp)
-                    .height(56.dp)
-                    .border(width = 1.dp, color = Color(0x33373533))
-                    .alpha(alpha)
-            )
-            Spacer(modifier = Modifier.width((30 * alpha).dp))
-
-            Image(
-                painter = painterResource(Res.drawable.menu_delete),
-                contentDescription = "Delete",
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .size(24.dp)
-                    .clickable {
-                        onSwipeDelete()
-                        scope.launch { offsetX.animateTo(0f) }
-                    },
-                alpha = alpha
-            )
-        }
-
-        Box(
-            modifier = Modifier.offset { IntOffset(offsetX.value.toInt(), 0) }
-        ) {
-            content()
-        }
-    }
-
-}
