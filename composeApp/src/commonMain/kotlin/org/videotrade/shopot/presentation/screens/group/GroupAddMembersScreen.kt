@@ -46,6 +46,7 @@ import org.jetbrains.compose.resources.InternalResourceApi
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.navigateToScreen
+import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
@@ -60,7 +61,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 
 
-class GroupAddMembersScreen() : Screen {
+class GroupAddMembersScreen(private val chat: ChatItem) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -109,8 +110,11 @@ class GroupAddMembersScreen() : Screen {
                                 )
                             } else {
 //                               TODO()
-                                viewModel.clearSelectedContacts()
-                                navigator.pop()
+                                
+                                viewModel.addUsersToGroup(chat.chatId)
+                                
+//                                viewModel.clearSelectedContacts()
+//                                navigator.pop()
                             }
                         }
                     )
@@ -157,18 +161,6 @@ class GroupAddMembersScreen() : Screen {
                             Spacer(modifier = Modifier.height(100.dp))
                         }
                     }
-//                    Box(modifier = Modifier.padding(top = 5.dp)) {
-//                        CustomButton(
-//                            stringResource(MokoRes.strings.next),
-//                            {
-//                                if (selectedContacts.isEmpty()) {
-////                                    Toast.makeText(context, "Выберите участников", Toast.LENGTH_SHORT).show()
-//                                } else {
-//                                    navigateToScreen(navigator,CreateGroupSecondScreen())
-//                                }
-//                            }
-//                        )
-//                    }
                 }
             }
         }

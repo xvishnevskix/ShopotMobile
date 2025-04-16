@@ -112,7 +112,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                     println("groupUsers: ${groupUsers}")
                     itemsIndexed(groupUsers) { _, groupUser ->
 
-                        GroupUserCard(groupUser = groupUser, viewModel, isEdit = false)
+                        GroupUserCard(groupUser = groupUser, viewModel, isEdit = false, chat)
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
