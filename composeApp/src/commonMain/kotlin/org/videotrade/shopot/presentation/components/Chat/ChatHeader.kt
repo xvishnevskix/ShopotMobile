@@ -48,6 +48,7 @@ import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.components.Common.ReconnectionBar
 import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
+import org.videotrade.shopot.presentation.components.Main.GroupAvatar
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
@@ -125,10 +126,14 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     }
                 ) {
                     
-                    Avatar(
-                        icon = chat.icon,
-                        size = 56.dp
-                    )
+                    if (chat.personal) {
+                        Avatar(
+                            icon = chat.icon,
+                            size = 56.dp
+                        )
+                    } else {
+                        GroupAvatar(users = groupUsers)
+                    }
 
                     println("sdfdsf sdfsdfsdffsdf ${chat.firstName}")
 
@@ -152,13 +157,15 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                         ?: ""
                     
                     Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Spacer(modifier = Modifier.height(8.dp))
+                    Column(
+                        verticalArrangement = Arrangement.Top
+                    ) {
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = fullName,
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
-//                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                             fontWeight = FontWeight(500),
                             color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),

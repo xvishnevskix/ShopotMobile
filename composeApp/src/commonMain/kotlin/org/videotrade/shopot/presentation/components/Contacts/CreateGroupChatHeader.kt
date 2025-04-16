@@ -55,6 +55,7 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Montserrat_Medium
@@ -68,6 +69,7 @@ import shopot.composeapp.generated.resources.search_icon
 fun CreateGroupChatHeader(
     text: String,
     order: String = "1",
+    viewModel: ContactsViewModel? = null,
     onClick: () -> Unit,
 ) {
     val navigator = LocalNavigator.currentOrThrow
@@ -93,6 +95,9 @@ fun CreateGroupChatHeader(
                 Box(modifier = Modifier
                     .clip(CircleShape)
                     .clickable {
+                        if (viewModel != null) {
+                            viewModel.clearSelectedContacts()
+                        }
                     navigator.pop()
                 }.padding(12.dp)) {
                     BackIcon()

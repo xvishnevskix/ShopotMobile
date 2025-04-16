@@ -60,7 +60,8 @@ fun ModalDialogWithoutText(
                     modifier = Modifier
                         .background(colors.background)
                         .padding(20.dp)
-                        .fillMaxWidth()
+                        .fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = title,

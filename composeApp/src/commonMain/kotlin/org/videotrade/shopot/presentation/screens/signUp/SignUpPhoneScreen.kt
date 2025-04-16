@@ -313,7 +313,9 @@ class SignUpPhoneScreen : Screen {
                                                                 "SignUp",
                                                                 navigator,
                                                                 fullPhoneNumber,
-                                                                selectCountryName
+                                                                selectCountryName,
+                                                                serverUnavailable,
+                                                                toasterViewModel
                                                             )
                                                             
                                                         }

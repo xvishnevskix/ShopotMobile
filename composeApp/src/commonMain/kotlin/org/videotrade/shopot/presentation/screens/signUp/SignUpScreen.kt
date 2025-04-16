@@ -231,8 +231,8 @@ class SignUpScreen(private val phone: String) : Screen {
                                     ) // Валидация имени
                                 },
                                 placeholder = stringResource(MokoRes.strings.name),
-                                error = firstNameError.value
-                            )
+                                error = firstNameError.value,
+                                subTitle = stringResource(MokoRes.strings.will_be_displayed_to_other_users)                            )
 
                             CustomTextField(
                                 title = stringResource(MokoRes.strings.enter_your_last_name),
@@ -246,7 +246,8 @@ class SignUpScreen(private val phone: String) : Screen {
                                     ) // Валидация фамилии
                                 },
                                 placeholder = stringResource(MokoRes.strings.lastname),
-                                error = lastNameError.value
+                                error = lastNameError.value,
+                                subTitle = stringResource(MokoRes.strings.will_be_displayed_to_other_users)
                             )
 
                             CustomTextField(
@@ -263,7 +264,8 @@ class SignUpScreen(private val phone: String) : Screen {
                                     ) // Валидация никнейма
                                 },
                                 placeholder = stringResource(MokoRes.strings.come_up_nickname),
-                                error = nicknameError.value
+                                error = nicknameError.value,
+                                subTitle = stringResource(MokoRes.strings.to_find_you_in_the_app)
                             )
                             Spacer(modifier = Modifier.height(40.dp))
 

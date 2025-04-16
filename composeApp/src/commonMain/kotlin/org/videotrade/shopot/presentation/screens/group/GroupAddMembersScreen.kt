@@ -1,7 +1,8 @@
-package org.videotrade.shopot.presentation.screens.contacts
+package org.videotrade.shopot.presentation.screens.group
+
+import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 
 import Avatar
-import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,17 +10,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,36 +38,29 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.Toast
 import com.dokar.sonner.ToastType
 import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.InternalResourceApi
-import org.jetbrains.compose.resources.StringResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
-import org.videotrade.shopot.presentation.components.Common.CustomButton
 import org.videotrade.shopot.presentation.components.Common.CustomCheckbox
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Contacts.CreateGroupChatHeader
-import org.videotrade.shopot.presentation.components.ProfileComponents.CreateChatHeader
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
-class CreateGroupFirstScreen() : Screen {
-    @OptIn(InternalResourceApi::class)
+class GroupAddMembersScreen() : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -107,8 +97,8 @@ class CreateGroupFirstScreen() : Screen {
                     modifier = Modifier.background(colors.background)
                 ) {
                     CreateGroupChatHeader(
-                        stringResource(MokoRes.strings.create_group),
-                        order = "1",
+                        stringResource(MokoRes.strings.add),
+                        order = "2",
                         viewModel = viewModel,
                         onClick = {
                             if (selectedContacts.isEmpty()) {
@@ -118,7 +108,9 @@ class CreateGroupFirstScreen() : Screen {
                                     duration = ToasterDefaults.DurationDefault
                                 )
                             } else {
-                                navigateToScreen(navigator,CreateGroupSecondScreen())
+//                               TODO()
+                                viewModel.clearSelectedContacts()
+                                navigator.pop()
                             }
                         }
                     )

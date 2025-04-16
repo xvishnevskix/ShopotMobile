@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,6 +54,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.api.getValueInStorage
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.multiplatform.Platform
@@ -60,6 +62,7 @@ import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
 import org.videotrade.shopot.presentation.components.Contacts.CreateGroupChatHeader
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
@@ -73,7 +76,6 @@ class CreateGroupSecondScreen() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
-        val commonViewModel: CommonViewModel = koinInject()
         val toasterViewModel: CommonViewModel = koinInject()
         val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
@@ -125,7 +127,14 @@ class CreateGroupSecondScreen() : Screen {
                                     duration = ToasterDefaults.DurationDefault
                                 )
                             } else {
-                                viewModel.createGroupChat(groupName.value)
+                                val profileId = getValueInStorage("profileId")
+                                println("profileId profileId ${profileId}")
+                                if (profileId != null) {
+                                    viewModel.createGroupChat(groupName.value,
+                                        profileId
+                                    )
+                                }
+
                                 navigateToScreen(navigator, CreateChatScreen())
                                 tabNavigator.current = ChatsTab
 //                                commonViewModel.restartApp()

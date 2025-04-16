@@ -2,11 +2,15 @@ package org.videotrade.shopot.presentation.components.Common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -38,7 +42,8 @@ fun CustomTextField(
     onValueChange: (String) -> Unit,
     placeholder: String,
     error: String? = null,
-    border: String = "gray"
+    border: String = "gray",
+    subTitle: String = ""
 ) {
 
     val colors = MaterialTheme.colorScheme
@@ -46,22 +51,36 @@ fun CustomTextField(
     Column(
         modifier = Modifier.padding(),
     ) {
-        if (title != "") {
-            Text(
-                title,
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                fontWeight = FontWeight(500),
-                textAlign = TextAlign.Center,
-                color = colors.primary,
-                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                modifier = Modifier.padding(
-                    top = 5.dp,
-                    bottom = 8.dp,
-                ),
-
-                )
+        Row(
+            modifier = Modifier.padding(top = 5.dp, bottom = 8.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.Bottom) {
+            if (title != "") {
+                Text(
+                    title,
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    textAlign = TextAlign.Center,
+                    color = colors.primary,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                    )
+            }
+            Spacer(modifier = Modifier.width(4.dp))
+            if (subTitle != "") {
+                Text(
+                    "(${subTitle})",
+                    fontSize = 12.sp,
+                    lineHeight = 12.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                    fontWeight = FontWeight(500),
+                    textAlign = TextAlign.Center,
+                    color = colors.secondary,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                    modifier = Modifier.padding(bottom = 1.dp)
+                    )
+            }
         }
         BasicTextField(
             value = value,
