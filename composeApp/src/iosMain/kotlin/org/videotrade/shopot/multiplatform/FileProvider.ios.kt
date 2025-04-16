@@ -704,6 +704,11 @@ actual class FileProvider {
             
             if (response.status.isSuccess()) {
                 val jsonElement = Json.parseToJsonElement(response.bodyAsText())
+                
+                saveFileInDir(filename, fileDirectory, fileType)
+                
+                deleteFile(cipherFilePath)
+                
                 return jsonElement.jsonObject["id"]?.jsonPrimitive?.content
             } else {
                 println("Failed to upload file: ${response.status}")
@@ -1104,7 +1109,7 @@ actual class FileProvider {
         val filePath = "$directoryPath/$fileName"
         if (fileManager.fileExistsAtPath(filePath)) {
             println("Файл уже существует: $filePath")
-            
+
 //            if (cipher) {
 //                deleteFile(filePath)
 //
@@ -1161,14 +1166,6 @@ actual class FileProvider {
                 true
             ).firstOrNull()?.let {
                 "$it/Documents"
-            }
-            
-            "zip" -> NSSearchPathForDirectoriesInDomains(
-                NSCachesDirectory,
-                NSUserDomainMask,
-                true
-            ).firstOrNull()?.let {
-                "$it/Zips"
             }
             
             "cipher" -> NSSearchPathForDirectoriesInDomains(
