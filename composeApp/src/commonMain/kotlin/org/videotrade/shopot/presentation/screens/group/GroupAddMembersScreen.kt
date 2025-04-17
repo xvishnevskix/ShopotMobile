@@ -67,6 +67,7 @@ class GroupAddMembersScreen(private val chat: ChatItem) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val viewModel: ContactsViewModel = koinInject()
         val viewModelProfile: ProfileViewModel = koinInject()
+        val groupViewModel: GroupViewModel = koinInject()
         val contacts = viewModel.contacts.collectAsState(initial = listOf()).value
         val selectedContacts = viewModel.selectedContacts
         val isSearching = remember { mutableStateOf(false) }
@@ -109,12 +110,8 @@ class GroupAddMembersScreen(private val chat: ChatItem) : Screen {
                                     duration = ToasterDefaults.DurationDefault
                                 )
                             } else {
-//                               TODO()
-                                
-                                viewModel.addUsersToGroup(chat.chatId)
-                                
-//                                viewModel.clearSelectedContacts()
-//                                navigator.pop()
+                                groupViewModel.addUsersToGroup(chat.chatId)
+                                navigator.pop()
                             }
                         }
                     )

@@ -138,7 +138,6 @@ class CreateGroupSecondScreen() : Screen {
                                 navigateToScreen(navigator, CreateChatScreen())
                                 tabNavigator.current = ChatsTab
 //                                commonViewModel.restartApp()
-                                mainViewModel.getChatsInBack()
                             }
                         }
                     )

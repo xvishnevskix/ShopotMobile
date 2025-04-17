@@ -11,17 +11,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.BlendMode.Companion.Color
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -33,18 +32,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.MokoRes
+import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.GroupUserRole
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.group.GroupEditScreen
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.arrow_left
 import shopot.composeapp.generated.resources.setting_dots
 
 
@@ -52,17 +52,20 @@ import shopot.composeapp.generated.resources.setting_dots
 fun GroupProfileHeader(
     text: String,
     profile: ProfileDTO,
-     chat: ChatItem,
+    chat: ChatItem,
     isEdit: Boolean,
 ) {
     val navigator = LocalNavigator.currentOrThrow
     val colors = MaterialTheme.colorScheme
+    val groupViewModel: GroupViewModel = koinInject()
+    val groupUserRole = groupViewModel.groupUserRole.collectAsState().value
+    
     Column {
         Row(
             modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(colors.background),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-
+            
             ) {
             Box(
                 modifier = Modifier.clip(CircleShape).padding(12.dp).clickable {
@@ -80,9 +83,9 @@ fun GroupProfileHeader(
                 fontWeight = FontWeight(500),
                 color = colors.primary,
                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                )
-
-            if (!isEdit) {
+            )
+            
+            if (isEdit) {
                 Box(
                     modifier = Modifier.clip(CircleShape).padding(12.dp).clickable {
                         navigator.push(GroupEditScreen(profile, chat))
@@ -97,20 +100,16 @@ fun GroupProfileHeader(
                     )
                 }
             } else {
-               Spacer(modifier = Modifier.width(20.dp))
+                Spacer(modifier = Modifier.width(20.dp))
             }
-
-
-
-
-
-
+            
+            
         }
         Box(Modifier.padding(bottom = 23.dp)) {
             CallBar()
         }
     }
-
+    
 }
 
 

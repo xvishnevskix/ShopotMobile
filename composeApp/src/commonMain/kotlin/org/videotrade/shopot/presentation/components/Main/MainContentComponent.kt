@@ -73,6 +73,7 @@ import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import org.videotrade.shopot.presentation.components.Common.shouldShowRateDialog
 import org.videotrade.shopot.presentation.components.Common.shouldShowSurvey
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
@@ -102,8 +103,9 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
     var showNewsOnceViewer by remember { mutableStateOf(false) }
     var selectedNews: NewsItem? by remember { mutableStateOf(null) }
     var selectedOnceNews: NewsItem? by remember { mutableStateOf(null) }
-
+    
     val viewModel: ChatViewModel = koinInject()
+    val groupViewModel: GroupViewModel = koinInject()
 
     val globalResults by mainViewModel.globalSearchResults.collectAsState()
 
@@ -240,12 +242,12 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                                         Crossfade(targetState = item) { item ->
                                             Column {
                                                 val groupUsers by remember {
-                                                    derivedStateOf { viewModel.cachedGroupUsers[item.chatId] ?: emptyList() }
+                                                    derivedStateOf { groupViewModel.cachedGroupUsers[item.chatId] ?: emptyList() }
                                                 }
 
                                                 LaunchedEffect(item.chatId) {
                                                     if (!item.personal && groupUsers.isEmpty()) {
-                                                        viewModel.getGroupUsers(item.chatId)
+                                                        groupViewModel.getGroupUsers(item.chatId)
                                                     }
                                                 }
                                                 UserComponentItem(item, commonViewModel, mainViewModel, groupUsers)

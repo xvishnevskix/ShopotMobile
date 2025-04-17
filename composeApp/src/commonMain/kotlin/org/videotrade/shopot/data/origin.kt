@@ -76,7 +76,7 @@ class origin {
                 println("Failed to retrieve data: ${response.status.description} ${response.request}")
             }
         } catch (e: Exception) {
-            println("Error22231: $e")
+            println("Error22231:$url $e  ")
         } finally {
             client.close()
         }

@@ -26,10 +26,11 @@ import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.GroupUserDTO
+import org.videotrade.shopot.domain.model.GroupUserRole
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
 import org.videotrade.shopot.presentation.components.Common.SwipeToDeleteContainer
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
-import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
@@ -44,46 +45,59 @@ fun GroupUserCard(
 ) {
     val colors = MaterialTheme.colorScheme
     val inContact = groupUser.phone.let {
-      val findContact = viewModel.findContactByPhone(it)
-      findContact != null
+        val findContact = viewModel.findContactByPhone(it)
+        findContact != null
     }
     val modalVisible = remember { mutableStateOf(false) }
-    val contactsViewModel: ContactsViewModel = koinInject()
-
-
+    val groupViewModel: GroupViewModel = koinInject()
+    
+    val op = groupUser.phone == viewModel.profile.value.phone
+    
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top,
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        SwipeToDeleteContainer(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
+            isVisible = isEdit,
+            onSwipeDelete = {
+                modalVisible.value = true
+            }
+        ) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top,
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
             ) {
-                SwipeToDeleteContainer(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min),
-                    isVisible = isEdit,
-                    onSwipeDelete = {
-                        modalVisible.value = true
-                    }
-                ) {
-                Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                ) {
-                    Row {
-                        Avatar(icon = groupUser.icon, size = 56.dp)
-                        Spacer(modifier = Modifier.width(12.dp))
-                        Column(
-                            modifier = Modifier,
-                            verticalArrangement = Arrangement.Top
-                        ) {
-
-                            Spacer(modifier = Modifier.height(4.dp))
-
-
+                Row {
+                    Avatar(icon = groupUser.icon, size = 56.dp)
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(
+                        modifier = Modifier,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        
+                        Spacer(modifier = Modifier.height(4.dp))
+                        
+                        
+                        if (groupUser.phone == viewModel.profile.value.phone) {
+                            Text(
+                                "Вы",
+                                fontSize = 16.sp,
+                                lineHeight = 16.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                fontWeight = FontWeight(500),
+                                color = colors.primary,
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                            )
+                            
+                        } else {
                             if (inContact) {
                                 Text(
                                     "${groupUser.firstName} ${groupUser.lastName}",
@@ -96,38 +110,42 @@ fun GroupUserCard(
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
-
+                            
                             Text(
                                 text = "+${groupUser.phone}",
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
-                                fontFamily = if (inContact) FontFamily(Font(Res.font.ArsonPro_Regular)) else FontFamily(Font(Res.font.ArsonPro_Medium)),
+                                fontFamily = if (inContact) FontFamily(Font(Res.font.ArsonPro_Regular)) else FontFamily(
+                                    Font(Res.font.ArsonPro_Medium)
+                                ),
                                 fontWeight = FontWeight(400),
                                 color = if (inContact) colors.secondary else colors.primary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
                             )
+                            
                         }
                     }
-
-//                    Text(
-//                        text = stringResource(MokoRes.strings.owner),
-//                        fontSize = 16.sp,
-//                        lineHeight = 16.sp,
-//                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)) ,
-//                        fontWeight = FontWeight(400),
-//                        color = colors.secondary,
-//                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                        modifier = Modifier.padding()
-//                    )
                 }
+                
+                if (groupUser.role == GroupUserRole.OWNER || groupUser.role == GroupUserRole.ADMIN) Text(
+                    text = groupUser.role.name,
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color = colors.secondary,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                    modifier = Modifier.padding(bottom = 10.dp)
+                )
             }
         }
+    }
     if (modalVisible.value) {
         ModalDialogWithoutText(
             onDismiss = { modalVisible.value = false },
             onConfirm = {
                 
-                contactsViewModel.removeUserFromGroup(chat.chatId, "groupUser")
+                groupViewModel.removeUserFromGroup(chat.chatId, groupUser.id)
                 modalVisible.value = false
             },
             confirmText = stringResource(MokoRes.strings.delete),

@@ -16,6 +16,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -177,38 +178,50 @@ suspend fun sendMessageOrReconnect(
     wsSession: DefaultClientWebSocketSession?,
     jsonContent: String,
     wsReconnectionCase: WsReconnectionCase
-) {
+): Boolean {
     val wsUseCase: WsUseCase = KoinPlatform.getKoin().get()
-    
-    
     val userId = getValueInStorage("profileId")
     
-    if (wsSession?.isActive == false) {
-        if (userId != null) {
-            if(wsUseCase.processingReconnect.value) return
-            
-            wsUseCase.processingReconnect.value = true
-            
-            val reconnect: suspend (
-                String,
-                suspend (Boolean, DefaultWebSocketSession) -> Unit
-            ) -> Unit = when (wsReconnectionCase) {
-                WsReconnectionCase.ChatWs -> ::reconnectWebSocket
-                WsReconnectionCase.CallWs -> ::reconnectCallWebSocket
-            }
-            
-            reconnect(userId) { isConnected, newWsSession ->
-                if (isConnected) {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        wsUseCase.processingReconnect.value = false
-                        
-                        newWsSession.send(Frame.Text(jsonContent))
-                    }
+    if (wsSession?.isActive == true) {
+        wsSession.send(Frame.Text(jsonContent))
+        return true
+    }
+    
+    if (userId != null) {
+        if (wsUseCase.processingReconnect.value) return false
+        
+        wsUseCase.processingReconnect.value = true
+        
+        val reconnect: suspend (
+            String,
+            suspend (Boolean, DefaultWebSocketSession) -> Unit
+        ) -> Unit = when (wsReconnectionCase) {
+            WsReconnectionCase.ChatWs -> ::reconnectWebSocket
+            WsReconnectionCase.CallWs -> ::reconnectCallWebSocket
+        }
+        
+        var result = false
+        
+        val latch = CompletableDeferred<Unit>()
+        
+        reconnect(userId) { isConnected, newWsSession ->
+            if (isConnected) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    newWsSession.send(Frame.Text(jsonContent))
+                    result = true
+                    wsUseCase.processingReconnect.value = false
+                    latch.complete(Unit)
                 }
+            } else {
+                wsUseCase.processingReconnect.value = false
+                latch.complete(Unit)
             }
         }
-    } else {
-        wsSession?.send(Frame.Text(jsonContent))
+        
+        latch.await()
+        return result
     }
+    
+    return false
 }
 

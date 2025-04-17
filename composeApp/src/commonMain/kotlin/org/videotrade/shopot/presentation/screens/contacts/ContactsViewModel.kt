@@ -28,7 +28,6 @@ class ContactsViewModel() : ViewModel(),
     
     private val contactsUseCase: ContactsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
-    private val wsUseCase: WsUseCase by inject()
     
     val unregisteredContacts = contactsUseCase.unregisteredContacts
     
@@ -115,58 +114,7 @@ class ContactsViewModel() : ViewModel(),
         selectedContacts.clear()
     }
     
-    fun addUsersToGroup(chatId: String) {
-        viewModelScope.launch {
-            
-            val selectedContactIds = selectedContacts.mapNotNull { it.id }
-            
-            println("selectedContacts ${selectedContactIds}")
-            
-            
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                    put("action", "addUsersToGroup")
-                    put("chatId", chatId)
-                    put("userIds", buildJsonArray {
-                        selectedContactIds.forEach { id ->
-                            add(JsonPrimitive(id))
-                        }
-                    })
-                }
-            )
-            
-            println("jsonContent $jsonContent")
-            
-            
-            sendMessageOrReconnect(
-                wsSession = wsUseCase.wsSession.value,
-                jsonContent = jsonContent,
-                wsReconnectionCase = WsReconnectionCase.ChatWs
-            )
-        }
-        
-    }
+
     
-    fun removeUserFromGroup(chatId: String, userId: String) {
-        viewModelScope.launch {
-            
-            val jsonContent = Json.encodeToString(
-                buildJsonObject {
-                    put("action", "addUsersToGroup")
-                    put("chatId", chatId)
-                    put("userId", userId)
-                    
-                }
-            )
-            
-            println("jsonContent $jsonContent")
-            
-            sendMessageOrReconnect(
-                wsSession = wsUseCase.wsSession.value,
-                jsonContent = jsonContent,
-                wsReconnectionCase = WsReconnectionCase.ChatWs
-            )
-        }
-    }
     
 }

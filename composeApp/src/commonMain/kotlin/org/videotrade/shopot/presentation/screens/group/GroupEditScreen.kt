@@ -60,13 +60,15 @@ class GroupEditScreen(private val profile: ProfileDTO, private val chat: ChatIte
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
         val viewModel: ChatViewModel = koinInject()
+        val groupViewModel: GroupViewModel = koinInject()
         val contactsViewModel: ContactsViewModel = koinInject()
-        val groupUsers = viewModel.groupUsers.collectAsState().value
+        
+        val groupUsers = groupViewModel.groupUsers.collectAsState().value
         val colors = MaterialTheme.colorScheme
 
 
         LaunchedEffect(Unit) {
-            viewModel.loadGroupUsers(chat.chatId)
+            groupViewModel.loadGroupUsers(chat.chatId)
         }
 
            Box(
@@ -82,7 +84,8 @@ class GroupEditScreen(private val profile: ProfileDTO, private val chat: ChatIte
                            .fillMaxWidth()
                            .background(colors.background)
                    ) {
-                       GroupProfileHeader(stringResource(MokoRes.strings.edit), profile, chat, isEdit = true)
+                       GroupProfileHeader(stringResource(MokoRes.strings.edit), profile, chat, isEdit = false)
+                       
                        ProfileSettingsButton(drawableRes = Res.drawable.add_users,
                            width = 19.dp,
                            height = 15.dp,

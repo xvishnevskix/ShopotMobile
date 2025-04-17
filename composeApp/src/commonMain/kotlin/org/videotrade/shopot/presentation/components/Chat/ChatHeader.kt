@@ -1,18 +1,15 @@
 package org.videotrade.shopot.presentation.components.Chat
 
 import Avatar
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
@@ -23,11 +20,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
@@ -35,30 +30,25 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ProfileDTO
-import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
 import org.videotrade.shopot.presentation.components.Common.ReconnectionBar
 import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
 import org.videotrade.shopot.presentation.components.Main.GroupAvatar
-import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
-import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.group.GroupProfileScreen
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileChatScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.chat_call
 
 
 @Composable
@@ -67,18 +57,19 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
-    val commonViewModel: CommonViewModel = koinInject()
     val callViewModel: CallViewModel = koinInject()
     val timer = callViewModel.timer.collectAsState()
-    val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
-
+    val groupViewModel: GroupViewModel = koinInject()
+    
+    val groupUsers = groupViewModel.groupUsers.collectAsState().value
+    
     if (!chat.personal) {
-        viewModel.loadGroupUsers(chat.chatId)
+        groupViewModel.loadGroupUsers(chat.chatId)
     }
-
-
-
+    
+    
+    
     Column {
         Row(
             modifier = Modifier
@@ -116,11 +107,11 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     modifier = Modifier.padding(end = 5.dp).pointerInput(Unit) {
                         
                         if (chat.personal) {
-                            navigateToScreen(navigator,ProfileChatScreen(chat))
+                            navigateToScreen(navigator, ProfileChatScreen(chat))
                         } else {
 
 //                            viewModel.loadGroupUsers(chat.chatId)
-                            navigateToScreen(navigator,GroupProfileScreen(profile, chat))
+                            navigateToScreen(navigator, GroupProfileScreen(profile, chat))
                             
                         }
                     }
@@ -134,15 +125,15 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     } else {
                         GroupAvatar(users = groupUsers)
                     }
-
+                    
                     println("sdfdsf sdfsdfsdffsdf ${chat.firstName}")
-
+                    
                     val fullName = if (chat.personal) {
                         val firstName = chat.firstName.orEmpty()
                         val lastName = chat.lastName.orEmpty()
                         val name = "$firstName $lastName".trim()
                         val isDeletedUser = firstName == "Unknown"
-
+                        
                         when {
                             isDeletedUser -> stringResource(MokoRes.strings.deleted_user)
                             chat.isSavedContact == false -> "+${chat.phone}"
@@ -183,9 +174,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     
                 }
             }
-            
-            
-            
+
+
 //            Box(
 //                modifier = Modifier
 //            ) {

@@ -4,7 +4,6 @@ package org.videotrade.shopot.presentation.screens.chat
 import androidx.compose.runtime.mutableStateMapOf
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
-import io.ktor.websocket.Frame
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +24,7 @@ import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.domain.model.GroupInfo
 import org.videotrade.shopot.domain.model.GroupUserDTO
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
@@ -53,8 +53,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
     val currentChat = chatUseCase.currentChat
     
     val footerText = MutableStateFlow("")
-    
-    val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
     
     private val _messages = MutableStateFlow<List<MessageItem>>(listOf())
     
@@ -331,7 +329,7 @@ class ChatViewModel : ViewModel(), KoinComponent {
             chatUseCase.sendUploadMessage(
                 MessageItem(
                     content = content,
-                    fromUser =  profile.value.id,
+                    fromUser = profile.value.id,
                     chatId = chat.chatId,
                     uploadId = uploadId,
                     anotherRead = false,
@@ -503,79 +501,6 @@ class ChatViewModel : ViewModel(), KoinComponent {
         return contactsUseCase.contacts.value.find { it.phone == phone }
     }
     
-    fun loadGroupUsers(chatId: String) {
-        
-        viewModelScope.launch {
-            try {
-                val groupUsersGet =
-                    origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId")
-                
-                val groupUsersFilter = mutableListOf<GroupUserDTO>()
-                
-                if (groupUsersGet != null) {
-                    for (groupUser in groupUsersGet) {
-                        fun normalizePhoneNumber(phone: String): String {
-                            return phone.replace(Regex("[^0-9]"), "")
-                        }
-                        
-                        if (profile.value.phone == normalizePhoneNumber(groupUser.phone)) {
-                            groupUsersFilter.add(
-                                groupUser.copy(
-                                    firstName = "Вы",
-                                    lastName = ""
-                                )
-                            )
-                            continue
-                        }
-                        
-                        val findInContacts = contactsUseCase.contacts.value.find {
-                            normalizePhoneNumber(it.phone) == normalizePhoneNumber(groupUser.phone)
-                        }
-                        
-                        if (findInContacts !== null && findInContacts.firstName !== null && findInContacts.lastName !== null) {
-                            groupUsersFilter.add(
-                                groupUser.copy(
-                                    firstName = findInContacts.firstName,
-                                    lastName = findInContacts.lastName
-                                )
-                            )
-                        } else {
-                            groupUsersFilter.add(groupUser)
-                        }
-                        
-                    }
-                }
-                
-                groupUsers.value = groupUsersFilter
-                
-            } catch (e: Exception) {
-            }
-        }
-        
-    }
-    
-    private val _cachedGroupUsers =
-        mutableStateMapOf<String, List<GroupUserDTO>>() // Кэш пользователей чатов
-    val cachedGroupUsers: Map<String, List<GroupUserDTO>> get() = _cachedGroupUsers
-    
-    suspend fun getGroupUsers(chatId: String): List<GroupUserDTO> {
-        
-        _cachedGroupUsers[chatId]?.let { return it }
-        
-        return try {
-            val groupUsersGet =
-                origin().get<List<GroupUserDTO>>("group_chat/chatParticipants?chatId=$chatId")
-                    ?: emptyList()
-            _cachedGroupUsers[chatId] = groupUsersGet // Сохраняем в кэше
-            groupUsersGet
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-    
-    fun clearCache() {
-        _cachedGroupUsers.clear() // Очищаем кэш (например, если юзер вышел)
-    }
     
     fun selectMessage(chatId: String, message: MessageItem, senderName: String) {
         _selectedMessagesByChat.value = _selectedMessagesByChat.value.toMutableMap().apply {
