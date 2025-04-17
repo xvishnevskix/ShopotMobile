@@ -9,4 +9,5 @@ data class GroupUserDTO(
     val lastName: String,
     val phone: String,
     val icon: String? = null,
+    val role: String
 )

@@ -107,8 +107,8 @@ fun HeaderMain(
             ) {
                 Text(
                     stringResource(MokoRes.strings.chats),
-                    fontSize = 24.sp,
-                    lineHeight = 24.sp,
+                    fontSize = 20.sp,
+                    lineHeight = 20.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     textAlign = TextAlign.Center,

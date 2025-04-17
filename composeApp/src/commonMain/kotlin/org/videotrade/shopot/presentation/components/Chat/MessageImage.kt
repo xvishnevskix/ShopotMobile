@@ -3,9 +3,12 @@ package org.videotrade.shopot.presentation.components.Chat
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -14,6 +17,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,16 +30,26 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.rememberAsyncImagePainter
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.api.EnvironmentConfig
+import org.videotrade.shopot.api.formatTimeOnly
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.Attachment
 import org.videotrade.shopot.domain.model.ChatItem
@@ -45,6 +60,10 @@ import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
+import shopot.composeapp.generated.resources.ArsonPro_Regular
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.message_double_check
+import shopot.composeapp.generated.resources.message_single_check
 
 
 @Composable
@@ -56,7 +75,7 @@ fun MessageImage(
 ) {
 //    if (getPlatform() == Platform.Android) {
         val navigator = LocalNavigator.currentOrThrow
-        
+
         val viewModel: ChatViewModel = koinInject()
         val isLoading = remember { mutableStateOf(false) }
         val isLoadingSuccess = remember { mutableStateOf(false) }
@@ -66,8 +85,10 @@ fun MessageImage(
         var photoFilePath = remember { mutableStateOf("") }
         val isBlurred = remember { mutableStateOf(true) }
         val isStartCipherLoading = remember { mutableStateOf(false) }
-        
-        val fileProvider by remember { mutableStateOf(FileProviderFactory.create()) }
+        val colors = MaterialTheme.colorScheme
+
+
+    val fileProvider by remember { mutableStateOf(FileProviderFactory.create()) }
         
         val animatedProgress = animateFloatAsState(
             targetValue = progress.value,
@@ -264,6 +285,63 @@ fun MessageImage(
 //                    modifier = Modifier.align(Alignment.Center).size(30.dp)
 //                )
 //            }
+
+            val isMainUser = message.fromUser == profile.id
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = if (!isMainUser) 6.dp else 0.dp,
+                        bottom = if (!isMainUser) 4.dp else 0.dp,
+                    )
+                    .background(
+                        color = Color(0x80000000),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(horizontal = 6.dp, vertical = 3.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    if (message.created.isNotEmpty()) {
+                        Text(
+                            text = formatTimeOnly(message.created),
+                            style = TextStyle(
+                                fontSize = 12.sp,
+                                lineHeight = 12.sp,
+                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                                fontWeight = FontWeight(400),
+                                color = Color.White,
+                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                            )
+                        )
+                    }
+
+                    if (isMainUser) {
+                        if (message.anotherRead) {
+                            Image(
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .size(width = 17.7.dp, height = 8.dp),
+                                painter = painterResource(Res.drawable.message_double_check),
+                                contentDescription = null,
+//                    colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        } else {
+                            Image(
+                                modifier = Modifier
+                                    .padding(start = 4.dp)
+                                    .size(width = 12.7.dp, height = 8.dp),
+                                painter = painterResource(Res.drawable.message_single_check),
+                                contentDescription = null,
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                        }
+                    }
+                }
+            }
+
         }
 //    } else {
 //        val imageFilePath = remember(attachments[0].fileId) { mutableStateOf("") }

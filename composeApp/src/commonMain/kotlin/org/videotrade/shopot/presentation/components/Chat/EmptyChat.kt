@@ -60,7 +60,7 @@ fun EmptyChat() {
         }
     } else {
         Column(
-            modifier = Modifier.background(colors.background).fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {

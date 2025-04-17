@@ -237,8 +237,8 @@ fun UserComponentItem(
                                 Text(
                                     text = stringResource(MokoRes.strings.you),
                                     textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    lineHeight = 16.sp,
+                                    fontSize = 14.sp,
+                                    lineHeight = 14.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     color = colors.primary,
@@ -262,8 +262,8 @@ fun UserComponentItem(
                                             MessageContent(message = it)
                                         } ?: stringResource(MokoRes.strings.start_conversation),
                                         textAlign = TextAlign.Start,
-                                        fontSize = 16.sp,
-                                        lineHeight = 16.sp,
+                                        fontSize = 14.sp,
+                                        lineHeight = 14.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
                                         color = colors.secondary,
@@ -292,8 +292,8 @@ fun UserComponentItem(
                             Text(
                                 formatTimestamp(chat.lastMessage!!.created),
                                 textAlign = TextAlign.End,
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
+                                fontSize = 14.sp,
+                                lineHeight = 14.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 color = colors.secondary,
@@ -351,8 +351,8 @@ fun UserComponentItem(
                                                     bottom = 3.dp
                                                 ),
                                             textAlign = TextAlign.Center,
-                                            fontSize = 16.sp,
-                                            lineHeight = 16.sp,
+                                            fontSize = 14.sp,
+                                            lineHeight = 14.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                             fontWeight = FontWeight(500),
                                             color = Color(0xFFFFFFFF),

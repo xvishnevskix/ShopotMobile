@@ -104,24 +104,11 @@ fun MessageBox(
     val iconOpacity by animateFloatAsState(targetValue = if (swipeOffset > 0) swipeOffset / 75f else 0f)
     val animatedOffset by animateFloatAsState(targetValue = swipeOffset)
     val isHighlighted = message.id == answerMessageId.value
-    val backgroundColor = animateColorAsState(
-        targetValue = if (isHighlighted) Color(0xFF2A293C).copy(alpha = 0.2f) else Color.Transparent,
-        animationSpec = tween(durationMillis = 500)
-    )
+
     val focusManager = LocalFocusManager.current
     val colors = MaterialTheme.colorScheme
     val theme = getThemeMode()
 
-
-//    LaunchedEffect(Unit) {
-//        message.phone?.let {
-//            val findContact = viewModel.findContactByPhone(it)
-//
-//            if (findContact != null) {
-//                messageSenderName.value = "${findContact.firstName} ${findContact.lastName}"
-//            }
-//        }
-//    }
     
     
     LaunchedEffect(viewModel.messages.value) {
@@ -147,7 +134,7 @@ fun MessageBox(
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
-            .background(color = backgroundColor.value)
+
             .onGloballyPositioned(onPositioned)
             .alpha(if (isVisible) 1f else 0f).pointerInput(message) {
                 detectTapGestures(
@@ -172,8 +159,8 @@ fun MessageBox(
                 )
             }
     ) {
-        
-        
+
+
         BoxWithConstraints(
             contentAlignment = Alignment.CenterStart
         ) {
@@ -185,7 +172,8 @@ fun MessageBox(
 //                        .padding(5.dp)
                         .alpha(iconOpacity)
                         .clip(RoundedCornerShape(50.dp))
-                        .size(35.dp).background(
+                        .size(35.dp)
+                        .background(
                             colors.primary
                                 .copy(alpha = 0.1f)
                         ),
@@ -204,36 +192,30 @@ fun MessageBox(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                
-                
+
+
                 Box(
                     contentAlignment = if (message.fromUser == profile.id) Alignment.CenterEnd else Alignment.CenterStart,
                     modifier = Modifier
                         .offset(x = animatedOffset.dp)
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp)
+                        .padding(vertical = 2.dp)
                         .pointerInput(message) {
                             detectTapGestures(
                                 onTap = {
                                     // Action for normal tap
                                     println("onTap")
-                                    
+
                                     focusManager.clearFocus() // Your action on tap
                                 },
                                 onLongPress = {
                                     println("onLongPress")
-                                    
+
                                     onClick()
                                 }
                             )
                         }
-//                        .clickable(
-//                            interactionSource = remember { MutableInteractionSource() },
-//                            indication = null // Убирает эффект нажатия
-//                        ) {
-//
-//                            focusManager.clearFocus() // Ваше действие при нажатии
-//                        }
+
                 ) {
                     Surface(
                         modifier = Modifier
@@ -248,39 +230,37 @@ fun MessageBox(
 
 
 //                        shadowElevation = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") 0.dp else 4.dp,
-                        
-                        
+
+
                         color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
                             Color.Transparent  // Прозрачный цвет для стикеров
                         } else {
-                            if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
-                            else colors.onBackground  // Цвет для сообщений от других пользователей
+                            if (message.fromUser == profile.id)
+//                                Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
+                                colors.primaryContainer
+                            else colors.onSecondaryContainer  // Цвет для сообщений от других пользователей
                         }
-                    
-                    
+
+
                     ) {
                         var messageFormatWidth by remember { mutableStateOf(0) }
-//                        var selectedMessageWidth by remember { mutableStateOf(0) }
-                        
+
                         Column(
                             horizontalAlignment =
-                            
+
                             //изменение для самого бокса сообщений
                             if (message.fromUser == profile.id) Alignment.Start else Alignment.Start,
                         ) {
-                            
-                            
+
+
                             // Ответ на сообщение
                             message.answerMessage?.let {
-                                
+
                                 Row(
                                     modifier = Modifier
-//                                        .onGloballyPositioned { coordinates ->
-//                                            selectedMessageWidth = coordinates.size.width
-//                                        }
                                         .widthIn(
                                             min = (messageFormatWidth * 0.38f).dp,
-                                            
+
                                             )
                                         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                                         .height(56.dp)
@@ -292,45 +272,16 @@ fun MessageBox(
                                         )
                                         .wrapContentHeight()
                                         .clickable {
-//                                            answerMessageId.value = it.id // Устанавливаем ID выделенного сообщения
-                                            
-                                            coroutineScope.launch {
 
-
-//                                                listState.animateScrollToItem(messagesState.indexOfFirst { msg -> msg.id == it.id })
-
-//                                                var messageIndex: Int
-//                                                var attemptCount = 0
-//                                                val maxAttempts = 5
-//
-//                                                do {
-//
-//                                                    messageIndex = messagesState.indexOfFirst { msg -> msg.id == it.id }
-//                                                    if (messageIndex == -1 && attemptCount < maxAttempts) {
-//
-//                                                        viewModel.getMessagesBack(chat.chatId)
-//                                                        attemptCount++
-//                                                        delay(500)
-//
-//                                                        messageIndex = messagesState.indexOfFirst { msg -> msg.id == it.id }
-//                                                        println("messageIndex = ${messageIndex}")
-//                                                    }
-//                                                } while (messageIndex == -1 && attemptCount < maxAttempts)
-//
-//                                                if (messageIndex != -1) {
-//                                                    listState.animateScrollToItem(messageIndex)
-//                                                    println("messageIndex = ${messageIndex}")
-//                                                }
-                                            }
                                         },
-                                    
+
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement =
                                     if (message.fromUser == profile.id) Arrangement.Start else Arrangement.Start
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            
+
                                             .width(6.dp)
                                             .height(56.dp)
                                             .clip(
@@ -349,9 +300,9 @@ fun MessageBox(
                                                     Color(0xFFCAB7A3)
                                             )
                                     )
-                                    
+
                                     {
-                                    
+
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column(
@@ -368,25 +319,7 @@ fun MessageBox(
                                 }
                             }
 
-//                            // Проверка на персональный чат
-//                            if (!chat.personal) {
-//                                if (message.fromUser != profile.id) {
-//                                    Text(
-//                                        text = messageSenderName,
-//                                        style = TextStyle(
-//                                            color = Color.Gray,
-//                                            fontSize = 12.sp,
-//                                            fontFamily = FontFamily(Font(Res.font.SFCompactDisplay_Regular)),
-//                                        ),
-//                                        modifier = Modifier.padding(
-//                                            start = 25.dp,
-//                                            end = 25.dp,
-//                                            top = 7.dp,
-//                                            bottom = 0.dp
-//                                        ),
-//                                    )
-//                                }
-//                            }
+
                             // Пересланное сообщение
                             if (message.forwardMessage == true) {
                                 Row(
@@ -397,8 +330,8 @@ fun MessageBox(
                                     ),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    
-                                    
+
+
                                     Image(
                                         modifier = Modifier.size(width = 16.5.dp, height = 11.5.dp),
                                         painter = painterResource(Res.drawable.chat_forward),
@@ -407,7 +340,7 @@ fun MessageBox(
                                             Color(0xFFF7F7F7)
                                         ) else ColorFilter.tint(colors.tertiary)
                                     )
-                                    
+
                                     Spacer(modifier = Modifier.width(7.dp))
                                     Text(
                                         stringResource(MokoRes.strings.forwarded_message),
@@ -424,7 +357,7 @@ fun MessageBox(
                                     )
                                 }
                             }
-                            
+
                             // Проверка на персональный чат и наличие имени отправителя
                             if (!chat.personal && messageSenderName.isNotBlank() && messageSenderName != stringResource(
                                     MokoRes.strings.you
@@ -450,81 +383,84 @@ fun MessageBox(
                                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         ),
                                         modifier = Modifier.padding(
-                                        
+
                                         ),
                                     )
                                 }
                             }
-                            
-                            
-                            Box(
+
+
+                            Row(
                                 modifier = Modifier
                                     .onGloballyPositioned { coordinates ->
                                         messageFormatWidth = coordinates.size.width
                                     }
-                                    .wrapContentSize()
+                                    .wrapContentSize(),
+
                             ) {
                                 MessageFormat(message, profile, onClick, messageSenderName, chat)
+//                                Row(
+//                                    horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
+//                                    verticalAlignment = Alignment.CenterVertically,
+//                                    modifier = Modifier.padding(start = 6.dp,bottom = 8.dp, end = 8.dp)
+//
+//                                        .clickable(
+//                                            interactionSource = remember { MutableInteractionSource() },
+//                                            indication = null // Убирает эффект нажатия
+//                                        ) {
+//                                            focusManager.clearFocus() // Ваше действие при нажатии
+//                                        }
+//                                ) {
+//
+//                                    if (message.created.isNotEmpty())
+//                                        Text(
+//                                            text = formatTimeOnly(message.created),
+//                                            style = TextStyle(
+//                                                fontSize = 12.sp,
+//                                                lineHeight = 12.sp,
+//                                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+//                                                fontWeight = FontWeight(400),
+//                                                color = if (message.fromUser == profile.id) Color.White else colors.onSecondary,
+//                                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
+//                                            ),
+//                                            modifier = Modifier.padding(),
+//                                        )
+//
+//
+//                                    if (message.fromUser == profile.id)
+//                                        if (message.anotherRead) {
+//                                            Image(
+//                                                modifier = Modifier
+//                                                    .padding(start = 4.dp)
+//                                                    .size(width = 17.7.dp, height = 8.5.dp),
+//                                                painter = painterResource(Res.drawable.message_double_check),
+//                                                contentDescription = null,
+//                                                colorFilter = ColorFilter.tint(Color.White)
+//                                            )
+//                                        } else {
+//                                            Image(
+//                                                modifier = Modifier
+//                                                    .padding(start = 4.dp)
+//                                                    .size(width = 12.7.dp, height = 8.5.dp),
+//                                                painter = painterResource(Res.drawable.message_single_check),
+//                                                contentDescription = null,
+//                                                colorFilter = ColorFilter.tint(colors.secondary)
+//                                            )
+//                                        }
+//
+//
+//                                }
                             }
                         }
                     }
                 }
-                
-                
+
+
             }
         }
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                
-                .fillMaxWidth().clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null // Убирает эффект нажатия
-                ) {
-                    focusManager.clearFocus() // Ваше действие при нажатии
-                }
-        ) {
-            
-            if (message.created.isNotEmpty())
-                Text(
-                    text = formatTimeOnly(message.created),
-                    style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 16.sp,
-                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                        fontWeight = FontWeight(400),
-                        color = colors.onSecondary,
-                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                    ),
-                    modifier = Modifier.padding(),
-                )
-            
-            
-            if (message.fromUser == profile.id)
-                if (message.anotherRead) {
-                    Image(
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .size(width = 17.7.dp, height = 8.5.dp),
-                        painter = painterResource(Res.drawable.message_double_check),
-                        contentDescription = null,
-                    )
-                } else {
-                    Image(
-                        modifier = Modifier
-                            .padding(start = 4.dp)
-                            .size(width = 12.7.dp, height = 8.5.dp),
-                        painter = painterResource(Res.drawable.message_single_check),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(colors.secondary)
-                    )
-                }
-            
-            
-        }
-        Spacer(modifier = Modifier.height(8.dp))
+//        Spacer(modifier = Modifier.height(4.dp))
+
+//        Spacer(modifier = Modifier.height(4.dp))
     }
 }
 
@@ -585,7 +521,8 @@ fun MessageFormat(
                     StickerMessage(
                         message,
                         message.attachments!![0].fileId,
-                        chat!!
+                        chat!!,
+                        profile
                     )
                 }
                 

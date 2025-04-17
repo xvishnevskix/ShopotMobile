@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -52,11 +53,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
@@ -87,6 +91,8 @@ fun BlurredMessageOverlay(
     ) {
     val colors = MaterialTheme.colorScheme
     val isDeleteConfirmationVisible by viewModel.isDeleteConfirmationVisible.collectAsState()
+
+
 
 
     val messageSenderName = if (selectedMessage?.fromUser  == profile.id) {
@@ -242,6 +248,7 @@ fun MessageBlurBox(
     var boxHeightDp by remember { mutableStateOf(0.dp) }
 
     val isDeleteConfirmationVisible by viewModel.isDeleteConfirmationVisible.collectAsState()
+
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -413,6 +420,7 @@ fun MessageBlurBox(
         }
     }
 }
+
 
 
 

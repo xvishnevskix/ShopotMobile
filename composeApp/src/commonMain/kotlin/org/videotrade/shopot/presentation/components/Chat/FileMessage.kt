@@ -53,6 +53,7 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.FileProviderFactory
+import org.videotrade.shopot.presentation.components.Chat.MessageStatus
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
@@ -161,129 +162,100 @@ fun FileMessage(
     }
     
     Row(
-        modifier = Modifier
-            .padding(
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 16.dp,
-                top = 16.dp
-            )
-            .widthIn(max = 260.dp)
-            .clickable {
-                val fileName = attachments[0].name
-                val existingFile = fileProvider.existingFileInDir(fileName, attachments[0].type)
-                if (existingFile != null) {
-                    println("existingFile: $existingFile")
-                    
-                    fileProvider.openFileOrDirectory(existingFile)
-                } else {
-                    println("File not found in the system: $fileName")
-                }
-            }
-            ,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Bottom
     ) {
-        Box(
-            modifier = Modifier.size(36.dp).background(Color.White,
-                shape = RoundedCornerShape(8.dp)),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier
+                .padding(
+                    start = 12.dp,
+//                end = 16.dp,
+                    bottom = 8.dp,
+                    top = 8.dp
+                )
+                .widthIn(max = 260.dp)
+                .clickable {
+                    val fileName = attachments[0].name
+                    val existingFile = fileProvider.existingFileInDir(fileName, attachments[0].type)
+                    if (existingFile != null) {
+                        println("existingFile: $existingFile")
+
+                        fileProvider.openFileOrDirectory(existingFile)
+                    } else {
+                        println("File not found in the system: $fileName")
+                    }
+                }
+            ,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(
-                onClick = {
-                    
-                    if (isLoadingSuccess) return@IconButton
-
-                    message.attachments?.get(0)?.let { attachment ->
-                        
-                        println(" attachment.type ${ attachment.type}")
-
-                        val existingFile = fileProvider.existingFileInDir(attachment.name, attachment.type)
-                        if (existingFile != null) {
-                            isStartCipherLoading = false
-                            isLoading = false
-                            isLoadingSuccess = true
-                            progress = 1f
-                            filePath = existingFile
-                            return@IconButton
-                        }
-
-                        if (!isLoading) {
-                            downloadJob?.cancel()
-                            progress = 0f
-                            isLoading = true
-
-                            val url =
-                                "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
-
-                            downloadJob = scope.launch {
-                                isLoading = true
-                                file.downloadCipherFile(
-                                    url,
-                                    attachment.type,
-                                    attachment.name,
-                                    "document"
-                                ) { newProgress ->
-                                    isStartCipherLoading = false
-                                    progress = newProgress
-                                }
-                                isLoadingSuccess = true
-                                isLoading = false
-                            }
-                        } else {
-                            downloadJob?.cancel()
-                            isStartCipherLoading = false
-                            isLoading = false
-                            progress = 0f
-                        }
-                    }
-                },
-                modifier = Modifier
-
+            Box(
+                modifier = Modifier.size(36.dp).background(Color.White,
+                    shape = RoundedCornerShape(8.dp)),
+                contentAlignment = Alignment.Center
             ) {
-                if (isStartCipherLoading) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.padding(4.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            color =
+                IconButton(
+                    onClick = {
 
-                            if (message.fromUser != profile.id) Color(0xFF373533) else Color(
-                                0xFFCAB7A3
-                            )
-                            ,
-                            strokeWidth = 2.dp,
-                            modifier = Modifier
-                        )
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = "Close",
-                            modifier = Modifier
-                                .padding(4.dp)
-                                .pointerInput(Unit) {
-                                    isStartCipherLoading = false
-                                    if (message.upload !== null) {
-                                        viewModel.deleteMessage(message)
+                        if (isLoadingSuccess) return@IconButton
+
+                        message.attachments?.get(0)?.let { attachment ->
+
+                            println(" attachment.type ${ attachment.type}")
+
+                            val existingFile = fileProvider.existingFileInDir(attachment.name, attachment.type)
+                            if (existingFile != null) {
+                                isStartCipherLoading = false
+                                isLoading = false
+                                isLoadingSuccess = true
+                                progress = 1f
+                                filePath = existingFile
+                                return@IconButton
+                            }
+
+                            if (!isLoading) {
+                                downloadJob?.cancel()
+                                progress = 0f
+                                isLoading = true
+
+                                val url =
+                                    "${EnvironmentConfig.SERVER_URL}file/id/${attachments[0].fileId}"
+
+                                downloadJob = scope.launch {
+                                    isLoading = true
+                                    file.downloadCipherFile(
+                                        url,
+                                        attachment.type,
+                                        attachment.name,
+                                        "document"
+                                    ) { newProgress ->
+                                        isStartCipherLoading = false
+                                        progress = newProgress
                                     }
-                                },
-                            tint =
-                            if (message.fromUser != profile.id) Color(0xFF373533) else Color(
-                                0xFFCAB7A3
-                            )
-                        )
-                    }
-                } else {
-                    if (isLoading) {
+                                    isLoadingSuccess = true
+                                    isLoading = false
+                                }
+                            } else {
+                                downloadJob?.cancel()
+                                isStartCipherLoading = false
+                                isLoading = false
+                                progress = 0f
+                            }
+                        }
+                    },
+                    modifier = Modifier
+
+                ) {
+                    if (isStartCipherLoading) {
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier.padding(4.dp)
                         ) {
                             CircularProgressIndicator(
-                                progress = progress,  // Use animated progress
                                 color =
+
                                 if (message.fromUser != profile.id) Color(0xFF373533) else Color(
                                     0xFFCAB7A3
-                                ),
+                                )
+                                ,
                                 strokeWidth = 2.dp,
                                 modifier = Modifier
                             )
@@ -293,77 +265,120 @@ fun FileMessage(
                                 modifier = Modifier
                                     .padding(4.dp)
                                     .pointerInput(Unit) {
-                                        isLoading = false
-
+                                        isStartCipherLoading = false
+                                        if (message.upload !== null) {
+                                            viewModel.deleteMessage(message)
+                                        }
                                     },
+                                tint =
                                 if (message.fromUser != profile.id) Color(0xFF373533) else Color(
                                     0xFFCAB7A3
                                 )
                             )
                         }
                     } else {
-                        Box(
-                            modifier = Modifier.background(
-                                color =  Color.White
-                            ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(
-                                    if (progress == 1f) {
-                                        Res.drawable.chat_file_message
-                                    } else {
-                                         Res.drawable.download
-                                    }
+                        if (isLoading) {
+                            Box(
+                                contentAlignment = Alignment.Center,
+                                modifier = Modifier.padding(4.dp)
+                            ) {
+                                CircularProgressIndicator(
+                                    progress = progress,  // Use animated progress
+                                    color =
+                                    if (message.fromUser != profile.id) Color(0xFF373533) else Color(
+                                        0xFFCAB7A3
+                                    ),
+                                    strokeWidth = 2.dp,
+                                    modifier = Modifier
+                                )
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Close",
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .pointerInput(Unit) {
+                                            isLoading = false
+
+                                        },
+                                    if (message.fromUser != profile.id) Color(0xFF373533) else Color(
+                                        0xFFCAB7A3
+                                    )
+                                )
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier.background(
+                                    color =  Color.White
                                 ),
-                                contentDescription = null,
-                                colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(Color(0xFFCAB7A3))  else ColorFilter.tint(Color(0xFF373533)) ,
-                                modifier = Modifier.size(
-                                    width = if (progress == 1f) 14.dp else 16.dp,
-                                    height = if (progress == 1f) 16.dp else 18.dp
-                                ).pointerInput(Unit) {
-                                    println("dasdadadaaaaaa ${progress != 1f}")
-                                    if (progress != 1f)
-                                        isStartCipherLoading = true
-                                }
-                                ,
-                            )
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(
+                                        if (progress == 1f) {
+                                            Res.drawable.chat_file_message
+                                        } else {
+                                            Res.drawable.download
+                                        }
+                                    ),
+                                    contentDescription = null,
+                                    colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(Color(0xFFCAB7A3))  else ColorFilter.tint(Color(0xFF373533)) ,
+                                    modifier = Modifier.size(
+                                        width = if (progress == 1f) 14.dp else 16.dp,
+                                        height = if (progress == 1f) 16.dp else 18.dp
+                                    ).pointerInput(Unit) {
+                                        println("dasdadadaaaaaa ${progress != 1f}")
+                                        if (progress != 1f)
+                                            isStartCipherLoading = true
+                                    }
+                                    ,
+                                )
+                            }
                         }
                     }
                 }
             }
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Column(verticalArrangement = Arrangement.Top) {
-            message.attachments?.get(0)?.let {
-                Text(
-                    text = it.name,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = if (message.fromUser == profile.id) Color(0xFFFFFFFF) else colors.primary,
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
-                    fontWeight = FontWeight(500),
-                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                )
-            }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-            if (attachments[0].size !== null) {
-                Text(
-                    text = formatSize(attachments[0].size!!),
-                    color = if (message.fromUser == profile.id) Color(0xFFF7F7F7) else colors.secondary,
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
-                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                    fontWeight = FontWeight(400),
-                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                )
+            Column(verticalArrangement = Arrangement.Top) {
+                message.attachments?.get(0)?.let {
+                    Text(
+                        text = it.name,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color =
+//                        if (message.fromUser == profile.id) Color(0xFFFFFFFF) else colors.primary
+                        colors.primary
+                        ,
+                        fontSize = 14.sp,
+                        lineHeight = 14.sp,
+                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
+                        fontWeight = FontWeight(500),
+                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Row {
+                    if (attachments[0].size !== null) {
+                        Text(
+                            text = formatSize(attachments[0].size!!),
+                            color =
+//                            if (message.fromUser == profile.id) Color(0xFFF7F7F7) else colors.secondary
+                            colors.secondary
+                            ,
+                            fontSize = 12.sp,
+                            lineHeight = 12.sp,
+                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                            fontWeight = FontWeight(400),
+                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                        )
+                    }
+                }
             }
         }
+        MessageStatus(message, profile.id)
+
     }
 }
