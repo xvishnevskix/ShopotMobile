@@ -37,7 +37,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
@@ -46,11 +45,11 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Common.getParticipantCountText
 import org.videotrade.shopot.presentation.components.ProfileComponents.GroupProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.add_photo
 import shopot.composeapp.generated.resources.add_users
-import shopot.composeapp.generated.resources.profile_design
 
 
 class GroupEditScreen(private val profile: ProfileDTO, private val chat: ChatItem) : Screen {
@@ -61,12 +60,15 @@ class GroupEditScreen(private val profile: ProfileDTO, private val chat: ChatIte
         val navigator = LocalNavigator.currentOrThrow
         val scope = rememberCoroutineScope()
         val viewModel: ChatViewModel = koinInject()
-        val groupUsers = viewModel.groupUsers.collectAsState().value
+        val groupViewModel: GroupViewModel = koinInject()
+        val contactsViewModel: ContactsViewModel = koinInject()
+        
+        val groupUsers = groupViewModel.groupUsers.collectAsState().value
         val colors = MaterialTheme.colorScheme
 
 
         LaunchedEffect(Unit) {
-            viewModel.loadGroupUsers(chat.chatId)
+            groupViewModel.loadGroupUsers(chat.chatId)
         }
 
            Box(
@@ -82,13 +84,16 @@ class GroupEditScreen(private val profile: ProfileDTO, private val chat: ChatIte
                            .fillMaxWidth()
                            .background(colors.background)
                    ) {
-                       GroupProfileHeader(stringResource(MokoRes.strings.edit), profile, chat, isEdit = true)
+                       GroupProfileHeader(stringResource(MokoRes.strings.edit), profile, chat, isEdit = false)
+                       
                        ProfileSettingsButton(drawableRes = Res.drawable.add_users,
                            width = 19.dp,
                            height = 15.dp,
                            stringResource(MokoRes.strings.add_members),
                            {
-                               navigator.push(GroupAddMembersScreen())
+                               contactsViewModel.clearSelectedContacts()
+                               
+                               navigator.push(GroupAddMembersScreen(chat))
                            })
 
                        Spacer(modifier = Modifier.height(16.dp))
@@ -112,7 +117,7 @@ class GroupEditScreen(private val profile: ProfileDTO, private val chat: ChatIte
                        println("groupUsers: ${groupUsers}")
                        itemsIndexed(groupUsers) { _, groupUser ->
 
-                           GroupUserCard(groupUser = groupUser, viewModel, isEdit = true)
+                           GroupUserCard(groupUser = groupUser, viewModel, isEdit = true, chat)
                            Spacer(modifier = Modifier.height(16.dp))
                        }
                    }

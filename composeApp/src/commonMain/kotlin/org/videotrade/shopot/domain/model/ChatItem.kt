@@ -24,7 +24,7 @@ data class ChatItem(
     var notificationToken: String?,
     var lastMessage: MessageItem?,
     var chatId: String,
-    var userId: String,
+    var userId:  String? = null,
     var groupName: String? = null,
     var sortedDate: List<Int> = emptyList(),
     var chatUser: List<ChatUser>? = null,

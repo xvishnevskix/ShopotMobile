@@ -39,6 +39,7 @@ import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.common.UpdateAppViewModel
 import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileViewModel
@@ -112,11 +113,12 @@ private val presentationModule = module {
     single { SettingsViewModel() }
     single { NetworkListener(get()) }
     single { NewsViewModel() }
-    single { SwiftFuncsClass(get()) }
+    single { GroupViewModel() }
     
     single<CallHandler> { CallHandler }
     
     
+    single { SwiftFuncsClass(get()) }
     
 }
 

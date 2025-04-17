@@ -57,6 +57,7 @@ import org.videotrade.shopot.presentation.screens.call.CallViewModel
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.group.GroupProfileScreen
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import org.videotrade.shopot.presentation.screens.profile.ProfileChatScreen
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
@@ -70,14 +71,15 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
         remember { MutableInteractionSource() }  // Создаем источник взаимодействия
     val navigator = LocalNavigator.currentOrThrow
     val scope = rememberCoroutineScope()
-    val commonViewModel: CommonViewModel = koinInject()
     val callViewModel: CallViewModel = koinInject()
     val timer = callViewModel.timer.collectAsState()
-    val groupUsers = viewModel.groupUsers.collectAsState().value
     val colors = MaterialTheme.colorScheme
+    val groupViewModel: GroupViewModel = koinInject()
+
+    val groupUsers = groupViewModel.groupUsers.collectAsState().value
 
     if (!chat.personal) {
-        viewModel.loadGroupUsers(chat.chatId)
+        groupViewModel.loadGroupUsers(chat.chatId)
     }
 
 
@@ -121,11 +123,11 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     modifier = Modifier.padding(end = 5.dp).pointerInput(Unit) {
                         
                         if (chat.personal) {
-                            navigateToScreen(navigator,ProfileChatScreen(chat))
+                            navigateToScreen(navigator, ProfileChatScreen(chat))
                         } else {
 
 //                            viewModel.loadGroupUsers(chat.chatId)
-                            navigateToScreen(navigator,GroupProfileScreen(profile, chat))
+                            navigateToScreen(navigator, GroupProfileScreen(profile, chat))
                             
                         }
                     }
@@ -188,9 +190,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     
                 }
             }
-            
-            
-            
+
+
 //            Box(
 //                modifier = Modifier
 //            ) {

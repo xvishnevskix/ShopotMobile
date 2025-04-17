@@ -21,6 +21,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.encodeToJsonElement
+import kotlinx.serialization.json.put
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.mp.KoinPlatform
@@ -34,6 +35,7 @@ import org.videotrade.shopot.domain.usecase.CallUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.login.SignInScreen
@@ -282,12 +284,15 @@ class MainViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
+                    put("userId", profile.value.id)
                 }
             )
 
             if (isArchive) {
                 origin().post("user/removeNotificationToken", jsonContent)
+                
               val response = origin().post("archive", jsonContent)
+                
                 println("sdgehefsdf ${response}")
             } else {
                 origin().post("user/removeNotificationToken", jsonContent)

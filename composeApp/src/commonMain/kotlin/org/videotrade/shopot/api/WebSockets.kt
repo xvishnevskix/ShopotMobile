@@ -28,6 +28,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
 
@@ -648,6 +649,21 @@ suspend fun handleConnectWebSocket(
                                     println("Error handling userStatus: ${e.message}")
                                 }
                             }
+                            
+                            
+                            "leaveGroupChat" -> {
+                                val mainViewModel: MainViewModel = KoinPlatform.getKoin().get()
+                                
+                                mainViewModel.getChatsInBack()
+                                
+                                mainViewModel.navigator.value?.let {
+                                    navigateToScreen(
+                                        it,
+                                        MainScreen())
+                                }
+                            }
+                            
+                            
                         }
                     }
                 }
