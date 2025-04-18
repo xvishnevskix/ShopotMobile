@@ -201,7 +201,7 @@ class FAQ() : Screen {
                     ) {
 
                         Text(
-                            text = "App Version: 1.1.5(beta)",
+                            text = "App Version: 1.1.5",
                             style = TextStyle(
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
