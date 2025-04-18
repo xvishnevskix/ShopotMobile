@@ -43,8 +43,9 @@ class GroupViewModel : ViewModel(), KoinComponent {
             
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
-                    put("action", "addUsersToGroup")
                     put("chatId", chatId)
+                    put("userId", profileUseCase.getProfile().id)
+                    
                     put("userIds", buildJsonArray {
                         selectedContactIds.forEach { id ->
                             add(JsonPrimitive(id))
@@ -53,16 +54,10 @@ class GroupViewModel : ViewModel(), KoinComponent {
                 }
             )
             
-            println("jsonContent $jsonContent")
             
+            val addUsersRes = origin().post("group_chat/addUsers", jsonContent)
             
-            val res = sendMessageOrReconnect(
-                wsSession = wsUseCase.wsSession.value,
-                jsonContent = jsonContent,
-                wsReconnectionCase = WsReconnectionCase.ChatWs
-            )
-            
-            if (res) {
+            if (addUsersRes !== null) {
                 
                 loadGroupUsers(chatId)
                 
@@ -72,27 +67,23 @@ class GroupViewModel : ViewModel(), KoinComponent {
         
     }
     
-    fun removeUserFromGroup(chatId: String, userId: String) {
+    fun removeUserFromGroup(chatId: String, removeUserId: String) {
         viewModelScope.launch {
             
             val jsonContent = Json.encodeToString(
                 buildJsonObject {
-                    put("action", "removeUserFromGroup")
                     put("chatId", chatId)
-                    put("userId", userId)
-                    
+                    put("userId", profileUseCase.getProfile().id)
+                    put("removeUserId", removeUserId)
                 }
             )
             
             println("jsonContent $jsonContent")
             
-            val res = sendMessageOrReconnect(
-                wsSession = wsUseCase.wsSession.value,
-                jsonContent = jsonContent,
-                wsReconnectionCase = WsReconnectionCase.ChatWs
-            )
+            val addUsersRes = origin().post("group_chat/removeUser", jsonContent)
             
-            if (res) removeUserById(userId)
+            
+            if (addUsersRes !== null) removeUserById(removeUserId)
             
         }
     }
@@ -109,6 +100,8 @@ class GroupViewModel : ViewModel(), KoinComponent {
             )
             
             println("jsonContent $jsonContent")
+            
+            
             
             sendMessageOrReconnect(
                 wsSession = wsUseCase.wsSession.value,
