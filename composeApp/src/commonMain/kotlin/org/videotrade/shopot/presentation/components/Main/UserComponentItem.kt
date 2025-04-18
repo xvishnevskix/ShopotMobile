@@ -57,7 +57,7 @@ import org.videotrade.shopot.presentation.components.Chat.ChatStatus
 import org.videotrade.shopot.presentation.components.Chat.getCallStatusString
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithText
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
-import org.videotrade.shopot.presentation.components.Common.SwipeToDeleteContainer
+import org.videotrade.shopot.presentation.components.Common.SwipeContainer
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -86,7 +86,7 @@ fun UserComponentItem(
 
 
 
-            SwipeToDeleteContainer(
+            SwipeContainer(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()

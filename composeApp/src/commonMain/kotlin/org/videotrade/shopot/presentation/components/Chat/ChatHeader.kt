@@ -89,6 +89,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
             modifier = Modifier
                 .clip(RoundedCornerShape(bottomStart = 16.dp, bottomEnd = 16.dp))
                 .background(colors.background)
+                .padding(top = 4.dp)
                 .padding(horizontal = 23.dp)
                 .fillMaxWidth()
                 .statusBarsPadding()
@@ -118,7 +119,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                 Spacer(modifier = Modifier.width(21.dp))
                 
                 Row(
-                    verticalAlignment = Alignment.Top,
+                    verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Start,
                     modifier = Modifier.padding(end = 5.dp).pointerInput(Unit) {
                         
@@ -136,7 +137,8 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     if (chat.personal) {
                         Avatar(
                             icon = chat.icon,
-                            size = 56.dp
+                            size = 42.dp,
+                            roundedCornerShape = 12.dp
                         )
                     } else {
                         GroupAvatar(users = groupUsers)
@@ -167,7 +169,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                     Column(
                         verticalArrangement = Arrangement.Top
                     ) {
-                        Spacer(modifier = Modifier.height(8.dp))
+//                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = fullName,
                             fontSize = 16.sp,
@@ -177,7 +179,7 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                             color = colors.primary,
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(4.dp))
                         if (!chat.personal) {
                             ParticipantCountText(groupUsers.size)
                         } else {

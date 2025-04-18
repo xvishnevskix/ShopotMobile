@@ -28,6 +28,7 @@ import org.videotrade.shopot.multiplatform.AudioFactory
 import org.videotrade.shopot.multiplatform.CipherWrapper
 import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import org.videotrade.shopot.presentation.tabs.ChatsTab
@@ -653,7 +654,8 @@ suspend fun handleConnectWebSocket(
                             
                             "leaveGroupChat" -> {
                                 val mainViewModel: MainViewModel = KoinPlatform.getKoin().get()
-                                
+                                val groupViewModel: GroupViewModel = KoinPlatform.getKoin().get()
+
                                 mainViewModel.getChatsInBack()
                                 
                                 mainViewModel.navigator.value?.let {
@@ -661,6 +663,18 @@ suspend fun handleConnectWebSocket(
                                         it,
                                         MainScreen())
                                 }
+                                groupViewModel.currentChatId?.let {
+                                    groupViewModel.clearCacheForGroupChat(it)
+                                }
+                                groupViewModel.reloadCurrentChatUsers()
+
+
+
+                            }
+
+                            "changeMemberRole" -> {
+                                val groupViewModel: GroupViewModel = KoinPlatform.getKoin().get()
+                                groupViewModel.reloadCurrentChatUsers()
                             }
                             
                             

@@ -293,66 +293,16 @@ fun MessageBlurBox(
                     color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
                         Color.Transparent  // Прозрачный цвет для стикеров
                     } else {
-                        if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
-                        else colors.onBackground  // Цвет для сообщений от других пользователей
+                        if (message.fromUser == profile.id)
+//                                Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
+                            colors.primaryContainer
+                        else colors.onSecondaryContainer  // Цвет для сообщений от других пользователей
                     }
                 ) {
                     message.content?.let {
                         MessageFormat(message, profile, onClick, chat = chat)
                     }
                 }
-            }
-
-
-
-            Row(
-                horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
-                modifier = Modifier
-
-                    .fillMaxWidth().clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null // Убирает эффект нажатия
-                    ) {
-
-                    }
-            ) {
-
-                if (message.created.isNotEmpty())
-                    Text(
-                        text = formatTimeOnly(message.created),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                            fontWeight = FontWeight(400),
-                            color = Color.White,
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                        ),
-                        modifier = Modifier.padding(),
-                    )
-
-
-                if (message.fromUser == profile.id)
-                    if (message.anotherRead) {
-                        Image(
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .size(width = 17.7.dp, height = 8.5.dp),
-                            painter = painterResource(Res.drawable.message_double_check),
-                            contentDescription = null,
-                        )
-                    } else {
-                        Image(
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .size(width = 12.7.dp, height = 8.5.dp),
-                            painter = painterResource(Res.drawable.message_single_check),
-                            contentDescription = null,
-                            colorFilter =  ColorFilter.tint(colors.secondary)
-                        )
-                    }
-
-
             }
         }
 

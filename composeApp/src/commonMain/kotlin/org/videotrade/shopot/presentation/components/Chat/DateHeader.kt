@@ -58,8 +58,8 @@ fun DateHeader(date: List<Int>, modifier: Modifier = Modifier) {
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = formatDateOnly(date),
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
+                    fontSize = 14.sp,
+                    lineHeight = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     color = colors.onSecondary,

@@ -32,7 +32,8 @@ class GroupViewModel : ViewModel(), KoinComponent {
     
     val groupUserRole = MutableStateFlow<GroupUserRole?>(null)
     val groupUsers = MutableStateFlow<List<GroupUserDTO>>(listOf())
-    
+    var currentChatId: String? = null
+        private set
     
     fun addUsersToGroup(chatId: String) {
         viewModelScope.launch {
@@ -117,10 +118,44 @@ class GroupViewModel : ViewModel(), KoinComponent {
             )
         }
     }
+
+    fun changeMemberRole(chatId: String, userId: String, newRole: GroupUserRole) {
+
+        viewModelScope.launch {
+            val jsonContent = Json.encodeToString(
+                buildJsonObject {
+                    put("action", "changeMemberRole")
+                    put("chatId", chatId)
+                    put("userId", userId)
+                    put("newRole", newRole.name)
+                }
+            )
+
+            println("changeMemberRole payload = $jsonContent")
+
+            val result = sendMessageOrReconnect(
+                wsSession = wsUseCase.wsSession.value,
+                jsonContent = jsonContent,
+                wsReconnectionCase = WsReconnectionCase.ChatWs
+            )
+
+            if (result) {
+                groupUsers.value = groupUsers.value.map {
+                    if (it.id == userId) it.copy(role = newRole) else it
+                }
+
+                _cachedGroupUsers[chatId] = groupUsers.value
+
+                loadGroupUsers(chatId)
+            }
+        }
+        reloadCurrentChatUsers()
+    }
     
     
     fun loadGroupUsers(chatId: String) {
-        
+        currentChatId = chatId
+
         viewModelScope.launch {
             try {
                 val groupUsersGet =
@@ -164,7 +199,8 @@ class GroupViewModel : ViewModel(), KoinComponent {
                         
                     }
                 }
-                
+
+                _cachedGroupUsers[chatId] = groupUsersFilter
                 groupUsers.value = groupUsersFilter
                 
             } catch (e: Exception) {
@@ -172,7 +208,10 @@ class GroupViewModel : ViewModel(), KoinComponent {
         }
         
     }
-    
+
+    fun reloadCurrentChatUsers() {
+        currentChatId?.let { loadGroupUsers(it) }
+    }
     
     private val _cachedGroupUsers =
         mutableStateMapOf<String, List<GroupUserDTO>>() // Кэш пользователей чатов
@@ -189,16 +228,16 @@ class GroupViewModel : ViewModel(), KoinComponent {
             
             if (groupUsersGet != null) {
                 _cachedGroupUsers[chatId] = groupUsersGet.groupUsers
-            } // Сохраняем в кэше
+            }
             
             groupUsersGet?.groupUsers ?: emptyList()
         } catch (e: Exception) {
             emptyList()
         }
     }
-    
-    fun clearCache() {
-        _cachedGroupUsers.clear() // Очищаем кэш (например, если юзер вышел)
+
+    fun clearCacheForGroupChat(chatId: String) {
+        _cachedGroupUsers.remove(chatId)
     }
     
     fun removeUserById(userId: String) {
