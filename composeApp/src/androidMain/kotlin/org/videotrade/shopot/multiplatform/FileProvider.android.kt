@@ -5,7 +5,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
@@ -16,13 +15,6 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import com.itextpdf.io.image.ImageDataFactory
-import com.itextpdf.kernel.font.PdfFontFactory
-import com.itextpdf.kernel.pdf.CompressionConstants
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfReader
-import com.itextpdf.kernel.pdf.PdfWriter
-import com.itextpdf.kernel.pdf.WriterProperties
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import io.github.vinceglb.filekit.core.PickerType
@@ -30,6 +22,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onUpload
+import io.ktor.client.request.forms.ChannelProvider
 import io.ktor.client.request.forms.InputProvider
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
@@ -44,6 +37,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
+import io.ktor.util.cio.readChannel
 import io.ktor.util.decodeBase64Bytes
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.streams.asInput
@@ -57,6 +51,7 @@ import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.androidSpecificApi.getContextObj
 import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -64,26 +59,18 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.nio.ByteBuffer
 import java.util.Locale
 import kotlin.math.roundToInt
 import kotlin.random.Random
-import id.zelory.compressor.Compressor
-import io.ktor.client.request.forms.ChannelProvider
-import io.ktor.util.cio.readChannel
-import net.jpountz.lz4.LZ4Factory
-import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
-import java.nio.ByteBuffer
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
-import java.util.zip.ZipOutputStream
 
 actual class FileProvider(private val applicationContext: Context) {
     
     private val cipherWrapper: CipherWrapper = KoinPlatform.getKoin().get()
     
     private val context = getContextObj.getContext()
-
-
+    
+    
     actual fun openFileOrDirectory(filePath: String): Boolean {
         return try {
             val file = File(filePath)
@@ -91,18 +78,18 @@ actual class FileProvider(private val applicationContext: Context) {
                 println("File not found: $filePath")
                 return false
             }
-
+            
             val uri = androidx.core.content.FileProvider.getUriForFile(
                 applicationContext,
                 "${applicationContext.packageName}.provider",
                 file
             )
-
+            
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 setDataAndType(uri, getMimeType(file))
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK
             }
-
+            
             applicationContext.startActivity(intent)
             true
         } catch (e: Exception) {
@@ -111,21 +98,19 @@ actual class FileProvider(private val applicationContext: Context) {
             false
         }
     }
-
+    
     private fun getMimeType(file: File): String {
         return MimeTypeMap.getSingleton()
             .getMimeTypeFromExtension(file.extension.lowercase())
             ?: "*/*"
     }
-
+    
     // Утилита для конвертации Int в байты
     fun Int.toByteArray(): ByteArray {
         return ByteBuffer.allocate(4).putInt(this).array()
     }
-
-
-
-
+    
+    
     actual suspend fun pickFile(pickerType: PickerType): PlatformFilePick? {
         try {
             val filePick = FileKit.pickFile(
@@ -416,7 +401,7 @@ actual class FileProvider(private val applicationContext: Context) {
             onProgress(1F)
             return null
         }
-
+        
         
         val encupsChachaFileResult = cipherWrapper.encupsChachaFileCommon(
             fileDirectory,
@@ -497,7 +482,7 @@ actual class FileProvider(private val applicationContext: Context) {
                 saveFileInDir(filename, fileDirectory, fileType)
                 
                 file.delete()
-
+                
                 return id
                 
             } else {
@@ -634,7 +619,10 @@ actual class FileProvider(private val applicationContext: Context) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(
+                Environment.DIRECTORY_DOCUMENTS
+            )
+            
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
@@ -675,7 +663,10 @@ actual class FileProvider(private val applicationContext: Context) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(
+                Environment.DIRECTORY_DOCUMENTS
+            )
+            
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
@@ -702,44 +693,47 @@ actual class FileProvider(private val applicationContext: Context) {
             null
         }
     }
-
-
+    
+    
     actual fun existingFileInDir(fileName: String, fileType: String): String? {
         val directory = when (fileType) {
             "audio" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MUSIC), "Audio")
             "video" -> File(context.getExternalFilesDir(Environment.DIRECTORY_MOVIES), "Video")
             "image" -> File(context.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "Images")
-            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
+            "document", "spreadsheet", "excel", "xls", "xlsx" -> context.getExternalFilesDir(
+                Environment.DIRECTORY_DOCUMENTS
+            )
+            
             "zip" -> File(context.cacheDir, "Zips")
             "cipher" -> File(context.cacheDir, "CipherFiles")
             "cache" -> File(context.cacheDir, "CacheFiles")
             else -> File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
         }
-
+        
         val file = File(directory, fileName)
-
+        
         if (file.exists()) {
             println("File found: ${file.absolutePath}")
             return file.absolutePath
         }
-
+        
         // Если тип документа и файл не найден в Documents, ищем в Others
         if (fileType == "document") {
-            val fallbackDir = File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
+            val fallbackDir =
+                File(context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS), "Others")
             val fallbackFile = File(fallbackDir, fileName)
-
+            
             if (fallbackFile.exists()) {
                 println("File not found in Others: ${fallbackFile.absolutePath}")
                 return fallbackFile.absolutePath
             }
         }
-
+        
         println("File not found: $fileName in catalogs $directory and Others")
         return null
     }
-
-
-
+    
+    
     actual suspend fun uploadFileNotInput(
         url: String,
         fileDirectory: String,
@@ -755,15 +749,16 @@ actual class FileProvider(private val applicationContext: Context) {
             }
         }
         
-        println("$fileDirectory $fileType $filename"
+        println(
+            "$fileDirectory $fileType $filename"
         )
         try {
             val token = getValueInStorage("accessToken")
-
+            
             println("accessToken: ${token}")
             
             val sharedSecret = getValueInStorage("sharedSecret")
-
+            
             println("sharedSecret: ${sharedSecret}")
             
             val fileNameCipher = "cipherFile${Random.nextInt(0, 100000)}"
@@ -1053,10 +1048,8 @@ actual class FileProvider(private val applicationContext: Context) {
         }
         return null
     }
-
-
-
-
+    
+    
 }
 
 
