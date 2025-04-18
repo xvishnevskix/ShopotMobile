@@ -373,7 +373,7 @@ actual class FileProvider(private val applicationContext: Context) {
         val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
         val chatViewModel: ChatViewModel = KoinPlatform.getKoin().get()
         
-        val client = HttpClient() {
+        val client = HttpClient {
             install(HttpTimeout) {
                 requestTimeoutMillis = 600_000
                 connectTimeoutMillis = 600_000
@@ -465,7 +465,7 @@ actual class FileProvider(private val applicationContext: Context) {
             }
             
             
-            println("11111111 ${response.status} ${response.toString()}")
+            println("11111111 ${response.status} $response")
             
             if (response.status.isSuccess()) {
                 chatViewModel.onFileUploadEnd()
@@ -741,7 +741,7 @@ actual class FileProvider(private val applicationContext: Context) {
         filename: String,
         onProgress: (Float) -> Unit
     ): String? {
-        val client = HttpClient() {
+        val client = HttpClient {
             install(HttpTimeout) {
                 requestTimeoutMillis = 600_000
                 connectTimeoutMillis = 600_000
@@ -882,7 +882,7 @@ actual class FileProvider(private val applicationContext: Context) {
         photoName: String,
         onProgress: (Float) -> Unit
     ): List<String>? {
-        val client = HttpClient() {
+        val client = HttpClient {
             install(HttpTimeout) {
                 requestTimeoutMillis = 600_000
                 connectTimeoutMillis = 600_000
@@ -1003,7 +1003,7 @@ actual class FileProvider(private val applicationContext: Context) {
                 }
                 
                 
-                println("11111111 ${response.status} ${response.toString()}")
+                println("11111111 ${response.status} $response")
                 
                 if (response.status.isSuccess()) {
                     println("11111111")

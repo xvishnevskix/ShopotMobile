@@ -61,8 +61,7 @@ fun GroupShortButton(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Box(
-            ) {
+            Box {
                 Image(
                     modifier = Modifier
                         .size(width, height),

@@ -405,8 +405,9 @@ fun PullRefreshIndicator(state: PullRefreshState, modifier: Modifier = Modifier)
             .padding(16.dp)
     ) {
         CircularProgressIndicator(
-            progress = progress,
-            color = Color(0xFFCAB7A3)
+            progress = { progress },
+            color = Color(0xFFCAB7A3),
+            trackColor = ProgressIndicatorDefaults.circularTrackColor,
         )
     }
 }

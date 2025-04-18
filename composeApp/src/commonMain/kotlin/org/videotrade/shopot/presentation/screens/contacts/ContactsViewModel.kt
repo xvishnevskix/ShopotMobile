@@ -21,7 +21,7 @@ import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
 
-class ContactsViewModel() : ViewModel(),
+class ContactsViewModel : ViewModel(),
     KoinComponent {
     val selectedContacts = mutableStateListOf<ContactDTO>()
     

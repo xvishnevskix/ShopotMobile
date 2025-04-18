@@ -3,7 +3,8 @@ package org.videotrade.shopot.presentation.components.Call
 import WebRTC.RTCMTLVideoView
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
+import androidx.compose.ui.viewinterop.UIKitView
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import kotlinx.cinterop.ExperimentalForeignApi
 import platform.UIKit.UIViewContentMode
@@ -19,5 +20,9 @@ actual fun Video(track: VideoStreamTrack, modifier: Modifier) {
             }
         },
         modifier = modifier,
+        properties = UIKitInteropProperties(
+            isInteractive = true,
+            isNativeAccessibilityEnabled = true
+        )
     )
 }

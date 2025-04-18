@@ -167,7 +167,7 @@ fun Otp(
                             .focusRequester(focusRequesters[index])
                             .fillMaxSize()
                             .onKeyEvent { event ->
-                                if (event.key == androidx.compose.ui.input.key.Key.Backspace && otpFields[index].isEmpty()) {
+                                if (event.key == Key.Backspace && otpFields[index].isEmpty()) {
                                     if (index > 0) {
                                         focusRequesters[index - 1].requestFocus()
                                     }

@@ -98,7 +98,7 @@ import shopot.composeapp.generated.resources.group
                         )
                     )
                 }
-                Box() {
+                Box {
                     Image(
                         painter = painterResource(Res.drawable.arrow_left),
                         contentDescription = "create group arrow",

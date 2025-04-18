@@ -56,7 +56,7 @@ import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
 import org.videotrade.shopot.presentation.screens.intro.WelcomeScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 
-class CallViewModel() : ViewModel(), KoinComponent {
+class CallViewModel : ViewModel(), KoinComponent {
     private val callUseCase: CallUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
@@ -480,7 +480,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                     val introViewModel: IntroViewModel =
                                         KoinPlatform.getKoin().get()
                                     
-                                    addValueInStorage("profileId", userId!!)
+                                    addValueInStorage("profileId", userId)
                                     
                                     commonViewModel.updateNotificationToken()
                                     
@@ -515,7 +515,7 @@ class CallViewModel() : ViewModel(), KoinComponent {
                                             val introViewModel: IntroViewModel =
                                                 KoinPlatform.getKoin().get()
                                             
-                                            addValueInStorage("profileId", userId!!)
+                                            addValueInStorage("profileId", userId)
                                             
                                             commonViewModel.updateNotificationToken()
                                             

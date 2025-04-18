@@ -72,7 +72,7 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
         var isRunning by remember { mutableStateOf(false) }
         var time by remember { mutableStateOf(60) }
         var reloadSend by remember { mutableStateOf(false) }
-        val toasterViewModel: org.videotrade.shopot.presentation.screens.common.CommonViewModel = koinInject()
+        val toasterViewModel: CommonViewModel = koinInject()
         val isLoading = remember { mutableStateOf(false) }
 
         val sentSMSCode = stringResource(MokoRes.strings.sms_with_code_sent)

@@ -117,7 +117,7 @@ suspend fun sendEmail(
 }
 
 
-class FAQ() : Screen {
+class FAQ : Screen {
 
 
     @Composable

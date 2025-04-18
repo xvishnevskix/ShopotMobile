@@ -209,12 +209,12 @@ fun StoryViewer(
                     ) {
                         progressList.forEachIndexed { index, progress ->
                             LinearProgressIndicator(
-                                progress = progress.coerceIn(0f, 1f),
+                                progress = { progress.coerceIn(0f, 1f) },
                                 modifier = Modifier
                                     .weight(1f)
                                     .padding(horizontal = 1.dp)
                                     .clip(RoundedCornerShape(50)),
-                                color = if (index <= pagerState.currentPage) Color.White else Color.Gray
+                                color = if (index <= pagerState.currentPage) Color.White else Color.Gray,
                             )
                         }
                     }

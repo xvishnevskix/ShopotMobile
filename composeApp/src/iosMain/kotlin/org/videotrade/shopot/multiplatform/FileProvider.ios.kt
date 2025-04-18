@@ -329,7 +329,7 @@ actual class FileProvider {
             
             // Получение URL для директории Documents
             val urls =
-                fileManager.URLsForDirectory(NSDocumentDirectory, NSUserDomainMask) as List<*>
+                fileManager.URLsForDirectory(NSDocumentDirectory, NSUserDomainMask)
             val documentsURL = urls.firstOrNull() as? NSURL
             
             documentsURL?.let { url ->
@@ -984,7 +984,7 @@ actual class FileProvider {
                 }
                 
                 
-                println("11111111 ${response.status} ${response.toString()}")
+                println("11111111 ${response.status} $response")
                 
                 if (response.status.isSuccess()) {
                     println("11111111")

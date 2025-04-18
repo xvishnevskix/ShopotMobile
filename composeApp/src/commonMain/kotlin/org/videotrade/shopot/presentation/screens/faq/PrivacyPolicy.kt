@@ -53,7 +53,7 @@ import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 import shopot.composeapp.generated.resources.SFProText_Semibold
 
-class PrivacyPolicy() : Screen {
+class PrivacyPolicy : Screen {
 
 
     @Composable

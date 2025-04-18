@@ -24,7 +24,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -77,7 +76,7 @@ import shopot.composeapp.generated.resources.arrowleft
 import shopot.composeapp.generated.resources.create_group
 import shopot.composeapp.generated.resources.group
 
-class CreateChatScreen() : Screen {
+class CreateChatScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -249,8 +248,7 @@ private fun ContactItem(
             }
     
     ) {
-        Column(
-        ) {
+        Column {
             Spacer(modifier = Modifier.height(9.dp))
             Row(
                 verticalAlignment = Alignment.CenterVertically,

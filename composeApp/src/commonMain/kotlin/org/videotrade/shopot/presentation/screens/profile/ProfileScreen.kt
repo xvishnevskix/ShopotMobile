@@ -178,7 +178,7 @@ class ProfileScreen(
                                     imagePainter.value?.let {
                                         commonViewModel.mainNavigator.value?.push(
                                             PhotoViewerScreen(
-                                                imagePainter!!,
+                                                imagePainter,
                                                 messageSenderName = "${profile.firstName} ${profile.lastName}",
                                             )
                                         )

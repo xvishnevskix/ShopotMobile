@@ -23,7 +23,8 @@ import platform.UIKit.UIImage
 import platform.UIKit.UIImageJPEGRepresentation
 import kotlin.random.Random
 import androidx.compose.runtime.remember
-import androidx.compose.ui.interop.UIKitView
+import androidx.compose.ui.viewinterop.UIKitInteropProperties
+import androidx.compose.ui.viewinterop.UIKitView
 import com.shepeliev.webrtckmp.AudioStreamTrack
 import com.shepeliev.webrtckmp.VideoStreamTrack
 import io.ktor.client.engine.darwin.*
@@ -123,6 +124,14 @@ actual fun VideoPlayer(modifier: Modifier, filePath: String) {
     playerLayer.player = player
     
     // Используем UIKitView для интеграции с существующими представлениями UIKit
+    { view: UIView, rect: CValue<CGRect> ->
+        CATransaction.begin()
+        CATransaction.setValue(true, kCATransactionDisableActions)
+        view.layer.setFrame(rect)
+        playerLayer.setFrame(rect)
+        avPlayerViewController.view.layer.frame = rect
+        CATransaction.commit()
+    }
     UIKitView(
         factory = {
             // Создаем UIView для удержания AVPlayerLayer
@@ -131,19 +140,15 @@ actual fun VideoPlayer(modifier: Modifier, filePath: String) {
             // Возвращаем playerContainer как корневой UIView
             playerContainer
         },
-        onResize = { view: UIView, rect: CValue<CGRect> ->
-            CATransaction.begin()
-            CATransaction.setValue(true, kCATransactionDisableActions)
-            view.layer.setFrame(rect)
-            playerLayer.setFrame(rect)
-            avPlayerViewController.view.layer.frame = rect
-            CATransaction.commit()
-        },
+        modifier = modifier,
         update = { view ->
             player.play()
             avPlayerViewController.player!!.play()
         },
-        modifier = modifier
+        properties = UIKitInteropProperties(
+            isInteractive = true,
+            isNativeAccessibilityEnabled = true
+        )
     )
 }
 
@@ -158,6 +163,10 @@ actual fun Video(videoTrack: VideoStreamTrack, modifier: Modifier, audioTrack: A
             }
         },
         modifier = modifier,
-        onRelease = { videoTrack.removeRenderer(it) }
+        onRelease = { videoTrack.removeRenderer(it) },
+        properties = UIKitInteropProperties(
+            isInteractive = true,
+            isNativeAccessibilityEnabled = true
+        )
     )
 }

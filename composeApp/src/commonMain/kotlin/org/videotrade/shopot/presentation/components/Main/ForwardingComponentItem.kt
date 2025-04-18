@@ -98,7 +98,7 @@ fun ForwardingComponentItem(
                         } ?: ""
 
                 Spacer(modifier = Modifier.height(8.dp))
-                Row() {
+                Row {
                     if (chat.personal) {
                         val displayName = fullName.ifBlank { chat.phone!! }
 

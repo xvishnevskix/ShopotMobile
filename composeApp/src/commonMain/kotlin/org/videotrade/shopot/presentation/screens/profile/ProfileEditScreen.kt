@@ -28,7 +28,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -120,7 +119,7 @@ import shopot.composeapp.generated.resources.human
 import shopot.composeapp.generated.resources.pencil_in_circle
 
 
-class ProfileEditScreen() : Screen {
+class ProfileEditScreen : Screen {
     
     @Composable
     override fun Content() {

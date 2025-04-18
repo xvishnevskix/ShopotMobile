@@ -165,7 +165,7 @@ class AuthViewModel : ViewModel(), KoinComponent {
                 val response: HttpResponse = client.post("${EnvironmentConfig.SERVER_URL}2fa/start") {
                     contentType(ContentType.Application.Json)
                     setBody(jsonContent)
-                } ?: return@launch
+                }
 //                val response = origin().post("2fa/start", jsonContent)
 
                 if (response.status.isSuccess()) {

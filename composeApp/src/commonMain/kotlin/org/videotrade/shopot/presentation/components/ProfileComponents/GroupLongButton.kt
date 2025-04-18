@@ -60,8 +60,7 @@ fun GroupLongButton(
         Row(
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Box(
-            ) {
+            Box {
                 Image(
                     modifier = Modifier
                         .size(width, height),

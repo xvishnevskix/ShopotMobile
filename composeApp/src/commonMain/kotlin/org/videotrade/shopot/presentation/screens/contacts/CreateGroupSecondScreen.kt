@@ -71,7 +71,7 @@ import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 
 
-class CreateGroupSecondScreen() : Screen {
+class CreateGroupSecondScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

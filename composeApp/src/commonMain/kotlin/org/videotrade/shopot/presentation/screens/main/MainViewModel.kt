@@ -170,7 +170,7 @@ class MainViewModel : ViewModel(), KoinComponent {
     
     fun getProfile() {
         viewModelScope.launch {
-            profile.value = profileUseCase.getProfile() ?: return@launch
+            profile.value = profileUseCase.getProfile()
         }
     }
     

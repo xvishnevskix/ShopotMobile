@@ -51,8 +51,7 @@ import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
 
-class ChatScreen(
-) : Screen {
+class ChatScreen : Screen {
     
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
     @Composable

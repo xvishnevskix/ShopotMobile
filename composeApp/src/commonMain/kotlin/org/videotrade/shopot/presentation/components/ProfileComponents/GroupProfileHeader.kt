@@ -217,7 +217,7 @@ data class PopupOption(
     val modifier: Modifier = Modifier,
     val color: Color = Color(0xFF373533),
 )
-enum class GroupEditOption() {
+enum class GroupEditOption {
     edit,
     remove;
 

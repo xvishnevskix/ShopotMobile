@@ -5,7 +5,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -178,7 +178,7 @@ fun UserComponentItem(
                                 chat.groupName?.takeIf { it.isNotBlank() } ?: "Deleted group"
                             }
 
-                            Row() {
+                            Row {
                                 if (chat.personal) {
 
 
@@ -243,7 +243,7 @@ fun UserComponentItem(
                             AnimatedContent(
                                 targetState = status == null || status == "OFFLINE" || status == "ONLINE" || !chat.personal,
                                 transitionSpec = {
-                                    fadeIn() with fadeOut()
+                                    fadeIn() togetherWith fadeOut()
                                 },
                                 label = "ChatStatusTransition"
                             ) { showMessage ->

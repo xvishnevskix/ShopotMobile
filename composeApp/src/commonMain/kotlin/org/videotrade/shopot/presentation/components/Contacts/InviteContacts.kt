@@ -101,7 +101,7 @@ fun InviteContacts(contacts: List<ContactDTO>) {
                         )
                     )
                 }
-                Box() {
+                Box {
                     Image(
                         painter = painterResource(Res.drawable.arrow_left),
                         contentDescription = "create group arrow",

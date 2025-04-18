@@ -250,7 +250,7 @@ class RTCAudioManager(context: Context) {
     
     
     /* Receiver which handles changes in wired headset availability. */
-    private inner class WiredHeadsetReceiver() : BroadcastReceiver() {
+    private inner class WiredHeadsetReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
             val state = intent.getIntExtra("state", STATE_UNPLUGGED)
             val microphone = intent.getIntExtra("microphone", HAS_NO_MIC)
@@ -477,7 +477,7 @@ class RTCAudioManager(context: Context) {
     
     /** Gets the current earpiece state.  */
     private fun hasEarpiece(): Boolean {
-        return apprtcContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
+        return apprtcContext.packageManager.hasSystemFeature(PackageManager.FEATURE_TELEPHONY)
     }
     
     /**
