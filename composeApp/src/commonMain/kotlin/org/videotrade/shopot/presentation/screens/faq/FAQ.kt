@@ -90,7 +90,7 @@ suspend fun sendEmail(
     try {
         val jsonContent = buildJsonObject {
             put("email", email)
-            put("message", "$message  \nApp Version: 1.1.5(beta) \n${getPlatform().name}")
+            put("message", "$message  \nApp Version: 1.1.5 \n${getPlatform().name}")
         }.toString()
 
         println("Sending email with data: $jsonContent")
