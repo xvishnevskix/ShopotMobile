@@ -44,14 +44,14 @@ fun SelectedCallMessage(
     val theme = getThemeMode()
 
     Column(
-        modifier = Modifier.height(56.dp),
+        modifier = Modifier,
         verticalArrangement = Arrangement.Top
     ) {
         Text(
             text = selectedMessageSenderName,
             style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 color = colorTitle,
@@ -78,14 +78,11 @@ fun SelectedCallMessage(
                     maxLines = 1, // Ограничение до одной строки
                     overflow = TextOverflow.Ellipsis, // Добавление многоточия в конце
                     style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 16.sp,
+                        fontSize = 14.sp,
+                        lineHeight = 14.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = if (isFromUser)
-                            colors.onTertiary
-                        else
-                            colors.secondary,
+                        color = colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     )
                 )

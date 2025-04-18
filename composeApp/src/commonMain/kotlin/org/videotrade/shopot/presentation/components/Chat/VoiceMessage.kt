@@ -76,7 +76,7 @@ fun VoiceMessage(
     
     // Состояния, уникальные для каждого сообщения
     var isPlaying = remember(message.id) { mutableStateOf(false) }
-    val waveData = remember(message.id) { generateRandomWaveData(29) }
+    val waveData = remember(message.id) { generateRandomWaveData(35) }
     var audioFilePath by remember(message.id) { mutableStateOf("") }
     val audioPlayer = remember { AudioFactory.createAudioPlayer() }
     var currentTime by remember(message.id) { mutableStateOf(0) }
@@ -207,7 +207,7 @@ fun VoiceMessage(
             modifier = Modifier
                 .widthIn(max = 261.dp)
                 .padding(
-                    start = 12.dp,
+                    start = 8.dp,
                     bottom = 8.dp,
                     top = 8.dp
                 ),

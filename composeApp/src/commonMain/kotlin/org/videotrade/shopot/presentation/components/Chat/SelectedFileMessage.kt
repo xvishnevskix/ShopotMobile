@@ -63,13 +63,14 @@ fun SelectedFileMessage(
     val colors = MaterialTheme.colorScheme
 
     Column(
-        modifier = Modifier
+        modifier = Modifier,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
             style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 color = colorTitle,
@@ -95,15 +96,11 @@ fun SelectedFileMessage(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 16.sp,
+                        fontSize = 14.sp,
+                        lineHeight = 14.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = if (isFromUser)
-                            colors.onTertiary
-
-                        else
-                            colors.secondary,
+                        color = colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )

@@ -587,7 +587,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
                 
                 _favoriteStickerPacks.value =
                     _favoriteStickerPacks.value.filter { it.packId != packId }
-                
+
+                getFavoritePacks()
                 println("Pack successfully removed from favorites")
             } else {
                 println("Failed to remove pack from favorites")
@@ -601,6 +602,11 @@ class ChatViewModel : ViewModel(), KoinComponent {
             if (success) {
                 _stickerPacks.value = _stickerPacks.value.map { pack ->
                     if (pack.packId == packId) pack.copy(favorite = true) else pack
+                }
+
+                val updatedPack = getPack(packId)
+                updatedPack?.let {
+                    _favoriteStickerPacks.value = _favoriteStickerPacks.value + it
                 }
                 println("Pack successfully added to favorites")
             } else {

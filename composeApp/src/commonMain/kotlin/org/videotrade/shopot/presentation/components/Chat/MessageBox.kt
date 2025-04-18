@@ -262,12 +262,14 @@ fun MessageBox(
                                             min = (messageFormatWidth * 0.38f).dp,
 
                                             )
-                                        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                                        .height(56.dp)
+                                        .padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                                        .height(42.dp)
                                         .background(
-                                            color = if (message.fromUser == profile.id) Color(
-                                                0x4DFFFFFF
-                                            ) else colors.background,
+                                            color =
+//                                            if (message.fromUser == profile.id)
+                                                Color(0x4DFFFFFF)
+//                                            else colors.background
+                                    ,
                                             shape = RoundedCornerShape(size = 8.dp)
                                         )
                                         .wrapContentHeight()
@@ -283,7 +285,7 @@ fun MessageBox(
                                         modifier = Modifier
 
                                             .width(6.dp)
-                                            .height(56.dp)
+                                            .height(42.dp)
                                             .clip(
                                                 RoundedCornerShape(
                                                     topStart = 8.dp,
@@ -292,18 +294,14 @@ fun MessageBox(
                                             )
                                             .background(
                                                 color =
-                                                if (message.fromUser == profile.id)
-                                                    if (theme == ThemeMode.LIGHT) Color.White else Color(
-                                                        0xFF373533
-                                                    )
-                                                else
-                                                    Color(0xFFCAB7A3)
+//                                                if (message.fromUser == profile.id)
+//                                                    if (theme == ThemeMode.LIGHT) Color.White else
+                                                Color(0xFFCAB7A3)
+//                                                else
+//                                                    Color(0xFFCAB7A3)
                                             )
                                     )
 
-                                    {
-
-                                    }
                                     Spacer(modifier = Modifier.width(10.dp))
                                     Column(
                                         verticalArrangement = Arrangement.Center
@@ -324,9 +322,9 @@ fun MessageBox(
                             if (message.forwardMessage == true) {
                                 Row(
                                     modifier = Modifier.padding(
-                                        start = 16.dp,
-                                        end = 16.dp,
-                                        top = 16.dp,
+                                        start = 12.dp,
+                                        end = 12.dp,
+                                        top = 12.dp,
                                     ),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
@@ -336,22 +334,20 @@ fun MessageBox(
                                         modifier = Modifier.size(width = 16.5.dp, height = 11.5.dp),
                                         painter = painterResource(Res.drawable.chat_forward),
                                         contentDescription = null,
-                                        colorFilter = if (message.fromUser == profile.id) ColorFilter.tint(
-                                            Color(0xFFF7F7F7)
-                                        ) else ColorFilter.tint(colors.tertiary)
+                                        colorFilter =  ColorFilter.tint(
+                                            colors.primary
+                                        )
                                     )
 
                                     Spacer(modifier = Modifier.width(7.dp))
                                     Text(
                                         stringResource(MokoRes.strings.forwarded_message),
                                         style = TextStyle(
-                                            fontSize = 16.sp,
-                                            lineHeight = 16.sp,
+                                            fontSize = 14.sp,
+                                            lineHeight = 14.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                             fontWeight = FontWeight(400),
-                                            color = if (message.fromUser == profile.id) Color(
-                                                0xFFF7F7F7
-                                            ) else colors.tertiary,
+                                            color = colors.primary,
                                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                                         ),
                                     )
@@ -365,16 +361,16 @@ fun MessageBox(
                             ) {
                                 Box(
                                     modifier = Modifier.padding(
-                                        start = 16.dp,
-                                        end = 16.dp,
-                                        top = 16.dp,
+                                        start = 12.dp,
+                                        end = 12.dp,
+                                        top = 12.dp,
                                     ),
                                 ) {
                                     Text(
                                         text = messageSenderName,
                                         style = TextStyle(
-                                            fontSize = 16.sp,
-                                            lineHeight = 16.sp,
+                                            fontSize = 14.sp,
+                                            lineHeight = 14.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                             fontWeight = FontWeight(500),
                                             color = if (message.fromUser == profile.id) Color(
@@ -566,9 +562,6 @@ fun SelectedMessageFormat(
     val isFromUser = message?.fromUser == profile?.id
     
     val colorTitle = if (isFromFooter) Color(0xFFCAB7A3) else {
-        if (isFromUser)
-            colors.inversePrimary
-        else
             colors.primary
     }
     

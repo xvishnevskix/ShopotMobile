@@ -624,8 +624,8 @@ fun ChatFooter(
                                     //text = "$hours:${minutes.toString().padStart(2, '0')}:${
                                     //                                    seconds.toString().padStart(2, '0')
                                     //                                }",
-                                    fontSize = 16.sp,
-                                    lineHeight = 16.sp,
+                                    fontSize = 14.sp,
+                                    lineHeight = 14.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     color = colors.secondary,
@@ -675,8 +675,8 @@ fun ChatFooter(
                                             Spacer(modifier = Modifier.width(9.dp))
                                             Text(
                                                 text = stringResource(MokoRes.strings.left_cancel),
-                                                fontSize = 16.sp,
-                                                lineHeight = 16.sp,
+                                                fontSize = 14.sp,
+                                                lineHeight = 14.sp,
                                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                                 fontWeight = FontWeight(400),
                                                 color = colors.secondary,
@@ -706,8 +706,8 @@ fun ChatFooter(
                                     ) {
                                         Text(
                                             text = stringResource(MokoRes.strings.cancel),
-                                            fontSize = 16.sp,
-                                            lineHeight = 16.sp,
+                                            fontSize = 14.sp,
+                                            lineHeight = 14.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                             fontWeight = FontWeight(400),
                                             color = colors.secondary,
@@ -819,7 +819,7 @@ fun ChatFooter(
                                             if (footerText.isEmpty()) {
                                                 Text(
                                                     stringResource(MokoRes.strings.write_message),
-                                                    fontSize = 16.sp,
+                                                    fontSize = 14.sp,
                                                     lineHeight = lineHeight.value.sp,
                                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                                     fontWeight = FontWeight(400),
@@ -1193,8 +1193,8 @@ fun ChatFooter(
                                         Spacer(modifier = Modifier.height(4.dp))
                                         Text(
                                             text = editOption.text,
-                                            fontSize = 16.sp,
-                                            lineHeight = 16.sp,
+                                            fontSize = 14.sp,
+                                            lineHeight = 14.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                             fontWeight = FontWeight(500),
                                             color = colors.primary,

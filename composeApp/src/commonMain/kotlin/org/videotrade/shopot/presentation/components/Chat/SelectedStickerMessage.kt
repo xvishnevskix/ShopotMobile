@@ -95,8 +95,8 @@ fun SelectedStickerMessage(
             Text(
                 text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
                 style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
+                    fontSize = 14.sp,
+                    lineHeight = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                     fontWeight = FontWeight(500),
                     color = colorTitle,
@@ -121,15 +121,11 @@ fun SelectedStickerMessage(
                 Text(
                     text = stringResource(MokoRes.strings.sticker),
                     style = TextStyle(
-                        fontSize = 16.sp,
-                        lineHeight = 16.sp,
+                        fontSize = 14.sp,
+                        lineHeight = 14.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                         fontWeight = FontWeight(400),
-                        color = if (isFromUser)
-                            colors.onTertiary
-
-                        else
-                            colors.secondary,
+                        color = colors.secondary,
                         letterSpacing = TextUnit(0F, TextUnitType.Sp),
                     ),
                 )
