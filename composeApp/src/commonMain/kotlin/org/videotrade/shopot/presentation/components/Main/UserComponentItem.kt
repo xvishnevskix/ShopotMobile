@@ -57,7 +57,7 @@ import org.videotrade.shopot.presentation.components.Chat.ChatStatus
 import org.videotrade.shopot.presentation.components.Chat.getCallStatusString
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithText
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
-import org.videotrade.shopot.presentation.components.Common.SwipeToDeleteContainer
+import org.videotrade.shopot.presentation.components.Common.SwipeContainer
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
@@ -86,7 +86,7 @@ fun UserComponentItem(
 
 
 
-            SwipeToDeleteContainer(
+            SwipeContainer(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .fillMaxWidth()
@@ -228,8 +228,8 @@ fun UserComponentItem(
                                 Text(
                                     text = stringResource(MokoRes.strings.you),
                                     textAlign = TextAlign.Start,
-                                    fontSize = 16.sp,
-                                    lineHeight = 16.sp,
+                                    fontSize = 14.sp,
+                                    lineHeight = 14.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
                                     color = colors.primary,
@@ -253,8 +253,8 @@ fun UserComponentItem(
                                             MessageContent(message = it)
                                         } ?: stringResource(MokoRes.strings.start_conversation),
                                         textAlign = TextAlign.Start,
-                                        fontSize = 16.sp,
-                                        lineHeight = 16.sp,
+                                        fontSize = 14.sp,
+                                        lineHeight = 14.sp,
                                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                         fontWeight = FontWeight(400),
                                         color = colors.secondary,
@@ -283,8 +283,8 @@ fun UserComponentItem(
                             Text(
                                 formatTimestamp(chat.lastMessage!!.created),
                                 textAlign = TextAlign.End,
-                                fontSize = 16.sp,
-                                lineHeight = 16.sp,
+                                fontSize = 14.sp,
+                                lineHeight = 14.sp,
                                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                 fontWeight = FontWeight(400),
                                 color = colors.secondary,
@@ -342,8 +342,8 @@ fun UserComponentItem(
                                                     bottom = 3.dp
                                                 ),
                                             textAlign = TextAlign.Center,
-                                            fontSize = 16.sp,
-                                            lineHeight = 16.sp,
+                                            fontSize = 14.sp,
+                                            lineHeight = 14.sp,
                                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                                             fontWeight = FontWeight(500),
                                             color = Color(0xFFFFFFFF),

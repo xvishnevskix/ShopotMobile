@@ -14,6 +14,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -56,8 +57,12 @@ import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
+import org.videotrade.shopot.presentation.screens.settings.ThemeMode
+import org.videotrade.shopot.presentation.screens.settings.getThemeMode
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.arrow_left
+import shopot.composeapp.generated.resources.chat_dark_theme
+import shopot.composeapp.generated.resources.chat_light_theme
 
 
 @OptIn(FlowPreview::class, ExperimentalFoundationApi::class)
@@ -95,7 +100,7 @@ fun Chat(
     var previousIndex by remember { mutableStateOf(listState.firstVisibleItemIndex) }
     var hasCheckedInitialScroll by remember { mutableStateOf(false) }
 
-
+    val theme = getThemeMode()
 
     LaunchedEffect(listState) {
         snapshotFlow { listState.firstVisibleItemIndex }
@@ -137,7 +142,18 @@ fun Chat(
     }
 
 
-    Box( ) {
+    Box( modifier = Modifier.fillMaxSize()) {
+
+        Image(
+            painter = if (theme == ThemeMode.LIGHT)
+            painterResource(Res.drawable.chat_light_theme) else
+                painterResource(Res.drawable.chat_dark_theme)
+            ,
+            contentDescription = null,
+            contentScale = ContentScale.Crop, // или .FillBounds, если нужно строго по размеру
+            modifier = Modifier.matchParentSize()
+        )
+
         if (messagesState.isNotEmpty()) {
             val groupedMessages = messagesState.groupBy { message ->
                 message.created.subList(0, 3)
@@ -194,7 +210,7 @@ fun Chat(
             LazyColumn(
                 state = listState,
                 reverseLayout = true,
-                modifier = modifier.background(colors.background).padding(horizontal = 8.dp)
+                modifier = modifier.padding(horizontal = 8.dp)
             ) {
                 groupedMessages.forEach { (date, messages) ->
 

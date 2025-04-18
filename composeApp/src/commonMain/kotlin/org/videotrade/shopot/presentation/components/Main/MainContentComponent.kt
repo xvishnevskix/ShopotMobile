@@ -206,7 +206,7 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
                     modifier = Modifier.animateContentSize().weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     
                     Box(
                         modifier = Modifier

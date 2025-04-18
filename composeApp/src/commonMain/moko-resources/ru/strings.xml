@@ -313,5 +313,11 @@
     <string name="this_action_will_permanently_delete_all_messages_in_this_chat">Это действие удалит все сообщения в данном чате без возможности восстановления</string>
     <string name="add_members">Добавить участников</string>
     <string name="remove_member">Удалить участника</string>
+    <string name="admin">Админ</string>
+    <string name="role">Роль</string>
+    <string name="leave_group">Покинуть группу</string>
+    <string name="do_you_really_want_to_leave_the_group">Вы действительно хотите выйти из группы</string>
+
+
 
 </resources>

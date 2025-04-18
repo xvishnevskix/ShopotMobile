@@ -1,4 +1,5 @@
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,13 +46,14 @@ fun SelectedVoiceMessage(
     val colors = MaterialTheme.colorScheme
 
     Column(
-        modifier = Modifier
+        modifier = Modifier,
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
             text = if (selectedMessageSenderName == "") stringResource(MokoRes.strings.you) else selectedMessageSenderName,
             style = TextStyle(
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 color = colorTitle,
@@ -74,15 +76,11 @@ fun SelectedVoiceMessage(
             Text(
                 text = stringResource(MokoRes.strings.voice_message),
                 style = TextStyle(
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
+                    fontSize = 14.sp,
+                    lineHeight = 14.sp,
                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                     fontWeight = FontWeight(400),
-                    color = if (isFromUser)
-                        colors.onTertiary
-
-                    else
-                        colors.secondary,
+                    color = colors.secondary,
                     letterSpacing = TextUnit(0F, TextUnitType.Sp),
                 ),
             )

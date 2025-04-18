@@ -15,35 +15,56 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
+import org.videotrade.shopot.MokoRes
+import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditOption
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.menu_delete
+import shopot.composeapp.generated.resources.user_settings
 
 @Composable
-fun SwipeToDeleteContainer(
+fun SwipeContainer(
     modifier: Modifier = Modifier,
     threshold: Float = 200f,
     onSwipeDelete: () -> Unit,
     isVisible: Boolean = true,
+    isGroup: Boolean = false,
+    onSwipeProgress: (Float) -> Unit = {},
+    onRoleClick: (Offset) -> Unit = {},
     content: @Composable () -> Unit,
+
 
 ) {
     val offsetX = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
     val deleteVisible = remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
+
+
+
+
 
     if (isVisible) {
         Box(
@@ -52,7 +73,7 @@ fun SwipeToDeleteContainer(
                     detectHorizontalDragGestures(
                         onDragEnd = {
                             scope.launch {
-                                if (offsetX.value <= -threshold + 5f) {
+                                if (offsetX.value <= -threshold + 5f && !isGroup) {
                                     onSwipeDelete()
                                     offsetX.animateTo(0f)
                                 } else if (offsetX.value < -threshold / 2) {
@@ -66,6 +87,7 @@ fun SwipeToDeleteContainer(
                             scope.launch {
                                 val newOffset = (offsetX.value + delta).coerceIn(-threshold, 0f)
                                 offsetX.snapTo(newOffset)
+                                onSwipeProgress((-newOffset / threshold).coerceIn(0f, 1f))
                             }
                         }
                     )
@@ -87,23 +109,58 @@ fun SwipeToDeleteContainer(
                         modifier = Modifier
                             .width(1.dp)
                             .height(56.dp)
-                            .border(width = 1.dp, color = Color(0x33373533))
+                            .border(width = 1.dp, color = colors.secondary)
                             .alpha(alpha)
                     )
-                    Spacer(modifier = Modifier.width((30 * alpha).dp))
+                    if (!isGroup) {
+                        Spacer(modifier = Modifier.width((30 * alpha).dp))
+                    }
 
-                    Image(
-                        painter = painterResource(Res.drawable.menu_delete),
-                        contentDescription = "Delete",
+                    if (isGroup) {
+                        var buttonOffset = remember { mutableStateOf(Offset.Zero) }
+
+                        Box(
+                            modifier = Modifier
+                                .clip(CircleShape)
+                                .padding(12.dp)
+                                .onGloballyPositioned {
+                                    val coordinates = it.localToWindow(Offset.Zero)
+                                    buttonOffset.value = coordinates
+                                }
+                                .clickable {
+                                    onRoleClick(buttonOffset.value)
+                                    scope.launch { offsetX.animateTo(0f) }
+                                }
+                        ) {
+                            Image(
+                                painter = painterResource(Res.drawable.user_settings),
+                                contentDescription = "Role",
+                                modifier = Modifier.size(24.dp),
+                                alpha = alpha,
+                                colorFilter = ColorFilter.tint(colors.primary)
+                            )
+                        }
+                    }
+
+                    Box(
                         modifier = Modifier
-                            .padding(end = 4.dp)
-                            .size(24.dp)
+                            .clip(CircleShape)
+                            .padding(12.dp)
                             .clickable {
                                 onSwipeDelete()
                                 scope.launch { offsetX.animateTo(0f) }
-                            },
-                        alpha = alpha
-                    )
+                            }
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.menu_delete),
+                            contentDescription = "Delete",
+                            modifier = Modifier
+                                .size(24.dp)
+                               ,
+                            alpha = alpha
+                        )
+                    }
+
                 }
             }
 
@@ -119,3 +176,5 @@ fun SwipeToDeleteContainer(
     }
 
 }
+
+

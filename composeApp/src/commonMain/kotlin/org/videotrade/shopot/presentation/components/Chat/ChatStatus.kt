@@ -89,8 +89,8 @@ fun ChatStatus(
                     Text(
                         text = animatedText ,
                         textAlign = TextAlign.Center,
-                        fontSize = 16.sp,
-                        lineHeight = 16.sp,
+                        fontSize = 14.sp,
+                        lineHeight = 14.sp,
                         fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                         fontWeight = FontWeight(500),
                         color =  if (animatedText == stringResource(MokoRes.strings.status_offline)) colors.secondary else Color(0xFFCAB7A3),
@@ -112,8 +112,8 @@ fun ChatStatus(
             Text(
                 text = stringResource(MokoRes.strings.status_offline),
                 textAlign = TextAlign.Center,
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
+                fontSize = 14.sp,
+                lineHeight = 14.sp,
                 fontFamily = FontFamily(Font(Res.font.ArsonPro_Medium)),
                 fontWeight = FontWeight(500),
                 color = colors.secondary,

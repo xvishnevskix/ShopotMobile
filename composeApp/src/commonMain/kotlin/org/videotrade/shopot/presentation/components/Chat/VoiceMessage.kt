@@ -76,7 +76,7 @@ fun VoiceMessage(
     
     // Состояния, уникальные для каждого сообщения
     var isPlaying = remember(message.id) { mutableStateOf(false) }
-    val waveData = remember(message.id) { generateRandomWaveData(29) }
+    val waveData = remember(message.id) { generateRandomWaveData(35) }
     var audioFilePath by remember(message.id) { mutableStateOf("") }
     val audioPlayer = remember { AudioFactory.createAudioPlayer() }
     var currentTime by remember(message.id) { mutableStateOf(0) }
@@ -201,74 +201,87 @@ fun VoiceMessage(
     }
     
     Row(
-        modifier = Modifier
-            .widthIn(max = 261.dp)
-            .padding(
-                start = 16.dp,
-                end = 16.dp,
-                bottom = 16.dp,
-                top = 16.dp
-            ),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Bottom
     ) {
-        if (isStartCipherLoading) {
-            LoadingBox(
-                isLoading = isStartCipherLoading,
-                color = if (message.fromUser == profile.id) Color.White else colors.primary,
-                onCancel = {
-                    isStartCipherLoading = false
-                    viewModel.deleteMessage(message)
-                }
-            )
-        } else if (isLoading) {
-            LoadingBox(
-                isLoading = isLoading,
-                progress = progress,
-                color = if (message.fromUser == profile.id) Color.White else colors.primary,
-                onCancel = {
-                    isLoading = false
-                }
-            )
-        } else {
-            PlayPauseButton(
-                isPlaying = isPlaying.value,
-                onClick = {
-                    isPlaying.value = !isPlaying.value
+        Row(
+            modifier = Modifier
+                .widthIn(max = 261.dp)
+                .padding(
+                    start = 8.dp,
+                    bottom = 8.dp,
+                    top = 8.dp
+                ),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (isStartCipherLoading) {
+                LoadingBox(
+                    isLoading = isStartCipherLoading,
+                    color =
+//                    if (message.fromUser == profile.id) Color.White else colors.primary
+                    colors.primary
+                    ,
+                    onCancel = {
+                        isStartCipherLoading = false
+                        viewModel.deleteMessage(message)
+                    }
+                )
+            } else if (isLoading) {
+                LoadingBox(
+                    isLoading = isLoading,
+                    progress = progress,
+                    color =
+//                    if (message.fromUser == profile.id) Color.White else colors.primary
+                    colors.primary
+                    ,
+                    onCancel = {
+                        isLoading = false
+                    }
+                )
+            } else {
+                PlayPauseButton(
+                    isPlaying = isPlaying.value,
+                    onClick = {
+                        isPlaying.value = !isPlaying.value
 //                    if (isPlaying.value) {
 //                        playVoice(audioPlayer, audioFilePath, isPlaying)
 //                    } else {
 //                        stopVoice(audioPlayer)
 //                    }
 
-                    if (isPlaying.value) {
-                        viewModel.setPlayingMessage(message.id)  // Устанавливаем новое активное сообщение
-                        playVoice(audioPlayer, audioFilePath, isPlaying) // Передаём isPlaying
+                        if (isPlaying.value) {
+                            viewModel.setPlayingMessage(message.id)  // Устанавливаем новое активное сообщение
+                            playVoice(audioPlayer, audioFilePath, isPlaying) // Передаём isPlaying
 
-                    } else {
-                        stopVoice(audioPlayer)
-                        viewModel.setPlayingMessage(null)  // Останавливаем текущее воспроизведение
-                        isPlaying.value = false
-                    }
-                },
-                isFromUser = message.fromUser == profile.id
-            )
+                        } else {
+                            stopVoice(audioPlayer)
+                            viewModel.setPlayingMessage(null)  // Останавливаем текущее воспроизведение
+                            isPlaying.value = false
+                        }
+                    },
+                    isFromUser = message.fromUser == profile.id
+                )
+            }
+            Spacer(modifier = Modifier.width(13.dp))
+            Box(modifier = Modifier.weight(1F)) {
+                Waveform(waveData = waveData, message, profile)
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Box(modifier = Modifier.width(50.dp)) {
+                Text(
+                    text = if (isPlaying.value) formatSecondsToDuration(currentTime) else duration,
+                    fontSize = 14.sp,
+                    lineHeight = 14.sp,
+                    fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
+                    fontWeight = FontWeight(400),
+                    color =
+//                    if (message.fromUser == profile.id) Color.White else colors.primary
+                    colors.primary
+                    ,
+                    letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                )
+            }
         }
-        Spacer(modifier = Modifier.width(13.dp))
-        Box(modifier = Modifier.weight(1F)) {
-            Waveform(waveData = waveData, message, profile)
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Box(modifier = Modifier.width(50.dp)) {
-            Text(
-                text = if (isPlaying.value) formatSecondsToDuration(currentTime) else duration,
-                fontSize = 16.sp,
-                lineHeight = 16.sp,
-                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                fontWeight = FontWeight(400),
-                color = if (message.fromUser == profile.id) Color.White else colors.primary,
-                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-            )
-        }
+        MessageStatus(message, profile.id)
     }
 }
 
@@ -290,7 +303,10 @@ fun Waveform(waveData: List<Float>, message: MessageItem, profile: ProfileDTO) {
             val barHeight = maxBarHeight * adjustedAmplitude
             
             drawRoundRect(
-                color = if (message.fromUser == profile.id) Color.White else colors.primary,
+                color =
+//                if (message.fromUser == profile.id) Color.White else colors.primary
+                colors.primary
+                ,
                 topLeft = Offset(index * 2 * barWidth, maxBarHeight / 2 - barHeight / 2),
                 size = Size(barWidth, barHeight),
                 cornerRadius = CornerRadius(barWidth / 2) // Закруглённые углы
@@ -357,7 +373,9 @@ fun PlayPauseButton(
             painter = icon,
             contentDescription = null,
             modifier = Modifier.size(14.dp),
-            colorFilter = if (isFromUser) ColorFilter.tint(Color.White) else ColorFilter.tint(colors.primary)
+            colorFilter =
+//            if (isFromUser) ColorFilter.tint(Color.White) else ColorFilter.tint(colors.primary)
+            ColorFilter.tint(colors.primary)
         )
     }
 }

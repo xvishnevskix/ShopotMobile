@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
@@ -52,11 +53,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Popup
 import dev.icerock.moko.resources.compose.stringResource
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
@@ -87,6 +91,8 @@ fun BlurredMessageOverlay(
     ) {
     val colors = MaterialTheme.colorScheme
     val isDeleteConfirmationVisible by viewModel.isDeleteConfirmationVisible.collectAsState()
+
+
 
 
     val messageSenderName = if (selectedMessage?.fromUser  == profile.id) {
@@ -243,6 +249,7 @@ fun MessageBlurBox(
 
     val isDeleteConfirmationVisible by viewModel.isDeleteConfirmationVisible.collectAsState()
 
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -286,66 +293,16 @@ fun MessageBlurBox(
                     color = if (message.attachments?.isNotEmpty() == true && message.attachments!![0].type == "sticker") {
                         Color.Transparent  // Прозрачный цвет для стикеров
                     } else {
-                        if (message.fromUser == profile.id) Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
-                        else colors.onBackground  // Цвет для сообщений от других пользователей
+                        if (message.fromUser == profile.id)
+//                                Color(0xFFCAB7A3)  // Цвет для сообщений от текущего пользователя
+                            colors.primaryContainer
+                        else colors.onSecondaryContainer  // Цвет для сообщений от других пользователей
                     }
                 ) {
                     message.content?.let {
                         MessageFormat(message, profile, onClick, chat = chat)
                     }
                 }
-            }
-
-
-
-            Row(
-                horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
-                modifier = Modifier
-
-                    .fillMaxWidth().clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null // Убирает эффект нажатия
-                    ) {
-
-                    }
-            ) {
-
-                if (message.created.isNotEmpty())
-                    Text(
-                        text = formatTimeOnly(message.created),
-                        style = TextStyle(
-                            fontSize = 16.sp,
-                            lineHeight = 16.sp,
-                            fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                            fontWeight = FontWeight(400),
-                            color = Color.White,
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                        ),
-                        modifier = Modifier.padding(),
-                    )
-
-
-                if (message.fromUser == profile.id)
-                    if (message.anotherRead) {
-                        Image(
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .size(width = 17.7.dp, height = 8.5.dp),
-                            painter = painterResource(Res.drawable.message_double_check),
-                            contentDescription = null,
-                        )
-                    } else {
-                        Image(
-                            modifier = Modifier
-                                .padding(start = 4.dp)
-                                .size(width = 12.7.dp, height = 8.5.dp),
-                            painter = painterResource(Res.drawable.message_single_check),
-                            contentDescription = null,
-                            colorFilter =  ColorFilter.tint(colors.secondary)
-                        )
-                    }
-
-
             }
         }
 
@@ -413,6 +370,7 @@ fun MessageBlurBox(
         }
     }
 }
+
 
 
 

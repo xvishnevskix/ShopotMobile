@@ -86,7 +86,7 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
-                        .padding(horizontal = 24.dp)
+                        .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                         .background(colors.background)
                 ) {
@@ -129,28 +129,28 @@ class GroupProfileScreen(private val profile: ProfileDTO, private val chat: Chat
                     
                     println("groupUsers: ${groupUsers}")
                     itemsIndexed(groupUsers) { _, groupUser ->
-                        
+
                         GroupUserCard(groupUser = groupUser, viewModel, isEdit = false, chat)
                         Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
                 
                 
-                Row(
-                    modifier = Modifier
-                        .height(100.dp)
-                        .fillMaxWidth()
-                        .background(colors.background).padding(top = 28.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    CustomButton(
-                        text = "Leave",
-                        onClick = {
-                            groupViewModel.leaveGroupChat(chatId = chat.chatId)
-                        },
-                        style = ButtonStyle.Red
-                    )
-                }
+//                Row(
+//                    modifier = Modifier
+//                        .height(100.dp)
+//                        .fillMaxWidth()
+//                        .background(colors.background).padding(top = 28.dp),
+//                    horizontalArrangement = Arrangement.Center
+//                ) {
+//                    CustomButton(
+//                        text = "Leave",
+//                        onClick = {
+//                            groupViewModel.leaveGroupChat(chatId = chat.chatId)
+//                        },
+//                        style = ButtonStyle.Red
+//                    )
+//                }
                 
                 Row(
                     modifier = Modifier

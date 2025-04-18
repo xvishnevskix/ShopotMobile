@@ -275,8 +275,8 @@ fun FavoriteStickersContent(viewModel: ChatViewModel = koinInject(), chat: ChatI
 
     val favoriteStickerPacks = viewModel.favoriteStickerPacks.collectAsState()
 
-    // Запрашиваем избранные пакеты, если их еще нет
-    LaunchedEffect(Unit) {
+
+    LaunchedEffect(favoriteStickerPacks) {
         viewModel.getFavoritePacks()
     }
 
