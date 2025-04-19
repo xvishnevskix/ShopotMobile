@@ -42,6 +42,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ContentScale.Companion.FillBounds
 import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -144,15 +145,18 @@ fun Chat(
 
     Box( modifier = Modifier.fillMaxSize()) {
 
-        Image(
-            painter = if (theme == ThemeMode.LIGHT)
-            painterResource(Res.drawable.chat_light_theme) else
-                painterResource(Res.drawable.chat_dark_theme)
-            ,
-            contentDescription = null,
-            contentScale = ContentScale.Crop, // или .FillBounds, если нужно строго по размеру
-            modifier = Modifier.matchParentSize()
-        )
+        val backgroundPainter = if (theme == ThemeMode.LIGHT)
+            painterResource(Res.drawable.chat_light_theme)
+        else
+            painterResource(Res.drawable.chat_dark_theme)
+
+            Image(
+                painter = backgroundPainter,
+                contentDescription = null,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+
 
         if (messagesState.isNotEmpty()) {
             val groupedMessages = messagesState.groupBy { message ->
