@@ -371,6 +371,7 @@ actual class FileProvider(private val applicationContext: Context) {
     ): String? {
         println("111111111313123123131")
         val commonViewModel: CommonViewModel = KoinPlatform.getKoin().get()
+        
         val chatViewModel: ChatViewModel = KoinPlatform.getKoin().get()
         
         val client = HttpClient {
@@ -380,6 +381,7 @@ actual class FileProvider(private val applicationContext: Context) {
                 socketTimeoutMillis = 600_000
             }
         }
+        
         
         val sharedSecret = getValueInStorage("sharedSecret")
         
