@@ -123,14 +123,7 @@ fun MessageBox(
         }
     }
     
-    //покраска сообщенния при переходе на него
-    LaunchedEffect(answerMessageId.value) {
-        if (isHighlighted) {
-            delay(2000)
-            answerMessageId.value = null
-        }
-    }
-    
+
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(8.dp))
@@ -395,57 +388,6 @@ fun MessageBox(
 
                             ) {
                                 MessageFormat(message, profile, onClick, messageSenderName, chat)
-//                                Row(
-//                                    horizontalArrangement = if (message.fromUser == profile.id) Arrangement.End else Arrangement.Start,
-//                                    verticalAlignment = Alignment.CenterVertically,
-//                                    modifier = Modifier.padding(start = 6.dp,bottom = 8.dp, end = 8.dp)
-//
-//                                        .clickable(
-//                                            interactionSource = remember { MutableInteractionSource() },
-//                                            indication = null // Убирает эффект нажатия
-//                                        ) {
-//                                            focusManager.clearFocus() // Ваше действие при нажатии
-//                                        }
-//                                ) {
-//
-//                                    if (message.created.isNotEmpty())
-//                                        Text(
-//                                            text = formatTimeOnly(message.created),
-//                                            style = TextStyle(
-//                                                fontSize = 12.sp,
-//                                                lineHeight = 12.sp,
-//                                                fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-//                                                fontWeight = FontWeight(400),
-//                                                color = if (message.fromUser == profile.id) Color.White else colors.onSecondary,
-//                                                letterSpacing = TextUnit(0F, TextUnitType.Sp),
-//                                            ),
-//                                            modifier = Modifier.padding(),
-//                                        )
-//
-//
-//                                    if (message.fromUser == profile.id)
-//                                        if (message.anotherRead) {
-//                                            Image(
-//                                                modifier = Modifier
-//                                                    .padding(start = 4.dp)
-//                                                    .size(width = 17.7.dp, height = 8.5.dp),
-//                                                painter = painterResource(Res.drawable.message_double_check),
-//                                                contentDescription = null,
-//                                                colorFilter = ColorFilter.tint(Color.White)
-//                                            )
-//                                        } else {
-//                                            Image(
-//                                                modifier = Modifier
-//                                                    .padding(start = 4.dp)
-//                                                    .size(width = 12.7.dp, height = 8.5.dp),
-//                                                painter = painterResource(Res.drawable.message_single_check),
-//                                                contentDescription = null,
-//                                                colorFilter = ColorFilter.tint(colors.secondary)
-//                                            )
-//                                        }
-//
-//
-//                                }
                             }
                         }
                     }

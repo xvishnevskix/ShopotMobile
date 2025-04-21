@@ -192,7 +192,6 @@ class ChatScreen(
                             profile,
                             chat,
                             Modifier.fillMaxSize()
-//                                .background(colors.background)
                                 .padding(innerPadding),
                             onMessageClick = { message, y ->
                                 // Сбрасываем текущее состояние для предотвращения конфликта

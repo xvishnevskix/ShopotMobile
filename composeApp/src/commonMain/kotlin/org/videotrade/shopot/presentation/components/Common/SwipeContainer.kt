@@ -38,7 +38,6 @@ import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
-import org.videotrade.shopot.presentation.components.ProfileComponents.GroupEditOption
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.menu_delete

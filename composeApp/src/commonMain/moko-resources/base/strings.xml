@@ -319,6 +319,7 @@
     <string name="role">Role</string>
     <string name="leave_group">Leave group</string>
     <string name="do_you_really_want_to_leave_the_group">Do you really want to leave the group</string>
+    <string name="call_to_auth_hint">Just give us a call — it's free and fast for you, and cheaper for us, helping us keep improving the app.</string>
 
 
 </resources>

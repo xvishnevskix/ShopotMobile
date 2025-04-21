@@ -55,6 +55,8 @@ import org.videotrade.shopot.domain.model.GroupUserRole
 import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.Call.CallBar
 import org.videotrade.shopot.presentation.components.Common.BackIcon
+import org.videotrade.shopot.presentation.components.Common.EditOptionsPopup
+import org.videotrade.shopot.presentation.components.Common.GroupEditOption
 import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.group.GroupEditScreen
@@ -112,7 +114,7 @@ fun GroupProfileHeader(
             onDismissRequest = { showEditPopup.value = false }
         )
         Row(
-            modifier = Modifier.fillMaxWidth().padding(top = 40.dp).background(colors.background),
+            modifier = Modifier.fillMaxWidth().padding(top = 32.dp).background(colors.background),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
             
@@ -210,100 +212,5 @@ fun GroupProfileHeader(
 }
 
 
-data class PopupOption(
-    val text: String,
-    val onClick: () -> Unit,
-    val imagePath: DrawableResource,
-    val modifier: Modifier = Modifier,
-    val color: Color = Color(0xFF373533),
-)
-enum class GroupEditOption() {
-    edit,
-    remove;
 
-    fun toPopupDTO(text: String, onClick: () -> Unit, imagePath: DrawableResource, modifier: Modifier, color: Color): PopupOption = when (this) {
-        edit -> PopupOption(text,onClick,imagePath, modifier, color)
-        remove -> PopupOption(text, onClick, imagePath, modifier, color)
-    }
-}
-
-@Composable
-fun EditOptionsPopup(
-    isVisible: Boolean,
-    popupDTO: List<PopupOption>,
-    onDismissRequest: () -> Unit,
-) {
-    val colors = MaterialTheme.colorScheme
-
-    if (isVisible) {
-        Popup(
-            alignment = Alignment.TopEnd,
-            offset = IntOffset(20, 200), // настроить под якорь
-            onDismissRequest = onDismissRequest
-        ) {
-            Crossfade(targetState = isVisible, label = "EditPopup") { visible ->
-                if (visible) {
-                    Column(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(colors.background)
-                            .border(
-                                width = 1.dp,
-                                color = colors.onSecondary,
-                                shape = RoundedCornerShape(size = 16.dp)
-                            )
-                            .shadow(1.dp)
-                            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
-                    ) {
-                        popupDTO.forEach { item ->
-                            Column {
-                                Row(
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    modifier = Modifier
-                                        .border(
-                                            width = 1.dp,
-                                            color = colors.onSecondary,
-                                            shape = RoundedCornerShape(16.dp)
-                                        )
-                                        .width(197.dp)
-                                        .clickable(
-                                            interactionSource = remember { MutableInteractionSource() },
-                                            indication = null
-                                        ) {
-                                            item.onClick()
-                                            onDismissRequest()
-                                        }
-                                        .padding(
-                                            start = 16.dp,
-                                            end = 16.dp,
-                                            top = 16.dp,
-                                            bottom = 16.dp
-                                        )
-                                ) {
-                                    Text(
-                                        text = item.text,
-                                        fontSize = 16.sp,
-                                        lineHeight = 16.sp,
-                                        fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                                        fontWeight = FontWeight(400),
-                                        color = colors.primary,
-                                        letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                    )
-                                    Image(
-                                        painter = painterResource(item.imagePath),
-                                        contentDescription = null,
-                                        modifier = Modifier.size(18.dp),
-                                        colorFilter = ColorFilter.tint(item.color)
-                                    )
-                                }
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
 

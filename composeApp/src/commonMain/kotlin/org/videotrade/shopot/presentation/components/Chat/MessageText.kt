@@ -76,7 +76,7 @@ fun MessageText(
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .align(Alignment.BottomEnd) // крепим в правый нижний угол
+                    .align(Alignment.BottomEnd)
                     .padding(end = 6.dp, bottom = 8.dp, )
             ) {
                 if (message.created.isNotEmpty()) {
