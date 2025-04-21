@@ -150,6 +150,7 @@ class CallForegroundService : Service() {
         val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
         val isScreenOn =
             powerManager.isInteractive
+        
         val callViewModel: CallViewModel = KoinPlatform.getKoin().get()
         
         callViewModel.setIsScreenOn(isScreenOn)

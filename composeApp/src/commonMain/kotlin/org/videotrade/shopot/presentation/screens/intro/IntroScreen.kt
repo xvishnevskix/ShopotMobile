@@ -72,150 +72,110 @@ import shopot.composeapp.generated.resources.auth_logo
 
 
 class IntroScreen : Screen {
-
+    
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
-        val viewModel: IntroViewModel = koinInject()
-        val updateAppViewModel: UpdateAppViewModel = koinInject()
-        val сommonViewModel: CommonViewModel = koinInject()
+        val introViewModel: IntroViewModel = koinInject()
+        val commonViewModel: CommonViewModel = koinInject()
         val callViewModel: CallViewModel = koinInject()
         val isCallBackground by callViewModel.isCallBackground.collectAsState()
         
-        if (getPlatform() == Platform.Ios) {
-            if (isCallBackground) {
+        if (isCallBackground) {
+            if (getPlatform() == Platform.Ios) {
                 isActiveCallIos(callViewModel, navigator)
             }
-        }
-        if (isCallBackground) {
             return
         }
         
-        LaunchedEffect(key1 = Unit) {
-            if (сommonViewModel.isRestartApp.value) {
-                navigateToScreen(navigator,MainScreen())
+        LaunchedEffect(Unit) {
+            if (commonViewModel.isRestartApp.value) {
+                navigateToScreen(navigator, MainScreen())
+                return@LaunchedEffect
             }
-        }
-
-        AppInitializer()
-
-        LaunchedEffect(key1 = Unit) {
+            
             try {
-
-
-                if (checkNetwork()) {
-                    val isCheckVersion = false
-//                        updateAppViewModel.checkVersion()  // Предполагаем, что checkVersion() - suspend-функция
-
-                    if (isCheckVersion) {
-                        navigateToScreen(navigator,UpdateScreen())
-                    } else {
-
-                        viewModel.navigator.value = navigator
-
-
-                        val contactsNative =
-                            PermissionsProviderFactory.create().checkPermission("contacts")
-                        PermissionsProviderFactory.create().getPermission("notifications")
-
-
-
-
-                        if (!contactsNative) {
-                            navigateToScreen(navigator,PermissionsScreen())
-                            return@LaunchedEffect
-                        }
-
-
-                        val response = origin().reloadTokens(navigator)
-
-                        if (response != null) {
-
-                            сommonViewModel.setMainNavigator(navigator)
-
-                            сommonViewModel.cipherShared(response, navigator)
-
-
-                            return@LaunchedEffect
-
-
-                        }
-                        println("dasdadasadsad")
-                        navigateToScreen(navigator,WelcomeScreen())
-
-
-                    }
-                } else {
-                    navigateToScreen(navigator,NetworkErrorScreen())
+                if (!checkNetwork()) {
+                    navigateToScreen(navigator, NetworkErrorScreen())
+                    return@LaunchedEffect
                 }
+                
+                val isCheckVersion = false // updateAppViewModel.checkVersion()
+                
+                if (isCheckVersion) {
+                    navigateToScreen(navigator, UpdateScreen())
+                    return@LaunchedEffect
+                }
+                
+                introViewModel.navigator.value = navigator
+                
+                val hasContactsPermission = PermissionsProviderFactory.create()
+                    .checkPermission("contacts")
+                PermissionsProviderFactory.create().getPermission("notifications")
+                
+                if (!hasContactsPermission) {
+                    navigateToScreen(navigator, PermissionsScreen())
+                    return@LaunchedEffect
+                }
+                
+                val response = origin().reloadTokens(navigator)
+                
+                if (response != null) {
+                    commonViewModel.setMainNavigator(navigator)
+                    commonViewModel.cipherShared(response, navigator)
+                    return@LaunchedEffect
+                }
+                
+                navigateToScreen(navigator, WelcomeScreen())
+                
             } catch (e: Exception) {
-                navigateToScreen(navigator,NetworkErrorScreen())
+                navigateToScreen(navigator, NetworkErrorScreen())
             } finally {
                 incrementAppLaunchCounter()
             }
-
         }
-
-
-
-
-
+        
+        AppInitializer()
+        
         Box(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .background(
                     brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFBBA796), // rgb(187, 167, 150)
-                            Color(0xFFEDDCCC), // rgb(237, 220, 204)
-                            Color(0xFFCAB7A3), // rgb(202, 183, 163)
-                            Color(0xFFEDDCCC), // rgb(237, 220, 204)
-                            Color(0xFFBBA796)  // rgb(187, 167, 150)
+                        listOf(
+                            Color(0xFFBBA796),
+                            Color(0xFFEDDCCC),
+                            Color(0xFFCAB7A3),
+                            Color(0xFFEDDCCC),
+                            Color(0xFFBBA796)
                         )
                     )
                 ),
             contentAlignment = Alignment.Center
         ) {
-
             Column(
                 modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-
-//                Image(
-//                    modifier = Modifier
-//                        .size(width = 195.dp, height = 132.dp),
-//                    painter = painterResource(Res.drawable.auth_logo),
-//                    contentDescription = null,
-//
-//                    )
                 Spacer(modifier = Modifier.height(16.dp))
-
+                
                 LogoLoading()
-
-                Box(
-                    modifier = Modifier.padding(bottom = 80.dp)
-                ) {
-
+                
+                Box(modifier = Modifier.padding(bottom = 80.dp)) {
                     Text(
-//                        text = "${MokoRes.strings.app_version}: alpha~1.0.6",
                         text = "App Version: 1.1.5",
                         style = TextStyle(
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
                             fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
-                            fontWeight = FontWeight(400),
+                            fontWeight = FontWeight.Normal,
                             textAlign = TextAlign.Center,
-                            color = Color(0x80373533),
-                            letterSpacing = TextUnit(0F, TextUnitType.Sp),
+                            color = Color(0x80373533)
                         )
                     )
                 }
             }
-
         }
-
     }
-
-
 }

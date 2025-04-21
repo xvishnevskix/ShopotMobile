@@ -94,7 +94,6 @@ class AndroidApp : Application() {
             modules(getSharedModules() + provideEncapsulateChecker())
             
             modules(platformModule)
-            
         }
         INSTANCE = this
         
