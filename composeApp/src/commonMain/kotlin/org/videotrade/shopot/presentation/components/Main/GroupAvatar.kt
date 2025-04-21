@@ -31,7 +31,7 @@ fun GroupAvatar(users: List<GroupUserDTO>, size: Dp = 24.dp, shape: Dp = 6.dp) {
             }
             2 -> {
                 Row(
-                    modifier = Modifier.align(Alignment.TopCenter),
+                    modifier = Modifier.align(Alignment.Center),
                     horizontalArrangement = Arrangement.spacedBy(spacing)
                 ) {
                     avatars.forEach { user ->

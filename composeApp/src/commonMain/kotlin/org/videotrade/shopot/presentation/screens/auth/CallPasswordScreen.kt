@@ -296,7 +296,7 @@ class CallPasswordScreen(
                             )
                             Spacer(modifier = Modifier.height(24.dp))
                             Text(
-                                stringResource(MokoRes.strings.auth_confirm_note),                                style = TextStyle(
+                                stringResource(MokoRes.strings.call_to_auth_hint),                                style = TextStyle(
                                     fontSize = 16.sp,
                                     fontFamily = FontFamily(Font(Res.font.ArsonPro_Regular)),
                                     fontWeight = FontWeight(400),
