@@ -8,12 +8,9 @@ expect class CallProvider {
     
 }
 
-
 expect object CallProviderFactory {
     fun create(): CallProvider
 }
-
-
 
 expect fun onResumeCallActivity(navigator: Navigator)
 

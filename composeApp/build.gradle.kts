@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.Lint
-import com.android.build.api.dsl.LintOptions
 import com.android.build.api.dsl.ManagedVirtualDevice
 import dev.icerock.gradle.MRVisibility
 import org.jetbrains.compose.ExperimentalComposeLibrary
@@ -10,6 +8,7 @@ import org.jetbrains.kotlin.konan.target.KonanTarget
 
 plugins {
     alias(libs.plugins.multiplatform)
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.compose)
     alias(libs.plugins.android.application)
     alias(libs.plugins.buildConfig)
@@ -17,12 +16,9 @@ plugins {
     kotlin("native.cocoapods")
     id("com.google.gms.google-services")
     id("dev.icerock.mobile.multiplatform-resources") version "0.24.1"
-    
 }
 
-
 kotlin {
-    
     cocoapods {
         version = "1.0"
         summary = "Compose app"
@@ -43,6 +39,7 @@ kotlin {
                 freeCompilerArgs += "-Xjdk-release=${JavaVersion.VERSION_1_8}"
             }
         }
+        
         @OptIn(ExperimentalKotlinGradlePluginApi::class)
         instrumentedTestVariant {
             sourceSetTree.set(KotlinSourceSetTree.test)
@@ -52,19 +49,6 @@ kotlin {
             }
         }
     }
-
-//    listOf(
-//        iosX64 { configureWebRtcCinterops() },
-//        iosArm64 { configureWebRtcCinterops() },
-//        iosSimulatorArm64 { configureWebRtcCinterops() }
-//    ).forEach { iosTarget ->
-//        iosTarget.binaries.framework {
-//            export("io.github.mirzemehdi:kmpnotifier:1.0.0")
-//            export(libs.resources)
-//            baseName = "ComposeApp"
-//            isStatic = true
-//        }
-//    }
     
     listOf(
         iosX64 { configureWebRtcCinterops() },
@@ -73,14 +57,13 @@ kotlin {
     ).forEach { iosTarget ->
         iosTarget.binaries.framework {
             baseName = "ComposeApp"
-            isStatic = true // Уберите, если проблемы сохраняются
+            isStatic = true // можно удалить при ошибках сборки
             export("io.github.mirzemehdi:kmpnotifier:1.0.0")
-            export("com.example:resources:1.0.0") // Замените, если `libs.resources` не работает
+            export("com.example:resources:1.0.0")
         }
     }
     
     sourceSets {
-        
         all {
             languageSettings {
                 optIn("org.jetbrains.compose.resources.ExperimentalResourceApi")
@@ -126,15 +109,15 @@ kotlin {
             implementation(libs.coil.mp)
             implementation(libs.coil.network.ktor)
             api(libs.resources)
-            api(libs.resources.compose) // for compose multiplatfor
+            api(libs.resources.compose)
             implementation(libs.compressor)
+            
         }
         
-        //Для версии приложения
-        commonMain {
-            val versionName = project.findProperty("VERSION_NAME") as String
-            kotlin.srcDir("build/generated/kotlin")
-        }
+//        commonMain {
+//            val versionName = project.findProperty("VERSION_NAME") as String
+//            kotlin.srcDir("build/generated/kotlin")
+//        }
         
         commonTest.dependencies {
             implementation(kotlin("test"))
@@ -153,7 +136,7 @@ kotlin {
             implementation(libs.androidx.work.runtime.ktx)
             implementation(libs.androidx.lifecycle.runtime.ktx)
             implementation(libs.androidx.lifecycle.process)
-            implementation(libs.itext7.core) // Добавлено для работы с PDF
+            implementation(libs.itext7.core)
             implementation(libs.lz4.java)
         }
         
@@ -162,7 +145,6 @@ kotlin {
         }
     }
 }
-
 
 tasks.register("generateBuildConfig") {
     val versionName = project.findProperty("VERSION_NAME") ?: "1.1.2"
@@ -180,11 +162,11 @@ tasks.register("generateBuildConfig") {
 
 android {
     namespace = "org.videotrade.shopot"
-    compileSdk = 34
+    compileSdk = 35
     
     defaultConfig {
         minSdk = 27
-        targetSdk = 34
+        targetSdk = 35
         
         applicationId = "org.videotrade.shopot.androidApp"
         versionCode = 30
@@ -205,7 +187,6 @@ android {
         manifest.srcFile("src/androidMain/AndroidManifest.xml")
         res.srcDirs("src/androidMain/res")
     }
-    
     
     @Suppress("UnstableApiUsage")
     testOptions {
@@ -242,10 +223,9 @@ android {
 }
 
 multiplatformResources {
-    resourcesPackage.set("org.videotrade.shopot") // required
-    resourcesClassName.set("MokoRes") // optional, default MR
+    resourcesPackage.set("org.videotrade.shopot")
+    resourcesClassName.set("MokoRes")
 }
-
 
 dependencies {
     implementation(libs.androidx.animation.core.android)
@@ -253,31 +233,26 @@ dependencies {
 }
 
 buildConfig {
-    // BuildConfig configuration here.
-    // https://github.com/gmazzo/gradle-buildconfig-plugin#usage-in-kts
+    // buildConfig block
 }
 
+// WebRTC cinterop setup
 fun KotlinNativeTarget.configureWebRtcCinterops() {
     val webRtcFrameworkPath = file("$buildDir/cocoapods/synthetic/IOS/Pods/WebRTC-SDK")
         .resolveArchPath(konanTarget, "WebRTC")
+    
     compilations.getByName("main") {
         cinterops.getByName("WebRTC") {
             compilerOpts("-framework", "WebRTC", "-F$webRtcFrameworkPath")
         }
     }
     
-    binaries {
-        getTest("DEBUG").apply {
-            linkerOpts(
-                "-framework",
-                "WebRTC",
-                "-F$webRtcFrameworkPath",
-                "-rpath",
-                "$webRtcFrameworkPath",
-                "-ObjC"
-            )
-        }
-    }
+    binaries.getTest("DEBUG").linkerOpts(
+        "-framework", "WebRTC",
+        "-F$webRtcFrameworkPath",
+        "-rpath", "$webRtcFrameworkPath",
+        "-ObjC"
+    )
 }
 
 fun File.resolveArchPath(target: KonanTarget, framework: String): File? {
@@ -298,4 +273,3 @@ private fun KonanTarget.matches(dir: String): Boolean {
         else -> error("Unsupported target $name")
     }
 }
-
