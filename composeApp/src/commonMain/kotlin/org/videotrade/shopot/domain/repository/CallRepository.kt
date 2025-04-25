@@ -95,5 +95,5 @@ interface CallRepository {
     
     fun resetWebRTC()
     
-    fun addIceCandidates(iceCandidates: List<WebRTCMessage>)
+    suspend fun addIceCandidates(iceCandidates: List<WebRTCMessage>)
 }

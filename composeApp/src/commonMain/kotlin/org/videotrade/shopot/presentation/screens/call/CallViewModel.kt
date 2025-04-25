@@ -598,7 +598,7 @@ class CallViewModel : ViewModel(), KoinComponent {
         callUseCase.setCalleeUserInfo(calleeUserInfo)
     }
     
-    fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
+    suspend fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
         callUseCase.addIceCandidates(iceCandidates)
     }
 }

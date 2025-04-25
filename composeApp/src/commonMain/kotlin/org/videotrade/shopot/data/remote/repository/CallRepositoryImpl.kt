@@ -1280,7 +1280,7 @@ class CallRepositoryImpl : CallRepository, KoinComponent {
     }
     
     
-    override fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
+    override suspend fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
         
         iceCandidates.forEach {
             

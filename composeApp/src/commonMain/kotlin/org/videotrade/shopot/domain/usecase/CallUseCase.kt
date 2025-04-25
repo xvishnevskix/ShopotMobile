@@ -144,7 +144,7 @@ class CallUseCase : KoinComponent {
     }
     
     
-    fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
+    suspend fun addIceCandidates(iceCandidates: List<WebRTCMessage>) {
         return repository.addIceCandidates(iceCandidates)
     }
     
