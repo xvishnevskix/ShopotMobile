@@ -15,7 +15,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     kotlin("native.cocoapods")
     id("com.google.gms.google-services")
-    id("dev.icerock.mobile.multiplatform-resources") version "0.24.1"
+    id("dev.icerock.mobile.multiplatform-resources") version "0.24.5"
 }
 
 kotlin {
@@ -99,7 +99,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.peekaboo.ui)
             implementation(libs.peekaboo.image.picker)
-            implementation(libs.sonner)
+//            implementation(libs.sonner)
             api(libs.image.loader.v181)
             api(libs.kmpnotifier)
             implementation(libs.firebase.common)

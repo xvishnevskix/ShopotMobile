@@ -51,8 +51,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -193,11 +191,11 @@ class CallPasswordScreen(
             hasError.value = true
             isLoading.value = false
             animationTrigger.value = !animationTrigger.value
-            toasterViewModel.toaster.show(
-                message = errorMessage,
-                type = ToastType.Warning,
-                duration = ToasterDefaults.DurationDefault,
-            )
+//            toasterViewModel.toaster.show(
+//                message = errorMessage,
+//                type = ToastType.Warning,
+//                duration = ToasterDefaults.DurationDefault,
+//            )
         }
         
         suspend fun handleAuthCase() {

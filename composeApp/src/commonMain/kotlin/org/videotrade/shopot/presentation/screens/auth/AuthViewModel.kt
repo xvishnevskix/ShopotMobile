@@ -2,8 +2,6 @@ package org.videotrade.shopot.presentation.screens.auth
 
 
 import cafe.adriel.voyager.navigator.Navigator
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
@@ -82,12 +80,12 @@ class AuthViewModel : ViewModel(), KoinComponent {
                                 "verificationCompleted" -> {
                                     println("verificationCompleted")
                                     
-                                    commonViewModel.toaster.show(
-                                        "Проверка прошла успешно подождите 5 сек",
-                                        type = ToastType.Success,
-                                        duration = ToasterDefaults.DurationDefault
-                                    )
-                                    
+//                                    commonViewModel.toaster.show(
+//                                        "Проверка прошла успешно подождите 5 сек",
+//                                        type = ToastType.Success,
+//                                        duration = ToasterDefaults.DurationDefault
+//                                    )
+//
                                     
                                     
                                     isCallPasswordSuccess.value = true
@@ -188,51 +186,51 @@ class AuthViewModel : ViewModel(), KoinComponent {
                         )
                     )
                 } else {
-                    when (response.status.value) {
-
-                        404 -> {
-                            toasterViewModel.toaster.show(
-                                serverUnavailable,
-                                type = ToastType.Error,
-                                duration = ToasterDefaults.DurationDefault
-                            )
-                        }
-                        500 -> {
-                            toasterViewModel.toaster.show(
-                                serverUnavailable,
-                                type = ToastType.Error,
-                                duration = ToasterDefaults.DurationDefault
-                            )
-                        }
-                        502 -> {
-                            toasterViewModel.toaster.show(
-                                serverUnavailable,
-                                type = ToastType.Error,
-                                duration = ToasterDefaults.DurationDefault
-                            )
-                        }
-                        503 -> {
-                            toasterViewModel.toaster.show(
-                                serverUnavailable,
-                                type = ToastType.Error,
-                                duration = ToasterDefaults.DurationDefault
-                            )
-                        }
-                        504 -> {
-                            toasterViewModel.toaster.show(
-                                serverUnavailable,
-                                type = ToastType.Error,
-                                duration = ToasterDefaults.DurationDefault
-                            )
-                        }
-                        else -> {
-                            toasterViewModel.toaster.show(
-                                "Неизвестная ошибка. Попробуйте, пожалуйста, позже.",
-                                type = ToastType.Error,
-                                duration = ToasterDefaults.DurationDefault
-                            )
-                        }
-                    }
+//                    when (response.status.value) {
+//
+//                        404 -> {
+//                            toasterViewModel.toaster.show(
+//                                serverUnavailable,
+//                                type = ToastType.Error,
+//                                duration = ToasterDefaults.DurationDefault
+//                            )
+//                        }
+//                        500 -> {
+//                            toasterViewModel.toaster.show(
+//                                serverUnavailable,
+//                                type = ToastType.Error,
+//                                duration = ToasterDefaults.DurationDefault
+//                            )
+//                        }
+//                        502 -> {
+//                            toasterViewModel.toaster.show(
+//                                serverUnavailable,
+//                                type = ToastType.Error,
+//                                duration = ToasterDefaults.DurationDefault
+//                            )
+//                        }
+//                        503 -> {
+//                            toasterViewModel.toaster.show(
+//                                serverUnavailable,
+//                                type = ToastType.Error,
+//                                duration = ToasterDefaults.DurationDefault
+//                            )
+//                        }
+//                        504 -> {
+//                            toasterViewModel.toaster.show(
+//                                serverUnavailable,
+//                                type = ToastType.Error,
+//                                duration = ToasterDefaults.DurationDefault
+//                            )
+//                        }
+//                        else -> {
+//                            toasterViewModel.toaster.show(
+//                                "Неизвестная ошибка. Попробуйте, пожалуйста, позже.",
+//                                type = ToastType.Error,
+//                                duration = ToasterDefaults.DurationDefault
+//                            )
+//                        }
+//                    }
                 }
 
             } catch (e: Exception) {

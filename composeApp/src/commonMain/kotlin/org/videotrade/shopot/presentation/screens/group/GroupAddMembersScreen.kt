@@ -38,8 +38,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.InternalResourceApi
@@ -104,11 +102,11 @@ class GroupAddMembersScreen(private val chat: ChatItem) : Screen {
                         viewModel = viewModel,
                         onClick = {
                             if (selectedContacts.isEmpty()) {
-                                toasterViewModel.toaster.show(
-                                    message = selectParticipants,
-                                    type = ToastType.Error,
-                                    duration = ToasterDefaults.DurationDefault
-                                )
+//                                toasterViewModel.toaster.show(
+//                                    message = selectParticipants,
+//                                    type = ToastType.Error,
+//                                    duration = ToasterDefaults.DurationDefault
+//                                )
                             } else {
                                 groupViewModel.addUsersToGroup(chat.chatId)
                                 navigator.pop()

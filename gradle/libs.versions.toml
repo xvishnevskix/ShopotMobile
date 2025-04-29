@@ -8,7 +8,7 @@ kermit = "2.0.3"
 kmpnotifier = "1.0.0"
 kotlin = "2.1.21-RC"
 compose = "1.8.0-beta01"
-agp = "8.6.0"
+agp = "8.6.1"
 androidx-activityCompose = "1.9.0"
 androidx-uiTest = "1.6.7"
 kotlinxDatetime = "0.5.0"
@@ -20,7 +20,7 @@ lifecycleRuntimeKtx = "2.8.2"
 lz4Java = "1.8.0"
 peekabooUi = "0.5.2"
 resources = "0.24.5"
-sonner = "0.3.6"
+#sonner = "0.3.6"
 voyager = "1.1.0-beta03"
 composeImageLoader = "1.8.1"
 buildConfig = "4.1.1"
@@ -35,7 +35,7 @@ statelyCommon = "2.0.6"
 voyagerTabNavigator = "1.0.0"
 webrtcKmp = "0.125.9"
 webrtc-ios-sdk = "125.6422.07"
-animationCoreAndroid = "1.6.7"
+animationCoreAndroid = "1.8.0"
 imageLoader = "1.8.1"
 gms = "4.4.0"
 firebaseCommon = "1.10.0"
@@ -80,7 +80,7 @@ peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", ver
 peekaboo-ui = { module = "io.github.onseok:peekaboo-ui", version.ref = "peekabooUi" }
 resources = { module = "dev.icerock.moko:resources", version.ref = "resources" }
 resources-compose = { module = "dev.icerock.moko:resources-compose", version.ref = "resources" }
-sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
+#sonner = { module = "io.github.dokar3:sonner", version.ref = "sonner" }
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }

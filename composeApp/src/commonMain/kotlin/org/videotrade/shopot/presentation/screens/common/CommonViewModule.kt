@@ -2,7 +2,6 @@ package org.videotrade.shopot.presentation.screens.common
 
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.TabNavigator
-import com.dokar.sonner.ToasterState
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
@@ -49,7 +48,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
     private val profileUseCase: ProfileUseCase by inject()
     private val commonUseCase: CommonUseCase by inject()
 
-    val toaster = ToasterState(viewModelScope)
+//    val toaster = ToasterState(viewModelScope)
 
 //    val showButtonNav = MutableStateFlow(true)
 

@@ -34,8 +34,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
+
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
@@ -133,11 +132,11 @@ class NetworkErrorScreen : Screen {
                                 if (checkNetwork()) {
                                     navigateToScreen(navigator,IntroScreen())
                                 } else {
-                                    commonViewModel.toaster.show(
-                                        "Не удалось подключиться к сети",
-                                        type = ToastType.Error,
-                                        duration = ToasterDefaults.DurationDefault
-                                    )
+//                                    commonViewModel.toaster.show(
+//                                        "Не удалось подключиться к сети",
+//                                        type = ToastType.Error,
+//                                        duration = ToasterDefaults.DurationDefault
+//                                    )
                                 }
                             
                             }, style = ButtonStyle.Gradient)

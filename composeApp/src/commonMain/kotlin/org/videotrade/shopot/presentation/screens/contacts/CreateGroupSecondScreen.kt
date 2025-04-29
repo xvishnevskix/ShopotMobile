@@ -48,8 +48,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.koin.compose.koinInject
@@ -121,11 +119,11 @@ class CreateGroupSecondScreen : Screen {
                         order = "2",
                         onClick = {
                             if (groupNameError.value != null) {
-                                toasterViewModel.toaster.show(
-                                    fillInput,
-                                    type = ToastType.Error,
-                                    duration = ToasterDefaults.DurationDefault
-                                )
+//                                toasterViewModel.toaster.show(
+//                                    fillInput,
+//                                    type = ToastType.Error,
+//                                    duration = ToasterDefaults.DurationDefault
+//                                )
                             } else {
                                 val profileId = getValueInStorage("profileId")
                                 println("profileId profileId ${profileId}")

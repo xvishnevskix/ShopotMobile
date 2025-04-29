@@ -49,8 +49,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
+
 import com.mmk.kmpnotifier.notification.NotifierManager
 import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
@@ -285,11 +284,11 @@ class SignUpPhoneScreen : Screen {
                                                     
                                                     if (fullPhoneNumber.length < phoneNumberLength) {
                                                         hasError.value = true
-                                                        toasterViewModel.toaster.show(
-                                                            "$requiredPhoneLength $phoneNumberLength",
-                                                            type = ToastType.Error,
-                                                            duration = ToasterDefaults.DurationDefault
-                                                        )
+//                                                        toasterViewModel.toaster.show(
+//                                                            "$requiredPhoneLength $phoneNumberLength",
+//                                                            type = ToastType.Error,
+//                                                            duration = ToasterDefaults.DurationDefault
+//                                                        )
                                                         animationTrigger.value =
                                                             !animationTrigger.value
                                                         
@@ -322,11 +321,11 @@ class SignUpPhoneScreen : Screen {
                                                         hasError.value = false
                                                         if (response != null) {
                                                             hasError.value = true
-                                                            toasterViewModel.toaster.show(
-                                                                phoneRegistered,
-                                                                type = ToastType.Error,
-                                                                duration = ToasterDefaults.DurationDefault
-                                                            )
+//                                                            toasterViewModel.toaster.show(
+//                                                                phoneRegistered,
+//                                                                type = ToastType.Error,
+//                                                                duration = ToasterDefaults.DurationDefault
+//                                                            )
                                                             animationTrigger.value =
                                                                 !animationTrigger.value
                                                         }

@@ -30,9 +30,6 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.Toast
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.delay
@@ -114,11 +111,11 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                 val messageObject = jsonElement.jsonObject["message"]?.jsonObject
                 responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
 
-                toasterViewModel.toaster.show(
-                    message = sentSMSCode,
-                    type = ToastType.Success,
-                    duration = ToasterDefaults.DurationDefault,
-                )
+//                toasterViewModel.toaster.show(
+//                    message = sentSMSCode,
+//                    type = ToastType.Success,
+//                    duration = ToasterDefaults.DurationDefault,
+//                )
             }
 
 
@@ -181,11 +178,11 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                                         responseState.value != otpText && !isSuccessOtp.value
                                     ) {
                                         isLoading.value = false
-                                        toasterViewModel.toaster.show(
-                                            message = invalidCode,
-                                            type = ToastType.Warning,
-                                            duration = ToasterDefaults.DurationDefault,
-                                        )
+//                                        toasterViewModel.toaster.show(
+//                                            message = invalidCode,
+//                                            type = ToastType.Warning,
+//                                            duration = ToasterDefaults.DurationDefault,
+//                                        )
                                         return@launch
                                     }
 
@@ -221,17 +218,17 @@ class AuthSMSScreen(private val phone: String, private val authCase: String) : S
                                 .clickable {
                                     if (isRunning) {
 
-                                        toasterViewModel.toaster.show(
-                                            message = "${wait} $time ${secondsBeforeResending}",
-                                            type = ToastType.Error,
-                                            duration = ToasterDefaults.DurationDefault,
-                                        )
+//                                        toasterViewModel.toaster.show(
+//                                            message = "${wait} $time ${secondsBeforeResending}",
+//                                            type = ToastType.Error,
+//                                            duration = ToasterDefaults.DurationDefault,
+//                                        )
                                     } else {
-                                        toasterViewModel.toaster.show(
-                                            message = sentSMSCode,
-                                            type = ToastType.Success,
-                                            duration = ToasterDefaults.DurationDefault,
-                                        )
+//                                        toasterViewModel.toaster.show(
+//                                            message = sentSMSCode,
+//                                            type = ToastType.Success,
+//                                            duration = ToasterDefaults.DurationDefault,
+//                                        )
                                         isRunning = true
                                         reloadSend = false
                                         startTimer()

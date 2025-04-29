@@ -44,8 +44,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import io.ktor.client.HttpClient
 import io.ktor.client.request.post
@@ -239,11 +237,11 @@ class AuthCallScreen(
             hasError.value = true
             isLoading.value = false
             animationTrigger.value = !animationTrigger.value
-            toasterViewModel.toaster.show(
-                message = errorMessage,
-                type = ToastType.Warning,
-                duration = ToasterDefaults.DurationDefault,
-            )
+//            toasterViewModel.toaster.show(
+//                message = errorMessage,
+//                type = ToastType.Warning,
+//                duration = ToasterDefaults.DurationDefault,
+//            )
         }
 
         suspend fun handleAuthCase() {
@@ -291,12 +289,12 @@ class AuthCallScreen(
                             val jsonElement = Json.parseToJsonElement(response)
                             val messageObject = jsonElement.jsonObject["message"]?.jsonObject
                             responseState.value = messageObject?.get("code")?.jsonPrimitive?.content
-
-                            toasterViewModel.toaster.show(
-                                message = sentSMSCode,
-                                type = ToastType.Success,
-                                duration = ToasterDefaults.DurationDefault,
-                            )
+//
+//                            toasterViewModel.toaster.show(
+//                                message = sentSMSCode,
+//                                type = ToastType.Success,
+//                                duration = ToasterDefaults.DurationDefault,
+//                            )
 
 
                             val otpText = otpFields.joinToString("")
@@ -577,58 +575,58 @@ suspend fun sendRequestToBackend(
 
             if (response.bodyAsText() == "User not found") {
                 hasError?.value = true
-                toasterViewModel.toaster.show(
-                    phoneNotRegistered,
-                    type = ToastType.Error,
-                    duration = ToasterDefaults.DurationDefault
-                )
+//                toasterViewModel.toaster.show(
+//                    phoneNotRegistered,
+//                    type = ToastType.Error,
+//                    duration = ToasterDefaults.DurationDefault
+//                )
             }
 
-            when (response.status.value) {
-
-                404 -> {
-                    toasterViewModel.toaster.show(
-                        serverUnavailable,
-                        type = ToastType.Error,
-                        duration = ToasterDefaults.DurationDefault
-                    )
-                }
-                500 -> {
-                    toasterViewModel.toaster.show(
-                        serverUnavailable,
-                        type = ToastType.Error,
-                        duration = ToasterDefaults.DurationDefault
-                    )
-                }
-                502 -> {
-                    toasterViewModel.toaster.show(
-                        serverUnavailable,
-                        type = ToastType.Error,
-                        duration = ToasterDefaults.DurationDefault
-                    )
-                }
-                503 -> {
-                    toasterViewModel.toaster.show(
-                        serverUnavailable,
-                        type = ToastType.Error,
-                        duration = ToasterDefaults.DurationDefault
-                    )
-                }
-                504 -> {
-                    toasterViewModel.toaster.show(
-                        serverUnavailable,
-                        type = ToastType.Error,
-                        duration = ToasterDefaults.DurationDefault
-                    )
-                }
-//                else -> {
+//            when (response.status.value) {
+//
+//                404 -> {
 //                    toasterViewModel.toaster.show(
-//                        "Неизвестная ошибка (${response.status.value}). Попробуйте позже.",
+//                        serverUnavailable,
 //                        type = ToastType.Error,
 //                        duration = ToasterDefaults.DurationDefault
 //                    )
 //                }
-            }
+//                500 -> {
+//                    toasterViewModel.toaster.show(
+//                        serverUnavailable,
+//                        type = ToastType.Error,
+//                        duration = ToasterDefaults.DurationDefault
+//                    )
+//                }
+//                502 -> {
+//                    toasterViewModel.toaster.show(
+//                        serverUnavailable,
+//                        type = ToastType.Error,
+//                        duration = ToasterDefaults.DurationDefault
+//                    )
+//                }
+//                503 -> {
+//                    toasterViewModel.toaster.show(
+//                        serverUnavailable,
+//                        type = ToastType.Error,
+//                        duration = ToasterDefaults.DurationDefault
+//                    )
+//                }
+//                504 -> {
+//                    toasterViewModel.toaster.show(
+//                        serverUnavailable,
+//                        type = ToastType.Error,
+//                        duration = ToasterDefaults.DurationDefault
+//                    )
+//                }
+////                else -> {
+////                    toasterViewModel.toaster.show(
+////                        "Неизвестная ошибка (${response.status.value}). Попробуйте позже.",
+////                        type = ToastType.Error,
+////                        duration = ToasterDefaults.DurationDefault
+////                    )
+////                }
+//            }
 
 // Триггер анимации, если нужно
             animationTrigger?.let {

@@ -60,8 +60,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.rememberAsyncImagePainter
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
+
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
@@ -175,11 +174,11 @@ class ProfileEditScreen : Screen {
                         scope.launch {
 
                             if (firstNameError.value != null || lastNameError.value != null || descriptionError.value != null) {
-                                toasterViewModel.toaster.show(
-                                    fillInputs,
-                                    type = ToastType.Error,
-                                    duration = ToasterDefaults.DurationDefault
-                                )
+//                                toasterViewModel.toaster.show(
+//                                    fillInputs,
+//                                    type = ToastType.Error,
+//                                    duration = ToasterDefaults.DurationDefault
+//                                )
                             } else {
                                 val profileUpdate = profileViewModel.sendNewProfile(
                                     textState.value,

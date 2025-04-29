@@ -13,7 +13,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.dokar.sonner.Toaster
 import org.koin.compose.koinInject
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
@@ -45,7 +44,7 @@ fun SafeArea(
                 }
             )
     ) {
-        Toaster(state = toasterViewModel.toaster)
+//        Toaster(state = toasterViewModel.toaster)
         content()
     }
 }

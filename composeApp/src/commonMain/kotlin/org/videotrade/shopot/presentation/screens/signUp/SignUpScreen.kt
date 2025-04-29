@@ -36,8 +36,6 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.rememberAsyncImagePainter
-import com.dokar.sonner.ToastType
-import com.dokar.sonner.ToasterDefaults
 import dev.icerock.moko.resources.compose.stringResource
 import io.github.vinceglb.filekit.core.PickerType
 import io.ktor.client.HttpClient
@@ -280,11 +278,11 @@ class SignUpScreen(private val phone: String) : Screen {
                                 stringResource(MokoRes.strings.create_account),
                                 { scope ->
                                     if (firstNameError.value != null || lastNameError.value != null || nicknameError.value != null) {
-                                        toasterViewModel.toaster.show(
-                                            fillInputs,
-                                            type = ToastType.Error,
-                                            duration = ToasterDefaults.DurationDefault
-                                        )
+//                                        toasterViewModel.toaster.show(
+//                                            fillInputs,
+//                                            type = ToastType.Error,
+//                                            duration = ToasterDefaults.DurationDefault
+//                                        )
                                     } else {
                                         scope.launch {
                                             val client = HttpClient(getHttpClientEngine())
@@ -328,11 +326,11 @@ class SignUpScreen(private val phone: String) : Screen {
                                                 val userId = responseData.userId
 
                                                 if (response.status.value == 500) {
-                                                    toasterViewModel.toaster.show(
-                                                        phoneIsRegistered,
-                                                        type = ToastType.Warning,
-                                                        duration = ToasterDefaults.DurationDefault
-                                                    )
+//                                                    toasterViewModel.toaster.show(
+//                                                        phoneIsRegistered,
+//                                                        type = ToastType.Warning,
+//                                                        duration = ToasterDefaults.DurationDefault
+//                                                    )
                                                 }
 
                                                 if (response.status.isSuccess()) {
