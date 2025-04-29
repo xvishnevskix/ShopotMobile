@@ -68,11 +68,11 @@ class ContactsViewModel : ViewModel(),
         }
     }
     
-    fun createChat(contact: ContactDTO, tabNavigator: TabNavigator? = null) {
+    fun createChat(userId: String) {
         viewModelScope.launch {
             val profile = profileUseCase.getProfile()
             
-            contactsUseCase.createChat(profile.id, contact)
+            contactsUseCase.createChat(profile.id, userId)
             
         }
         

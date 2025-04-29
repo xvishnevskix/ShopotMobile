@@ -198,7 +198,7 @@ private fun ContactItem(
             .clickable {
                 println("item41421 $onInviteNewUsers")
                 if (onInviteNewUsers == null) {
-                    viewModel.createChat(item, tabNavigator)
+                    item.id?.let { viewModel.createChat(it) }
 
                     tabNavigator.current = ChatsTab
                 } else {

@@ -323,7 +323,11 @@ fun MainContentComponent(mainViewModel: MainViewModel, commonViewModel: CommonVi
 
                                                                scope.launch {
                                                                    val contact = user.toContactDTO()
-                                                                   contactsViewModel.createChat(contact)
+                                                                   contact.id?.let {
+                                                                       contactsViewModel.createChat(
+                                                                           it
+                                                                       )
+                                                                   }
                                                                    isSearching.value = false
                                                                    searchQuery.value = ""
                                                                    mainViewModel.clearGlobalResults()

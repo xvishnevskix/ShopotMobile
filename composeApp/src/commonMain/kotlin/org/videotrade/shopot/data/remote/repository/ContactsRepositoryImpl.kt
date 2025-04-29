@@ -168,7 +168,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     }
     
     
-    override suspend fun createChat(profileId: String, contact: ContactDTO) {
+    override suspend fun createChat(profileId: String, userId: String) {
         val wsUseCase: WsUseCase by inject()
         
         
@@ -177,7 +177,7 @@ class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
                 buildJsonObject {
                     put("action", "createChat")
                     put("firstUserId", profileId)
-                    put("secondUserId", contact.id)
+                    put("secondUserId", userId)
                 }
             )
             println("error createChat $jsonContent")

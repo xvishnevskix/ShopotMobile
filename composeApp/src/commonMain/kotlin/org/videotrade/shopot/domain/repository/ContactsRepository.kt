@@ -13,7 +13,8 @@ interface ContactsRepository {
      fun getContacts(): List<ContactDTO>
     
     
-    suspend fun createChat(profileId: String, contact: ContactDTO)
+    suspend fun createChat(profileId: String, userId: String)
+    
     suspend fun createGroupChat(
         users: List<String?>,
         groupName: String,

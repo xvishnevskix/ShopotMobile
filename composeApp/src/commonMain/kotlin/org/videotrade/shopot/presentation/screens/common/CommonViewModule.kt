@@ -97,6 +97,7 @@ class CommonViewModel : ViewModel(), KoinComponent {
         println("dsadaasaaaa")
         commonUseCase.setNavigator(value)
     }
+    
 
     fun setTabNavigator(value: TabNavigator) {
         tabNavigator.value = value

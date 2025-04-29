@@ -1,7 +1,7 @@
 package org.videotrade.shopot.presentation.screens.profile
 
 import Avatar
-import androidx.compose.foundation.ExperimentalFoundationApi
+import ProfileSettingsButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,37 +35,44 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import dev.icerock.moko.resources.StringResource
 import dev.icerock.moko.resources.compose.stringResource
 import getImageStorage
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.navigateToScreen
-import org.videotrade.shopot.domain.model.ChatItem
+import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileChatHeader
-import org.videotrade.shopot.presentation.components.ProfileComponents.ProfileHeader
 import org.videotrade.shopot.presentation.screens.chat.PhotoViewerScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
+import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
-import shopot.composeapp.generated.resources.Montserrat_SemiBold
 import shopot.composeapp.generated.resources.Res
-import shopot.composeapp.generated.resources.SFCompactDisplay_Regular
 
 
-class ProfileChatScreen(private val chat: ChatItem) : Screen {
+class ProfileChatScreen(private val profile: ProfileDTO, private val isCreateChat: Boolean) :
+    Screen {
     
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val contactsViewModel: ContactsViewModel = koinInject()
+        val commonViewModel: CommonViewModel = koinInject()
+        
         val scope = rememberCoroutineScope()
         val pagerState = rememberPagerState(pageCount = { ProfileMediaTabs.entries.size })
+        
         val selectedTabIndex = remember {
             derivedStateOf { pagerState.currentPage }
         }
+        
         val colors = MaterialTheme.colorScheme
-
+        
         val tabs = ProfileMediaTabs.entries.map { tab ->
             org.videotrade.shopot.presentation.screens.group.TabInfo(
                 title = stringResource(tab.titleResId),
@@ -73,7 +80,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
             )
         }
         
-        val imagePainter = getImageStorage(chat.icon, chat.icon, false)
+        val imagePainter = getImageStorage(profile.icon, profile.icon, false)
         
         
         Box(
@@ -92,17 +99,18 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                     ProfileChatHeader(stringResource(MokoRes.strings.profile))
                     Spacer(modifier = Modifier.height(30.dp))
                     Avatar(
-                        icon = chat.icon,
+                        icon = profile.icon,
                         size = 128.dp,
                         onClick = {
                             println("AAAAA")
                             
                             scope.launch {
                                 imagePainter.value?.let {
-                                    navigateToScreen(navigator,
+                                    navigateToScreen(
+                                        navigator,
                                         PhotoViewerScreen(
                                             imagePainter,
-                                            messageSenderName = "${chat.firstName} ${chat.lastName}",
+                                            messageSenderName = "${profile.firstName} ${profile.lastName}",
                                         )
                                     )
                                 }
@@ -112,13 +120,16 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         }
                     )
                     Spacer(modifier = Modifier.height(24.dp))
-
-                    val isDeletedUser = chat.firstName.equals("Unknown", ignoreCase = true) && chat.lastName.isNullOrBlank()
+                    
+                    val isDeletedUser = profile.firstName.equals(
+                        "Unknown",
+                        ignoreCase = true
+                    ) && profile.lastName.isBlank()
                     val displayName = when {
                         isDeletedUser -> stringResource(MokoRes.strings.deleted_user)
-                        else -> "${chat.firstName.orEmpty()} ${chat.lastName.orEmpty()}".trim()
+                        else -> "${profile.firstName.orEmpty()} ${profile.lastName.orEmpty()}".trim()
                     }
-
+                    
                     Text(
                         text = displayName,
                         textAlign = TextAlign.Center,
@@ -136,7 +147,7 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier,
                     ) {
-                        chat.phone?.let {
+                        profile.phone?.let {
                             Text(
                                 it,
                                 textAlign = TextAlign.Center,
@@ -146,22 +157,23 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                                 fontWeight = FontWeight(400),
                                 color = colors.secondary,
                                 letterSpacing = TextUnit(0F, TextUnitType.Sp),
-                                modifier = Modifier.padding(end = if (chat.phone == "") 0.dp else 1.dp),
+                                modifier = Modifier.padding(end = if (profile.phone == "") 0.dp else 1.dp),
                             )
                         }
-
+                        
                         Box(
-                            modifier = Modifier.padding(start = 18.dp, end = 18.dp).clip(RoundedCornerShape(50.dp)).width(4.dp)
+                            modifier = Modifier.padding(start = 18.dp, end = 18.dp)
+                                .clip(RoundedCornerShape(50.dp)).width(4.dp)
                                 .height(4.dp)
                                 .background(color = colors.secondary),
                             contentAlignment = Alignment.Center
                         ) {
-
+                        
                         }
-
-                        if (chat.chatUser?.get(0)?.login != null) {
+                        
+                        if (profile.login != null) {
                             Text(
-                                chat.chatUser!![0].login!!,
+                                profile.login,
                                 textAlign = TextAlign.Center,
                                 fontSize = 16.sp,
                                 lineHeight = 16.sp,
@@ -172,12 +184,12 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                             )
                         }
                     }
-
+                    
                     Spacer(modifier = Modifier.height(28.dp))
-
-                    if (chat.chatUser?.get(0)?.description != null) {
+                    
+                    if (profile.description != null) {
                         Text(
-                            chat.chatUser!![0].description!!,
+                            profile.description,
                             textAlign = TextAlign.Center,
                             fontSize = 16.sp,
                             lineHeight = 16.sp,
@@ -187,16 +199,31 @@ class ProfileChatScreen(private val chat: ChatItem) : Screen {
                             letterSpacing = TextUnit(0F, TextUnitType.Sp),
                         )
                     }
-                    Spacer(modifier = Modifier.height(56.dp))
+//                    Spacer(modifier = Modifier.height(56.dp))
 //
                 }
                 
                 Column(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    
+                    if (isCreateChat)
+                        ProfileSettingsButton(
+                            drawableRes = null,
+                            width = 20.dp,
+                            height = 20.dp,
+                            mainText = "Создать чат",
+                            onClick = {
+                                contactsViewModel.createChat(profile.id)
+                                
+                                commonViewModel.tabNavigator.value?.current = ChatsTab
+                            }
+                        )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
                 }
-
+                
             }
         }
         
