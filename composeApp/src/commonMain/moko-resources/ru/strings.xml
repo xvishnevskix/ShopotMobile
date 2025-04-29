@@ -319,6 +319,6 @@
     <string name="do_you_really_want_to_leave_the_group">Вы действительно хотите выйти из группы</string>
     <string name="call_to_auth_hint">Просто позвоните — для вас это бесплатно и быстро, а для нас дешевле и позволяет нам продолжать улучшать приложение.</string>
 
-
+    <string name="applications">Приложения</string>
 
 </resources>

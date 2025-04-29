@@ -18,18 +18,26 @@ import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.domain.model.ProfileDTO
+import org.videotrade.shopot.presentation.screens.apps.AppsScreen
 import org.videotrade.shopot.presentation.screens.contacts.CreateChatScreen
 import org.videotrade.shopot.presentation.screens.main.MainScreen
 import org.videotrade.shopot.presentation.screens.profile.ProfileScreen
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.apps
 import shopot.composeapp.generated.resources.contacts_nav
 
 object ContactsTab : Tab {
     override val options: TabOptions
         @Composable
         get() {
-            val title = stringResource(MokoRes.strings.contacts)
-            val icon: Painter = painterResource(Res.drawable.contacts_nav)
+            val title = stringResource(MokoRes.strings.
+//            contacts
+                applications
+            )
+            val icon: Painter = painterResource(Res.drawable.
+//            contacts_nav
+                apps
+            )
             
             
             return remember {
@@ -43,7 +51,10 @@ object ContactsTab : Tab {
     
     @Composable
     override fun Content() {
-        Navigator(screen = CreateChatScreen()) { navigator ->
+        Navigator(screen =
+//        CreateChatScreen()
+        AppsScreen()
+        ) { navigator ->
             SlideTransition(navigator = navigator)
             
             

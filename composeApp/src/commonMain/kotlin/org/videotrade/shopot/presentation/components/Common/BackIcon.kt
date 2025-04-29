@@ -29,11 +29,4 @@ fun BackIcon(modifier: Modifier = Modifier) {
         contentScale = ContentScale.Crop,
         colorFilter =  ColorFilter.tint(colors.primary)
     )
-
-//    Icon(
-//        imageVector = Icons.Default.ArrowBack,
-//        contentDescription = "Back",
-//        modifier = modifier,
-//        tint = Color(0xFF000000)
-//    )
 }
