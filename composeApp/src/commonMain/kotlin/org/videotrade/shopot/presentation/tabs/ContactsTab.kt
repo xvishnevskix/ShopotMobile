@@ -31,12 +31,12 @@ object ContactsTab : Tab {
         @Composable
         get() {
             val title = stringResource(MokoRes.strings.
-//            contacts
-                applications
+            contacts
+//                applications
             )
             val icon: Painter = painterResource(Res.drawable.
-//            contacts_nav
-                apps
+            contacts_nav
+//                apps
             )
             
             
@@ -52,8 +52,8 @@ object ContactsTab : Tab {
     @Composable
     override fun Content() {
         Navigator(screen =
-//        CreateChatScreen()
-        AppsScreen()
+        CreateChatScreen()
+//        AppsScreen()
         ) { navigator ->
             SlideTransition(navigator = navigator)
             

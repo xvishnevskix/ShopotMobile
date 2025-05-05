@@ -31,6 +31,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.domain.model.StickerPack
 import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.usecase.ChatUseCase
+import org.videotrade.shopot.domain.usecase.ChatsUseCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.StickerUseCase
@@ -45,6 +46,7 @@ import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {
     private val chatUseCase: ChatUseCase by inject()
+    private val chatsUseCase: ChatsUseCase by inject()
     private val profileUseCase: ProfileUseCase by inject()
     private val wsUseCase: WsUseCase by inject()
     private val contactsUseCase: ContactsUseCase by inject()
@@ -515,6 +517,13 @@ class ChatViewModel : ViewModel(), KoinComponent {
     }
     
     
+    fun deleteChat(chat: ChatItem) {
+        viewModelScope.launch {
+            chatsUseCase.delChat(chat)
+        }
+    }
+    
+    
     ////////////////// СТИКЕРЫ /////////////////////////////
     
     private val stickerUseCase = StickerUseCase()
@@ -635,6 +644,8 @@ class ChatViewModel : ViewModel(), KoinComponent {
     
     
     ///////////////////////////////////////////////////////
+    
+    
     
     
 }

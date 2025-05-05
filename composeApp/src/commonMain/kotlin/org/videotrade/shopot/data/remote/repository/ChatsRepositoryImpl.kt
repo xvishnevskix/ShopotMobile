@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import org.koin.mp.KoinPlatform
+import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.WsReconnectionCase
@@ -139,8 +140,16 @@ class ChatsRepositoryImpl : ChatsRepository {
     }
     
     
-    override fun delChat(chat: ChatItem) {
-//        _chats= _users.value.filter { it.id != user.id }
+    override suspend fun delChat(chat: ChatItem) {
+        
+        val resDel = origin().delete("delete/chat/${chat.chatId}/user")
+        
+        println("resDel $resDel")
+        
+        if (resDel)
+            _chats.value = _chats.value.filter { it.id != chat.id }
+        
+        
     }
     
     
@@ -163,5 +172,5 @@ class ChatsRepositoryImpl : ChatsRepository {
         _isLoadingChats.value = loadingValue
     }
     
-
+    
 }

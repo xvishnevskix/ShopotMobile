@@ -272,7 +272,6 @@ class origin {
     
     suspend inline fun delete(
         url: String,
-        headers: Map<String, String> = emptyMap()
     ): Boolean {
         return try {
             val token = getValueInStorage("accessToken")
@@ -281,12 +280,10 @@ class origin {
             val response: HttpResponse = client.delete("${EnvironmentConfig.SERVER_URL}$url") {
                 contentType(ContentType.Application.Json)
                 header(HttpHeaders.Authorization, "Bearer $token")
-                headers.forEach { (key, value) ->
-                    header(key, value)
-                }
+
             }
             
-            if (response.status == HttpStatusCode.NoContent) {
+            if (response.status == HttpStatusCode.OK) {
                 // Успешное удаление, сервер возвращает 204 No Content
                 true
             } else {

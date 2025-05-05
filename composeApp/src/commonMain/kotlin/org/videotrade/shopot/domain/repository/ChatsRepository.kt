@@ -27,7 +27,7 @@ interface ChatsRepository {
     fun setCurrentChat(chatValue: String)
     
     
-    fun delChat(chat: ChatItem)
+    suspend fun delChat(chat: ChatItem)
     fun addChat(chat: ChatItem)
     fun addChats(chatsInit: MutableList<ChatItem>)
     
