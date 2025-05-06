@@ -668,12 +668,92 @@ suspend fun handleConnectWebSocket(
                                     groupViewModel.clearCacheForGroupChat(it)
                                 }
                                 groupViewModel.reloadCurrentChatUsers()
+
+
+
                             }
 
                             "changeMemberRole" -> {
                                 val groupViewModel: GroupViewModel = KoinPlatform.getKoin().get()
                                 groupViewModel.reloadCurrentChatUsers()
                             }
+
+
+                            "chatRestoredDetails" -> {
+
+                                try {
+                                    val dataJson =
+                                        jsonElement.jsonObject["message"]?.jsonObject
+
+                                    println("getMessages111111 ${dataJson}")
+
+
+                                    if (dataJson != null) {
+
+                                        val contactsMap =
+                                            contactsUseCase.contacts.value.associateBy {
+                                                normalizePhoneNumber(it.phone)
+                                            }
+
+
+                                        println("sortChat $dataJson")
+
+
+                                        val chat: ChatItem =
+                                            Json.decodeFromString(dataJson.toString())
+
+                                        println("chat $chat")
+
+
+                                        var newChat = chat
+
+                                        if (chat.lastMessage?.content?.isNotBlank() == true) {
+                                            val lastMessageContent = decupsMessage(
+                                                chat.lastMessage?.content!!,
+                                            )
+
+                                            println("lastMessageContent")
+
+                                            newChat = chat.copy(
+                                                lastMessage = chat.lastMessage!!.copy(
+                                                    content = lastMessageContent
+                                                )
+                                            )
+
+                                        }
+
+
+                                        if (chat.personal) {
+                                            val normalizedChatPhone =
+                                                newChat.phone?.let { normalizePhoneNumber(it) }
+
+                                            val contact = contactsMap[normalizedChatPhone]
+
+                                            if (contact != null) {
+                                                val sortChat = newChat.copy(
+                                                    firstName = "${contact.firstName}",
+                                                    lastName = "${contact.lastName}"
+                                                )
+                                                println("sortChat $sortChat")
+
+                                                chatsUseCase.addChat(sortChat)
+
+                                            } else {
+                                                chatsUseCase.addChat(newChat.copy(isSavedContact = false))
+                                            }
+                                        } else {
+                                            chatsUseCase.addChat(newChat)
+                                        }
+
+                                    }
+
+                                } catch (e: Exception) {
+
+                                    Logger.d("Error228: $e")
+                                }
+                            }
+
+
                         }
                     }
                 }
