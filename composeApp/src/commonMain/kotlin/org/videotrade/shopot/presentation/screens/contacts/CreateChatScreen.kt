@@ -240,7 +240,7 @@ private fun ContactItem(
                                 lastName = item.lastName ?: "",
                                 icon = item.icon ?: "",
                                 phone = item.phone,
-                                login = item.login
+                                login =  item.login,
                             ),
                             
                             true

@@ -41,6 +41,7 @@ import org.videotrade.shopot.MokoRes
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.edit_pencil
 import shopot.composeapp.generated.resources.menu_delete
+import shopot.composeapp.generated.resources.profile_exit
 import shopot.composeapp.generated.resources.user_settings
 
 @Composable
@@ -52,9 +53,8 @@ fun SwipeContainer(
     isGroup: Boolean = false,
     onSwipeProgress: (Float) -> Unit = {},
     onRoleClick: (Offset) -> Unit = {},
+    isPersonal: Boolean = false,
     content: @Composable () -> Unit,
-
-
 ) {
     val offsetX = remember { Animatable(0f) }
     val scope = rememberCoroutineScope()
@@ -151,7 +151,15 @@ fun SwipeContainer(
                             }
                     ) {
                         Image(
-                            painter = painterResource(Res.drawable.menu_delete),
+                            painter =
+                                if (isGroup) {
+                                    painterResource(Res.drawable.menu_delete)
+                                } else if (!isGroup && !isPersonal) {
+                                    painterResource(Res.drawable.profile_exit)
+                                } else {
+                                    painterResource(Res.drawable.menu_delete)
+                                }
+                            ,
                             contentDescription = "Delete",
                             modifier = Modifier
                                 .size(24.dp)

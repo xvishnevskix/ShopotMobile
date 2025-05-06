@@ -27,13 +27,8 @@ class ContactsUseCase : KoinComponent {
         return repository.createChat(profileId, userId)
     }
     
-    suspend fun createGroupChat(users: List<String?>, groupName: String,
-    ownerId: String,
-    ) {
-        return repository.createGroupChat(users, groupName,
-            ownerId
-
-        )
+    suspend fun createGroupChat(users: List<String?>, groupName: String, ownerId: String, ) {
+        return repository.createGroupChat(users, groupName, ownerId)
     }
     
     fun clearData() {

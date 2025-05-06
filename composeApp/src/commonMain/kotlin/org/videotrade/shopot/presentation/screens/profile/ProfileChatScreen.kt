@@ -41,6 +41,7 @@ import dev.icerock.moko.resources.compose.stringResource
 import getImageStorage
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.Font
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.navigateToScreen
@@ -53,6 +54,7 @@ import org.videotrade.shopot.presentation.tabs.ChatsTab
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.chat_nav
 
 
 class ProfileChatScreen(private val profile: ProfileDTO, private val isCreateChat: Boolean) :
@@ -204,16 +206,16 @@ class ProfileChatScreen(private val profile: ProfileDTO, private val isCreateCha
                 }
                 
                 Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     
                     if (isCreateChat)
                         ProfileSettingsButton(
-                            drawableRes = null,
-                            width = 20.dp,
-                            height = 20.dp,
-                            mainText = "Создать чат",
+                            drawableRes = Res.drawable.chat_nav,
+                            width = 18.dp,
+                            height = 16.92.dp,
+                            mainText = stringResource(MokoRes.strings.create_chat),
                             onClick = {
                                 contactsViewModel.createChat(profile.id)
                                 

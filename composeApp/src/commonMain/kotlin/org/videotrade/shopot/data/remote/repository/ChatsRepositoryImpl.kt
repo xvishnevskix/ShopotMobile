@@ -151,11 +151,15 @@ class ChatsRepositoryImpl : ChatsRepository {
         
         
     }
-    
-    
+
+
     override fun addChat(chat: ChatItem) {
         _chats.update { currentChats ->
-            currentChats + chat
+            if (currentChats.any { it.chatId == chat.chatId }) {
+                currentChats
+            } else {
+                currentChats + chat
+            }
         }
     }
     

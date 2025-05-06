@@ -61,6 +61,7 @@ import org.videotrade.shopot.presentation.components.Common.SwipeContainer
 import org.videotrade.shopot.presentation.screens.chat.ChatScreen
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium
 import shopot.composeapp.generated.resources.ArsonPro_Regular
@@ -81,19 +82,26 @@ fun UserComponentItem(
     val profile = mainViewModel.profile.collectAsState().value
     val colors = MaterialTheme.colorScheme
     val status = chatViewModel.userStatuses.collectAsState().value[chat.userId]
-    val firstModalVisible = remember { mutableStateOf(false) }
-    val secondModalVisible = remember { mutableStateOf(false) }
-    
-    
-    
+    val firstDeleteModalVisible = remember { mutableStateOf(false) }
+    val secondDeleteModalVisible = remember { mutableStateOf(false) }
+    val showLeaveModal = remember { mutableStateOf(false) }
+    val groupViewModel: GroupViewModel = koinInject()
+
+
+
     SwipeContainer(
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
         isVisible = true,
+        isPersonal = chat.personal,
         onSwipeDelete = {
-            firstModalVisible.value = true
+            if (chat.personal) {
+                firstDeleteModalVisible.value = true
+            } else {
+                showLeaveModal.value = true
+            }
         }
     ) {
         Row(
@@ -360,33 +368,45 @@ fun UserComponentItem(
             
         }
     }
-    if (firstModalVisible.value) {
+    if (firstDeleteModalVisible.value) {
         ModalDialogWithoutText(
-            onDismiss = { firstModalVisible.value = false },
+            onDismiss = { firstDeleteModalVisible.value = false },
             onConfirm = {
-                firstModalVisible.value = false
-                secondModalVisible.value = true
+                firstDeleteModalVisible.value = false
+                secondDeleteModalVisible.value = true
             },
             confirmText = stringResource(MokoRes.strings.delete),
             dismissText = stringResource(MokoRes.strings.cancel),
             title = "${stringResource(MokoRes.strings.delete_chat_with)} ${chat.firstName + " " + chat.lastName}?"
         )
     }
-    if (secondModalVisible.value) {
+    if (secondDeleteModalVisible.value) {
         ModalDialogWithText(
             onDismiss = {
-                secondModalVisible.value = false
+                secondDeleteModalVisible.value = false
             },
             onConfirm = {
                 //                        onDelete()
                 chatViewModel.deleteChat(chat)
                 
-                secondModalVisible.value = false
+                secondDeleteModalVisible.value = false
             },
             confirmText = stringResource(MokoRes.strings.delete),
             dismissText = stringResource(MokoRes.strings.cancel),
             title = stringResource(MokoRes.strings.attention),
             text = stringResource(MokoRes.strings.this_action_will_permanently_delete_all_messages_in_this_chat)
+        )
+    }
+    if (showLeaveModal.value) {
+        ModalDialogWithoutText(
+            onDismiss = { showLeaveModal.value = false },
+            onConfirm = {
+                groupViewModel.leaveGroupChat(chatId = chat.chatId)
+                showLeaveModal.value = false
+            },
+            confirmText = stringResource(MokoRes.strings.leave_group),
+            dismissText = stringResource(MokoRes.strings.cancel),
+            title = "${stringResource(MokoRes.strings.do_you_really_want_to_leave_the_group)} ${chat.groupName}?"
         )
     }
 }

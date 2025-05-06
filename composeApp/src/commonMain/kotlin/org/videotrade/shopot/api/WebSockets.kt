@@ -54,6 +54,8 @@ suspend fun handleConnectWebSocket(
             port = 5050,
             path = "/chat?userId=$userId"
         ) {
+            val mainViewModel: MainViewModel = KoinPlatform.getKoin().get()
+
             wsUseCase.setWsSession(this)
             wsUseCase.setConnection(true)
 
@@ -653,7 +655,6 @@ suspend fun handleConnectWebSocket(
                             
                             
                             "leaveGroupChat" -> {
-                                val mainViewModel: MainViewModel = KoinPlatform.getKoin().get()
                                 val groupViewModel: GroupViewModel = KoinPlatform.getKoin().get()
 
                                 mainViewModel.getChatsInBack()
@@ -667,17 +668,12 @@ suspend fun handleConnectWebSocket(
                                     groupViewModel.clearCacheForGroupChat(it)
                                 }
                                 groupViewModel.reloadCurrentChatUsers()
-
-
-
                             }
 
                             "changeMemberRole" -> {
                                 val groupViewModel: GroupViewModel = KoinPlatform.getKoin().get()
                                 groupViewModel.reloadCurrentChatUsers()
                             }
-                            
-                            
                         }
                     }
                 }

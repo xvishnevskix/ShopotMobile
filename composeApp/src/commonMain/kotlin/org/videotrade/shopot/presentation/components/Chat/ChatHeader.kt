@@ -124,7 +124,6 @@ fun ChatHeader(chat: ChatItem, viewModel: ChatViewModel, profile: ProfileDTO) {
                                 )
                             )
                         } else {
-//                            viewModel.loadGroupUsers(chat.chatId)
                             navigateToScreen(navigator, GroupProfileScreen(profile, chat))
                             
                         }

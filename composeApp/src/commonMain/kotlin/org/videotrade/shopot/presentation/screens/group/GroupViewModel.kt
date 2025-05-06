@@ -101,9 +101,7 @@ class GroupViewModel : ViewModel(), KoinComponent {
             )
             
             println("jsonContent $jsonContent")
-            
-            
-            
+
             sendMessageOrReconnect(
                 wsSession = wsUseCase.wsSession.value,
                 jsonContent = jsonContent,
