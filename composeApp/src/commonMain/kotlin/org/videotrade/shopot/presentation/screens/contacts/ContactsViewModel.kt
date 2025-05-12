@@ -19,7 +19,7 @@ import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.usecase.ContactsUseCase
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
-import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
+import org.videotrade.shopot.api.sendMessageOrReconnect
 
 class ContactsViewModel : ViewModel(),
     KoinComponent {

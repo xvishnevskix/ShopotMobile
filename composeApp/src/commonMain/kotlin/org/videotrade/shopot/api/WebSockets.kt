@@ -2,12 +2,17 @@ package org.videotrade.shopot.api
 
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.http.HttpMethod
 import io.ktor.websocket.DefaultWebSocketSession
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -17,8 +22,10 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.mp.KoinPlatform
 import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
+import org.videotrade.shopot.data.remote.repository.reconnectCallWebSocket
 import org.videotrade.shopot.domain.model.ChatItem
 import org.videotrade.shopot.domain.model.MessageItem
+import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.repository.ChatRepository
 import org.videotrade.shopot.domain.usecase.ChatUseCase
 import org.videotrade.shopot.domain.usecase.ChatsUseCase
@@ -800,17 +807,54 @@ suspend fun reconnectWebSocket(
 }
 
 
-suspend fun monitorWebSocketConnection(userId: String) {
+suspend fun sendMessageOrReconnect(
+    wsSession: DefaultClientWebSocketSession?,
+    jsonContent: String,
+    wsReconnectionCase: WsReconnectionCase
+): Boolean {
     val wsUseCase: WsUseCase = KoinPlatform.getKoin().get()
-    
-    while (true) {
-        delay(5000) // Проверяем каждые 5 секунд
-        
-        val session = wsUseCase.wsSession.value
-        if (session == null || !session.isActive) {
-            println("⚠️ WebSocket lost connection! Reconnecting...")
-            reconnectWebSocket(userId)
-            break // Выходим из цикла, так как `reconnectWebSocket` уже запустит новый мониторинг
-        }
+    val userId = getValueInStorage("profileId")
+
+    if (wsSession?.isActive == true) {
+        wsSession.send(Frame.Text(jsonContent))
+        return true
     }
+
+    if (userId != null) {
+        if (wsUseCase.processingReconnect.value) return false
+
+        wsUseCase.processingReconnect.value = true
+
+        val reconnect: suspend (
+            String,
+            suspend (Boolean, DefaultWebSocketSession) -> Unit
+        ) -> Unit = when (wsReconnectionCase) {
+            WsReconnectionCase.ChatWs -> ::reconnectWebSocket
+            WsReconnectionCase.CallWs -> ::reconnectCallWebSocket
+        }
+
+        var result = false
+
+        val latch = CompletableDeferred<Unit>()
+
+        reconnect(userId) { isConnected, newWsSession ->
+            if (isConnected) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    newWsSession.send(Frame.Text(jsonContent))
+                    result = true
+                    wsUseCase.processingReconnect.value = false
+                    latch.complete(Unit)
+                }
+            } else {
+                wsUseCase.processingReconnect.value = false
+                latch.complete(Unit)
+            }
+        }
+
+        latch.await()
+        return result
+    }
+
+    return false
 }
+

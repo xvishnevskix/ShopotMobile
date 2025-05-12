@@ -31,6 +31,7 @@ import org.videotrade.shopot.api.EnvironmentConfig.WEB_SOCKETS_URL
 import org.videotrade.shopot.api.addValueInStorage
 import org.videotrade.shopot.api.decupsMessage
 import org.videotrade.shopot.api.getValueInStorage
+import org.videotrade.shopot.api.sendMessageOrReconnect
 import org.videotrade.shopot.data.origin
 import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.usecase.CommonUseCase
@@ -41,7 +42,6 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.getFbToken
 import org.videotrade.shopot.presentation.screens.intro.IntroScreen
 import org.videotrade.shopot.presentation.screens.intro.IntroViewModel
-import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
 
 class CommonViewModel : ViewModel(), KoinComponent {
     private val wsUseCase: WsUseCase by inject()

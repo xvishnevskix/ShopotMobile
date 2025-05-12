@@ -20,7 +20,7 @@ import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.repository.ContactsRepository
 import org.videotrade.shopot.domain.usecase.WsUseCase
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
-import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
+import org.videotrade.shopot.api.sendMessageOrReconnect
 
 class ContactsRepositoryImpl : ContactsRepository, KoinComponent {
     private val _contacts = MutableStateFlow<List<ContactDTO>>(

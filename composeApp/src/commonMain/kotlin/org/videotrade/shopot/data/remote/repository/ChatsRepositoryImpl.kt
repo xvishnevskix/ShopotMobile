@@ -15,7 +15,7 @@ import org.videotrade.shopot.domain.model.MessageItem
 import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.repository.ChatsRepository
 import org.videotrade.shopot.domain.usecase.ProfileUseCase
-import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
+import org.videotrade.shopot.api.sendMessageOrReconnect
 
 class ChatsRepositoryImpl : ChatsRepository {
     

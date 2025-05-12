@@ -41,7 +41,7 @@ import org.videotrade.shopot.multiplatform.FileProviderFactory
 import org.videotrade.shopot.multiplatform.MusicType
 import org.videotrade.shopot.multiplatform.PlatformFilePick
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
-import org.videotrade.shopot.presentation.screens.test.sendMessageOrReconnect
+import org.videotrade.shopot.api.sendMessageOrReconnect
 import kotlin.random.Random
 
 class ChatViewModel : ViewModel(), KoinComponent {

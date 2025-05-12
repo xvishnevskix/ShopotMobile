@@ -34,6 +34,7 @@ import org.videotrade.shopot.api.reconnectWebSocket
 import org.videotrade.shopot.data.remote.repository.reconnectCallWebSocket
 import org.videotrade.shopot.domain.model.WsReconnectionCase
 import org.videotrade.shopot.domain.usecase.WsUseCase
+import org.videotrade.shopot.multiplatform.downloadAndInstallApk
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 
 
@@ -42,186 +43,27 @@ class TestScreen : Screen {
     override fun Content() {
         val scope = rememberCoroutineScope()
         val wsSession = MutableStateFlow<DefaultClientWebSocketSession?>(null)
-        
-        
-        
+
+
+
         MaterialTheme {
             SafeArea {
-                Column {
-                    Button(
-                        onClick = {
-                            
-                            val userId = getValueInStorage("profileId")
-                            
-                            scope.launch {
-                                connectionWSS(userId, wsSession, {
-                                    println("OOOOOP $it")
-                                })
-                            }
-                            
+                Button(onClick = {
+                    scope.launch {
+                        downloadAndInstallApk("https://videotradedev.ru/api/file/test-file")  { progress ->
+                            println("Прогресс загрузки: ${progress * 100}%")
                         }
-                    ) {
-                        Text(
-                            "Start Connect",
-                            color = Color.White
-                        )
+
                     }
-                    
-                    
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                val jsonContent = Json.encodeToString(
-                                    buildJsonObject {
-                                        put("action", "disconnect")
-                                    }
-                                )
-                                println("jsonContent $jsonContent")
-                                
-                                wsSession.value?.send(Frame.Text(jsonContent))
-                            }
-                        }
-                    ) {
-                        Text(
-                            "disconnect",
-                            color = Color.White
-                        )
-                    }
-                    
-                    Button(
-                        onClick = {
-                            scope.launch {
-                                val userId = getValueInStorage("profileId")
-                                
-                                val jsonContent = Json.encodeToString(
-                                    buildJsonObject {
-                                        put("action", "connectionTest")
-                                    }
-                                )
-                                
-                                println("jsonContent $jsonContent")
-                                
-                                println("connectionTest ${wsSession.value?.isActive}")
-                                
-                                sendMessageOrReconnect(
-                                    wsSession = wsSession.value,
-                                    jsonContent = jsonContent,
-                                    wsReconnectionCase = WsReconnectionCase.ChatWs
-                                )
-                                
-                                
-                            }
-                        }
-                    ) {
-                        Text(
-                            "connectionTest",
-                            color = Color.White
-                        )
-                    }
-                    
-                }
+                }, content = {
+                    Text("AAAAAA")
+                })
             }
         }
     }
 }
 
 
-suspend fun connectionWSS(
-    userId: String?,
-    wsSession: MutableStateFlow<DefaultClientWebSocketSession?>,
-    onConnectionResult: (Boolean) -> Unit
-) {
-    val httpClient = HttpClient {
-        install(WebSockets)
-    }
-    
-    try {
-        httpClient.webSocket(
-            method = HttpMethod.Get,
-            host = EnvironmentConfig.WEB_SOCKETS_URL,
-            port = 5050,
-            path = "/chat?userId=$userId"
-        ) {
-            println("WebSocket connected successfully")
-            
-            wsSession.value = this
-            
-            // ✅ Успешное соединение
-            onConnectionResult(true)
-            
-            val callOutputRoutine = launch {
-                for (frame in incoming) {
-                    if (frame is Frame.Text) {
-                        val text = frame.readText()
-                        println("NewFrame $text")
-                    }
-                }
-            }
-            
-            callOutputRoutine.join()
-        }
-    } catch (e: Exception) {
-        println("Ошибка соединения: $e")
-        
-        // ❌ Ошибка соединения
-        onConnectionResult(false)
-        
-        // Повторное подключение
-        if (userId != null) {
-            reconnectWebSocket(userId)
-        }
-    }
-}
 
 
-suspend fun sendMessageOrReconnect(
-    wsSession: DefaultClientWebSocketSession?,
-    jsonContent: String,
-    wsReconnectionCase: WsReconnectionCase
-): Boolean {
-    val wsUseCase: WsUseCase = KoinPlatform.getKoin().get()
-    val userId = getValueInStorage("profileId")
-    
-    if (wsSession?.isActive == true) {
-        wsSession.send(Frame.Text(jsonContent))
-        return true
-    }
-    
-    if (userId != null) {
-        if (wsUseCase.processingReconnect.value) return false
-        
-        wsUseCase.processingReconnect.value = true
-        
-        val reconnect: suspend (
-            String,
-            suspend (Boolean, DefaultWebSocketSession) -> Unit
-        ) -> Unit = when (wsReconnectionCase) {
-            WsReconnectionCase.ChatWs -> ::reconnectWebSocket
-            WsReconnectionCase.CallWs -> ::reconnectCallWebSocket
-        }
-        
-        var result = false
-        
-        val latch = CompletableDeferred<Unit>()
-        
-        reconnect(userId) { isConnected, newWsSession ->
-            if (isConnected) {
-                CoroutineScope(Dispatchers.IO).launch {
-                    newWsSession.send(Frame.Text(jsonContent))
-                    result = true
-                    wsUseCase.processingReconnect.value = false
-                    latch.complete(Unit)
-                }
-            } else {
-                wsUseCase.processingReconnect.value = false
-                latch.complete(Unit)
-            }
-        }
-        
-        latch.await()
-        return result
-    }
-    
-    return false
-}
 
