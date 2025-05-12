@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.components.Common.Map.Buttons
+package org.videotrade.shopot.parkingProj.presentation.components.Map.Buttons
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,10 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import parkingproj.composeapp.generated.resources.Res
-import parkingproj.composeapp.generated.resources.minus
-import parkingproj.composeapp.generated.resources.plus
-import videotrade.parkingProj.presentation.components.Common.Common.CustomImage
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomImage
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.minus
+import shopot.composeapp.generated.resources.plus
 
 @Composable
 fun ZoomControlButtons(

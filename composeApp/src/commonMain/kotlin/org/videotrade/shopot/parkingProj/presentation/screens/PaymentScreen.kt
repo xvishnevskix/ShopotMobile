@@ -1,7 +1,6 @@
 package videotrade.parkingProj.presentation.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,21 +13,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import org.jetbrains.compose.resources.DrawableResource
-import org.videotrade.shopot.presentation.components.Auth.BaseHeader
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BaseHeader
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.card_linked
 import shopot.composeapp.generated.resources.new_card
 import shopot.composeapp.generated.resources.phone
 import shopot.composeapp.generated.resources.sbp
-import videotrade.parkingProj.presentation.components.Common.Common.ButtonStyle
-import videotrade.parkingProj.presentation.components.Common.Common.CustomButton
-import videotrade.parkingProj.presentation.components.Common.Common.PaymentMethodCard
+import org.videotrade.shopot.parkingProj.presentation.components.Common.ButtonStyle
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomButton
+import org.videotrade.shopot.parkingProj.presentation.components.Common.PaymentMethodCard
+import org.videotrade.shopot.parkingProj.presentation.screens.TopUpScreen
 
 class PaymentScreen : Screen {
 

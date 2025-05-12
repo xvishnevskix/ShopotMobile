@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.screens
+package org.videotrade.shopot.parkingProj.presentation.screens
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -27,15 +27,13 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.delay
 import org.jetbrains.compose.resources.painterResource
-import org.videotrade.shopot.parkingProj.presentation.screens.MapScreen
-import parkingproj.composeapp.generated.resources.Res
-import parkingproj.composeapp.generated.resources.search
 import shopot.composeapp.generated.resources.Res
-import videotrade.parkingProj.presentation.components.Common.Common.BackIcon
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
-import videotrade.parkingProj.presentation.components.Common.CustomTextField
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BackIcon
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomText
+import org.videotrade.shopot.parkingProj.presentation.components.Common.FontStyleType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.TextType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomTextField
+import shopot.composeapp.generated.resources.search
 
 class ParkingSearchScreen : Screen {
 
@@ -205,7 +203,7 @@ fun ParkingZoneItem(
                     type = TextType.WHITE,
                     fontSize = 12.sp,
                     modifier = Modifier
-                        .background(Color(0xFF4D91D8), shape = androidx.compose.foundation.shape.RoundedCornerShape(4.dp))
+                        .background(Color(0xFF4D91D8), shape = RoundedCornerShape(4.dp))
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 )
 

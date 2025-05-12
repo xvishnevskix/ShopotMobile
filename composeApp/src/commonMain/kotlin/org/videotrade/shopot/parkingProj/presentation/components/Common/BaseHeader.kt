@@ -1,4 +1,4 @@
-package org.videotrade.shopot.presentation.components.Auth
+package org.videotrade.shopot.parkingProj.presentation.components.Common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,9 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import videotrade.parkingProj.presentation.components.Common.Common.BackIcon
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
 
 @Composable
 fun BaseHeader(text: String, background: Color = Color(0xFFf9f9f9)) {

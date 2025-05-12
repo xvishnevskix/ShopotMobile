@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.screens
+package org.videotrade.shopot.parkingProj.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,11 +16,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import org.videotrade.shopot.presentation.components.Auth.BaseHeader
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
-import videotrade.parkingProj.presentation.components.Common.Title
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomText
+import org.videotrade.shopot.parkingProj.presentation.components.Common.FontStyleType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.TextType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.Title
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BaseHeader
+
 
 
 class FinesAndEvacuationsScreen : Screen {

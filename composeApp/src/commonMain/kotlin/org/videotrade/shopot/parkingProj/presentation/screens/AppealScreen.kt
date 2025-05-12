@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.screens
+package org.videotrade.shopot.parkingProj.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,19 +8,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import org.videotrade.shopot.presentation.components.Auth.BaseHeader
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.CustomTextInputRow
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
-import videotrade.parkingProj.presentation.components.Common.CustomTextField
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BaseHeader
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomText
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomTextInputRow
+import org.videotrade.shopot.parkingProj.presentation.components.Common.FontStyleType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.TextType
 
 class AppealScreen : Screen {
     @Composable

@@ -23,16 +23,15 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import shopot.composeapp.generated.resources.Res
-import videotrade.parkingProj.presentation.components.Common.Common.CustomButton
-import videotrade.parkingProj.presentation.components.Common.Map.Buttons.BalanceChip
-import videotrade.parkingProj.presentation.components.Common.Map.Buttons.CircularImageButton
-import videotrade.parkingProj.presentation.components.Common.Map.Buttons.ParkingBottomSheet
-import videotrade.parkingProj.presentation.components.Common.Map.Buttons.ZoomControlButtons
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomButton
+import org.videotrade.shopot.parkingProj.presentation.components.Map.Buttons.BalanceChip
+import org.videotrade.shopot.parkingProj.presentation.components.Map.Buttons.CircularImageButton
+import org.videotrade.shopot.parkingProj.presentation.components.Map.ParkingBottomSheet
+import org.videotrade.shopot.parkingProj.presentation.components.Map.Buttons.ZoomControlButtons
+import shopot.composeapp.generated.resources.location
+import shopot.composeapp.generated.resources.menu
+import shopot.composeapp.generated.resources.search
 import videotrade.parkingProj.presentation.components.Map.MapUi
-import videotrade.parkingProj.presentation.screens.MainSettingsScreen
-import videotrade.parkingProj.presentation.screens.NewCarScreen
-import videotrade.parkingProj.presentation.screens.ParkingSearchScreen
-import videotrade.parkingProj.presentation.screens.TopUpScreen
 
 class MapScreen : Screen {
 

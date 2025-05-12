@@ -13,6 +13,8 @@ import ru.sulgik.mapkit.compose.YandexMap
 import ru.sulgik.mapkit.compose.imageProvider
 import ru.sulgik.mapkit.compose.rememberYandexMapController
 import ru.sulgik.mapkit.geometry.Point
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.parking_mark
 import videotrade.parkingProj.domain.model.MapObjectType
 import videotrade.parkingProj.domain.model.MapObjectUserData
 

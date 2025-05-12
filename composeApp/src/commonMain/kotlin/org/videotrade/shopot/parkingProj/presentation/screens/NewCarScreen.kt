@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.screens
+package org.videotrade.shopot.parkingProj.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -20,13 +19,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
-import org.videotrade.shopot.presentation.components.Auth.BaseHeader
-import videotrade.parkingProj.presentation.components.Common.Common.CustomInfoRow
-import videotrade.parkingProj.presentation.components.Common.Common.CustomSwitchRow
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.CustomTextInputRow
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BaseHeader
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomInfoRow
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomSwitchRow
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomText
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomTextInputRow
+import org.videotrade.shopot.parkingProj.presentation.components.Common.FontStyleType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.TextType
 
 class NewCarScreen : Screen {
 

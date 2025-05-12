@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.screens
+package org.videotrade.shopot.parkingProj.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -24,16 +24,17 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import org.videotrade.shopot.presentation.components.Auth.BaseHeader
-import parkingproj.composeapp.generated.resources.Res
-import parkingproj.composeapp.generated.resources.new_card
-import videotrade.parkingProj.presentation.components.Common.Common.ButtonStyle
-import videotrade.parkingProj.presentation.components.Common.Common.CustomButton
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
-import videotrade.parkingProj.presentation.components.Common.Common.PaymentMethodCard
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
-import videotrade.parkingProj.presentation.components.Common.CustomTextField
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BaseHeader
+import org.videotrade.shopot.parkingProj.presentation.components.Common.ButtonStyle
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomButton
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomText
+import org.videotrade.shopot.parkingProj.presentation.components.Common.FontStyleType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.PaymentMethodCard
+import org.videotrade.shopot.parkingProj.presentation.components.Common.TextType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomTextField
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.new_card
+import videotrade.parkingProj.presentation.screens.PaymentScreen
 
 class TopUpScreen : Screen {
     @Composable

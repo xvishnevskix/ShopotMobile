@@ -1,20 +1,19 @@
-package videotrade.parkingProj.presentation.screens
+package org.videotrade.shopot.parkingProj.presentation.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
-import org.videotrade.shopot.presentation.components.Auth.BaseHeader
-import videotrade.parkingProj.presentation.components.Common.Common.CustomInfoRow
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
-import videotrade.parkingProj.presentation.components.Common.Title
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BaseHeader
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomInfoRow
+import org.videotrade.shopot.parkingProj.presentation.components.Common.TextType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.Title
 
 class NotificationsScreen : Screen {
 

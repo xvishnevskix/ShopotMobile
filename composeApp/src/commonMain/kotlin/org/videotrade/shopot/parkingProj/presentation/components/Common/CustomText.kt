@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.components.Common.Common
+package org.videotrade.shopot.parkingProj.presentation.components.Common
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -11,10 +11,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import parkingproj.composeapp.generated.resources.Res
-import parkingproj.composeapp.generated.resources.SFProText_Bold
-import parkingproj.composeapp.generated.resources.SFProText_Medium
-import parkingproj.composeapp.generated.resources.SFProText_Regular
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.SFProText_Bold
+import shopot.composeapp.generated.resources.SFProText_Medium
+import shopot.composeapp.generated.resources.SFProText_Regular
+
 
 @Composable
 fun CustomText(

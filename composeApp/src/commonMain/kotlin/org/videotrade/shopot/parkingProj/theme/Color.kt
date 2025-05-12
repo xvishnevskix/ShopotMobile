@@ -1,4 +1,4 @@
-package videotrade.parkingProj.theme
+package org.videotrade.shopot.parkingProj.theme
 
 import androidx.compose.ui.graphics.Color
 

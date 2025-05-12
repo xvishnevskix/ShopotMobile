@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.components.Common.Map.Buttons
+package org.videotrade.shopot.parkingProj.presentation.components.Map
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Canvas
@@ -35,10 +35,10 @@ import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.plus
 import kotlinx.datetime.toLocalDateTime
-import videotrade.parkingProj.presentation.components.Common.Common.CustomButton
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomButton
+import org.videotrade.shopot.parkingProj.presentation.components.Common.CustomText
+import org.videotrade.shopot.parkingProj.presentation.components.Common.FontStyleType
+import org.videotrade.shopot.parkingProj.presentation.components.Common.TextType
 import kotlin.math.ceil
 
 

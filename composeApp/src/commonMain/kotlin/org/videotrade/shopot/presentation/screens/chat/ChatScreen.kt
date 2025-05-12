@@ -36,6 +36,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import org.videotrade.shopot.domain.model.MessageItem
@@ -46,7 +47,7 @@ import org.videotrade.shopot.presentation.components.Chat.ChatFooter
 import org.videotrade.shopot.presentation.components.Chat.ChatHeader
 import org.videotrade.shopot.presentation.components.Chat.StickerMenuContent
 import org.videotrade.shopot.presentation.components.Common.BottomSheetModal
-import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.parkingProj.presentation.components.SafeArea
 import org.videotrade.shopot.presentation.screens.chats.ChatsScreen
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 
@@ -200,7 +201,7 @@ class ChatScreen : Screen {
                                 
                                 scope.launch {
                                     
-                                    kotlinx.coroutines.delay(16)
+                                    delay(16)
                                     
                                     // Устанавливаем новое состояние
                                     val calculatedY = when {
@@ -224,7 +225,7 @@ class ChatScreen : Screen {
                                 
                                 scope.launch {
                                     
-                                    kotlinx.coroutines.delay(16)
+                                    delay(16)
                                     
                                     // Устанавливаем новое состояние
                                     val calculatedY = when {

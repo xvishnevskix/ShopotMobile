@@ -65,15 +65,13 @@ import org.videotrade.shopot.domain.model.ContactDTO
 import org.videotrade.shopot.domain.model.NewsItem
 import org.videotrade.shopot.domain.model.SearchDto
 import org.videotrade.shopot.presentation.components.Common.CheckAndShowDialogs
-import org.videotrade.shopot.presentation.components.Common.SafeArea
+import org.videotrade.shopot.parkingProj.presentation.components.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Main.News.NewsViewModel
 import org.videotrade.shopot.presentation.components.Main.News.StoryViewer
 import org.videotrade.shopot.presentation.screens.chat.ChatViewModel
 import org.videotrade.shopot.presentation.screens.common.CommonViewModel
 import org.videotrade.shopot.presentation.screens.contacts.ContactsViewModel
-import org.videotrade.shopot.presentation.components.Common.shouldShowRateDialog
-import org.videotrade.shopot.presentation.components.Common.shouldShowSurvey
 import org.videotrade.shopot.presentation.screens.group.GroupViewModel
 import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Medium

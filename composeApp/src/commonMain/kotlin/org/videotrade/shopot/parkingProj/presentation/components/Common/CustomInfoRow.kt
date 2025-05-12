@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.components.Common.Common
+package org.videotrade.shopot.parkingProj.presentation.components.Common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,9 +26,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
-import parkingproj.composeapp.generated.resources.Res
-import parkingproj.composeapp.generated.resources.arrow_left
-import parkingproj.composeapp.generated.resources.check_mark
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.arrow_left
+import shopot.composeapp.generated.resources.check_mark
 
 @Composable
 fun CustomInfoRow(

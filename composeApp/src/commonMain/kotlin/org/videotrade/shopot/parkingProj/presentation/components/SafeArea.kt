@@ -1,4 +1,4 @@
-package org.videotrade.shopot.presentation.components.Common
+package org.videotrade.shopot.parkingProj.presentation.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

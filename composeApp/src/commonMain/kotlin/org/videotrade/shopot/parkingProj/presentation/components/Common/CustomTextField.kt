@@ -1,4 +1,4 @@
-package videotrade.parkingProj.presentation.components.Common
+package org.videotrade.shopot.parkingProj.presentation.components.Common
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -15,11 +15,8 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
-import parkingproj.composeapp.generated.resources.Res
-import parkingproj.composeapp.generated.resources.SFProText_Regular
-import videotrade.parkingProj.presentation.components.Common.Common.CustomText
-import videotrade.parkingProj.presentation.components.Common.Common.FontStyleType
-import videotrade.parkingProj.presentation.components.Common.Common.TextType
+import shopot.composeapp.generated.resources.Res
+import shopot.composeapp.generated.resources.SFProText_Regular
 
 @Composable
 fun CustomTextField(

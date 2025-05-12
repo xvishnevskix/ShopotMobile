@@ -1,4 +1,4 @@
-package videotrade.parkingProj.theme
+package org.videotrade.shopot.parkingProj.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -95,13 +95,13 @@ internal fun AppTheme(
         LocalThemeIsDark provides isDarkState
     ) {
         val isDark by isDarkState
-        SystemAppearance(!isDark)
+        org.videotrade.shopot.theme.SystemAppearance(!isDark)
         MaterialTheme(
             colorScheme = if (isDark) DarkColorScheme else LightColorScheme,
             content = { Surface(content = content) }
         )
     }
 }
-
-@Composable
-internal expect fun SystemAppearance(isDark: Boolean)
+//
+//@Composable
+//internal expect fun SystemAppearance(isDark: Boolean)

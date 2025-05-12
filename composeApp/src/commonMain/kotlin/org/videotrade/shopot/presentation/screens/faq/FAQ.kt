@@ -70,7 +70,7 @@ import org.videotrade.shopot.api.EnvironmentConfig
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.multiplatform.getHttpClientEngine
 import org.videotrade.shopot.multiplatform.getPlatform
-import org.videotrade.shopot.presentation.components.Auth.BaseHeader
+import org.videotrade.shopot.parkingProj.presentation.components.Common.BaseHeader
 import org.videotrade.shopot.presentation.components.Common.ButtonStyle
 import org.videotrade.shopot.presentation.components.Common.CustomButton
 import shopot.composeapp.generated.resources.ArsonPro_Medium
