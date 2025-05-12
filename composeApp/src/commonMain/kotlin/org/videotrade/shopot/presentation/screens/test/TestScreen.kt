@@ -50,10 +50,6 @@ class TestScreen : Screen {
             SafeArea {
                 Button(onClick = {
                     scope.launch {
-                        downloadAndInstallApk("https://videotradedev.ru/api/file/test-file")  { progress ->
-                            println("Прогресс загрузки: ${progress * 100}%")
-                        }
-
                     }
                 }, content = {
                     Text("AAAAAA")

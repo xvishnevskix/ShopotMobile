@@ -16,6 +16,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
+import org.videotrade.shopot.parkingProj.ParkingScreen
 import org.videotrade.shopot.presentation.screens.auth.CallPasswordScreen
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
@@ -59,7 +60,8 @@ internal fun App() {
                     
                     Navigator(
 //                        IntroScreen()
-                        TestScreen()
+//                        TestScreen()
+                      ParkingScreen()
                     ) { navigator ->
                         SlideTransition(navigator)
                     }

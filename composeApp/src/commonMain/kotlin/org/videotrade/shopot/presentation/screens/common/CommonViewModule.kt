@@ -66,6 +66,10 @@ class CommonViewModel : ViewModel(), KoinComponent {
 
     val isReconnectionWs: StateFlow<Boolean> = _isReconnectionWs
 
+
+    private val activeParking = MutableStateFlow(false)
+
+
     fun setIsReconnectionWs(activeValue: Boolean) {
         println("Setting isReconnectionWs to $activeValue")
         _isReconnectionWs.value = activeValue

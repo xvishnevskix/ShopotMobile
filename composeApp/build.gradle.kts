@@ -111,6 +111,10 @@ kotlin {
             api(libs.resources)
             api(libs.resources.compose)
             implementation(libs.compressor)
+
+
+            implementation(libs.yandex.mapkit.kmp)
+            implementation(libs.yandex.mapkit.kmp.compose)
             
         }
         
