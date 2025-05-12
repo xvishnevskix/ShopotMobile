@@ -166,7 +166,7 @@ fun UserComponentItem(
                     modifier = Modifier,
                     verticalArrangement = Arrangement.Top
                 ) {
-                    
+
                     val displayName = if (chat.personal) {
                         val firstName = chat.firstName.orEmpty()
                         val lastName = chat.lastName.orEmpty()
@@ -177,7 +177,7 @@ fun UserComponentItem(
                                 "Unknown",
                                 ignoreCase = true
                             ) && lastName.isBlank() -> stringResource(MokoRes.strings.deleted_user)
-                            
+
                             name.isNotBlank() -> name
                             !chat.phone.isNullOrBlank() -> "+${chat.phone}"
                             else -> stringResource(MokoRes.strings.deleted_user)
