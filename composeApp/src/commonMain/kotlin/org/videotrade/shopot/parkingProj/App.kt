@@ -8,6 +8,5 @@ import org.videotrade.shopot.parkingProj.presentation.screens.MapScreen
 class ParkingScreen : Screen {
     @Composable
     override fun Content() {
-        MapScreen()
     }
 }

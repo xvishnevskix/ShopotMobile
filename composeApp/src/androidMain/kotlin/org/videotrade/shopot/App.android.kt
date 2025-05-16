@@ -54,7 +54,9 @@ import org.videotrade.shopot.multiplatform.NotificationHelper.createNotification
 import org.videotrade.shopot.multiplatform.PermissionsProviderFactory
 import org.videotrade.shopot.multiplatform.getAppLifecycleObserver
 import org.videotrade.shopot.multiplatform.platformModule
+import org.videotrade.shopot.parkingProj.mapKitInit
 import org.videotrade.shopot.presentation.screens.settings.SettingsViewModel
+import ru.sulgik.mapkit.MapKit
 
 
 class AndroidApp : Application() {
@@ -99,7 +101,13 @@ class AndroidApp : Application() {
         
         // Создаем канал уведомлений
         createNotificationChannel()
+
+
+        // parkingProj
+        mapKitInit(this)
     }
+
+
     
     private fun initializeFactories(context: Context) {
         
@@ -153,8 +161,8 @@ class AndroidApp : Application() {
         notificationManager?.createNotificationChannel(ongoingCallChannel)
         notificationManager?.createNotificationChannel(messageInChatChannel)
     }
-    
-    
+
+
 }
 
 
@@ -240,6 +248,8 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
                 1001
             )
         }
+
+
         
     }
     
@@ -352,6 +362,17 @@ open class AppActivity : ComponentActivity(), SensorEventListener {
         const val REQUEST_CODE_MICROPHONE = 3
         const val REQUEST_CODE_NOTIFICATIONS = 4
     }
+
+    override fun onStart() {
+        super.onStart()
+        MapKit.getInstance().onStart()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        MapKit.getInstance().onStop()
+    }
+
 }
 
 
@@ -360,3 +381,5 @@ fun deleteNotification(context: Context) {
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     notificationManager.cancel(3)
 }
+
+

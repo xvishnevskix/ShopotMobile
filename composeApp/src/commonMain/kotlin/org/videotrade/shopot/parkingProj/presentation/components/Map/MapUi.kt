@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 
 //import parkingproj.composeapp.generated.resources.pin_green
@@ -13,6 +15,12 @@ import ru.sulgik.mapkit.compose.YandexMap
 import ru.sulgik.mapkit.compose.imageProvider
 import ru.sulgik.mapkit.compose.rememberYandexMapController
 import ru.sulgik.mapkit.geometry.Point
+import ru.sulgik.mapkit.map.CameraListener
+import ru.sulgik.mapkit.map.CameraPosition
+import ru.sulgik.mapkit.map.CameraUpdateReason
+import ru.sulgik.mapkit.map.IconStyle
+import ru.sulgik.mapkit.map.Map
+import ru.sulgik.mapkit.map.PlacemarkMapObject
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.parking_mark
 import videotrade.parkingProj.domain.model.MapObjectType
@@ -39,17 +47,54 @@ fun MapUi() {
         MapObjectType.YELLOW to pinYellowImage,
     )
 
-    // Дожидаемся, пока mapWindow станет доступен
+    val placemarkRefs = remember { mutableStateListOf<PlacemarkMapObject>() }
+
     LaunchedEffect(mapController.mapWindow) {
         mapController.mapWindow?.let { mapWindow ->
             val mapObjects = mapWindow.map.mapObjects
+
+            // Добавляем placemarks с начальным масштабом
             placemarks.forEach { (point, data) ->
-                mapObjects.addPlacemark().apply {
+                val icon = typeToImageMap[data.type]!!
+                val placemark = mapObjects.addPlacemark().apply {
                     geometry = point
-                    setIcon(typeToImageMap[data.type]!!)
                     userData = data
+                    setIcon(
+                        icon,
+                        IconStyle(scale = calculateScale(mapWindow.map.cameraPosition.zoom))
+                    )
                 }
+                placemarkRefs += placemark
             }
+
+
+            // Подписка на изменение зума
+
+            mapWindow.map.addCameraListener(object : CameraListener() {
+                override fun onCameraPositionChanged(
+                    map: Map,
+                    cameraPosition: CameraPosition,
+                    cameraUpdateReason: CameraUpdateReason,
+                    finished: Boolean
+                ) {
+                    val zoom = cameraPosition.zoom
+                    val scale = calculateScale(zoom)
+
+                    placemarkRefs.forEach { placemark ->
+                        val userData = placemark.userData as? MapObjectUserData ?: return@forEach
+                        val icon = typeToImageMap[userData.type] ?: return@forEach
+
+                        placemark.setIcon(
+                            icon,
+                            IconStyle(scale = scale)
+                        )
+                    }
+                }
+            })
+
+
+
+
         }
     }
 
@@ -57,10 +102,18 @@ fun MapUi() {
         YandexMap(
             modifier = Modifier.fillMaxSize(),
             controller = mapController,
-//                cameraPositionState = rememberCameraPositionState {
-//                    position = CameraPosition(Point(55.751244, 37.618423), 16f, 0f, 0f)
-//                }
         )
+    }
+}
+
+// Примерная функция для масштаба
+fun calculateScale(zoom: Float): Float {
+    return when {
+        zoom > 17f -> 1.3f
+        zoom > 15f -> 1.0f
+        zoom > 13f -> 0.8f
+        zoom > 11f -> 0.6f
+        else -> 0.4f
     }
 }
 

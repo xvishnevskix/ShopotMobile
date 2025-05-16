@@ -17,6 +17,7 @@ import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.multiplatform.setScreenLockFlags
 import org.videotrade.shopot.parkingProj.ParkingScreen
+import org.videotrade.shopot.parkingProj.presentation.screens.MapScreen
 import org.videotrade.shopot.presentation.screens.auth.CallPasswordScreen
 import org.videotrade.shopot.presentation.screens.call.CallScreen
 import org.videotrade.shopot.presentation.screens.call.CallViewModel
@@ -35,41 +36,33 @@ internal fun App() {
     val callViewModel: CallViewModel = koinInject()
     val settingsViewModel: SettingsViewModel = koinInject()
     val isDarkTheme by settingsViewModel.isDarkTheme
-    
-    
+
+
     AppTheme(darkTheme = isDarkTheme) {
         KoinContext {
-            if (getPlatform() === Platform.Ios) {
-                    Navigator(
-//                        IntroScreen()
-                        TestScreen()
-                    ) { navigator ->
-                        val appIsActive by commonViewModel.appIsActive.collectAsState()
-                        
-                        if (appIsActive) {
-                            SlideTransition(navigator)
-                        }
-                    }
-                
-                
-            } else {
-                if (callViewModel.isCallBackground.value) {
-                    isActiveCall(callViewModel)
-                } else {
-                    setScreenLockFlags(false)
-                    
-                    Navigator(
-//                        IntroScreen()
-//                        TestScreen()
-                      ParkingScreen()
-                    ) { navigator ->
+            val isIos = getPlatform() == Platform.Ios
+
+            if (!isIos && callViewModel.isCallBackground.value) {
+                isActiveCall(callViewModel)
+            }
+
+            if (!isIos) {
+                setScreenLockFlags(false)
+            }
+
+            Navigator(IntroScreen()) { navigator ->
+                if (isIos) {
+                    val appIsActive by commonViewModel.appIsActive.collectAsState()
+                    if (appIsActive) {
                         SlideTransition(navigator)
                     }
+                } else {
+                    SlideTransition(navigator)
                 }
-                
             }
         }
     }
+
 }
 
 

@@ -33,11 +33,15 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import dev.icerock.moko.resources.compose.stringResource
 import org.jetbrains.compose.resources.Font
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
 import org.videotrade.shopot.presentation.components.Apps.AppsHeader
 import org.videotrade.shopot.parkingProj.presentation.components.SafeArea
+import org.videotrade.shopot.parkingProj.presentation.screens.MapScreen
+import org.videotrade.shopot.presentation.screens.common.CommonViewModel
+import org.videotrade.shopot.presentation.screens.main.MainViewModel
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
 import shopot.composeapp.generated.resources.parking_app
@@ -47,6 +51,7 @@ class AppsScreen() : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val colors = MaterialTheme.colorScheme
+        val mainViewModel: MainViewModel = koinInject()
 
 
         Box(
@@ -67,12 +72,14 @@ class AppsScreen() : Screen {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Row(
-                        Modifier.padding(24.dp).clickable {
-
-                        }
+                        Modifier.padding(24.dp)
                     ) {
                             Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier.clickable {
+                                    println(mainViewModel.navigator.value)
+                                    mainViewModel.navigator.value?.push(MapScreen())
+                                }
                             ) {
                                 Image(
                                     painter = painterResource(Res.drawable.parking_app),
