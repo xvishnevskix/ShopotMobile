@@ -79,19 +79,27 @@ fun ModalDialogWithoutText(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.Top
                     ) {
-                        CustomButton(
-                            text = confirmText,
-                            onClick = {
-                                onConfirm(scope)
-                            },
-                            style = ButtonStyle.Red
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        CustomButton(
-                            text = dismissText,
-                            onClick = { onDismiss() },
-                            style = ButtonStyle.Gradient
-                        )
+                        if (confirmText == "") {
+
+                        } else {
+                            CustomButton(
+                                text = confirmText,
+                                onClick = {
+                                    onConfirm(scope)
+                                },
+                                style = ButtonStyle.Red
+                            )
+                        }
+                        if (dismissText == "") {
+
+                        } else {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            CustomButton(
+                                text = dismissText,
+                                onClick = { onDismiss() },
+                                style = ButtonStyle.Gradient
+                            )
+                        }
                     }
                 }
             }

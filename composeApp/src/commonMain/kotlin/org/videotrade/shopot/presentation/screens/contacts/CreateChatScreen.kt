@@ -50,6 +50,7 @@ import org.videotrade.shopot.domain.model.ProfileDTO
 import org.videotrade.shopot.multiplatform.ContactsProviderFactory
 import org.videotrade.shopot.multiplatform.Platform
 import org.videotrade.shopot.multiplatform.getPlatform
+import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
 import org.videotrade.shopot.presentation.components.Common.SafeArea
 import org.videotrade.shopot.presentation.components.Contacts.ContactsSearch
 import org.videotrade.shopot.presentation.components.Contacts.InviteContacts
@@ -73,7 +74,7 @@ class CreateChatScreen : Screen {
         val isSearching = remember { mutableStateOf(false) }
         val searchQuery = remember { mutableStateOf("") }
         val colors = MaterialTheme.colorScheme
-        
+        val showModal = remember { mutableStateOf(false) }
         
         LaunchedEffect(Unit) {
             viewModel.getContacts()
@@ -125,7 +126,7 @@ class CreateChatScreen : Screen {
                                 }
                             } else {
                                 Column(Modifier.animateContentSize()) {
-                                    MakeGroup(contacts)
+                                    MakeGroup(contacts, showModal)
                                     Spacer(modifier = Modifier.height(16.dp))
                                     InviteContacts(unregisteredContacts)
                                 }
@@ -207,7 +208,14 @@ class CreateChatScreen : Screen {
             }
 //                BottomBar(modifier = Modifier.align(Alignment.BottomCenter))
         }
-        
+
+        if (showModal.value == true) {
+            ModalDialogWithoutText(
+                title = stringResource(MokoRes.strings.you_dont_have_any_contacts_to_create_a_group),
+                onDismiss = {showModal.value = false},
+                onConfirm = {showModal.value = false},
+            )
+        }
     }
 }
 
@@ -311,4 +319,7 @@ private fun ContactItem(
             Spacer(modifier = Modifier.height(9.dp))
         }
     }
+
+
+
 }

@@ -320,5 +320,6 @@
     <string name="call_to_auth_hint">Просто позвоните — для вас это бесплатно и быстро, а для нас дешевле и позволяет нам продолжать улучшать приложение.</string>
 
     <string name="applications">Приложения</string>
+    <string name="you_dont_have_any_contacts_to_create_a_group">У вас нет контактов для создания группы</string>
 
 </resources>

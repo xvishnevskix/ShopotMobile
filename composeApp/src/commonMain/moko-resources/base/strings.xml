@@ -322,4 +322,6 @@
     <string name="call_to_auth_hint">Just give us a call — it's free and fast for you, and cheaper for us, helping us keep improving the app.</string>
     <string name="applications">Apps</string>
 
+    <string name="you_dont_have_any_contacts_to_create_a_group">You don't have any contacts to create a group</string>
+
 </resources>

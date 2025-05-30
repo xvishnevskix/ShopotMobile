@@ -17,6 +17,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +41,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.videotrade.shopot.MokoRes
 import org.videotrade.shopot.api.navigateToScreen
 import org.videotrade.shopot.domain.model.ContactDTO
+import org.videotrade.shopot.presentation.components.Common.ModalDialogWithText
+import org.videotrade.shopot.presentation.components.Common.ModalDialogWithoutText
 import org.videotrade.shopot.presentation.screens.contacts.CreateGroupFirstScreen
 import shopot.composeapp.generated.resources.ArsonPro_Regular
 import shopot.composeapp.generated.resources.Res
@@ -45,9 +50,10 @@ import shopot.composeapp.generated.resources.arrow_left
 import shopot.composeapp.generated.resources.group
 
 @Composable
- fun MakeGroup(contacts: List<ContactDTO>) {
+ fun MakeGroup(contacts: List<ContactDTO>, showModal: MutableState<Boolean>) {
     val navigator = LocalNavigator.currentOrThrow
     val colors = MaterialTheme.colorScheme
+
 
     Column(
         modifier = Modifier.padding(horizontal = 16.dp)
@@ -65,6 +71,10 @@ import shopot.composeapp.generated.resources.group
                 .clickable {
                     if (contacts.isNotEmpty())
                         navigateToScreen(navigator,CreateGroupFirstScreen())
+                    else {
+                        showModal.value = true
+
+                    }
                 },
 
             ) {
@@ -109,4 +119,6 @@ import shopot.composeapp.generated.resources.group
             }
         }
     }
+
+
 }
