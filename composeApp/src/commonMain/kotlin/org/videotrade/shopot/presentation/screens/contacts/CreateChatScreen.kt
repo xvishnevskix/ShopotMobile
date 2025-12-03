@@ -105,7 +105,8 @@ class CreateChatScreen : Screen {
                 .background(colors.surface)
         ) {
             SafeArea(padding = if (getPlatform() == Platform.Android) 0.dp else 16.dp)
-            
+
+
             {
                 Column(
                     Modifier.background(colors.background)
